@@ -66,7 +66,11 @@ function deleteKey(key){localStorage.removeItem(key)}
 const COURSES_ENTITY='todo.courses';
 function preferredTodoEntity(entities){
   const list=Array.isArray(entities)?entities:[];
-  return list.find(entry=>entry?.id===COURSES_ENTITY) || null;
+  const saved=String(localStorage.getItem(STORAGE.entity)||'').trim();
+  return list.find(entry=>entry?.id===saved)
+    || list.find(entry=>entry?.id===COURSES_ENTITY)
+    || list[0]
+    || null;
 }
 
 const ALL=[];
@@ -1019,13 +1023,16 @@ function connectWs(token){
   });
 }
 async function discoverEntities(){
-  state.entity=COURSES_ENTITY;
-  localStorage.setItem(STORAGE.entity,state.entity);
+  const saved=String(localStorage.getItem(STORAGE.entity)||'').trim();
+  state.entity=saved||COURSES_ENTITY;
   try{
     const states=await request({type:'get_states'});
     state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')).map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
     const preferred=preferredTodoEntity(state.entities);
-    if(preferred)state.entity=preferred.id;
+    if(preferred){
+      state.entity=preferred.id;
+      localStorage.setItem(STORAGE.entity,state.entity);
+    }
   }catch(error){
     state.entities=[];
     console.warn('courses-app: get_states',error);
@@ -1164,18 +1171,17 @@ async function removeGroup(name,row=null){
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   $('#settingsHaUrl').value=state.haUrl;
-  const preferred=preferredTodoEntity(state.entities);
-  const choices=preferred?[preferred]:state.entities;
+  const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
   $('#entitySelect').innerHTML=choices.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
   updateFaceIdSettings();
   $('#settingsDialog').showModal();
 }
 async function saveSettings(){
   const nextUrl=normalizeHaUrl($('#settingsHaUrl').value);
-  const preferred=preferredTodoEntity(state.entities);
-  const nextEntity=preferred?.id||$('#entitySelect').value;
+  const nextEntity=$('#entitySelect').value||state.entity;
   if(!nextUrl)return;
   const changedUrl=nextUrl!==state.haUrl;
+  const changedEntity=!!nextEntity&&nextEntity!==state.entity;
   if(nextEntity){state.entity=nextEntity;localStorage.setItem(STORAGE.entity,nextEntity)}
   $('#settingsDialog').close();
   if(changedUrl){
@@ -1184,6 +1190,7 @@ async function saveSettings(){
     $('#haUrlInput').value=nextUrl;
     $('#setupError').textContent='Adresse modifiée : reconnecte Home Assistant.';
   }else{
+    if(changedEntity)await subscribe();
     await refreshItems();armIdleLock();
   }
 }
