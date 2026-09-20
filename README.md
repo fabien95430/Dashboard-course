@@ -49,6 +49,10 @@ Le coffre Face ID local est stocké sous la clé `courses-faceid-v1`. Il ne cont
 
 Le Catalogue et **Ma liste** utilisent le même renderer de visuels premium que le popup Courses du dashboard Home Assistant. Les anciens emoji et leurs cadres ont été retirés.
 
+## Geste d’achat
+
+Dans **Ma liste**, un glissement horizontal vers la gauche révèle **✓ Acheté !**. L’article n’est validé qu’après un glissement suffisamment long ; un geste court revient en place. Après validation, le retour visuel reste affiché brièvement avant la disparition de l’article. Le bouton ✓ reste disponible.
+
 ## Utilisation de la liste
 
 - **Ma liste** est l'écran affiché par défaut et l'onglet de gauche.
