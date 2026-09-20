@@ -23,3 +23,11 @@
 .faceid-settings small{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.35}
 .faceid-settings .secondary,.faceid-settings .danger{margin-top:7px}
 .compact-danger{margin-top:7px!important}
+
+.password-panel[hidden]{display:none}
+.password-toggle{margin-top:9px}
+.reset-link{height:38px!important;font-size:10px!important;opacity:.72}
+.security-modal.is-quick-unlock .modal-icon{font-size:38px}
+.security-modal.is-quick-unlock h2{margin-bottom:4px}
+.security-modal.is-quick-unlock>p{margin-top:4px;margin-bottom:14px}
+.security-modal.is-quick-unlock .faceid-btn{margin-top:8px}
