@@ -63,9 +63,10 @@ function loadJson(key, fallback=null){try{return JSON.parse(localStorage.getItem
 function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function deleteKey(key){localStorage.removeItem(key)}
 
+const COURSES_ENTITY='todo.courses';
 function preferredTodoEntity(entities){
   const list=Array.isArray(entities)?entities:[];
-  return list.find(entry=>entry?.id==='todo.courses') || null;
+  return list.find(entry=>entry?.id===COURSES_ENTITY) || null;
 }
 
 const ALL=[];
@@ -830,11 +831,13 @@ async function connectAuthorized(token){
   hideSetup();hideSecurity();
   status('is-waiting','Connexion…','Home Assistant');
   await connectWs(token);
-  const entity=await discoverEntities();
-  if(!entity){
-    state.loading=false;renderList();status('is-waiting','Choisir une liste','Réglages');openSettings();armIdleLock();return;
-  }
-  await subscribe();await refreshItems();armIdleLock();
+  await discoverEntities();
+  state.loading=true;
+  renderList();
+  status('is-waiting','Connexion…','Liste Courses');
+  await subscribe();
+  await refreshItems();
+  armIdleLock();
 }
 async function connectFromRefresh(){
   try{
@@ -962,17 +965,18 @@ function connectWs(token){
   });
 }
 async function discoverEntities(){
-  const states=await request({type:'get_states'});
-  state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')).map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
-  const preferred=preferredTodoEntity(state.entities);
-  if(preferred){
-    state.entity=preferred.id;
-    localStorage.setItem(STORAGE.entity,state.entity);
-    return state.entity;
+  state.entity=COURSES_ENTITY;
+  localStorage.setItem(STORAGE.entity,state.entity);
+  try{
+    const states=await request({type:'get_states'});
+    state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')).map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
+    const preferred=preferredTodoEntity(state.entities);
+    if(preferred)state.entity=preferred.id;
+  }catch(error){
+    state.entities=[];
+    console.warn('courses-app: get_states',error);
   }
-  state.entity='';
-  deleteKey(STORAGE.entity);
-  return '';
+  return state.entity;
 }
 async function subscribe(){try{await request({type:'subscribe_trigger',trigger:{platform:'state',entity_id:state.entity}})}catch(_){}}
 async function refreshItems(){
@@ -993,7 +997,12 @@ async function refreshItems(){
     });
     state.loading=false;state.error='';renderProducts();renderList();
     status('', 'Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
-  }catch(error){state.loading=false;state.error=error.message||'Synchronisation indisponible';renderList();status('is-error','Hors synchro',state.error)}
+  }catch(error){
+    state.loading=false;
+    state.error=error.message||'Liste Courses indisponible';
+    renderList();
+    status('is-error','Courses indisponible',state.error);
+  }
 }
 async function toggleProduct(name){
   const item=String(name||'').trim();
