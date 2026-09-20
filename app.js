@@ -89,6 +89,7 @@ let state={
   demo:false,
   lockTimer:null,
   backgroundLockTimer:null,
+  productBusy:new Set(),
   faceAutoAttempted:false,
   facePromptActive:false,
   usage:loadJson(STORAGE.usage,{})||{}
@@ -188,7 +189,7 @@ function renderProducts(){
     const active=selected.has(norm(product.name));
     return '<button type="button" class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'">'+(active?'<span class="badge">✓</span>':'')+'<span class="media">'+sprite(product)+'</span><span class="pname">'+esc(product.name)+'</span></button>';
   }).join('');
-  el.querySelectorAll('.product').forEach(button=>button.onclick=()=>addItem(button.dataset.name||''));
+  el.querySelectorAll('.product').forEach(button=>button.onclick=()=>toggleProduct(button.dataset.name||''));
 }
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery),rows=groups.filter(g=>!needle||norm(g.summary).includes(needle)),el=$('#listItems');
@@ -736,6 +737,52 @@ async function refreshItems(){
     status('', 'Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
   }catch(error){state.loading=false;state.error=error.message||'Synchronisation indisponible';renderList();status('is-error','Hors synchro',state.error)}
 }
+async function toggleProduct(name){
+  const item=String(name||'').trim();
+  if(!item)return;
+  const key=norm(item);
+  if(state.productBusy.has(key))return;
+  state.productBusy.add(key);
+  try{
+    const group=activeGroups().find(g=>norm(g.summary)===key);
+    if(group){
+      if(state.demo){
+        const items=(loadJson(DEMO_KEY,[])||[]).filter(entry=>{
+          const status=String(entry?.status||'needs_action');
+          const summary=String(entry?.summary??entry?.name??entry?.item??'').trim();
+          return status==='completed'||norm(summary)!==key;
+        });
+        saveJson(DEMO_KEY,items);
+        state.items=items;
+        navigator.vibrate?.(8);
+        toast(item+' retiré');
+        renderProducts();renderList();
+        return;
+      }
+      if(!state.entity)return;
+      const uids=group.uids.filter(Boolean);
+      if(!uids.length){toast('Suppression impossible');return}
+      await Promise.all(uids.map(uid=>request({
+        type:'call_service',
+        domain:'todo',
+        service:'update_item',
+        service_data:{item:uid,status:'completed'},
+        target:{entity_id:state.entity}
+      })));
+      navigator.vibrate?.(8);
+      toast(item+' retiré');
+      await refreshItems();
+      return;
+    }
+    await addItem(item);
+  }catch(error){
+    toast('Modification impossible');
+    status('is-error','Erreur',error.message||'Modification impossible');
+  }finally{
+    state.productBusy.delete(key);
+  }
+}
+
 async function addItem(name){
   const item=String(name||'').trim();
   if(!item)return;
