@@ -1,0 +1,18 @@
+{
+  "name": "Mes courses",
+  "short_name": "Courses",
+  "description": "Liste de courses synchronisée avec Home Assistant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#171219",
+  "theme_color": "#2b1d27",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
