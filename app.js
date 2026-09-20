@@ -1262,28 +1262,61 @@ document.addEventListener('click',event=>{
 });
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
+function resumeForegroundSession(){
+  clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
+  if(state.demo){
+    state.view='list';
+    renderView();
+    refreshItems();
+    return;
+  }
+  if(!vaultRecord())return;
+  if(state.locked){
+    state.view='list';
+    renderView();
+    status('is-waiting','Verrouillé','Déverrouillage requis');
+    showSecurity('unlock');
+    return;
+  }
+  if(state.ws?.readyState===WebSocket.OPEN){
+    refreshItems();
+    armIdleLock();
+    return;
+  }
+  if(state.ws?.readyState===WebSocket.CONNECTING){
+    armIdleLock();
+    return;
+  }
+  if(state.refreshToken){
+    connectFromRefresh();
+    return;
+  }
+  state.locked=true;
+  state.view='list';
+  renderView();
+  status('is-waiting','Verrouillé','Déverrouillage requis');
+  showSecurity('unlock');
+}
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'){
     clearTimeout(state.backgroundLockTimer);
     if(!state.locked&&!state.demo&&vaultRecord())state.backgroundLockTimer=setTimeout(()=>lockApp('Verrouillage après passage en arrière-plan.'),SECURITY.backgroundLockMs);
     return;
   }
-  clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
-  if(state.demo)refreshItems();
-  else if(!state.locked&&state.ws?.readyState===WebSocket.OPEN){refreshItems();armIdleLock()}
+  resumeForegroundSession();
 });
-window.addEventListener('online',()=>{if(!state.locked&&!state.demo&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN)connectFromRefresh()});
+window.addEventListener('online',()=>{
+  if(state.demo)return;
+  if(!state.locked&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN&&state.ws?.readyState!==WebSocket.CONNECTING)connectFromRefresh();
+});
 window.addEventListener('pagehide',()=>{
   clearLockTimers();closeSocket();wipeMemoryCredentials();
+  state.faceAutoAttempted=false;
+  state.view='list';
   if(vaultRecord()&&!state.demo)state.locked=true;
 });
-window.addEventListener('pageshow',event=>{
-  if(event.persisted&&vaultRecord()&&!state.demo){
-    state.locked=true;state.items=[];
-    renderProducts();renderList();
-    status('is-waiting','Verrouillé','Mot de passe local requis');
-    showSecurity('unlock','Session restaurée : déverrouille l’application.');
-  }
+window.addEventListener('pageshow',()=>{
+  resumeForegroundSession();
 });
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
