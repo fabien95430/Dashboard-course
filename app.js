@@ -1006,7 +1006,7 @@ async function refreshItems(){
   if(state.demo){
     state.items=loadJson(DEMO_KEY,[])||[];
     state.loading=false;state.error='';
-    renderProducts();renderList();
+    syncProductSelection();renderList();
     status('', 'Mode test', 'Stockage local sur ce téléphone');
     return;
   }
