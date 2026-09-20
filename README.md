@@ -65,7 +65,7 @@ Le bouton **Tester sans Home Assistant** permet de vérifier immédiatement la r
 
 ## Liste Home Assistant partagée
 
-Quand une entité **Courses** est disponible (`todo.courses` ou une liste nommée Courses), l’application la sélectionne systématiquement avant les anciennes listes Bring ou Shopping List. Cela garantit que l’app mobile et le popup du dashboard travaillent sur la même liste Home Assistant.
+Quand une entité **Courses** est disponible (`todo.courses` ou une liste nommée Courses), l’application la sélectionne comme liste Home Assistant partagée avec le popup du dashboard.
 
 ## Connexion Home Assistant
 
