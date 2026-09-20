@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2b1d27">
+  <meta name="description" content="Liste de courses synchronisée avec Home Assistant">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <title>Mes courses</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main id="app" class="app is-locked">
+    <header class="topbar">
+      <div class="brandmark" aria-hidden="true">
+        <svg viewBox="0 0 48 48"><path d="M12 19h24l-2 20H14z" fill="#ee9db6"/><path d="M15 22h18l-1.2 13H16.2z" fill="#f4adc1"/><path d="M18 25v8M24 25v8M30 25v8" stroke="rgba(255,255,255,.52)" stroke-width="2" stroke-linecap="round"/><path d="M17 19c0-5.2 3.1-8.7 7-8.7s7 3.5 7 8.7" fill="none" stroke="#f6c7d4" stroke-width="2.8" stroke-linecap="round"/><path d="M12.5 14.8c2.5-4.9 6-6.7 9.2-5.7-1.3 3.9-4.4 6.2-9.2 5.7z" fill="#71ca88"/><path d="M18.2 15c-.1-4.3 2.2-7.2 5.6-8.4.6 4.1-1.3 7.2-5.6 8.4z" fill="#5bbf79"/><rect x="27" y="8.5" width="7" height="11.5" rx="2.3" fill="#f7f5f2"/><rect x="28.4" y="6" width="4.2" height="4" rx="1.2" fill="#d7e4ea"/><circle cx="34.7" cy="16.2" r="3" fill="#ff9c70"/></svg>
+      </div>
+      <div class="brandcopy">
+        <h1>Mes courses</h1>
+        <p>GitHub Pages • Home Assistant</p>
+      </div>
+      <button id="settingsBtn" class="round-btn" type="button" aria-label="Réglages">⚙</button>
+    </header>
+
+    <div id="status" class="status is-waiting"><span></span><div><strong>Connexion…</strong><small>Home Assistant</small></div></div>
+
+    <section id="catalogView" class="view catalog-view is-active">
+      <div id="categories" class="categories" aria-label="Catégories"></div>
+      <label class="searchbox">
+        <span>⌕</span>
+        <input id="productSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher un produit…">
+        <small id="productCount"></small>
+      </label>
+      <div id="products" class="products"></div>
+    </section>
+
+    <section id="listView" class="view list-view">
+      <div class="list-head"><div><strong>Ma liste</strong><small id="listCount">0 article</small></div><span>☷</span></div>
+      <label class="searchbox">
+        <span>⌕</span>
+        <input id="listSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher dans ma liste…">
+        <small></small>
+      </label>
+      <div id="listItems" class="list-items"></div>
+      <div class="manual"><input id="manualInput" type="text" enterkeyhint="done" autocomplete="off" placeholder="Ajouter un article"><button id="manualAdd" type="button" aria-label="Ajouter">＋</button></div>
+    </section>
+
+    <nav class="tabs" aria-label="Navigation">
+      <button class="tab is-active" data-view="catalog" type="button">Catalogue</button>
+      <button class="tab" data-view="list" type="button">Ma liste</button>
+    </nav>
+  </main>
+
+  <section id="setup" class="overlay is-visible" aria-modal="true">
+    <div class="modal">
+      <div class="modal-icon">🛒</div>
+      <h2>Connecter mes courses</h2>
+      <p>L’application fonctionne sur GitHub Pages et se connecte directement à Home Assistant via ton accès distant sécurisé.</p>
+      <label class="field">
+        <span>Adresse Home Assistant / Nabu Casa</span>
+        <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
+      </label>
+      <p class="hint">Aucun secret Home Assistant n’est stocké dans GitHub. Tu peux aussi tester l’interface sans connexion.</p>
+      <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
+      <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
+      <div id="setupError" class="setup-error" role="alert"></div>
+    </div>
+  </section>
+
+  <dialog id="settingsDialog" class="dialog">
+    <h3>Réglages</h3>
+    <label class="field"><span>Liste Home Assistant</span><select id="entitySelect"></select></label>
+    <label class="field"><span>Adresse Home Assistant</span><input id="settingsHaUrl" type="url" autocomplete="url"></label>
+    <div class="dialog-actions"><button id="cancelSettings" type="button">Annuler</button><button id="saveSettings" class="primary" type="button">Enregistrer</button></div>
+    <button id="logoutBtn" class="danger" type="button">Déconnecter cette appli</button>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="./catalog.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
