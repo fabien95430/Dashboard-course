@@ -28,6 +28,7 @@ const STORAGE = {
   vault:'courses-secure-vault-v1',
   biometric:'courses-faceid-v1',
   entity:'courses-external-entity-v1',
+  entityPreference:'courses-external-entity-preference-v1',
   usage:'courses-external-usage-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
@@ -64,11 +65,15 @@ function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function deleteKey(key){localStorage.removeItem(key)}
 
 const COURSES_ENTITY='todo.courses';
+const URL_ENTITY='todo.url';
 function preferredTodoEntity(entities){
   const list=Array.isArray(entities)?entities:[];
-  const saved=String(localStorage.getItem(STORAGE.entity)||'').trim();
+  const explicit=String(localStorage.getItem(STORAGE.entityPreference)||'').trim();
+  const legacy=String(localStorage.getItem(STORAGE.entity)||'').trim();
+  const saved=explicit||(legacy&&legacy!==COURSES_ENTITY?legacy:'');
   return list.find(entry=>entry?.id===saved)
     || list.find(entry=>entry?.id===COURSES_ENTITY)
+    || list.find(entry=>entry?.id===URL_ENTITY)
     || list[0]
     || null;
 }
@@ -855,7 +860,7 @@ function lockApp(message='Application verrouillée.'){
 }
 async function resetLocalConnection(){
   clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();
   state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;state.demo=false;
   hideSecurity();showSetup('Connexion locale supprimée. Tu peux reconnecter Home Assistant.');
@@ -985,7 +990,7 @@ async function revoke(){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
   clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();
   state.entity='';state.entities=[];state.items=[];state.haUrl='';state.locked=true;
   $('#settingsDialog').close();
@@ -1182,7 +1187,11 @@ async function saveSettings(){
   if(!nextUrl)return;
   const changedUrl=nextUrl!==state.haUrl;
   const changedEntity=!!nextEntity&&nextEntity!==state.entity;
-  if(nextEntity){state.entity=nextEntity;localStorage.setItem(STORAGE.entity,nextEntity)}
+  if(nextEntity){
+    state.entity=nextEntity;
+    localStorage.setItem(STORAGE.entity,nextEntity);
+    localStorage.setItem(STORAGE.entityPreference,nextEntity);
+  }
   $('#settingsDialog').close();
   if(changedUrl){
     await revoke();
