@@ -26,6 +26,22 @@ La connexion Home Assistant enregistrée sur un appareil est protégée par un m
 
 Le coffre chiffré est stocké localement par le navigateur sous la clé `courses-secure-vault-v1`.
 
+### Face ID / biométrie
+
+Sur les appareils compatibles, l'application peut aussi être déverrouillée avec WebAuthn et la vérification biométrique de l'appareil :
+
+- le bouton **Activer Face ID** crée une passkey locale/plateforme ;
+- l'extension WebAuthn `prf` produit un secret cryptographique lié à cette passkey ;
+- ce secret chiffre une seconde copie du coffre OAuth avec AES-GCM ;
+- le secret PRF lui-même n'est jamais enregistré dans `localStorage` ;
+- à l'ouverture, **Déverrouiller avec Face ID** demande une vérification utilisateur à iOS ;
+- le mot de passe local reste disponible comme solution de secours ;
+- Face ID doit être activé séparément sur chaque appareil/navigateur.
+
+Sur iPhone, iOS peut utiliser Face ID et, selon ses règles de sécurité, proposer le code de l'appareil comme mécanisme de secours. Sur un autre appareil, le mécanisme équivalent peut être Touch ID, Windows Hello ou une autre vérification de plateforme.
+
+Le coffre Face ID local est stocké sous la clé `courses-faceid-v1`. Il ne contient ni le secret PRF ni le mot de passe local.
+
 > Cette protection réduit fortement le risque en cas d'accès aux fichiers de stockage du navigateur. Un appareil déjà déverrouillé et une application déjà déverrouillée restent naturellement accessibles pendant la session active.
 
 ## Test sans Home Assistant
@@ -40,7 +56,7 @@ Au premier appairage :
 3. créer le mot de passe local de l'application ;
 4. sélectionner la liste `todo.*` si plusieurs listes existent.
 
-Aux ouvertures suivantes, seul le mot de passe local est demandé. Le mot de passe Home Assistant n'est pas stocké par l'application.
+Aux ouvertures suivantes, l'utilisateur peut déverrouiller avec Face ID s'il l'a activé, ou utiliser le mot de passe local en secours. Le mot de passe Home Assistant n'est pas stocké par l'application.
 
 ## GitHub Pages
 

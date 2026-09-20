@@ -76,6 +76,8 @@
       <div class="modal-icon">🔐</div>
       <h2 id="securityTitle">Déverrouiller Courses</h2>
       <p id="securityText">Entre le mot de passe local de cette application.</p>
+      <button id="faceIdUnlockBtn" class="faceid-btn" type="button" hidden><span aria-hidden="true">◉</span> Déverrouiller avec Face ID</button>
+      <div id="passwordDivider" class="security-divider" hidden><span>ou avec le mot de passe</span></div>
       <label class="field">
         <span>Mot de passe local</span>
         <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
@@ -95,6 +97,11 @@
     <h3>Réglages</h3>
     <label class="field"><span>Liste Home Assistant</span><select id="entitySelect"></select></label>
     <label class="field"><span>Adresse Home Assistant</span><input id="settingsHaUrl" type="url" autocomplete="url"></label>
+    <section class="faceid-settings" aria-labelledby="faceIdSettingsTitle">
+      <div><strong id="faceIdSettingsTitle">Face ID</strong><small id="faceIdSettingsStatus">Vérification de la compatibilité…</small></div>
+      <button id="faceIdSetupBtn" class="secondary" type="button">Activer Face ID</button>
+      <button id="faceIdRemoveBtn" class="danger compact-danger" type="button" hidden>Désactiver Face ID</button>
+    </section>
     <div class="dialog-actions"><button id="cancelSettings" type="button">Annuler</button><button id="saveSettings" class="primary" type="button">Enregistrer</button></div>
     <button id="lockNowBtn" class="secondary" type="button">🔒 Verrouiller maintenant</button>
     <button id="logoutBtn" class="danger" type="button">Déconnecter cette appli</button>
