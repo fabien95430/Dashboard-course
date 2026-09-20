@@ -320,9 +320,30 @@ function renderProducts(){
   if(!products.length){el.innerHTML='<div class="empty is-wide">Aucun produit ne correspond à cette recherche.</div>';return}
   el.innerHTML=products.map(product=>{
     const active=selected.has(norm(product.name));
-    return '<button type="button" class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'">'+(active?'<span class="badge">✓</span>':'')+'<span class="media">'+sprite(product)+'</span><span class="pname">'+esc(product.name)+'</span></button>';
+    return '<button type="button" class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" aria-pressed="'+(active?'true':'false')+'">'+(active?'<span class="badge">✓</span>':'')+'<span class="media">'+sprite(product)+'</span><span class="pname">'+esc(product.name)+'</span></button>';
   }).join('');
   el.querySelectorAll('.product').forEach(button=>button.onclick=()=>toggleProduct(button.dataset.name||''));
+}
+function setProductSelected(name,active){
+  const key=norm(name);
+  const button=[...document.querySelectorAll('#products .product')].find(entry=>norm(entry.dataset.name)===key);
+  if(!button)return;
+  button.classList.toggle('is-selected',active);
+  button.setAttribute('aria-pressed',active?'true':'false');
+  const badge=button.querySelector('.badge');
+  if(active&&!badge)button.insertAdjacentHTML('afterbegin','<span class="badge">✓</span>');
+  else if(!active&&badge)badge.remove();
+}
+function syncProductSelection(){
+  const selected=selectedSet();
+  document.querySelectorAll('#products .product').forEach(button=>{
+    const active=selected.has(norm(button.dataset.name));
+    button.classList.toggle('is-selected',active);
+    button.setAttribute('aria-pressed',active?'true':'false');
+    const badge=button.querySelector('.badge');
+    if(active&&!badge)button.insertAdjacentHTML('afterbegin','<span class="badge">✓</span>');
+    else if(!active&&badge)badge.remove();
+  });
 }
 function closeListFilter(){
   const menu=$('#listFilterMenu'),button=$('#listFilterBtn');
@@ -997,7 +1018,7 @@ async function refreshItems(){
       const summary=String(item?.summary??item?.name??item?.item??'').trim();
       return !state.pendingRemoval.has(norm(summary));
     });
-    state.loading=false;state.error='';renderProducts();renderList();
+    state.loading=false;state.error='';syncProductSelection();renderList();
     status('', 'Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
   }catch(error){
     state.loading=false;
@@ -1013,15 +1034,17 @@ async function toggleProduct(name){
   if(state.productBusy.has(key))return;
   const group=activeGroups().find(g=>norm(g.summary)===key);
   if(group){
+    setProductSelected(item,false);
     await removeGroup(item);
     return;
   }
   state.productBusy.add(key);
+  setProductSelected(item,true);
   try{
     await addItem(item);
   }finally{
     state.productBusy.delete(key);
-    renderProducts();renderList();
+    syncProductSelection();renderList();
   }
 }
 
@@ -1032,7 +1055,7 @@ async function addItem(name){
     const items=loadJson(DEMO_KEY,[])||[];
     items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
     saveJson(DEMO_KEY,items);state.items=items;recordUsage(item);
-    navigator.vibrate?.(10);toast(item+' ajouté');renderProducts();renderList();return;
+    navigator.vibrate?.(10);toast(item+' ajouté');syncProductSelection();renderList();return;
   }
   if(!state.entity)return;
   try{
@@ -1067,7 +1090,7 @@ async function removeGroup(name,row=null){
     return norm(summary)!==key;
   };
   state.items=state.items.filter(keepOtherItems);
-  renderProducts();renderList();
+  syncProductSelection();renderList();
 
   try{
     if(state.demo){
@@ -1095,7 +1118,7 @@ async function removeGroup(name,row=null){
     state.pendingRemoval.delete(key);
     state.productBusy.delete(key);
     if(!state.demo)await refreshItems();
-    else {renderProducts();renderList()}
+    else {syncProductSelection();renderList()}
   }
 }
 function openSettings(){
