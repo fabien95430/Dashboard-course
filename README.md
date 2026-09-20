@@ -59,6 +59,10 @@ Le coffre Face ID local est stocké sous la clé `courses-faceid-v1`. Il ne cont
 
 Le bouton **Tester sans Home Assistant** permet de vérifier immédiatement la recherche, les catégories et la liste. Les données de ce mode restent uniquement dans le stockage local du navigateur.
 
+## Liste Home Assistant partagée
+
+Quand une entité **Courses** est disponible (`todo.courses` ou une liste nommée Courses), l’application la sélectionne systématiquement avant les anciennes listes Bring ou Shopping List. Cela garantit que l’app mobile et le popup du dashboard travaillent sur la même liste Home Assistant.
+
 ## Connexion Home Assistant
 
 Au premier appairage :

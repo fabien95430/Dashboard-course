@@ -59,6 +59,17 @@ function loadJson(key, fallback=null){try{return JSON.parse(localStorage.getItem
 function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function deleteKey(key){localStorage.removeItem(key)}
 
+function preferredTodoEntity(entities){
+  const list=Array.isArray(entities)?entities:[];
+  const describe=entry=>String((entry?.id||'')+' '+(entry?.name||''));
+  return list.find(entry=>entry?.id==='todo.courses')
+    || list.find(entry=>/^courses$/i.test(String(entry?.name||'').trim()))
+    || list.find(entry=>/courses/i.test(describe(entry)))
+    || list.find(entry=>/shopping[_ ]?list|liste[_ ]?de[_ ]?courses/i.test(describe(entry)))
+    || list.find(entry=>/bring/i.test(describe(entry)))
+    || (list.length===1?list[0]:null);
+}
+
 const ALL=[];
 Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names])=>names.forEach(name=>ALL.push({name,category,sub}))));
 const BY_NAME=new Map(ALL.map(p=>[norm(p.name),p]));
@@ -755,10 +766,14 @@ function connectWs(token){
 async function discoverEntities(){
   const states=await request({type:'get_states'});
   state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')).map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
-  if(state.entity&&state.entities.some(e=>e.id===state.entity))return state.entity;
-  const preferred=state.entities.find(e=>/bring|shopping[_ ]?list|courses/i.test(e.id+' '+e.name));
-  if(preferred){state.entity=preferred.id;localStorage.setItem(STORAGE.entity,state.entity);return state.entity}
-  if(state.entities.length===1){state.entity=state.entities[0].id;localStorage.setItem(STORAGE.entity,state.entity);return state.entity}
+  const preferred=preferredTodoEntity(state.entities);
+  if(preferred){
+    state.entity=preferred.id;
+    localStorage.setItem(STORAGE.entity,state.entity);
+    return state.entity;
+  }
+  state.entity='';
+  deleteKey(STORAGE.entity);
   return '';
 }
 async function subscribe(){try{await request({type:'subscribe_trigger',trigger:{platform:'state',entity_id:state.entity}})}catch(_){}}
@@ -869,12 +884,16 @@ async function removeGroup(name,row=null){
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   $('#settingsHaUrl').value=state.haUrl;
-  $('#entitySelect').innerHTML=state.entities.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
+  const preferred=preferredTodoEntity(state.entities);
+  const choices=preferred?[preferred]:state.entities;
+  $('#entitySelect').innerHTML=choices.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
   updateFaceIdSettings();
   $('#settingsDialog').showModal();
 }
 async function saveSettings(){
-  const nextUrl=normalizeHaUrl($('#settingsHaUrl').value),nextEntity=$('#entitySelect').value;
+  const nextUrl=normalizeHaUrl($('#settingsHaUrl').value);
+  const preferred=preferredTodoEntity(state.entities);
+  const nextEntity=preferred?.id||$('#entitySelect').value;
   if(!nextUrl)return;
   const changedUrl=nextUrl!==state.haUrl;
   if(nextEntity){state.entity=nextEntity;localStorage.setItem(STORAGE.entity,nextEntity)}
