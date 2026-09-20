@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#2b1d27">
   <meta name="description" content="Liste de courses synchronisée avec Home Assistant">
+  <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
@@ -62,10 +63,31 @@
         <span>Adresse Home Assistant / Nabu Casa</span>
         <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
       </label>
-      <p class="hint">Aucun secret Home Assistant n’est stocké dans GitHub. Tu peux aussi tester l’interface sans connexion.</p>
+      <p class="hint">Aucun secret Home Assistant n’est stocké dans GitHub. Après l’autorisation HA, tu créeras un mot de passe local qui chiffre la connexion sur cet appareil.</p>
       <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
       <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
       <div id="setupError" class="setup-error" role="alert"></div>
+    </div>
+  </section>
+
+
+  <section id="securityOverlay" class="overlay security-overlay" aria-modal="true" aria-labelledby="securityTitle">
+    <div class="modal security-modal">
+      <div class="modal-icon">🔐</div>
+      <h2 id="securityTitle">Déverrouiller Courses</h2>
+      <p id="securityText">Entre le mot de passe local de cette application.</p>
+      <label class="field">
+        <span>Mot de passe local</span>
+        <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
+      </label>
+      <label id="securityConfirmWrap" class="field" hidden>
+        <span>Confirmer le mot de passe</span>
+        <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+      </label>
+      <p id="securityHint" class="hint">Le mot de passe n’est jamais enregistré. Il sert uniquement à déchiffrer ton autorisation Home Assistant sur cet appareil.</p>
+      <button id="securitySubmit" class="primary" type="button">Déverrouiller</button>
+      <button id="resetSecurityBtn" class="secondary" type="button">Réinitialiser la connexion de cet appareil</button>
+      <div id="securityError" class="setup-error" role="alert"></div>
     </div>
   </section>
 
@@ -74,6 +96,7 @@
     <label class="field"><span>Liste Home Assistant</span><select id="entitySelect"></select></label>
     <label class="field"><span>Adresse Home Assistant</span><input id="settingsHaUrl" type="url" autocomplete="url"></label>
     <div class="dialog-actions"><button id="cancelSettings" type="button">Annuler</button><button id="saveSettings" class="primary" type="button">Enregistrer</button></div>
+    <button id="lockNowBtn" class="secondary" type="button">🔒 Verrouiller maintenant</button>
     <button id="logoutBtn" class="danger" type="button">Déconnecter cette appli</button>
   </dialog>
 
