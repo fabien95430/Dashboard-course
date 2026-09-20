@@ -61,13 +61,7 @@ function deleteKey(key){localStorage.removeItem(key)}
 
 function preferredTodoEntity(entities){
   const list=Array.isArray(entities)?entities:[];
-  const describe=entry=>String((entry?.id||'')+' '+(entry?.name||''));
-  return list.find(entry=>entry?.id==='todo.courses')
-    || list.find(entry=>/^courses$/i.test(String(entry?.name||'').trim()))
-    || list.find(entry=>/courses/i.test(describe(entry)))
-    || list.find(entry=>/shopping[_ ]?list|liste[_ ]?de[_ ]?courses/i.test(describe(entry)))
-    || list.find(entry=>/bring/i.test(describe(entry)))
-    || (list.length===1?list[0]:null);
+  return list.find(entry=>entry?.id==='todo.courses') || null;
 }
 
 const ALL=[];
