@@ -56,12 +56,12 @@ Dans **Ma liste**, un glissement horizontal vers la gauche révèle **✓ Achet�
 ## Utilisation de la liste
 
 - **Ma liste** est l'écran affiché par défaut et l'onglet de gauche.
-- toucher un article dans **Ma liste** le marque comme acheté et le retire immédiatement de l’affichage ;
-- le bouton **✓** à droite fait la même action et synchronise ensuite Home Assistant ;
-- la quantité (`x2`, `x3`…) reste visible comme information, sans servir à ajouter depuis cet écran ;
-- le filtre **Toutes / Frais / Fruits & Légumes / Épicerie / Boissons / Maison** limite les articles affichés ;
-- l'ajout manuel depuis **Ma liste** a été retiré : les articles sont choisis depuis le catalogue ;
-- les catégories du catalogue utilisent des libellés texte sans icône.
+- seul le cercle à gauche valide un article afin d'éviter les suppressions involontaires ;
+- après validation, la coche devient verte, le nom est légèrement barré et la ligne s'atténue ;
+- l'article reste visible un court instant avec **Annuler**, puis disparaît doucement et Home Assistant est synchronisé ;
+- la quantité (`x2`, `x3`…) reste visible uniquement lorsqu'un article est présent plusieurs fois ;
+- la recherche filtre la liste affichée ; le filtre de catégories a été retiré de **Ma liste** ;
+- l'ajout se fait depuis le **Catalogue**.
 
 ## Test sans Home Assistant
 
@@ -73,7 +73,7 @@ Le bouton **Tester sans Home Assistant** permet de vérifier immédiatement la r
 
 ## Démarrage
 
-L’application n’ouvre jamais **Réglages** automatiquement. Après déverrouillage, elle reste sur **Ma liste** et charge automatiquement `todo.url` lorsqu’elle est disponible. Les réglages ne s’ouvrent que lorsque l’utilisateur appuie sur le bouton prévu.
+L’application n’ouvre jamais **Réglages** automatiquement. Après déverrouillage, elle reste sur **Ma liste** et charge automatiquement `todo.url` lorsqu’elle est disponible. La navigation principale contient désormais **Ma liste**, **Catalogue** et **Réglages**.
 
 ## Connexion Home Assistant
 
@@ -102,3 +102,10 @@ URL : `https://fabien95430.github.io/Dashboard-course/`
 - Content Security Policy et politique de referrer `no-referrer` ;
 - aucun script tiers ;
 - aucun service serveur permanent côté GitHub Pages.
+
+
+## Interface validée
+
+L’interface mobile repose sur quatre écrans cohérents : déverrouillage sécurisé, **Ma liste**, **Catalogue** et **Réglages**. Le rendu est mobile-first, utilise toute la largeur disponible, conserve les visuels produits premium et n’ajoute aucun framework ni dépendance externe.
+
+L’onglet **Réglages** expose uniquement les fonctions réellement disponibles : connexion Home Assistant, liste active, sécurité locale, Face ID, état de synchronisation, verrouillage manuel et déconnexion.
