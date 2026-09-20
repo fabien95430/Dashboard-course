@@ -26,6 +26,7 @@ const STORAGE = {
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
 const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
+const OAUTH_TEMP_KEY = 'courses-oauth-temp-v2';
 const LEGACY_OAUTH_STATE_KEY = 'courses-external-oauth-state';
 const SECURITY = Object.freeze({
   version:1,
@@ -266,15 +267,18 @@ async function storeSecureVault(refreshToken,haUrl,password){
   deleteKey(STORAGE.haUrl);
 }
 function loadOAuthState(){
-  try{
-    const current=JSON.parse(sessionStorage.getItem(OAUTH_STATE_KEY)||'null');
-    if(current)return current;
-  }catch(_){}
-  // Compatibility only if an OAuth redirect was already in progress on the old version.
-  return loadJson(LEGACY_OAUTH_STATE_KEY,null);
+  let current=null;
+  try{current=JSON.parse(sessionStorage.getItem(OAUTH_STATE_KEY)||'null')}catch(_){}
+  if(!current)current=loadJson(OAUTH_TEMP_KEY,null);
+  if(!current)current=loadJson(LEGACY_OAUTH_STATE_KEY,null);
+  if(current?.createdAt&&Date.now()-Number(current.createdAt)>20*60*1000){
+    clearOAuthState();return null;
+  }
+  return current;
 }
 function clearOAuthState(){
   try{sessionStorage.removeItem(OAUTH_STATE_KEY)}catch(_){}
+  deleteKey(OAUTH_TEMP_KEY);
   deleteKey(LEGACY_OAUTH_STATE_KEY);
 }
 function wipeMemoryCredentials(){
@@ -326,6 +330,7 @@ function hideSecurity(){
 }
 function lockApp(message='Application verrouillée.'){
   if(state.demo||!vaultRecord())return;
+  if($('#settingsDialog').open)$('#settingsDialog').close();
   clearLockTimers();
   closeSocket();
   wipeMemoryCredentials();
@@ -448,7 +453,12 @@ function beginOAuth(){
   // Do not persist the HA URL in plaintext. It survives the OAuth round-trip only in this tab.
   deleteKey(STORAGE.haUrl);
   const nonce=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));
-  try{sessionStorage.setItem(OAUTH_STATE_KEY,JSON.stringify({nonce,haUrl:value,createdAt:Date.now()}))}catch(_){
+  const oauthState={nonce,haUrl:value,createdAt:Date.now()};
+  try{
+    sessionStorage.setItem(OAUTH_STATE_KEY,JSON.stringify(oauthState));
+    // Temporary fallback for iOS/PWA OAuth navigation. Contains no credential and is deleted after the callback.
+    saveJson(OAUTH_TEMP_KEY,oauthState);
+  }catch(_){
     $('#setupError').textContent='Le stockage temporaire du navigateur est indisponible.';return;
   }
   const authorize=value+'/auth/authorize?client_id='+encodeURIComponent(CLIENT_ID)+'&redirect_uri='+encodeURIComponent(REDIRECT_URI)+'&state='+encodeURIComponent(nonce);
@@ -645,7 +655,18 @@ document.addEventListener('visibilitychange',()=>{
   else if(!state.locked&&state.ws?.readyState===WebSocket.OPEN){refreshItems();armIdleLock()}
 });
 window.addEventListener('online',()=>{if(!state.locked&&!state.demo&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN)connectFromRefresh()});
-window.addEventListener('pagehide',()=>{clearLockTimers();closeSocket();wipeMemoryCredentials()});
+window.addEventListener('pagehide',()=>{
+  clearLockTimers();closeSocket();wipeMemoryCredentials();
+  if(vaultRecord()&&!state.demo)state.locked=true;
+});
+window.addEventListener('pageshow',event=>{
+  if(event.persisted&&vaultRecord()&&!state.demo){
+    state.locked=true;state.items=[];
+    renderProducts();renderList();
+    status('is-waiting','Verrouillé','Mot de passe local requis');
+    showSecurity('unlock','Session restaurée : déverrouille l’application.');
+  }
+});
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderView();init();
