@@ -491,7 +491,7 @@ function armIdleLock(){
   if(state.demo||state.locked||!vaultRecord())return;
   state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),SECURITY.idleLockMs);
 }
-function showSecurity(mode,message=''){
+function showSecurity(mode,message='',options={}){
   const overlay=$('#securityOverlay');
   const wasVisible=overlay.classList.contains('is-visible');
   state.securityMode=mode;
@@ -520,8 +520,8 @@ function showSecurity(mode,message=''){
   $('#resetSecurityBtn').hidden=creating;
   $('#securityError').textContent='';
   refreshVisualLock();
-  if(faceReady&&!creating)scheduleAutomaticFaceId();
-  else setTimeout(()=>$('#securityPassword').focus(),80);
+  if(faceReady&&!creating&&options.autoFaceId!==false)scheduleAutomaticFaceId();
+  else if(!faceReady||creating)setTimeout(()=>$('#securityPassword').focus(),80);
 }
 function hideSecurity(){
   $('#securityOverlay').classList.remove('is-visible');
@@ -592,7 +592,7 @@ async function connectFromRefresh(){
   }catch(error){
     wipeMemoryCredentials();state.locked=true;
     status('is-error','Connexion refusée',error.message||'Session invalide');
-    showSecurity('unlock','La connexion Home Assistant n’a pas pu être renouvelée. Déverrouille à nouveau ou réinitialise la connexion.');
+    showSecurity('unlock','La connexion Home Assistant n’a pas pu être renouvelée. Utilise le mot de passe ou réinitialise la connexion.',{autoFaceId:false});
   }
 }
 async function completeSecurityAction(){
