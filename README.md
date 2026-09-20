@@ -45,6 +45,10 @@ Le coffre Face ID local est stocké sous la clé `courses-faceid-v1`. Il ne cont
 
 > Cette protection réduit fortement le risque en cas d'accès aux fichiers de stockage du navigateur. Un appareil déjà déverrouillé et une application déjà déverrouillée restent naturellement accessibles pendant la session active.
 
+## Visuels produits
+
+Le Catalogue et **Ma liste** utilisent le même renderer de visuels premium que le popup Courses du dashboard Home Assistant. Les anciens emoji et leurs cadres ont été retirés.
+
 ## Utilisation de la liste
 
 - **Ma liste** est l'écran affiché par défaut et l'onglet de gauche.
