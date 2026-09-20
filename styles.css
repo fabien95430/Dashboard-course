@@ -350,10 +350,10 @@ body{
 }
 .premium-sprite>img{
   position:absolute;
-  top:calc(var(--sprite-row) * -100%);
-  left:calc(var(--sprite-col) * -100%);
-  width:calc(var(--sprite-cols) * 100%);
-  height:calc(var(--sprite-rows) * 100%);
+  top:var(--sprite-top);
+  left:var(--sprite-left);
+  width:var(--sprite-width);
+  height:var(--sprite-height);
   max-width:none;
   max-height:none;
   object-fit:fill;
