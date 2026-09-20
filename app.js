@@ -16,6 +16,10 @@ const CATEGORY_META = {
   'Maison': { label:'Maison' }
 };
 const LIST_CATEGORIES=['Toutes',...Object.keys(GROUPS)];
+const PURCHASE_HOLD_MS=520;
+const PURCHASE_EXIT_MS=260;
+const SWIPE_TRIGGER_RATIO=.36;
+const SWIPE_MAX_RATIO=.42;
 
 const STORAGE = {
   // Legacy keys are kept only for one-time migration from the previous version.
@@ -339,17 +343,99 @@ function renderList(){
   }
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=BY_NAME.get(key),busy=state.productBusy.has(key);
-    return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'">'+
-      '<button class="list-main" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>'+
-        '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
-        '<span class="list-name">'+esc(group.summary)+'</span>'+
-        '<span class="qty">x'+group.count+'</span>'+
-      '</button>'+
-      '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
+    return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
+      '<div class="swipe-action" aria-hidden="true"><span>✓</span><strong>Acheté !</strong></div>'+
+      '<div class="swipe-content">'+
+        '<button class="list-main" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>'+
+          '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
+          '<span class="list-name">'+esc(group.summary)+'</span>'+
+          '<span class="qty">x'+group.count+'</span>'+
+        '</button>'+
+        '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
+      '</div>'+
     '</div>';
   }).join('');
-  const markPurchased=button=>removeGroup(button.dataset.name||'',button.closest('.list-row'));
+  const markPurchased=button=>{
+    const row=button.closest('.list-row');
+    if(row?.dataset.suppressClick==='1')return;
+    removeGroup(button.dataset.name||'',row);
+  };
   el.querySelectorAll('.list-main,.done').forEach(button=>button.onclick=event=>{event.stopPropagation();markPurchased(button)});
+  bindSwipeRows(el);
+}
+function bindSwipeRows(root){
+  root.querySelectorAll('.list-row').forEach(row=>{
+    const content=row.querySelector('.swipe-content');
+    const action=row.querySelector('.swipe-action');
+    if(!content||!action||row.classList.contains('is-busy'))return;
+    let startX=0,startY=0,offsetX=0,tracking=false,horizontal=false,pointerId=null;
+
+    const clearVisual=()=>{
+      content.style.transition='transform .26s cubic-bezier(.22,.75,.2,1)';
+      content.style.transform='translate3d(0,0,0)';
+      action.style.opacity='0';
+      action.style.transform='translateX(18px)';
+      window.setTimeout(()=>{if(!row.classList.contains('is-purchased'))content.style.transition=''},280);
+    };
+    const stopTracking=()=>{
+      tracking=false;
+      horizontal=false;
+      pointerId=null;
+      offsetX=0;
+    };
+    const finishSwipe=()=>{
+      if(!horizontal){stopTracking();return}
+      const threshold=Math.min(row.clientWidth*SWIPE_TRIGGER_RATIO,160);
+      const shouldPurchase=-offsetX>=threshold;
+      if(shouldPurchase){
+        row.dataset.suppressClick='1';
+        content.style.transition='';
+        action.style.opacity='1';
+        action.style.transform='translateX(0)';
+        removeGroup(row.dataset.name||'',row);
+      }else{
+        clearVisual();
+      }
+      window.setTimeout(()=>delete row.dataset.suppressClick,0);
+      stopTracking();
+    };
+
+    row.addEventListener('pointerdown',event=>{
+      if(event.pointerType==='mouse'&&event.button!==0)return;
+      if(row.classList.contains('is-purchased')||row.classList.contains('is-removing'))return;
+      tracking=true;horizontal=false;pointerId=event.pointerId;
+      startX=event.clientX;startY=event.clientY;offsetX=0;
+      content.style.transition='none';
+    });
+    row.addEventListener('pointermove',event=>{
+      if(!tracking||event.pointerId!==pointerId)return;
+      const dx=event.clientX-startX,dy=event.clientY-startY;
+      if(!horizontal){
+        if(Math.abs(dx)<8&&Math.abs(dy)<8)return;
+        if(Math.abs(dy)>=Math.abs(dx)*.95||dx>=0){clearVisual();stopTracking();return}
+        horizontal=true;
+        row.dataset.suppressClick='1';
+        try{row.setPointerCapture(event.pointerId)}catch(_){}
+      }
+      event.preventDefault();
+      const maxReveal=row.clientWidth*SWIPE_MAX_RATIO;
+      offsetX=Math.max(-maxReveal,Math.min(0,dx));
+      const progress=Math.min(1,Math.abs(offsetX)/Math.max(1,maxReveal));
+      content.style.transform='translate3d('+offsetX+'px,0,0)';
+      action.style.opacity=String(.18+.82*progress);
+      action.style.transform='translateX('+(18*(1-progress))+'px)';
+    },{passive:false});
+    row.addEventListener('pointerup',event=>{
+      if(event.pointerId!==pointerId)return;
+      finishSwipe();
+    });
+    row.addEventListener('pointercancel',event=>{
+      if(event.pointerId!==pointerId)return;
+      if(horizontal)clearVisual();
+      stopTracking();
+      window.setTimeout(()=>delete row.dataset.suppressClick,0);
+    });
+  });
 }
 function renderView(){
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
@@ -936,10 +1022,18 @@ async function removeGroup(name,row=null){
   const group=activeGroups().find(entry=>norm(entry.summary)===key);
   if(!group)return;
   state.productBusy.add(key);
-  state.pendingRemoval.add(key);
-  row?.classList.add('is-removing');
+  if(row){
+    row.classList.add('is-purchased');
+    row.querySelector('.swipe-content')?.style.removeProperty('transform');
+    row.querySelector('.swipe-content')?.style.removeProperty('transition');
+    const action=row.querySelector('.swipe-action');
+    if(action){action.style.opacity='1';action.style.transform='translateX(0)'}
+  }
   navigator.vibrate?.(8);
-  await new Promise(resolve=>setTimeout(resolve,row?90:0));
+  await new Promise(resolve=>setTimeout(resolve,row?PURCHASE_HOLD_MS:0));
+  row?.classList.add('is-removing');
+  await new Promise(resolve=>setTimeout(resolve,row?PURCHASE_EXIT_MS:0));
+  state.pendingRemoval.add(key);
 
   const keepOtherItems=entry=>{
     if(String(entry?.status||'needs_action')==='completed')return true;
