@@ -232,16 +232,16 @@ function renderList(){
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=BY_NAME.get(key),busy=state.productBusy.has(key);
     return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'">'+
-      '<button class="remove" type="button" data-name="'+esc(group.summary)+'" aria-label="Supprimer '+esc(group.summary)+'" '+(busy?'disabled':'')+'>🗑</button>'+
-      '<button class="list-main" type="button" data-name="'+esc(group.summary)+'" aria-label="Ajouter une unité de '+esc(group.summary)+'" '+(busy?'disabled':'')+'>'+
+      '<button class="list-main" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>'+
         '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
         '<span class="list-name">'+esc(group.summary)+'</span>'+
         '<span class="qty">x'+group.count+'</span>'+
       '</button>'+
+      '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
     '</div>';
   }).join('');
-  el.querySelectorAll('.remove').forEach(button=>button.onclick=event=>{event.stopPropagation();removeGroup(button.dataset.name||'',button.closest('.list-row'))});
-  el.querySelectorAll('.list-main').forEach(button=>button.onclick=()=>incrementGroup(button.dataset.name||''));
+  const markPurchased=button=>removeGroup(button.dataset.name||'',button.closest('.list-row'));
+  el.querySelectorAll('.list-main,.done').forEach(button=>button.onclick=event=>{event.stopPropagation();markPurchased(button)});
 }
 function renderView(){
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
@@ -816,47 +816,6 @@ async function addItem(name){
     recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();
   }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
 }
-async function incrementGroup(name){
-  const item=String(name||'').trim();
-  if(!item)return;
-  const key=norm(item);
-  if(state.productBusy.has(key))return;
-  const current=activeGroups().find(group=>norm(group.summary)===key);
-  if(!current)return;
-  state.productBusy.add(key);
-  try{
-    if(state.demo){
-      const items=loadJson(DEMO_KEY,[])||[];
-      items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
-      saveJson(DEMO_KEY,items);
-      state.items=items;
-      recordUsage(item);
-      navigator.vibrate?.(7);
-      toast(item+' x'+(current.count+1));
-      renderProducts();renderList();
-      return;
-    }
-    if(!state.entity)return;
-    const optimistic={uid:'',summary:item,status:'needs_action',_optimistic:true};
-    state.items=[...state.items,optimistic];
-    navigator.vibrate?.(7);
-    renderList();
-    try{
-      await request({type:'call_service',domain:'todo',service:'add_item',service_data:{item},target:{entity_id:state.entity}});
-      recordUsage(item);
-      toast(item+' x'+(current.count+1));
-      await refreshItems();
-    }catch(error){
-      state.items=state.items.filter(entry=>entry!==optimistic);
-      renderList();
-      toast('Ajout impossible');
-      status('is-error','Erreur',error.message||'Ajout impossible');
-    }
-  }finally{
-    state.productBusy.delete(key);
-    renderProducts();renderList();
-  }
-}
 async function removeGroup(name,row=null){
   const item=String(name||'').trim();
   if(!item)return;
@@ -883,7 +842,7 @@ async function removeGroup(name,row=null){
       const items=(loadJson(DEMO_KEY,[])||[]).filter(keepOtherItems);
       saveJson(DEMO_KEY,items);
       state.items=items;
-      toast(item+' supprimé');
+      toast(item+' acheté');
       return;
     }
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
@@ -896,7 +855,7 @@ async function removeGroup(name,row=null){
       service_data:{item:uid,status:'completed'},
       target:{entity_id:state.entity}
     })));
-    toast(item+' supprimé');
+    toast(item+' acheté');
   }catch(error){
     toast('Suppression impossible');
     status('is-error','Erreur',error.message||'Suppression impossible');
