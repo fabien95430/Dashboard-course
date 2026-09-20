@@ -70,10 +70,10 @@ function preferredTodoEntity(entities){
   const list=Array.isArray(entities)?entities:[];
   const explicit=String(localStorage.getItem(STORAGE.entityPreference)||'').trim();
   const legacy=String(localStorage.getItem(STORAGE.entity)||'').trim();
-  const saved=explicit||(legacy&&legacy!==COURSES_ENTITY?legacy:'');
-  return list.find(entry=>entry?.id===saved)
+  const saved=explicit||legacy;
+  return list.find(entry=>entry?.id===URL_ENTITY)
+    || list.find(entry=>entry?.id===saved)
     || list.find(entry=>entry?.id===COURSES_ENTITY)
-    || list.find(entry=>entry?.id===URL_ENTITY)
     || list[0]
     || null;
 }
@@ -908,7 +908,7 @@ async function connectAuthorized(token){
   await discoverEntities();
   state.loading=true;
   renderList();
-  status('is-waiting','Connexion…','Liste Courses');
+  status('is-waiting','Connexion…','Liste Home Assistant');
   await subscribe();
   await refreshItems();
   armIdleLock();
@@ -1040,7 +1040,7 @@ function connectWs(token){
 }
 async function discoverEntities(){
   const saved=String(localStorage.getItem(STORAGE.entity)||'').trim();
-  state.entity=saved||COURSES_ENTITY;
+  state.entity=URL_ENTITY||saved||COURSES_ENTITY;
   try{
     const states=await request({type:'get_states'});
     state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')).map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
