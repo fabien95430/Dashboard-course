@@ -17,7 +17,6 @@ const CATEGORY_META = {
   'Favoris': { label:'Favoris' }
 };
 const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Favoris'];
-const LIST_CATEGORIES=['Toutes',...Object.keys(GROUPS)];
 const PURCHASE_HOLD_MS=1100;
 const PURCHASE_EXIT_MS=240;
 const SWIPE_TRIGGER_RATIO=.36;
@@ -113,7 +112,6 @@ let state={
   category:'Toutes',
   productQuery:'',
   listQuery:'',
-  listCategory:'Toutes',
   view:'list',
   reconnectTimer:null,
   intentionalClose:false,
@@ -364,33 +362,9 @@ function syncProductSelection(){
     if(badge)badge.textContent=active?'✓':'+';
   });
 }
-function closeListFilter(){
-  const menu=$('#listFilterMenu'),button=$('#listFilterBtn');
-  if(!menu||!button)return;
-  menu.hidden=true;
-  button.setAttribute('aria-expanded','false');
-}
-function renderListFilter(){
-  const button=$('#listFilterBtn'),menu=$('#listFilterMenu');
-  if(!button||!menu)return;
-  button.innerHTML=esc(state.listCategory)+' <span aria-hidden="true">⌄</span>';
-  menu.innerHTML=LIST_CATEGORIES.map(category=>'<button type="button" class="filter-option '+(state.listCategory===category?'is-active':'')+'" data-category="'+esc(category)+'" role="menuitem">'+esc(category)+'</button>').join('');
-  menu.querySelectorAll('.filter-option').forEach(option=>option.onclick=event=>{
-    event.stopPropagation();
-    state.listCategory=option.dataset.category||'Toutes';
-    closeListFilter();
-    renderList();
-  });
-}
 function renderList(){
-  renderListFilter();
-  const groups=activeGroups(),needle=norm(state.listQuery),category=state.listCategory||'Toutes';
-  const rows=groups.filter(group=>{
-    if(needle&&!norm(group.summary).includes(needle))return false;
-    if(category==='Toutes')return true;
-    const product=BY_NAME.get(norm(group.summary));
-    return product?.category===category;
-  });
+  const groups=activeGroups(),needle=norm(state.listQuery);
+  const rows=groups.filter(group=>!needle||norm(group.summary).includes(needle));
   const el=$('#listItems');
   if(!el)return;
   const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
@@ -1322,16 +1296,6 @@ $('#lockNowBtn').onclick=()=>{$('#settingsDialog').close();lockApp('Verrouillage
 $('#logoutBtn').onclick=revoke;
 $('#productSearch').oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
 $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
-const listFilterBtn=$('#listFilterBtn');
-if(listFilterBtn)listFilterBtn.onclick=event=>{
-  event.stopPropagation();
-  const menu=$('#listFilterMenu'),open=menu.hidden;
-  menu.hidden=!open;
-  listFilterBtn.setAttribute('aria-expanded',String(open));
-};
-document.addEventListener('click',event=>{
-  if(!(event.target instanceof Element)||!event.target.closest('.list-filter'))closeListFilter();
-});
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
 function resumeForegroundSession(){
