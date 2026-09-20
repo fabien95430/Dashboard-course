@@ -109,31 +109,134 @@ let state={
   usage:loadJson(STORAGE.usage,{})||{}
 };
 
-const ITEM_ICONS = [
-  [/pain|baguette|brioche|croissant|wrap/i,'🥖'],
-  [/lait|crème|yaourt|fromage|beurre|skyr/i,'🥛'],
-  [/oeuf|œuf/i,'🥚'],
-  [/pomme|poire|banane|orange|citron|fraise|raisin|kiwi|mangue|ananas|fruit/i,'🍎'],
-  [/tomate|carotte|courgette|aubergine|poivron|salade|brocoli|chou|légume/i,'🥕'],
-  [/café/i,'☕'],
-  [/thé|infusion|matcha/i,'🍵'],
-  [/eau|jus|coca|soda|limonade|smoothie|sirop/i,'🥤'],
-  [/vin|bière|champagne|rhum|whisky|cidre|prosecco/i,'🍷'],
-  [/pâtes|spaghetti|penne|riz|semoule|quinoa|boulgour/i,'🍝'],
-  [/papier|mouchoir|essuie/i,'🧻'],
-  [/lessive|vaisselle|nettoyant|éponge|javel|détartrant/i,'🧽'],
-  [/poulet|boeuf|bœuf|porc|veau|agneau|steak|jambon|saucisse|merguez/i,'🥩'],
-  [/saumon|poisson|thon|crevette|moule|truite|cabillaud/i,'🐟'],
-  [/glace|sorbet/i,'🍨'],
-  [/chocolat|cookie|biscuit|bonbon|madeleine|gaufre|brownie/i,'🍫']
-];
-function productEmoji(name){
-  const hit=ITEM_ICONS.find(([rx])=>rx.test(String(name||'')));
-  return hit ? hit[1] : '🛒';
-}
+const hashName = (value) => {
+  let hash = 2166136261;
+  for (const char of String(value || '')) { hash ^= char.charCodeAt(0); hash = Math.imul(hash, 16777619); }
+  return hash >>> 0;
+};
+const shortLabel = (value, max = 11) => {
+  const words = String(value || '').split(/\s+/).filter(Boolean);
+  if (!words.length) return 'PRODUIT';
+  if (words.length === 1) return words[0].slice(0, max).toUpperCase();
+  const joined = words.slice(0, 2).join(' ');
+  return joined.length <= max ? joined.toUpperCase() : `${words[0].slice(0, Math.max(4, max - 3))} ${words[1].slice(0, 2)}`.toUpperCase();
+};
+
+function premiumVisualSpec(product) {
+    const key = norm(product?.name), sub = norm(product?.sub), category = product?.category || '';
+    const hash = hashName(`${product?.name}|${product?.sub}`);
+    const hue = hash % 360, hue2 = (hue + 38 + (hash % 53)) % 360;
+    let kind = 'box', base = `hsl(${hue} 68% 52%)`, accent = `hsl(${hue2} 76% 60%)`, detail = '#eef7ff';
+
+    const fruitColors = {
+      pommes:'#e83e3e', bananes:'#f4cf2e', poires:'#9bc84a', oranges:'#ef8a20', clementines:'#f28720', citrons:'#e9d62c',
+      peches:'#ef765b', nectarines:'#dc5355', abricots:'#f39a42', prunes:'#72458e', raisin:'#6a49a2', kiwis:'#8b6b3f', fraises:'#e63d4d',
+      framboises:'#d92e61', myrtilles:'#4059a8', mures:'#38264e', cerises:'#b62036', ananas:'#d8aa2d', mangue:'#f0a735', avocat:'#6da044',
+      'noix de coco':'#8f673e', grenade:'#b5263f', 'fruit de la passion':'#8c4b96', melon:'#9bcf62', tomates:'#e64a3c', carottes:'#ef7d22',
+      courgettes:'#5b9c4b', aubergines:'#6b3c78', poivrons:'#e44839', concombres:'#4f9c59', brocoli:'#4d8d46', 'chou fleur':'#e5e1c7',
+      champignons:'#c39f7a', betteraves:'#9b2848', navets:'#d8c5dc', courge:'#db8a25', potiron:'#d86c1b', butternut:'#d39b58', mais:'#e0bd31',
+      radis:'#e44d66', 'salade verte':'#62a94e', mache:'#5c9b48', roquette:'#598d42', endives:'#dde0aa', 'chou rouge':'#78468a',
+      'pommes de terre':'#b5915c', 'patates douces':'#c66e3f', 'oignons jaunes':'#d7a946', 'oignons rouges':'#934a79', echalotes:'#a66377', ail:'#e1ddd0',
+      gingembre:'#c69254', piments:'#d92d32', 'citron vert':'#85b845', 'olives fraiches':'#69782d', noix:'#9f764c', noisettes:'#9d6b40'
+    };
+    if (category === 'Fruits & Légumes') {
+      kind = /banane/.test(key) ? 'banana' : /carotte|asperge|poireau|ciboulette|romarin|thym/.test(key) ? 'longveg' : /raisin|myrtille|framboise|mure|cerise|olive|noix|noisette/.test(key) ? 'cluster' : 'produce';
+      base = fruitColors[key] || base;
+      accent = `hsl(${(hue + 85) % 360} 52% 45%)`;
+    } else if (/lait/.test(key)) kind = /amande|avoine/.test(key) ? 'carton' : 'bottle';
+    else if (/yaourt|skyr|fromage blanc|petits suisses|creme dessert|riz au lait|flan|mascarpone/.test(key)) kind = 'cup';
+    else if (/beurre/.test(key)) kind = 'butter';
+    else if (/fromage|emmental|comte|camembert|brie|chevre|mozzarella|parmesan|roquefort|raclette|reblochon/.test(key)) kind = 'cheese';
+    else if (/baguette/.test(key)) kind = 'baguette';
+    else if (/pain|brioche/.test(key)) kind = 'bread';
+    else if (/croissant|pains au chocolat/.test(key)) kind = 'pastry';
+    else if (/wrap|galette/.test(key)) kind = 'wrap';
+    else if (/steak|boeuf|porc|veau|agneau|viande|escalope/.test(key)) kind = 'meat';
+    else if (/poulet|dinde/.test(key)) kind = 'poultry';
+    else if (/saucisse|merguez|saucisson|chorizo|rosette|coppa|bacon|jambon|lardon|mortadelle/.test(key)) kind = 'slices';
+    else if (/saumon|cabillaud|thon frais|truite|poisson/.test(key)) kind = 'fish';
+    else if (/crevette/.test(key)) kind = 'shrimp';
+    else if (/moule/.test(key)) kind = 'shell';
+    else if (/pizza|quiche/.test(key)) kind = 'roundfood';
+    else if (/glace|sorbet/.test(key)) kind = 'icecream';
+    else if (/eau |^eau|jus|limonade|orangeade|soda|tonic|ginger beer|the glace|sirop|boisson energetique|smoothie|lait chocolate/.test(key)) kind = /jus|lait chocolate|smoothie/.test(key) ? 'carton' : 'drink';
+    else if (/biere/.test(key)) kind = 'can';
+    else if (/vin|champagne|prosecco|cidre|rhum|whisky|aperitif anise/.test(key)) kind = 'wine';
+    else if (/conserve|boite|thon en|sardine|maquereaux|tomates pelees|mais en boite|raviolis/.test(`${sub} ${key}`)) kind = 'can';
+    else if (/ketchup|mayonnaise|moutarde|sauce|huile|vinaigre|tabasco|pesto|harissa/.test(key)) kind = 'condiment';
+    else if (/cafe|the |infusion|chicoree|matcha|chocolat chaud/.test(key)) kind = /capsule|dosette/.test(key) ? 'pods' : 'coffee';
+    else if (/riz|spaghetti|penne|coquillette|tagliatelle|lasagne|semoule|quinoa|boulgour|polenta|nouille|couscous/.test(key)) kind = 'pouch';
+    else if (/farine|sucre|maizena|chapelure|flocons|cereales|muesli/.test(key)) kind = 'bag';
+    else if (/chips|tortilla|cacahuete|cajou|pistache|cracker|bretzel/.test(key)) kind = 'snack';
+    else if (/biscuit|cookie|madeleine|brownie|gaufre|crepe|barres cereal|chocolat/.test(key)) kind = 'treat';
+    else if (/papier toilette|essuie tout|mouchoir|serviette papier/.test(key)) kind = 'rolls';
+    else if (/sac poubelle|sacs congelation|sacs zip|film alimentaire|papier aluminium|papier cuisson/.test(key)) kind = 'pack';
+    else if (/lessive|adoucissant|detergent|liquide vaisselle|nettoyant|javel|desinfectant|vinaigre menager|detartrant|shampoing|gel douche|savon|creme|demaquillant|antiseptique|eau micellaire/.test(key)) kind = /vitres|multi usages|desinfectant/.test(key) ? 'spray' : 'cleaner';
+    else if (/dentifrice/.test(key)) kind = 'tube';
+    else if (/brosse/.test(key)) kind = 'brush';
+    else if (/eponge|grattoir/.test(key)) kind = 'sponge';
+    else if (/couche/.test(key)) kind = 'diaper';
+    else if (/croquette|patee|litiere|friandise/.test(key)) kind = 'petbag';
+    return { kind, base, accent, detail, label:shortLabel(product?.name), hash };
+  }
+
+function premiumProductVisual(product, compact = false) {
+    const { kind, base, accent, detail, label, hash } = premiumVisualSpec(product);
+    const id = `p${hash.toString(36)}`;
+    const labelSize = compact ? 0 : (label.length > 9 ? 6.3 : 7.2);
+    const defs = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${base}"/><stop offset="1" stop-color="${accent}"/></linearGradient><filter id="${id}s" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="2.4" flood-color="#6b4a5a" flood-opacity=".12"/></filter></defs>`;
+    const commonLabel = labelSize ? `<rect x="30" y="48" width="60" height="19" rx="5" fill="rgba(255,255,255,.92)"/><text x="60" y="60.5" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="${labelSize}" font-weight="800" fill="#142232">${esc(label)}</text><path d="M34 73h52" stroke="rgba(255,255,255,.45)" stroke-width="2" stroke-linecap="round"/>` : '';
+    let body = '';
+    switch (kind) {
+      case 'bottle': body = `<g filter="url(#${id}s)"><path d="M48 12h24v13l8 9v54c0 10-8 18-20 18s-20-8-20-18V34l8-9z" fill="url(#${id}g)"/><rect x="48" y="8" width="24" height="9" rx="3" fill="#d8e7f2"/><rect x="43" y="39" width="34" height="40" rx="9" fill="rgba(255,255,255,.88)"/>${commonLabel}<path d="M48 30c8 4 16 4 24 0" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none"/></g>`; break;
+      case 'carton': body = `<g filter="url(#${id}s)"><path d="M38 20h43l8 13v69H34V30z" fill="url(#${id}g)"/><path d="M38 20l12-10h30l1 10z" fill="#eef4f7"/><path d="M81 20l8 13H49l-11-13z" fill="rgba(255,255,255,.42)"/>${commonLabel}</g>`; break;
+      case 'cup': body = `<g filter="url(#${id}s)"><ellipse cx="60" cy="30" rx="34" ry="10" fill="#eff5f8"/><path d="M28 31h64l-7 62c-1 9-10 14-25 14s-24-5-25-14z" fill="url(#${id}g)"/><ellipse cx="60" cy="31" rx="31" ry="7" fill="#fff" fill-opacity=".8"/>${commonLabel}</g>`; break;
+      case 'butter': body = `<g filter="url(#${id}s)" transform="rotate(-6 60 60)"><rect x="24" y="34" width="72" height="50" rx="9" fill="url(#${id}g)"/><path d="M24 42h72M30 34l10 50M90 34L78 84" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>${commonLabel}</g>`; break;
+      case 'cheese': body = `<g filter="url(#${id}s)"><path d="M24 81L70 25l27 21-12 53H35z" fill="url(#${id}g)"/><circle cx="69" cy="52" r="5" fill="#f7cf55" fill-opacity=".85"/><circle cx="54" cy="72" r="4" fill="#f7cf55" fill-opacity=".85"/><circle cx="78" cy="79" r="6" fill="#f7cf55" fill-opacity=".85"/>${commonLabel}</g>`; break;
+      case 'baguette': body = `<g filter="url(#${id}s)" transform="rotate(-14 60 60)"><rect x="13" y="47" width="94" height="30" rx="15" fill="#ca7a31"/><path d="M29 50l8 24M48 48l8 27M68 48l8 27M87 50l7 21" stroke="#f1c17a" stroke-width="4" stroke-linecap="round"/></g>`; break;
+      case 'bread': body = `<g filter="url(#${id}s)"><path d="M23 43c0-14 12-24 29-24h17c17 0 28 10 28 24v49H23z" fill="#b66e35"/><path d="M29 44c0-10 9-18 24-18h15c13 0 22 7 22 18v39H29z" fill="#e2a968"/>${commonLabel}</g>`; break;
+      case 'pastry': body = `<g filter="url(#${id}s)"><path d="M19 73c8-35 28-47 42-24 13-23 36-12 40 24-18-12-31-8-40 9-11-17-25-22-42-9z" fill="#d48a38"/><path d="M30 67c10-17 19-18 29 1M64 68c11-20 21-18 28-1" stroke="#f4c47b" stroke-width="6" fill="none" stroke-linecap="round"/></g>`; break;
+      case 'wrap': body = `<g filter="url(#${id}s)"><circle cx="60" cy="61" r="41" fill="#e2c891"/><circle cx="60" cy="61" r="34" fill="#f1e0b5"/><path d="M39 43l43 37M35 67l36-36" stroke="${base}" stroke-opacity=".65" stroke-width="5" stroke-linecap="round"/></g>`; break;
+      case 'meat': body = `<g filter="url(#${id}s)"><path d="M24 61c3-27 27-42 52-30 23 11 28 39 7 55-19 15-55 6-59-25z" fill="#b94752"/><path d="M37 58c7-15 24-22 39-14" stroke="#f2a5a7" stroke-width="7" stroke-linecap="round"/><circle cx="71" cy="68" r="9" fill="#f4d2bb"/></g>`; break;
+      case 'poultry': body = `<g filter="url(#${id}s)"><ellipse cx="58" cy="64" rx="34" ry="25" fill="#d5a16d"/><path d="M82 57c10-2 19 2 21 10 2 7-4 13-14 13" stroke="#c38a52" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="31" cy="60" r="9" fill="#e8bf91"/></g>`; break;
+      case 'slices': body = `<g filter="url(#${id}s)"><ellipse cx="50" cy="64" rx="29" ry="18" fill="#c84f59" transform="rotate(-16 50 64)"/><ellipse cx="70" cy="61" rx="29" ry="18" fill="#d76363" transform="rotate(12 70 61)"/><path d="M48 53l8 21M65 48l12 24" stroke="#f0a7a2" stroke-width="3"/></g>`; break;
+      case 'fish': body = `<g filter="url(#${id}s)"><path d="M22 62c22-30 57-31 76-4-19 29-54 30-76 4z" fill="url(#${id}g)"/><path d="M97 58l16-14v30z" fill="${accent}"/><circle cx="42" cy="55" r="3" fill="#111d2b"/><path d="M54 53c11 6 20 7 30 3" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none"/></g>`; break;
+      case 'shrimp': body = `<g filter="url(#${id}s)"><path d="M87 36c-32-13-58 7-57 33 1 23 23 34 44 23 14-7 19-24 8-35-9-9-26-7-32 3" fill="none" stroke="#ee7c62" stroke-width="14" stroke-linecap="round"/><path d="M87 36l16-9-4 17z" fill="#e95f50"/></g>`; break;
+      case 'shell': body = `<g filter="url(#${id}s)"><path d="M28 79c0-28 13-48 32-48s32 20 32 48c-17 17-47 17-64 0z" fill="#393747"/><path d="M60 35v53M43 40l9 49M77 40l-9 49" stroke="#706b7e" stroke-width="4"/></g>`; break;
+      case 'roundfood': body = `<g filter="url(#${id}s)"><circle cx="60" cy="61" r="42" fill="#d5a35e"/><circle cx="60" cy="61" r="35" fill="${base}"/><circle cx="45" cy="49" r="6" fill="${accent}"/><circle cx="72" cy="43" r="5" fill="#f4e09b"/><circle cx="70" cy="72" r="7" fill="#d84c43"/><path d="M60 27v68M27 61h66" stroke="#f6d59b" stroke-opacity=".45" stroke-width="3"/></g>`; break;
+      case 'icecream': body = `<g filter="url(#${id}s)"><path d="M45 59h30L62 105z" fill="#d6a25e"/><circle cx="53" cy="51" r="18" fill="${base}"/><circle cx="70" cy="51" r="18" fill="${accent}"/><circle cx="61" cy="38" r="18" fill="#f2e3c5"/></g>`; break;
+      case 'drink': body = `<g filter="url(#${id}s)"><path d="M47 13h26v15l7 10v53c0 9-7 15-20 15s-20-6-20-15V38l7-10z" fill="url(#${id}g)"/><rect x="47" y="8" width="26" height="9" rx="3" fill="#dae5ef"/>${commonLabel}</g>`; break;
+      case 'wine': body = `<g filter="url(#${id}s)"><path d="M51 10h18v26l7 13v45c0 8-6 12-16 12s-16-4-16-12V49l7-13z" fill="url(#${id}g)"/><rect x="48" y="9" width="24" height="8" rx="2" fill="#c5b079"/>${commonLabel}</g>`; break;
+      case 'can': body = `<g filter="url(#${id}s)"><ellipse cx="60" cy="24" rx="27" ry="8" fill="#dbe4e9"/><rect x="33" y="24" width="54" height="74" fill="url(#${id}g)"/><ellipse cx="60" cy="98" rx="27" ry="8" fill="#bac7ce"/>${commonLabel}</g>`; break;
+      case 'condiment': body = `<g filter="url(#${id}s)"><path d="M48 20h24l5 18 4 7v50c0 8-8 12-21 12s-21-4-21-12V45l4-7z" fill="url(#${id}g)"/><rect x="46" y="14" width="28" height="10" rx="4" fill="#e6e9ec"/>${commonLabel}</g>`; break;
+      case 'coffee': body = `<g filter="url(#${id}s)"><path d="M31 25h58l7 75H24z" fill="url(#${id}g)"/><path d="M34 25h52" stroke="#f0d9b5" stroke-width="6"/><circle cx="60" cy="59" r="14" fill="#5b3928"/><path d="M55 48c8 7 8 16 0 23" stroke="#c89d76" stroke-width="3" fill="none"/>${commonLabel}</g>`; break;
+      case 'pods': body = `<g filter="url(#${id}s)"><ellipse cx="43" cy="58" rx="21" ry="15" fill="url(#${id}g)"/><ellipse cx="76" cy="61" rx="21" ry="15" fill="${accent}"/><ellipse cx="60" cy="43" rx="21" ry="15" fill="#d7b374"/><path d="M28 58h30M61 61h30M45 43h30" stroke="#fff" stroke-opacity=".4" stroke-width="3"/></g>`; break;
+      case 'pouch': body = `<g filter="url(#${id}s)"><path d="M28 18h64l-5 88H33z" fill="url(#${id}g)"/><path d="M31 25h58" stroke="#fff" stroke-opacity=".5" stroke-width="4"/><rect x="37" y="43" width="46" height="39" rx="7" fill="rgba(255,255,255,.88)"/>${commonLabel}</g>`; break;
+      case 'bag': body = `<g filter="url(#${id}s)"><path d="M32 23h56l8 81H24z" fill="url(#${id}g)"/><path d="M35 23h50" stroke="#f1e4c9" stroke-width="6"/>${commonLabel}</g>`; break;
+      case 'snack': body = `<g filter="url(#${id}s)"><path d="M28 16h64l-6 90H34z" fill="url(#${id}g)"/><path d="M31 23h58M34 96h52" stroke="#fff" stroke-opacity=".42" stroke-width="4"/><circle cx="60" cy="57" r="18" fill="#f1c86a"/>${commonLabel}</g>`; break;
+      case 'treat': body = `<g filter="url(#${id}s)"><rect x="24" y="25" width="72" height="72" rx="12" fill="url(#${id}g)"/><circle cx="60" cy="58" r="18" fill="#9a5f37"/><circle cx="53" cy="52" r="3" fill="#5e3623"/><circle cx="68" cy="63" r="3" fill="#5e3623"/>${commonLabel}</g>`; break;
+      case 'rolls': body = `<g filter="url(#${id}s)"><ellipse cx="40" cy="65" rx="22" ry="31" fill="#f8f9fa"/><ellipse cx="76" cy="65" rx="22" ry="31" fill="#eef1f4"/><circle cx="40" cy="65" r="8" fill="#c9d0d6"/><circle cx="76" cy="65" r="8" fill="#c9d0d6"/><path d="M28 46h24M64 46h24" stroke="#d8dee4" stroke-width="2"/></g>`; break;
+      case 'pack': body = `<g filter="url(#${id}s)"><rect x="26" y="24" width="68" height="72" rx="12" fill="url(#${id}g)"/><rect x="34" y="34" width="52" height="48" rx="9" fill="rgba(255,255,255,.12)"/>${commonLabel}</g>`; break;
+      case 'spray': body = `<g filter="url(#${id}s)"><path d="M46 39h32l5 12v44c0 8-8 12-21 12S41 103 41 95V51z" fill="url(#${id}g)"/><path d="M52 39V25h31l10 7-8 10H69" fill="#cbd7df"/><path d="M85 31h17" stroke="#e9eff3" stroke-width="6" stroke-linecap="round"/>${commonLabel}</g>`; break;
+      case 'cleaner': body = `<g filter="url(#${id}s)"><path d="M46 14h28v17l8 12v51c0 9-8 13-22 13s-22-4-22-13V43l8-12z" fill="url(#${id}g)"/><rect x="47" y="10" width="26" height="9" rx="3" fill="#dae4e8"/>${commonLabel}</g>`; break;
+      case 'tube': body = `<g filter="url(#${id}s)" transform="rotate(-9 60 60)"><path d="M35 23h50l-8 74H43z" fill="url(#${id}g)"/><rect x="42" y="94" width="36" height="10" rx="3" fill="#dce5eb"/>${commonLabel}</g>`; break;
+      case 'brush': body = `<g filter="url(#${id}s)" transform="rotate(-18 60 60)"><rect x="53" y="28" width="14" height="76" rx="7" fill="url(#${id}g)"/><rect x="42" y="20" width="36" height="18" rx="7" fill="${accent}"/><path d="M46 18v-9M53 18v-9M60 18v-9M67 18v-9M74 18v-9" stroke="#e9f4f8" stroke-width="3"/></g>`; break;
+      case 'sponge': body = `<g filter="url(#${id}s)"><rect x="24" y="39" width="72" height="43" rx="13" fill="url(#${id}g)"/><circle cx="39" cy="53" r="3" fill="#fff" fill-opacity=".42"/><circle cx="56" cy="66" r="4" fill="#fff" fill-opacity=".34"/><circle cx="78" cy="51" r="3" fill="#fff" fill-opacity=".38"/></g>`; break;
+      case 'diaper': body = `<g filter="url(#${id}s)"><path d="M28 31h64l-7 67H35z" fill="#f5f7f9"/><path d="M28 31l18 20h28l18-20M35 98l16-22h18l16 22" fill="${base}" fill-opacity=".65"/>${commonLabel}</g>`; break;
+      case 'petbag': body = `<g filter="url(#${id}s)"><path d="M29 19h62l5 87H24z" fill="url(#${id}g)"/><circle cx="60" cy="57" r="20" fill="rgba(255,255,255,.9)"/><circle cx="50" cy="51" r="6" fill="#26384a"/><circle cx="70" cy="51" r="6" fill="#26384a"/><path d="M51 69c6 5 12 5 18 0" stroke="#26384a" stroke-width="3" fill="none" stroke-linecap="round"/>${commonLabel}</g>`; break;
+      case 'banana': body = `<g filter="url(#${id}s)"><path d="M24 45c8 33 37 48 69 29 10-6 17-14 20-24-23 23-51 29-71 10-8-8-11-14-18-15z" fill="${base}"/><path d="M28 45l-5-8M111 49l5-8" stroke="#7b6b27" stroke-width="5" stroke-linecap="round"/></g>`; break;
+      case 'longveg': body = `<g filter="url(#${id}s)" transform="rotate(-13 60 60)"><path d="M53 19h14l9 76c1 9-5 13-16 13s-17-4-16-13z" fill="${base}"/><path d="M54 20l-12-13M60 20V4M66 20L79 7" stroke="${accent}" stroke-width="5" stroke-linecap="round"/></g>`; break;
+      case 'cluster': body = `<g filter="url(#${id}s)"><path d="M61 19c-5 9-8 17-8 25" stroke="#5d7f39" stroke-width="5" fill="none"/><circle cx="50" cy="52" r="13" fill="${base}"/><circle cx="70" cy="52" r="13" fill="${base}"/><circle cx="41" cy="69" r="12" fill="${base}"/><circle cx="60" cy="69" r="13" fill="${base}"/><circle cx="79" cy="69" r="12" fill="${base}"/><circle cx="52" cy="85" r="11" fill="${base}"/><circle cx="69" cy="85" r="11" fill="${base}"/></g>`; break;
+      case 'produce': body = `<g filter="url(#${id}s)"><path d="M60 24c-7-8-7-15-2-20" stroke="#5e7a34" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M58 18c10-7 19-6 26 1-10 4-18 5-26-1z" fill="#63a64b"/><path d="M27 61c0-25 14-39 33-39s33 14 33 39c0 27-16 43-33 43S27 88 27 61z" fill="${base}"/><ellipse cx="49" cy="43" rx="8" ry="12" fill="#fff" fill-opacity=".18"/></g>`; break;
+      default: body = `<g filter="url(#${id}s)"><rect x="26" y="20" width="68" height="84" rx="12" fill="url(#${id}g)"/><path d="M34 30h52" stroke="#fff" stroke-opacity=".4" stroke-width="4"/>${commonLabel}</g>`;
+    }
+    return `<svg class="product-svg ${compact ? 'is-compact' : ''}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">${defs}${body}</svg>`;
+  }
+
 function sprite(product,compact=false){
-  return '<span class="emoji-icon'+(compact?' is-compact':'')+'">'+productEmoji(product?.name)+'</span>';
+  return premiumProductVisual(product,compact);
 }
+
 function usageSave(){saveJson(STORAGE.usage,state.usage)}
 function recordUsage(name){const key=norm(name);const old=state.usage[key]||{count:0,lastAt:0};state.usage[key]={count:Number(old.count||0)+1,lastAt:Date.now()};usageSave()}
 function favorites(){
