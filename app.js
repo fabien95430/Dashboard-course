@@ -109,6 +109,7 @@ let state={
   demo:false,
   lockTimer:null,
   backgroundLockTimer:null,
+  resumeToList:false,
   productBusy:new Set(),
   pendingRemoval:new Set(),
   faceAutoAttempted:false,
@@ -1264,16 +1265,17 @@ document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
 function resumeForegroundSession(){
   clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
-  if(state.demo){
+  if(state.resumeToList){
+    state.resumeToList=false;
     state.view='list';
     renderView();
+  }
+  if(state.demo){
     refreshItems();
     return;
   }
   if(!vaultRecord())return;
   if(state.locked){
-    state.view='list';
-    renderView();
     status('is-waiting','Verrouillé','Déverrouillage requis');
     showSecurity('unlock');
     return;
@@ -1292,8 +1294,6 @@ function resumeForegroundSession(){
     return;
   }
   state.locked=true;
-  state.view='list';
-  renderView();
   status('is-waiting','Verrouillé','Déverrouillage requis');
   showSecurity('unlock');
 }
@@ -1312,7 +1312,7 @@ window.addEventListener('online',()=>{
 window.addEventListener('pagehide',()=>{
   clearLockTimers();closeSocket();wipeMemoryCredentials();
   state.faceAutoAttempted=false;
-  state.view='list';
+  state.resumeToList=true;
   if(vaultRecord()&&!state.demo)state.locked=true;
 });
 window.addEventListener('pageshow',()=>{
