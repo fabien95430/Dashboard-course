@@ -1360,6 +1360,7 @@ window.addEventListener('pageshow',()=>{
   resumeForegroundSession();
 });
 
+['gesturestart','gesturechange','gestureend'].forEach(name=>document.addEventListener(name,event=>event.preventDefault(),{passive:false}));
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderView();init();
 })();

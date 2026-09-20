@@ -1756,3 +1756,7 @@ svg{display:block}
   .security-benefits{bottom:max(15px,calc(env(safe-area-inset-bottom) + 8px))}
   .security-benefits i{width:42px;height:42px}
 }
+
+
+/* ===== UI v26 — zoom verrouillé ===== */
+html,body{touch-action:pan-x pan-y}
