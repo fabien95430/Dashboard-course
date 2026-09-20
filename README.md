@@ -48,8 +48,9 @@ Le coffre Face ID local est stocké sous la clé `courses-faceid-v1`. Il ne cont
 ## Utilisation de la liste
 
 - **Ma liste** est l'écran affiché par défaut et l'onglet de gauche.
-- toucher un article dans **Ma liste** ajoute une unité (`x1 → x2 → x3…`) ;
-- la poubelle supprime immédiatement l'article complet de l'affichage, puis synchronise Home Assistant ;
+- toucher un article dans **Ma liste** le marque comme acheté et le retire immédiatement de l’affichage ;
+- le bouton **✓** à droite fait la même action et synchronise ensuite Home Assistant ;
+- la quantité (`x2`, `x3`…) reste visible comme information, sans servir à ajouter depuis cet écran ;
 - le filtre **Toutes / Frais / Fruits & Légumes / Épicerie / Boissons / Maison** limite les articles affichés ;
 - l'ajout manuel depuis **Ma liste** a été retiré : les articles sont choisis depuis le catalogue ;
 - les catégories du catalogue utilisent des libellés texte sans icône.
