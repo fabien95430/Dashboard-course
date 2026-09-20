@@ -17,12 +17,26 @@ const CATEGORY_META = {
 };
 
 const STORAGE = {
+  // Legacy keys are kept only for one-time migration from the previous version.
   haUrl:'courses-external-ha-url-v1',
   auth:'courses-external-auth-v1',
+  vault:'courses-secure-vault-v1',
   entity:'courses-external-entity-v1',
   usage:'courses-external-usage-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
+const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
+const LEGACY_OAUTH_STATE_KEY = 'courses-external-oauth-state';
+const SECURITY = Object.freeze({
+  version:1,
+  kdf:'PBKDF2-SHA256',
+  iterations:600000,
+  minPasswordLength:10,
+  idleLockMs:5*60*1000,
+  backgroundLockMs:30*1000
+});
+const UTF8 = new TextEncoder();
+const UTF8_DECODER = new TextDecoder();
 const CLIENT_ID = location.origin;
 const REDIRECT_URI = location.origin + location.pathname;
 const $ = selector => document.querySelector(selector);
@@ -49,8 +63,13 @@ const POSITIONS=new Map();
 Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));
 
 let state={
-  haUrl:normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||''),
+  haUrl:'',
   accessToken:'',
+  accessTokenExpiresAt:0,
+  refreshToken:'',
+  locked:true,
+  securityMode:'',
+  pendingOAuthCode:'',
   ws:null,
   seq:1,
   pending:new Map(),
@@ -66,6 +85,8 @@ let state={
   reconnectTimer:null,
   intentionalClose:false,
   demo:false,
+  lockTimer:null,
+  backgroundLockTimer:null,
   usage:loadJson(STORAGE.usage,{})||{}
 };
 
@@ -137,13 +158,18 @@ function status(kind,title,detail=''){
   el.innerHTML='<span></span><div><strong>'+esc(title)+'</strong><small>'+esc(detail)+'</small></div>';
 }
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
-function showSetup(message=''){
-  $('#app').classList.add('is-locked');
-  $('#setup').classList.add('is-visible');
-  $('#haUrlInput').value=state.haUrl||'';
-  $('#setupError').textContent=message;
+function refreshVisualLock(){
+  const blocked=$('#setup').classList.contains('is-visible')||$('#securityOverlay').classList.contains('is-visible');
+  $('#app').classList.toggle('is-locked',blocked);
 }
-function hideSetup(){$('#app').classList.remove('is-locked');$('#setup').classList.remove('is-visible')}
+function showSetup(message=''){
+  $('#securityOverlay').classList.remove('is-visible');
+  $('#setup').classList.add('is-visible');
+  $('#haUrlInput').value=state.haUrl||normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
+  $('#setupError').textContent=message;
+  refreshVisualLock();
+}
+function hideSetup(){$('#setup').classList.remove('is-visible');refreshVisualLock()}
 
 function renderCategories(){
   const el=$('#categories');
@@ -178,58 +204,267 @@ function renderView(){
   renderCategories();renderProducts();renderList();
 }
 
-function authRecord(){return loadJson(STORAGE.auth,null)}
-function saveAuth(data){saveJson(STORAGE.auth,data)}
-function clearAuth(){deleteKey(STORAGE.auth);state.accessToken=''}
-async function exchangeCode(code){
-  const authState=loadJson('courses-external-oauth-state',null);
-  const query=new URLSearchParams(location.search);
-  const returnedState=query.get('state')||'';
-  if(!authState||authState.nonce!==returnedState||authState.haUrl!==state.haUrl)throw new Error('Validation de connexion impossible');
+
+function vaultRecord(){return loadJson(STORAGE.vault,null)}
+function legacyAuthRecord(){return loadJson(STORAGE.auth,null)}
+function bytesToBase64(bytes){
+  let binary='';
+  const array=bytes instanceof Uint8Array?bytes:new Uint8Array(bytes);
+  for(let i=0;i<array.length;i++)binary+=String.fromCharCode(array[i]);
+  return btoa(binary);
+}
+function base64ToBytes(value){
+  const binary=atob(String(value||''));
+  const out=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)out[i]=binary.charCodeAt(i);
+  return out;
+}
+async function deriveVaultKey(password,salt,iterations=SECURITY.iterations){
+  const material=await crypto.subtle.importKey('raw',UTF8.encode(password),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',hash:'SHA-256',salt,iterations},
+    material,
+    {name:'AES-GCM',length:256},
+    false,
+    ['encrypt','decrypt']
+  );
+}
+function vaultAad(){return UTF8.encode('courses-secure-vault-v1|'+CLIENT_ID)}
+async function encryptVault(payload,password){
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveVaultKey(password,salt,SECURITY.iterations);
+  const plain=UTF8.encode(JSON.stringify(payload));
+  const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:vaultAad()},key,plain);
+  return {
+    version:SECURITY.version,
+    kdf:SECURITY.kdf,
+    iterations:SECURITY.iterations,
+    salt:bytesToBase64(salt),
+    iv:bytesToBase64(iv),
+    ciphertext:bytesToBase64(new Uint8Array(cipher))
+  };
+}
+async function decryptVault(record,password){
+  if(!record||Number(record.version)!==SECURITY.version)throw new Error('Coffre de sécurité incompatible');
+  const salt=base64ToBytes(record.salt),iv=base64ToBytes(record.iv),cipher=base64ToBytes(record.ciphertext);
+  const key=await deriveVaultKey(password,salt,Number(record.iterations)||SECURITY.iterations);
+  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:vaultAad()},key,cipher);
+  const payload=JSON.parse(UTF8_DECODER.decode(plain));
+  if(!payload?.refresh_token||!normalizeHaUrl(payload?.ha_url))throw new Error('Coffre invalide');
+  return payload;
+}
+async function storeSecureVault(refreshToken,haUrl,password){
+  const secure=await encryptVault({
+    refresh_token:String(refreshToken||''),
+    ha_url:normalizeHaUrl(haUrl),
+    created_at:Date.now()
+  },password);
+  saveJson(STORAGE.vault,secure);
+  // Remove every previous plaintext credential after a successful encrypted write.
+  deleteKey(STORAGE.auth);
+  deleteKey(STORAGE.haUrl);
+}
+function loadOAuthState(){
+  try{
+    const current=JSON.parse(sessionStorage.getItem(OAUTH_STATE_KEY)||'null');
+    if(current)return current;
+  }catch(_){}
+  // Compatibility only if an OAuth redirect was already in progress on the old version.
+  return loadJson(LEGACY_OAUTH_STATE_KEY,null);
+}
+function clearOAuthState(){
+  try{sessionStorage.removeItem(OAUTH_STATE_KEY)}catch(_){}
+  deleteKey(LEGACY_OAUTH_STATE_KEY);
+}
+function wipeMemoryCredentials(){
+  state.accessToken='';
+  state.accessTokenExpiresAt=0;
+  state.refreshToken='';
+}
+function closeSocket(){
+  state.intentionalClose=true;
+  try{state.ws?.close()}catch(_){}
+  state.ws=null;
+  state.pending.forEach(p=>{clearTimeout(p.timer);p.reject(new Error('Connexion fermée'))});
+  state.pending.clear();
+}
+function clearLockTimers(){
+  clearTimeout(state.lockTimer);state.lockTimer=null;
+  clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
+}
+function armIdleLock(){
+  clearTimeout(state.lockTimer);
+  if(state.demo||state.locked||!vaultRecord())return;
+  state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),SECURITY.idleLockMs);
+}
+function showSecurity(mode,message=''){
+  state.securityMode=mode;
+  $('#setup').classList.remove('is-visible');
+  $('#securityOverlay').classList.add('is-visible');
+  const creating=mode==='oauth'||mode==='migrate';
+  $('#securityTitle').textContent=creating?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application'):'Déverrouiller Courses';
+  $('#securityText').textContent=message||(creating
+    ?'Choisis un mot de passe local. Il chiffrera l’autorisation Home Assistant enregistrée sur cet appareil.'
+    :'Entre le mot de passe local de cette application.');
+  $('#securityConfirmWrap').hidden=!creating;
+  $('#securityPassword').autocomplete=creating?'new-password':'current-password';
+  $('#securityPassword').value='';
+  $('#securityConfirm').value='';
+  $('#securitySubmit').textContent=creating?'Chiffrer et continuer':'Déverrouiller';
+  $('#resetSecurityBtn').hidden=creating;
+  $('#securityError').textContent='';
+  refreshVisualLock();
+  setTimeout(()=>$('#securityPassword').focus(),80);
+}
+function hideSecurity(){
+  $('#securityOverlay').classList.remove('is-visible');
+  $('#securityPassword').value='';
+  $('#securityConfirm').value='';
+  $('#securityError').textContent='';
+  refreshVisualLock();
+}
+function lockApp(message='Application verrouillée.'){
+  if(state.demo||!vaultRecord())return;
+  clearLockTimers();
+  closeSocket();
+  wipeMemoryCredentials();
+  state.locked=true;
+  state.items=[];
+  renderProducts();renderList();
+  status('is-waiting','Verrouillé','Mot de passe local requis');
+  showSecurity('unlock',message);
+}
+async function resetLocalConnection(){
+  clearLockTimers();closeSocket();wipeMemoryCredentials();
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  clearOAuthState();
+  state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;state.demo=false;
+  hideSecurity();showSetup('Connexion locale supprimée. Tu peux reconnecter Home Assistant.');
+}
+async function exchangeCodeRaw(code){
+  const authState=loadOAuthState();
+  const returnedState=new URLSearchParams(location.search).get('state')||'';
+  if(!authState||authState.nonce!==returnedState)throw new Error('Validation OAuth impossible');
+  const haUrl=normalizeHaUrl(authState.haUrl);
+  if(!haUrl)throw new Error('Adresse Home Assistant manquante');
+  state.haUrl=haUrl;
   const body=new URLSearchParams({grant_type:'authorization_code',code,client_id:CLIENT_ID});
-  const response=await fetch(state.haUrl+'/auth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+  const response=await fetch(haUrl+'/auth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
   if(!response.ok)throw new Error('Home Assistant a refusé la connexion');
-  const data=await response.json();
-  saveAuth({access_token:data.access_token,refresh_token:data.refresh_token,expires_at:Date.now()+Number(data.expires_in||1800)*1000,ha_url:state.haUrl});
-  deleteKey('courses-external-oauth-state');
-  history.replaceState({},'',REDIRECT_URI);
-  return data.access_token;
+  return response.json();
 }
-async function refreshToken(record){
-  const body=new URLSearchParams({grant_type:'refresh_token',refresh_token:record.refresh_token,client_id:CLIENT_ID});
+async function refreshAccessToken(){
+  if(!state.refreshToken||!state.haUrl)throw new Error('Application verrouillée');
+  const body=new URLSearchParams({grant_type:'refresh_token',refresh_token:state.refreshToken,client_id:CLIENT_ID});
   const response=await fetch(state.haUrl+'/auth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
-  if(!response.ok)throw new Error('Session expirée');
+  if(!response.ok)throw new Error('Session Home Assistant expirée ou révoquée');
   const data=await response.json();
-  const next={...record,access_token:data.access_token,expires_at:Date.now()+Number(data.expires_in||1800)*1000,ha_url:state.haUrl};
-  saveAuth(next);return next.access_token;
+  state.accessToken=String(data.access_token||'');
+  state.accessTokenExpiresAt=Date.now()+Number(data.expires_in||1800)*1000;
+  if(!state.accessToken)throw new Error('Jeton Home Assistant absent');
+  return state.accessToken;
 }
-async function ensureAccessToken(){
-  const query=new URLSearchParams(location.search),code=query.get('code');
-  if(code)return exchangeCode(code);
-  const record=authRecord();
-  if(!record?.refresh_token||normalizeHaUrl(record.ha_url)!==state.haUrl)return '';
-  if(record.access_token&&Number(record.expires_at||0)>Date.now()+60000)return record.access_token;
-  try{return await refreshToken(record)}catch(_){clearAuth();return ''}
+async function connectAuthorized(token){
+  state.accessToken=token;
+  state.locked=false;
+  hideSetup();hideSecurity();
+  status('is-waiting','Connexion…','Home Assistant');
+  await connectWs(token);
+  const entity=await discoverEntities();
+  if(!entity){
+    state.loading=false;renderList();status('is-waiting','Choisir une liste','Réglages');openSettings();armIdleLock();return;
+  }
+  await subscribe();await refreshItems();armIdleLock();
+}
+async function connectFromRefresh(){
+  try{
+    const token=await refreshAccessToken();
+    await connectAuthorized(token);
+  }catch(error){
+    wipeMemoryCredentials();state.locked=true;
+    status('is-error','Connexion refusée',error.message||'Session invalide');
+    showSecurity('unlock','La connexion Home Assistant n’a pas pu être renouvelée. Déverrouille à nouveau ou réinitialise la connexion.');
+  }
+}
+async function completeSecurityAction(){
+  const password=$('#securityPassword').value;
+  const confirm=$('#securityConfirm').value;
+  const error=$('#securityError'),button=$('#securitySubmit');
+  error.textContent='';
+  if(!password){error.textContent='Entre le mot de passe local.';return}
+  if(state.securityMode==='oauth'||state.securityMode==='migrate'){
+    if(password.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
+    if(password!==confirm){error.textContent='Les deux mots de passe ne correspondent pas.';return}
+  }
+  button.disabled=true;
+  try{
+    if(state.securityMode==='unlock'){
+      const payload=await decryptVault(vaultRecord(),password);
+      state.haUrl=normalizeHaUrl(payload.ha_url);
+      state.refreshToken=String(payload.refresh_token||'');
+      state.locked=false;
+      hideSecurity();
+      await connectFromRefresh();
+      return;
+    }
+    if(state.securityMode==='migrate'){
+      const legacy=legacyAuthRecord();
+      const haUrl=normalizeHaUrl(legacy?.ha_url||localStorage.getItem(STORAGE.haUrl)||state.haUrl);
+      if(!legacy?.refresh_token||!haUrl)throw new Error('Ancienne connexion introuvable');
+      await storeSecureVault(legacy.refresh_token,haUrl,password);
+      state.haUrl=haUrl;state.refreshToken=String(legacy.refresh_token);state.locked=false;
+      hideSecurity();
+      await connectFromRefresh();
+      return;
+    }
+    if(state.securityMode==='oauth'){
+      const code=state.pendingOAuthCode||new URLSearchParams(location.search).get('code')||'';
+      if(!code)throw new Error('Code OAuth manquant');
+      const data=await exchangeCodeRaw(code);
+      if(!data?.refresh_token||!data?.access_token)throw new Error('Réponse OAuth incomplète');
+      await storeSecureVault(data.refresh_token,state.haUrl,password);
+      state.refreshToken=String(data.refresh_token);
+      state.accessToken=String(data.access_token);
+      state.accessTokenExpiresAt=Date.now()+Number(data.expires_in||1800)*1000;
+      state.locked=false;
+      clearOAuthState();state.pendingOAuthCode='';
+      history.replaceState({},'',REDIRECT_URI);
+      hideSecurity();
+      await connectAuthorized(state.accessToken);
+      return;
+    }
+  }catch(err){
+    error.textContent=state.securityMode==='unlock'
+      ?'Mot de passe incorrect ou coffre illisible.'
+      :(err.message||'Sécurisation impossible');
+  }finally{button.disabled=false}
 }
 function beginOAuth(){
   state.demo=false;
   const value=normalizeHaUrl($('#haUrlInput').value);
   if(!value){$('#setupError').textContent='Entre une adresse HTTPS Home Assistant valide.';return}
-  state.haUrl=value;localStorage.setItem(STORAGE.haUrl,value);
+  state.haUrl=value;
+  // Do not persist the HA URL in plaintext. It survives the OAuth round-trip only in this tab.
+  deleteKey(STORAGE.haUrl);
   const nonce=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));
-  saveJson('courses-external-oauth-state',{nonce,haUrl:value});
+  try{sessionStorage.setItem(OAUTH_STATE_KEY,JSON.stringify({nonce,haUrl:value,createdAt:Date.now()}))}catch(_){
+    $('#setupError').textContent='Le stockage temporaire du navigateur est indisponible.';return;
+  }
   const authorize=value+'/auth/authorize?client_id='+encodeURIComponent(CLIENT_ID)+'&redirect_uri='+encodeURIComponent(REDIRECT_URI)+'&state='+encodeURIComponent(nonce);
   location.assign(authorize);
 }
 async function revoke(){
   state.demo=false;
-  const record=authRecord();
-  if(record?.refresh_token&&state.haUrl){
-    try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:record.refresh_token})})}catch(_){}
+  if(state.refreshToken&&state.haUrl){
+    try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
-  clearAuth();deleteKey(STORAGE.entity);state.entity='';state.items=[];state.intentionalClose=true;
-  try{state.ws?.close()}catch(_){}
-  showSetup('');
+  clearLockTimers();closeSocket();wipeMemoryCredentials();
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  clearOAuthState();
+  state.entity='';state.entities=[];state.items=[];state.haUrl='';state.locked=true;
+  $('#settingsDialog').close();
+  showSetup('Autorisation locale supprimée et session Home Assistant révoquée.');
 }
 
 function websocketUrl(){const u=new URL(state.haUrl);u.protocol=u.protocol==='https:'?'wss:':'ws:';u.pathname=(u.pathname.replace(/\/$/,'')+'/api/websocket');u.search='';u.hash='';return u.toString()}
@@ -258,7 +493,7 @@ function connectWs(token){
     ws.onerror=()=>{if(!authed){clearTimeout(timeout);reject(new Error('WebSocket Home Assistant indisponible'))}};
     ws.onclose=()=>{
       state.pending.forEach(p=>{clearTimeout(p.timer);p.reject(new Error('Connexion interrompue'))});state.pending.clear();
-      if(authed&&!state.intentionalClose){status('is-waiting','Reconnexion…','Home Assistant');clearTimeout(state.reconnectTimer);state.reconnectTimer=setTimeout(init,2500)}
+      if(authed&&!state.intentionalClose&&!state.locked&&state.refreshToken){status('is-waiting','Reconnexion…','Home Assistant');clearTimeout(state.reconnectTimer);state.reconnectTimer=setTimeout(connectFromRefresh,2500)}
     };
   });
 }
@@ -319,45 +554,98 @@ function openSettings(){
   $('#entitySelect').innerHTML=state.entities.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
   $('#settingsDialog').showModal();
 }
-function saveSettings(){
+async function saveSettings(){
   const nextUrl=normalizeHaUrl($('#settingsHaUrl').value),nextEntity=$('#entitySelect').value;
   if(!nextUrl)return;
   const changedUrl=nextUrl!==state.haUrl;
-  state.haUrl=nextUrl;localStorage.setItem(STORAGE.haUrl,nextUrl);
   if(nextEntity){state.entity=nextEntity;localStorage.setItem(STORAGE.entity,nextEntity)}
   $('#settingsDialog').close();
-  if(changedUrl){clearAuth();state.intentionalClose=true;try{state.ws?.close()}catch(_){}showSetup('Adresse modifiée : reconnecte Home Assistant.')}else refreshItems();
+  if(changedUrl){
+    await revoke();
+    state.haUrl=nextUrl;
+    $('#haUrlInput').value=nextUrl;
+    $('#setupError').textContent='Adresse modifiée : reconnecte Home Assistant.';
+  }else{
+    await refreshItems();armIdleLock();
+  }
 }
 async function init(){
-  if(!state.haUrl){state.loading=false;renderView();showSetup();status('is-waiting','Configuration requise','Première connexion');return}
-  try{
-    status('is-waiting','Connexion…','Home Assistant');
-    const token=await ensureAccessToken();
-    if(!token){state.loading=false;renderView();showSetup();return}
-    state.accessToken=token;hideSetup();await connectWs(token);
-    const entity=await discoverEntities();
-    if(!entity){state.loading=false;renderList();status('is-waiting','Choisir une liste','Réglages');openSettings();return}
-    await subscribe();await refreshItems();
-  }catch(error){state.loading=false;state.error=error.message||'Connexion impossible';renderList();status('is-error','Hors connexion',state.error);if(!authRecord()?.refresh_token)showSetup(state.error)}
+  renderView();
+  if(!window.crypto?.subtle){
+    state.loading=false;renderList();
+    showSetup('Ce navigateur ne prend pas en charge le chiffrement Web Crypto requis.');
+    status('is-error','Navigateur incompatible','Web Crypto indisponible');
+    return;
+  }
+  const params=new URLSearchParams(location.search);
+  const code=params.get('code');
+  if(code){
+    const oauth=loadOAuthState();
+    const returnedState=params.get('state')||'';
+    if(!oauth||oauth.nonce!==returnedState||!normalizeHaUrl(oauth.haUrl)){
+      history.replaceState({},'',REDIRECT_URI);
+      showSetup('Retour OAuth invalide ou expiré. Recommence la connexion.');
+      return;
+    }
+    state.haUrl=normalizeHaUrl(oauth.haUrl);
+    state.pendingOAuthCode=code;
+    state.loading=false;renderList();
+    showSecurity('oauth','Crée maintenant le mot de passe local qui protégera l’autorisation Home Assistant sur cet appareil.');
+    status('is-waiting','Sécurisation requise','Créer le mot de passe local');
+    return;
+  }
+  const legacy=legacyAuthRecord();
+  if(legacy?.refresh_token){
+    state.haUrl=normalizeHaUrl(legacy.ha_url||localStorage.getItem(STORAGE.haUrl)||'');
+    state.loading=false;renderList();
+    showSecurity('migrate','Une ancienne connexion non chiffrée a été détectée. Crée un mot de passe local pour la chiffrer immédiatement.');
+    status('is-waiting','Migration sécurité','Chiffrement de la connexion');
+    return;
+  }
+  if(vaultRecord()){
+    state.loading=false;renderList();
+    showSecurity('unlock');
+    status('is-waiting','Verrouillé','Mot de passe local requis');
+    return;
+  }
+  state.haUrl=normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
+  state.loading=false;renderView();showSetup();status('is-waiting','Configuration requise','Première connexion');
 }
 
 $('#connectBtn').onclick=beginOAuth;
+$('#securitySubmit').onclick=completeSecurityAction;
+$('#securityPassword').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+$('#securityConfirm').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+$('#resetSecurityBtn').onclick=resetLocalConnection;
 $('#demoBtn').onclick=()=>{
-  state.demo=true;state.loading=false;state.error='';
+  state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
+  state.loading=false;state.error='';
   state.items=loadJson(DEMO_KEY,[])||[];
-  hideSetup();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
+  hideSetup();hideSecurity();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
 };
 $('#settingsBtn').onclick=openSettings;
 $('#cancelSettings').onclick=()=>$('#settingsDialog').close();
 $('#saveSettings').onclick=saveSettings;
+$('#lockNowBtn').onclick=()=>{$('#settingsDialog').close();lockApp('Verrouillage manuel.')};
 $('#logoutBtn').onclick=revoke;
 $('#productSearch').oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
 $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
 $('#manualAdd').onclick=()=>{const input=$('#manualInput'),value=input.value.trim();if(value){input.value='';addItem(value)}};
 $('#manualInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#manualAdd').click()}};
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'catalog';renderView()});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(state.demo)refreshItems();else if(state.ws?.readyState===WebSocket.OPEN)refreshItems()}});
-window.addEventListener('online',()=>init());
+['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){
+    clearTimeout(state.backgroundLockTimer);
+    if(!state.locked&&!state.demo&&vaultRecord())state.backgroundLockTimer=setTimeout(()=>lockApp('Verrouillage après passage en arrière-plan.'),SECURITY.backgroundLockMs);
+    return;
+  }
+  clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
+  if(state.demo)refreshItems();
+  else if(!state.locked&&state.ws?.readyState===WebSocket.OPEN){refreshItems();armIdleLock()}
+});
+window.addEventListener('online',()=>{if(!state.locked&&!state.demo&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN)connectFromRefresh()});
+window.addEventListener('pagehide',()=>{clearLockTimers();closeSocket();wipeMemoryCredentials()});
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderView();init();
