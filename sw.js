@@ -1,5 +1,5 @@
-const CACHE='courses-app-v27-security-layout';
-const SHELL=['./','./index.html','./styles.css?v=27','./catalog.js','./app.js?v=27','./manifest.webmanifest','./apple-touch-icon.png','./icon-premium.png','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
+const CACHE='courses-app-v27-ios-cache-bust';
+const SHELL=['./','./index.html','./styles.css?v=27','./catalog.js','./app.js?v=27','./manifest.webmanifest?v=27','./courses-apple-touch-v27.png','./courses-icon-192-v27.png','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
