@@ -720,6 +720,7 @@ async function unlockWithFaceId(options={}){
 function showPasswordFallback(){
   $('#passwordPanel').hidden=false;
   $('#passwordLoginBtn').hidden=true;
+  $('.security-shell').classList.add('is-password-open');
   $('#securityError').textContent='';
   setTimeout(()=>$('#securityPassword').focus(),60);
 }
@@ -842,6 +843,9 @@ function showSecurity(mode,message='',options={}){
   const creating=mode==='oauth'||mode==='migrate';
   const faceReady=mode==='unlock'&&!!biometricRecord()&&!!window.PublicKeyCredential;
   $('.security-modal').classList.toggle('is-quick-unlock',faceReady&&!creating);
+  $('.security-modal').classList.toggle('is-creating',creating);
+  $('.security-shell').classList.toggle('is-form-mode',creating||!faceReady);
+  $('.security-shell').classList.remove('is-password-open');
   $('#securityIcon').classList.toggle('is-creating',creating);
   $('#securityTitle').textContent=creating
     ?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application')
@@ -870,6 +874,7 @@ function hideSecurity(){
   $('#securityConfirm').value='';
   $('#securityError').textContent='';
   state.facePromptActive=false;
+  $('.security-shell').classList.remove('is-password-open','is-form-mode');
   refreshVisualLock();
 }
 function lockApp(message='Application verrouillée.'){
@@ -1284,6 +1289,7 @@ $('#demoBtn').onclick=()=>{
   hideSetup();hideSecurity();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
 };
 $('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
+$('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
 $('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
 ['settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsFaceIdBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
 $('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
