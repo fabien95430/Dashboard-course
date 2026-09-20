@@ -189,7 +189,7 @@ body{
   box-shadow:0 8px 20px rgba(183,90,126,.22),inset 0 1px 0 rgba(255,255,255,.72)
 }
 .done:active{transform:scale(.93)}
-.list-row.is-removing{opacity:0;transform:translateX(-14px)}
+
 .tabs{
   background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,238,245,.035));
   border-color:rgba(255,235,244,.14)
@@ -248,4 +248,78 @@ body{
 }
 .list-main .list-icon{
   filter:drop-shadow(0 4px 7px rgba(12,6,10,.12));
+}
+
+
+/* Swipe d'achat : glisser vers la gauche, puis laisser le feedback respirer */
+.list-row{
+  position:relative;
+  display:block;
+  min-height:74px;
+  overflow:hidden;
+  padding:0;
+  border-bottom:1px solid rgba(255,235,244,.075);
+  touch-action:pan-y;
+  transition:opacity .26s ease,transform .26s ease,max-height .26s ease;
+}
+.list-row:last-child{border-bottom:0}
+.swipe-action{
+  position:absolute;
+  z-index:1;
+  inset:0 0 0 auto;
+  width:42%;
+  min-width:126px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0 18px;
+  background:linear-gradient(105deg,rgba(121,58,91,.70),rgba(236,155,188,.34));
+  color:#ffd9e8;
+  opacity:0;
+  transform:translateX(18px);
+  transition:opacity .20s ease,transform .20s ease;
+  pointer-events:none;
+}
+.swipe-action span{
+  font-size:29px;
+  line-height:1;
+  font-weight:900;
+}
+.swipe-action strong{
+  font-size:17px;
+  line-height:1;
+  font-weight:780;
+  white-space:nowrap;
+}
+.swipe-content{
+  position:relative;
+  z-index:2;
+  min-height:74px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 52px;
+  align-items:center;
+  gap:8px;
+  padding:3px 2px;
+  background:linear-gradient(145deg,rgba(255,255,255,.018),rgba(255,238,245,.008)),rgba(20,15,20,.20);
+  will-change:transform;
+  touch-action:pan-y;
+}
+.list-main,.done{touch-action:pan-y}
+.list-row.is-purchased .swipe-content{
+  transform:translate3d(-42%,0,0)!important;
+  transition:transform .34s cubic-bezier(.2,.8,.2,1)!important;
+}
+.list-row.is-purchased .swipe-action{
+  opacity:1!important;
+  transform:translateX(0)!important;
+}
+.list-row.is-purchased .list-name{
+  text-decoration:line-through;
+  color:rgba(255,235,244,.50);
+}
+.list-row.is-purchased .qty{opacity:.55}
+.list-row.is-removing{
+  opacity:0;
+  transform:translateX(-12px);
 }
