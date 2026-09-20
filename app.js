@@ -74,6 +74,14 @@ const BY_NAME=new Map(ALL.map(p=>[norm(p.name),p]));
 const POSITIONS=new Map();
 Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));
 
+const PRODUCT_SHEETS=Object.freeze({
+  'Frais':{src:'./assets/bring-photo-v4-frais.webp',cols:12,rows:8,ratio:1},
+  'Fruits & Légumes':{src:'./assets/bring-photo-v4-fruits-legumes.webp',cols:12,rows:6,ratio:1},
+  'Épicerie':{src:'./assets/bring-photo-v4-epicerie.webp',cols:12,rows:8,ratio:1},
+  'Boissons':{src:'./assets/bring-photo-v4-boissons.webp',cols:12,rows:4,ratio:1},
+  'Maison':{src:'./assets/bring-photo-v4-maison.webp',cols:12,rows:7,ratio:.875}
+});
+
 let state={
   haUrl:'',
   accessToken:'',
@@ -232,7 +240,14 @@ function premiumProductVisual(product, compact = false) {
   }
 
 function sprite(product,compact=false){
-  return premiumProductVisual(product,compact);
+  const position=POSITIONS.get(norm(product?.name));
+  const sheet=position&&PRODUCT_SHEETS[position.category];
+  if(!position||!sheet)return premiumProductVisual(product,compact);
+  const fallback=premiumProductVisual(product,compact);
+  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-cols:'+sheet.cols+';--sprite-rows:'+sheet.rows+';--sprite-col:'+position.col+';--sprite-row:'+position.row+';--sprite-ratio:'+sheet.ratio+'" aria-hidden="true">'+
+    '<img src="'+sheet.src+'" alt="" loading="lazy" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
+    '<span class="sprite-fallback">'+fallback+'</span>'+
+  '</span>';
 }
 
 function usageSave(){saveJson(STORAGE.usage,state.usage)}
