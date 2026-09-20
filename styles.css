@@ -31,3 +31,49 @@
 .security-modal.is-quick-unlock h2{margin-bottom:4px}
 .security-modal.is-quick-unlock>p{margin-top:4px;margin-bottom:14px}
 .security-modal.is-quick-unlock .faceid-btn{margin-top:8px}
+
+
+/* Interface mobile : fond plus sobre, liste prioritaire et commandes tactiles */
+:root{--text:#f7f9fb;--muted:rgba(225,232,238,.62);--line:rgba(255,255,255,.105);--green:#78dda8;--danger:#ff8794}
+html,body{background:#0d1115}
+body{background:radial-gradient(85% 55% at 50% -12%,rgba(102,157,137,.16),transparent 64%),linear-gradient(180deg,#12171c 0%,#0d1115 100%)}
+.status,.searchbox,.tabs,.list-items{background:rgba(20,26,31,.82);border-color:rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.round-btn{background:rgba(24,31,36,.82);border-color:rgba(255,255,255,.11)}
+.catalog-view{grid-template-rows:42px 43px minmax(0,1fr);gap:9px}
+.categories{align-items:center;gap:8px;padding:1px 0}
+.cat{flex:0 0 auto;min-width:76px;height:38px;border:1px solid rgba(255,255,255,.11);border-radius:999px;background:rgba(24,31,36,.84);box-shadow:none;display:flex;align-items:center;justify-content:center;padding:0 14px}
+.cat>span,.cat-label{font-size:12px;font-weight:760;white-space:nowrap}
+.cat.is-active{color:#173126;background:#eaf4ef;border-color:rgba(255,255,255,.72);box-shadow:0 5px 14px rgba(0,0,0,.13)}
+.product{background:linear-gradient(145deg,rgba(28,35,41,.95),rgba(20,26,31,.94));border-color:rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 20px rgba(0,0,0,.14)}
+.product.is-selected{background:linear-gradient(180deg,#edf6f1,#dcebe3);color:#20372e;border-color:rgba(255,255,255,.72)}
+.emoji-icon{background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.055)}
+.product.is-selected .emoji-icon{background:rgba(255,255,255,.48)}
+
+.list-view{grid-template-rows:auto 46px minmax(0,1fr);gap:10px}
+.list-head{position:relative;min-height:42px;padding:0 1px}
+.list-head strong{font-size:20px;letter-spacing:-.25px}
+.list-head small{font-size:11px;margin-top:4px}
+.list-filter{position:relative;z-index:20}
+.filter-btn{height:38px;max-width:190px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(24,31,36,.94);color:#eef3f5;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:760;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+.filter-btn span{color:var(--muted);font-size:14px}
+.filter-menu{position:absolute;right:0;top:44px;width:min(250px,calc(100vw - 32px));padding:6px;border:1px solid rgba(255,255,255,.13);border-radius:15px;background:#171d22;box-shadow:0 18px 44px rgba(0,0,0,.38);display:grid;gap:3px}
+.filter-menu[hidden]{display:none}
+.filter-option{min-height:40px;border:0;border-radius:10px;background:transparent;color:#edf2f4;text-align:left;padding:0 11px;font-size:13px;font-weight:650}
+.filter-option:active,.filter-option.is-active{background:rgba(120,221,168,.13);color:#9bebbf}
+.list-items{padding:5px 7px;border-radius:18px;overscroll-behavior:contain}
+.list-row{min-height:70px;display:grid;grid-template-columns:50px minmax(0,1fr);align-items:center;gap:7px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.065);transition:opacity .12s ease,transform .12s ease}
+.list-row:last-child{border-bottom:0}
+.list-row.is-busy{opacity:.68}
+.list-row.is-removing{opacity:0;transform:translateX(-12px)}
+.remove{width:44px;height:44px;justify-self:center;border:1px solid rgba(255,125,139,.26);border-radius:13px;background:rgba(255,90,108,.09);color:#ff9aa5;font-size:21px;line-height:1;display:grid;place-items:center}
+.remove:active{transform:scale(.94)}
+.list-main{min-width:0;width:100%;height:66px;border:0;background:transparent;color:var(--text);display:grid;grid-template-columns:58px minmax(0,1fr) auto;align-items:center;gap:9px;padding:0 4px 0 0;text-align:left}
+.list-main:active{transform:scale(.988)}
+.list-icon{width:54px;height:54px;display:grid;place-items:center}
+.emoji-icon.is-compact{width:48px;height:48px;border-radius:14px;font-size:30px}
+.unknown{width:46px;height:46px;border-radius:13px;font-size:20px}
+.list-name{font-size:16px;font-weight:720;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.15px}
+.qty{min-width:42px;height:30px;padding:0 9px;border-radius:10px;background:rgba(120,221,168,.10);color:#9be8bd;display:grid;place-items:center;font-size:13px;font-weight:820}
+.tabs{background:rgba(19,25,30,.92);border-color:rgba(255,255,255,.10);box-shadow:0 12px 30px rgba(0,0,0,.20)}
+.tab{font-size:13px}
+.tab.is-active{background:#eaf4ef;color:#173126;box-shadow:0 6px 16px rgba(0,0,0,.14)}

@@ -45,6 +45,15 @@ Le coffre Face ID local est stocké sous la clé `courses-faceid-v1`. Il ne cont
 
 > Cette protection réduit fortement le risque en cas d'accès aux fichiers de stockage du navigateur. Un appareil déjà déverrouillé et une application déjà déverrouillée restent naturellement accessibles pendant la session active.
 
+## Utilisation de la liste
+
+- **Ma liste** est l'écran affiché par défaut et l'onglet de gauche.
+- toucher un article dans **Ma liste** ajoute une unité (`x1 → x2 → x3…`) ;
+- la poubelle supprime immédiatement l'article complet de l'affichage, puis synchronise Home Assistant ;
+- le filtre **Toutes / Frais / Fruits & Légumes / Épicerie / Boissons / Maison** limite les articles affichés ;
+- l'ajout manuel depuis **Ma liste** a été retiré : les articles sont choisis depuis le catalogue ;
+- les catégories du catalogue utilisent des libellés texte sans icône.
+
 ## Test sans Home Assistant
 
 Le bouton **Tester sans Home Assistant** permet de vérifier immédiatement la recherche, les catégories et la liste. Les données de ce mode restent uniquement dans le stockage local du navigateur.
