@@ -323,3 +323,75 @@ body{
   opacity:0;
   transform:translateX(-12px);
 }
+
+
+/* Premium raster product sheets — mobile catalogue + Ma liste */
+.media,
+.list-icon,
+.premium-sprite,
+.unknown{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+.product .media,
+.list-main .list-icon{
+  filter:none!important;
+}
+.premium-sprite{
+  position:relative;
+  display:block;
+  width:calc(96px * var(--sprite-ratio,1));
+  height:96px;
+  max-width:100%;
+  max-height:100%;
+  overflow:hidden;
+}
+.premium-sprite>img{
+  position:absolute;
+  top:calc(var(--sprite-row) * -100%);
+  left:calc(var(--sprite-col) * -100%);
+  width:calc(var(--sprite-cols) * 100%);
+  height:calc(var(--sprite-rows) * 100%);
+  max-width:none;
+  max-height:none;
+  object-fit:fill;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+.premium-sprite.is-compact{
+  width:calc(46px * var(--sprite-ratio,1));
+  height:46px;
+}
+.sprite-fallback{
+  display:none;
+  width:100%;
+  height:100%;
+}
+.premium-sprite.is-fallback>img{display:none}
+.premium-sprite.is-fallback>.sprite-fallback{
+  display:grid;
+  place-items:center;
+}
+.premium-sprite.is-fallback .product-svg{
+  width:100%;
+  height:100%;
+}
+.unknown{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+}
+@media(max-width:370px){
+  .premium-sprite{
+    width:calc(86px * var(--sprite-ratio,1));
+    height:86px;
+  }
+  .premium-sprite.is-compact{
+    width:calc(44px * var(--sprite-ratio,1));
+    height:44px;
+  }
+}
