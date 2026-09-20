@@ -73,22 +73,27 @@
 
   <section id="securityOverlay" class="overlay security-overlay" aria-modal="true" aria-labelledby="securityTitle">
     <div class="modal security-modal">
-      <div class="modal-icon">🔐</div>
-      <h2 id="securityTitle">Déverrouiller Courses</h2>
-      <p id="securityText">Entre le mot de passe local de cette application.</p>
-      <button id="faceIdUnlockBtn" class="faceid-btn" type="button" hidden><span aria-hidden="true">◉</span> Déverrouiller avec Face ID</button>
-      <div id="passwordDivider" class="security-divider" hidden><span>ou avec le mot de passe</span></div>
-      <label class="field">
-        <span>Mot de passe local</span>
-        <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
-      </label>
-      <label id="securityConfirmWrap" class="field" hidden>
-        <span>Confirmer le mot de passe</span>
-        <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
-      </label>
-      <p id="securityHint" class="hint">Le mot de passe n’est jamais enregistré. Il sert uniquement à déchiffrer ton autorisation Home Assistant sur cet appareil.</p>
-      <button id="securitySubmit" class="primary" type="button">Déverrouiller</button>
-      <button id="resetSecurityBtn" class="secondary" type="button">Réinitialiser la connexion de cet appareil</button>
+      <div class="modal-icon" id="securityIcon">🔐</div>
+      <h2 id="securityTitle">Mes courses</h2>
+      <p id="securityText">Déverrouillage sécurisé</p>
+
+      <button id="faceIdUnlockBtn" class="faceid-btn" type="button" hidden><span aria-hidden="true">◉</span> Face ID</button>
+      <button id="passwordLoginBtn" class="secondary password-toggle" type="button" hidden>Connexion avec mot de passe</button>
+
+      <div id="passwordPanel" class="password-panel">
+        <label class="field">
+          <span>Mot de passe local</span>
+          <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
+        </label>
+        <label id="securityConfirmWrap" class="field" hidden>
+          <span>Confirmer le mot de passe</span>
+          <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+        </label>
+        <p id="securityHint" class="hint">Le mot de passe n’est jamais enregistré. Il sert uniquement à déchiffrer ton autorisation Home Assistant sur cet appareil.</p>
+        <button id="securitySubmit" class="primary" type="button">Connexion</button>
+        <button id="resetSecurityBtn" class="secondary reset-link" type="button">Réinitialiser la connexion de cet appareil</button>
+      </div>
+
       <div id="securityError" class="setup-error" role="alert"></div>
     </div>
   </section>
