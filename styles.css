@@ -395,3 +395,93 @@ body{
     height:44px;
   }
 }
+
+
+/* Swipe premium — le ✓ s'efface et laisse place à la capsule « Acheté ! » */
+.swipe-action{
+  top:7px;
+  right:6px;
+  bottom:7px;
+  left:auto;
+  width:40%;
+  min-width:138px;
+  border:1px solid rgba(255,220,235,.24);
+  border-radius:24px;
+  overflow:hidden;
+  padding:0 20px;
+  background:
+    radial-gradient(circle at 22% 12%,rgba(255,244,249,.28),transparent 34%),
+    linear-gradient(118deg,rgba(113,61,88,.92) 0%,rgba(174,91,132,.84) 54%,rgba(239,159,192,.72) 100%);
+  -webkit-backdrop-filter:blur(18px) saturate(128%);
+  backdrop-filter:blur(18px) saturate(128%);
+  box-shadow:
+    0 12px 28px rgba(48,20,36,.28),
+    inset 0 1px 0 rgba(255,255,255,.26),
+    inset 0 -1px 0 rgba(94,40,68,.26);
+  color:#fff4fa;
+  opacity:0;
+  transform:translateX(20px) scale(.96);
+  transition:
+    opacity .20s ease,
+    transform .22s cubic-bezier(.2,.8,.2,1),
+    box-shadow .22s ease,
+    border-color .22s ease;
+}
+.swipe-action::before{
+  content:'';
+  position:absolute;
+  inset:1px 10% auto 10%;
+  height:42%;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.19),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.swipe-action::after{
+  content:'';
+  position:absolute;
+  width:54px;
+  height:54px;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,224,238,.24),rgba(255,224,238,0) 68%);
+  filter:blur(2px);
+  pointer-events:none;
+}
+.swipe-action strong{
+  position:relative;
+  z-index:2;
+  font-size:18px;
+  line-height:1;
+  font-weight:820;
+  letter-spacing:-.2px;
+  white-space:nowrap;
+  text-shadow:0 1px 10px rgba(73,29,51,.28);
+}
+.swipe-action.is-ready{
+  border-color:rgba(255,227,240,.46);
+  box-shadow:
+    0 14px 34px rgba(122,48,85,.34),
+    0 0 24px rgba(242,159,193,.12),
+    inset 0 1px 0 rgba(255,255,255,.34),
+    inset 0 -1px 0 rgba(94,40,68,.22);
+}
+.swipe-content .done{
+  transition:opacity .16s ease,transform .18s ease,filter .18s ease;
+  transform-origin:center;
+  will-change:opacity,transform;
+}
+.list-row.is-purchased .done{
+  opacity:0!important;
+  transform:scale(.86)!important;
+  pointer-events:none;
+}
+.list-row.is-purchased .swipe-action{
+  border-color:rgba(255,230,241,.48);
+  box-shadow:
+    0 16px 36px rgba(122,48,85,.34),
+    0 0 28px rgba(242,159,193,.14),
+    inset 0 1px 0 rgba(255,255,255,.36),
+    inset 0 -1px 0 rgba(94,40,68,.20);
+}
