@@ -1760,3 +1760,22 @@ svg{display:block}
 
 /* ===== UI v26 — zoom verrouillé ===== */
 html,body{touch-action:pan-x pan-y}
+
+
+/* ===== UI v27 — états sécurité cohérents ===== */
+[hidden]{display:none!important}
+.security-shell.is-form-mode .security-note,
+.security-shell.is-form-mode .security-benefits{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.security-shell.is-form-mode .security-modal{
+  top:35%!important;
+}
+.security-modal.is-creating .faceid-btn,
+.security-modal.is-creating .password-toggle{
+  display:none!important;
+}
+@media(max-height:720px){
+  .security-shell.is-form-mode .security-modal{top:31%!important}
+}
