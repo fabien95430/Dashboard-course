@@ -340,7 +340,7 @@ function renderProducts(){
     return '<button type="button" class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" aria-pressed="'+(active?'true':'false')+'">'+
       '<span class="badge">'+(active?'✓':'+')+'</span>'+
       '<span class="media">'+sprite(product)+'</span>'+
-      '<span class="product-copy"><span class="pname">'+esc(product.name)+'</span><small class="pcat">'+esc(product.category)+'</small></span>'+
+      '<span class="product-copy"><span class="pname">'+esc(product.name)+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>'+
     '</button>';
   }).join('');
   el.querySelectorAll('.product').forEach(button=>button.onclick=()=>toggleProduct(button.dataset.name||''));
@@ -402,7 +402,7 @@ function renderList(){
   }
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=BY_NAME.get(key),busy=state.productBusy.has(key);
-    const categoryLabel=product?.category||'Article';
+    const categoryLabel=product?.sub||product?.category||'Article';
     const quantity=group.count>1?'<span class="list-qty">x'+group.count+'</span>':'';
     return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
       '<button class="purchase-check" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'><svg><use href="#i-check"></use></svg></button>'+
