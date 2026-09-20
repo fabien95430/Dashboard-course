@@ -847,9 +847,7 @@ function showSecurity(mode,message='',options={}){
   $('.security-shell').classList.toggle('is-form-mode',creating||!faceReady);
   $('.security-shell').classList.remove('is-password-open');
   $('#securityIcon').classList.toggle('is-creating',creating);
-  $('#securityTitle').textContent=creating
-    ?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application')
-    :'Mes courses';
+  $('#securityTitle').textContent='Mes courses';
   $('#securityText').textContent=message||(creating
     ?'Choisis un mot de passe local. Il chiffrera l’autorisation Home Assistant enregistrée sur cet appareil.'
     :(faceReady?'Déverrouillage sécurisé':'Entre ton mot de passe local.'));
