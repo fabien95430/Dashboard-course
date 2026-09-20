@@ -21,6 +21,7 @@ const STORAGE = {
   haUrl:'courses-external-ha-url-v1',
   auth:'courses-external-auth-v1',
   vault:'courses-secure-vault-v1',
+  biometric:'courses-faceid-v1',
   entity:'courses-external-entity-v1',
   usage:'courses-external-usage-v1'
 };
@@ -220,6 +221,162 @@ function base64ToBytes(value){
   for(let i=0;i<binary.length;i++)out[i]=binary.charCodeAt(i);
   return out;
 }
+
+function bytesToBase64Url(bytes){
+  return bytesToBase64(bytes).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function base64UrlToBytes(value){
+  const raw=String(value||'').replace(/-/g,'+').replace(/_/g,'/');
+  return base64ToBytes(raw+'='.repeat((4-raw.length%4)%4));
+}
+function biometricRecord(){return loadJson(STORAGE.biometric,null)}
+function biometricAad(credentialId){return UTF8.encode('courses-faceid-v1|'+CLIENT_ID+'|'+credentialId)}
+async function importBiometricKey(secret){
+  const raw=secret instanceof Uint8Array?secret:new Uint8Array(secret);
+  return crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt']);
+}
+async function encryptBiometricPayload(payload,secret,credentialId){
+  const key=await importBiometricKey(secret);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const cipher=await crypto.subtle.encrypt(
+    {name:'AES-GCM',iv,additionalData:biometricAad(credentialId)},
+    key,
+    UTF8.encode(JSON.stringify(payload))
+  );
+  return {iv:bytesToBase64(iv),ciphertext:bytesToBase64(new Uint8Array(cipher))};
+}
+async function decryptBiometricPayload(record,secret){
+  const key=await importBiometricKey(secret);
+  const plain=await crypto.subtle.decrypt(
+    {name:'AES-GCM',iv:base64ToBytes(record.iv),additionalData:biometricAad(record.credential_id)},
+    key,
+    base64ToBytes(record.ciphertext)
+  );
+  const payload=JSON.parse(UTF8_DECODER.decode(plain));
+  if(!payload?.refresh_token||!normalizeHaUrl(payload?.ha_url))throw new Error('Coffre Face ID invalide');
+  return payload;
+}
+function randomBytes(length=32){return crypto.getRandomValues(new Uint8Array(length))}
+async function supportsFaceIdUnlock(){
+  if(!window.PublicKeyCredential||!navigator.credentials?.create||!navigator.credentials?.get)return false;
+  try{
+    if(PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
+      const available=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if(!available)return false;
+    }
+    if(PublicKeyCredential.getClientCapabilities){
+      const capabilities=await PublicKeyCredential.getClientCapabilities();
+      if(Object.prototype.hasOwnProperty.call(capabilities,'extension:prf')&&!capabilities['extension:prf'])return false;
+    }
+    return true;
+  }catch(_){return false}
+}
+async function getBiometricPrfSecret(credentialId,prfSalt){
+  const assertion=await navigator.credentials.get({
+    publicKey:{
+      challenge:randomBytes(32),
+      rpId:location.hostname,
+      allowCredentials:[{type:'public-key',id:credentialId}],
+      userVerification:'required',
+      timeout:60000,
+      extensions:{prf:{eval:{first:prfSalt}}}
+    }
+  });
+  if(!assertion)throw new Error('Vérification biométrique annulée');
+  const result=assertion.getClientExtensionResults?.()?.prf?.results?.first;
+  if(!result)throw new Error('La clé Face ID n’est pas disponible sur cet appareil');
+  return new Uint8Array(result);
+}
+async function enrollFaceId(){
+  if(state.locked||!state.refreshToken||!state.haUrl){toast('Déverrouille d’abord l’application');return}
+  const button=$('#faceIdSetupBtn');
+  button.disabled=true;
+  $('#faceIdSettingsStatus').textContent='Ouverture de Face ID…';
+  try{
+    if(!(await supportsFaceIdUnlock()))throw new Error('Face ID/WebAuthn PRF n’est pas disponible dans ce navigateur');
+    const prfSalt=randomBytes(32);
+    const credential=await navigator.credentials.create({
+      publicKey:{
+        challenge:randomBytes(32),
+        rp:{name:'Mes courses',id:location.hostname},
+        user:{id:randomBytes(32),name:'courses-local',displayName:'Mes courses'},
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{
+          authenticatorAttachment:'platform',
+          residentKey:'preferred',
+          userVerification:'required'
+        },
+        timeout:60000,
+        attestation:'none',
+        extensions:{prf:{eval:{first:prfSalt}}}
+      }
+    });
+    if(!credential)throw new Error('Création Face ID annulée');
+    const ext=credential.getClientExtensionResults?.()?.prf;
+    if(ext&&ext.enabled===false)throw new Error('Cet authentificateur ne prend pas en charge la clé PRF');
+    const credentialId=bytesToBase64Url(new Uint8Array(credential.rawId));
+    let secret=ext?.results?.first?new Uint8Array(ext.results.first):null;
+    if(!secret)secret=await getBiometricPrfSecret(new Uint8Array(credential.rawId),prfSalt);
+    const encrypted=await encryptBiometricPayload({
+      refresh_token:state.refreshToken,
+      ha_url:state.haUrl,
+      created_at:Date.now()
+    },secret,credentialId);
+    saveJson(STORAGE.biometric,{
+      version:1,
+      credential_id:credentialId,
+      prf_salt:bytesToBase64(prfSalt),
+      iv:encrypted.iv,
+      ciphertext:encrypted.ciphertext,
+      created_at:Date.now()
+    });
+    updateFaceIdSettings();
+    toast('Face ID activé');
+  }catch(error){
+    $('#faceIdSettingsStatus').textContent=error?.name==='NotAllowedError'
+      ?'Activation annulée.'
+      :(error.message||'Face ID indisponible');
+  }finally{button.disabled=false}
+}
+async function unlockWithFaceId(){
+  const record=biometricRecord();
+  const button=$('#faceIdUnlockBtn'),error=$('#securityError');
+  if(!record){error.textContent='Face ID n’est pas configuré sur cet appareil.';return}
+  button.disabled=true;error.textContent='';
+  try{
+    const secret=await getBiometricPrfSecret(
+      base64UrlToBytes(record.credential_id),
+      base64ToBytes(record.prf_salt)
+    );
+    const payload=await decryptBiometricPayload(record,secret);
+    state.haUrl=normalizeHaUrl(payload.ha_url);
+    state.refreshToken=String(payload.refresh_token||'');
+    state.locked=false;
+    hideSecurity();
+    await connectFromRefresh();
+  }catch(err){
+    error.textContent=err?.name==='NotAllowedError'
+      ?'Face ID annulé.'
+      :'Face ID impossible. Utilise le mot de passe local.';
+  }finally{button.disabled=false}
+}
+function removeFaceId(){
+  deleteKey(STORAGE.biometric);
+  updateFaceIdSettings();
+  toast('Face ID désactivé pour cette app');
+}
+async function updateFaceIdSettings(){
+  const record=biometricRecord();
+  const statusEl=$('#faceIdSettingsStatus'),setupBtn=$('#faceIdSetupBtn'),removeBtn=$('#faceIdRemoveBtn');
+  if(record){
+    statusEl.textContent='Activé sur cet appareil. Le mot de passe local reste disponible en secours.';
+    setupBtn.hidden=true;removeBtn.hidden=false;return;
+  }
+  removeBtn.hidden=true;setupBtn.hidden=false;setupBtn.disabled=false;
+  statusEl.textContent=(await supportsFaceIdUnlock())
+    ?'Disponible. Face ID peut déverrouiller le coffre local.'
+    :'Non disponible dans ce navigateur ou sur cet appareil.';
+}
 async function deriveVaultKey(password,salt,iterations=SECURITY.iterations){
   const material=await crypto.subtle.importKey('raw',UTF8.encode(password),'PBKDF2',false,['deriveKey']);
   return crypto.subtle.deriveKey(
@@ -307,10 +464,13 @@ function showSecurity(mode,message=''){
   $('#setup').classList.remove('is-visible');
   $('#securityOverlay').classList.add('is-visible');
   const creating=mode==='oauth'||mode==='migrate';
+  const faceReady=mode==='unlock'&&!!biometricRecord()&&!!window.PublicKeyCredential;
   $('#securityTitle').textContent=creating?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application'):'Déverrouiller Courses';
   $('#securityText').textContent=message||(creating
     ?'Choisis un mot de passe local. Il chiffrera l’autorisation Home Assistant enregistrée sur cet appareil.'
-    :'Entre le mot de passe local de cette application.');
+    :(faceReady?'Utilise Face ID ou ton mot de passe local.':'Entre le mot de passe local de cette application.'));
+  $('#faceIdUnlockBtn').hidden=!faceReady;
+  $('#passwordDivider').hidden=!faceReady;
   $('#securityConfirmWrap').hidden=!creating;
   $('#securityPassword').autocomplete=creating?'new-password':'current-password';
   $('#securityPassword').value='';
@@ -319,7 +479,7 @@ function showSecurity(mode,message=''){
   $('#resetSecurityBtn').hidden=creating;
   $('#securityError').textContent='';
   refreshVisualLock();
-  setTimeout(()=>$('#securityPassword').focus(),80);
+  if(!faceReady)setTimeout(()=>$('#securityPassword').focus(),80);
 }
 function hideSecurity(){
   $('#securityOverlay').classList.remove('is-visible');
@@ -342,7 +502,7 @@ function lockApp(message='Application verrouillée.'){
 }
 async function resetLocalConnection(){
   clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
   clearOAuthState();
   state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;state.demo=false;
   hideSecurity();showSetup('Connexion locale supprimée. Tu peux reconnecter Home Assistant.');
@@ -470,7 +630,7 @@ async function revoke(){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
   clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
   clearOAuthState();
   state.entity='';state.entities=[];state.items=[];state.haUrl='';state.locked=true;
   $('#settingsDialog').close();
@@ -562,6 +722,7 @@ function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   $('#settingsHaUrl').value=state.haUrl;
   $('#entitySelect').innerHTML=state.entities.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
+  updateFaceIdSettings();
   $('#settingsDialog').showModal();
 }
 async function saveSettings(){
@@ -624,6 +785,7 @@ async function init(){
 
 $('#connectBtn').onclick=beginOAuth;
 $('#securitySubmit').onclick=completeSecurityAction;
+$('#faceIdUnlockBtn').onclick=unlockWithFaceId;
 $('#securityPassword').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
 $('#securityConfirm').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
 $('#resetSecurityBtn').onclick=resetLocalConnection;
@@ -636,6 +798,8 @@ $('#demoBtn').onclick=()=>{
 $('#settingsBtn').onclick=openSettings;
 $('#cancelSettings').onclick=()=>$('#settingsDialog').close();
 $('#saveSettings').onclick=saveSettings;
+$('#faceIdSetupBtn').onclick=enrollFaceId;
+$('#faceIdRemoveBtn').onclick=removeFaceId;
 $('#lockNowBtn').onclick=()=>{$('#settingsDialog').close();lockApp('Verrouillage manuel.')};
 $('#logoutBtn').onclick=revoke;
 $('#productSearch').oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
