@@ -1,5 +1,5 @@
-const CACHE='courses-app-v17-reopen-courses-list';
-const SHELL=['./','./index.html','./styles.css?v=14','./catalog.js','./app.js?v=17','./manifest.webmanifest','./icon.svg','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
+const CACHE='courses-app-v18-todo-selection';
+const SHELL=['./','./index.html','./styles.css?v=14','./catalog.js','./app.js?v=18','./manifest.webmanifest','./icon.svg','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
