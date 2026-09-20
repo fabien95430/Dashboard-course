@@ -27,7 +27,23 @@
 
     <div id="status" class="status is-waiting"><span></span><div><strong>Connexion…</strong><small>Home Assistant</small></div></div>
 
-    <section id="catalogView" class="view catalog-view is-active">
+    <section id="listView" class="view list-view is-active">
+      <div class="list-head">
+        <div><strong>Ma liste</strong><small id="listCount">0 article</small></div>
+        <div class="list-filter">
+          <button id="listFilterBtn" class="filter-btn" type="button" aria-haspopup="true" aria-expanded="false">Toutes <span aria-hidden="true">⌄</span></button>
+          <div id="listFilterMenu" class="filter-menu" role="menu" hidden></div>
+        </div>
+      </div>
+      <label class="searchbox">
+        <span>⌕</span>
+        <input id="listSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher dans ma liste…">
+        <small></small>
+      </label>
+      <div id="listItems" class="list-items"></div>
+    </section>
+
+    <section id="catalogView" class="view catalog-view">
       <div id="categories" class="categories" aria-label="Catégories"></div>
       <label class="searchbox">
         <span>⌕</span>
@@ -37,20 +53,9 @@
       <div id="products" class="products"></div>
     </section>
 
-    <section id="listView" class="view list-view">
-      <div class="list-head"><div><strong>Ma liste</strong><small id="listCount">0 article</small></div><span>☷</span></div>
-      <label class="searchbox">
-        <span>⌕</span>
-        <input id="listSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher dans ma liste…">
-        <small></small>
-      </label>
-      <div id="listItems" class="list-items"></div>
-      <div class="manual"><input id="manualInput" type="text" enterkeyhint="done" autocomplete="off" placeholder="Ajouter un article"><button id="manualAdd" type="button" aria-label="Ajouter">＋</button></div>
-    </section>
-
     <nav class="tabs" aria-label="Navigation">
-      <button class="tab is-active" data-view="catalog" type="button">Catalogue</button>
-      <button class="tab" data-view="list" type="button">Ma liste</button>
+      <button class="tab is-active" data-view="list" type="button">Ma liste</button>
+      <button class="tab" data-view="catalog" type="button">Catalogue</button>
     </nav>
   </main>
 
