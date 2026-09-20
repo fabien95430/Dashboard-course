@@ -16,8 +16,8 @@ const CATEGORY_META = {
   'Maison': { label:'Maison' }
 };
 const LIST_CATEGORIES=['Toutes',...Object.keys(GROUPS)];
-const PURCHASE_HOLD_MS=520;
-const PURCHASE_EXIT_MS=260;
+const PURCHASE_HOLD_MS=720;
+const PURCHASE_EXIT_MS=360;
 const SWIPE_TRIGGER_RATIO=.36;
 const SWIPE_MAX_RATIO=.42;
 
@@ -400,8 +400,8 @@ function renderList(){
           '<span class="list-name">'+esc(group.summary)+'</span>'+
           '<span class="qty">x'+group.count+'</span>'+
         '</button>'+
-        '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
       '</div>'+
+      '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
     '</div>';
   }).join('');
   const markPurchased=button=>{
@@ -424,12 +424,14 @@ function bindSwipeRows(root){
       content.style.transition='transform .28s cubic-bezier(.22,.75,.2,1)';
       content.style.transform='translate3d(0,0,0)';
       action.style.opacity='0';
-      action.style.transform='translateX(20px) scale(.96)';
+      action.style.transform='translateX(28px) scale(.84)';
+      action.style.filter='blur(3px)';
       action.classList.remove('is-ready');
       if(done){
-        done.style.transition='opacity .22s ease,transform .22s ease';
+        done.style.transition='opacity .28s ease,transform .28s cubic-bezier(.2,.8,.2,1),filter .28s ease';
         done.style.opacity='1';
         done.style.transform='scale(1)';
+        done.style.filter='blur(0)';
       }
       ready=false;
       window.setTimeout(()=>{
@@ -451,13 +453,17 @@ function bindSwipeRows(root){
       const shouldPurchase=-offsetX>=threshold;
       if(shouldPurchase){
         row.dataset.suppressClick='1';
-        content.style.transition='';
+        content.style.transition='transform .34s cubic-bezier(.18,.82,.2,1)';
+        action.style.transition='opacity .30s ease,transform .34s cubic-bezier(.18,.82,.2,1),filter .30s ease,box-shadow .30s ease,border-color .30s ease';
         action.style.opacity='1';
         action.style.transform='translateX(0) scale(1)';
+        action.style.filter='blur(0)';
         action.classList.add('is-ready');
         if(done){
+          done.style.transition='opacity .22s ease,transform .26s ease,filter .22s ease';
           done.style.opacity='0';
-          done.style.transform='scale(.86)';
+          done.style.transform='scale(.72)';
+          done.style.filter='blur(3px)';
         }
         removeGroup(row.dataset.name||'',row);
       }else{
@@ -491,12 +497,17 @@ function bindSwipeRows(root){
       const threshold=Math.min(row.clientWidth*SWIPE_TRIGGER_RATIO,160);
       const isReady=-offsetX>=threshold;
       content.style.transform='translate3d('+offsetX+'px,0,0)';
-      action.style.opacity=String(.10+.90*progress);
-      action.style.transform='translateX('+(20*(1-progress))+'px) scale('+(0.96+0.04*progress)+')';
+      const actionProgress=Math.max(0,Math.min(1,(progress-.10)/.90));
+      const actionEase=1-Math.pow(1-actionProgress,2.1);
+      action.style.opacity=String(actionEase);
+      action.style.transform='translateX('+(28*(1-actionEase))+'px) scale('+(0.84+0.16*actionEase)+')';
+      action.style.filter='blur('+(3*(1-actionEase))+'px)';
       if(done){
-        const doneProgress=Math.min(1,progress/.72);
-        done.style.opacity=String(1-doneProgress);
-        done.style.transform='scale('+(1-.12*doneProgress)+')';
+        const doneProgress=Math.min(1,progress/.44);
+        const doneEase=doneProgress*doneProgress*(3-2*doneProgress);
+        done.style.opacity=String(1-doneEase);
+        done.style.transform='scale('+(1-.28*doneEase)+')';
+        done.style.filter='blur('+(3*doneEase)+'px)';
       }
       if(isReady!==ready){
         ready=isReady;
@@ -1122,12 +1133,14 @@ async function removeGroup(name,row=null){
     if(action){
       action.style.opacity='1';
       action.style.transform='translateX(0) scale(1)';
+      action.style.filter='blur(0)';
       action.classList.add('is-ready');
     }
     const done=row.querySelector('.done');
     if(done){
       done.style.opacity='0';
-      done.style.transform='scale(.86)';
+      done.style.transform='scale(.72)';
+      done.style.filter='blur(3px)';
     }
   }
   navigator.vibrate?.(8);
