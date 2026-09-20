@@ -4,3 +4,10 @@
 .emoji-icon{width:82px;height:82px;border-radius:22px;display:grid;place-items:center;font-size:48px;background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.18),rgba(255,255,255,.055));box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
 .emoji-icon.is-compact{width:38px;height:38px;border-radius:11px;font-size:23px}
 .product.is-selected .emoji-icon{background:rgba(255,255,255,.34)}
+
+.security-overlay{z-index:65}
+.security-modal{position:relative}
+.security-modal .primary{width:100%;margin-top:14px}
+.security-modal .secondary{margin-top:9px}
+.security-modal input[type="password"]{letter-spacing:.04em}
+.security-state{display:flex;align-items:center;gap:8px;margin-top:12px;padding:9px 11px;border:1px solid rgba(102,224,161,.18);border-radius:12px;background:rgba(102,224,161,.055);font-size:10px;color:rgba(255,255,255,.72)}
