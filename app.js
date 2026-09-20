@@ -66,8 +66,7 @@ function preferredTodoEntity(entities){
     || list.find(entry=>/^courses$/i.test(String(entry?.name||'').trim()))
     || list.find(entry=>/courses/i.test(describe(entry)))
     || list.find(entry=>/shopping[_ ]?list|liste[_ ]?de[_ ]?courses/i.test(describe(entry)))
-    || list.find(entry=>/bring/i.test(describe(entry)))
-    || (list.length===1?list[0]:null);
+    || null;
 }
 
 const ALL=[];
