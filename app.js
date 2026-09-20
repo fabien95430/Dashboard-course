@@ -383,7 +383,7 @@ function renderList(){
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=BY_NAME.get(key),busy=state.productBusy.has(key);
     return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
-      '<div class="swipe-action" aria-hidden="true"><span>✓</span><strong>Acheté !</strong></div>'+
+      '<div class="swipe-action" aria-hidden="true"><strong>Acheté !</strong></div>'+
       '<div class="swipe-content">'+
         '<button class="list-main" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>'+
           '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
@@ -406,15 +406,28 @@ function bindSwipeRows(root){
   root.querySelectorAll('.list-row').forEach(row=>{
     const content=row.querySelector('.swipe-content');
     const action=row.querySelector('.swipe-action');
+    const done=row.querySelector('.done');
     if(!content||!action||row.classList.contains('is-busy'))return;
-    let startX=0,startY=0,offsetX=0,tracking=false,horizontal=false,pointerId=null;
+    let startX=0,startY=0,offsetX=0,tracking=false,horizontal=false,pointerId=null,ready=false;
 
     const clearVisual=()=>{
-      content.style.transition='transform .26s cubic-bezier(.22,.75,.2,1)';
+      content.style.transition='transform .28s cubic-bezier(.22,.75,.2,1)';
       content.style.transform='translate3d(0,0,0)';
       action.style.opacity='0';
-      action.style.transform='translateX(18px)';
-      window.setTimeout(()=>{if(!row.classList.contains('is-purchased'))content.style.transition=''},280);
+      action.style.transform='translateX(20px) scale(.96)';
+      action.classList.remove('is-ready');
+      if(done){
+        done.style.transition='opacity .22s ease,transform .22s ease';
+        done.style.opacity='1';
+        done.style.transform='scale(1)';
+      }
+      ready=false;
+      window.setTimeout(()=>{
+        if(!row.classList.contains('is-purchased')){
+          content.style.transition='';
+          if(done)done.style.transition='';
+        }
+      },300);
     };
     const stopTracking=()=>{
       tracking=false;
@@ -430,7 +443,12 @@ function bindSwipeRows(root){
         row.dataset.suppressClick='1';
         content.style.transition='';
         action.style.opacity='1';
-        action.style.transform='translateX(0)';
+        action.style.transform='translateX(0) scale(1)';
+        action.classList.add('is-ready');
+        if(done){
+          done.style.opacity='0';
+          done.style.transform='scale(.86)';
+        }
         removeGroup(row.dataset.name||'',row);
       }else{
         clearVisual();
@@ -460,9 +478,21 @@ function bindSwipeRows(root){
       const maxReveal=row.clientWidth*SWIPE_MAX_RATIO;
       offsetX=Math.max(-maxReveal,Math.min(0,dx));
       const progress=Math.min(1,Math.abs(offsetX)/Math.max(1,maxReveal));
+      const threshold=Math.min(row.clientWidth*SWIPE_TRIGGER_RATIO,160);
+      const isReady=-offsetX>=threshold;
       content.style.transform='translate3d('+offsetX+'px,0,0)';
-      action.style.opacity=String(.18+.82*progress);
-      action.style.transform='translateX('+(18*(1-progress))+'px)';
+      action.style.opacity=String(.10+.90*progress);
+      action.style.transform='translateX('+(20*(1-progress))+'px) scale('+(0.96+0.04*progress)+')';
+      if(done){
+        const doneProgress=Math.min(1,progress/.72);
+        done.style.opacity=String(1-doneProgress);
+        done.style.transform='scale('+(1-.12*doneProgress)+')';
+      }
+      if(isReady!==ready){
+        ready=isReady;
+        action.classList.toggle('is-ready',ready);
+        if(ready)navigator.vibrate?.(5);
+      }
     },{passive:false});
     row.addEventListener('pointerup',event=>{
       if(event.pointerId!==pointerId)return;
@@ -1076,7 +1106,16 @@ async function removeGroup(name,row=null){
     row.querySelector('.swipe-content')?.style.removeProperty('transform');
     row.querySelector('.swipe-content')?.style.removeProperty('transition');
     const action=row.querySelector('.swipe-action');
-    if(action){action.style.opacity='1';action.style.transform='translateX(0)'}
+    if(action){
+      action.style.opacity='1';
+      action.style.transform='translateX(0) scale(1)';
+      action.classList.add('is-ready');
+    }
+    const done=row.querySelector('.done');
+    if(done){
+      done.style.opacity='0';
+      done.style.transform='scale(.86)';
+    }
   }
   navigator.vibrate?.(8);
   await new Promise(resolve=>setTimeout(resolve,row?PURCHASE_HOLD_MS:0));
