@@ -75,11 +75,11 @@ const POSITIONS=new Map();
 Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));
 
 const PRODUCT_SHEETS=Object.freeze({
-  'Frais':{src:'./assets/bring-photo-v4-frais.webp',cols:12,rows:8,ratio:1},
-  'Fruits & Légumes':{src:'./assets/bring-photo-v4-fruits-legumes.webp',cols:12,rows:6,ratio:1},
-  'Épicerie':{src:'./assets/bring-photo-v4-epicerie.webp',cols:12,rows:8,ratio:1},
-  'Boissons':{src:'./assets/bring-photo-v4-boissons.webp',cols:12,rows:4,ratio:1},
-  'Maison':{src:'./assets/bring-photo-v4-maison.webp',cols:12,rows:7,ratio:.875}
+  'Frais':{src:'./bring-photo-v4-frais.webp.png',cols:12,rows:8,ratio:1},
+  'Fruits & Légumes':{src:'./bring-photo-v4-fruits-legumes.webp.png',cols:12,rows:6,ratio:1},
+  'Épicerie':{src:'./bring-photo-v4-epicerie.webp.png',cols:12,rows:8,ratio:1},
+  'Boissons':{src:'./bring-photo-v4-boissons.webp.png',cols:12,rows:4,ratio:1},
+  'Maison':{src:'./bring-photo-v4-maison.webp.png',cols:12,rows:7,ratio:.875}
 });
 
 let state={
