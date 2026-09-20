@@ -69,11 +69,11 @@ Le bouton **Tester sans Home Assistant** permet de vérifier immédiatement la r
 
 ## Liste Home Assistant partagée
 
-L’application réutilise la liste `todo.*` enregistrée sur l’appareil. **`todo.courses`** reste prioritaire lorsqu’aucune sélection valide n’est enregistrée ; si elle n’existe pas, la première liste `todo.*` disponible est utilisée.
+À l’ouverture, l’application sélectionne automatiquement **`todo.url`** lorsqu’elle existe afin de charger directement la liste sans passer par Réglages. Si `todo.url` n’existe pas, elle utilise ensuite la liste enregistrée, puis `todo.courses`, puis la première liste `todo.*` disponible.
 
 ## Démarrage
 
-L’application n’ouvre jamais **Réglages** automatiquement. Après déverrouillage, elle reste sur **Ma liste** et recharge la liste `todo.*` enregistrée ; `todo.courses` sert de priorité de repli. Les réglages ne s’ouvrent que lorsque l’utilisateur appuie sur le bouton prévu.
+L’application n’ouvre jamais **Réglages** automatiquement. Après déverrouillage, elle reste sur **Ma liste** et charge automatiquement `todo.url` lorsqu’elle est disponible. Les réglages ne s’ouvrent que lorsque l’utilisateur appuie sur le bouton prévu.
 
 ## Connexion Home Assistant
 
