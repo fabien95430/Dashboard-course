@@ -218,3 +218,34 @@ body{
   background:linear-gradient(180deg,#fff8fb,#f4d9e3);
   color:#4b2d3b
 }
+
+
+/* Visuels produits premium — même renderer que le popup dashboard */
+.media,.list-icon{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+.product-svg{
+  display:block;
+  width:112px;
+  height:112px;
+  max-width:100%;
+  max-height:100%;
+  overflow:visible;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.product-svg.is-compact{
+  width:52px;
+  height:52px;
+}
+.product .media{
+  filter:drop-shadow(0 7px 10px rgba(12,6,10,.16));
+}
+.list-main .list-icon{
+  filter:drop-shadow(0 4px 7px rgba(12,6,10,.12));
+}
