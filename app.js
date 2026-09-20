@@ -75,11 +75,11 @@ const POSITIONS=new Map();
 Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));
 
 const PRODUCT_SHEETS=Object.freeze({
-  'Frais':{src:'./bring-photo-v4-frais.webp.png',cols:12,rows:8,ratio:1},
-  'Fruits & Légumes':{src:'./bring-photo-v4-fruits-legumes.webp.png',cols:12,rows:6,ratio:1},
-  'Épicerie':{src:'./bring-photo-v4-epicerie.webp.png',cols:12,rows:8,ratio:1},
-  'Boissons':{src:'./bring-photo-v4-boissons.webp.png',cols:12,rows:4,ratio:1},
-  'Maison':{src:'./bring-photo-v4-maison.webp.png',cols:12,rows:7,ratio:.875}
+  'Frais':{src:'./bring-photo-v4-frais.webp.png?v=13',cols:12,rows:8,ratio:1},
+  'Fruits & Légumes':{src:'./bring-photo-v4-fruits-legumes.webp.png?v=13',cols:12,rows:6,ratio:1},
+  'Épicerie':{src:'./bring-photo-v4-epicerie.webp.png?v=13',cols:12,rows:8,ratio:1},
+  'Boissons':{src:'./bring-photo-v4-boissons.webp.png?v=13',cols:12,rows:4,ratio:1},
+  'Maison':{src:'./bring-photo-v4-maison.webp.png?v=13',cols:12,rows:7,ratio:.875}
 });
 
 let state={
@@ -244,8 +244,10 @@ function sprite(product,compact=false){
   const sheet=position&&PRODUCT_SHEETS[position.category];
   if(!position||!sheet)return premiumProductVisual(product,compact);
   const fallback=premiumProductVisual(product,compact);
-  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-cols:'+sheet.cols+';--sprite-rows:'+sheet.rows+';--sprite-col:'+position.col+';--sprite-row:'+position.row+';--sprite-ratio:'+sheet.ratio+'" aria-hidden="true">'+
-    '<img src="'+sheet.src+'" alt="" loading="lazy" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
+  const left=-(position.col*100),top=-(position.row*100);
+  const width=sheet.cols*100,height=sheet.rows*100;
+  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+'" aria-hidden="true">'+
+    '<img src="'+sheet.src+'" alt="" loading="eager" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
   '</span>';
 }
