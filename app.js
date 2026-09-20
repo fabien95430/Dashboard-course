@@ -8,16 +8,18 @@ const GROUPS = CATALOG.groups;
 const META = CATALOG.meta;
 const FAVORITES = CATALOG.favorites;
 const CATEGORY_META = {
-  'Favoris': { label:'Favoris' },
-  'Frais': { label:'Frais' },
-  'Fruits & Légumes': { label:'Fruits & Légumes' },
+  'Toutes': { label:'Tous' },
+  'Fruits & Légumes': { label:'Fruits & légumes' },
   'Épicerie': { label:'Épicerie' },
+  'Frais': { label:'Produits frais' },
   'Boissons': { label:'Boissons' },
-  'Maison': { label:'Maison' }
+  'Maison': { label:'Maison' },
+  'Favoris': { label:'Favoris' }
 };
+const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Favoris'];
 const LIST_CATEGORIES=['Toutes',...Object.keys(GROUPS)];
-const PURCHASE_HOLD_MS=720;
-const PURCHASE_EXIT_MS=360;
+const PURCHASE_HOLD_MS=1100;
+const PURCHASE_EXIT_MS=240;
 const SWIPE_TRIGGER_RATIO=.36;
 const SWIPE_MAX_RATIO=.42;
 
@@ -108,7 +110,7 @@ let state={
   items:[],
   loading:true,
   error:'',
-  category:'Favoris',
+  category:'Toutes',
   productQuery:'',
   listQuery:'',
   listCategory:'Toutes',
@@ -121,6 +123,7 @@ let state={
   resumeToList:false,
   productBusy:new Set(),
   pendingRemoval:new Set(),
+  purchaseUndo:new Map(),
   faceAutoAttempted:false,
   facePromptActive:false,
   usage:loadJson(STORAGE.usage,{})||{}
@@ -284,6 +287,7 @@ function visibleProducts(){
       return {product,score};
     }).filter(Boolean).sort((a,b)=>b.score-a.score||a.product.name.localeCompare(b.product.name,'fr')).map(x=>x.product);
   }
+  if(state.category==='Toutes')return unique(ALL);
   if(state.category==='Favoris')return favorites();
   const subs=GROUPS[state.category]||{};
   return unique(Object.entries(subs).flatMap(([sub,names])=>names.map(name=>({name,category:state.category,sub}))));
@@ -304,6 +308,7 @@ function selectedSet(){return new Set(activeGroups().map(g=>norm(g.summary)))}
 function status(kind,title,detail=''){
   const el=$('#status');el.className='status '+kind;
   el.innerHTML='<span></span><div><strong>'+esc(title)+'</strong><small>'+esc(detail)+'</small></div>';
+  renderSettingsPage();
 }
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
 function refreshVisualLock(){
@@ -321,16 +326,22 @@ function hideSetup(){$('#setup').classList.remove('is-visible');refreshVisualLoc
 
 function renderCategories(){
   const el=$('#categories');
-  el.innerHTML=Object.keys(CATEGORY_META).map(category=>'<button type="button" class="cat '+(state.category===category?'is-active':'')+'" data-category="'+esc(category)+'"><span class="cat-label">'+esc(CATEGORY_META[category].label)+'</span></button>').join('');
-  el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>{state.category=button.dataset.category||'Favoris';state.productQuery='';$('#productSearch').value='';renderCategories();renderProducts()});
+  if(!el)return;
+  el.innerHTML=CATALOG_CATEGORY_ORDER.map(category=>'<button type="button" class="cat '+(state.category===category?'is-active':'')+'" data-category="'+esc(category)+'"><span class="cat-label">'+esc(CATEGORY_META[category].label)+'</span></button>').join('');
+  el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>{state.category=button.dataset.category||'Toutes';state.productQuery='';$('#productSearch').value='';renderCategories();renderProducts()});
 }
 function renderProducts(){
   const el=$('#products'),products=visibleProducts(),selected=selectedSet();
-  $('#productCount').textContent=products.length+' produit'+(products.length>1?'s':'');
+  if(!el)return;
+  const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
   if(!products.length){el.innerHTML='<div class="empty is-wide">Aucun produit ne correspond à cette recherche.</div>';return}
   el.innerHTML=products.map(product=>{
     const active=selected.has(norm(product.name));
-    return '<button type="button" class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" aria-pressed="'+(active?'true':'false')+'">'+(active?'<span class="badge">✓</span>':'')+'<span class="media">'+sprite(product)+'</span><span class="pname">'+esc(product.name)+'</span></button>';
+    return '<button type="button" class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" aria-pressed="'+(active?'true':'false')+'">'+
+      '<span class="badge">'+(active?'✓':'+')+'</span>'+
+      '<span class="media">'+sprite(product)+'</span>'+
+      '<span class="product-copy"><span class="pname">'+esc(product.name)+'</span><small class="pcat">'+esc(product.category)+'</small></span>'+
+    '</button>';
   }).join('');
   el.querySelectorAll('.product').forEach(button=>button.onclick=()=>toggleProduct(button.dataset.name||''));
 }
@@ -341,8 +352,7 @@ function setProductSelected(name,active){
   button.classList.toggle('is-selected',active);
   button.setAttribute('aria-pressed',active?'true':'false');
   const badge=button.querySelector('.badge');
-  if(active&&!badge)button.insertAdjacentHTML('afterbegin','<span class="badge">✓</span>');
-  else if(!active&&badge)badge.remove();
+  if(badge)badge.textContent=active?'✓':'+';
 }
 function syncProductSelection(){
   const selected=selectedSet();
@@ -351,8 +361,7 @@ function syncProductSelection(){
     button.classList.toggle('is-selected',active);
     button.setAttribute('aria-pressed',active?'true':'false');
     const badge=button.querySelector('.badge');
-    if(active&&!badge)button.insertAdjacentHTML('afterbegin','<span class="badge">✓</span>');
-    else if(!active&&badge)badge.remove();
+    if(badge)badge.textContent=active?'✓':'+';
   });
 }
 function closeListFilter(){
@@ -383,34 +392,50 @@ function renderList(){
     return product?.category===category;
   });
   const el=$('#listItems');
-  $('#listCount').textContent=rows.length+' article'+(rows.length>1?'s':'');
+  if(!el)return;
+  const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
   if(state.loading&&!groups.length){el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';return}
   if(!rows.length){
-    const message=needle?'Aucun article trouvé.':(category!=='Toutes'?'Aucun article dans cette catégorie.':(state.error?'Liste indisponible.':'La liste est vide.'));
+    const message=needle?'Aucun article trouvé.':(state.error?'Liste indisponible.':'La liste est vide.');
     el.innerHTML='<div class="empty">'+message+'</div>';
     return;
   }
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=BY_NAME.get(key),busy=state.productBusy.has(key);
+    const categoryLabel=product?.category||'Article';
+    const quantity=group.count>1?'<span class="list-qty">x'+group.count+'</span>':'';
     return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
-      '<div class="swipe-action" aria-hidden="true"><strong>Acheté !</strong></div>'+
-      '<div class="swipe-content">'+
-        '<button class="list-main" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>'+
-          '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
-          '<span class="list-name">'+esc(group.summary)+'</span>'+
-          '<span class="qty">x'+group.count+'</span>'+
-        '</button>'+
-      '</div>'+
-      '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
+      '<button class="purchase-check" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'><svg><use href="#i-check"></use></svg></button>'+
+      '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
+      '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong><small>'+esc(categoryLabel)+'</small></span>'+
+      quantity+
+      '<button class="undo-purchase" type="button" data-name="'+esc(group.summary)+'" hidden>Annuler</button>'+
+      '<span class="row-grip" aria-hidden="true">≡</span>'+
     '</div>';
   }).join('');
-  const markPurchased=button=>{
+  el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
+    event.stopPropagation();
     const row=button.closest('.list-row');
-    if(row?.dataset.suppressClick==='1')return;
     removeGroup(button.dataset.name||'',row);
-  };
-  el.querySelectorAll('.list-main,.done').forEach(button=>button.onclick=event=>{event.stopPropagation();markPurchased(button)});
-  bindSwipeRows(el);
+  });
+  el.querySelectorAll('.undo-purchase').forEach(button=>button.onclick=event=>{
+    event.stopPropagation();
+    undoPurchase(button.dataset.name||'',button.closest('.list-row'));
+  });
+}
+function undoPurchase(name,row){
+  const key=norm(name),token=state.purchaseUndo.get(key);
+  if(!token)return;
+  token.cancelled=true;
+  state.purchaseUndo.delete(key);
+  state.productBusy.delete(key);
+  if(row){
+    row.classList.remove('is-purchased','is-removing','is-busy');
+    const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=true;
+    const check=row.querySelector('.purchase-check');if(check)check.disabled=false;
+  }
+  navigator.vibrate?.(5);
+  toast('Article conservé');
 }
 function bindSwipeRows(root){
   root.querySelectorAll('.list-row').forEach(row=>{
@@ -530,8 +555,24 @@ function bindSwipeRows(root){
 function renderView(){
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
   $('#listView').classList.toggle('is-active',state.view==='list');
+  $('#settingsView').classList.toggle('is-active',state.view==='settings');
   document.querySelectorAll('.tab').forEach(button=>button.classList.toggle('is-active',button.dataset.view===state.view));
-  renderCategories();renderProducts();renderList();
+  renderCategories();renderProducts();renderList();renderSettingsPage();
+}
+function renderSettingsPage(){
+  const connection=$('#settingsConnectionSummary');
+  const list=$('#settingsListSummary');
+  const face=$('#settingsFaceIdSummary');
+  const sync=$('#settingsSyncSummary');
+  const dot=$('#settingsSyncDot');
+  const connected=!state.locked&&state.ws?.readyState===WebSocket.OPEN;
+  if(connection)connection.textContent=connected?'Connecté':(state.locked?'Verrouillé':'Connexion…');
+  if(connection)connection.classList.toggle('is-connected',connected);
+  const activeEntity=state.entities.find(entry=>entry.id===state.entity);
+  if(list)list.textContent=activeEntity?.name||state.entity||'Aucune liste';
+  if(face)face.textContent=biometricRecord()?'Activé sur cet appareil':'Mot de passe local disponible';
+  if(sync)sync.textContent=connected?'Synchronisation en temps réel':'Connexion Home Assistant';
+  if(dot)dot.classList.toggle('is-online',connected);
 }
 
 
@@ -658,7 +699,7 @@ async function enrollFaceId(){
       ciphertext:encrypted.ciphertext,
       created_at:Date.now()
     });
-    updateFaceIdSettings();
+    updateFaceIdSettings();renderSettingsPage();
     toast('Face ID activé');
   }catch(error){
     $('#faceIdSettingsStatus').textContent=error?.name==='NotAllowedError'
@@ -720,7 +761,7 @@ function scheduleAutomaticFaceId(){
 }
 function removeFaceId(){
   deleteKey(STORAGE.biometric);
-  updateFaceIdSettings();
+  updateFaceIdSettings();renderSettingsPage();
   toast('Face ID désactivé pour cette app');
 }
 async function updateFaceIdSettings(){
@@ -827,7 +868,7 @@ function showSecurity(mode,message='',options={}){
   const creating=mode==='oauth'||mode==='migrate';
   const faceReady=mode==='unlock'&&!!biometricRecord()&&!!window.PublicKeyCredential;
   $('.security-modal').classList.toggle('is-quick-unlock',faceReady&&!creating);
-  $('#securityIcon').textContent=creating?'🔐':(faceReady?'🔒':'🔐');
+  $('#securityIcon').classList.toggle('is-creating',creating);
   $('#securityTitle').textContent=creating
     ?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application')
     :'Mes courses';
@@ -1124,31 +1165,25 @@ async function removeGroup(name,row=null){
   if(state.productBusy.has(key))return;
   const group=activeGroups().find(entry=>norm(entry.summary)===key);
   if(!group)return;
-  state.productBusy.add(key);
-  if(row){
-    row.classList.add('is-purchased');
-    row.querySelector('.swipe-content')?.style.removeProperty('transform');
-    row.querySelector('.swipe-content')?.style.removeProperty('transition');
-    const action=row.querySelector('.swipe-action');
-    if(action){
-      action.style.opacity='1';
-      action.style.transform='translateX(0) scale(1)';
-      action.style.filter='blur(0)';
-      action.classList.add('is-ready');
-    }
-    const done=row.querySelector('.done');
-    if(done){
-      done.style.opacity='0';
-      done.style.transform='scale(.72)';
-      done.style.filter='blur(3px)';
-    }
-  }
-  navigator.vibrate?.(8);
-  await new Promise(resolve=>setTimeout(resolve,row?PURCHASE_HOLD_MS:0));
-  row?.classList.add('is-removing');
-  await new Promise(resolve=>setTimeout(resolve,row?PURCHASE_EXIT_MS:0));
-  state.pendingRemoval.add(key);
 
+  state.productBusy.add(key);
+  let undoToken=null;
+  if(row){
+    undoToken={cancelled:false};
+    state.purchaseUndo.set(key,undoToken);
+    row.classList.add('is-purchased','is-busy');
+    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
+    const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=false;
+    navigator.vibrate?.(8);
+    await new Promise(resolve=>setTimeout(resolve,PURCHASE_HOLD_MS));
+    if(undoToken.cancelled)return;
+    row.classList.add('is-removing');
+    await new Promise(resolve=>setTimeout(resolve,PURCHASE_EXIT_MS));
+    if(undoToken.cancelled)return;
+    state.purchaseUndo.delete(key);
+  }
+
+  state.pendingRemoval.add(key);
   const keepOtherItems=entry=>{
     if(String(entry?.status||'needs_action')==='completed')return true;
     const summary=String(entry?.summary??entry?.name??entry?.item??'').trim();
@@ -1180,6 +1215,7 @@ async function removeGroup(name,row=null){
     toast('Suppression impossible');
     status('is-error','Erreur',error.message||'Suppression impossible');
   }finally{
+    state.purchaseUndo.delete(key);
     state.pendingRemoval.delete(key);
     state.productBusy.delete(key);
     if(!state.demo)await refreshItems();
@@ -1192,6 +1228,7 @@ function openSettings(){
   const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
   $('#entitySelect').innerHTML=choices.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
   updateFaceIdSettings();
+  renderSettingsPage();
   $('#settingsDialog').showModal();
 }
 async function saveSettings(){
@@ -1272,7 +1309,11 @@ $('#demoBtn').onclick=()=>{
   state.items=loadJson(DEMO_KEY,[])||[];
   hideSetup();hideSecurity();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
 };
-$('#settingsBtn').onclick=openSettings;
+$('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
+$('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
+['settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsFaceIdBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
+$('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
+$('#settingsLogoutBtn').onclick=revoke;
 $('#cancelSettings').onclick=()=>$('#settingsDialog').close();
 $('#saveSettings').onclick=saveSettings;
 $('#faceIdSetupBtn').onclick=enrollFaceId;
@@ -1281,11 +1322,12 @@ $('#lockNowBtn').onclick=()=>{$('#settingsDialog').close();lockApp('Verrouillage
 $('#logoutBtn').onclick=revoke;
 $('#productSearch').oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
 $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
-$('#listFilterBtn').onclick=event=>{
+const listFilterBtn=$('#listFilterBtn');
+if(listFilterBtn)listFilterBtn.onclick=event=>{
   event.stopPropagation();
   const menu=$('#listFilterMenu'),open=menu.hidden;
   menu.hidden=!open;
-  $('#listFilterBtn').setAttribute('aria-expanded',String(open));
+  listFilterBtn.setAttribute('aria-expanded',String(open));
 };
 document.addEventListener('click',event=>{
   if(!(event.target instanceof Element)||!event.target.closest('.list-filter'))closeListFilter();
