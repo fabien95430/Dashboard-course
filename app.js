@@ -8,13 +8,14 @@ const GROUPS = CATALOG.groups;
 const META = CATALOG.meta;
 const FAVORITES = CATALOG.favorites;
 const CATEGORY_META = {
-  'Favoris': { icon:'★', label:'Favoris' },
-  'Frais': { icon:'◒', label:'Frais' },
-  'Fruits & Légumes': { icon:'●', label:'Fruits & Légumes' },
-  'Épicerie': { icon:'▣', label:'Épicerie' },
-  'Boissons': { icon:'▥', label:'Boissons' },
-  'Maison': { icon:'⌂', label:'Maison' }
+  'Favoris': { label:'Favoris' },
+  'Frais': { label:'Frais' },
+  'Fruits & Légumes': { label:'Fruits & Légumes' },
+  'Épicerie': { label:'Épicerie' },
+  'Boissons': { label:'Boissons' },
+  'Maison': { label:'Maison' }
 };
+const LIST_CATEGORIES=['Toutes',...Object.keys(GROUPS)];
 
 const STORAGE = {
   // Legacy keys are kept only for one-time migration from the previous version.
@@ -83,13 +84,15 @@ let state={
   category:'Favoris',
   productQuery:'',
   listQuery:'',
-  view:'catalog',
+  listCategory:'Toutes',
+  view:'list',
   reconnectTimer:null,
   intentionalClose:false,
   demo:false,
   lockTimer:null,
   backgroundLockTimer:null,
   productBusy:new Set(),
+  pendingRemoval:new Set(),
   faceAutoAttempted:false,
   facePromptActive:false,
   usage:loadJson(STORAGE.usage,{})||{}
@@ -178,7 +181,7 @@ function hideSetup(){$('#setup').classList.remove('is-visible');refreshVisualLoc
 
 function renderCategories(){
   const el=$('#categories');
-  el.innerHTML=Object.keys(CATEGORY_META).map(category=>'<button type="button" class="cat '+(state.category===category?'is-active':'')+'" data-category="'+esc(category)+'"><span>'+CATEGORY_META[category].icon+'</span><small>'+esc(CATEGORY_META[category].label)+'</small></button>').join('');
+  el.innerHTML=Object.keys(CATEGORY_META).map(category=>'<button type="button" class="cat '+(state.category===category?'is-active':'')+'" data-category="'+esc(category)+'"><span class="cat-label">'+esc(CATEGORY_META[category].label)+'</span></button>').join('');
   el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>{state.category=button.dataset.category||'Favoris';state.productQuery='';$('#productSearch').value='';renderCategories();renderProducts()});
 }
 function renderProducts(){
@@ -191,16 +194,54 @@ function renderProducts(){
   }).join('');
   el.querySelectorAll('.product').forEach(button=>button.onclick=()=>toggleProduct(button.dataset.name||''));
 }
+function closeListFilter(){
+  const menu=$('#listFilterMenu'),button=$('#listFilterBtn');
+  if(!menu||!button)return;
+  menu.hidden=true;
+  button.setAttribute('aria-expanded','false');
+}
+function renderListFilter(){
+  const button=$('#listFilterBtn'),menu=$('#listFilterMenu');
+  if(!button||!menu)return;
+  button.innerHTML=esc(state.listCategory)+' <span aria-hidden="true">⌄</span>';
+  menu.innerHTML=LIST_CATEGORIES.map(category=>'<button type="button" class="filter-option '+(state.listCategory===category?'is-active':'')+'" data-category="'+esc(category)+'" role="menuitem">'+esc(category)+'</button>').join('');
+  menu.querySelectorAll('.filter-option').forEach(option=>option.onclick=event=>{
+    event.stopPropagation();
+    state.listCategory=option.dataset.category||'Toutes';
+    closeListFilter();
+    renderList();
+  });
+}
 function renderList(){
-  const groups=activeGroups(),needle=norm(state.listQuery),rows=groups.filter(g=>!needle||norm(g.summary).includes(needle)),el=$('#listItems');
-  $('#listCount').textContent=groups.length+' article'+(groups.length>1?'s':'');
-  if(state.loading&&!groups.length){el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';return}
-  if(!rows.length){el.innerHTML='<div class="empty">'+(needle?'Aucun article trouvé.':(state.error?'Liste indisponible.':'La liste est vide.'))+'</div>';return}
-  el.innerHTML=rows.map(group=>{
+  renderListFilter();
+  const groups=activeGroups(),needle=norm(state.listQuery),category=state.listCategory||'Toutes';
+  const rows=groups.filter(group=>{
+    if(needle&&!norm(group.summary).includes(needle))return false;
+    if(category==='Toutes')return true;
     const product=BY_NAME.get(norm(group.summary));
-    return '<div class="list-row"><button class="remove" type="button" data-uid="'+esc(group.uids[0]||'')+'" aria-label="Retirer">×</button><span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span><span class="list-name">'+esc(group.summary)+'</span><span class="qty">x'+group.count+'</span></div>';
+    return product?.category===category;
+  });
+  const el=$('#listItems');
+  $('#listCount').textContent=rows.length+' article'+(rows.length>1?'s':'');
+  if(state.loading&&!groups.length){el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';return}
+  if(!rows.length){
+    const message=needle?'Aucun article trouvé.':(category!=='Toutes'?'Aucun article dans cette catégorie.':(state.error?'Liste indisponible.':'La liste est vide.'));
+    el.innerHTML='<div class="empty">'+message+'</div>';
+    return;
+  }
+  el.innerHTML=rows.map(group=>{
+    const key=norm(group.summary),product=BY_NAME.get(key),busy=state.productBusy.has(key);
+    return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'">'+
+      '<button class="remove" type="button" data-name="'+esc(group.summary)+'" aria-label="Supprimer '+esc(group.summary)+'" '+(busy?'disabled':'')+'>🗑</button>'+
+      '<button class="list-main" type="button" data-name="'+esc(group.summary)+'" aria-label="Ajouter une unité de '+esc(group.summary)+'" '+(busy?'disabled':'')+'>'+
+        '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
+        '<span class="list-name">'+esc(group.summary)+'</span>'+
+        '<span class="qty">x'+group.count+'</span>'+
+      '</button>'+
+    '</div>';
   }).join('');
-  el.querySelectorAll('.remove').forEach(button=>button.onclick=()=>completeOne(button.dataset.uid||''));
+  el.querySelectorAll('.remove').forEach(button=>button.onclick=event=>{event.stopPropagation();removeGroup(button.dataset.name||'',button.closest('.list-row'))});
+  el.querySelectorAll('.list-main').forEach(button=>button.onclick=()=>incrementGroup(button.dataset.name||''));
 }
 function renderView(){
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
@@ -732,7 +773,11 @@ async function refreshItems(){
   if(!state.entity)return;
   try{
     const result=await request({type:'todo/item/list',entity_id:state.entity});
-    state.items=Array.isArray(result?.items)?result.items:[];
+    const incoming=Array.isArray(result?.items)?result.items:[];
+    state.items=incoming.filter(item=>{
+      const summary=String(item?.summary??item?.name??item?.item??'').trim();
+      return !state.pendingRemoval.has(norm(summary));
+    });
     state.loading=false;state.error='';renderProducts();renderList();
     status('', 'Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
   }catch(error){state.loading=false;state.error=error.message||'Synchronisation indisponible';renderList();status('is-error','Hors synchro',state.error)}
@@ -742,44 +787,17 @@ async function toggleProduct(name){
   if(!item)return;
   const key=norm(item);
   if(state.productBusy.has(key))return;
+  const group=activeGroups().find(g=>norm(g.summary)===key);
+  if(group){
+    await removeGroup(item);
+    return;
+  }
   state.productBusy.add(key);
   try{
-    const group=activeGroups().find(g=>norm(g.summary)===key);
-    if(group){
-      if(state.demo){
-        const items=(loadJson(DEMO_KEY,[])||[]).filter(entry=>{
-          const status=String(entry?.status||'needs_action');
-          const summary=String(entry?.summary??entry?.name??entry?.item??'').trim();
-          return status==='completed'||norm(summary)!==key;
-        });
-        saveJson(DEMO_KEY,items);
-        state.items=items;
-        navigator.vibrate?.(8);
-        toast(item+' retiré');
-        renderProducts();renderList();
-        return;
-      }
-      if(!state.entity)return;
-      const uids=group.uids.filter(Boolean);
-      if(!uids.length){toast('Suppression impossible');return}
-      await Promise.all(uids.map(uid=>request({
-        type:'call_service',
-        domain:'todo',
-        service:'update_item',
-        service_data:{item:uid,status:'completed'},
-        target:{entity_id:state.entity}
-      })));
-      navigator.vibrate?.(8);
-      toast(item+' retiré');
-      await refreshItems();
-      return;
-    }
     await addItem(item);
-  }catch(error){
-    toast('Modification impossible');
-    status('is-error','Erreur',error.message||'Modification impossible');
   }finally{
     state.productBusy.delete(key);
+    renderProducts();renderList();
   }
 }
 
@@ -798,15 +816,96 @@ async function addItem(name){
     recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();
   }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
 }
-async function completeOne(uid){
-  if(!uid)return;
-  if(state.demo){
-    const items=(loadJson(DEMO_KEY,[])||[]).filter(item=>String(item.uid)!==String(uid));
-    saveJson(DEMO_KEY,items);state.items=items;navigator.vibrate?.(8);
-    renderProducts();renderList();return;
+async function incrementGroup(name){
+  const item=String(name||'').trim();
+  if(!item)return;
+  const key=norm(item);
+  if(state.productBusy.has(key))return;
+  const current=activeGroups().find(group=>norm(group.summary)===key);
+  if(!current)return;
+  state.productBusy.add(key);
+  try{
+    if(state.demo){
+      const items=loadJson(DEMO_KEY,[])||[];
+      items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
+      saveJson(DEMO_KEY,items);
+      state.items=items;
+      recordUsage(item);
+      navigator.vibrate?.(7);
+      toast(item+' x'+(current.count+1));
+      renderProducts();renderList();
+      return;
+    }
+    if(!state.entity)return;
+    const optimistic={uid:'',summary:item,status:'needs_action',_optimistic:true};
+    state.items=[...state.items,optimistic];
+    navigator.vibrate?.(7);
+    renderList();
+    try{
+      await request({type:'call_service',domain:'todo',service:'add_item',service_data:{item},target:{entity_id:state.entity}});
+      recordUsage(item);
+      toast(item+' x'+(current.count+1));
+      await refreshItems();
+    }catch(error){
+      state.items=state.items.filter(entry=>entry!==optimistic);
+      renderList();
+      toast('Ajout impossible');
+      status('is-error','Erreur',error.message||'Ajout impossible');
+    }
+  }finally{
+    state.productBusy.delete(key);
+    renderProducts();renderList();
   }
-  if(!state.entity)return;
-  try{await request({type:'call_service',domain:'todo',service:'update_item',service_data:{item:uid,status:'completed'},target:{entity_id:state.entity}});navigator.vibrate?.(8);await refreshItems()}catch(_){toast('Suppression impossible')}
+}
+async function removeGroup(name,row=null){
+  const item=String(name||'').trim();
+  if(!item)return;
+  const key=norm(item);
+  if(state.productBusy.has(key))return;
+  const group=activeGroups().find(entry=>norm(entry.summary)===key);
+  if(!group)return;
+  state.productBusy.add(key);
+  state.pendingRemoval.add(key);
+  row?.classList.add('is-removing');
+  navigator.vibrate?.(8);
+  await new Promise(resolve=>setTimeout(resolve,row?90:0));
+
+  const keepOtherItems=entry=>{
+    if(String(entry?.status||'needs_action')==='completed')return true;
+    const summary=String(entry?.summary??entry?.name??entry?.item??'').trim();
+    return norm(summary)!==key;
+  };
+  state.items=state.items.filter(keepOtherItems);
+  renderProducts();renderList();
+
+  try{
+    if(state.demo){
+      const items=(loadJson(DEMO_KEY,[])||[]).filter(keepOtherItems);
+      saveJson(DEMO_KEY,items);
+      state.items=items;
+      toast(item+' supprimé');
+      return;
+    }
+    if(!state.entity)throw new Error('Liste Home Assistant indisponible');
+    const uids=group.uids.filter(Boolean);
+    if(!uids.length)throw new Error('Identifiant de l’article indisponible');
+    await Promise.all(uids.map(uid=>request({
+      type:'call_service',
+      domain:'todo',
+      service:'update_item',
+      service_data:{item:uid,status:'completed'},
+      target:{entity_id:state.entity}
+    })));
+    toast(item+' supprimé');
+  }catch(error){
+    toast('Suppression impossible');
+    status('is-error','Erreur',error.message||'Suppression impossible');
+  }finally{
+    state.pendingRemoval.delete(key);
+    state.productBusy.delete(key);
+    if(!state.demo)await refreshItems();
+    else {renderProducts();renderList()}
+  }
 }
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
@@ -895,9 +994,16 @@ $('#lockNowBtn').onclick=()=>{$('#settingsDialog').close();lockApp('Verrouillage
 $('#logoutBtn').onclick=revoke;
 $('#productSearch').oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
 $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
-$('#manualAdd').onclick=()=>{const input=$('#manualInput'),value=input.value.trim();if(value){input.value='';addItem(value)}};
-$('#manualInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#manualAdd').click()}};
-document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'catalog';renderView()});
+$('#listFilterBtn').onclick=event=>{
+  event.stopPropagation();
+  const menu=$('#listFilterMenu'),open=menu.hidden;
+  menu.hidden=!open;
+  $('#listFilterBtn').setAttribute('aria-expanded',String(open));
+};
+document.addEventListener('click',event=>{
+  if(!(event.target instanceof Element)||!event.target.closest('.list-filter'))closeListFilter();
+});
+document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'){
