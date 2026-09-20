@@ -34,8 +34,9 @@ Sur les appareils compatibles, l'application peut aussi être déverrouillée av
 - l'extension WebAuthn `prf` produit un secret cryptographique lié à cette passkey ;
 - ce secret chiffre une seconde copie du coffre OAuth avec AES-GCM ;
 - le secret PRF lui-même n'est jamais enregistré dans `localStorage` ;
-- à l'ouverture, **Déverrouiller avec Face ID** demande une vérification utilisateur à iOS ;
-- le mot de passe local reste disponible comme solution de secours ;
+- à l'ouverture verrouillée, l'application tente automatiquement Face ID une seule fois ;
+- l'écran reste volontairement minimal : **Face ID** puis **Connexion avec mot de passe** en secours ;
+- le champ mot de passe n'est affiché que lorsque l'utilisateur demande cette méthode ;
 - Face ID doit être activé séparément sur chaque appareil/navigateur.
 
 Sur iPhone, iOS peut utiliser Face ID et, selon ses règles de sécurité, proposer le code de l'appareil comme mécanisme de secours. Sur un autre appareil, le mécanisme équivalent peut être Touch ID, Windows Hello ou une autre vérification de plateforme.

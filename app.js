@@ -89,6 +89,8 @@ let state={
   demo:false,
   lockTimer:null,
   backgroundLockTimer:null,
+  faceAutoAttempted:false,
+  facePromptActive:false,
   usage:loadJson(STORAGE.usage,{})||{}
 };
 
@@ -338,11 +340,18 @@ async function enrollFaceId(){
       :(error.message||'Face ID indisponible');
   }finally{button.disabled=false}
 }
-async function unlockWithFaceId(){
+async function unlockWithFaceId(options={}){
+  const automatic=!!options.automatic;
   const record=biometricRecord();
   const button=$('#faceIdUnlockBtn'),error=$('#securityError');
-  if(!record){error.textContent='Face ID n’est pas configuré sur cet appareil.';return}
-  button.disabled=true;error.textContent='';
+  if(state.facePromptActive)return;
+  if(!record){
+    if(!automatic)error.textContent='Face ID n’est pas configuré sur cet appareil.';
+    return;
+  }
+  state.facePromptActive=true;
+  button.disabled=true;
+  if(!automatic)error.textContent='';
   try{
     const secret=await getBiometricPrfSecret(
       base64UrlToBytes(record.credential_id),
@@ -355,10 +364,33 @@ async function unlockWithFaceId(){
     hideSecurity();
     await connectFromRefresh();
   }catch(err){
-    error.textContent=err?.name==='NotAllowedError'
-      ?'Face ID annulé.'
-      :'Face ID impossible. Utilise le mot de passe local.';
-  }finally{button.disabled=false}
+    if(!automatic){
+      error.textContent=err?.name==='NotAllowedError'
+        ?'Face ID annulé.'
+        :'Face ID impossible. Utilise le mot de passe local.';
+    }else if(err?.name!=='NotAllowedError'){
+      error.textContent='Face ID indisponible. Tu peux utiliser le mot de passe.';
+    }
+  }finally{
+    state.facePromptActive=false;
+    button.disabled=false;
+  }
+}
+function showPasswordFallback(){
+  $('#passwordPanel').hidden=false;
+  $('#passwordLoginBtn').hidden=true;
+  $('#securityError').textContent='';
+  setTimeout(()=>$('#securityPassword').focus(),60);
+}
+function scheduleAutomaticFaceId(){
+  if(state.faceAutoAttempted||state.facePromptActive||state.securityMode!=='unlock')return;
+  if(!biometricRecord()||!window.PublicKeyCredential||document.visibilityState!=='visible')return;
+  state.faceAutoAttempted=true;
+  setTimeout(()=>{
+    if(state.securityMode==='unlock'&&$('#securityOverlay').classList.contains('is-visible')&&document.visibilityState==='visible'){
+      unlockWithFaceId({automatic:true});
+    }
+  },260);
 }
 function removeFaceId(){
   deleteKey(STORAGE.biometric);
@@ -459,33 +491,44 @@ function armIdleLock(){
   if(state.demo||state.locked||!vaultRecord())return;
   state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),SECURITY.idleLockMs);
 }
-function showSecurity(mode,message=''){
+function showSecurity(mode,message='',options={}){
+  const overlay=$('#securityOverlay');
+  const wasVisible=overlay.classList.contains('is-visible');
   state.securityMode=mode;
+  if(!wasVisible&&mode==='unlock')state.faceAutoAttempted=false;
   $('#setup').classList.remove('is-visible');
-  $('#securityOverlay').classList.add('is-visible');
+  overlay.classList.add('is-visible');
   const creating=mode==='oauth'||mode==='migrate';
   const faceReady=mode==='unlock'&&!!biometricRecord()&&!!window.PublicKeyCredential;
-  $('#securityTitle').textContent=creating?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application'):'Déverrouiller Courses';
+  $('.security-modal').classList.toggle('is-quick-unlock',faceReady&&!creating);
+  $('#securityIcon').textContent=creating?'🔐':(faceReady?'🔒':'🔐');
+  $('#securityTitle').textContent=creating
+    ?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application')
+    :'Mes courses';
   $('#securityText').textContent=message||(creating
     ?'Choisis un mot de passe local. Il chiffrera l’autorisation Home Assistant enregistrée sur cet appareil.'
-    :(faceReady?'Utilise Face ID ou ton mot de passe local.':'Entre le mot de passe local de cette application.'));
+    :(faceReady?'Déverrouillage sécurisé':'Entre ton mot de passe local.'));
   $('#faceIdUnlockBtn').hidden=!faceReady;
-  $('#passwordDivider').hidden=!faceReady;
+  $('#passwordLoginBtn').hidden=!faceReady||creating;
+  $('#passwordPanel').hidden=faceReady&&!creating;
   $('#securityConfirmWrap').hidden=!creating;
+  $('#securityHint').hidden=!creating;
   $('#securityPassword').autocomplete=creating?'new-password':'current-password';
   $('#securityPassword').value='';
   $('#securityConfirm').value='';
-  $('#securitySubmit').textContent=creating?'Chiffrer et continuer':'Déverrouiller';
+  $('#securitySubmit').textContent=creating?'Chiffrer et continuer':'Connexion';
   $('#resetSecurityBtn').hidden=creating;
   $('#securityError').textContent='';
   refreshVisualLock();
-  if(!faceReady)setTimeout(()=>$('#securityPassword').focus(),80);
+  if(faceReady&&!creating&&options.autoFaceId!==false)scheduleAutomaticFaceId();
+  else if(!faceReady||creating)setTimeout(()=>$('#securityPassword').focus(),80);
 }
 function hideSecurity(){
   $('#securityOverlay').classList.remove('is-visible');
   $('#securityPassword').value='';
   $('#securityConfirm').value='';
   $('#securityError').textContent='';
+  state.facePromptActive=false;
   refreshVisualLock();
 }
 function lockApp(message='Application verrouillée.'){
@@ -549,7 +592,7 @@ async function connectFromRefresh(){
   }catch(error){
     wipeMemoryCredentials();state.locked=true;
     status('is-error','Connexion refusée',error.message||'Session invalide');
-    showSecurity('unlock','La connexion Home Assistant n’a pas pu être renouvelée. Déverrouille à nouveau ou réinitialise la connexion.');
+    showSecurity('unlock','La connexion Home Assistant n’a pas pu être renouvelée. Utilise le mot de passe ou réinitialise la connexion.',{autoFaceId:false});
   }
 }
 async function completeSecurityAction(){
@@ -785,7 +828,8 @@ async function init(){
 
 $('#connectBtn').onclick=beginOAuth;
 $('#securitySubmit').onclick=completeSecurityAction;
-$('#faceIdUnlockBtn').onclick=unlockWithFaceId;
+$('#faceIdUnlockBtn').onclick=()=>unlockWithFaceId({automatic:false});
+$('#passwordLoginBtn').onclick=showPasswordFallback;
 $('#securityPassword').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
 $('#securityConfirm').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
 $('#resetSecurityBtn').onclick=resetLocalConnection;
