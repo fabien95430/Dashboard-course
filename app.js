@@ -990,7 +990,7 @@ async function revoke(){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
   clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();
   state.entity='';state.entities=[];state.items=[];state.haUrl='';state.locked=true;
   $('#settingsDialog').close();
