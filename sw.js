@@ -1,4 +1,4 @@
-const CACHE='courses-app-v9-entity-sync';
+const CACHE='courses-app-v10-premium-visuals';
 const SHELL=['./','./index.html','./styles.css','./catalog.js','./app.js','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
