@@ -65,7 +65,7 @@ Le bouton **Tester sans Home Assistant** permet de vérifier immédiatement la r
 
 ## Liste Home Assistant partagée
 
-Quand une entité **Courses** est disponible (`todo.courses` ou une liste nommée Courses), l’application la sélectionne comme liste Home Assistant partagée avec le popup du dashboard.
+L’application et le popup du dashboard utilisent exclusivement l’entité Home Assistant **`todo.courses`** afin de partager exactement la même liste.
 
 ## Connexion Home Assistant
 
