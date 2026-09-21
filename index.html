@@ -2,227 +2,106 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f7f2">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2b1d27">
   <meta name="description" content="Liste de courses synchronisée avec Home Assistant">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
-  <link rel="manifest" href="./manifest.webmanifest?v=46">
+  <link rel="manifest" href="./manifest.webmanifest?v=67">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=66">
+  <link rel="stylesheet" href="./styles.css?v=67">
 </head>
 <body>
-  <svg class="svg-sprite" aria-hidden="true">
-    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l1.4 9.1a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L19.5 7H6.1"/><circle cx="9" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/></symbol>
-    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></symbol>
-    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.4 1a7.7 7.7 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.6A7.7 7.7 0 0 0 7 6.6l-2.4-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3L2.6 15l2 3.4 2.4-1a7.7 7.7 0 0 0 2.6 1.5l.4 2.6h4l.4-2.6a7.7 7.7 0 0 0 2.6-1.5l2.4 1 2-3.4-2-1.5Z"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 4.2 4.2"/></symbol>
-    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.4"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"/><path d="M12 14v2.5"/></symbol>
-    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3.5 10 8.5-7 8.5 7"/><path d="M5.5 9.5V21h13V9.5"/><path d="M9.5 21v-6h5v6"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v5.5c0 5.1-3.4 8.1-8 9.5-4.6-1.4-8-4.4-8-9.5V6l8-3Z"/><path d="m8.7 12.1 2.1 2.1 4.5-4.6"/></symbol>
-    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
-    <symbol id="i-face" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M8.5 10v1M15.5 10v1M9 15c.9.9 1.9 1.3 3 1.3s2.1-.4 3-1.3"/></symbol>
-    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.1 8.2A7 7 0 0 1 18.8 7L20 12M4 12l1.2 5A7 7 0 0 0 18 15.8"/></symbol>
-    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M7.2 5.5a8 8 0 1 0 9.6 0"/></symbol>
-    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
-    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M14 8l4 4-4 4M18 12H8"/></symbol>
-    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13h6l-1 9 9-12h-6.2l.7-8Z"/></symbol>
-  </svg>
-
   <main id="app" class="app is-locked">
-    <div id="status" class="status is-waiting" aria-live="polite"><span></span><div><strong>Connexion…</strong><small>Home Assistant</small></div></div>
+    <header class="topbar">
+      <div class="brandcopy">
+        <h1>Mes courses</h1>
+        <p>Mes achats en cours</p>
+      </div>
+      <button id="settingsBtn" class="round-btn" type="button" aria-label="Réglages">⚙</button>
+    </header>
+
+    <div id="status" class="status is-waiting"><span></span><div><strong>Connexion…</strong><small>Home Assistant</small></div></div>
 
     <section id="listView" class="view list-view is-active">
-      <header class="page-header">
-        <div>
-          <h1>Ma liste</h1>
-          <p>Vos courses du quotidien</p>
+      <div class="list-head">
+        <div><strong>Ma liste</strong><small id="listCount">0 article</small></div>
+        <div class="list-filter">
+          <button id="listFilterBtn" class="filter-btn" type="button" aria-haspopup="true" aria-expanded="false">Toutes <span aria-hidden="true">⌄</span></button>
+          <div id="listFilterMenu" class="filter-menu" role="menu" hidden></div>
         </div>
-        <button id="settingsBtn" class="icon-btn" type="button" aria-label="Ouvrir les réglages">
-          <svg><use href="#i-gear"></use></svg>
-        </button>
-      </header>
-
-      <label class="searchbox page-search">
-        <svg><use href="#i-search"></use></svg>
-        <input id="listSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher un produit…">
-        <small id="listCount">0 article</small>
+      </div>
+      <label class="searchbox">
+        <span>⌕</span>
+        <input id="listSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher dans ma liste…">
+        <small></small>
       </label>
       <div id="listItems" class="list-items"></div>
     </section>
 
     <section id="catalogView" class="view catalog-view">
-      <header class="page-header">
-        <div>
-          <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits</p>
-        </div>
-        <button id="catalogSearchBtn" class="icon-btn" type="button" aria-label="Rechercher dans le catalogue">
-          <svg><use href="#i-search"></use></svg>
-        </button>
-      </header>
-
-      <label class="searchbox page-search">
-        <svg><use href="#i-search"></use></svg>
+      <div id="categories" class="categories" aria-label="Catégories"></div>
+      <label class="searchbox">
+        <span>⌕</span>
         <input id="productSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher un produit…">
         <small id="productCount"></small>
       </label>
-      <div id="categories" class="categories" aria-label="Catégories"></div>
       <div id="products" class="products"></div>
     </section>
 
-    <section id="settingsView" class="view settings-view">
-      <header class="page-header settings-header">
-        <div>
-          <h1>Réglages</h1>
-          <p>Personnalisez votre expérience</p>
-        </div>
-      </header>
-
-      <div class="settings-scroll">
-        <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-home"></use></svg></span>Compte</h2>
-          <div class="settings-card">
-            <button id="settingsConnectionBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-home"></use></svg></span>
-              <span class="settings-copy"><strong>Connexion Home Assistant</strong><small id="settingsConnectionSummary">Connexion…</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-            <button id="settingsSecurityBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-lock"></use></svg></span>
-              <span class="settings-copy"><strong>Sécurité et verrouillage</strong><small>Biométrie, code, chiffrement</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-          </div>
-        </section>
-
-        <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-gear"></use></svg></span>Préférences</h2>
-          <div class="settings-card">
-            <button id="settingsListBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
-              <span class="settings-copy"><strong>Liste Home Assistant</strong><small id="settingsListSummary">Liste active</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-            <button id="settingsFaceIdBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-face"></use></svg></span>
-              <span class="settings-copy"><strong>Face ID</strong><small id="settingsFaceIdSummary">Vérification…</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-          </div>
-        </section>
-
-        <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-sync"></use></svg></span>Données</h2>
-          <div class="settings-card">
-            <div class="settings-row is-static">
-              <span class="settings-icon"><svg><use href="#i-sync"></use></svg></span>
-              <span class="settings-copy"><strong>Synchronisation</strong><small id="settingsSyncSummary">Home Assistant</small></span>
-              <span id="settingsSyncDot" class="sync-dot" aria-hidden="true"></span>
-            </div>
-            <button id="settingsLockBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-lock"></use></svg></span>
-              <span class="settings-copy"><strong>Verrouiller maintenant</strong><small>Fermer la session sur cet appareil</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-          </div>
-        </section>
-
-        <button id="settingsLogoutBtn" class="settings-logout" type="button">
-          <svg><use href="#i-exit"></use></svg>
-          <span>Se déconnecter</span>
-        </button>
-      </div>
-    </section>
-
     <nav class="tabs" aria-label="Navigation">
-      <button class="tab is-active" data-view="list" type="button">
-        <svg><use href="#i-cart"></use></svg><span>Ma liste</span>
-      </button>
-      <button class="tab" data-view="catalog" type="button">
-        <svg><use href="#i-grid"></use></svg><span>Catalogue</span>
-      </button>
-      <button class="tab" data-view="settings" type="button">
-        <svg><use href="#i-gear"></use></svg><span>Réglages</span>
-      </button>
+      <button class="tab is-active" data-view="list" type="button">Ma liste</button>
+      <button class="tab" data-view="catalog" type="button">Catalogue</button>
     </nav>
   </main>
 
   <section id="setup" class="overlay is-visible" aria-modal="true">
-    <div class="modal setup-modal">
-      <div class="welcome-logo"><svg><use href="#i-cart"></use></svg></div>
-      <h2>Mes courses</h2>
-      <p>Connecte Home Assistant pour retrouver ta liste sur cet appareil.</p>
+    <div class="modal">
+      <div class="modal-icon">🛒</div>
+      <h2>Connecter mes courses</h2>
+      <p>L’application fonctionne sur GitHub Pages et se connecte directement à Home Assistant via ton accès distant sécurisé.</p>
       <label class="field">
         <span>Adresse Home Assistant / Nabu Casa</span>
         <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
       </label>
-      <p class="hint">La connexion est sécurisée par OAuth. Ton autorisation locale sera ensuite chiffrée sur cet appareil.</p>
+      <p class="hint">Aucun secret Home Assistant n’est stocké dans GitHub. Après l’autorisation HA, tu créeras un mot de passe local qui chiffre la connexion sur cet appareil.</p>
       <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
       <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
       <div id="setupError" class="setup-error" role="alert"></div>
     </div>
   </section>
 
+
   <section id="securityOverlay" class="overlay security-overlay" aria-modal="true" aria-labelledby="securityTitle">
-    <button id="securitySettingsBtn" class="security-settings-pill" type="button" aria-label="Réglages">
-      <svg><use href="#i-gear"></use></svg><span>Réglages</span>
-    </button>
+    <div class="modal security-modal">
+      <div class="modal-icon" id="securityIcon">🔐</div>
+      <h2 id="securityTitle">Mes courses</h2>
+      <p id="securityText">Déverrouillage sécurisé</p>
 
-    <div class="security-shell">
-      <div class="security-hero">
-        <div class="welcome-cart-art" aria-hidden="true">
-          <img src="./welcome-cart-v48.webp" alt="" width="220" height="226">
-        </div>
-        <h2 id="securityTitle">Mes courses</h2>
-        <p class="security-tagline">Simple, rapide, toujours à jour <span aria-hidden="true">♥</span></p>
+      <button id="faceIdUnlockBtn" class="faceid-btn" type="button" hidden><span aria-hidden="true">◉</span> Face ID</button>
+      <button id="passwordLoginBtn" class="secondary password-toggle" type="button" hidden>Connexion avec mot de passe</button>
+
+      <div id="passwordPanel" class="password-panel">
+        <label class="field">
+          <span>Mot de passe local</span>
+          <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
+        </label>
+        <label id="securityConfirmWrap" class="field" hidden>
+          <span>Confirmer le mot de passe</span>
+          <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+        </label>
+        <p id="securityHint" class="hint">Le mot de passe n’est jamais enregistré. Il sert uniquement à déchiffrer ton autorisation Home Assistant sur cet appareil.</p>
+        <button id="securitySubmit" class="primary" type="button">Connexion</button>
+        <button id="resetSecurityBtn" class="secondary reset-link" type="button">Réinitialiser la connexion de cet appareil</button>
       </div>
 
-      <div class="modal security-modal">
-        <div id="securityIcon" class="security-lock-icon"><svg><use href="#i-lock"></use></svg></div>
-        <h3>Accéder à mes courses</h3>
-        <p class="security-card-copy">Déverrouillage sécurisé avec votre compte Home Assistant</p>
-        <p id="securityText" class="security-dynamic" aria-live="polite"></p>
-
-        <button id="faceIdUnlockBtn" class="faceid-btn" type="button" hidden>
-          <svg><use href="#i-face"></use></svg><span>Face ID</span>
-        </button>
-        <button id="passwordLoginBtn" class="secondary password-toggle" type="button" hidden>
-          <svg><use href="#i-lock"></use></svg><span>Connexion avec mot de passe</span>
-        </button>
-
-        <div id="passwordPanel" class="password-panel">
-          <label class="field">
-            <span>Mot de passe local</span>
-            <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
-          </label>
-          <label id="securityConfirmWrap" class="field" hidden>
-            <span>Confirmer le mot de passe</span>
-            <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
-          </label>
-          <p id="securityHint" class="hint">Le mot de passe n’est jamais enregistré. Il sert uniquement à déchiffrer ton autorisation Home Assistant sur cet appareil.</p>
-          <button id="securitySubmit" class="primary" type="button">Connexion</button>
-          <button id="resetSecurityBtn" class="secondary reset-link" type="button">Réinitialiser la connexion de cet appareil</button>
-        </div>
-        <div id="securityError" class="setup-error" role="alert"></div>
-      </div>
-
-      <div class="security-note" aria-hidden="true">Tout pour<br>des courses plus simples<br>au quotidien !<span></span></div>
-
-      <div class="security-benefits" aria-hidden="true">
-        <span><i><svg><use href="#i-sync"></use></svg></i><small>Synchronisé<br>avec Home Assistant</small></span>
-        <span><i><svg><use href="#i-lock"></use></svg></i><small>Vos données<br>restent privées</small></span>
-        <span><i class="benefit-bolt"><svg><use href="#i-bolt"></use></svg></i><small>Rapide<br>et intuitif</small></span>
-      </div>
+      <div id="securityError" class="setup-error" role="alert"></div>
     </div>
   </section>
 
   <dialog id="settingsDialog" class="dialog">
-    <h3>Connexion et sécurité</h3>
+    <h3>Réglages</h3>
     <label class="field"><span>Liste Home Assistant</span><select id="entitySelect"></select></label>
     <label class="field"><span>Adresse Home Assistant</span><input id="settingsHaUrl" type="url" autocomplete="url"></label>
     <section class="faceid-settings" aria-labelledby="faceIdSettingsTitle">
@@ -231,12 +110,12 @@
       <button id="faceIdRemoveBtn" class="danger compact-danger" type="button" hidden>Désactiver Face ID</button>
     </section>
     <div class="dialog-actions"><button id="cancelSettings" type="button">Annuler</button><button id="saveSettings" class="primary" type="button">Enregistrer</button></div>
-    <button id="lockNowBtn" class="secondary" type="button">Verrouiller maintenant</button>
+    <button id="lockNowBtn" class="secondary" type="button">🔒 Verrouiller maintenant</button>
     <button id="logoutBtn" class="danger" type="button">Déconnecter cette appli</button>
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=27"></script>
+  <script src="./app.js?v=67"></script>
 </body>
 </html>
