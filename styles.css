@@ -2243,3 +2243,25 @@ html,body{touch-action:pan-x pan-y}
   background:transparent!important;
   filter:drop-shadow(0 5px 7px rgba(31,78,49,.08));
 }
+
+
+/* ===== UI v42 — prolongation réelle du fond sous la safe area ===== */
+/* Sur iOS standalone, le viewport CSS peut s'arrêter au-dessus de la zone du home indicator.
+   On prolonge donc réellement le calque de fond sous cette zone au lieu de seulement le repositionner. */
+.security-overlay{
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  bottom:auto!important;
+  width:100vw!important;
+  height:calc(100dvh + max(env(safe-area-inset-bottom), 56px))!important;
+  min-height:calc(100dvh + max(env(safe-area-inset-bottom), 56px))!important;
+  overflow:hidden!important;
+  background-position:center top!important;
+  background-size:cover!important;
+}
+/* L'UI conserve sa hauteur visible : seul le décor est prolongé. */
+.security-shell{
+  height:100dvh!important;
+  min-height:100dvh!important;
+}

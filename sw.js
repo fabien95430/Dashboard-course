@@ -1,5 +1,5 @@
-const CACHE='courses-app-v41-safe-area-cart';
-const SHELL=['./welcome-background-v40.webp','./','./index.html','./styles.css?v=41','./catalog.js','./app.js?v=27','./manifest.webmanifest?v=40','./icon-premium-v40.svg','./icon.svg','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
+const CACHE='courses-app-v42-bottom-safe-area';
+const SHELL=['./welcome-background-v40.webp','./','./index.html','./styles.css?v=42','./catalog.js','./app.js?v=27','./manifest.webmanifest?v=40','./icon-premium-v40.svg','./icon.svg','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
