@@ -2146,7 +2146,7 @@ html,body{touch-action:pan-x pan-y}
 .security-overlay{
   padding:0!important;
   overflow:hidden!important;
-  background:#f5f2ea url("./welcome-background-v38.svg") center center / cover no-repeat!important;
+  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat!important;
 }
 .security-overlay::before,
 .security-overlay::after,
@@ -2190,4 +2190,15 @@ html,body{touch-action:pan-x pan-y}
 @media(max-height:720px){
   .security-note{top:69.8%!important}
   .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px))!important}
+}
+
+
+/* ===== UI v40 — image générée validée ===== */
+/* Fond décoratif uniquement : toute l'interface reste en HTML/CSS au-dessus. */
+.security-overlay{
+  background-color:#f5f2ea!important;
+  background-image:url("./welcome-background-v40.webp")!important;
+  background-repeat:no-repeat!important;
+  background-position:center center!important;
+  background-size:cover!important;
 }
