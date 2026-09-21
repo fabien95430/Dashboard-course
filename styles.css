@@ -2317,10 +2317,15 @@ body:has(#securityOverlay.is-visible){
 /* ===== UI v48 — accueil reconstruit : fond et caddie indépendants ===== */
 /* Le décor photo est un calque autonome. Il couvre le grand viewport iOS,
    sans modifier la hauteur ni le placement de l'interface de déverrouillage. */
-html:has(#securityOverlay.is-visible),
+html:has(#securityOverlay.is-visible){
+  background-color:#efe7db!important;
+  background-image:url("./welcome-background-v48.webp")!important;
+  background-repeat:no-repeat!important;
+  background-position:center top!important;
+  background-size:100vw auto!important;
+}
 body:has(#securityOverlay.is-visible){
-  background:#efe7db!important;
-  background-image:none!important;
+  background:transparent!important;
 }
 .security-overlay{
   position:fixed!important;
