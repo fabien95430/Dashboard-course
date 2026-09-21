@@ -694,9 +694,9 @@ svg{display:block}
   max-width:560px;
   height:100dvh;
   margin:0 auto;
-  padding:max(14px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));
+  padding:max(14px,env(safe-area-inset-top)) 0 0;
   display:grid;
-  grid-template-rows:minmax(0,1fr) 72px;
+  grid-template-rows:minmax(0,1fr) auto;
   gap:0;
   background:transparent;
 }
@@ -1552,4 +1552,23 @@ svg{display:block}
   .welcome-logo svg{width:58px;height:58px}
   .security-hero h2{font-size:36px}
   .security-benefits small{font-size:10px}
+}
+
+/* Extend backgrounds to the screen edge; keep controls above the home gesture. */
+.app > .view{
+  padding-left:max(12px,env(safe-area-inset-left));
+  padding-right:max(12px,env(safe-area-inset-right));
+}
+.app > .tabs{
+  height:calc(72px + env(safe-area-inset-bottom,0px));
+  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));
+  padding-left:max(10px,env(safe-area-inset-left));
+  padding-right:max(10px,env(safe-area-inset-right));
+}
+@media(max-width:390px){
+  .app{padding-left:0;padding-right:0}
+  .app > .view{
+    padding-left:max(9px,env(safe-area-inset-left));
+    padding-right:max(9px,env(safe-area-inset-right));
+  }
 }
