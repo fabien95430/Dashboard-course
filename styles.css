@@ -2426,3 +2426,30 @@ body:has(#securityOverlay.is-visible){
     }
   }
 }
+
+
+/* ===== UI v62 — peindre aussi le canvas iOS sous le Home Indicator ===== */
+/* Les essais précédents agrandissaient les éléments, mais la zone résiduelle est
+   peinte par le canvas racine d'iOS. On lui donne donc le même visuel que l'écran. */
+html{
+  background:#fff!important;
+}
+html:has(#securityOverlay.is-visible){
+  background-color:#efe7db!important;
+  background-image:url("./welcome-background-v48.webp?v=59")!important;
+  background-repeat:no-repeat!important;
+  background-position:center 58%!important;
+  background-size:cover!important;
+  background-attachment:fixed!important;
+}
+body:has(#securityOverlay.is-visible){
+  background:transparent!important;
+}
+/* Hors écran verrouillé, le canvas racine blanc prolonge visuellement la barre basse. */
+@supports (-webkit-touch-callout:none){
+  @media (max-width:600px){
+    .tabs{
+      background:#fff!important;
+    }
+  }
+}
