@@ -2202,3 +2202,28 @@ html,body{touch-action:pan-x pan-y}
   background-position:center center!important;
   background-size:cover!important;
 }
+
+/* iOS installed app: paint the document canvas under the home-indicator area. */
+html{background:#fff}
+html:has(#setup.is-visible),
+html:has(#securityOverlay.is-visible),
+body:has(#setup.is-visible),
+body:has(#securityOverlay.is-visible){
+  background-color:#f6f1e7!important;
+  background-image:url("./welcome-background-v40.webp")!important;
+  background-position:center!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+}
+.security-overlay.is-visible{background-color:transparent!important}
+.app .tabs{position:relative}
+.app .tabs::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-160px;
+  height:160px;
+  background:inherit;
+  border:0;
+}
