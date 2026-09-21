@@ -2314,14 +2314,16 @@ body:has(#securityOverlay.is-visible){
 }
 
 
-/* ===== UI v54 — fond d'accueil unique sur le canvas iOS ===== */
-/* Une seule image peint le canvas racine, y compris la zone basse hors du viewport CSS.
-   L'interface de déverrouillage reste indépendante et conserve son placement actuel. */
-html:has(#securityOverlay.is-visible){
-  background:transparent!important;
-}
+/* ===== UI v55 — fond iOS aligné sans raccord ===== */
+/* Le décor est peint à la même échelle et depuis le même point d'origine sur le canvas
+   racine et sur l'overlay. L'overlay reste opaque : l'application verrouillée ne transparaît pas. */
+html:has(#securityOverlay.is-visible),
 body:has(#securityOverlay.is-visible){
-  background:#efe7db url("./welcome-background-v48.webp") center top / cover no-repeat!important;
+  background-color:#efe7db!important;
+  background-image:url("./welcome-background-v48.webp")!important;
+  background-repeat:no-repeat!important;
+  background-position:center top!important;
+  background-size:100vw auto!important;
 }
 .security-overlay{
   position:fixed!important;
@@ -2331,8 +2333,11 @@ body:has(#securityOverlay.is-visible){
   min-height:100dvh!important;
   padding:0!important;
   overflow:hidden!important;
-  background:transparent!important;
-  background-image:none!important;
+  background-color:#efe7db!important;
+  background-image:url("./welcome-background-v48.webp")!important;
+  background-repeat:no-repeat!important;
+  background-position:center top!important;
+  background-size:100vw auto!important;
 }
 .security-background{
   display:none!important;
