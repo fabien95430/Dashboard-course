@@ -2227,3 +2227,24 @@ body:has(#securityOverlay.is-visible){
   background:inherit;
   border:0;
 }
+
+/* v43: full-bleed installed iPhone layout — top status overlay + bottom safe area. */
+@supports (padding-bottom:env(safe-area-inset-bottom)){
+  .app{
+    height:calc(100dvh + env(safe-area-inset-bottom))!important;
+    padding-bottom:env(safe-area-inset-bottom)!important;
+  }
+  .security-overlay,
+  #setup{
+    top:0!important;
+    right:0!important;
+    bottom:calc(-1 * env(safe-area-inset-bottom))!important;
+    left:0!important;
+    height:auto!important;
+    min-height:calc(100dvh + env(safe-area-inset-bottom))!important;
+  }
+  .security-shell{
+    height:calc(100% - env(safe-area-inset-bottom))!important;
+    padding-bottom:env(safe-area-inset-bottom)!important;
+  }
+}
