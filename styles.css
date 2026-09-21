@@ -2295,17 +2295,20 @@ body:has(#securityOverlay.is-visible){
 }
 
 
-/* ===== UI v45 — navigation basse iOS ===== */
-/* L'app garde le viewport visible. Le fond de la navigation descend dans la safe area,
-   tandis que ses icônes restent au-dessus du Home Indicator. */
-@media (display-mode: standalone){
-  .app{
-    height:100dvh;
-    padding-bottom:0;
-    grid-template-rows:minmax(0,1fr) calc(72px + env(safe-area-inset-bottom));
-  }
-  .tabs{
-    height:calc(72px + env(safe-area-inset-bottom));
-    padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+/* ===== UI v46 — barre basse iOS indépendante du viewport ===== */
+/* La barre est ancrée au viewport iOS au lieu de dépendre de la hauteur de .app.
+   Cela évite le décalage de 100dvh/100lvh tout en gardant les boutons au-dessus du Home Indicator. */
+@supports (-webkit-touch-callout:none){
+  @media (max-width:600px){
+    .tabs{
+      position:fixed;
+      z-index:20;
+      left:50%;
+      right:auto;
+      bottom:max(8px,env(safe-area-inset-bottom));
+      width:min(calc(100vw - 24px),536px);
+      height:72px;
+      transform:translateX(-50%);
+    }
   }
 }
