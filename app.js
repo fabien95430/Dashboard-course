@@ -1358,4 +1358,6 @@ window.addEventListener('pageshow',()=>{
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderView();init();
 })();
+const IS_STANDALONE=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+document.documentElement.classList.toggle('is-standalone',IS_STANDALONE);
 
