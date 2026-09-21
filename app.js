@@ -16,8 +16,8 @@ const CATEGORY_META = {
   'Maison': { label:'Maison' }
 };
 const LIST_CATEGORIES=['Toutes',...Object.keys(GROUPS)];
-const PURCHASE_HOLD_MS=520;
-const PURCHASE_EXIT_MS=260;
+const PURCHASE_HOLD_MS=720;
+const PURCHASE_EXIT_MS=360;
 const SWIPE_TRIGGER_RATIO=.36;
 const SWIPE_MAX_RATIO=.42;
 
@@ -28,6 +28,7 @@ const STORAGE = {
   vault:'courses-secure-vault-v1',
   biometric:'courses-faceid-v1',
   entity:'courses-external-entity-v1',
+  entityPreference:'courses-external-entity-preference-v1',
   usage:'courses-external-usage-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
@@ -64,9 +65,17 @@ function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function deleteKey(key){localStorage.removeItem(key)}
 
 const COURSES_ENTITY='todo.courses';
+const URL_ENTITY='todo.url';
 function preferredTodoEntity(entities){
   const list=Array.isArray(entities)?entities:[];
-  return list.find(entry=>entry?.id===COURSES_ENTITY) || null;
+  const explicit=String(localStorage.getItem(STORAGE.entityPreference)||'').trim();
+  const legacy=String(localStorage.getItem(STORAGE.entity)||'').trim();
+  const saved=explicit||(legacy&&legacy!==COURSES_ENTITY?legacy:'');
+  return list.find(entry=>entry?.id===saved)
+    || list.find(entry=>entry?.id===COURSES_ENTITY)
+    || list.find(entry=>entry?.id===URL_ENTITY)
+    || list[0]
+    || null;
 }
 
 const ALL=[];
@@ -109,6 +118,7 @@ let state={
   demo:false,
   lockTimer:null,
   backgroundLockTimer:null,
+  resumeToList:false,
   productBusy:new Set(),
   pendingRemoval:new Set(),
   faceAutoAttempted:false,
@@ -390,8 +400,8 @@ function renderList(){
           '<span class="list-name">'+esc(group.summary)+'</span>'+
           '<span class="qty">x'+group.count+'</span>'+
         '</button>'+
-        '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
       '</div>'+
+      '<button class="done" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'>✓</button>'+
     '</div>';
   }).join('');
   const markPurchased=button=>{
@@ -414,12 +424,14 @@ function bindSwipeRows(root){
       content.style.transition='transform .28s cubic-bezier(.22,.75,.2,1)';
       content.style.transform='translate3d(0,0,0)';
       action.style.opacity='0';
-      action.style.transform='translateX(20px) scale(.96)';
+      action.style.transform='translateX(28px) scale(.84)';
+      action.style.filter='blur(3px)';
       action.classList.remove('is-ready');
       if(done){
-        done.style.transition='opacity .22s ease,transform .22s ease';
+        done.style.transition='opacity .28s ease,transform .28s cubic-bezier(.2,.8,.2,1),filter .28s ease';
         done.style.opacity='1';
         done.style.transform='scale(1)';
+        done.style.filter='blur(0)';
       }
       ready=false;
       window.setTimeout(()=>{
@@ -441,13 +453,17 @@ function bindSwipeRows(root){
       const shouldPurchase=-offsetX>=threshold;
       if(shouldPurchase){
         row.dataset.suppressClick='1';
-        content.style.transition='';
+        content.style.transition='transform .34s cubic-bezier(.18,.82,.2,1)';
+        action.style.transition='opacity .30s ease,transform .34s cubic-bezier(.18,.82,.2,1),filter .30s ease,box-shadow .30s ease,border-color .30s ease';
         action.style.opacity='1';
         action.style.transform='translateX(0) scale(1)';
+        action.style.filter='blur(0)';
         action.classList.add('is-ready');
         if(done){
+          done.style.transition='opacity .22s ease,transform .26s ease,filter .22s ease';
           done.style.opacity='0';
-          done.style.transform='scale(.86)';
+          done.style.transform='scale(.72)';
+          done.style.filter='blur(3px)';
         }
         removeGroup(row.dataset.name||'',row);
       }else{
@@ -481,12 +497,17 @@ function bindSwipeRows(root){
       const threshold=Math.min(row.clientWidth*SWIPE_TRIGGER_RATIO,160);
       const isReady=-offsetX>=threshold;
       content.style.transform='translate3d('+offsetX+'px,0,0)';
-      action.style.opacity=String(.10+.90*progress);
-      action.style.transform='translateX('+(20*(1-progress))+'px) scale('+(0.96+0.04*progress)+')';
+      const actionProgress=Math.max(0,Math.min(1,(progress-.10)/.90));
+      const actionEase=1-Math.pow(1-actionProgress,2.1);
+      action.style.opacity=String(actionEase);
+      action.style.transform='translateX('+(28*(1-actionEase))+'px) scale('+(0.84+0.16*actionEase)+')';
+      action.style.filter='blur('+(3*(1-actionEase))+'px)';
       if(done){
-        const doneProgress=Math.min(1,progress/.72);
-        done.style.opacity=String(1-doneProgress);
-        done.style.transform='scale('+(1-.12*doneProgress)+')';
+        const doneProgress=Math.min(1,progress/.44);
+        const doneEase=doneProgress*doneProgress*(3-2*doneProgress);
+        done.style.opacity=String(1-doneEase);
+        done.style.transform='scale('+(1-.28*doneEase)+')';
+        done.style.filter='blur('+(3*doneEase)+'px)';
       }
       if(isReady!==ready){
         ready=isReady;
@@ -850,7 +871,7 @@ function lockApp(message='Application verrouillée.'){
 }
 async function resetLocalConnection(){
   clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();
   state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;state.demo=false;
   hideSecurity();showSetup('Connexion locale supprimée. Tu peux reconnecter Home Assistant.');
@@ -980,7 +1001,7 @@ async function revoke(){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
   clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);
+  deleteKey(STORAGE.vault);deleteKey(STORAGE.biometric);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();
   state.entity='';state.entities=[];state.items=[];state.haUrl='';state.locked=true;
   $('#settingsDialog').close();
@@ -1018,13 +1039,16 @@ function connectWs(token){
   });
 }
 async function discoverEntities(){
-  state.entity=COURSES_ENTITY;
-  localStorage.setItem(STORAGE.entity,state.entity);
+  const saved=String(localStorage.getItem(STORAGE.entity)||'').trim();
+  state.entity=saved||COURSES_ENTITY;
   try{
     const states=await request({type:'get_states'});
     state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')).map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
     const preferred=preferredTodoEntity(state.entities);
-    if(preferred)state.entity=preferred.id;
+    if(preferred){
+      state.entity=preferred.id;
+      localStorage.setItem(STORAGE.entity,state.entity);
+    }
   }catch(error){
     state.entities=[];
     console.warn('courses-app: get_states',error);
@@ -1109,12 +1133,14 @@ async function removeGroup(name,row=null){
     if(action){
       action.style.opacity='1';
       action.style.transform='translateX(0) scale(1)';
+      action.style.filter='blur(0)';
       action.classList.add('is-ready');
     }
     const done=row.querySelector('.done');
     if(done){
       done.style.opacity='0';
-      done.style.transform='scale(.86)';
+      done.style.transform='scale(.72)';
+      done.style.filter='blur(3px)';
     }
   }
   navigator.vibrate?.(8);
@@ -1163,19 +1189,22 @@ async function removeGroup(name,row=null){
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   $('#settingsHaUrl').value=state.haUrl;
-  const preferred=preferredTodoEntity(state.entities);
-  const choices=preferred?[preferred]:state.entities;
+  const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
   $('#entitySelect').innerHTML=choices.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
   updateFaceIdSettings();
   $('#settingsDialog').showModal();
 }
 async function saveSettings(){
   const nextUrl=normalizeHaUrl($('#settingsHaUrl').value);
-  const preferred=preferredTodoEntity(state.entities);
-  const nextEntity=preferred?.id||$('#entitySelect').value;
+  const nextEntity=$('#entitySelect').value||state.entity;
   if(!nextUrl)return;
   const changedUrl=nextUrl!==state.haUrl;
-  if(nextEntity){state.entity=nextEntity;localStorage.setItem(STORAGE.entity,nextEntity)}
+  const changedEntity=!!nextEntity&&nextEntity!==state.entity;
+  if(nextEntity){
+    state.entity=nextEntity;
+    localStorage.setItem(STORAGE.entity,nextEntity);
+    localStorage.setItem(STORAGE.entityPreference,nextEntity);
+  }
   $('#settingsDialog').close();
   if(changedUrl){
     await revoke();
@@ -1183,6 +1212,7 @@ async function saveSettings(){
     $('#haUrlInput').value=nextUrl;
     $('#setupError').textContent='Adresse modifiée : reconnecte Home Assistant.';
   }else{
+    if(changedEntity)await subscribe();
     await refreshItems();armIdleLock();
   }
 }
@@ -1262,28 +1292,60 @@ document.addEventListener('click',event=>{
 });
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
+function resumeForegroundSession(){
+  clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
+  if(state.resumeToList){
+    state.resumeToList=false;
+    state.view='list';
+    renderView();
+  }
+  if(state.demo){
+    refreshItems();
+    return;
+  }
+  if(!vaultRecord())return;
+  if(state.locked){
+    status('is-waiting','Verrouillé','Déverrouillage requis');
+    showSecurity('unlock');
+    return;
+  }
+  if(state.ws?.readyState===WebSocket.OPEN){
+    refreshItems();
+    armIdleLock();
+    return;
+  }
+  if(state.ws?.readyState===WebSocket.CONNECTING){
+    armIdleLock();
+    return;
+  }
+  if(state.refreshToken){
+    connectFromRefresh();
+    return;
+  }
+  state.locked=true;
+  status('is-waiting','Verrouillé','Déverrouillage requis');
+  showSecurity('unlock');
+}
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'){
     clearTimeout(state.backgroundLockTimer);
     if(!state.locked&&!state.demo&&vaultRecord())state.backgroundLockTimer=setTimeout(()=>lockApp('Verrouillage après passage en arrière-plan.'),SECURITY.backgroundLockMs);
     return;
   }
-  clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
-  if(state.demo)refreshItems();
-  else if(!state.locked&&state.ws?.readyState===WebSocket.OPEN){refreshItems();armIdleLock()}
+  resumeForegroundSession();
 });
-window.addEventListener('online',()=>{if(!state.locked&&!state.demo&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN)connectFromRefresh()});
+window.addEventListener('online',()=>{
+  if(state.demo)return;
+  if(!state.locked&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN&&state.ws?.readyState!==WebSocket.CONNECTING)connectFromRefresh();
+});
 window.addEventListener('pagehide',()=>{
   clearLockTimers();closeSocket();wipeMemoryCredentials();
+  state.faceAutoAttempted=false;
+  state.resumeToList=true;
   if(vaultRecord()&&!state.demo)state.locked=true;
 });
-window.addEventListener('pageshow',event=>{
-  if(event.persisted&&vaultRecord()&&!state.demo){
-    state.locked=true;state.items=[];
-    renderProducts();renderList();
-    status('is-waiting','Verrouillé','Mot de passe local requis');
-    showSecurity('unlock','Session restaurée : déverrouille l’application.');
-  }
+window.addEventListener('pageshow',()=>{
+  resumeForegroundSession();
 });
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
