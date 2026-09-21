@@ -841,19 +841,20 @@ function showSecurity(mode,message='',options={}){
   $('#setup').classList.remove('is-visible');
   overlay.classList.add('is-visible');
   const creating=mode==='oauth'||mode==='migrate';
-  const faceReady=mode==='unlock'&&!!biometricRecord()&&!!window.PublicKeyCredential;
-  $('.security-modal').classList.toggle('is-quick-unlock',faceReady&&!creating);
+  const unlocking=mode==='unlock';
+  const faceReady=unlocking&&!!biometricRecord()&&!!window.PublicKeyCredential;
+  $('.security-modal').classList.toggle('is-quick-unlock',unlocking&&!creating);
   $('.security-modal').classList.toggle('is-creating',creating);
-  $('.security-shell').classList.toggle('is-form-mode',creating||!faceReady);
+  $('.security-shell').classList.toggle('is-form-mode',creating);
   $('.security-shell').classList.remove('is-password-open');
   $('#securityIcon').classList.toggle('is-creating',creating);
   $('#securityTitle').textContent='Mes courses';
   $('#securityText').textContent=message||(creating
     ?'Choisis un mot de passe local. Il chiffrera l’autorisation Home Assistant enregistrée sur cet appareil.'
-    :(faceReady?'Déverrouillage sécurisé':'Entre ton mot de passe local.'));
-  $('#faceIdUnlockBtn').hidden=!faceReady;
-  $('#passwordLoginBtn').hidden=!faceReady||creating;
-  $('#passwordPanel').hidden=faceReady&&!creating;
+    :'Déverrouillage sécurisé');
+  $('#faceIdUnlockBtn').hidden=!unlocking||creating;
+  $('#passwordLoginBtn').hidden=!unlocking||creating;
+  $('#passwordPanel').hidden=unlocking&&!creating;
   $('#securityConfirmWrap').hidden=!creating;
   $('#securityHint').hidden=!creating;
   $('#securityPassword').autocomplete=creating?'new-password':'current-password';
@@ -864,7 +865,7 @@ function showSecurity(mode,message='',options={}){
   $('#securityError').textContent='';
   refreshVisualLock();
   if(faceReady&&!creating&&options.autoFaceId!==false)scheduleAutomaticFaceId();
-  else if(!faceReady||creating)setTimeout(()=>$('#securityPassword').focus(),80);
+  else if(creating)setTimeout(()=>$('#securityPassword').focus(),80);
 }
 function hideSecurity(){
   $('#securityOverlay').classList.remove('is-visible');
