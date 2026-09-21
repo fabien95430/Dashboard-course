@@ -109,3 +109,17 @@ URL : `https://fabien95430.github.io/Dashboard-course/`
 L’interface mobile repose sur quatre écrans cohérents : déverrouillage sécurisé, **Ma liste**, **Catalogue** et **Réglages**. Le rendu est mobile-first, utilise toute la largeur disponible, conserve les visuels produits premium et n’ajoute aucun framework ni dépendance externe.
 
 L’onglet **Réglages** expose uniquement les fonctions réellement disponibles : connexion Home Assistant, liste active, sécurité locale, Face ID, état de synchronisation, verrouillage manuel et déconnexion.
+
+
+## Règle d’affichage iPhone installé
+
+Le rendu validé utilise l’application ajoutée à l’écran d’accueil, et non la hauteur visible dans Safari. Cette règle doit rester commune à tous les écrans : accueil et déverrouillage, **Ma liste**, **Catalogue** et **Réglages**.
+
+- conserver `viewport-fit=cover` ;
+- conserver `apple-mobile-web-app-status-bar-style=black-translucent` ;
+- afficher le fond derrière la barre d’état ;
+- prolonger la hauteur de l’application avec `env(safe-area-inset-bottom)` ;
+- conserver les commandes au-dessus du geste d’accueil tout en prolongeant leur fond jusqu’au bord physique ;
+- ne jamais réserver l’espace de la barre d’adresse Safari dans le mode installé.
+
+Toute modification de hauteur, de `100dvh`, des overlays ou de la navigation basse doit être vérifiée en mode PWA installé, en haut et en bas de l’écran.
