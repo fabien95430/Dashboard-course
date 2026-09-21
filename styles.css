@@ -2550,3 +2550,11 @@ body:has(#securityOverlay.is-visible){
     }
   }
 }
+
+
+/* ===== UI v65 — activer réellement le raccord bas iOS ===== */
+/* v38 masque tous les pseudo-éléments de l'écran d'accueil avec display:none!important.
+   Les raccords v63/v64 étaient donc présents dans le CSS mais invisibles. */
+.security-overlay::after{
+  display:block!important;
+}
