@@ -13,7 +13,7 @@
   <link rel="icon" href="./icon.svg?v=23" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.png?v=23">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=25">
+  <link rel="stylesheet" href="./styles.css?v=26">
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -153,18 +153,31 @@
   </main>
 
   <section id="setup" class="overlay is-visible" aria-modal="true">
-    <div class="modal setup-modal">
-      <div class="welcome-logo"><svg><use href="#i-cart"></use></svg></div>
-      <h2>Mes courses</h2>
-      <p>Connecte Home Assistant pour retrouver ta liste sur cet appareil.</p>
-      <label class="field">
-        <span>Adresse Home Assistant / Nabu Casa</span>
-        <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
-      </label>
-      <p class="hint">La connexion est sécurisée par OAuth. Ton autorisation locale sera ensuite chiffrée sur cet appareil.</p>
-      <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
-      <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
-      <div id="setupError" class="setup-error" role="alert"></div>
+    <div class="setup-shell">
+      <div class="setup-hero">
+        <img class="welcome-cart" src="./welcome-cart-v25.png" alt="">
+        <h2>Mes courses</h2>
+        <p>Simple, rapide, toujours à jour <span aria-hidden="true">♥</span></p>
+      </div>
+      <div class="modal setup-modal">
+        <div class="security-lock-icon"><svg><use href="#i-lock"></use></svg></div>
+        <h3>Accéder à mes courses</h3>
+        <p>Connectez votre compte Home Assistant</p>
+        <label class="field">
+          <span>Adresse Home Assistant / Nabu Casa</span>
+          <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
+        </label>
+        <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
+        <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
+        <p class="hint">Connexion sécurisée par OAuth. Votre autorisation sera chiffrée sur cet appareil.</p>
+        <div id="setupError" class="setup-error" role="alert"></div>
+      </div>
+      <p class="welcome-slogan">Tout pour<br>des courses plus simples<br>au quotidien !</p>
+      <div class="security-benefits setup-benefits" aria-hidden="true">
+        <span><svg><use href="#i-sync"></use></svg><small>Synchronisé<br>avec Home Assistant</small></span>
+        <span><svg><use href="#i-lock"></use></svg><small>Vos données<br>restent privées</small></span>
+        <span><strong>⚡</strong><small>Rapide<br>et intuitif</small></span>
+      </div>
     </div>
   </section>
 
@@ -233,7 +246,7 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=25"></script>
+  <script src="./app.js?v=26"></script>
 </body>
 </html>
 
