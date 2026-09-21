@@ -2146,7 +2146,7 @@ html,body{touch-action:pan-x pan-y}
 .security-overlay{
   padding:0!important;
   overflow:hidden!important;
-  background:#f5f2ea url("./welcome-background-v38.svg") center center / cover no-repeat!important;
+  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat!important;
 }
 .security-overlay::before,
 .security-overlay::after,
