@@ -71,10 +71,10 @@ function preferredTodoEntity(entities){
   const list=Array.isArray(entities)?entities:[];
   const explicit=String(localStorage.getItem(STORAGE.entityPreference)||'').trim();
   const legacy=String(localStorage.getItem(STORAGE.entity)||'').trim();
-  const saved=explicit||(legacy&&legacy!==COURSES_ENTITY?legacy:'');
-  return list.find(entry=>entry?.id===saved)
+  const saved=explicit||legacy;
+  return list.find(entry=>entry?.id===URL_ENTITY)
+    || list.find(entry=>entry?.id===saved)
     || list.find(entry=>entry?.id===COURSES_ENTITY)
-    || list.find(entry=>entry?.id===URL_ENTITY)
     || list[0]
     || null;
 }
