@@ -1284,6 +1284,7 @@ $('#demoBtn').onclick=()=>{
   hideSetup();hideSecurity();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
 };
 $('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
+$('#securitySettingsBtn').onclick=openSettings;
 $('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
 ['settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsFaceIdBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
 $('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
@@ -1357,3 +1358,4 @@ window.addEventListener('pageshow',()=>{
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderView();init();
 })();
+

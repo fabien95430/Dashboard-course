@@ -13,7 +13,7 @@
   <link rel="icon" href="./icon.svg?v=23" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.png?v=23">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=24">
+  <link rel="stylesheet" href="./styles.css?v=25">
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -169,11 +169,14 @@
   </section>
 
   <section id="securityOverlay" class="overlay security-overlay" aria-modal="true" aria-labelledby="securityTitle">
+    <button id="securitySettingsBtn" class="security-settings-chip" type="button" aria-label="Ouvrir les réglages">
+      <svg><use href="#i-gear"></use></svg><span>Réglages</span>
+    </button>
     <div class="security-shell">
       <div class="security-hero">
-        <div class="welcome-logo"><svg><use href="#i-cart"></use></svg></div>
+        <img class="welcome-cart" src="./welcome-cart-v25.png" alt="">
         <h2 id="securityTitle">Mes courses</h2>
-        <p id="securityText">Simple, rapide, toujours à jour</p>
+        <p id="securityText">Simple, rapide, toujours à jour <span aria-hidden="true">♥</span></p>
       </div>
 
       <div class="modal security-modal">
@@ -204,6 +207,8 @@
         <div id="securityError" class="setup-error" role="alert"></div>
       </div>
 
+      <p class="welcome-slogan">Tout pour<br>des courses plus simples<br>au quotidien !</p>
+
       <div class="security-benefits" aria-hidden="true">
         <span><svg><use href="#i-sync"></use></svg><small>Synchronisé<br>avec Home Assistant</small></span>
         <span><svg><use href="#i-lock"></use></svg><small>Vos données<br>restent privées</small></span>
@@ -228,6 +233,7 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=23"></script>
+  <script src="./app.js?v=25"></script>
 </body>
 </html>
+
