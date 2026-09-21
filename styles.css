@@ -2295,11 +2295,17 @@ body:has(#securityOverlay.is-visible){
 }
 
 
-/* ===== UI v44 — hauteur application iOS standalone ===== */
-/* En mode installé iOS, 100dvh peut s'arrêter avant le canvas plein écran.
-   On utilise le grand viewport uniquement pour l'app principale ; les safe areas existantes gardent la navigation hors du Home Indicator. */
+/* ===== UI v45 — navigation basse iOS ===== */
+/* L'app garde le viewport visible. Le fond de la navigation descend dans la safe area,
+   tandis que ses icônes restent au-dessus du Home Indicator. */
 @media (display-mode: standalone){
-  @supports (height:100lvh){
-    .app{height:100lvh}
+  .app{
+    height:100dvh;
+    padding-bottom:0;
+    grid-template-rows:minmax(0,1fr) calc(72px + env(safe-area-inset-bottom));
+  }
+  .tabs{
+    height:calc(72px + env(safe-area-inset-bottom));
+    padding:6px 10px calc(6px + env(safe-area-inset-bottom));
   }
 }
