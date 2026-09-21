@@ -720,6 +720,7 @@ async function unlockWithFaceId(options={}){
 function showPasswordFallback(){
   $('#passwordPanel').hidden=false;
   $('#passwordLoginBtn').hidden=true;
+  $('.security-shell').classList.add('is-password-open');
   $('#securityError').textContent='';
   setTimeout(()=>$('#securityPassword').focus(),60);
 }
@@ -842,10 +843,11 @@ function showSecurity(mode,message='',options={}){
   const creating=mode==='oauth'||mode==='migrate';
   const faceReady=mode==='unlock'&&!!biometricRecord()&&!!window.PublicKeyCredential;
   $('.security-modal').classList.toggle('is-quick-unlock',faceReady&&!creating);
+  $('.security-modal').classList.toggle('is-creating',creating);
+  $('.security-shell').classList.toggle('is-form-mode',creating||!faceReady);
+  $('.security-shell').classList.remove('is-password-open');
   $('#securityIcon').classList.toggle('is-creating',creating);
-  $('#securityTitle').textContent=creating
-    ?(mode==='migrate'?'Sécuriser la connexion existante':'Créer le verrou de l’application')
-    :'Mes courses';
+  $('#securityTitle').textContent='Mes courses';
   $('#securityText').textContent=message||(creating
     ?'Choisis un mot de passe local. Il chiffrera l’autorisation Home Assistant enregistrée sur cet appareil.'
     :(faceReady?'Déverrouillage sécurisé':'Entre ton mot de passe local.'));
@@ -870,6 +872,7 @@ function hideSecurity(){
   $('#securityConfirm').value='';
   $('#securityError').textContent='';
   state.facePromptActive=false;
+  $('.security-shell').classList.remove('is-password-open','is-form-mode');
   refreshVisualLock();
 }
 function lockApp(message='Application verrouillée.'){
@@ -1284,7 +1287,7 @@ $('#demoBtn').onclick=()=>{
   hideSetup();hideSecurity();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
 };
 $('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
-$('#securitySettingsBtn').onclick=openSettings;
+$('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
 $('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
 ['settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsFaceIdBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
 $('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
@@ -1355,9 +1358,7 @@ window.addEventListener('pageshow',()=>{
   resumeForegroundSession();
 });
 
+['gesturestart','gesturechange','gestureend'].forEach(name=>document.addEventListener(name,event=>event.preventDefault(),{passive:false}));
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderView();init();
 })();
-const IS_STANDALONE=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-document.documentElement.classList.toggle('is-standalone',IS_STANDALONE);
-

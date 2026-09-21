@@ -694,9 +694,9 @@ svg{display:block}
   max-width:560px;
   height:100dvh;
   margin:0 auto;
-  padding:max(14px,env(safe-area-inset-top)) 0 0;
+  padding:max(14px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));
   display:grid;
-  grid-template-rows:minmax(0,1fr) auto;
+  grid-template-rows:minmax(0,1fr) 72px;
   gap:0;
   background:transparent;
 }
@@ -1554,274 +1554,651 @@ svg{display:block}
   .security-benefits small{font-size:10px}
 }
 
-/* Extend backgrounds to the screen edge; keep controls above the home gesture. */
-.app > .view{
-  padding-left:max(12px,env(safe-area-inset-left));
-  padding-right:max(12px,env(safe-area-inset-right));
-}
-.app > .tabs{
-  height:calc(72px + env(safe-area-inset-bottom,0px));
-  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));
-  padding-left:max(10px,env(safe-area-inset-left));
-  padding-right:max(10px,env(safe-area-inset-right));
-}
-@media(max-width:390px){
-  .app{padding-left:0;padding-right:0}
-  .app > .view{
-    padding-left:max(9px,env(safe-area-inset-left));
-    padding-right:max(9px,env(safe-area-inset-right));
-  }
-}
 
-/* Welcome / unlock screen — photo composition matched to the approved reference. */
-.security-overlay,
-#setup{
-  position:fixed;
-  inset:0;
-  min-height:100dvh;
-  padding:max(20px,env(safe-area-inset-top)) 16px max(12px,env(safe-area-inset-bottom));
+/* ===== UI v24 — accueil fidèle à la maquette validée ===== */
+.security-overlay{
+  padding:0!important;
+  place-items:stretch!important;
   overflow:hidden;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,248,236,.08)),
-    url("./welcome-background-v26.jpg") center/cover no-repeat;
+  background-image:
+    linear-gradient(180deg,rgba(250,249,244,.04),rgba(247,240,228,.06)),
+    url("data:image/webp;base64,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")!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
 }
-.setup-shell{
-  width:min(100%,430px);
-  height:100%;
-  min-height:0;
-  margin:auto;
-  padding:28px 0 0;
-  display:grid;
-  grid-template-rows:auto auto minmax(36px,1fr) auto;
-  gap:14px;
-}
-.setup-hero{text-align:center}
-.setup-hero h2{
-  margin:0;
-  color:#063b28;
-  font-size:clamp(42px,11.2vw,56px);
-  line-height:.95;
-  font-weight:880;
-  letter-spacing:-2px;
-}
-.setup-hero>p{
-  margin:9px 0 0;
-  color:#626a66;
-  font-size:clamp(17px,4.6vw,22px);
-  line-height:1.15;
-  font-weight:500;
-}
-.setup-hero>p span{color:#32a94e}
-.security-settings-chip{
+.security-settings-pill{
   position:absolute;
-  z-index:2;
+  z-index:6;
   top:max(18px,env(safe-area-inset-top));
-  right:max(18px,env(safe-area-inset-right));
-  height:43px;
-  padding:0 16px;
-  border:1px solid rgba(255,255,255,.68);
+  right:max(18px,calc((100vw - 440px)/2 + 18px));
+  height:38px;
+  padding:0 15px;
+  border:1px solid rgba(17,45,29,.04);
   border-radius:999px;
   display:flex;
   align-items:center;
-  gap:8px;
-  color:#4d514e;
-  background:rgba(255,255,255,.78);
-  -webkit-backdrop-filter:blur(14px);
-  backdrop-filter:blur(14px);
-  box-shadow:0 7px 20px rgba(55,62,53,.12);
-  font-size:14px;
-  font-weight:650;
+  gap:7px;
+  background:rgba(255,255,255,.88);
+  color:#4d514d;
+  box-shadow:0 8px 20px rgba(53,68,58,.10),inset 0 1px 0 rgba(255,255,255,.95);
+  font-size:13px;
+  font-weight:700;
 }
-.security-settings-chip svg{
-  width:20px;
-  height:20px;
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.9;
-}
+.security-settings-pill svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9}
 .security-shell{
-  width:min(100%,430px);
-  height:100%;
-  padding:66px 0 0;
-  display:grid;
-  grid-template-rows:auto auto minmax(52px,1fr) auto;
-  align-content:stretch;
-  gap:16px;
+  position:relative!important;
+  width:min(100%,440px)!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:auto!important;
+  display:block!important;
+  padding:0!important;
 }
-.security-hero{text-align:center}
-.welcome-cart{
+.security-hero{
+  position:absolute;
+  z-index:2;
+  top:7.3%;
+  left:0;
+  right:0;
+  text-align:center;
+}
+.welcome-cart-art{
   width:154px;
-  height:142px;
-  margin:0 auto 4px;
-  display:block;
-  object-fit:contain;
+  height:135px;
+  margin:0 auto 2px;
 }
+.welcome-cart-art svg{width:100%;height:100%;overflow:visible}
+.welcome-cart-art .cart-handle,.welcome-cart-art .cart-basket{fill:none;stroke:#1f6f3d;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
+.welcome-cart-art .cart-basket{fill:#43a63f;stroke:#236f39;stroke-width:7}
+.welcome-cart-art .cart-wheel{fill:#286f42}
+.welcome-cart-art .leaf{fill:#24743e}
+.welcome-cart-art .leaf-b{fill:#318442}.welcome-cart-art .leaf-c{fill:#3c9448}
+.welcome-cart-art .tomato{fill:#e73c28}.welcome-cart-art .citrus{fill:#f4b626}
+.welcome-cart-art .produce-stem,.welcome-cart-art .cart-spark{fill:none;stroke:#46ae2b;stroke-width:8;stroke-linecap:round}
 .security-hero h2{
-  margin:0;
-  color:#063b28;
-  font-size:clamp(42px,11.2vw,56px);
-  line-height:.95;
-  font-weight:880;
-  letter-spacing:-2px;
+  margin:3px 0 0!important;
+  color:#082f1f!important;
+  font-size:42px!important;
+  line-height:.98!important;
+  font-weight:880!important;
+  letter-spacing:-1.6px!important;
 }
-.security-hero>p{
-  margin:10px 0 0;
-  color:#626a66;
-  font-size:clamp(17px,4.6vw,22px);
-  line-height:1.15;
-  font-weight:500;
+.security-tagline{
+  margin:9px 0 0!important;
+  color:#656b66!important;
+  font-size:16px!important;
+  line-height:1.1!important;
+  font-weight:520!important;
 }
-.security-hero>p span{color:#32a94e}
+.security-tagline span{color:#40b62b;font-size:17px}
 .security-modal{
-  align-self:start;
-  border:1px solid rgba(255,255,255,.80);
-  border-radius:27px;
-  padding:22px 20px 20px;
-  background:rgba(255,255,255,.84);
-  -webkit-backdrop-filter:blur(16px);
-  backdrop-filter:blur(16px);
-  box-shadow:0 18px 45px rgba(58,58,43,.17),inset 0 1px 0 rgba(255,255,255,.92);
+  position:absolute!important;
+  z-index:3;
+  top:36.8%;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(78%,352px)!important;
+  border-radius:26px!important;
+  padding:17px 16px 16px!important;
+  background:rgba(255,255,255,.91)!important;
+  border:1px solid rgba(46,70,54,.055)!important;
+  box-shadow:0 15px 36px rgba(52,63,55,.14),inset 0 1px 0 rgba(255,255,255,.92)!important;
+  -webkit-backdrop-filter:blur(10px) saturate(112%);
+  backdrop-filter:blur(10px) saturate(112%);
 }
-.setup-modal{
-  width:100%;
-  align-self:start;
-  border:1px solid rgba(255,255,255,.80);
-  border-radius:27px;
-  padding:20px;
-  background:rgba(255,255,255,.84);
-  -webkit-backdrop-filter:blur(16px);
-  backdrop-filter:blur(16px);
-  box-shadow:0 18px 45px rgba(58,58,43,.17),inset 0 1px 0 rgba(255,255,255,.92);
-  text-align:center;
-}
-.setup-modal h3{
-  margin:0;
-  color:#131915;
-  font-size:23px;
-  font-weight:820;
-}
-.setup-modal>p:not(.hint){margin:7px auto 13px;color:#737b80;font-size:14px}
-.setup-modal .field{text-align:left;margin-top:12px}
-.setup-modal .primary{height:54px;margin-top:13px;border-radius:17px;font-size:16px}
-.setup-modal .secondary{height:48px;border-radius:17px}
-.setup-modal .hint{margin:9px 3px 0;text-align:center!important;font-size:9px!important;line-height:1.3}
-.setup-benefits{margin:0;padding-bottom:6px}
 .security-lock-icon{
-  width:62px;
-  height:62px;
-  margin:0 auto 12px;
-  background:rgba(226,246,222,.90);
+  width:44px!important;
+  height:44px!important;
+  margin:0 auto 9px!important;
+  background:#e8f6df!important;
+  color:#167844!important;
 }
-.security-modal h3{font-size:23px}
-.security-modal>p{margin:7px auto 17px;font-size:14px}
-.faceid-btn{height:58px;border-radius:17px}
-.password-toggle{height:52px;border-radius:17px;background:rgba(255,255,255,.72)}
-.welcome-slogan{
-  align-self:center;
-  margin:0;
-  color:#0b5034;
+.security-lock-icon svg{width:22px!important;height:22px!important}
+.security-modal h3{
+  margin:0!important;
+  font-size:19px!important;
+  line-height:1.08!important;
+  font-weight:840!important;
+  color:#111814!important;
+}
+.security-card-copy{
+  margin:7px auto 12px!important;
+  max-width:290px;
+  color:#747a77!important;
+  font-size:12.5px!important;
+  line-height:1.3!important;
+}
+.security-dynamic{display:none;margin:7px auto 10px!important;color:#747a77!important;font-size:11px!important;line-height:1.3!important}
+.security-modal.is-creating .security-card-copy{display:none}
+.security-modal.is-creating .security-dynamic{display:block}
+.faceid-btn{
+  height:51px!important;
+  border-radius:17px!important;
+  background:linear-gradient(160deg,#4cad6c,#319653)!important;
+  box-shadow:0 8px 18px rgba(34,132,69,.16)!important;
+  font-size:17px!important;
+}
+.faceid-btn svg{width:27px!important;height:27px!important}
+.password-toggle{
+  height:49px!important;
+  margin-top:9px!important;
+  border-radius:17px!important;
+  background:rgba(255,255,255,.92)!important;
+  border:1px solid #e3e7e2!important;
+  color:#141a16!important;
+  font-size:14px!important;
+  box-shadow:0 4px 13px rgba(50,67,56,.04)!important;
+}
+.security-modal .password-panel{margin-top:9px!important}
+.security-modal .password-panel .field{margin-top:9px!important}
+.security-modal .password-panel .field input{height:42px!important}
+.security-modal .password-panel .primary{height:44px!important;margin-top:10px!important}
+.security-modal .reset-link{height:35px!important;margin-top:7px!important}
+.security-note{
+  position:absolute;
+  z-index:2;
+  top:69.8%;
+  left:50%;
+  transform:translateX(-50%) rotate(-3deg);
+  width:220px;
+  color:#0d4d2c;
   text-align:center;
-  font-family:"Segoe Print","Bradley Hand",cursive;
-  font-size:19px;
-  line-height:1.28;
-  font-style:italic;
-  transform:rotate(-4deg);
-  text-shadow:0 1px 0 rgba(255,255,255,.65);
+  font-family:"Bradley Hand","Segoe Print","Comic Sans MS",cursive;
+  font-size:16px;
+  line-height:1.18;
+  font-weight:540;
+  letter-spacing:.15px;
 }
-.welcome-slogan::after{
-  content:"";
-  width:72px;
+.security-note span{
+  display:block;
+  width:85px;
   height:2px;
   margin:7px auto 0;
-  display:block;
-  border-radius:99px;
-  background:#0b5034;
-  transform:rotate(-5deg);
+  border-radius:999px;
+  background:#0e6c3a;
+  transform:rotate(-8deg);
 }
 .security-benefits{
-  align-self:end;
-  margin:0;
-  padding:4px 0 2px;
-  gap:8px;
+  position:absolute!important;
+  z-index:2;
+  left:4px;
+  right:4px;
+  bottom:max(24px,calc(env(safe-area-inset-bottom) + 14px));
+  margin:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,1fr)!important;
+  gap:8px!important;
 }
-.security-benefits>span{gap:5px}
-.security-benefits svg{width:31px;height:31px}
-.security-benefits strong{font-size:29px}
-.security-benefits small{
-  color:#236843;
-  font-size:11px;
-  line-height:1.17;
-  text-shadow:0 1px 0 rgba(255,255,255,.72);
+.security-benefits>span{display:grid!important;justify-items:center!important;gap:6px!important;text-align:center!important}
+.security-benefits i{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:rgba(226,245,218,.92);
+  color:#167844;
+  font-style:normal;
 }
-@media(max-height:880px){
-  .setup-shell{padding-top:12px;gap:9px;grid-template-rows:auto auto minmax(18px,1fr) auto}
-  .setup-hero .welcome-cart{width:126px;height:108px}
-  .setup-hero h2{font-size:42px}
-  .setup-hero>p{margin-top:6px;font-size:16px}
-  .setup-modal{padding:16px 18px}
-  .setup-modal .security-lock-icon{width:52px;height:52px;margin-bottom:8px}
-  .setup-modal h3{font-size:21px}
-  .setup-modal>p:not(.hint){margin:5px auto 9px;font-size:13px}
-  .setup-modal .field{margin-top:8px}
-  .setup-modal .primary{height:48px;margin-top:9px}
-  .setup-modal .secondary{height:44px}
-  .setup-modal .hint{margin-top:6px;font-size:8px!important}
-  .setup-shell>.welcome-slogan{font-size:16px}
-}
-@media(max-height:760px){
-  .security-shell{padding-top:46px;gap:10px;grid-template-rows:auto auto minmax(18px,1fr) auto}
-  .welcome-cart{width:118px;height:102px}
-  .security-hero h2{font-size:40px}
-  .security-hero>p{margin-top:6px;font-size:16px}
-  .security-modal{padding:16px 17px}
-  .security-lock-icon{width:48px;height:48px;margin-bottom:8px}
-  .security-modal h3{font-size:20px}
-  .security-modal>p{margin:5px auto 11px;font-size:12px}
-  .faceid-btn{height:49px}
-  .password-toggle{height:45px}
-  .welcome-slogan{font-size:15px}
-  .security-benefits svg{width:26px;height:26px}
-  .security-benefits small{font-size:9px}
-  .setup-shell{padding-top:8px;gap:8px;grid-template-rows:auto auto minmax(8px,1fr) auto}
-  .setup-hero .welcome-cart{width:104px;height:88px}
-  .setup-hero h2{font-size:38px}
-  .setup-hero>p{margin-top:5px;font-size:15px}
-  .setup-modal{padding:14px 16px}
-  .setup-modal .security-lock-icon{display:none}
-  .setup-modal h3{font-size:19px}
-  .setup-modal>p:not(.hint){margin:4px auto 8px;font-size:12px}
-  .setup-modal .field{margin-top:7px}
-  .setup-modal .primary{height:46px;margin-top:8px}
-  .setup-modal .secondary{height:42px}
-  .setup-modal .hint{display:none}
+.security-benefits i svg{width:27px!important;height:27px!important;fill:none;stroke:currentColor;stroke-width:1.9}
+.security-benefits .benefit-bolt{font-size:27px;color:#12834a}
+.security-benefits small{color:#2e6746!important;font-size:10px!important;line-height:1.2!important}
+.security-shell.is-password-open .security-note,.security-shell.is-password-open .security-benefits,.security-shell.is-form-mode .security-note{opacity:0;pointer-events:none}
+.security-shell.is-form-mode .security-modal{top:31%}
+@media(max-height:720px){
+  .security-hero{top:5.5%}
+  .welcome-cart-art{width:132px;height:116px}
+  .security-hero h2{font-size:36px!important}
+  .security-tagline{font-size:14px!important}
+  .security-modal{top:35.5%;width:min(82%,350px)!important;padding:14px!important}
+  .security-note{top:70.5%;font-size:14px}
+  .security-benefits{bottom:max(15px,calc(env(safe-area-inset-bottom) + 8px))}
+  .security-benefits i{width:42px;height:42px}
 }
 
-/* Installed iPhone app: use the physical screen, with no Safari toolbar allowance. */
-html.is-standalone,
-html.is-standalone body{
+
+/* ===== UI v26 — zoom verrouillé ===== */
+html,body{touch-action:pan-x pan-y}
+
+
+/* ===== UI v27 — états sécurité cohérents ===== */
+[hidden]{display:none!important}
+.security-shell.is-form-mode .security-note,
+.security-shell.is-form-mode .security-benefits{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.security-shell.is-form-mode .security-modal{
+  top:35%!important;
+}
+.security-modal.is-creating .faceid-btn,
+.security-modal.is-creating .password-toggle{
+  display:none!important;
+}
+@media(max-height:720px){
+  .security-shell.is-form-mode .security-modal{top:31%!important}
+}
+
+
+/* ===== UI v29 — accueil HD calé sur la référence 2 ===== */
+.security-overlay{
+  background:#f2f0ea!important;
+  background-image:none!important;
+}
+.security-overlay::before,
+.security-overlay::after,
+.security-shell::before{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:0;
+  background-repeat:no-repeat;
+}
+.security-overlay::before{
+  left:0;
+  bottom:0;
+  width:17.68%;
+  height:94.4%;
+  background-image:url("./welcome-left-v28.webp");
+  background-size:100% 100%;
+  background-position:left bottom;
+}
+.security-overlay::after{
+  right:0;
+  bottom:0;
+  width:17.82%;
+  height:68%;
+  background-image:url("./welcome-right-v28.webp");
+  background-size:100% 100%;
+  background-position:right bottom;
+}
+.security-shell::before{
+  left:50%;
+  top:59.9%;
   width:100%;
-  height:100%;
-  min-height:100dvh;
-  overflow:hidden;
+  aspect-ratio:832 / 350;
+  transform:translateX(-50%);
+  background-image:url("./welcome-bottom-v28.webp");
+  background-size:100% 100%;
+  background-position:center;
 }
-html.is-standalone .app,
-html.is-standalone .overlay{
-  height:100dvh;
-  min-height:100dvh;
+.security-shell.is-form-mode::before{display:none}
+.security-settings-pill{
+  top:max(8px,calc(env(safe-area-inset-top) - 16px))!important;
+  right:14px!important;
+  height:38px!important;
 }
-html.is-standalone .overlay{
-  inset:0;
-  padding-top:max(20px,env(safe-area-inset-top));
-  padding-bottom:max(8px,env(safe-area-inset-bottom));
+.security-hero{
+  top:3.6%!important;
 }
-html.is-standalone .setup-shell,
-html.is-standalone .security-shell{
-  height:100%;
-  max-height:none;
+.welcome-cart-art{
+  width:150px!important;
+  height:auto!important;
+  margin:0 auto 0!important;
 }
-html.is-standalone .tabs{
-  margin-bottom:0;
-  height:calc(72px + env(safe-area-inset-bottom,0px));
-  padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));
+.welcome-cart-art img{
+  display:block;
+  width:100%;
+  height:auto;
+  border:0;
+}
+.security-hero h2{
+  margin:0!important;
+  font-size:40px!important;
+  letter-spacing:-1.45px!important;
+}
+.security-tagline{
+  margin-top:8px!important;
+  font-size:15.5px!important;
+}
+.security-modal{
+  top:33.5%!important;
+  width:min(78%,352px)!important;
+  padding:14px 14px 13px!important;
+  border-radius:25px!important;
+}
+.security-lock-icon{
+  width:41px!important;
+  height:41px!important;
+  margin-bottom:7px!important;
+}
+.security-lock-icon svg{width:21px!important;height:21px!important}
+.security-modal h3{font-size:18.5px!important}
+.security-card-copy{
+  margin:6px auto 10px!important;
+  font-size:12px!important;
+  line-height:1.28!important;
+}
+.faceid-btn{
+  height:46px!important;
+  border-radius:16px!important;
+  font-size:16px!important;
+}
+.faceid-btn svg{width:25px!important;height:25px!important}
+.password-toggle{
+  height:44px!important;
+  margin-top:8px!important;
+  border-radius:16px!important;
+  font-size:13.5px!important;
+}
+.security-modal .setup-error{min-height:0!important}
+.security-modal .setup-error:empty{display:none!important}
+.security-note{display:none!important}
+.security-benefits{
+  bottom:max(28px,calc(env(safe-area-inset-bottom) + 20px))!important;
+}
+.security-benefits i{
+  width:46px!important;
+  height:46px!important;
+}
+.security-benefits i svg{
+  width:26px!important;
+  height:26px!important;
+}
+.security-benefits .benefit-bolt{
+  color:#167844!important;
+}
+.security-benefits .benefit-bolt svg{
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linejoin:round;
+}
+.security-benefits small{font-size:10px!important}
+.security-shell.is-form-mode .security-modal{top:31.5%!important}
+@media(max-height:720px){
+  .security-hero{top:2.8%!important}
+  .welcome-cart-art{width:136px!important}
+  .security-modal{top:32.8%!important}
+  .security-shell.is-form-mode .security-modal{top:29.5%!important}
+  .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 10px))!important}
 }
 
+
+/* ===== UI v30 — raccords fond + placement référence ===== */
+.security-overlay::before{
+  width:10.9%!important;
+  background-size:auto 100%!important;
+  background-position:left bottom!important;
+}
+.security-overlay::after{
+  width:10.3%!important;
+  background-size:auto 100%!important;
+  background-position:right bottom!important;
+}
+.security-shell::before{
+  top:68.4%!important;
+  aspect-ratio:832 / 245!important;
+  background-size:100% auto!important;
+  background-position:center bottom!important;
+  mix-blend-mode:multiply;
+}
+.security-settings-pill{
+  top:max(4px,calc(env(safe-area-inset-top) - 24px))!important;
+}
+.security-hero{
+  top:2.7%!important;
+}
+.welcome-cart-art img{
+  mix-blend-mode:multiply;
+}
+.security-modal{
+  top:30.8%!important;
+}
+.security-shell.is-password-open .security-modal{
+  top:30.8%!important;
+}
+.security-shell.is-form-mode .security-modal{
+  top:28.5%!important;
+}
+@media(max-height:720px){
+  .security-hero{top:2.1%!important}
+  .security-modal{top:29.8%!important}
+  .security-shell.is-password-open .security-modal{top:29.8%!important}
+  .security-shell.is-form-mode .security-modal{top:27.2%!important}
+  .security-shell::before{top:68.8%!important}
+}
+
+
+/* ===== UI v32 — suppression du bandeau central ===== */
+.security-overlay{
+  background:
+    radial-gradient(42% 58% at 7% 52%,rgba(119,142,74,.12),transparent 74%),
+    radial-gradient(40% 58% at 94% 58%,rgba(210,170,111,.11),transparent 76%),
+    linear-gradient(180deg,#f4f2ec 0%,#f1efe8 58%,#f4eee3 100%)!important;
+}
+.security-overlay::before{
+  width:23%!important;
+  height:95%!important;
+  background-size:100% 100%!important;
+  background-position:left bottom!important;
+  -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 56%,rgba(0,0,0,.78) 72%,transparent 100%);
+  mask-image:linear-gradient(90deg,#000 0%,#000 56%,rgba(0,0,0,.78) 72%,transparent 100%);
+}
+.security-overlay::after{
+  width:25%!important;
+  height:70%!important;
+  background-size:100% 100%!important;
+  background-position:right bottom!important;
+  -webkit-mask-image:linear-gradient(270deg,#000 0%,#000 58%,rgba(0,0,0,.78) 74%,transparent 100%);
+  mask-image:linear-gradient(270deg,#000 0%,#000 58%,rgba(0,0,0,.78) 74%,transparent 100%);
+}
+.security-shell::before{
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
+}
+
+
+/* ===== UI v33 — décor jusqu’en haut ===== */
+.security-overlay::before{
+  top:0!important;
+  bottom:0!important;
+  height:100%!important;
+  background-position:left top!important;
+}
+
+
+/* ===== UI v36 — référence 2 finale ===== */
+/* Un seul fond de scène sur l'overlay : plus aucun panneau central ni raccord de pseudo-élément. */
+.security-overlay{
+  padding:0!important;
+  overflow:hidden!important;
+  background-color:#f5f2ea!important;
+  background-image:
+    url("./welcome-bottom-v28.webp"),
+    url("./welcome-right-v28.webp"),
+    url("./welcome-left-v28.webp"),
+    linear-gradient(180deg,#f3f2ed 0%,#f4f3ef 64%,#f8f4e8 100%)!important;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat!important;
+  background-size:
+    100% 17.58%,
+    10.18% 58.27%,
+    10.75% 77.15%,
+    100% 100%!important;
+  background-position:
+    left 68.68%,
+    right 27.99%,
+    left 9.11%,
+    center!important;
+}
+.security-overlay::before,
+.security-overlay::after,
+.security-shell::before{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+.security-shell{
+  position:relative!important;
+  width:min(100%,440px)!important;
+  height:100%!important;
+  margin:0 auto!important;
+  padding:0!important;
+}
+.security-settings-pill{
+  top:max(12px,calc(env(safe-area-inset-top) + 3px))!important;
+  right:max(14px,calc((100vw - 440px)/2 + 14px))!important;
+}
+.security-hero{
+  top:4.1%!important;
+}
+.welcome-cart-art{
+  width:174px!important;
+  height:auto!important;
+  margin:0 auto -22px!important;
+}
+.welcome-cart-art img{
+  width:100%!important;
+  height:auto!important;
+  display:block!important;
+  mix-blend-mode:multiply!important;
+}
+.security-hero h2{
+  margin:0!important;
+  font-size:40px!important;
+  line-height:1!important;
+  letter-spacing:-1.45px!important;
+}
+.security-tagline{
+  margin-top:10px!important;
+  font-size:15.5px!important;
+  line-height:1.1!important;
+}
+.security-modal{
+  top:33.8%!important;
+  width:min(78%,352px)!important;
+  padding:18px 16px 16px!important;
+  border-radius:26px!important;
+}
+.security-shell.is-password-open .security-modal{
+  top:33.8%!important;
+}
+.security-lock-icon{
+  width:46px!important;
+  height:46px!important;
+  margin:0 auto 9px!important;
+}
+.security-lock-icon svg{
+  width:23px!important;
+  height:23px!important;
+}
+.security-modal h3{
+  font-size:19px!important;
+  line-height:1.08!important;
+}
+.security-card-copy{
+  margin:7px auto 13px!important;
+  font-size:12.5px!important;
+  line-height:1.3!important;
+}
+.faceid-btn{
+  height:50px!important;
+  border-radius:17px!important;
+  font-size:16.5px!important;
+}
+.faceid-btn svg{
+  width:27px!important;
+  height:27px!important;
+}
+.password-toggle{
+  height:48px!important;
+  margin-top:9px!important;
+  border-radius:17px!important;
+  font-size:14px!important;
+}
+.security-note{
+  display:none!important;
+}
+.security-benefits{
+  left:4px!important;
+  right:4px!important;
+  bottom:max(31px,calc(env(safe-area-inset-bottom) + 19px))!important;
+}
+.security-benefits i{
+  width:46px!important;
+  height:46px!important;
+}
+.security-benefits small{
+  font-size:10px!important;
+  line-height:1.2!important;
+}
+.security-shell.is-form-mode .security-modal{
+  top:29.5%!important;
+}
+.security-shell.is-form-mode .security-benefits{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+@media(max-height:720px){
+  .security-hero{top:3.2%!important}
+  .welcome-cart-art{width:158px!important;margin-bottom:-20px!important}
+  .security-modal{top:32.2%!important}
+  .security-shell.is-password-open .security-modal{top:32.2%!important}
+  .security-shell.is-form-mode .security-modal{top:27.8%!important}
+  .security-benefits{bottom:max(17px,calc(env(safe-area-inset-bottom) + 8px))!important}
+}
+
+
+/* ===== UI v38 — fond généré propre, UI séparée ===== */
+.security-overlay{
+  padding:0!important;
+  overflow:hidden!important;
+  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat!important;
+}
+.security-overlay::before,
+.security-overlay::after,
+.security-shell::before{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+.security-settings-pill{
+  z-index:6!important;
+}
+.security-shell,
+.security-hero,
+.security-modal,
+.security-note,
+.security-benefits{
+  z-index:2;
+}
+.security-note{
+  display:block!important;
+  top:70.8%!important;
+  width:220px!important;
+  color:#0d4d2c!important;
+  opacity:1!important;
+}
+.security-note span{
+  display:block!important;
+}
+.security-benefits{
+  bottom:max(30px,calc(env(safe-area-inset-bottom) + 18px))!important;
+}
+.security-shell.is-password-open .security-note,
+.security-shell.is-password-open .security-benefits,
+.security-shell.is-form-mode .security-note,
+.security-shell.is-form-mode .security-benefits{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+@media(max-height:720px){
+  .security-note{top:69.8%!important}
+  .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px))!important}
+}
+
+
+/* ===== UI v40 — image générée validée ===== */
+/* Fond décoratif uniquement : toute l'interface reste en HTML/CSS au-dessus. */
+.security-overlay{
+  background-color:#f5f2ea!important;
+  background-image:url("./welcome-background-v40.webp")!important;
+  background-repeat:no-repeat!important;
+  background-position:center center!important;
+  background-size:cover!important;
+}

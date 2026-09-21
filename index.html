@@ -2,18 +2,17 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f7f2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#f7f7f2">
   <meta name="description" content="Liste de courses synchronisée avec Home Assistant">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icon.svg?v=23" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon.png?v=23">
+  <link rel="manifest" href="./manifest.webmanifest?v=40">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=28">
+  <link rel="stylesheet" href="./styles.css?v=40">
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -30,7 +29,7 @@
     <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M7.2 5.5a8 8 0 1 0 9.6 0"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
-    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M14 8l4 4-4 4M18 12H8"/></symbol>
+    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M14 8l4 4-4 4M18 12H8"/></symbol>\n    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13h6l-1 9 9-12h-6.2l.7-8Z"/></symbol>
   </svg>
 
   <main id="app" class="app is-locked">
@@ -153,49 +152,40 @@
   </main>
 
   <section id="setup" class="overlay is-visible" aria-modal="true">
-    <div class="setup-shell">
-      <div class="setup-hero">
-        <img class="welcome-cart" src="./welcome-cart-v26.webp" alt="">
-        <h2>Mes courses</h2>
-        <p>Simple, rapide, toujours à jour <span aria-hidden="true">♥</span></p>
-      </div>
-      <div class="modal setup-modal">
-        <div class="security-lock-icon"><svg><use href="#i-lock"></use></svg></div>
-        <h3>Accéder à mes courses</h3>
-        <p>Connectez votre compte Home Assistant</p>
-        <label class="field">
-          <span>Adresse Home Assistant / Nabu Casa</span>
-          <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
-        </label>
-        <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
-        <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
-        <p class="hint">Connexion sécurisée par OAuth. Votre autorisation sera chiffrée sur cet appareil.</p>
-        <div id="setupError" class="setup-error" role="alert"></div>
-      </div>
-      <p class="welcome-slogan">Tout pour<br>des courses plus simples<br>au quotidien !</p>
-      <div class="security-benefits setup-benefits" aria-hidden="true">
-        <span><svg><use href="#i-sync"></use></svg><small>Synchronisé<br>avec Home Assistant</small></span>
-        <span><svg><use href="#i-lock"></use></svg><small>Vos données<br>restent privées</small></span>
-        <span><strong>⚡</strong><small>Rapide<br>et intuitif</small></span>
-      </div>
+    <div class="modal setup-modal">
+      <div class="welcome-logo"><svg><use href="#i-cart"></use></svg></div>
+      <h2>Mes courses</h2>
+      <p>Connecte Home Assistant pour retrouver ta liste sur cet appareil.</p>
+      <label class="field">
+        <span>Adresse Home Assistant / Nabu Casa</span>
+        <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
+      </label>
+      <p class="hint">La connexion est sécurisée par OAuth. Ton autorisation locale sera ensuite chiffrée sur cet appareil.</p>
+      <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
+      <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
+      <div id="setupError" class="setup-error" role="alert"></div>
     </div>
   </section>
 
   <section id="securityOverlay" class="overlay security-overlay" aria-modal="true" aria-labelledby="securityTitle">
-    <button id="securitySettingsBtn" class="security-settings-chip" type="button" aria-label="Ouvrir les réglages">
+    <button id="securitySettingsBtn" class="security-settings-pill" type="button" aria-label="Réglages">
       <svg><use href="#i-gear"></use></svg><span>Réglages</span>
     </button>
+
     <div class="security-shell">
       <div class="security-hero">
-        <img class="welcome-cart" src="./welcome-cart-v26.webp" alt="">
+        <div class="welcome-cart-art" aria-hidden="true">
+          <img src="./welcome-cart-v28.webp" alt="" width="380" height="345">
+        </div>
         <h2 id="securityTitle">Mes courses</h2>
-        <p id="securityText">Simple, rapide, toujours à jour <span aria-hidden="true">♥</span></p>
+        <p class="security-tagline">Simple, rapide, toujours à jour <span aria-hidden="true">♥</span></p>
       </div>
 
       <div class="modal security-modal">
         <div id="securityIcon" class="security-lock-icon"><svg><use href="#i-lock"></use></svg></div>
         <h3>Accéder à mes courses</h3>
-        <p>Déverrouillage sécurisé avec votre compte Home Assistant</p>
+        <p class="security-card-copy">Déverrouillage sécurisé avec votre compte Home Assistant</p>
+        <p id="securityText" class="security-dynamic" aria-live="polite"></p>
 
         <button id="faceIdUnlockBtn" class="faceid-btn" type="button" hidden>
           <svg><use href="#i-face"></use></svg><span>Face ID</span>
@@ -220,12 +210,12 @@
         <div id="securityError" class="setup-error" role="alert"></div>
       </div>
 
-      <p class="welcome-slogan">Tout pour<br>des courses plus simples<br>au quotidien !</p>
+      <div class="security-note" aria-hidden="true">Tout pour<br>des courses plus simples<br>au quotidien !<span></span></div>
 
       <div class="security-benefits" aria-hidden="true">
-        <span><svg><use href="#i-sync"></use></svg><small>Synchronisé<br>avec Home Assistant</small></span>
-        <span><svg><use href="#i-lock"></use></svg><small>Vos données<br>restent privées</small></span>
-        <span><strong>⚡</strong><small>Rapide<br>et intuitif</small></span>
+        <span><i><svg><use href="#i-sync"></use></svg></i><small>Synchronisé<br>avec Home Assistant</small></span>
+        <span><i><svg><use href="#i-lock"></use></svg></i><small>Vos données<br>restent privées</small></span>
+        <span><i class="benefit-bolt"><svg><use href="#i-bolt"></use></svg></i><small>Rapide<br>et intuitif</small></span>
       </div>
     </div>
   </section>
@@ -246,7 +236,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=28"></script>
+  <script src="./app.js?v=27"></script>
 </body>
 </html>
-
