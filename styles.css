@@ -2140,3 +2140,54 @@ html,body{touch-action:pan-x pan-y}
   .security-shell.is-form-mode .security-modal{top:27.8%!important}
   .security-benefits{bottom:max(17px,calc(env(safe-area-inset-bottom) + 8px))!important}
 }
+
+
+/* ===== UI v38 — fond généré propre, UI séparée ===== */
+.security-overlay{
+  padding:0!important;
+  overflow:hidden!important;
+  background:#f5f2ea url("./welcome-background-v38.svg") center center / cover no-repeat!important;
+}
+.security-overlay::before,
+.security-overlay::after,
+.security-shell::before{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+.security-settings-pill{
+  z-index:6!important;
+}
+.security-shell,
+.security-hero,
+.security-modal,
+.security-note,
+.security-benefits{
+  z-index:2;
+}
+.security-note{
+  display:block!important;
+  top:70.8%!important;
+  width:220px!important;
+  color:#0d4d2c!important;
+  opacity:1!important;
+}
+.security-note span{
+  display:block!important;
+}
+.security-benefits{
+  bottom:max(30px,calc(env(safe-area-inset-bottom) + 18px))!important;
+}
+.security-shell.is-password-open .security-note,
+.security-shell.is-password-open .security-benefits,
+.security-shell.is-form-mode .security-note,
+.security-shell.is-form-mode .security-benefits{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+@media(max-height:720px){
+  .security-note{top:69.8%!important}
+  .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px))!important}
+}
