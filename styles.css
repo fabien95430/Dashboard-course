@@ -2386,3 +2386,20 @@ body:has(#securityOverlay.is-visible){
   mix-blend-mode:normal!important;
   filter:drop-shadow(0 7px 12px rgba(18,67,40,.13));
 }
+
+
+/* ===== UI v53 — continuité basse iOS sans déplacer l'image ===== */
+/* Le fond principal conserve exactement sa taille et sa position.
+   Seule une bande décorative indépendante prolonge les derniers pixels sous 100dvh. */
+.security-overlay::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  top:100%!important;
+  left:0!important;
+  width:100vw!important;
+  height:max(64px,env(safe-area-inset-bottom))!important;
+  pointer-events:none!important;
+  background:url("./welcome-background-v48.webp") center bottom / 100vw 435.3846vw no-repeat!important;
+}
