@@ -1914,3 +1914,48 @@ html,body{touch-action:pan-x pan-y}
   .security-shell.is-form-mode .security-modal{top:29.5%!important}
   .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 10px))!important}
 }
+
+
+/* ===== UI v30 — raccords fond + placement référence ===== */
+.security-overlay::before{
+  width:10.9%!important;
+  background-size:auto 100%!important;
+  background-position:left bottom!important;
+}
+.security-overlay::after{
+  width:10.3%!important;
+  background-size:auto 100%!important;
+  background-position:right bottom!important;
+}
+.security-shell::before{
+  top:68.4%!important;
+  aspect-ratio:832 / 245!important;
+  background-size:100% auto!important;
+  background-position:center bottom!important;
+  mix-blend-mode:multiply;
+}
+.security-settings-pill{
+  top:max(4px,calc(env(safe-area-inset-top) - 24px))!important;
+}
+.security-hero{
+  top:2.7%!important;
+}
+.welcome-cart-art img{
+  mix-blend-mode:multiply;
+}
+.security-modal{
+  top:30.8%!important;
+}
+.security-shell.is-password-open .security-modal{
+  top:30.8%!important;
+}
+.security-shell.is-form-mode .security-modal{
+  top:28.5%!important;
+}
+@media(max-height:720px){
+  .security-hero{top:2.1%!important}
+  .security-modal{top:29.8%!important}
+  .security-shell.is-password-open .security-modal{top:29.8%!important}
+  .security-shell.is-form-mode .security-modal{top:27.2%!important}
+  .security-shell::before{top:68.8%!important}
+}
