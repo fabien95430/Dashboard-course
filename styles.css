@@ -2314,60 +2314,146 @@ body:has(#securityOverlay.is-visible){
 }
 
 
-/* ===== UI v55 — fond iOS aligné sans raccord ===== */
-/* Le décor est peint à la même échelle et depuis le même point d'origine sur le canvas
-   racine et sur l'overlay. L'overlay reste opaque : l'application verrouillée ne transparaît pas. */
-html:has(#securityOverlay.is-visible),
-body:has(#securityOverlay.is-visible){
+/* ===== UI v56 — écran verrouillé iPhone : une image plein écran + zones interactives ===== */
+/* Le visuel complet est peint une seule fois sur le canvas racine. L'application située
+   derrière est masquée ; seuls les vrais contrôles restent cliquables au-dessus du visuel. */
+html:has(#securityOverlay.is-visible){
   background-color:#efe7db!important;
-  background-image:url("./welcome-background-v48.webp")!important;
+  background-image:url("./welcome-screen-v56.webp")!important;
   background-repeat:no-repeat!important;
-  background-position:center top!important;
-  background-size:100vw auto!important;
+  background-position:center center!important;
+  background-size:100% 100%!important;
+  background-attachment:fixed!important;
+}
+body:has(#securityOverlay.is-visible){
+  background:transparent!important;
+}
+body:has(#securityOverlay.is-visible) #app{
+  visibility:hidden!important;
 }
 .security-overlay{
   position:fixed!important;
   inset:0!important;
-  width:100vw!important;
-  height:100dvh!important;
-  min-height:100dvh!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
   padding:0!important;
   overflow:hidden!important;
-  background-color:#efe7db!important;
-  background-image:url("./welcome-background-v48.webp")!important;
-  background-repeat:no-repeat!important;
-  background-position:center top!important;
-  background-size:100vw auto!important;
+  background:transparent!important;
+  background-image:none!important;
+  backdrop-filter:none!important;
+}
+.security-overlay.is-visible{
+  display:block!important;
 }
 .security-background{
   display:none!important;
 }
 .security-shell{
-  position:relative!important;
+  position:fixed!important;
+  inset:0!important;
   z-index:1!important;
-  width:min(100%,440px)!important;
-  height:100dvh!important;
-  min-height:100dvh!important;
-  margin:0 auto!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  margin:0!important;
   padding:0!important;
 }
 .security-settings-pill{
-  z-index:3!important;
-}
-.welcome-cart-art{
-  width:150px!important;
-  height:auto!important;
-  margin:0 auto -12px!important;
+  position:fixed!important;
+  z-index:6!important;
+  top:6.7%!important;
+  left:66.7%!important;
+  width:28.3%!important;
+  height:5.4%!important;
+  margin:0!important;
+  padding:0!important;
   border:0!important;
+  border-radius:999px!important;
   background:transparent!important;
   box-shadow:none!important;
+  color:transparent!important;
+  opacity:.001!important;
+  -webkit-tap-highlight-color:transparent!important;
 }
-.welcome-cart-art img{
-  display:block!important;
+.security-settings-pill svg,
+.security-settings-pill span{
+  opacity:0!important;
+}
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-hero,
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-note,
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-benefits{
+  display:none!important;
+}
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-modal.is-quick-unlock{
+  position:fixed!important;
+  inset:0!important;
+  top:0!important;
+  left:0!important;
   width:100%!important;
-  height:auto!important;
+  height:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
   border:0!important;
+  border-radius:0!important;
   background:transparent!important;
-  mix-blend-mode:normal!important;
-  filter:drop-shadow(0 7px 12px rgba(18,67,40,.13));
+  box-shadow:none!important;
+  transform:none!important;
+  pointer-events:none!important;
+}
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-modal.is-quick-unlock .security-lock-icon,
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-modal.is-quick-unlock h3,
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-modal.is-quick-unlock .security-card-copy,
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-modal.is-quick-unlock .security-dynamic,
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-modal.is-quick-unlock .password-panel,
+.security-shell:not(.is-password-open):not(.is-form-mode) .security-modal.is-quick-unlock .setup-error{
+  display:none!important;
+}
+.security-shell:not(.is-password-open):not(.is-form-mode) #faceIdUnlockBtn,
+.security-shell:not(.is-password-open):not(.is-form-mode) #passwordLoginBtn{
+  position:fixed!important;
+  z-index:7!important;
+  left:16.7%!important;
+  width:65.4%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:18px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:transparent!important;
+  opacity:.001!important;
+  pointer-events:auto!important;
+  font-size:0!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.security-shell:not(.is-password-open):not(.is-form-mode) #faceIdUnlockBtn{
+  top:52.25%!important;
+  height:6.65%!important;
+}
+.security-shell:not(.is-password-open):not(.is-form-mode) #passwordLoginBtn{
+  top:60.0%!important;
+  height:6.3%!important;
+}
+.security-shell:not(.is-password-open):not(.is-form-mode) #faceIdUnlockBtn svg,
+.security-shell:not(.is-password-open):not(.is-form-mode) #faceIdUnlockBtn span,
+.security-shell:not(.is-password-open):not(.is-form-mode) #passwordLoginBtn svg,
+.security-shell:not(.is-password-open):not(.is-form-mode) #passwordLoginBtn span{
+  opacity:0!important;
+}
+.security-overlay:has(.security-shell.is-password-open)::before,
+.security-overlay:has(.security-shell.is-form-mode)::before{
+  content:""!important;
+  display:block!important;
+  position:fixed!important;
+  inset:0!important;
+  z-index:2!important;
+  background:rgba(245,242,234,.46)!important;
+  backdrop-filter:blur(8px)!important;
+  -webkit-backdrop-filter:blur(8px)!important;
+}
+.security-shell.is-password-open .security-modal,
+.security-shell.is-form-mode .security-modal{
+  z-index:4!important;
 }
