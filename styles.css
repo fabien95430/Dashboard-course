@@ -2457,3 +2457,31 @@ body:has(#securityOverlay.is-visible) #app{
 .security-shell.is-form-mode .security-modal{
   z-index:4!important;
 }
+
+
+/* ===== UI v58 — écran verrouillé rendu par l'image réelle, pas par le canvas racine ===== */
+/* Safari iOS peut laisser apparaître le canvas beige quand le fond est porté uniquement
+   par html:has(...). L'image déjà présente dans le DOM devient donc le calque visuel principal. */
+.security-background{
+  display:block!important;
+  position:fixed!important;
+  z-index:0!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  object-fit:fill!important;
+  object-position:center center!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+@supports (height:100lvh){
+  .security-background{
+    height:100lvh!important;
+    min-height:100lvh!important;
+  }
+}
+.security-overlay{
+  background:transparent!important;
+}
