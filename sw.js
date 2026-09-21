@@ -1,5 +1,5 @@
-const CACHE='courses-app-v63-ios-system-band-blend';
-const SHELL=['./welcome-background-v48.webp?v=59','./welcome-cart-v48.webp','./','./index.html','./styles.css?v=63','./catalog.js','./app.js?v=27','./manifest.webmanifest?v=46','./icon-premium-v40.svg','./icon.svg','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
+const CACHE='courses-app-v64-ios-system-seam';
+const SHELL=['./welcome-background-v48.webp?v=59','./welcome-cart-v48.webp','./','./index.html','./styles.css?v=64','./catalog.js','./app.js?v=27','./manifest.webmanifest?v=46','./icon-premium-v40.svg','./icon.svg','./bring-photo-v4-frais.webp.png?v=14','./bring-photo-v4-fruits-legumes.webp.png?v=14','./bring-photo-v4-epicerie.webp.png?v=14','./bring-photo-v4-boissons.webp.png?v=14','./bring-photo-v4-maison.webp.png?v=14'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
