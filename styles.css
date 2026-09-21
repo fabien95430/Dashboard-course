@@ -2381,3 +2381,48 @@ body:has(#securityOverlay.is-visible){
   mix-blend-mode:normal!important;
   filter:drop-shadow(0 7px 12px rgba(18,67,40,.13));
 }
+
+
+/* ===== UI v61 — suppression du bandeau bas iOS ===== */
+/* Le viewport standalone peut s'arrêter avant la zone du Home Indicator.
+   On prolonge seulement les calques visuels dans cette zone, sans déplacer l'UI. */
+@supports (-webkit-touch-callout:none){
+  @media (max-width:600px){
+    .security-overlay{
+      inset:auto!important;
+      top:0!important;
+      right:0!important;
+      bottom:auto!important;
+      left:0!important;
+      width:100vw!important;
+      height:calc(100dvh + max(env(safe-area-inset-bottom),52px))!important;
+      min-height:calc(100dvh + max(env(safe-area-inset-bottom),52px))!important;
+      overflow:hidden!important;
+    }
+    .security-background{
+      top:0!important;
+      bottom:auto!important;
+      width:100%!important;
+      height:100%!important;
+      min-height:100%!important;
+      object-fit:cover!important;
+      object-position:center 58%!important;
+    }
+    .security-shell{
+      height:100dvh!important;
+      min-height:100dvh!important;
+    }
+
+    .tabs{
+      position:fixed!important;
+      z-index:20!important;
+      left:50%!important;
+      right:auto!important;
+      bottom:calc(-1 * max(env(safe-area-inset-bottom),52px))!important;
+      width:min(calc(100vw - 24px),536px)!important;
+      height:calc(72px + max(env(safe-area-inset-bottom),52px))!important;
+      padding:6px 10px calc(6px + max(env(safe-area-inset-bottom),52px))!important;
+      transform:translateX(-50%)!important;
+    }
+  }
+}
