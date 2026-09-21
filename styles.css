@@ -1988,3 +1988,12 @@ html,body{touch-action:pan-x pan-y}
   -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
   mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
 }
+
+
+/* ===== UI v33 — décor jusqu’en haut ===== */
+.security-overlay::before{
+  top:0!important;
+  bottom:0!important;
+  height:100%!important;
+  background-position:left top!important;
+}
