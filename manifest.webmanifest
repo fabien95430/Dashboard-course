@@ -9,8 +9,8 @@
   "theme_color": "#f7f7f2",
   "icons": [
     {
-      "src": "./icon-premium-ios-v31.png",
-      "sizes": "180x180",
+      "src": "./icon-premium-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     }
