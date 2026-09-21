@@ -1959,3 +1959,32 @@ html,body{touch-action:pan-x pan-y}
   .security-shell.is-form-mode .security-modal{top:27.2%!important}
   .security-shell::before{top:68.8%!important}
 }
+
+
+/* ===== UI v32 — suppression du bandeau central ===== */
+.security-overlay{
+  background:
+    radial-gradient(42% 58% at 7% 52%,rgba(119,142,74,.12),transparent 74%),
+    radial-gradient(40% 58% at 94% 58%,rgba(210,170,111,.11),transparent 76%),
+    linear-gradient(180deg,#f4f2ec 0%,#f1efe8 58%,#f4eee3 100%)!important;
+}
+.security-overlay::before{
+  width:23%!important;
+  height:95%!important;
+  background-size:100% 100%!important;
+  background-position:left bottom!important;
+  -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 56%,rgba(0,0,0,.78) 72%,transparent 100%);
+  mask-image:linear-gradient(90deg,#000 0%,#000 56%,rgba(0,0,0,.78) 72%,transparent 100%);
+}
+.security-overlay::after{
+  width:25%!important;
+  height:70%!important;
+  background-size:100% 100%!important;
+  background-position:right bottom!important;
+  -webkit-mask-image:linear-gradient(270deg,#000 0%,#000 58%,rgba(0,0,0,.78) 74%,transparent 100%);
+  mask-image:linear-gradient(270deg,#000 0%,#000 58%,rgba(0,0,0,.78) 74%,transparent 100%);
+}
+.security-shell::before{
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
+}
