@@ -2312,3 +2312,72 @@ body:has(#securityOverlay.is-visible){
     }
   }
 }
+
+
+/* ===== UI v48 — accueil reconstruit : fond et caddie indépendants ===== */
+/* Le décor photo est un calque autonome. Il couvre le grand viewport iOS,
+   sans modifier la hauteur ni le placement de l'interface de déverrouillage. */
+html:has(#securityOverlay.is-visible),
+body:has(#securityOverlay.is-visible){
+  background:#efe7db!important;
+  background-image:none!important;
+}
+.security-overlay{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  padding:0!important;
+  overflow:visible!important;
+  background:#efe7db!important;
+  background-image:none!important;
+}
+.security-background{
+  position:fixed;
+  z-index:0;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100dvh;
+  object-fit:cover;
+  object-position:center center;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+@supports (height:100lvh){
+  .security-background{
+    height:100lvh;
+    min-height:100lvh;
+  }
+}
+.security-shell{
+  position:relative!important;
+  z-index:1!important;
+  width:min(100%,440px)!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  margin:0 auto!important;
+  padding:0!important;
+}
+.security-settings-pill{
+  z-index:3!important;
+}
+.welcome-cart-art{
+  width:150px!important;
+  height:auto!important;
+  margin:0 auto -12px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.welcome-cart-art img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  border:0!important;
+  background:transparent!important;
+  mix-blend-mode:normal!important;
+  filter:drop-shadow(0 7px 12px rgba(18,67,40,.13));
+}
