@@ -1779,3 +1779,150 @@ html,body{touch-action:pan-x pan-y}
 @media(max-height:720px){
   .security-shell.is-form-mode .security-modal{top:31%!important}
 }
+
+
+/* ===== UI v29 — accueil HD calé sur la référence 2 ===== */
+.security-overlay{
+  background:#f2f0ea!important;
+  background-image:none!important;
+}
+.security-overlay::before,
+.security-overlay::after,
+.security-shell::before{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:0;
+  background-repeat:no-repeat;
+}
+.security-overlay::before{
+  left:0;
+  bottom:0;
+  width:17.68%;
+  height:94.4%;
+  background-image:url("./welcome-left-v28.webp");
+  background-size:100% 100%;
+  background-position:left bottom;
+}
+.security-overlay::after{
+  right:0;
+  bottom:0;
+  width:17.82%;
+  height:68%;
+  background-image:url("./welcome-right-v28.webp");
+  background-size:100% 100%;
+  background-position:right bottom;
+}
+.security-shell::before{
+  left:50%;
+  top:59.9%;
+  width:100%;
+  aspect-ratio:832 / 350;
+  transform:translateX(-50%);
+  background-image:url("./welcome-bottom-v28.webp");
+  background-size:100% 100%;
+  background-position:center;
+}
+.security-shell.is-form-mode::before{display:none}
+.security-settings-pill{
+  top:max(8px,calc(env(safe-area-inset-top) - 16px))!important;
+  right:14px!important;
+  height:38px!important;
+}
+.security-hero{
+  top:3.6%!important;
+}
+.welcome-cart-art{
+  width:150px!important;
+  height:auto!important;
+  margin:0 auto 0!important;
+}
+.welcome-cart-art img{
+  display:block;
+  width:100%;
+  height:auto;
+  border:0;
+}
+.security-hero h2{
+  margin:0!important;
+  font-size:40px!important;
+  letter-spacing:-1.45px!important;
+}
+.security-tagline{
+  margin-top:8px!important;
+  font-size:15.5px!important;
+}
+.security-modal{
+  top:33.5%!important;
+  width:min(78%,352px)!important;
+  padding:14px 14px 13px!important;
+  border-radius:25px!important;
+}
+.security-lock-icon{
+  width:41px!important;
+  height:41px!important;
+  margin-bottom:7px!important;
+}
+.security-lock-icon svg{width:21px!important;height:21px!important}
+.security-modal h3{
+  font-size:18.5px!important;
+}
+.security-card-copy{
+  margin:6px auto 10px!important;
+  font-size:12px!important;
+  line-height:1.28!important;
+}
+.faceid-btn{
+  height:46px!important;
+  border-radius:16px!important;
+  font-size:16px!important;
+}
+.faceid-btn svg{width:25px!important;height:25px!important}
+.password-toggle{
+  height:44px!important;
+  margin-top:8px!important;
+  border-radius:16px!important;
+  font-size:13.5px!important;
+}
+.security-modal .setup-error{
+  min-height:0!important;
+}
+.security-modal .setup-error:empty{
+  display:none!important;
+}
+.security-note{
+  display:none!important;
+}
+.security-benefits{
+  bottom:max(28px,calc(env(safe-area-inset-bottom) + 20px))!important;
+}
+.security-benefits i{
+  width:46px!important;
+  height:46px!important;
+}
+.security-benefits i svg{
+  width:26px!important;
+  height:26px!important;
+}
+.security-benefits .benefit-bolt{
+  color:#167844!important;
+}
+.security-benefits .benefit-bolt svg{
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linejoin:round;
+}
+.security-benefits small{
+  font-size:10px!important;
+}
+.security-shell.is-form-mode .security-modal{
+  top:31.5%!important;
+}
+@media(max-height:720px){
+  .security-hero{top:2.8%!important}
+  .welcome-cart-art{width:136px!important}
+  .security-modal{top:32.8%!important}
+  .security-shell.is-form-mode .security-modal{top:29.5%!important}
+  .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 10px))!important}
+}
