@@ -2319,7 +2319,7 @@ body:has(#securityOverlay.is-visible){
    derrière est masquée ; seuls les vrais contrôles restent cliquables au-dessus du visuel. */
 html:has(#securityOverlay.is-visible){
   background-color:#efe7db!important;
-  background-image:url("./welcome-screen-v56.webp")!important;
+  background-image:url("./welcome-screen-v56.webp?v=57")!important;
   background-repeat:no-repeat!important;
   background-position:center center!important;
   background-size:100% 100%!important;
