@@ -109,3 +109,16 @@ URL : `https://fabien95430.github.io/Dashboard-course/`
 L’interface mobile repose sur quatre écrans cohérents : déverrouillage sécurisé, **Ma liste**, **Catalogue** et **Réglages**. Le rendu est mobile-first, utilise toute la largeur disponible, conserve les visuels produits premium et n’ajoute aucun framework ni dépendance externe.
 
 L’onglet **Réglages** expose uniquement les fonctions réellement disponibles : connexion Home Assistant, liste active, sécurité locale, Face ID, état de synchronisation, verrouillage manuel et déconnexion.
+
+
+## Icône iOS — règle validée
+
+La configuration validée sur iPhone/Safari est celle du commit `92067f998d3d8b4fab2d30764bcf920a31fe23b9` :
+
+- l’icône d’installation vient du `manifest.webmanifest` ;
+- le manifest pointe vers `icon-premium-v40.svg` ;
+- le SVG est autonome et embarque son image directement ;
+- `sizes` reste `any`, `type` reste `image/svg+xml` et `purpose` reste `any maskable` ;
+- ne pas réintroduire `apple-touch-icon` ni remplacer cette voie par une icône PNG déclarée directement dans le manifest.
+
+Pour changer l’apparence de l’icône, modifier uniquement le visuel embarqué dans `icon-premium-v40.svg`, sans changer cette mécanique.
