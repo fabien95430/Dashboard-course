@@ -2664,3 +2664,30 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     height:22px!important;
   }
 }
+
+
+/* ===== UI v59 — marges symétriques, catégories sans cadre, navigation rapprochée ===== */
+@media(max-width:520px){
+  .list-view,
+  .catalog-view,
+  .settings-view{
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+
+  .catalog-view .categories{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    outline:0!important;
+  }
+
+  .app>.tabs{
+    padding-top:0!important;
+  }
+  .app>.tabs .tab{
+    align-self:start!important;
+    margin-top:4px!important;
+    transform:none!important;
+  }
+}
