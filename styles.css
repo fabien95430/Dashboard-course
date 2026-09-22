@@ -2939,3 +2939,27 @@ body{
     min-height:82px!important;
   }
 }
+
+
+/* ===== UI v70 — quantité catalogue + / image -1 ===== */
+.product .badge,
+.product .media{
+  -webkit-appearance:none;
+  appearance:none;
+  font:inherit;
+}
+.product .badge{
+  padding:0;
+  cursor:pointer;
+}
+.product .media{
+  border:0;
+  padding:0;
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+}
+.product .media:disabled{
+  opacity:1;
+  cursor:default;
+}

@@ -330,37 +330,49 @@ function renderCategories(){
   el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>{state.category=button.dataset.category||'Toutes';state.productQuery='';$('#productSearch').value='';renderCategories();renderProducts()});
 }
 function renderProducts(){
-  const el=$('#products'),products=visibleProducts(),selected=selectedSet();
+  const el=$('#products'),products=visibleProducts();
   if(!el)return;
+  const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
   const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
   if(!products.length){el.innerHTML='<div class="empty is-wide">Aucun produit ne correspond à cette recherche.</div>';return}
   el.innerHTML=products.map(product=>{
-    const active=selected.has(norm(product.name));
-    return '<button type="button" class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" aria-pressed="'+(active?'true':'false')+'">'+
-      '<span class="badge">'+(active?'✓':'+')+'</span>'+
-      '<span class="media">'+sprite(product)+'</span>'+
+    const quantity=quantities.get(norm(product.name))||0,active=quantity>0;
+    const addLabel='Ajouter une unité de '+product.name+'. Quantité '+quantity;
+    const removeLabel=active?'Retirer une unité de '+product.name+'. Quantité '+quantity:'Aucune unité de '+product.name+' à retirer';
+    return '<div class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" data-quantity="'+quantity+'">'+
+      '<button type="button" class="badge" aria-label="'+esc(addLabel)+'">'+(active?quantity:'+')+'</button>'+
+      '<button type="button" class="media" aria-label="'+esc(removeLabel)+'" '+(active?'':'disabled')+'>'+sprite(product)+'</button>'+
       '<span class="product-copy"><span class="pname">'+esc(product.name)+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>'+
-    '</button>';
+    '</div>';
   }).join('');
-  el.querySelectorAll('.product').forEach(button=>button.onclick=()=>toggleProduct(button.dataset.name||''));
+  el.querySelectorAll('.product').forEach(card=>{
+    const name=card.dataset.name||'';
+    const add=card.querySelector('.badge');if(add)add.onclick=()=>incrementProduct(name);
+    const remove=card.querySelector('.media');if(remove)remove.onclick=()=>decrementProduct(name);
+  });
 }
-function setProductSelected(name,active){
-  const key=norm(name);
-  const button=[...document.querySelectorAll('#products .product')].find(entry=>norm(entry.dataset.name)===key);
-  if(!button)return;
-  button.classList.toggle('is-selected',active);
-  button.setAttribute('aria-pressed',active?'true':'false');
-  const badge=button.querySelector('.badge');
-  if(badge)badge.textContent=active?'✓':'+';
+function setProductQuantity(name,quantity){
+  const key=norm(name),value=Math.max(0,Number(quantity)||0);
+  const card=[...document.querySelectorAll('#products .product')].find(entry=>norm(entry.dataset.name)===key);
+  if(!card)return;
+  const active=value>0;
+  card.dataset.quantity=String(value);
+  card.classList.toggle('is-selected',active);
+  const badge=card.querySelector('.badge');
+  if(badge){
+    badge.textContent=active?String(value):'+';
+    badge.setAttribute('aria-label','Ajouter une unité de '+name+'. Quantité '+value);
+  }
+  const media=card.querySelector('.media');
+  if(media){
+    media.disabled=!active;
+    media.setAttribute('aria-label',active?'Retirer une unité de '+name+'. Quantité '+value:'Aucune unité de '+name+' à retirer');
+  }
 }
 function syncProductSelection(){
-  const selected=selectedSet();
-  document.querySelectorAll('#products .product').forEach(button=>{
-    const active=selected.has(norm(button.dataset.name));
-    button.classList.toggle('is-selected',active);
-    button.setAttribute('aria-pressed',active?'true':'false');
-    const badge=button.querySelector('.badge');
-    if(badge)badge.textContent=active?'✓':'+';
+  const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
+  document.querySelectorAll('#products .product').forEach(card=>{
+    setProductQuantity(card.dataset.name||'',quantities.get(norm(card.dataset.name))||0);
   });
 }
 function renderList(){
@@ -1101,21 +1113,32 @@ async function refreshItems(){
     status('is-error','Courses indisponible',state.error);
   }
 }
-async function toggleProduct(name){
+async function incrementProduct(name){
   const item=String(name||'').trim();
   if(!item)return;
   const key=norm(item);
   if(state.productBusy.has(key))return;
-  const group=activeGroups().find(g=>norm(g.summary)===key);
-  if(group){
-    setProductSelected(item,false);
-    await removeGroup(item);
-    return;
-  }
+  const current=activeGroups().find(group=>norm(group.summary)===key)?.count||0;
   state.productBusy.add(key);
-  setProductSelected(item,true);
+  setProductQuantity(item,current+1);
   try{
     await addItem(item);
+  }finally{
+    state.productBusy.delete(key);
+    syncProductSelection();renderList();
+  }
+}
+async function decrementProduct(name){
+  const item=String(name||'').trim();
+  if(!item)return;
+  const key=norm(item);
+  if(state.productBusy.has(key))return;
+  const group=activeGroups().find(entry=>norm(entry.summary)===key);
+  if(!group||group.count<1)return;
+  state.productBusy.add(key);
+  setProductQuantity(item,group.count-1);
+  try{
+    await removeOneItem(item,group);
   }finally{
     state.productBusy.delete(key);
     syncProductSelection();renderList();
@@ -1137,6 +1160,52 @@ async function addItem(name){
     recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();
   }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
 }
+async function removeOneItem(name,groupHint=null){
+  const item=String(name||'').trim();
+  if(!item)return;
+  const key=norm(item);
+  const group=groupHint||activeGroups().find(entry=>norm(entry.summary)===key);
+  if(!group||group.count<1)return;
+
+  try{
+    if(state.demo){
+      const items=loadJson(DEMO_KEY,[])||[];
+      let removeIndex=-1;
+      for(let i=items.length-1;i>=0;i--){
+        const entry=items[i];
+        if(String(entry?.status||'needs_action')==='completed')continue;
+        const summary=String(entry?.summary??entry?.name??entry?.item??'').trim();
+        if(norm(summary)===key){removeIndex=i;break}
+      }
+      if(removeIndex<0)return;
+      items.splice(removeIndex,1);
+      saveJson(DEMO_KEY,items);
+      state.items=items;
+      navigator.vibrate?.(8);
+      toast(item+' -1');
+      syncProductSelection();renderList();
+      return;
+    }
+
+    if(!state.entity)throw new Error('Liste Home Assistant indisponible');
+    const uid=group.uids.filter(Boolean).at(-1);
+    if(!uid)throw new Error('Identifiant de l’article indisponible');
+    await request({
+      type:'call_service',
+      domain:'todo',
+      service:'update_item',
+      service_data:{item:uid,status:'completed'},
+      target:{entity_id:state.entity}
+    });
+    navigator.vibrate?.(8);
+    toast(item+' -1');
+    await refreshItems();
+  }catch(error){
+    toast('Retrait impossible');
+    status('is-error','Erreur',error.message||'Retrait impossible');
+  }
+}
+
 async function removeGroup(name,row=null){
   const item=String(name||'').trim();
   if(!item)return;
