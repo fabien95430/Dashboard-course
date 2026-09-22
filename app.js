@@ -1361,19 +1361,6 @@ window.addEventListener('pageshow',()=>{
 });
 
 ['gesturestart','gesturechange','gestureend'].forEach(name=>document.addEventListener(name,event=>event.preventDefault(),{passive:false}));
-if('serviceWorker' in navigator){
-  let serviceWorkerReloading=false;
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    if(serviceWorkerReloading)return;
-    serviceWorkerReloading=true;
-    window.location.reload();
-  });
-  window.addEventListener('load',async()=>{
-    try{
-      const registration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
-      registration.update().catch(()=>{});
-    }catch{}
-  });
-}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderView();init();
 })();
