@@ -2989,3 +2989,58 @@ body{
     padding:1px 19px 8px!important;
   }
 }
+
+
+/* ===== UI v74 — connexion Home Assistant dédiée ===== */
+.settings-row-end{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+.settings-row-end .sync-dot{
+  flex:0 0 auto;
+}
+.connection-dialog{
+  width:min(calc(100% - 36px),390px)!important;
+  padding:22px!important;
+  border:0!important;
+  border-radius:24px!important;
+  background:#fff!important;
+  color:#151a17!important;
+  box-shadow:0 24px 70px rgba(28,39,31,.18)!important;
+}
+.connection-dialog h3{
+  margin:0 0 18px!important;
+  color:#0c2f20!important;
+  font-size:22px!important;
+  line-height:1.1!important;
+}
+.connection-dialog .field{
+  margin-top:14px!important;
+}
+.connection-dialog .field>span{
+  margin-bottom:7px!important;
+  color:#7c848b!important;
+  font-size:13px!important;
+}
+.connection-dialog input,
+.connection-dialog select{
+  width:100%!important;
+  height:50px!important;
+  border:1px solid #dfe5df!important;
+  border-radius:15px!important;
+  background:#f9faf8!important;
+  color:#1a211d!important;
+  padding:0 14px!important;
+  outline:0!important;
+  font-size:15px!important;
+}
+.connection-dialog .dialog-actions{
+  margin-top:20px!important;
+}
+.connection-dialog::backdrop{
+  background:rgba(28,38,31,.28)!important;
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+}

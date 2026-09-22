@@ -548,11 +548,13 @@ function renderView(){
 }
 function renderSettingsPage(){
   const connection=$('#settingsConnectionSummary');
+  const connectionDot=$('#settingsConnectionDot');
   const list=$('#settingsListSummary');
   const face=$('#settingsFaceIdSummary');
   const connected=!state.locked&&state.ws?.readyState===WebSocket.OPEN;
   if(connection)connection.textContent=connected?'Connecté':(state.locked?'Verrouillé':'Connexion…');
   if(connection)connection.classList.toggle('is-connected',connected);
+  if(connectionDot)connectionDot.classList.toggle('is-online',connected);
   const activeEntity=state.entities.find(entry=>entry.id===state.entity);
   if(list)list.textContent=activeEntity?.name||state.entity||'Aucune liste';
   if(face)face.textContent=biometricRecord()?'Activé sur cet appareil':'Mot de passe local disponible';
@@ -887,6 +889,7 @@ function hideSecurity(){
 }
 function lockApp(message='Application verrouillée.'){
   if(state.demo||!vaultRecord())return;
+  if($('#connectionDialog').open)$('#connectionDialog').close();
   if($('#settingsDialog').open)$('#settingsDialog').close();
   clearLockTimers();
   closeSocket();
@@ -1266,6 +1269,43 @@ async function removeGroup(name,row=null){
     else {syncProductSelection();renderList()}
   }
 }
+function openConnectionSettings(){
+  if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
+  const urlInput=$('#connectionHaUrl');
+  if(urlInput)urlInput.value=state.haUrl||'';
+  const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
+  const select=$('#connectionEntitySelect');
+  if(select){
+    select.innerHTML='<option value="" selected>Choisir une liste</option>'+choices.map(e=>'<option value="'+esc(e.id)+'">'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
+    select.value='';
+  }
+  renderSettingsPage();
+  $('#connectionDialog').showModal();
+}
+async function saveConnectionSettings(){
+  const nextUrl=normalizeHaUrl($('#connectionHaUrl').value);
+  const chosenEntity=$('#connectionEntitySelect').value;
+  const nextEntity=chosenEntity||state.entity;
+  if(!nextUrl)return;
+  const changedUrl=nextUrl!==state.haUrl;
+  const changedEntity=!!chosenEntity&&chosenEntity!==state.entity;
+  if(chosenEntity){
+    state.entity=chosenEntity;
+    localStorage.setItem(STORAGE.entity,chosenEntity);
+    localStorage.setItem(STORAGE.entityPreference,chosenEntity);
+  }
+  $('#connectionDialog').close();
+  if(changedUrl){
+    await revoke();
+    state.haUrl=nextUrl;
+    $('#haUrlInput').value=nextUrl;
+    $('#setupError').textContent='Adresse modifiée : reconnecte Home Assistant.';
+  }else{
+    if(changedEntity)await subscribe();
+    await refreshItems();armIdleLock();
+  }
+}
+
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   $('#settingsHaUrl').value=state.haUrl;
@@ -1356,9 +1396,12 @@ $('#demoBtn').onclick=()=>{
 $('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
 $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
 $('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
-['settingsConnectionBtn','settingsSecurityBtn','settingsListBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
+$('#settingsConnectionBtn').onclick=openConnectionSettings;
+['settingsSecurityBtn','settingsListBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
 $('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
 $('#settingsLogoutBtn').onclick=revoke;
+$('#cancelConnectionSettings').onclick=()=>$('#connectionDialog').close();
+$('#saveConnectionSettings').onclick=saveConnectionSettings;
 $('#cancelSettings').onclick=()=>$('#settingsDialog').close();
 $('#saveSettings').onclick=saveSettings;
 $('#faceIdSetupBtn').onclick=enrollFaceId;

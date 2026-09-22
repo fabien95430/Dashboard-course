@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=73">
+  <link rel="stylesheet" href="./styles.css?v=74">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -41,7 +41,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v73</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v74</span></p>
         </div>
         <button id="settingsBtn" class="icon-btn" type="button" aria-label="Ouvrir les réglages">
           <svg><use href="#i-gear"></use></svg>
@@ -60,7 +60,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v73</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v74</span></p>
         </div>
         <button id="catalogSearchBtn" class="icon-btn" type="button" aria-label="Rechercher dans le catalogue">
           <svg><use href="#i-search"></use></svg>
@@ -80,7 +80,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v73</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v74</span></p>
         </div>
       </header>
 
@@ -91,7 +91,7 @@
             <button id="settingsConnectionBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-home"></use></svg></span>
               <span class="settings-copy"><strong>Connexion Home Assistant</strong><small id="settingsConnectionSummary">Connexion…</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
+              <span class="settings-row-end"><span id="settingsConnectionDot" class="sync-dot" aria-hidden="true"></span><svg class="chevron"><use href="#i-chevron"></use></svg></span>
             </button>
           </div>
         </section>
@@ -212,6 +212,24 @@
     </div>
   </section>
 
+  <dialog id="connectionDialog" class="dialog connection-dialog">
+    <h3>Connexion Home Assistant</h3>
+    <label class="field">
+      <span>Liste Home Assistant</span>
+      <select id="connectionEntitySelect">
+        <option value="" selected>Choisir une liste</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Adresse Home Assistant</span>
+      <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
+    </label>
+    <div class="dialog-actions">
+      <button id="cancelConnectionSettings" type="button">Annuler</button>
+      <button id="saveConnectionSettings" class="primary" type="button">Enregistrer</button>
+    </div>
+  </dialog>
+
   <dialog id="settingsDialog" class="dialog">
     <h3>Connexion et sécurité</h3>
     <label class="field"><span>Liste Home Assistant</span><select id="entitySelect"></select></label>
@@ -228,6 +246,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=51"></script>
+  <script src="./app.js?v=52"></script>
 </body>
 </html>
