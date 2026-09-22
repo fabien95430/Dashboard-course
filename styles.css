@@ -2493,3 +2493,12 @@ body:has(#securityOverlay.is-visible){
     transform:translateY(4px)!important;
   }
 }
+
+
+/* ===== UI v53 — attendre la fin du zoom de lancement avant l’UI sécurité ===== */
+body.is-launching #securityOverlay.is-visible .security-hero,
+body.is-launching #securityOverlay.is-visible .security-modal,
+body.is-launching #securityOverlay.is-visible .security-note,
+body.is-launching #securityOverlay.is-visible .security-benefits{
+  visibility:hidden!important;
+}

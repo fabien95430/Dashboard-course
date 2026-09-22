@@ -309,6 +309,7 @@ function status(kind,title,detail=''){
   renderSettingsPage();
 }
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
+requestAnimationFrame(()=>setTimeout(()=>document.body.classList.remove('is-launching'),180));
 function refreshVisualLock(){
   const blocked=$('#setup').classList.contains('is-visible')||$('#securityOverlay').classList.contains('is-visible');
   $('#app').classList.toggle('is-locked',blocked);
