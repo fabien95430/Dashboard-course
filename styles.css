@@ -2971,3 +2971,11 @@ body{
     padding-top:20px!important;
   }
 }
+
+
+/* ===== UI v72 — prolonge le fond entre les tuiles jusqu'aux bords ===== */
+@media(max-width:520px){
+  .catalog-view .products{
+    padding:1px 7px 8px!important;
+  }
+}
