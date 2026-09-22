@@ -313,9 +313,27 @@ function refreshVisualLock(){
   const blocked=$('#setup').classList.contains('is-visible')||$('#securityOverlay').classList.contains('is-visible');
   $('#app').classList.toggle('is-locked',blocked);
 }
+const startupVisualReady=Promise.race([
+  Promise.all([
+    './welcome-background-v40.webp',
+    './welcome-cart-transparent-v46.png'
+  ].map(src=>{
+    const img=new Image();
+    img.src=src;
+    if(typeof img.decode==='function')return img.decode().catch(()=>{});
+    return new Promise(resolve=>{
+      if(img.complete){resolve();return}
+      img.onload=resolve;
+      img.onerror=resolve;
+    });
+  })),
+  new Promise(resolve=>setTimeout(resolve,1200))
+]);
 function finishInitialPaint(){
   if(!document.body.classList.contains('is-booting'))return;
-  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.remove('is-booting')));
+  startupVisualReady.then(()=>{
+    requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.remove('is-booting')));
+  });
 }
 function showSetup(message=''){
   $('#securityOverlay').classList.remove('is-visible');

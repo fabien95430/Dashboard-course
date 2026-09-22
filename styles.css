@@ -2319,14 +2319,14 @@ body:has(#securityOverlay.is-visible){
 
 /* ===== UI v47 — premier rendu stable, sans glissement ===== */
 body.is-booting{
-  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat!important;
+  background:#f5f2ea!important;
 }
 body.is-booting::before{
   content:"";
   position:fixed;
   z-index:1000;
   inset:0;
-  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat;
+  background:#f5f2ea;
   pointer-events:none;
 }
 body.is-booting>.app,
