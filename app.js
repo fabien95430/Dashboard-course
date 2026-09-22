@@ -313,17 +313,12 @@ function refreshVisualLock(){
   const blocked=$('#setup').classList.contains('is-visible')||$('#securityOverlay').classList.contains('is-visible');
   $('#app').classList.toggle('is-locked',blocked);
 }
-function finishInitialPaint(){
-  if(!document.body.classList.contains('is-booting'))return;
-  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.remove('is-booting')));
-}
 function showSetup(message=''){
   $('#securityOverlay').classList.remove('is-visible');
   $('#setup').classList.add('is-visible');
   $('#haUrlInput').value=state.haUrl||normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
   $('#setupError').textContent=message;
   refreshVisualLock();
-  finishInitialPaint();
 }
 function hideSetup(){$('#setup').classList.remove('is-visible');refreshVisualLock()}
 
@@ -871,7 +866,6 @@ function showSecurity(mode,message='',options={}){
   refreshVisualLock();
   if(faceReady&&!creating&&options.autoFaceId!==false)scheduleAutomaticFaceId();
   else if(creating)setTimeout(()=>$('#securityPassword').focus(),80);
-  finishInitialPaint();
 }
 function hideSecurity(){
   $('#securityOverlay').classList.remove('is-visible');

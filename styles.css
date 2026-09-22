@@ -2317,33 +2317,6 @@ body:has(#securityOverlay.is-visible){
 }
 
 
-/* ===== UI v47 — premier rendu stable, sans glissement ===== */
-body.is-booting{
-  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat!important;
-}
-body.is-booting::before{
-  content:"";
-  position:fixed;
-  z-index:1000;
-  inset:0;
-  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat;
-  pointer-events:none;
-}
-body.is-booting>.app,
-body.is-booting>#setup,
-body.is-booting>#securityOverlay{
-  visibility:hidden!important;
-}
-.security-overlay,
-.security-shell,
-.security-hero,
-.security-modal,
-.security-note,
-.security-benefits,
-.welcome-cart-art{
-  animation:none!important;
-  transition:none!important;
-}
 
 
 /* ===== UI v48 — proportions de la liste alignées sur la référence ===== */
