@@ -2468,13 +2468,15 @@ body:has(#securityOverlay.is-visible){
 /* ===== UI v50 — titre net et navigation abaissée dans la zone sûre ===== */
 @media(max-width:520px){
   .list-view .page-header h1{
+    font-size:32px!important;
+    line-height:1!important;
     font-weight:800!important;
-    letter-spacing:-.9px!important;
+    letter-spacing:-1px!important;
     text-shadow:none!important;
     filter:none!important;
     opacity:1!important;
-    -webkit-font-smoothing:antialiased;
-    text-rendering:geometricPrecision;
+    -webkit-font-smoothing:auto;
+    text-rendering:auto;
   }
   .app>.tabs{
     padding-bottom:0!important;
