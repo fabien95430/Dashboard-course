@@ -2510,3 +2510,13 @@ body.is-booting>#securityOverlay{
     transform:translateY(8px)!important;
   }
 }
+
+
+/* v51 — boutons bas sans bande vide ni rognage. */
+@media(max-width:520px){
+  .app>.tabs .tab{
+    height:92px!important;
+    align-self:center!important;
+    transform:translateY(4px)!important;
+  }
+}
