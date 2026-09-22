@@ -2688,3 +2688,20 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     transform:none!important;
   }
 }
+
+
+/* ===== UI v61 — version visible sur chaque page ===== */
+.page-version{
+  display:inline-block;
+  margin-left:5px;
+  padding:1px 5px;
+  border-radius:999px;
+  background:rgba(7,62,44,.08);
+  color:#497064;
+  font-size:10px;
+  line-height:1.2;
+  font-weight:760;
+  letter-spacing:.1px;
+  vertical-align:1px;
+  white-space:nowrap;
+}
