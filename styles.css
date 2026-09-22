@@ -2897,3 +2897,24 @@ body{
     background:#08733d;
   }
 }
+
+
+/* ===== UI v68 — remonte légèrement les en-têtes ===== */
+@media(max-width:520px){
+  .list-view{
+    grid-template-rows:92px 42px minmax(0,1fr)!important;
+  }
+  .catalog-view{
+    grid-template-rows:92px 42px 42px minmax(0,1fr)!important;
+  }
+  .settings-view{
+    grid-template-rows:92px minmax(0,1fr)!important;
+  }
+
+  .list-view .page-header,
+  .catalog-view .page-header,
+  .settings-view .page-header{
+    height:92px!important;
+    min-height:92px!important;
+  }
+}
