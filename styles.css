@@ -3061,3 +3061,32 @@ body{
       )!important;
   }
 }
+
+
+/* ===== UI v77 — catalogue réellement bord à bord, contenu aligné ===== */
+@media(max-width:520px){
+  .app>.catalog-view{
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  .catalog-view .page-header{
+    margin-left:12px!important;
+    margin-right:12px!important;
+  }
+  .catalog-view .page-search{
+    margin-left:13px!important;
+    margin-right:13px!important;
+  }
+  .catalog-view .categories{
+    margin-left:12px!important;
+    margin-right:12px!important;
+  }
+
+  .catalog-view .products{
+    margin-left:0!important;
+    margin-right:0!important;
+    padding:1px 19px 8px!important;
+    background:transparent!important;
+  }
+}
