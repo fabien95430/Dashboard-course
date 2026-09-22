@@ -2522,13 +2522,18 @@ body.is-booting>#securityOverlay{
 }
 
 
-/* ===== UI v56 — cadrage du fond indépendant de la hauteur PWA iOS ===== */
-body.is-booting,
-body.is-booting::before,
-html:has(#securityOverlay.is-visible),
-body:has(#securityOverlay.is-visible),
-#securityOverlay.security-overlay{
-  background-size:100% auto!important;
-  background-position:center top!important;
-  background-repeat:no-repeat!important;
+/* ===== UI v57 — positions connexion indépendantes de 100dvh sur iPhone PWA ===== */
+@supports (-webkit-touch-callout:none){
+  @media (display-mode:standalone) and (max-width:520px){
+    .security-hero{
+      top:13.483582vw!important;
+    }
+    .security-modal,
+    .security-shell.is-password-open .security-modal{
+      top:82.587065vw!important;
+    }
+    .security-note{
+      top:157.313433vw!important;
+    }
+  }
 }
