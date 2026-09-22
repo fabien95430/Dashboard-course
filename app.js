@@ -550,16 +550,12 @@ function renderSettingsPage(){
   const connection=$('#settingsConnectionSummary');
   const list=$('#settingsListSummary');
   const face=$('#settingsFaceIdSummary');
-  const sync=$('#settingsSyncSummary');
-  const dot=$('#settingsSyncDot');
   const connected=!state.locked&&state.ws?.readyState===WebSocket.OPEN;
   if(connection)connection.textContent=connected?'Connecté':(state.locked?'Verrouillé':'Connexion…');
   if(connection)connection.classList.toggle('is-connected',connected);
   const activeEntity=state.entities.find(entry=>entry.id===state.entity);
   if(list)list.textContent=activeEntity?.name||state.entity||'Aucune liste';
   if(face)face.textContent=biometricRecord()?'Activé sur cet appareil':'Mot de passe local disponible';
-  if(sync)sync.textContent=connected?'Synchronisation en temps réel':'Connexion Home Assistant';
-  if(dot)dot.classList.toggle('is-online',connected);
 }
 
 
@@ -1360,7 +1356,7 @@ $('#demoBtn').onclick=()=>{
 $('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
 $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
 $('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
-['settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsFaceIdBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
+['settingsConnectionBtn','settingsSecurityBtn','settingsListBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
 $('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
 $('#settingsLogoutBtn').onclick=revoke;
 $('#cancelSettings').onclick=()=>$('#settingsDialog').close();

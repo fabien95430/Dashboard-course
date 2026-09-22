@@ -2963,3 +2963,11 @@ body{
   opacity:1;
   cursor:default;
 }
+
+
+/* ===== UI v71 — réglages simplifiés + contenu descendu de 20 px ===== */
+@media(max-width:520px){
+  .settings-scroll{
+    padding-top:20px!important;
+  }
+}

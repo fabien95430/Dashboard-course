@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=70">
+  <link rel="stylesheet" href="./styles.css?v=71">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -41,7 +41,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v70</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v71</span></p>
         </div>
         <button id="settingsBtn" class="icon-btn" type="button" aria-label="Ouvrir les réglages">
           <svg><use href="#i-gear"></use></svg>
@@ -60,7 +60,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v70</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v71</span></p>
         </div>
         <button id="catalogSearchBtn" class="icon-btn" type="button" aria-label="Rechercher dans le catalogue">
           <svg><use href="#i-search"></use></svg>
@@ -80,7 +80,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v70</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v71</span></p>
         </div>
       </header>
 
@@ -93,9 +93,20 @@
               <span class="settings-copy"><strong>Connexion Home Assistant</strong><small id="settingsConnectionSummary">Connexion…</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <h2><span class="section-icon"><svg><use href="#i-lock"></use></svg></span>Sécurité</h2>
+          <div class="settings-card">
             <button id="settingsSecurityBtn" class="settings-row" type="button">
+              <span class="settings-icon"><svg><use href="#i-face"></use></svg></span>
+              <span class="settings-copy"><strong>Face ID et verrouillage</strong><small id="settingsFaceIdSummary">Vérification…</small></span>
+              <svg class="chevron"><use href="#i-chevron"></use></svg>
+            </button>
+            <button id="settingsLockBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-lock"></use></svg></span>
-              <span class="settings-copy"><strong>Sécurité et verrouillage</strong><small>Biométrie, code, chiffrement</small></span>
+              <span class="settings-copy"><strong>Verrouiller maintenant</strong><small>Fermer la session sur cet appareil</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
           </div>
@@ -107,27 +118,6 @@
             <button id="settingsListBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
               <span class="settings-copy"><strong>Liste Home Assistant</strong><small id="settingsListSummary">Liste active</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-            <button id="settingsFaceIdBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-face"></use></svg></span>
-              <span class="settings-copy"><strong>Face ID</strong><small id="settingsFaceIdSummary">Vérification…</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-          </div>
-        </section>
-
-        <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-sync"></use></svg></span>Données</h2>
-          <div class="settings-card">
-            <div class="settings-row is-static">
-              <span class="settings-icon"><svg><use href="#i-sync"></use></svg></span>
-              <span class="settings-copy"><strong>Synchronisation</strong><small id="settingsSyncSummary">Home Assistant</small></span>
-              <span id="settingsSyncDot" class="sync-dot" aria-hidden="true"></span>
-            </div>
-            <button id="settingsLockBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-lock"></use></svg></span>
-              <span class="settings-copy"><strong>Verrouiller maintenant</strong><small>Fermer la session sur cet appareil</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
           </div>
@@ -238,6 +228,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=50"></script>
+  <script src="./app.js?v=51"></script>
 </body>
 </html>
