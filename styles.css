@@ -2473,3 +2473,20 @@ body.is-booting>#securityOverlay{
     border-radius:20px!important;
   }
 }
+
+
+/* v49 — alignement bord à bord mesuré sur viewport iPhone. */
+@media(max-width:520px){
+  .list-view{
+    width:calc(100% - 12px)!important;
+  }
+  .app>.tabs{
+    left:auto!important;
+    margin-left:-6px!important;
+    transform:none!important;
+  }
+  .tab{
+    margin-left:7px!important;
+    margin-right:7px!important;
+  }
+}
