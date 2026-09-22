@@ -2831,3 +2831,24 @@ body{
     filter:none!important;
   }
 }
+
+
+/* ===== UI v66 — titres descendus sous la zone haute iPhone ===== */
+@media(max-width:520px){
+  .list-view{
+    grid-template-rows:104px 42px minmax(0,1fr)!important;
+  }
+  .catalog-view{
+    grid-template-rows:104px 42px 42px minmax(0,1fr)!important;
+  }
+  .settings-view{
+    grid-template-rows:104px minmax(0,1fr)!important;
+  }
+
+  .list-view .page-header,
+  .catalog-view .page-header,
+  .settings-view .page-header{
+    height:104px!important;
+    min-height:104px!important;
+  }
+}
