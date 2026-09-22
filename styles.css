@@ -2315,3 +2315,32 @@ body:has(#securityOverlay.is-visible){
   .security-note{top:71.6%!important}
   .security-benefits{bottom:max(22px,calc(env(safe-area-inset-bottom) + 13px))!important}
 }
+
+
+/* ===== UI v47 — premier rendu stable, sans glissement ===== */
+body.is-booting{
+  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat!important;
+}
+body.is-booting::before{
+  content:"";
+  position:fixed;
+  z-index:1000;
+  inset:0;
+  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat;
+  pointer-events:none;
+}
+body.is-booting>.app,
+body.is-booting>#setup,
+body.is-booting>#securityOverlay{
+  visibility:hidden!important;
+}
+.security-overlay,
+.security-shell,
+.security-hero,
+.security-modal,
+.security-note,
+.security-benefits,
+.welcome-cart-art{
+  animation:none!important;
+  transition:none!important;
+}
