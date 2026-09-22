@@ -3090,3 +3090,21 @@ body{
     background:transparent!important;
   }
 }
+
+
+
+/* ===== UI v78 — bandeau bas réduit de 10 px et navigation réalignée ===== */
+@media(max-width:520px){
+  .app{
+    grid-template-rows:minmax(0,1fr) 104px!important;
+  }
+  .app>.tabs{
+    height:104px!important;
+  }
+  .app>.tabs .tab{
+    height:100px!important;
+  }
+  .app>.tabs .tab::after{
+    bottom:25px!important;
+  }
+}
