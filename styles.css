@@ -2705,3 +2705,24 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   vertical-align:1px;
   white-space:nowrap;
 }
+
+
+
+/* ===== UI v62 — titres iPhone rendus sur des pixels entiers ===== */
+@media(max-width:520px){
+  .list-view .page-header h1,
+  .catalog-view .page-header h1,
+  .settings-view .page-header h1{
+    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
+    font-size:32px!important;
+    line-height:32px!important;
+    font-weight:700!important;
+    letter-spacing:0!important;
+    font-synthesis:none;
+    font-variation-settings:normal;
+    text-shadow:none!important;
+    filter:none!important;
+    transform:none!important;
+    opacity:1!important;
+  }
+}
