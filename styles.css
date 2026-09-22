@@ -2280,3 +2280,38 @@ body:has(#securityOverlay.is-visible){
     min-height:calc(100dvh + env(safe-area-inset-bottom))!important;
   }
 }
+
+
+/* ===== UI v46 — alignement exact sur la référence mobile ===== */
+.security-settings-pill{
+  display:none!important;
+}
+.security-hero{
+  top:6.2%!important;
+}
+.welcome-cart-art{
+  width:198px!important;
+  margin:0 auto -24px!important;
+}
+.welcome-cart-art img{
+  mix-blend-mode:normal!important;
+  background:transparent!important;
+}
+.security-modal,
+.security-shell.is-password-open .security-modal{
+  top:38%!important;
+}
+.security-note{
+  top:72.3%!important;
+}
+.security-benefits{
+  bottom:max(38px,calc(env(safe-area-inset-bottom) + 26px))!important;
+}
+@media(max-height:720px){
+  .security-hero{top:5.1%!important}
+  .welcome-cart-art{width:178px!important;margin-bottom:-22px!important}
+  .security-modal,
+  .security-shell.is-password-open .security-modal{top:36.8%!important}
+  .security-note{top:71.6%!important}
+  .security-benefits{bottom:max(22px,calc(env(safe-area-inset-bottom) + 13px))!important}
+}
