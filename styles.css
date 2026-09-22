@@ -2979,3 +2979,13 @@ body{
     padding:1px 7px 8px!important;
   }
 }
+
+
+/* ===== UI v73 — étend la grille produit jusqu'aux bords sans déplacer les cartes ===== */
+@media(max-width:520px){
+  .catalog-view .products{
+    margin-left:-12px!important;
+    margin-right:-12px!important;
+    padding:1px 19px 8px!important;
+  }
+}
