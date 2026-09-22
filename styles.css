@@ -2747,3 +2747,55 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     vertical-align:baseline;
   }
 }
+
+
+/* ===== UI v64 — marges fixes, filtres sans halo, navigation remplie ===== */
+@media(max-width:520px){
+  .app{
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  .app>.list-view,
+  .app>.catalog-view,
+  .app>.settings-view{
+    width:auto!important;
+    margin-left:12px!important;
+    margin-right:12px!important;
+  }
+
+  .catalog-view .categories{
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    outline:0!important;
+    filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  .catalog-view .cat,
+  .catalog-view .cat.is-active{
+    box-shadow:none!important;
+  }
+
+  .app>.tabs{
+    left:auto!important;
+    width:100vw!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    transform:none!important;
+    padding-top:0!important;
+  }
+  .app>.tabs .tab{
+    height:110px!important;
+    align-self:start!important;
+    margin-top:4px!important;
+    transform:none!important;
+  }
+  .app>.tabs .tab>svg,
+  .app>.tabs .tab>span{
+    transform:translateY(-9px)!important;
+  }
+}
