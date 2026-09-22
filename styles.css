@@ -2520,20 +2520,3 @@ body.is-booting>#securityOverlay{
     transform:translateY(4px)!important;
   }
 }
-
-
-/* ===== UI v57 — positions connexion indépendantes de 100dvh sur iPhone PWA ===== */
-@supports (-webkit-touch-callout:none){
-  @media (display-mode:standalone) and (max-width:520px){
-    .security-hero{
-      top:13.483582vw!important;
-    }
-    .security-modal,
-    .security-shell.is-password-open .security-modal{
-      top:82.587065vw!important;
-    }
-    .security-note{
-      top:157.313433vw!important;
-    }
-  }
-}
