@@ -2520,3 +2520,15 @@ body.is-booting>#securityOverlay{
     transform:translateY(4px)!important;
   }
 }
+
+
+/* ===== UI v56 — cadrage du fond indépendant de la hauteur PWA iOS ===== */
+body.is-booting,
+body.is-booting::before,
+html:has(#securityOverlay.is-visible),
+body:has(#securityOverlay.is-visible),
+#securityOverlay.security-overlay{
+  background-size:100% auto!important;
+  background-position:center top!important;
+  background-repeat:no-repeat!important;
+}
