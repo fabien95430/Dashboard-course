@@ -2344,3 +2344,132 @@ body.is-booting>#securityOverlay{
   animation:none!important;
   transition:none!important;
 }
+
+
+/* ===== UI v48 — proportions de la liste alignées sur la référence ===== */
+@media(max-width:520px){
+  .app{
+    padding-left:6px!important;
+    padding-right:6px!important;
+    grid-template-rows:minmax(0,1fr) 114px!important;
+  }
+  .list-view{
+    grid-template-rows:60px 42px minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  .list-view .page-header{
+    min-height:60px!important;
+    padding:0 8px 5px!important;
+    gap:10px!important;
+  }
+  .list-view .page-header h1{
+    font-size:32px!important;
+    line-height:.96!important;
+    letter-spacing:-1.15px!important;
+  }
+  .list-view .page-header p{
+    margin-top:6px!important;
+    font-size:14px!important;
+    line-height:1.1!important;
+  }
+  .list-view .icon-btn{
+    width:45px!important;
+    height:45px!important;
+  }
+  .list-view .icon-btn svg{
+    width:23px!important;
+    height:23px!important;
+  }
+  .list-view .page-search{
+    height:42px!important;
+    margin:0 1px!important;
+    grid-template-columns:24px minmax(0,1fr) auto!important;
+    gap:8px!important;
+    padding:0 14px!important;
+    border-radius:22px!important;
+  }
+  .list-view .page-search svg{
+    width:22px!important;
+    height:22px!important;
+  }
+  .list-view .page-search input{
+    font-size:14px!important;
+    font-weight:540!important;
+  }
+  .list-view .page-search small{
+    font-size:9.5px!important;
+  }
+  .list-items{
+    padding:2px 1px 8px!important;
+  }
+  .list-row{
+    min-height:54px!important;
+    max-height:62px!important;
+    margin-bottom:5px!important;
+    padding:4px 8px!important;
+    grid-template-columns:36px 50px minmax(0,1fr) auto auto 20px!important;
+    gap:6px!important;
+    border-radius:18px!important;
+    box-shadow:0 4px 14px rgba(57,75,62,.045)!important;
+  }
+  .purchase-check{
+    width:34px!important;
+    height:34px!important;
+  }
+  .purchase-check svg{
+    width:18px!important;
+    height:18px!important;
+  }
+  .list-icon{
+    width:50px!important;
+    height:48px!important;
+  }
+  .premium-sprite.is-compact{
+    width:calc(47px * var(--sprite-ratio,1))!important;
+    height:47px!important;
+  }
+  .list-copy{gap:2px!important}
+  .list-name{
+    font-size:15px!important;
+    line-height:1.05!important;
+  }
+  .list-copy small{
+    font-size:11.5px!important;
+    line-height:1.05!important;
+  }
+  .list-qty{
+    min-width:32px!important;
+    height:26px!important;
+    padding:0 8px!important;
+    font-size:11.5px!important;
+  }
+  .undo-purchase{
+    font-size:12px!important;
+    padding:7px 1px!important;
+  }
+  .row-grip{
+    font-size:19px!important;
+  }
+  .app>.tabs{
+    position:relative!important;
+    left:50%!important;
+    width:100vw!important;
+    height:114px!important;
+    margin-left:0!important;
+    transform:translateX(-50%)!important;
+    align-self:end!important;
+    padding:8px 14px max(12px,env(safe-area-inset-bottom))!important;
+    border-radius:0!important;
+  }
+  .tab{
+    gap:3px!important;
+    font-size:11.5px!important;
+  }
+  .tab svg{
+    width:26px!important;
+    height:26px!important;
+  }
+  .tab.is-active{
+    border-radius:20px!important;
+  }
+}
