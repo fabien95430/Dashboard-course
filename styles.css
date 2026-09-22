@@ -2726,3 +2726,24 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     opacity:1!important;
   }
 }
+
+
+/* ===== UI v63 — géométrie entière de l’en-tête iPhone ===== */
+@media(max-width:520px){
+  .list-view .page-header>div,
+  .catalog-view .page-header>div,
+  .settings-view .page-header>div{
+    height:54px!important;
+    min-height:54px!important;
+  }
+  .list-view .page-header p,
+  .catalog-view .page-header p,
+  .settings-view .page-header p{
+    line-height:16px!important;
+  }
+  .page-version{
+    height:14px;
+    line-height:12px;
+    vertical-align:baseline;
+  }
+}
