@@ -2799,3 +2799,35 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     transform:translateY(-9px)!important;
   }
 }
+
+
+/* ===== UI v65 — neutralise le compositing WebKit autour des titres ===== */
+html,
+body{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+@media(max-width:520px){
+  .status{
+    position:absolute!important;
+  }
+
+  .app>.tabs{
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+
+  .list-view .page-header,
+  .catalog-view .page-header,
+  .settings-view .page-header,
+  .list-view .page-header>div,
+  .catalog-view .page-header>div,
+  .settings-view .page-header>div,
+  .list-view .page-header h1,
+  .catalog-view .page-header h1,
+  .settings-view .page-header h1{
+    -webkit-transform:none!important;
+    transform:none!important;
+    filter:none!important;
+  }
+}
