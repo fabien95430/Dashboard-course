@@ -2520,3 +2520,15 @@ body.is-booting>#securityOverlay{
     transform:translateY(4px)!important;
   }
 }
+
+
+/* ===== UI v52 — fond de démarrage calé sur la safe-area iPhone ===== */
+@supports (padding-bottom:env(safe-area-inset-bottom)){
+  body.is-booting::before{
+    top:0;
+    right:0;
+    bottom:calc(-1 * env(safe-area-inset-bottom));
+    left:0;
+    min-height:calc(100dvh + env(safe-area-inset-bottom));
+  }
+}
