@@ -1280,7 +1280,15 @@ function openConnectionSettings(){
     select.value='';
   }
   renderSettingsPage();
-  $('#connectionDialog').showModal();
+  const dialog=$('#connectionDialog');
+  select?.blur();
+  urlInput?.blur();
+  dialog.showModal();
+  requestAnimationFrame(()=>{
+    select?.blur();
+    urlInput?.blur();
+    try{dialog.focus({preventScroll:true})}catch{dialog.focus()}
+  });
 }
 async function saveConnectionSettings(){
   const nextUrl=normalizeHaUrl($('#connectionHaUrl').value);
