@@ -2504,3 +2504,180 @@ body.is-launching #securityOverlay.is-visible .security-note,
 body.is-launching #securityOverlay.is-visible .security-benefits{
   visibility:hidden!important;
 }
+
+
+/* ===== UI v56 — même échelle mobile sur Catalogue et Réglages ===== */
+@media(max-width:520px){
+  .catalog-view,
+  .settings-view{
+    width:calc(100% - 12px)!important;
+  }
+
+  .catalog-view{
+    grid-template-rows:60px 42px 42px minmax(0,1fr)!important;
+    gap:8px!important;
+  }
+  .settings-view{
+    grid-template-rows:60px minmax(0,1fr)!important;
+  }
+
+  .catalog-view .page-header,
+  .settings-view .page-header{
+    min-height:60px!important;
+    padding:0 8px 5px!important;
+    gap:10px!important;
+  }
+  .catalog-view .page-header h1,
+  .settings-view .page-header h1{
+    font-size:32px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:-1px!important;
+    text-shadow:none!important;
+    filter:none!important;
+    opacity:1!important;
+    -webkit-font-smoothing:auto;
+    text-rendering:auto;
+  }
+  .catalog-view .page-header p,
+  .settings-view .page-header p{
+    margin-top:6px!important;
+    font-size:14px!important;
+    line-height:1.1!important;
+  }
+  .catalog-view .icon-btn{
+    width:45px!important;
+    height:45px!important;
+  }
+  .catalog-view .icon-btn svg{
+    width:23px!important;
+    height:23px!important;
+  }
+
+  .catalog-view .page-search{
+    height:42px!important;
+    margin:0 1px!important;
+    grid-template-columns:24px minmax(0,1fr) auto!important;
+    gap:8px!important;
+    padding:0 14px!important;
+    border-radius:22px!important;
+  }
+  .catalog-view .page-search svg{
+    width:22px!important;
+    height:22px!important;
+  }
+  .catalog-view .page-search input{
+    font-size:14px!important;
+    font-weight:540!important;
+  }
+  .catalog-view .page-search small{
+    font-size:9.5px!important;
+  }
+
+  .categories{
+    gap:7px!important;
+    padding:0 1px 3px!important;
+  }
+  .cat{
+    height:38px!important;
+    padding:0 16px!important;
+    border-radius:20px!important;
+  }
+  .cat .cat-label{
+    font-size:13px!important;
+  }
+
+  .products{
+    grid-auto-rows:132px!important;
+    gap:7px!important;
+    padding:1px 1px 8px!important;
+  }
+  .product{
+    grid-template-rows:82px minmax(0,1fr)!important;
+    padding:6px 6px 8px!important;
+    border-radius:18px!important;
+  }
+  .product .media{
+    height:80px!important;
+  }
+  .product .premium-sprite{
+    width:calc(74px * var(--sprite-ratio,1))!important;
+    height:74px!important;
+  }
+  .product .pname{
+    font-size:12px!important;
+    line-height:1.05!important;
+  }
+  .product .pcat{
+    font-size:9.5px!important;
+    line-height:1.05!important;
+  }
+
+  .settings-header{
+    padding-bottom:5px!important;
+  }
+  .settings-scroll{
+    padding:0 1px 8px!important;
+  }
+  .settings-section{
+    margin:0 0 13px!important;
+  }
+  .settings-section h2{
+    margin:0 0 7px 6px!important;
+    gap:7px!important;
+    font-size:15px!important;
+  }
+  .section-icon{
+    width:27px!important;
+    height:27px!important;
+  }
+  .section-icon svg{
+    width:16px!important;
+    height:16px!important;
+  }
+  .settings-card{
+    border-radius:18px!important;
+  }
+  .settings-row{
+    min-height:60px!important;
+    grid-template-columns:40px minmax(0,1fr) 20px!important;
+    gap:8px!important;
+    padding:7px 10px!important;
+  }
+  .settings-icon{
+    width:38px!important;
+    height:38px!important;
+  }
+  .settings-icon svg{
+    width:20px!important;
+    height:20px!important;
+  }
+  .settings-copy{
+    gap:2px!important;
+  }
+  .settings-copy strong{
+    font-size:14px!important;
+  }
+  .settings-copy small{
+    font-size:11.5px!important;
+  }
+  .chevron{
+    width:18px!important;
+    height:18px!important;
+  }
+  .sync-dot{
+    width:11px!important;
+    height:11px!important;
+  }
+  .settings-logout{
+    height:52px!important;
+    margin:2px 0 4px!important;
+    border-radius:18px!important;
+    gap:8px!important;
+    font-size:15px!important;
+  }
+  .settings-logout svg{
+    width:22px!important;
+    height:22px!important;
+  }
+}
