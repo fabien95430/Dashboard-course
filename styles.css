@@ -2852,3 +2852,48 @@ body{
     min-height:104px!important;
   }
 }
+
+
+/* ===== UI v67 — navigation active soulignée, sans pavé ===== */
+@media(max-width:520px){
+  .app>.tabs{
+    background:#fff!important;
+    border-top:1px solid #e6e9e3!important;
+    box-shadow:0 -7px 22px rgba(44,61,50,.04)!important;
+  }
+
+  .app>.tabs .tab{
+    position:relative!important;
+    background:transparent!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    color:#818996!important;
+  }
+
+  .app>.tabs .tab.is-active{
+    background:transparent!important;
+    color:#08733d!important;
+    box-shadow:none!important;
+  }
+
+  .app>.tabs .tab.is-active span{
+    font-weight:790!important;
+  }
+
+  .app>.tabs .tab::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:30px;
+    width:30px;
+    height:3px;
+    border-radius:999px;
+    background:transparent;
+    transform:translateX(-50%);
+    pointer-events:none;
+  }
+
+  .app>.tabs .tab.is-active::after{
+    background:#08733d;
+  }
+}
