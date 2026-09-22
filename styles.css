@@ -2532,3 +2532,29 @@ body.is-booting>#securityOverlay{
     min-height:calc(100dvh + env(safe-area-inset-bottom));
   }
 }
+
+
+/* ===== UI v53 — un seul fond pendant tout le démarrage sécurisé ===== */
+body.is-booting::before,
+body:has(#securityOverlay.is-visible)::before{
+  content:"";
+  position:fixed;
+  z-index:64;
+  inset:0;
+  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat;
+  pointer-events:none;
+}
+body:has(#securityOverlay.is-visible) #securityOverlay{
+  background-color:transparent!important;
+  background-image:none!important;
+}
+@supports (padding-bottom:env(safe-area-inset-bottom)){
+  body.is-booting::before,
+  body:has(#securityOverlay.is-visible)::before{
+    top:0;
+    right:0;
+    bottom:calc(-1 * env(safe-area-inset-bottom));
+    left:0;
+    min-height:calc(100dvh + env(safe-area-inset-bottom));
+  }
+}
