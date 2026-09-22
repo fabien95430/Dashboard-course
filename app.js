@@ -315,20 +315,7 @@ function refreshVisualLock(){
 }
 function finishInitialPaint(){
   if(!document.body.classList.contains('is-booting'))return;
-  let previousHeight=-1,stableFrames=0,frames=0;
-  const waitForStableViewport=()=>{
-    if(!document.body.classList.contains('is-booting'))return;
-    const height=Math.round(window.visualViewport?.height||window.innerHeight||document.documentElement.clientHeight||0);
-    if(height===previousHeight&&height>0)stableFrames+=1;
-    else{previousHeight=height;stableFrames=0}
-    frames+=1;
-    if(stableFrames>=3||frames>=18){
-      document.body.classList.remove('is-booting');
-      return;
-    }
-    requestAnimationFrame(waitForStableViewport);
-  };
-  requestAnimationFrame(waitForStableViewport);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.remove('is-booting')));
 }
 function showSetup(message=''){
   $('#securityOverlay').classList.remove('is-visible');
