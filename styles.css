@@ -2490,3 +2490,23 @@ body.is-booting>#securityOverlay{
     margin-right:7px!important;
   }
 }
+
+
+/* ===== UI v50 — titre net et navigation abaissée dans la zone sûre ===== */
+@media(max-width:520px){
+  .list-view .page-header h1{
+    font-weight:800!important;
+    letter-spacing:-.9px!important;
+    text-shadow:none!important;
+    filter:none!important;
+    opacity:1!important;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:geometricPrecision;
+  }
+  .app>.tabs{
+    padding-bottom:0!important;
+  }
+  .app>.tabs .tab{
+    transform:translateY(8px)!important;
+  }
+}
