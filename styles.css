@@ -2519,14 +2519,8 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   .catalog-view .page-header h1,
   .settings-view .page-header h1{
     font-size:32px!important;
-    line-height:1!important;
-    font-weight:800!important;
-    letter-spacing:-1px!important;
-    text-shadow:none!important;
-    filter:none!important;
-    opacity:1!important;
-    -webkit-font-smoothing:auto;
-    text-rendering:auto;
+    line-height:.96!important;
+    letter-spacing:-1.15px!important;
   }
   .catalog-view .page-header p,
   .settings-view .page-header p{
