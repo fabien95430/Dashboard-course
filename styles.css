@@ -3108,3 +3108,11 @@ body{
     bottom:25px!important;
   }
 }
+
+
+/* ===== UI v79 — réserve la zone du bouton + dans les cartes catalogue ===== */
+@media(max-width:520px){
+  .catalog-view .product .media{
+    padding-right:34px!important;
+  }
+}
