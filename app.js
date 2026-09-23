@@ -178,6 +178,36 @@ const UTF8_DECODER = new TextDecoder();
 const CLIENT_ID = location.origin;
 const REDIRECT_URI = location.origin + location.pathname;
 const $ = selector => document.querySelector(selector);
+const UI = Object.freeze({
+  securityPassword: document.getElementById('securityPassword'),
+  settingsDialog: document.getElementById('settingsDialog'),
+  connectionDialog: document.getElementById('connectionDialog'),
+  preferencesDialog: document.getElementById('preferencesDialog'),
+  setup: document.getElementById('setup'),
+  securityOverlay: document.getElementById('securityOverlay'),
+  setupError: document.getElementById('setupError'),
+  securityConfirm: document.getElementById('securityConfirm'),
+  haUrlInput: document.getElementById('haUrlInput'),
+  securityShell: document.querySelector('.security-shell'),
+  securitySubmit: document.getElementById('securitySubmit'),
+  securityError: document.getElementById('securityError'),
+  confirmNewLocalPassword: document.getElementById('confirmNewLocalPassword'),
+  changePasswordError: document.getElementById('changePasswordError'),
+  productSearch: document.getElementById('productSearch'),
+  resetSecurityBtn: document.getElementById('resetSecurityBtn'),
+  currentLocalPassword: document.getElementById('currentLocalPassword'),
+  newLocalPassword: document.getElementById('newLocalPassword'),
+  changePasswordPanel: document.getElementById('changePasswordPanel'),
+  connectionHaUrl: document.getElementById('connectionHaUrl'),
+  connectionEntitySelect: document.getElementById('connectionEntitySelect'),
+  preferencesListSort: document.getElementById('preferencesListSort'),
+  preferencesStartView: document.getElementById('preferencesStartView'),
+  preferencesHideAdded: document.getElementById('preferencesHideAdded'),
+  preferencesSmartFavorites: document.getElementById('preferencesSmartFavorites'),
+  savePasswordChange: document.getElementById('savePasswordChange'),
+  refreshBtn: document.getElementById('refreshBtn'),
+  catalogRefreshBtn: document.getElementById('catalogRefreshBtn')
+});
 const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const esc = value => String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
@@ -539,23 +569,23 @@ function status(kind,title,detail=''){
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
 requestAnimationFrame(()=>setTimeout(()=>document.body.classList.remove('is-launching'),180));
 function refreshVisualLock(){
-  const blocked=$('#setup').classList.contains('is-visible')||$('#securityOverlay').classList.contains('is-visible');
+  const blocked=UI.setup.classList.contains('is-visible')||UI.securityOverlay.classList.contains('is-visible');
   $('#app').classList.toggle('is-locked',blocked);
 }
 function showSetup(message=''){
-  $('#securityOverlay').classList.remove('is-visible');
-  $('#setup').classList.add('is-visible');
-  $('#haUrlInput').value=state.haUrl||normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
-  $('#setupError').textContent=message;
+  UI.securityOverlay.classList.remove('is-visible');
+  UI.setup.classList.add('is-visible');
+  UI.haUrlInput.value=state.haUrl||normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
+  UI.setupError.textContent=message;
   refreshVisualLock();
 }
-function hideSetup(){$('#setup').classList.remove('is-visible');refreshVisualLock()}
+function hideSetup(){UI.setup.classList.remove('is-visible');refreshVisualLock()}
 
 function renderCategories(){
   const el=$('#categories');
   if(!el)return;
   el.innerHTML=CATALOG_CATEGORY_ORDER.map(category=>'<button type="button" class="cat '+(state.category===category?'is-active':'')+'" data-category="'+esc(category)+'"><span class="cat-label">'+esc(CATEGORY_META[category].label)+'</span></button>').join('');
-  el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>{state.category=button.dataset.category||'Toutes';state.productQuery='';$('#productSearch').value='';renderCategories();renderProducts()});
+  el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>{state.category=button.dataset.category||'Toutes';state.productQuery='';UI.productSearch.value='';renderCategories();renderProducts()});
 }
 function renderProducts(){
   const el=$('#products'),products=visibleProducts();
@@ -940,14 +970,14 @@ function armIdleLock(){
   state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),SECURITY.idleLockMs);
 }
 function showSecurity(mode,message=''){
-  const overlay=$('#securityOverlay');
+  const overlay=UI.securityOverlay;
   state.securityMode=mode;
-  $('#setup').classList.remove('is-visible');
+  UI.setup.classList.remove('is-visible');
   overlay.classList.add('is-visible');
   const creating=mode==='oauth'||mode==='migrate';
   $('.security-modal').classList.toggle('is-creating',creating);
-  $('.security-shell').classList.toggle('is-form-mode',creating);
-  $('.security-shell').classList.remove('is-password-open');
+  UI.securityShell.classList.toggle('is-form-mode',creating);
+  UI.securityShell.classList.remove('is-password-open');
   $('#securityIcon').classList.toggle('is-creating',creating);
   $('#securityTitle').textContent='Mes courses';
   $('#securityText').textContent=message||(creating
@@ -956,28 +986,28 @@ function showSecurity(mode,message=''){
   $('#passwordPanel').hidden=false;
   $('#securityConfirmWrap').hidden=!creating;
   $('#securityHint').hidden=!creating;
-  $('#securityPassword').autocomplete=creating?'new-password':'current-password';
-  $('#securityPassword').value='';
-  $('#securityConfirm').value='';
-  $('#securitySubmit').textContent=creating?'Chiffrer et continuer':'Connexion';
-  $('#resetSecurityBtn').hidden=creating;
-  $('#securityError').textContent='';
+  UI.securityPassword.autocomplete=creating?'new-password':'current-password';
+  UI.securityPassword.value='';
+  UI.securityConfirm.value='';
+  UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Connexion';
+  UI.resetSecurityBtn.hidden=creating;
+  UI.securityError.textContent='';
   refreshVisualLock();
-  setTimeout(()=>$('#securityPassword').focus(),80);
+  setTimeout(()=>UI.securityPassword.focus(),80);
 }
 function hideSecurity(){
-  $('#securityOverlay').classList.remove('is-visible');
-  $('#securityPassword').value='';
-  $('#securityConfirm').value='';
-  $('#securityError').textContent='';
-  $('.security-shell').classList.remove('is-password-open','is-form-mode');
+  UI.securityOverlay.classList.remove('is-visible');
+  UI.securityPassword.value='';
+  UI.securityConfirm.value='';
+  UI.securityError.textContent='';
+  UI.securityShell.classList.remove('is-password-open','is-form-mode');
   refreshVisualLock();
 }
 function lockApp(message='Application verrouillée.'){
   if(state.demo||!vaultRecord())return;
-  if($('#connectionDialog').open)$('#connectionDialog').close();
-  if($('#preferencesDialog').open)$('#preferencesDialog').close();
-  if($('#settingsDialog').open)$('#settingsDialog').close();
+  if(UI.connectionDialog.open)UI.connectionDialog.close();
+  if(UI.preferencesDialog.open)UI.preferencesDialog.close();
+  if(UI.settingsDialog.open)UI.settingsDialog.close();
   clearLockTimers();
   closeSocket();
   wipeMemoryCredentials();
@@ -1045,9 +1075,9 @@ async function connectFromRefresh(){
   }
 }
 async function completeSecurityAction(){
-  const password=$('#securityPassword').value;
-  const confirm=$('#securityConfirm').value;
-  const error=$('#securityError'),button=$('#securitySubmit');
+  const password=UI.securityPassword.value;
+  const confirm=UI.securityConfirm.value;
+  const error=UI.securityError,button=UI.securitySubmit;
   error.textContent='';
   if(state.securityMode==='unlock'){
     const retryMs=unlockRetryMs();
@@ -1111,8 +1141,8 @@ async function completeSecurityAction(){
 }
 function beginOAuth(){
   state.demo=false;
-  const value=normalizeHaUrl($('#haUrlInput').value);
-  if(!value){$('#setupError').textContent='Entre une adresse HTTPS Home Assistant valide.';return}
+  const value=normalizeHaUrl(UI.haUrlInput.value);
+  if(!value){UI.setupError.textContent='Entre une adresse HTTPS Home Assistant valide.';return}
   state.haUrl=value;
   // Do not persist the HA URL in plaintext. It survives the OAuth round-trip only in this tab.
   deleteKey(STORAGE.haUrl);
@@ -1123,7 +1153,7 @@ function beginOAuth(){
     // Temporary fallback for iOS/PWA OAuth navigation. Contains no credential and is deleted after the callback.
     saveJson(OAUTH_TEMP_KEY,oauthState);
   }catch(_){
-    $('#setupError').textContent='Le stockage temporaire du navigateur est indisponible.';return;
+    UI.setupError.textContent='Le stockage temporaire du navigateur est indisponible.';return;
   }
   const authorize=value+'/auth/authorize?client_id='+encodeURIComponent(CLIENT_ID)+'&redirect_uri='+encodeURIComponent(REDIRECT_URI)+'&state='+encodeURIComponent(nonce);
   location.assign(authorize);
@@ -1134,7 +1164,7 @@ async function revoke(){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
   clearLocalConnectionData();
-  $('#settingsDialog').close();
+  UI.settingsDialog.close();
   showSetup('Autorisation locale supprimée et session Home Assistant révoquée.');
 }
 
@@ -1368,31 +1398,31 @@ function showNeutralDialog(dialog){
   });
 }
 function clearPasswordChangeForm(){
-  $('#currentLocalPassword').value='';
-  $('#newLocalPassword').value='';
-  $('#confirmNewLocalPassword').value='';
-  $('#changePasswordError').textContent='';
-  $('#changePasswordPanel').hidden=true;
+  UI.currentLocalPassword.value='';
+  UI.newLocalPassword.value='';
+  UI.confirmNewLocalPassword.value='';
+  UI.changePasswordError.textContent='';
+  UI.changePasswordPanel.hidden=true;
 }
 function openConnectionSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
-  const urlInput=$('#connectionHaUrl');
+  const urlInput=UI.connectionHaUrl;
   if(urlInput)urlInput.value=state.haUrl||'';
   const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
-  const select=$('#connectionEntitySelect');
+  const select=UI.connectionEntitySelect;
   if(select){
     select.innerHTML='<option value="" selected>Choisir une liste</option>'+choices.map(e=>'<option value="'+esc(e.id)+'">'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
     select.value='';
   }
   renderSettingsPage();
-  const dialog=$('#connectionDialog');
+  const dialog=UI.connectionDialog;
   select?.blur();
   urlInput?.blur();
   showNeutralDialog(dialog);
 }
 async function saveConnectionSettings(){
-  const nextUrl=normalizeHaUrl($('#connectionHaUrl').value);
-  const chosenEntity=$('#connectionEntitySelect').value;
+  const nextUrl=normalizeHaUrl(UI.connectionHaUrl.value);
+  const chosenEntity=UI.connectionEntitySelect.value;
   const nextEntity=chosenEntity||state.entity;
   if(!nextUrl)return;
   const changedUrl=nextUrl!==state.haUrl;
@@ -1402,12 +1432,12 @@ async function saveConnectionSettings(){
     localStorage.setItem(STORAGE.entity,chosenEntity);
     localStorage.setItem(STORAGE.entityPreference,chosenEntity);
   }
-  $('#connectionDialog').close();
+  UI.connectionDialog.close();
   if(changedUrl){
     await revoke();
     state.haUrl=nextUrl;
-    $('#haUrlInput').value=nextUrl;
-    $('#setupError').textContent='Adresse modifiée : reconnecte Home Assistant.';
+    UI.haUrlInput.value=nextUrl;
+    UI.setupError.textContent='Adresse modifiée : reconnecte Home Assistant.';
   }else{
     if(changedEntity)await subscribe();
     await refreshItems();armIdleLock();
@@ -1415,24 +1445,24 @@ async function saveConnectionSettings(){
 }
 
 function openPreferences(){
-  const dialog=$('#preferencesDialog');
-  $('#preferencesListSort').value=state.preferences.listSort;
-  $('#preferencesStartView').value=state.preferences.startView;
-  $('#preferencesHideAdded').checked=state.preferences.hideAdded;
-  $('#preferencesSmartFavorites').checked=state.preferences.smartFavorites;
+  const dialog=UI.preferencesDialog;
+  UI.preferencesListSort.value=state.preferences.listSort;
+  UI.preferencesStartView.value=state.preferences.startView;
+  UI.preferencesHideAdded.checked=state.preferences.hideAdded;
+  UI.preferencesSmartFavorites.checked=state.preferences.smartFavorites;
   showNeutralDialog(dialog);
 }
 function savePreferencesSettings(){
-  const nextSort=$('#preferencesListSort').value;
-  const nextStartView=$('#preferencesStartView').value;
+  const nextSort=UI.preferencesListSort.value;
+  const nextStartView=UI.preferencesStartView.value;
   state.preferences={
     listSort:['added','category','alpha'].includes(nextSort)?nextSort:DEFAULT_PREFERENCES.listSort,
     startView:['list','catalog'].includes(nextStartView)?nextStartView:DEFAULT_PREFERENCES.startView,
-    hideAdded:$('#preferencesHideAdded').checked,
-    smartFavorites:$('#preferencesSmartFavorites').checked
+    hideAdded:UI.preferencesHideAdded.checked,
+    smartFavorites:UI.preferencesSmartFavorites.checked
   };
   persistPreferences();
-  $('#preferencesDialog').close();
+  UI.preferencesDialog.close();
   renderProducts();
   renderList();
   renderSettingsPage();
@@ -1442,14 +1472,14 @@ function savePreferencesSettings(){
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   clearPasswordChangeForm();
-  showNeutralDialog($('#settingsDialog'));
+  showNeutralDialog(UI.settingsDialog);
 }
 async function changeLocalPassword(){
-  const current=$('#currentLocalPassword').value;
-  const next=$('#newLocalPassword').value;
-  const confirm=$('#confirmNewLocalPassword').value;
-  const error=$('#changePasswordError');
-  const button=$('#savePasswordChange');
+  const current=UI.currentLocalPassword.value;
+  const next=UI.newLocalPassword.value;
+  const confirm=UI.confirmNewLocalPassword.value;
+  const error=UI.changePasswordError;
+  const button=UI.savePasswordChange;
   error.textContent='';
   if(!current){error.textContent='Entre le mot de passe actuel.';return}
   if(next.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
@@ -1515,10 +1545,10 @@ async function init(){
 }
 
 $('#connectBtn').onclick=beginOAuth;
-$('#securitySubmit').onclick=completeSecurityAction;
-$('#securityPassword').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
-$('#securityConfirm').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
-$('#resetSecurityBtn').onclick=resetLocalConnection;
+UI.securitySubmit.onclick=completeSecurityAction;
+UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+UI.resetSecurityBtn.onclick=resetLocalConnection;
 $('#demoBtn').onclick=()=>{
   state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
   state.loading=false;state.error='';
@@ -1536,30 +1566,30 @@ async function refreshFromHeader(button){
     if(button)button.disabled=false;
   }
 }
-$('#refreshBtn').onclick=()=>refreshFromHeader($('#refreshBtn'));
+UI.refreshBtn.onclick=()=>refreshFromHeader(UI.refreshBtn);
 $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
-$('#catalogRefreshBtn').onclick=()=>refreshFromHeader($('#catalogRefreshBtn'));
+UI.catalogRefreshBtn.onclick=()=>refreshFromHeader(UI.catalogRefreshBtn);
 $('#settingsConnectionBtn').onclick=openConnectionSettings;
 $('#settingsSecurityBtn').onclick=openSettings;
 $('#settingsListBtn').onclick=openPreferences;
 $('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
 $('#settingsLogoutBtn').onclick=revoke;
-$('#cancelConnectionSettings').onclick=()=>$('#connectionDialog').close();
+$('#cancelConnectionSettings').onclick=()=>UI.connectionDialog.close();
 $('#saveConnectionSettings').onclick=saveConnectionSettings;
-$('#cancelPreferences').onclick=()=>$('#preferencesDialog').close();
+$('#cancelPreferences').onclick=()=>UI.preferencesDialog.close();
 $('#savePreferences').onclick=savePreferencesSettings;
 $('#changePasswordBtn').onclick=()=>{
-  const panel=$('#changePasswordPanel');
+  const panel=UI.changePasswordPanel;
   const opening=panel.hidden;
   if(!opening){clearPasswordChangeForm();return}
   panel.hidden=false;
-  $('#changePasswordError').textContent='';
+  UI.changePasswordError.textContent='';
 };
-$('#savePasswordChange').onclick=changeLocalPassword;
-$('#confirmNewLocalPassword').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
-$('#cancelSettings').onclick=()=>{clearPasswordChangeForm();$('#settingsDialog').close()};
-$('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();$('#settingsDialog').close();lockApp('Verrouillage manuel.')};
-$('#productSearch').oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
+UI.savePasswordChange.onclick=changeLocalPassword;
+UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
+$('#cancelSettings').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close()};
+$('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp('Verrouillage manuel.')};
+UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
 $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
