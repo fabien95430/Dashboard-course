@@ -257,6 +257,27 @@ function preferredTodoEntity(entities){
 const ALL=[];
 Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names])=>names.forEach(name=>ALL.push({name,category,sub}))));
 const BY_NAME=new Map(ALL.map(p=>[norm(p.name),p]));
+const catalogMatchKey=value=>norm(String(value||'')
+  .replace(/(\d+)\s*(?:litres?|l)\b/gi,'$1l')
+  .replace(/\bsacs?\b/gi,'sac')
+  .replace(/\bpoub\.?\b/gi,'poubelle'));
+const catalogMatchTokens=value=>catalogMatchKey(value).split(' ').filter(Boolean).map(token=>token.length>3&&token.endsWith('s')?token.slice(0,-1):token);
+const CATALOG_ALIASES=ALL.flatMap(product=>{
+  const display=productDisplayName(product.name);
+  return [{product,key:catalogMatchKey(product.name),tokens:catalogMatchTokens(product.name)},
+    ...(display!==product.name?[{product,key:catalogMatchKey(display),tokens:catalogMatchTokens(display)}]:[])];
+});
+function catalogProductFor(value){
+  const exact=BY_NAME.get(norm(value));
+  if(exact)return exact;
+  const key=catalogMatchKey(value);
+  const exactAlias=CATALOG_ALIASES.find(entry=>entry.key===key);
+  if(exactAlias)return exactAlias.product;
+  const tokens=catalogMatchTokens(value);
+  if(tokens.length<2)return null;
+  const matches=unique(CATALOG_ALIASES.filter(entry=>tokens.every(token=>entry.tokens.some(candidate=>candidate===token||(token.length>=3&&candidate.length>=3&&(candidate.startsWith(token)||token.startsWith(candidate)))))).map(entry=>entry.product));
+  return matches.length===1?matches[0]:null;
+}
 const POSITIONS=new Map();
 Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));
 
@@ -498,7 +519,7 @@ function sortedGroups(groups){
   if(state.preferences.listSort==='alpha')return rows.sort((a,b)=>a.summary.localeCompare(b.summary,'fr',{sensitivity:'base'}));
   if(state.preferences.listSort==='category'){
     return rows.map((group,index)=>({group,index})).sort((a,b)=>{
-      const productA=BY_NAME.get(norm(a.group.summary)),productB=BY_NAME.get(norm(b.group.summary));
+      const productA=catalogProductFor(a.group.summary),productB=catalogProductFor(b.group.summary);
       const categoryA=CATALOG_CATEGORY_ORDER.indexOf(productA?.category),categoryB=CATALOG_CATEGORY_ORDER.indexOf(productB?.category);
       const rankA=categoryA>0&&categoryA<CATALOG_CATEGORY_ORDER.length-1?categoryA:999;
       const rankB=categoryB>0&&categoryB<CATALOG_CATEGORY_ORDER.length-1?categoryB:999;
@@ -595,7 +616,7 @@ function renderList(){
     return;
   }
   el.innerHTML=rows.map(group=>{
-    const key=norm(group.summary),product=BY_NAME.get(key),busy=state.productBusy.has(key);
+    const key=norm(group.summary),product=catalogProductFor(group.summary),busy=state.productBusy.has(key);
     const categoryLabel=product?.sub||product?.category||'Article';
     const quantity=group.count>1?'<span class="list-qty">x'+group.count+'</span>':'';
     return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
