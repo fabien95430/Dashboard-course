@@ -3050,3 +3050,21 @@ body{
 .preferences-dialog:focus-visible{
   outline:none;
 }
+
+/* ===== UI v85 — recentrage après retrait de Face ID ===== */
+.security-modal,
+.security-shell.is-password-open .security-modal{
+  top:36%!important;
+}
+.security-note{
+  top:74.5%!important;
+}
+@media(max-height:720px){
+  .security-modal,
+  .security-shell.is-password-open .security-modal{
+    top:35.2%!important;
+  }
+  .security-note{
+    top:73.6%!important;
+  }
+}
