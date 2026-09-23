@@ -56,6 +56,20 @@ La reconstruction validée de Boissons conserve :
 - débordements entre les lignes supprimés ;
 - recadrage spécifique Boissons supprimé côté application.
 
+## Référence Épicerie v5
+
+La reconstruction validée d'Épicerie conserve :
+
+- grille : **12 colonnes × 8 lignes** ;
+- ratio de cellule : **1** ;
+- cellule : **140 × 140 px** ;
+- atlas final : **1680 × 1120 px** ;
+- 96 produits conservés dans le même ordre ;
+- pixels produits copiés à leur taille source, sans upscale ;
+- fond transparent et gouttières régulières ;
+- produits qui dépassaient les anciennes limites de cellule isolés par leur contour alpha ;
+- recadrage Épicerie supprimé côté application.
+
 ## Garde-fous
 
 - `catalog.js` reste la source du catalogue : ne pas changer les noms ou l'ordre uniquement pour faciliter l'atlas.
