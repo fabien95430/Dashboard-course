@@ -1207,16 +1207,9 @@ svg{display:block}
   .page-header h1{font-size:39px}
   .page-header p{font-size:15px}
   .icon-btn{width:50px;height:50px}
-  .list-view{grid-template-rows:104px 54px minmax(0,1fr)}
   .searchbox{height:54px;padding:0 16px}
   .searchbox input{font-size:15px}
   .premium-sprite{width:calc(84px * var(--sprite-ratio,1))!important;height:84px!important}
-  .list-row{min-height:71px;grid-template-columns:42px 59px minmax(0,1fr) auto auto 23px;padding:6px 9px}
-  .purchase-check{width:39px;height:39px}
-  .list-icon{width:58px;height:56px}
-  .premium-sprite.is-compact{width:calc(54px * var(--sprite-ratio,1))!important;height:54px!important}
-  .list-name{font-size:16px}
-  .list-copy small{font-size:12px}
   .settings-row{min-height:74px;grid-template-columns:47px minmax(0,1fr) 22px;padding:9px 12px}
   .settings-icon{width:44px;height:44px}
   .security-shell{gap:15px}
@@ -1928,7 +1921,7 @@ body:has(#securityOverlay.is-visible){
   .security-benefits{bottom:max(22px,calc(env(safe-area-inset-bottom) + 13px))!important}
 }
 
-/* ===== UI v48 — proportions de la liste alignées sur la référence ===== */
+/* ===== UI v110 — proportions finales de Ma liste sur mobile ===== */
 @media(max-width:520px){
   .app{
     padding-left:6px!important;
@@ -1936,23 +1929,15 @@ body:has(#securityOverlay.is-visible){
     grid-template-rows:minmax(0,1fr) 114px!important;
   }
   .list-view{
-    grid-template-rows:60px 42px minmax(0,1fr)!important;
     gap:8px!important;
   }
   .list-view .page-header{
-    min-height:60px!important;
     padding:0 8px 5px!important;
     gap:10px!important;
-  }
-  .list-view .page-header h1{
-    font-size:32px!important;
-    line-height:.96!important;
-    letter-spacing:-1.15px!important;
   }
   .list-view .page-header p{
     margin-top:6px!important;
     font-size:14px!important;
-    line-height:1.1!important;
   }
   .list-view .icon-btn{
     width:45px!important;
@@ -2058,9 +2043,6 @@ body:has(#securityOverlay.is-visible){
 
 /* v49 — alignement bord à bord mesuré sur viewport iPhone. */
 @media(max-width:520px){
-  .list-view{
-    width:calc(100% - 12px)!important;
-  }
   .app>.tabs{
     left:auto!important;
     margin-left:-6px!important;
