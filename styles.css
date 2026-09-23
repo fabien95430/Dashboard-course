@@ -743,6 +743,8 @@ svg{display:block}
 .icon-btn:active{transform:scale(.96)}
 .icon-btn:disabled{cursor:default}
 .icon-btn svg{width:29px;height:29px}
+.icon-btn #i-refresh{}
+.icon-btn svg:has(use[href="#i-refresh"]){stroke-width:1.7}
 .icon-btn.is-refreshing svg{animation:header-refresh-spin .3s linear infinite}
 @keyframes header-refresh-spin{to{transform:rotate(360deg)}}
 
