@@ -1208,15 +1208,9 @@ svg{display:block}
   .page-header p{font-size:15px}
   .icon-btn{width:50px;height:50px}
   .list-view{grid-template-rows:104px 54px minmax(0,1fr)}
-  .catalog-view{grid-template-rows:104px 54px 50px minmax(0,1fr)}
   .searchbox{height:54px;padding:0 16px}
   .searchbox input{font-size:15px}
-  .products{grid-auto-rows:151px;gap:7px}
-  .product{grid-template-rows:94px minmax(0,1fr);border-radius:19px}
-  .media{height:92px}
   .premium-sprite{width:calc(84px * var(--sprite-ratio,1))!important;height:84px!important}
-  .pname{font-size:12px}
-  .pcat{font-size:9.5px}
   .list-row{min-height:71px;grid-template-columns:42px 59px minmax(0,1fr) auto auto 23px;padding:6px 9px}
   .purchase-check{width:39px;height:39px}
   .list-icon{width:58px;height:56px}
@@ -2098,16 +2092,11 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
 
 /* ===== UI v56 — même échelle mobile sur Catalogue et Réglages ===== */
 @media(max-width:520px){
-  .catalog-view,
-  .settings-view{
-    width:calc(100% - 12px)!important;
-  }
-
   .catalog-view{
-    grid-template-rows:60px 42px 42px minmax(0,1fr)!important;
     gap:8px!important;
   }
   .settings-view{
+    width:calc(100% - 12px)!important;
     grid-template-rows:60px minmax(0,1fr)!important;
   }
 
@@ -2160,7 +2149,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
 
   .categories{
     gap:7px!important;
-    padding:0 1px 3px!important;
   }
   .cat{
     height:38px!important;
@@ -2174,7 +2162,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   .products{
     grid-auto-rows:132px!important;
     gap:7px!important;
-    padding:1px 1px 8px!important;
   }
   .product{
     grid-template-rows:82px minmax(0,1fr)!important;
@@ -2497,22 +2484,6 @@ body{
   }
 }
 
-/* ===== UI v72 — prolonge le fond entre les tuiles jusqu'aux bords ===== */
-@media(max-width:520px){
-  .catalog-view .products{
-    padding:1px 7px 8px!important;
-  }
-}
-
-/* ===== UI v73 — étend la grille produit jusqu'aux bords sans déplacer les cartes ===== */
-@media(max-width:520px){
-  .catalog-view .products{
-    margin-left:-12px!important;
-    margin-right:-12px!important;
-    padding:1px 19px 8px!important;
-  }
-}
-
 /* ===== UI v74 — connexion Home Assistant dédiée ===== */
 .settings-row-end{
   display:flex;
@@ -2567,23 +2538,7 @@ body{
   backdrop-filter:blur(8px);
 }
 
-/* ===== UI v76 — prolonge visuellement les interstices sur les bords ===== */
-@media(max-width:520px){
-  .catalog-view .products{
-    background:
-      linear-gradient(
-        90deg,
-        #f1f2ed 0,
-        #f1f2ed 19px,
-        transparent 19px,
-        transparent calc(100% - 19px),
-        #f1f2ed calc(100% - 19px),
-        #f1f2ed 100%
-      )!important;
-  }
-}
-
-/* ===== UI v77 — catalogue réellement bord à bord, contenu aligné ===== */
+/* ===== UI v109 — géométrie finale du catalogue mobile ===== */
 @media(max-width:520px){
   .app>.catalog-view{
     margin-left:0!important;
