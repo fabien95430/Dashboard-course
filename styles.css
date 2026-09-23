@@ -928,11 +928,18 @@ svg{display:block}
 }
 .row-grip:active,.row-grip.is-active{color:#6f7880;cursor:grabbing}
 .row-grip:focus-visible{outline:2px solid rgba(17,104,58,.35);outline-offset:2px;border-radius:8px}
+.list-items.is-reordering,
+.list-items.is-reordering *{
+  user-select:none;
+  -webkit-user-select:none;
+}
 .list-row.is-dragging{
   z-index:3;
-  border-color:rgba(17,104,58,.14);
-  box-shadow:0 12px 28px rgba(57,75,62,.14);
-  transform:scale(.992);
+  opacity:.74;
+  border-color:rgba(17,104,58,.12);
+  box-shadow:0 16px 34px rgba(57,75,62,.18);
+  transform:scale(.985);
+  transition:opacity .14s ease,transform .14s ease,box-shadow .14s ease,border-color .14s ease;
 }
 .list-row.is-purchased{
   background:linear-gradient(90deg,#edf8ec 0%,#f7fbf6 100%);

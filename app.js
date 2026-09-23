@@ -710,6 +710,8 @@ function bindListReorder(root){
       const originalOrder=visibleListOrder(root).join('\u0000');
       row.classList.add('is-dragging');
       handle.classList.add('is-active');
+      root.classList.add('is-reordering');
+      navigator.vibrate?.(5);
       try{handle.setPointerCapture(pointerId)}catch(_){}
       const move=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
@@ -730,9 +732,10 @@ function bindListReorder(root){
       const cleanup=()=>{
         row.classList.remove('is-dragging');
         handle.classList.remove('is-active');
-        handle.removeEventListener('pointermove',move);
-        handle.removeEventListener('pointerup',finish);
-        handle.removeEventListener('pointercancel',cancel);
+        root.classList.remove('is-reordering');
+        document.removeEventListener('pointermove',move,true);
+        document.removeEventListener('pointerup',finish,true);
+        document.removeEventListener('pointercancel',cancel,true);
         try{handle.releasePointerCapture(pointerId)}catch(_){}
       };
       const finish=upEvent=>{
@@ -746,9 +749,9 @@ function bindListReorder(root){
         cleanup();
         if(visibleListOrder(root).join('\u0000')!==originalOrder)renderList();
       };
-      handle.addEventListener('pointermove',move,{passive:false});
-      handle.addEventListener('pointerup',finish);
-      handle.addEventListener('pointercancel',cancel);
+      document.addEventListener('pointermove',move,{passive:false,capture:true});
+      document.addEventListener('pointerup',finish,{capture:true});
+      document.addEventListener('pointercancel',cancel,{capture:true});
     });
   });
 }
