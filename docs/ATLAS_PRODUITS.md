@@ -70,6 +70,20 @@ La reconstruction validée d'Épicerie conserve :
 - produits qui dépassaient les anciennes limites de cellule isolés par leur contour alpha ;
 - recadrage Épicerie supprimé côté application.
 
+## Référence Fruits & Légumes v5
+
+La reconstruction validée de Fruits & Légumes conserve :
+
+- grille : **12 colonnes × 6 lignes** ;
+- ratio de cellule : **1** ;
+- cellule : **160 × 160 px** ;
+- atlas final : **1920 × 960 px** ;
+- 72 produits conservés dans le même ordre ;
+- pixels produits copiés à leur taille source, sans upscale ;
+- fond transparent et gouttières régulières ;
+- contours isolés avec le même seuil alpha de référence (\`alpha <= 8\`) ;
+- recadrage Fruits & Légumes supprimé côté application.
+
 ## Garde-fous
 
 - `catalog.js` reste la source du catalogue : ne pas changer les noms ou l'ordre uniquement pour faciliter l'atlas.
