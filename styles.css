@@ -3179,3 +3179,26 @@ body{
   .security-action-row{min-height:62px;padding:9px 10px}
   .security-setting-copy strong{font-size:13px}
 }
+
+
+/* ===== UI v88 — bandeau bas réduit de 10 px, boutons recentrés sans descendre ===== */
+@media(max-width:520px){
+  .app{
+    grid-template-rows:minmax(0,1fr) 94px!important;
+  }
+  .app>.tabs{
+    height:94px!important;
+  }
+  .app>.tabs .tab{
+    height:90px!important;
+    align-self:center!important;
+    margin-top:0!important;
+  }
+  .app>.tabs .tab>svg,
+  .app>.tabs .tab>span{
+    transform:translateY(-12px)!important;
+  }
+  .app>.tabs .tab::after{
+    bottom:23px!important;
+  }
+}
