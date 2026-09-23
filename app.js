@@ -146,6 +146,20 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
 const productDisplayName=name=>CATALOG_DISPLAY_NAMES[name]||name;
 const PURCHASE_HOLD_MS=1100;
 const PURCHASE_EXIT_MS=240;
+const HA_TIMING=Object.freeze({
+  requestTimeoutMs:12000,
+  reconnectDelayMs:2500,
+  eventRefreshDelayMs:120
+});
+const STATUS_TEXT=Object.freeze({
+  demoTitle:'Mode test',
+  demoDetail:'Stockage local sur ce téléphone',
+  lockedTitle:'Verrouillé',
+  passwordRequired:'Mot de passe local requis',
+  unlockRequired:'Déverrouillage requis',
+  manualLockReason:'Verrouillage manuel.',
+  demoConnectHint:'Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.'
+});
 
 const STORAGE = {
   // Legacy keys are kept only for one-time migration from the previous version.
@@ -634,6 +648,10 @@ function syncProductSelection(){
     setProductQuantity(card.dataset.name||'',quantities.get(norm(card.dataset.name))||0);
   });
 }
+function renderSelectionAndList(){
+  syncProductSelection();
+  renderList();
+}
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery);
   const rows=sortedGroups(groups.filter(group=>!needle||norm(group.summary).includes(needle)));
@@ -1031,7 +1049,7 @@ function lockApp(message='Application verrouillée.'){
   state.locked=true;
   state.items=[];
   renderProducts();renderList();
-  status('is-waiting','Verrouillé','Mot de passe local requis');
+  status('is-waiting',STATUS_TEXT.lockedTitle,STATUS_TEXT.passwordRequired);
   showSecurity('unlock',message);
 }
 function clearLocalConnectionData(){
@@ -1189,7 +1207,7 @@ function websocketUrl(){const u=new URL(state.haUrl);u.protocol=u.protocol==='ht
 function request(payload){
   return new Promise((resolve,reject)=>{
     if(!state.ws||state.ws.readyState!==WebSocket.OPEN){reject(new Error('Connexion interrompue'));return}
-    const id=state.seq++,timer=setTimeout(()=>{state.pending.delete(id);reject(new Error('Home Assistant ne répond pas'))},12000);
+    const id=state.seq++,timer=setTimeout(()=>{state.pending.delete(id);reject(new Error('Home Assistant ne répond pas'))},HA_TIMING.requestTimeoutMs);
     state.pending.set(id,{resolve,reject,timer});
     state.ws.send(JSON.stringify({id,...payload}));
   });
@@ -1216,19 +1234,19 @@ function connectWs(token){
     state.intentionalClose=false;
     const ws=new WebSocket(websocketUrl());state.ws=ws;
     let authed=false;
-    const timeout=setTimeout(()=>{try{ws.close()}catch(_){}reject(new Error('Connexion distante impossible'))},12000);
+    const timeout=setTimeout(()=>{try{ws.close()}catch(_){}reject(new Error('Connexion distante impossible'))},HA_TIMING.requestTimeoutMs);
     ws.onmessage=event=>{
       let msg;try{msg=JSON.parse(event.data)}catch(_){return}
       if(msg.type==='auth_required'){ws.send(JSON.stringify({type:'auth',access_token:token}));return}
       if(msg.type==='auth_invalid'){clearTimeout(timeout);reject(new Error('Autorisation Home Assistant invalide'));return}
       if(msg.type==='auth_ok'){authed=true;clearTimeout(timeout);resolve();return}
       if(msg.type==='result'&&state.pending.has(msg.id)){const p=state.pending.get(msg.id);state.pending.delete(msg.id);clearTimeout(p.timer);msg.success?p.resolve(msg.result):p.reject(new Error(msg.error?.message||'Erreur Home Assistant'));return}
-      if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id===state.entity)setTimeout(refreshItems,120);
+      if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id===state.entity)setTimeout(refreshItems,HA_TIMING.eventRefreshDelayMs);
     };
     ws.onerror=()=>{if(!authed){clearTimeout(timeout);reject(new Error('WebSocket Home Assistant indisponible'))}};
     ws.onclose=()=>{
       state.pending.forEach(p=>{clearTimeout(p.timer);p.reject(new Error('Connexion interrompue'))});state.pending.clear();
-      if(authed&&!state.intentionalClose&&!state.locked&&state.refreshToken){status('is-waiting','Reconnexion…','Home Assistant');clearTimeout(state.reconnectTimer);state.reconnectTimer=setTimeout(connectFromRefresh,2500)}
+      if(authed&&!state.intentionalClose&&!state.locked&&state.refreshToken){status('is-waiting','Reconnexion…','Home Assistant');clearTimeout(state.reconnectTimer);state.reconnectTimer=setTimeout(connectFromRefresh,HA_TIMING.reconnectDelayMs)}
     };
   });
 }
@@ -1254,8 +1272,8 @@ async function refreshItems(){
   if(state.demo){
     state.items=loadJson(DEMO_KEY,[])||[];
     state.loading=false;state.error='';
-    syncProductSelection();renderList();
-    status('', 'Mode test', 'Stockage local sur ce téléphone');
+    renderSelectionAndList();
+    status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);
     return;
   }
   if(!state.entity)return;
@@ -1285,7 +1303,7 @@ async function incrementProduct(name){
     await addItem(item);
   }finally{
     state.productBusy.delete(key);
-    syncProductSelection();renderList();
+    renderSelectionAndList();
   }
 }
 async function decrementProduct(name){
@@ -1301,7 +1319,7 @@ async function decrementProduct(name){
     await removeOneItem(item,group);
   }finally{
     state.productBusy.delete(key);
-    syncProductSelection();renderList();
+    renderSelectionAndList();
   }
 }
 
@@ -1312,7 +1330,7 @@ async function addItem(name){
     const items=loadJson(DEMO_KEY,[])||[];
     items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
     saveJson(DEMO_KEY,items);state.items=items;recordUsage(item);
-    navigator.vibrate?.(10);toast(item+' ajouté');syncProductSelection();renderList();return;
+    navigator.vibrate?.(10);toast(item+' ajouté');renderSelectionAndList();return;
   }
   if(!state.entity)return;
   try{
@@ -1347,7 +1365,7 @@ async function removeOneItem(name,groupHint=null){
       state.items=items;
       navigator.vibrate?.(8);
       toast(item+' -1');
-      syncProductSelection();renderList();
+      renderSelectionAndList();
       return;
     }
 
@@ -1391,7 +1409,7 @@ async function removeGroup(name,row=null){
   state.pendingRemoval.add(key);
   const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
   state.items=state.items.filter(keepOtherItems);
-  syncProductSelection();renderList();
+  renderSelectionAndList();
 
   try{
     if(state.demo){
@@ -1414,7 +1432,7 @@ async function removeGroup(name,row=null){
     state.pendingRemoval.delete(key);
     state.productBusy.delete(key);
     if(!state.demo)await refreshItems();
-    else {syncProductSelection();renderList()}
+    else {renderSelectionAndList()}
   }
 }
 function showNeutralDialog(dialog){
@@ -1434,7 +1452,7 @@ function clearPasswordChangeForm(){
   UI.changePasswordPanel.hidden=true;
 }
 function openConnectionSettings(){
-  if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
+  if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
   const urlInput=UI.connectionHaUrl;
   if(urlInput)urlInput.value=state.haUrl||'';
   const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
@@ -1499,7 +1517,7 @@ function savePreferencesSettings(){
 }
 
 function openSettings(){
-  if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
+  if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
   clearPasswordChangeForm();
   showNeutralDialog(UI.settingsDialog);
 }
@@ -1566,24 +1584,13 @@ async function init(){
   if(vaultRecord()){
     state.loading=false;renderList();
     showSecurity('unlock');
-    status('is-waiting','Verrouillé','Mot de passe local requis');
+    status('is-waiting',STATUS_TEXT.lockedTitle,STATUS_TEXT.passwordRequired);
     return;
   }
   state.haUrl=normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
   state.loading=false;renderView();showSetup();status('is-waiting','Configuration requise','Première connexion');
 }
 
-$('#connectBtn').onclick=beginOAuth;
-UI.securitySubmit.onclick=completeSecurityAction;
-UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
-UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
-UI.resetSecurityBtn.onclick=resetLocalConnection;
-$('#demoBtn').onclick=()=>{
-  state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
-  state.loading=false;state.error='';
-  state.items=loadJson(DEMO_KEY,[])||[];
-  hideSetup();hideSecurity();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
-};
 async function refreshFromHeader(button){
   if(button?.classList.contains('is-refreshing'))return;
   button?.classList.add('is-refreshing');
@@ -1595,32 +1602,46 @@ async function refreshFromHeader(button){
     if(button)button.disabled=false;
   }
 }
-UI.refreshBtn.onclick=()=>refreshFromHeader(UI.refreshBtn);
-$('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
-UI.catalogRefreshBtn.onclick=()=>refreshFromHeader(UI.catalogRefreshBtn);
-$('#settingsConnectionBtn').onclick=openConnectionSettings;
-$('#settingsSecurityBtn').onclick=openSettings;
-$('#settingsListBtn').onclick=openPreferences;
-$('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
-$('#settingsLogoutBtn').onclick=revoke;
-$('#cancelConnectionSettings').onclick=()=>UI.connectionDialog.close();
-$('#saveConnectionSettings').onclick=saveConnectionSettings;
-$('#cancelPreferences').onclick=()=>UI.preferencesDialog.close();
-$('#savePreferences').onclick=savePreferencesSettings;
-$('#changePasswordBtn').onclick=()=>{
-  const panel=UI.changePasswordPanel;
-  const opening=panel.hidden;
-  if(!opening){clearPasswordChangeForm();return}
-  panel.hidden=false;
-  UI.changePasswordError.textContent='';
-};
-UI.savePasswordChange.onclick=changeLocalPassword;
-UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
-$('#cancelSettings').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close()};
-$('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp('Verrouillage manuel.')};
-UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
-$('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
-document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
+
+function bindUiEvents(){
+  $('#connectBtn').onclick=beginOAuth;
+  UI.securitySubmit.onclick=completeSecurityAction;
+  UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+  UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+  UI.resetSecurityBtn.onclick=resetLocalConnection;
+  $('#demoBtn').onclick=()=>{
+    state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
+    state.loading=false;state.error='';
+    state.items=loadJson(DEMO_KEY,[])||[];
+    hideSetup();hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
+  };
+  UI.refreshBtn.onclick=()=>refreshFromHeader(UI.refreshBtn);
+  $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
+  UI.catalogRefreshBtn.onclick=()=>refreshFromHeader(UI.catalogRefreshBtn);
+  $('#settingsConnectionBtn').onclick=openConnectionSettings;
+  $('#settingsSecurityBtn').onclick=openSettings;
+  $('#settingsListBtn').onclick=openPreferences;
+  $('#settingsLockBtn').onclick=()=>lockApp(STATUS_TEXT.manualLockReason);
+  $('#settingsLogoutBtn').onclick=revoke;
+  $('#cancelConnectionSettings').onclick=()=>UI.connectionDialog.close();
+  $('#saveConnectionSettings').onclick=saveConnectionSettings;
+  $('#cancelPreferences').onclick=()=>UI.preferencesDialog.close();
+  $('#savePreferences').onclick=savePreferencesSettings;
+  $('#changePasswordBtn').onclick=()=>{
+    const panel=UI.changePasswordPanel;
+    const opening=panel.hidden;
+    if(!opening){clearPasswordChangeForm();return}
+    panel.hidden=false;
+    UI.changePasswordError.textContent='';
+  };
+  UI.savePasswordChange.onclick=changeLocalPassword;
+  UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
+  $('#cancelSettings').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close()};
+  $('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp(STATUS_TEXT.manualLockReason)};
+  UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
+  $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
+  document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
+}
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
 function resumeForegroundSession(){
   clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
@@ -1635,7 +1656,7 @@ function resumeForegroundSession(){
   }
   if(!vaultRecord())return;
   if(state.locked){
-    status('is-waiting','Verrouillé','Déverrouillage requis');
+    status('is-waiting',STATUS_TEXT.lockedTitle,STATUS_TEXT.unlockRequired);
     showSecurity('unlock');
     return;
   }
@@ -1653,7 +1674,7 @@ function resumeForegroundSession(){
     return;
   }
   state.locked=true;
-  status('is-waiting','Verrouillé','Déverrouillage requis');
+  status('is-waiting',STATUS_TEXT.lockedTitle,STATUS_TEXT.unlockRequired);
   showSecurity('unlock');
 }
 document.addEventListener('visibilitychange',()=>{
@@ -1679,5 +1700,6 @@ window.addEventListener('pageshow',()=>{
 
 ['gesturestart','gesturechange','gestureend'].forEach(name=>document.addEventListener(name,event=>event.preventDefault(),{passive:false}));
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+bindUiEvents();
 renderView();init();
 })();
