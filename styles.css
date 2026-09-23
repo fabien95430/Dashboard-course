@@ -741,7 +741,10 @@ svg{display:block}
   box-shadow:0 10px 26px rgba(43,61,50,.10),inset 0 1px 0 rgba(255,255,255,.94);
 }
 .icon-btn:active{transform:scale(.96)}
+.icon-btn:disabled{cursor:default}
 .icon-btn svg{width:29px;height:29px}
+.icon-btn.is-refreshing svg{animation:header-refresh-spin .7s linear infinite}
+@keyframes header-refresh-spin{to{transform:rotate(360deg)}}
 
 /* Recherche */
 .searchbox{

@@ -1649,9 +1649,20 @@ $('#demoBtn').onclick=()=>{
   state.items=loadJson(DEMO_KEY,[])||[];
   hideSetup();hideSecurity();status('', 'Mode test', 'Stockage local sur ce téléphone');renderView();
 };
-$('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
+$('#refreshBtn').onclick=async()=>{
+  const button=$('#refreshBtn');
+  if(button?.classList.contains('is-refreshing'))return;
+  button?.classList.add('is-refreshing');
+  if(button)button.disabled=true;
+  try{
+    await Promise.all([refreshItems(),new Promise(resolve=>setTimeout(resolve,550))]);
+  }finally{
+    button?.classList.remove('is-refreshing');
+    if(button)button.disabled=false;
+  }
+};
 $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
-$('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
+$('#catalogSettingsBtn').onclick=()=>{state.view='settings';renderView()};
 $('#settingsConnectionBtn').onclick=openConnectionSettings;
 $('#settingsSecurityBtn').onclick=openSettings;
 $('#settingsListBtn').onclick=openPreferences;
