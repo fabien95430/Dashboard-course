@@ -299,17 +299,16 @@ function premiumProductVisual(product, compact = false) {
     return `<svg class="product-svg ${compact ? 'is-compact' : ''}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">${defs}${body}</svg>`;
   }
 
-const SPRITE_SAFE_INSET=.08;
-
 function sprite(product,compact=false){
   const position=POSITIONS.get(norm(product?.name));
   const sheet=position&&PRODUCT_SHEETS[position.category];
   if(!position||!sheet)return premiumProductVisual(product,compact);
   const fallback=premiumProductVisual(product,compact);
-  const inset=SPRITE_SAFE_INSET,scale=1-(inset*2);
-  const left=-((position.col+inset)*100/scale),top=-((position.row+inset)*100/scale);
-  const width=(sheet.cols*100)/scale,height=(sheet.rows*100)/scale;
-  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+'" aria-hidden="true">'+
+  const left=-(position.col*100),top=-(position.row*100);
+  const width=sheet.cols*100,height=sheet.rows*100;
+  const safeX=position.category==='Maison'?11:7;
+  const safeY=7;
+  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+';--sprite-safe-x:'+safeX+'%;--sprite-safe-y:'+safeY+'%" aria-hidden="true">'+
     '<img src="'+sheet.src+'" alt="" loading="eager" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
   '</span>';

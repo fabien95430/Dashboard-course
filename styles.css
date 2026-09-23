@@ -344,6 +344,10 @@ body{
   user-select:none;
   -webkit-user-drag:none;
 }
+.premium-sprite:not(.is-fallback){
+  -webkit-clip-path:inset(var(--sprite-safe-y,7%) var(--sprite-safe-x,7%));
+  clip-path:inset(var(--sprite-safe-y,7%) var(--sprite-safe-x,7%));
+}
 .premium-sprite.is-compact{
   width:calc(46px * var(--sprite-ratio,1));
   height:46px;
