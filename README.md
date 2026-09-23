@@ -15,6 +15,7 @@ La WebSocket est ouverte uniquement pendant l'utilisation de l'application. Elle
 La connexion Home Assistant enregistrée sur un appareil est protégée par un mot de passe local :
 
 - le mot de passe local n'est jamais enregistré ;
+- après plusieurs erreurs de déverrouillage, les nouvelles tentatives sont temporairement ralenties avec un délai progressif dans la session ;
 - le `refresh_token` OAuth est chiffré avec AES-GCM 256 bits ;
 - la clé AES est dérivée du mot de passe par PBKDF2-HMAC-SHA-256 avec sel aléatoire et 600 000 itérations ;
 - le `refresh_token` n'existe en clair qu'en mémoire après déverrouillage ;
@@ -76,8 +77,8 @@ URL : `https://fabien95430.github.io/Dashboard-course/`
 
 - aucun long-lived access token dans Git ;
 - aucun secret dans le dépôt public ;
-- OAuth Home Assistant ;
-- coffre local AES-GCM ;
+- OAuth Home Assistant avec nonce cryptographiquement aléatoire et suppression immédiate du code d’autorisation de l’URL après validation ;
+- coffre local AES-GCM avec validation stricte de ses paramètres avant déchiffrement ;
 - access token uniquement en RAM ;
 - WebSocket sécurisée `wss://` ;
 - Content Security Policy et politique de referrer `no-referrer` ;

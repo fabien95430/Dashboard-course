@@ -36,6 +36,7 @@ const DEMO_KEY = 'courses-external-demo-items-v2';
 const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
 const OAUTH_TEMP_KEY = 'courses-oauth-temp-v2';
 const LEGACY_OAUTH_STATE_KEY = 'courses-external-oauth-state';
+const UNLOCK_GUARD_KEY = 'courses-unlock-guard-v1';
 const LEGACY_UNLOCK_KEY = 'courses-faceid-v1';
 const SECURITY = Object.freeze({
   version:1,
@@ -43,7 +44,9 @@ const SECURITY = Object.freeze({
   iterations:600000,
   minPasswordLength:10,
   idleLockMs:5*60*1000,
-  backgroundLockMs:30*1000
+  backgroundLockMs:30*1000,
+  unlockDelayBaseMs:2000,
+  unlockDelayMaxMs:30000
 });
 const UTF8 = new TextEncoder();
 const UTF8_DECODER = new TextDecoder();
@@ -65,6 +68,30 @@ function normalizeHaUrl(value) {
 function loadJson(key, fallback=null){try{return JSON.parse(localStorage.getItem(key)||'null') ?? fallback}catch(_){return fallback}}
 function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function deleteKey(key){localStorage.removeItem(key)}
+function secureRandomToken(length=32){
+  const bytes=crypto.getRandomValues(new Uint8Array(length));
+  return Array.from(bytes,byte=>byte.toString(16).padStart(2,'0')).join('');
+}
+function loadUnlockGuard(){
+  try{return JSON.parse(sessionStorage.getItem(UNLOCK_GUARD_KEY)||'null')||{failures:0,blockedUntil:0}}catch(_){return {failures:0,blockedUntil:0}}
+}
+function saveUnlockGuard(value){
+  try{sessionStorage.setItem(UNLOCK_GUARD_KEY,JSON.stringify(value))}catch(_){}
+}
+function unlockRetryMs(){
+  const guard=loadUnlockGuard();
+  return Math.max(0,Number(guard.blockedUntil||0)-Date.now());
+}
+function registerUnlockFailure(){
+  const guard=loadUnlockGuard();
+  const failures=Math.max(0,Number(guard.failures||0))+1;
+  const delay=failures<3?0:Math.min(SECURITY.unlockDelayMaxMs,SECURITY.unlockDelayBaseMs*(2**(failures-3)));
+  saveUnlockGuard({failures,blockedUntil:delay?Date.now()+delay:0});
+  return delay;
+}
+function clearUnlockGuard(){
+  try{sessionStorage.removeItem(UNLOCK_GUARD_KEY)}catch(_){}
+}
 
 const DEFAULT_PREFERENCES=Object.freeze({
   listSort:'added',
@@ -122,6 +149,7 @@ let state={
   locked:true,
   securityMode:'',
   pendingOAuthCode:'',
+  pendingOAuthState:'',
   ws:null,
   seq:1,
   pending:new Map(),
@@ -650,9 +678,12 @@ async function encryptVault(payload,password){
   };
 }
 async function decryptVault(record,password){
-  if(!record||Number(record.version)!==SECURITY.version)throw new Error('Coffre de sécurité incompatible');
+  if(!record||Number(record.version)!==SECURITY.version||record.kdf!==SECURITY.kdf)throw new Error('Coffre de sécurité incompatible');
+  const iterations=Number(record.iterations);
+  if(!Number.isInteger(iterations)||iterations<SECURITY.iterations||iterations>2000000)throw new Error('Paramètres du coffre invalides');
   const salt=base64ToBytes(record.salt),iv=base64ToBytes(record.iv),cipher=base64ToBytes(record.ciphertext);
-  const key=await deriveVaultKey(password,salt,Number(record.iterations)||SECURITY.iterations);
+  if(salt.length<16||iv.length!==12||cipher.length<16)throw new Error('Coffre de sécurité invalide');
+  const key=await deriveVaultKey(password,salt,iterations);
   const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:vaultAad()},key,cipher);
   const payload=JSON.parse(UTF8_DECODER.decode(plain));
   if(!payload?.refresh_token||!normalizeHaUrl(payload?.ha_url))throw new Error('Coffre invalide');
@@ -756,14 +787,13 @@ function lockApp(message='Application verrouillée.'){
 async function resetLocalConnection(){
   clearLockTimers();closeSocket();wipeMemoryCredentials();
   deleteKey(STORAGE.vault);deleteKey(LEGACY_UNLOCK_KEY);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
-  clearOAuthState();
+  clearOAuthState();clearUnlockGuard();
   state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;state.demo=false;
   hideSecurity();showSetup('Connexion locale supprimée. Tu peux reconnecter Home Assistant.');
 }
-async function exchangeCodeRaw(code){
+async function exchangeCodeRaw(code,returnedState){
   const authState=loadOAuthState();
-  const returnedState=new URLSearchParams(location.search).get('state')||'';
-  if(!authState||authState.nonce!==returnedState)throw new Error('Validation OAuth impossible');
+  if(!authState||authState.nonce!==String(returnedState||''))throw new Error('Validation OAuth impossible');
   const haUrl=normalizeHaUrl(authState.haUrl);
   if(!haUrl)throw new Error('Adresse Home Assistant manquante');
   state.haUrl=haUrl;
@@ -812,6 +842,13 @@ async function completeSecurityAction(){
   const confirm=$('#securityConfirm').value;
   const error=$('#securityError'),button=$('#securitySubmit');
   error.textContent='';
+  if(state.securityMode==='unlock'){
+    const retryMs=unlockRetryMs();
+    if(retryMs>0){
+      error.textContent='Trop de tentatives. Réessaie dans '+Math.ceil(retryMs/1000)+' s.';
+      return;
+    }
+  }
   if(!password){error.textContent='Entre le mot de passe local.';return}
   if(state.securityMode==='oauth'||state.securityMode==='migrate'){
     if(password.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
@@ -821,6 +858,7 @@ async function completeSecurityAction(){
   try{
     if(state.securityMode==='unlock'){
       const payload=await decryptVault(vaultRecord(),password);
+      clearUnlockGuard();
       state.haUrl=normalizeHaUrl(payload.ha_url);
       state.refreshToken=String(payload.refresh_token||'');
       state.locked=false;
@@ -839,25 +877,29 @@ async function completeSecurityAction(){
       return;
     }
     if(state.securityMode==='oauth'){
-      const code=state.pendingOAuthCode||new URLSearchParams(location.search).get('code')||'';
+      const code=state.pendingOAuthCode;
       if(!code)throw new Error('Code OAuth manquant');
-      const data=await exchangeCodeRaw(code);
+      const data=await exchangeCodeRaw(code,state.pendingOAuthState);
       if(!data?.refresh_token||!data?.access_token)throw new Error('Réponse OAuth incomplète');
       await storeSecureVault(data.refresh_token,state.haUrl,password);
       state.refreshToken=String(data.refresh_token);
       state.accessToken=String(data.access_token);
       state.accessTokenExpiresAt=Date.now()+Number(data.expires_in||1800)*1000;
       state.locked=false;
-      clearOAuthState();state.pendingOAuthCode='';
-      history.replaceState({},'',REDIRECT_URI);
+      clearOAuthState();state.pendingOAuthCode='';state.pendingOAuthState='';
       hideSecurity();
       await connectAuthorized(state.accessToken);
       return;
     }
   }catch(err){
-    error.textContent=state.securityMode==='unlock'
-      ?'Mot de passe incorrect ou coffre illisible.'
-      :(err.message||'Sécurisation impossible');
+    if(state.securityMode==='unlock'){
+      const delay=registerUnlockFailure();
+      error.textContent=delay
+        ?'Mot de passe incorrect. Réessaie dans '+Math.ceil(delay/1000)+' s.'
+        :'Mot de passe incorrect ou coffre illisible.';
+    }else{
+      error.textContent=err.message||'Sécurisation impossible';
+    }
   }finally{button.disabled=false}
 }
 function beginOAuth(){
@@ -867,7 +909,7 @@ function beginOAuth(){
   state.haUrl=value;
   // Do not persist the HA URL in plaintext. It survives the OAuth round-trip only in this tab.
   deleteKey(STORAGE.haUrl);
-  const nonce=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));
+  const nonce=crypto.randomUUID?crypto.randomUUID():secureRandomToken();
   const oauthState={nonce,haUrl:value,createdAt:Date.now()};
   try{
     sessionStorage.setItem(OAUTH_STATE_KEY,JSON.stringify(oauthState));
@@ -886,7 +928,7 @@ async function revoke(){
   }
   clearLockTimers();closeSocket();wipeMemoryCredentials();
   deleteKey(STORAGE.vault);deleteKey(LEGACY_UNLOCK_KEY);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
-  clearOAuthState();
+  clearOAuthState();clearUnlockGuard();
   state.entity='';state.entities=[];state.items=[];state.haUrl='';state.locked=true;
   $('#settingsDialog').close();
   showSetup('Autorisation locale supprimée et session Home Assistant révoquée.');
@@ -1269,6 +1311,8 @@ async function init(){
     }
     state.haUrl=normalizeHaUrl(oauth.haUrl);
     state.pendingOAuthCode=code;
+    state.pendingOAuthState=returnedState;
+    history.replaceState({},'',REDIRECT_URI);
     state.loading=false;renderList();
     showSecurity('oauth','Crée maintenant le mot de passe local qui protégera l’autorisation Home Assistant sur cet appareil.');
     status('is-waiting','Sécurisation requise','Créer le mot de passe local');
