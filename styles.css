@@ -1210,11 +1210,8 @@ svg{display:block}
   .searchbox{height:54px;padding:0 16px}
   .searchbox input{font-size:15px}
   .premium-sprite{width:calc(84px * var(--sprite-ratio,1))!important;height:84px!important}
-  .security-shell{gap:15px}
   .welcome-logo{width:92px;height:92px}
   .welcome-logo svg{width:58px;height:58px}
-  .security-hero h2{font-size:36px}
-  .security-benefits small{font-size:10px}
 }
 
 /* ===== UI v24 — accueil fidèle à la maquette validée ===== */
@@ -1404,220 +1401,22 @@ svg{display:block}
 /* ===== UI v26 — zoom verrouillé ===== */
 html,body{touch-action:pan-x pan-y}
 
-/* ===== UI v27 — états sécurité cohérents ===== */
+/* ===== UI v27 — visibilité des éléments masqués ===== */
 [hidden]{display:none!important}
-.security-shell.is-form-mode .security-note,
-.security-shell.is-form-mode .security-benefits{
-  opacity:0!important;
-  pointer-events:none!important;
-}
-.security-shell.is-form-mode .security-modal{
-  top:35%!important;
-}
-@media(max-height:720px){
-  .security-shell.is-form-mode .security-modal{top:31%!important}
-}
 
-/* ===== UI v29 — accueil HD calé sur la référence 2 ===== */
-.security-overlay{
-  background:#f2f0ea!important;
-  background-image:none!important;
-}
-.security-overlay::before,
-.security-overlay::after,
-.security-shell::before{
-  content:"";
-  position:absolute;
-  pointer-events:none;
-  z-index:0;
-  background-repeat:no-repeat;
-}
-.security-overlay::before{
-  left:0;
-  bottom:0;
-  width:17.68%;
-  height:94.4%;
-  background-image:url("./welcome-left-v28.webp");
-  background-size:100% 100%;
-  background-position:left bottom;
-}
-.security-overlay::after{
-  right:0;
-  bottom:0;
-  width:17.82%;
-  height:68%;
-  background-image:url("./welcome-right-v28.webp");
-  background-size:100% 100%;
-  background-position:right bottom;
-}
-.security-shell::before{
-  left:50%;
-  top:59.9%;
-  width:100%;
-  aspect-ratio:832 / 350;
-  transform:translateX(-50%);
-  background-image:url("./welcome-bottom-v28.webp");
-  background-size:100% 100%;
-  background-position:center;
-}
-.security-shell.is-form-mode::before{display:none}
-.security-settings-pill{
-  top:max(8px,calc(env(safe-area-inset-top) - 16px))!important;
-  right:14px!important;
-  height:38px!important;
-}
-.security-hero{
-  top:3.6%!important;
-}
-.welcome-cart-art{
-  width:150px!important;
-  height:auto!important;
-  margin:0 auto 0!important;
-}
-.welcome-cart-art img{
-  display:block;
-  width:100%;
-  height:auto;
-  border:0;
-}
-.security-hero h2{
-  margin:0!important;
-  font-size:40px!important;
-  letter-spacing:-1.45px!important;
-}
-.security-tagline{
-  margin-top:8px!important;
-  font-size:15.5px!important;
-}
-.security-modal{
-  top:33.5%!important;
-  width:min(78%,352px)!important;
-  padding:14px 14px 13px!important;
-  border-radius:25px!important;
-}
-.security-lock-icon{
-  width:41px!important;
-  height:41px!important;
-  margin-bottom:7px!important;
-}
-.security-lock-icon svg{width:21px!important;height:21px!important}
-.security-modal h3{font-size:18.5px!important}
-.security-card-copy{
-  margin:6px auto 10px!important;
-  font-size:12px!important;
-  line-height:1.28!important;
-}
+/* ===== UI v113 — détails sécurité conservés après consolidation ===== */
 .security-modal .setup-error{min-height:0!important}
 .security-modal .setup-error:empty{display:none!important}
-.security-note{display:none!important}
-.security-benefits{
-  bottom:max(28px,calc(env(safe-area-inset-bottom) + 20px))!important;
-}
-.security-benefits i{
-  width:46px!important;
-  height:46px!important;
-}
 .security-benefits i svg{
   width:26px!important;
   height:26px!important;
 }
-.security-benefits .benefit-bolt{
-  color:#167844!important;
-}
+.security-benefits .benefit-bolt{color:#167844!important}
 .security-benefits .benefit-bolt svg{
   fill:none!important;
   stroke:currentColor!important;
   stroke-width:1.8!important;
   stroke-linejoin:round;
-}
-.security-benefits small{font-size:10px!important}
-.security-shell.is-form-mode .security-modal{top:31.5%!important}
-@media(max-height:720px){
-  .security-hero{top:2.8%!important}
-  .welcome-cart-art{width:136px!important}
-  .security-modal{top:32.8%!important}
-  .security-shell.is-form-mode .security-modal{top:29.5%!important}
-  .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 10px))!important}
-}
-
-/* ===== UI v30 — raccords fond + placement référence ===== */
-.security-overlay::before{
-  width:10.9%!important;
-  background-size:auto 100%!important;
-  background-position:left bottom!important;
-}
-.security-overlay::after{
-  width:10.3%!important;
-  background-size:auto 100%!important;
-  background-position:right bottom!important;
-}
-.security-shell::before{
-  top:68.4%!important;
-  aspect-ratio:832 / 245!important;
-  background-size:100% auto!important;
-  background-position:center bottom!important;
-  mix-blend-mode:multiply;
-}
-.security-settings-pill{
-  top:max(4px,calc(env(safe-area-inset-top) - 24px))!important;
-}
-.security-hero{
-  top:2.7%!important;
-}
-.welcome-cart-art img{
-  mix-blend-mode:multiply;
-}
-.security-modal{
-  top:30.8%!important;
-}
-.security-shell.is-password-open .security-modal{
-  top:30.8%!important;
-}
-.security-shell.is-form-mode .security-modal{
-  top:28.5%!important;
-}
-@media(max-height:720px){
-  .security-hero{top:2.1%!important}
-  .security-modal{top:29.8%!important}
-  .security-shell.is-password-open .security-modal{top:29.8%!important}
-  .security-shell.is-form-mode .security-modal{top:27.2%!important}
-  .security-shell::before{top:68.8%!important}
-}
-
-/* ===== UI v32 — suppression du bandeau central ===== */
-.security-overlay{
-  background:
-    radial-gradient(42% 58% at 7% 52%,rgba(119,142,74,.12),transparent 74%),
-    radial-gradient(40% 58% at 94% 58%,rgba(210,170,111,.11),transparent 76%),
-    linear-gradient(180deg,#f4f2ec 0%,#f1efe8 58%,#f4eee3 100%)!important;
-}
-.security-overlay::before{
-  width:23%!important;
-  height:95%!important;
-  background-size:100% 100%!important;
-  background-position:left bottom!important;
-  -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 56%,rgba(0,0,0,.78) 72%,transparent 100%);
-  mask-image:linear-gradient(90deg,#000 0%,#000 56%,rgba(0,0,0,.78) 72%,transparent 100%);
-}
-.security-overlay::after{
-  width:25%!important;
-  height:70%!important;
-  background-size:100% 100%!important;
-  background-position:right bottom!important;
-  -webkit-mask-image:linear-gradient(270deg,#000 0%,#000 58%,rgba(0,0,0,.78) 74%,transparent 100%);
-  mask-image:linear-gradient(270deg,#000 0%,#000 58%,rgba(0,0,0,.78) 74%,transparent 100%);
-}
-.security-shell::before{
-  -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
-  mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
-}
-
-/* ===== UI v33 — décor jusqu’en haut ===== */
-.security-overlay::before{
-  top:0!important;
-  bottom:0!important;
-  height:100%!important;
-  background-position:left top!important;
 }
 
 /* ===== UI v36 — référence 2 finale ===== */
@@ -1675,6 +1474,7 @@ html,body{touch-action:pan-x pan-y}
   width:100%!important;
   height:auto!important;
   display:block!important;
+  border:0;
   mix-blend-mode:multiply!important;
 }
 .security-hero h2{
