@@ -1210,8 +1210,6 @@ svg{display:block}
   .searchbox{height:54px;padding:0 16px}
   .searchbox input{font-size:15px}
   .premium-sprite{width:calc(84px * var(--sprite-ratio,1))!important;height:84px!important}
-  .settings-row{min-height:74px;grid-template-columns:47px minmax(0,1fr) 22px;padding:9px 12px}
-  .settings-icon{width:44px;height:44px}
   .security-shell{gap:15px}
   .welcome-logo{width:92px;height:92px}
   .welcome-logo svg{width:58px;height:58px}
@@ -2077,28 +2075,15 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   .catalog-view{
     gap:8px!important;
   }
-  .settings-view{
-    width:calc(100% - 12px)!important;
-    grid-template-rows:60px minmax(0,1fr)!important;
-  }
-
   .catalog-view .page-header,
   .settings-view .page-header{
-    min-height:60px!important;
     padding:0 8px 5px!important;
     gap:10px!important;
-  }
-  .catalog-view .page-header h1,
-  .settings-view .page-header h1{
-    font-size:32px!important;
-    line-height:.96!important;
-    letter-spacing:-1.15px!important;
   }
   .catalog-view .page-header p,
   .settings-view .page-header p{
     margin-top:6px!important;
     font-size:14px!important;
-    line-height:1.1!important;
   }
   .catalog-view .icon-btn{
     width:45px!important;
@@ -2170,7 +2155,7 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     padding-bottom:5px!important;
   }
   .settings-scroll{
-    padding:0 1px 8px!important;
+    padding:20px 1px 8px!important;
   }
   .settings-section{
     margin:0 0 13px!important;
@@ -2457,13 +2442,6 @@ body{
 .product .media:disabled{
   opacity:1;
   cursor:default;
-}
-
-/* ===== UI v71 — réglages simplifiés + contenu descendu de 20 px ===== */
-@media(max-width:520px){
-  .settings-scroll{
-    padding-top:20px!important;
-  }
 }
 
 /* ===== UI v74 — connexion Home Assistant dédiée ===== */
