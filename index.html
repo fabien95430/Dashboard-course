@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=79">
+  <link rel="stylesheet" href="./styles.css?v=82">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -40,7 +40,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v81</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v82</span></p>
         </div>
         <button id="settingsBtn" class="icon-btn" type="button" aria-label="Ouvrir les réglages">
           <svg><use href="#i-gear"></use></svg>
@@ -59,7 +59,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v81</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v82</span></p>
         </div>
         <button id="catalogSearchBtn" class="icon-btn" type="button" aria-label="Rechercher dans le catalogue">
           <svg><use href="#i-search"></use></svg>
@@ -79,7 +79,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v81</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v82</span></p>
         </div>
       </header>
 
@@ -222,6 +222,63 @@
     </div>
   </dialog>
 
+
+  <dialog id="preferencesDialog" class="dialog preferences-dialog" tabindex="-1">
+    <h3>Préférences</h3>
+    <p class="dialog-intro">Personnalisez l’affichage et le comportement de l’application.</p>
+
+    <label class="field">
+      <span>Liste Home Assistant</span>
+      <select id="preferencesEntitySelect"></select>
+    </label>
+
+    <label class="field">
+      <span>Tri de Ma liste</span>
+      <select id="preferencesListSort">
+        <option value="added">Ordre d’ajout</option>
+        <option value="category">Par catégorie</option>
+        <option value="alpha">A → Z</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Ouverture de l’application</span>
+      <select id="preferencesStartView">
+        <option value="list">Ma liste</option>
+        <option value="catalog">Catalogue</option>
+      </select>
+    </label>
+
+    <div class="preference-options" aria-label="Options du catalogue">
+      <label class="preference-toggle">
+        <span class="preference-toggle-copy">
+          <strong>Masquer les produits déjà ajoutés</strong>
+          <small>Allège le catalogue pendant les courses.</small>
+        </span>
+        <span class="preference-switch">
+          <input id="preferencesHideAdded" type="checkbox" aria-label="Masquer les produits déjà ajoutés">
+          <span aria-hidden="true"></span>
+        </span>
+      </label>
+
+      <label class="preference-toggle">
+        <span class="preference-toggle-copy">
+          <strong>Favoris intelligents</strong>
+          <small>Priorise les produits que vous ajoutez le plus souvent.</small>
+        </span>
+        <span class="preference-switch">
+          <input id="preferencesSmartFavorites" type="checkbox" aria-label="Favoris intelligents">
+          <span aria-hidden="true"></span>
+        </span>
+      </label>
+    </div>
+
+    <div class="dialog-actions">
+      <button id="cancelPreferences" type="button">Annuler</button>
+      <button id="savePreferences" class="primary" type="button">Enregistrer</button>
+    </div>
+  </dialog>
+
   <dialog id="settingsDialog" class="dialog">
     <h3>Connexion et sécurité</h3>
     <label class="field"><span>Liste Home Assistant</span><select id="entitySelect"></select></label>
@@ -233,6 +290,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=55"></script>
+  <script src="./app.js?v=82"></script>
 </body>
 </html>

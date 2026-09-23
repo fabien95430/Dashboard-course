@@ -29,7 +29,8 @@ const STORAGE = {
   vault:'courses-secure-vault-v1',
   entity:'courses-external-entity-v1',
   entityPreference:'courses-external-entity-preference-v1',
-  usage:'courses-external-usage-v1'
+  usage:'courses-external-usage-v1',
+  preferences:'courses-preferences-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
 const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
@@ -64,6 +65,26 @@ function normalizeHaUrl(value) {
 function loadJson(key, fallback=null){try{return JSON.parse(localStorage.getItem(key)||'null') ?? fallback}catch(_){return fallback}}
 function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function deleteKey(key){localStorage.removeItem(key)}
+
+const DEFAULT_PREFERENCES=Object.freeze({
+  listSort:'added',
+  startView:'list',
+  hideAdded:false,
+  smartFavorites:true
+});
+function readPreferences(){
+  const saved=loadJson(STORAGE.preferences,{})||{};
+  const listSort=['added','category','alpha'].includes(saved.listSort)?saved.listSort:DEFAULT_PREFERENCES.listSort;
+  const startView=['list','catalog'].includes(saved.startView)?saved.startView:DEFAULT_PREFERENCES.startView;
+  return {
+    listSort,
+    startView,
+    hideAdded:saved.hideAdded===true,
+    smartFavorites:saved.smartFavorites!==false
+  };
+}
+function persistPreferences(){saveJson(STORAGE.preferences,state.preferences)}
+const INITIAL_PREFERENCES=readPreferences();
 
 const COURSES_ENTITY='todo.courses';
 const URL_ENTITY='todo.url';
@@ -112,7 +133,7 @@ let state={
   category:'Toutes',
   productQuery:'',
   listQuery:'',
-  view:'list',
+  view:INITIAL_PREFERENCES.startView,
   reconnectTimer:null,
   intentionalClose:false,
   demo:false,
@@ -122,7 +143,8 @@ let state={
   productBusy:new Set(),
   pendingRemoval:new Set(),
   purchaseUndo:new Map(),
-  usage:loadJson(STORAGE.usage,{})||{}
+  usage:loadJson(STORAGE.usage,{})||{},
+  preferences:INITIAL_PREFERENCES
 };
 
 const hashName = (value) => {
@@ -268,28 +290,39 @@ function sprite(product,compact=false){
 function usageSave(){saveJson(STORAGE.usage,state.usage)}
 function recordUsage(name){const key=norm(name);const old=state.usage[key]||{count:0,lastAt:0};state.usage[key]={count:Number(old.count||0)+1,lastAt:Date.now()};usageSave()}
 function favorites(){
+  const curated=FAVORITES.map(n=>BY_NAME.get(norm(n))).filter(Boolean);
+  if(!state.preferences.smartFavorites)return unique(curated).slice(0,12);
   const ranked=Object.entries(state.usage).filter(([key])=>BY_NAME.has(key)).sort((a,b)=>Number(b[1]?.count||0)-Number(a[1]?.count||0)||Number(b[1]?.lastAt||0)-Number(a[1]?.lastAt||0)).map(([key])=>BY_NAME.get(key));
   const out=[],seen=new Set();
-  [...ranked,...FAVORITES.map(n=>BY_NAME.get(norm(n))).filter(Boolean)].forEach(p=>{const k=norm(p?.name);if(!p||!k||seen.has(k)||out.length>=12)return;seen.add(k);out.push(p)});
+  [...ranked,...curated].forEach(p=>{const k=norm(p?.name);if(!p||!k||seen.has(k)||out.length>=12)return;seen.add(k);out.push(p)});
   return out;
 }
 function unique(products){const seen=new Set();return products.filter(p=>{const k=norm(p.name);if(!k||seen.has(k))return false;seen.add(k);return true})}
 function visibleProducts(){
   const needle=norm(state.productQuery);
+  let products;
   if(needle){
     const tokens=needle.split(' ').filter(Boolean);
-    return unique(ALL).map(product=>{
+    products=unique(ALL).map(product=>{
       const name=norm(product.name),category=norm(product.category),sub=norm(product.sub),hay=name+' '+category+' '+sub;
       if(!tokens.every(t=>hay.includes(t)))return null;
       let score=0;if(name===needle)score+=100;if(name.startsWith(needle))score+=60;if(name.includes(needle))score+=35;
       tokens.forEach(t=>{if(name.split(' ').some(w=>w.startsWith(t)))score+=14;else if(name.includes(t))score+=8;else if(sub.includes(t))score+=3});
       return {product,score};
     }).filter(Boolean).sort((a,b)=>b.score-a.score||a.product.name.localeCompare(b.product.name,'fr')).map(x=>x.product);
+  }else if(state.category==='Toutes'){
+    products=unique(ALL);
+  }else if(state.category==='Favoris'){
+    products=favorites();
+  }else{
+    const subs=GROUPS[state.category]||{};
+    products=unique(Object.entries(subs).flatMap(([sub,names])=>names.map(name=>({name,category:state.category,sub}))));
   }
-  if(state.category==='Toutes')return unique(ALL);
-  if(state.category==='Favoris')return favorites();
-  const subs=GROUPS[state.category]||{};
-  return unique(Object.entries(subs).flatMap(([sub,names])=>names.map(name=>({name,category:state.category,sub}))));
+  if(state.preferences.hideAdded){
+    const selected=selectedSet();
+    products=products.filter(product=>!selected.has(norm(product.name)));
+  }
+  return products;
 }
 function activeGroups(){
   const groups=new Map();
@@ -301,6 +334,20 @@ function activeGroups(){
     const uid=String(item?.uid??item?.id??item?.item_id??'').trim();if(uid)group.uids.push(uid);
   });
   return [...groups.values()];
+}
+function sortedGroups(groups){
+  const rows=[...groups];
+  if(state.preferences.listSort==='alpha')return rows.sort((a,b)=>a.summary.localeCompare(b.summary,'fr',{sensitivity:'base'}));
+  if(state.preferences.listSort==='category'){
+    return rows.map((group,index)=>({group,index})).sort((a,b)=>{
+      const productA=BY_NAME.get(norm(a.group.summary)),productB=BY_NAME.get(norm(b.group.summary));
+      const categoryA=CATALOG_CATEGORY_ORDER.indexOf(productA?.category),categoryB=CATALOG_CATEGORY_ORDER.indexOf(productB?.category);
+      const rankA=categoryA>0&&categoryA<CATALOG_CATEGORY_ORDER.length-1?categoryA:999;
+      const rankB=categoryB>0&&categoryB<CATALOG_CATEGORY_ORDER.length-1?categoryB:999;
+      return rankA-rankB||a.index-b.index;
+    }).map(entry=>entry.group);
+  }
+  return rows;
 }
 function selectedSet(){return new Set(activeGroups().map(g=>norm(g.summary)))}
 
@@ -371,6 +418,7 @@ function setProductQuantity(name,quantity){
   }
 }
 function syncProductSelection(){
+  if(state.preferences.hideAdded){renderProducts();return}
   const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
   document.querySelectorAll('#products .product').forEach(card=>{
     setProductQuantity(card.dataset.name||'',quantities.get(norm(card.dataset.name))||0);
@@ -378,7 +426,7 @@ function syncProductSelection(){
 }
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery);
-  const rows=groups.filter(group=>!needle||norm(group.summary).includes(needle));
+  const rows=sortedGroups(groups.filter(group=>!needle||norm(group.summary).includes(needle)));
   const el=$('#listItems');
   if(!el)return;
   const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
@@ -694,6 +742,7 @@ function hideSecurity(){
 function lockApp(message='Application verrouillée.'){
   if(state.demo||!vaultRecord())return;
   if($('#connectionDialog').open)$('#connectionDialog').close();
+  if($('#preferencesDialog').open)$('#preferencesDialog').close();
   if($('#settingsDialog').open)$('#settingsDialog').close();
   clearLockTimers();
   closeSocket();
@@ -1118,6 +1167,57 @@ async function saveConnectionSettings(){
   }
 }
 
+function openPreferences(){
+  const dialog=$('#preferencesDialog');
+  const select=$('#preferencesEntitySelect');
+  const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
+  if(state.demo){
+    select.innerHTML='<option value="">Mode test — aucune liste Home Assistant</option>';
+    select.disabled=true;
+  }else{
+    select.disabled=!choices.length;
+    select.innerHTML=choices.length
+      ? choices.map(entry=>'<option value="'+esc(entry.id)+'">'+esc(entry.name)+' — '+esc(entry.id)+'</option>').join('')
+      : '<option value="">Aucune liste disponible</option>';
+    if(choices.some(entry=>entry.id===state.entity))select.value=state.entity;
+  }
+  $('#preferencesListSort').value=state.preferences.listSort;
+  $('#preferencesStartView').value=state.preferences.startView;
+  $('#preferencesHideAdded').checked=state.preferences.hideAdded;
+  $('#preferencesSmartFavorites').checked=state.preferences.smartFavorites;
+  dialog.showModal();
+  requestAnimationFrame(()=>{try{dialog.focus({preventScroll:true})}catch{dialog.focus()}});
+}
+async function savePreferencesSettings(){
+  const select=$('#preferencesEntitySelect');
+  const nextEntity=!state.demo&&!select.disabled?(select.value||state.entity):state.entity;
+  const nextSort=$('#preferencesListSort').value;
+  const nextStartView=$('#preferencesStartView').value;
+  const changedEntity=!!nextEntity&&nextEntity!==state.entity;
+  state.preferences={
+    listSort:['added','category','alpha'].includes(nextSort)?nextSort:DEFAULT_PREFERENCES.listSort,
+    startView:['list','catalog'].includes(nextStartView)?nextStartView:DEFAULT_PREFERENCES.startView,
+    hideAdded:$('#preferencesHideAdded').checked,
+    smartFavorites:$('#preferencesSmartFavorites').checked
+  };
+  persistPreferences();
+  if(changedEntity){
+    state.entity=nextEntity;
+    localStorage.setItem(STORAGE.entity,nextEntity);
+    localStorage.setItem(STORAGE.entityPreference,nextEntity);
+  }
+  $('#preferencesDialog').close();
+  if(changedEntity&&!state.demo&&state.ws?.readyState===WebSocket.OPEN){
+    await subscribe();
+    await refreshItems();
+  }else{
+    renderProducts();
+    renderList();
+    renderSettingsPage();
+  }
+  toast('Préférences enregistrées');
+}
+
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   $('#settingsHaUrl').value=state.haUrl;
@@ -1207,11 +1307,14 @@ $('#settingsBtn').onclick=()=>{state.view='settings';renderView()};
 $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
 $('#catalogSearchBtn').onclick=()=>$('#productSearch')?.focus();
 $('#settingsConnectionBtn').onclick=openConnectionSettings;
-['settingsSecurityBtn','settingsListBtn'].forEach(id=>{const button=$('#'+id);if(button)button.onclick=openSettings});
+$('#settingsSecurityBtn').onclick=openSettings;
+$('#settingsListBtn').onclick=openPreferences;
 $('#settingsLockBtn').onclick=()=>lockApp('Verrouillage manuel.');
 $('#settingsLogoutBtn').onclick=revoke;
 $('#cancelConnectionSettings').onclick=()=>$('#connectionDialog').close();
 $('#saveConnectionSettings').onclick=saveConnectionSettings;
+$('#cancelPreferences').onclick=()=>$('#preferencesDialog').close();
+$('#savePreferences').onclick=savePreferencesSettings;
 $('#cancelSettings').onclick=()=>$('#settingsDialog').close();
 $('#saveSettings').onclick=saveSettings;
 $('#lockNowBtn').onclick=()=>{$('#settingsDialog').close();lockApp('Verrouillage manuel.')};

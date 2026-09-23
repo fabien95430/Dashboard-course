@@ -2952,3 +2952,94 @@ body{
     padding-right:34px!important;
   }
 }
+
+
+/* ===== UI v82 — popup Préférences ===== */
+.preferences-dialog{
+  max-height:calc(100dvh - max(36px,env(safe-area-inset-top)) - max(36px,env(safe-area-inset-bottom)));
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.preferences-dialog h3{margin-bottom:4px}
+.dialog-intro{
+  margin:0 0 4px;
+  color:#7d858d;
+  font-size:12px;
+  line-height:1.35;
+}
+.preferences-dialog .field{margin-top:12px}
+.preference-options{
+  margin-top:15px;
+  overflow:hidden;
+  border:1px solid #e6eae4;
+  border-radius:16px;
+  background:#f8faf7;
+}
+.preference-toggle{
+  min-height:66px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 12px;
+}
+.preference-toggle+.preference-toggle{border-top:1px solid #e8ece7}
+.preference-toggle-copy{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+.preference-toggle-copy strong{
+  color:#172019;
+  font-size:13.5px;
+  line-height:1.15;
+  font-weight:740;
+}
+.preference-toggle-copy small{
+  color:#858d94;
+  font-size:10.5px;
+  line-height:1.25;
+}
+.preference-switch{
+  position:relative;
+  flex:0 0 48px;
+  width:48px;
+  height:29px;
+}
+.preference-switch input{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  margin:0;
+  opacity:0;
+  cursor:pointer;
+  z-index:2;
+}
+.preference-switch>span{
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  background:#d9ded9;
+  transition:background .18s ease;
+}
+.preference-switch>span::after{
+  content:"";
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:23px;
+  height:23px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 2px 7px rgba(35,50,40,.20);
+  transition:transform .18s ease;
+}
+.preference-switch input:checked+span{background:#269052}
+.preference-switch input:checked+span::after{transform:translateX(19px)}
+.preference-switch input:focus-visible+span{outline:2px solid rgba(38,144,82,.28);outline-offset:2px}
+@media(max-width:390px){
+  .preferences-dialog{padding:17px}
+  .preference-toggle{min-height:62px;padding:9px 10px}
+  .preference-toggle-copy strong{font-size:13px}
+}
