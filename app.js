@@ -17,6 +17,15 @@ const CATEGORY_META = {
   'Favoris': { label:'Favoris' }
 };
 const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Favoris'];
+const CATALOG_DISPLAY_NAMES=Object.freeze({
+  'Sacs poubelle 30L':'Sacs poub. 30L',
+  'Sacs poubelle 50L':'Sacs poub. 50L',
+  'Sacs congélation':'Sacs cong.',
+  'Filtres aspirateur':'Filtres aspi.',
+  'Après-shampoing':'Après-shamp.',
+  'Brosses à dents':'Brosses dents'
+});
+const productDisplayName=name=>CATALOG_DISPLAY_NAMES[name]||name;
 const PURCHASE_HOLD_MS=1100;
 const PURCHASE_EXIT_MS=240;
 const SWIPE_TRIGGER_RATIO=.36;
@@ -417,7 +426,7 @@ function renderProducts(){
     return '<div class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" data-quantity="'+quantity+'">'+
       '<button type="button" class="badge" aria-label="'+esc(addLabel)+'">'+(active?quantity:'+')+'</button>'+
       '<button type="button" class="media" aria-label="'+esc(removeLabel)+'" '+(active?'':'disabled')+'>'+sprite(product)+'</button>'+
-      '<span class="product-copy"><span class="pname">'+esc(product.name)+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>'+
+      '<span class="product-copy"><span class="pname">'+esc(productDisplayName(product.name))+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>'+
     '</div>';
   }).join('');
   el.querySelectorAll('.product').forEach(card=>{
