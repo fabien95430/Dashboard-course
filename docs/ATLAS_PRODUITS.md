@@ -84,6 +84,20 @@ La reconstruction validée de Fruits & Légumes conserve :
 - contours isolés avec le même seuil alpha de référence (\`alpha <= 8\`) ;
 - recadrage Fruits & Légumes supprimé côté application.
 
+## Référence Frais v5
+
+La reconstruction validée de Frais conserve :
+
+- grille : **12 colonnes × 8 lignes** ;
+- ratio de cellule : **1** ;
+- cellule : **140 × 140 px** ;
+- atlas final : **1680 × 1120 px** ;
+- 96 produits conservés dans le même ordre ;
+- pixels produits copiés à leur taille source, sans upscale ;
+- fond transparent et gouttières régulières ;
+- boîtes de contour calculées automatiquement dans chaque cellule source avec le seuil alpha de référence (\`alpha <= 8\`) ;
+- recadrage Frais supprimé côté application.
+
 ## Garde-fous
 
 - `catalog.js` reste la source du catalogue : ne pas changer les noms ou l'ordre uniquement pour faciliter l'atlas.
