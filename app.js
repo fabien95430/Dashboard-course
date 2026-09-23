@@ -146,8 +146,6 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
 const productDisplayName=name=>CATALOG_DISPLAY_NAMES[name]||name;
 const PURCHASE_HOLD_MS=1100;
 const PURCHASE_EXIT_MS=240;
-const SWIPE_TRIGGER_RATIO=.36;
-const SWIPE_MAX_RATIO=.42;
 
 const STORAGE = {
   // Legacy keys are kept only for one-time migration from the previous version.
@@ -503,14 +501,17 @@ function visibleProducts(){
   }
   return products;
 }
+function itemSummary(item){return String(item?.summary??item?.name??item?.item??'').trim()}
+function itemUid(item){return String(item?.uid??item?.id??item?.item_id??'').trim()}
+function isPendingItem(item){return String(item?.status||'needs_action')!=='completed'}
 function activeGroups(){
   const groups=new Map();
-  state.items.filter(i=>String(i?.status||'needs_action')!=='completed').forEach(item=>{
-    const summary=String(item?.summary??item?.name??item?.item??'').trim()||'Article';
+  state.items.filter(isPendingItem).forEach(item=>{
+    const summary=itemSummary(item)||'Article';
     const key=norm(summary)||summary;
     if(!groups.has(key))groups.set(key,{summary,count:0,uids:[]});
     const group=groups.get(key);group.count++;
-    const uid=String(item?.uid??item?.id??item?.item_id??'').trim();if(uid)group.uids.push(uid);
+    const uid=itemUid(item);if(uid)group.uids.push(uid);
   });
   return [...groups.values()];
 }
@@ -652,9 +653,8 @@ function applyDemoListOrder(orderKeys){
   const buckets=new Map(orderKeys.map(key=>[key,[]]));
   const extras=[],completed=[];
   state.items.forEach(item=>{
-    if(String(item?.status||'needs_action')==='completed'){completed.push(item);return}
-    const summary=String(item?.summary??item?.name??item?.item??'').trim();
-    const key=norm(summary);
+    if(!isPendingItem(item)){completed.push(item);return}
+    const key=norm(itemSummary(item));
     if(buckets.has(key))buckets.get(key).push(item);
     else extras.push(item);
   });
@@ -822,121 +822,6 @@ function undoPurchase(name,row){
   navigator.vibrate?.(5);
   toast('Article conservé');
 }
-function bindSwipeRows(root){
-  root.querySelectorAll('.list-row').forEach(row=>{
-    const content=row.querySelector('.swipe-content');
-    const action=row.querySelector('.swipe-action');
-    const done=row.querySelector('.done');
-    if(!content||!action||row.classList.contains('is-busy'))return;
-    let startX=0,startY=0,offsetX=0,tracking=false,horizontal=false,pointerId=null,ready=false;
-
-    const clearVisual=()=>{
-      content.style.transition='transform .28s cubic-bezier(.22,.75,.2,1)';
-      content.style.transform='translate3d(0,0,0)';
-      action.style.opacity='0';
-      action.style.transform='translateX(28px) scale(.84)';
-      action.style.filter='blur(3px)';
-      action.classList.remove('is-ready');
-      if(done){
-        done.style.transition='opacity .28s ease,transform .28s cubic-bezier(.2,.8,.2,1),filter .28s ease';
-        done.style.opacity='1';
-        done.style.transform='scale(1)';
-        done.style.filter='blur(0)';
-      }
-      ready=false;
-      window.setTimeout(()=>{
-        if(!row.classList.contains('is-purchased')){
-          content.style.transition='';
-          if(done)done.style.transition='';
-        }
-      },300);
-    };
-    const stopTracking=()=>{
-      tracking=false;
-      horizontal=false;
-      pointerId=null;
-      offsetX=0;
-    };
-    const finishSwipe=()=>{
-      if(!horizontal){stopTracking();return}
-      const threshold=Math.min(row.clientWidth*SWIPE_TRIGGER_RATIO,160);
-      const shouldPurchase=-offsetX>=threshold;
-      if(shouldPurchase){
-        row.dataset.suppressClick='1';
-        content.style.transition='transform .34s cubic-bezier(.18,.82,.2,1)';
-        action.style.transition='opacity .30s ease,transform .34s cubic-bezier(.18,.82,.2,1),filter .30s ease,box-shadow .30s ease,border-color .30s ease';
-        action.style.opacity='1';
-        action.style.transform='translateX(0) scale(1)';
-        action.style.filter='blur(0)';
-        action.classList.add('is-ready');
-        if(done){
-          done.style.transition='opacity .22s ease,transform .26s ease,filter .22s ease';
-          done.style.opacity='0';
-          done.style.transform='scale(.72)';
-          done.style.filter='blur(3px)';
-        }
-        removeGroup(row.dataset.name||'',row);
-      }else{
-        clearVisual();
-      }
-      window.setTimeout(()=>delete row.dataset.suppressClick,0);
-      stopTracking();
-    };
-
-    row.addEventListener('pointerdown',event=>{
-      if(event.pointerType==='mouse'&&event.button!==0)return;
-      if(row.classList.contains('is-purchased')||row.classList.contains('is-removing'))return;
-      tracking=true;horizontal=false;pointerId=event.pointerId;
-      startX=event.clientX;startY=event.clientY;offsetX=0;
-      content.style.transition='none';
-    });
-    row.addEventListener('pointermove',event=>{
-      if(!tracking||event.pointerId!==pointerId)return;
-      const dx=event.clientX-startX,dy=event.clientY-startY;
-      if(!horizontal){
-        if(Math.abs(dx)<8&&Math.abs(dy)<8)return;
-        if(Math.abs(dy)>=Math.abs(dx)*.95||dx>=0){clearVisual();stopTracking();return}
-        horizontal=true;
-        row.dataset.suppressClick='1';
-        try{row.setPointerCapture(event.pointerId)}catch(_){}
-      }
-      event.preventDefault();
-      const maxReveal=row.clientWidth*SWIPE_MAX_RATIO;
-      offsetX=Math.max(-maxReveal,Math.min(0,dx));
-      const progress=Math.min(1,Math.abs(offsetX)/Math.max(1,maxReveal));
-      const threshold=Math.min(row.clientWidth*SWIPE_TRIGGER_RATIO,160);
-      const isReady=-offsetX>=threshold;
-      content.style.transform='translate3d('+offsetX+'px,0,0)';
-      const actionProgress=Math.max(0,Math.min(1,(progress-.10)/.90));
-      const actionEase=1-Math.pow(1-actionProgress,2.1);
-      action.style.opacity=String(actionEase);
-      action.style.transform='translateX('+(28*(1-actionEase))+'px) scale('+(0.84+0.16*actionEase)+')';
-      action.style.filter='blur('+(3*(1-actionEase))+'px)';
-      if(done){
-        const doneProgress=Math.min(1,progress/.44);
-        const doneEase=doneProgress*doneProgress*(3-2*doneProgress);
-        done.style.opacity=String(1-doneEase);
-        done.style.transform='scale('+(1-.28*doneEase)+')';
-        done.style.filter='blur('+(3*doneEase)+'px)';
-      }
-      if(isReady!==ready){
-        ready=isReady;
-        action.classList.toggle('is-ready',ready);
-        if(ready)navigator.vibrate?.(5);
-      }
-    },{passive:false});
-    row.addEventListener('pointerup',event=>{
-      if(event.pointerId!==pointerId)return;
-      finishSwipe();
-    });
-    row.addEventListener('pointercancel',event=>{
-      if(event.pointerId!==pointerId)return;
-      if(horizontal)clearVisual();
-      stopTracking();
-      window.setTimeout(()=>delete row.dataset.suppressClick,0);
-    });
-  });
-}
 function renderView(){
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
   $('#listView').classList.toggle('is-active',state.view==='list');
@@ -1102,11 +987,15 @@ function lockApp(message='Application verrouillée.'){
   status('is-waiting','Verrouillé','Mot de passe local requis');
   showSecurity('unlock',message);
 }
-async function resetLocalConnection(){
+function clearLocalConnectionData(){
   clearLockTimers();closeSocket();wipeMemoryCredentials();
   deleteKey(STORAGE.vault);deleteKey(LEGACY_UNLOCK_KEY);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();clearUnlockGuard();
-  state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;state.demo=false;
+  state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;
+}
+async function resetLocalConnection(){
+  state.demo=false;
+  clearLocalConnectionData();
   hideSecurity();showSetup('Connexion locale supprimée. Tu peux reconnecter Home Assistant.');
 }
 async function exchangeCodeRaw(code,returnedState){
@@ -1244,10 +1133,7 @@ async function revoke(){
   if(state.refreshToken&&state.haUrl){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
-  clearLockTimers();closeSocket();wipeMemoryCredentials();
-  deleteKey(STORAGE.vault);deleteKey(LEGACY_UNLOCK_KEY);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
-  clearOAuthState();clearUnlockGuard();
-  state.entity='';state.entities=[];state.items=[];state.haUrl='';state.locked=true;
+  clearLocalConnectionData();
   $('#settingsDialog').close();
   showSetup('Autorisation locale supprimée et session Home Assistant révoquée.');
 }
@@ -1312,10 +1198,7 @@ async function refreshItems(){
   try{
     const result=await request({type:'todo/item/list',entity_id:state.entity});
     const incoming=Array.isArray(result?.items)?result.items:[];
-    state.items=incoming.filter(item=>{
-      const summary=String(item?.summary??item?.name??item?.item??'').trim();
-      return !state.pendingRemoval.has(norm(summary));
-    });
+    state.items=incoming.filter(item=>!state.pendingRemoval.has(norm(itemSummary(item))));
     state.loading=false;state.error='';syncProductSelection();renderList();
     status('', 'Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
   }catch(error){
@@ -1372,6 +1255,17 @@ async function addItem(name){
     recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();
   }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
 }
+async function completeTodoItem(uid){
+  const uidValue=String(uid||'').trim();
+  if(!uidValue)throw new Error('Identifiant de l’article indisponible');
+  return request({
+    type:'call_service',
+    domain:'todo',
+    service:'update_item',
+    service_data:{item:uidValue,status:'completed'},
+    target:{entity_id:state.entity}
+  });
+}
 async function removeOneItem(name,groupHint=null){
   const item=String(name||'').trim();
   if(!item)return;
@@ -1385,9 +1279,8 @@ async function removeOneItem(name,groupHint=null){
       let removeIndex=-1;
       for(let i=items.length-1;i>=0;i--){
         const entry=items[i];
-        if(String(entry?.status||'needs_action')==='completed')continue;
-        const summary=String(entry?.summary??entry?.name??entry?.item??'').trim();
-        if(norm(summary)===key){removeIndex=i;break}
+        if(!isPendingItem(entry))continue;
+        if(norm(itemSummary(entry))===key){removeIndex=i;break}
       }
       if(removeIndex<0)return;
       items.splice(removeIndex,1);
@@ -1401,14 +1294,7 @@ async function removeOneItem(name,groupHint=null){
 
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
     const uid=group.uids.filter(Boolean).at(-1);
-    if(!uid)throw new Error('Identifiant de l’article indisponible');
-    await request({
-      type:'call_service',
-      domain:'todo',
-      service:'update_item',
-      service_data:{item:uid,status:'completed'},
-      target:{entity_id:state.entity}
-    });
+    await completeTodoItem(uid);
     navigator.vibrate?.(8);
     toast(item+' -1');
     await refreshItems();
@@ -1444,11 +1330,7 @@ async function removeGroup(name,row=null){
   }
 
   state.pendingRemoval.add(key);
-  const keepOtherItems=entry=>{
-    if(String(entry?.status||'needs_action')==='completed')return true;
-    const summary=String(entry?.summary??entry?.name??entry?.item??'').trim();
-    return norm(summary)!==key;
-  };
+  const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
   state.items=state.items.filter(keepOtherItems);
   syncProductSelection();renderList();
 
@@ -1463,13 +1345,7 @@ async function removeGroup(name,row=null){
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
     const uids=group.uids.filter(Boolean);
     if(!uids.length)throw new Error('Identifiant de l’article indisponible');
-    await Promise.all(uids.map(uid=>request({
-      type:'call_service',
-      domain:'todo',
-      service:'update_item',
-      service_data:{item:uid,status:'completed'},
-      target:{entity_id:state.entity}
-    })));
+    await Promise.all(uids.map(completeTodoItem));
     toast(item+' acheté');
   }catch(error){
     toast('Suppression impossible');
