@@ -637,6 +637,7 @@ function syncProductSelection(){
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery);
   const rows=sortedGroups(groups.filter(group=>!needle||norm(group.summary).includes(needle)));
+  const canReorder=rows.length>1;
   const el=$('#listItems');
   if(!el)return;
   const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
@@ -656,7 +657,7 @@ function renderList(){
       '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong><small>'+esc(categoryLabel)+'</small></span>'+
       quantity+
       '<button class="undo-purchase" type="button" data-name="'+esc(group.summary)+'" hidden>Annuler</button>'+
-      '<button class="row-grip" type="button" data-name="'+esc(group.summary)+'" aria-label="Déplacer '+esc(group.summary)+'">≡</button>'+
+      '<button class="row-grip" type="button" data-name="'+esc(group.summary)+'" aria-label="Déplacer '+esc(group.summary)+'" '+(canReorder?'':'disabled')+'>≡</button>'+
     '</div>';
   }).join('');
   el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
@@ -669,6 +670,23 @@ function renderList(){
     undoPurchase(button.dataset.name||'',button.closest('.list-row'));
   });
   bindListReorder(el);
+}
+function listDomMatchesCurrentState(){
+  const root=$('#listItems');
+  if(!root)return false;
+  const groups=activeGroups(),needle=norm(state.listQuery);
+  const rows=sortedGroups(groups.filter(group=>!needle||norm(group.summary).includes(needle)));
+  if(!rows.length)return false;
+  const rendered=[...root.querySelectorAll('.list-row')];
+  if(rendered.length!==rows.length)return false;
+  return rows.every((group,index)=>{
+    const row=rendered[index],key=norm(group.summary);
+    const quantity=group.count>1?'x'+group.count:'';
+    return row.dataset.key===key
+      &&row.dataset.name===group.summary
+      &&(row.querySelector('.list-qty')?.textContent||'')===quantity
+      &&row.classList.contains('is-busy')===state.productBusy.has(key);
+  });
 }
 function listReorderUnavailableMessage(){
   if(state.listReorderBusy)return 'Réorganisation en cours';
@@ -736,6 +754,7 @@ async function persistListReorder(root,movedKey){
 }
 function bindListReorder(root){
   root.querySelectorAll('.row-grip').forEach(handle=>{
+    if(handle.disabled)return;
     const row=handle.closest('.list-row');
     if(!row)return;
     handle.addEventListener('keydown',event=>{
@@ -1229,7 +1248,8 @@ async function refreshItems(){
     const result=await request({type:'todo/item/list',entity_id:state.entity});
     const incoming=Array.isArray(result?.items)?result.items:[];
     state.items=incoming.filter(item=>!state.pendingRemoval.has(norm(itemSummary(item))));
-    state.loading=false;state.error='';syncProductSelection();renderList();
+    state.loading=false;state.error='';syncProductSelection();
+    if(!listDomMatchesCurrentState())renderList();
     status('', 'Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
   }catch(error){
     state.loading=false;
