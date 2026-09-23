@@ -735,9 +735,7 @@ async function persistListReorder(root,movedKey){
       previousUid=previousGroup?.uids?.filter(Boolean).at(-1)||'';
     }
     for(const uid of movedUids){
-      const payload={type:'todo/item/move',entity_id:state.entity,uid};
-      if(previousUid)payload.previous_uid=previousUid;
-      await request(payload);
+      await todoMove(uid,previousUid);
       previousUid=uid;
     }
     navigator.vibrate?.(8);
@@ -1196,6 +1194,23 @@ function request(payload){
     state.ws.send(JSON.stringify({id,...payload}));
   });
 }
+function todoList(){
+  return request({type:'todo/item/list',entity_id:state.entity});
+}
+function todoService(service,serviceData){
+  return request({
+    type:'call_service',
+    domain:'todo',
+    service,
+    service_data:serviceData,
+    target:{entity_id:state.entity}
+  });
+}
+function todoMove(uid,previousUid=''){
+  const payload={type:'todo/item/move',entity_id:state.entity,uid};
+  if(previousUid)payload.previous_uid=previousUid;
+  return request(payload);
+}
 function connectWs(token){
   return new Promise((resolve,reject)=>{
     state.intentionalClose=false;
@@ -1245,7 +1260,7 @@ async function refreshItems(){
   }
   if(!state.entity)return;
   try{
-    const result=await request({type:'todo/item/list',entity_id:state.entity});
+    const result=await todoList();
     const incoming=Array.isArray(result?.items)?result.items:[];
     state.items=incoming.filter(item=>!state.pendingRemoval.has(norm(itemSummary(item))));
     state.loading=false;state.error='';syncProductSelection();
@@ -1301,20 +1316,14 @@ async function addItem(name){
   }
   if(!state.entity)return;
   try{
-    await request({type:'call_service',domain:'todo',service:'add_item',service_data:{item},target:{entity_id:state.entity}});
+    await todoService('add_item',{item});
     recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();
   }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
 }
 async function completeTodoItem(uid){
   const uidValue=String(uid||'').trim();
   if(!uidValue)throw new Error('Identifiant de l’article indisponible');
-  return request({
-    type:'call_service',
-    domain:'todo',
-    service:'update_item',
-    service_data:{item:uidValue,status:'completed'},
-    target:{entity_id:state.entity}
-  });
+  return todoService('update_item',{item:uidValue,status:'completed'});
 }
 async function removeOneItem(name,groupHint=null){
   const item=String(name||'').trim();
