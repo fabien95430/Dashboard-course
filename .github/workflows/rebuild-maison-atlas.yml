@@ -1,0 +1,40 @@
+name: Rebuild Maison atlas
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/rebuild_maison_atlas.py
+      - .github/workflows/rebuild-maison-atlas.yml
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rebuild isolated Maison atlas
+        run: python3 tools/rebuild_maison_atlas.py
+      - name: Validate generated atlas
+        run: |
+          test -s bring-photo-v5-maison.webp.png
+          python3 - <<'PY'
+          import struct
+          data=open('bring-photo-v5-maison.webp.png','rb').read(32)
+          assert data[:8] == b'\x89PNG\r\n\x1a\n'
+          w,h=struct.unpack('>II', data[16:24])
+          assert (w,h)==(1680,1120), (w,h)
+          print('atlas ok:', w, h)
+          PY
+      - name: Commit v95
+        run: |
+          git config user.name "Fabien"
+          git config user.email "canape-silence-8o@icloud.com"
+          git rm --ignore-unmatch preview-atlas-maison.html tools/rebuild_maison_atlas.py .github/workflows/rebuild-maison-atlas.yml
+          git add bring-photo-v5-maison.webp.png app.js index.html sw.js
+          git commit -m "v95: reconstruit l'atlas Maison"
+          git push
