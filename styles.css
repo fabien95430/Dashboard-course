@@ -3202,3 +3202,26 @@ body{
     bottom:23px!important;
   }
 }
+
+
+/* ===== UI v89 — bandeau bas réduit de 5 px supplémentaires ===== */
+@media(max-width:520px){
+  .app{
+    grid-template-rows:minmax(0,1fr) 89px!important;
+  }
+  .app>.tabs{
+    height:89px!important;
+  }
+  .app>.tabs .tab{
+    height:85px!important;
+    align-self:center!important;
+    margin-top:0!important;
+  }
+  .app>.tabs .tab>svg,
+  .app>.tabs .tab>span{
+    transform:translateY(-12px)!important;
+  }
+  .app>.tabs .tab::after{
+    bottom:20px!important;
+  }
+}
