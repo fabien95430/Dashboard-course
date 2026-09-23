@@ -1621,6 +1621,11 @@ async function refreshFromHeader(button){
 function bindUiEvents(){
   $('#connectBtn').onclick=beginOAuth;
   UI.securitySubmit.onclick=completeSecurityAction;
+  const syncPasswordOpen=()=>UI.securityShell.classList.toggle('is-password-open',document.activeElement===UI.securityPassword||document.activeElement===UI.securityConfirm);
+  [UI.securityPassword,UI.securityConfirm].forEach(input=>{
+    input.addEventListener('focus',syncPasswordOpen);
+    input.addEventListener('blur',()=>requestAnimationFrame(syncPasswordOpen));
+  });
   UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
   UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
   UI.resetSecurityBtn.onclick=resetLocalConnection;
