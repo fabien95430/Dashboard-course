@@ -12,26 +12,13 @@
 .security-modal input[type="password"]{letter-spacing:.04em}
 .security-state{display:flex;align-items:center;gap:8px;margin-top:12px;padding:9px 11px;border:1px solid rgba(102,224,161,.18);border-radius:12px;background:rgba(102,224,161,.055);font-size:10px;color:rgba(255,255,255,.72)}
 
-.faceid-btn{width:100%;height:50px;margin-top:14px;border:1px solid rgba(255,255,255,.36);border-radius:15px;background:linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,.08));color:#fff;font-weight:820;box-shadow:inset 0 1px 0 rgba(255,255,255,.20)}
-.faceid-btn span{display:inline-grid;place-items:center;width:23px;height:23px;margin-right:7px;border:1.5px solid rgba(255,255,255,.72);border-radius:8px;font-size:13px}
 .security-divider{display:flex;align-items:center;gap:9px;margin:14px 0 0;color:rgba(255,255,255,.42);font-size:9px;text-transform:uppercase;letter-spacing:.06em}
 .security-divider::before,.security-divider::after{content:"";height:1px;flex:1;background:rgba(255,255,255,.12)}
 .security-divider span{white-space:nowrap}
-.faceid-settings{margin-top:16px;padding:13px;border:1px solid rgba(255,255,255,.16);border-radius:15px;background:rgba(255,255,255,.045)}
-.faceid-settings>div{margin-bottom:10px}
-.faceid-settings strong{display:block;font-size:13px}
-.faceid-settings small{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.35}
-.faceid-settings .secondary,.faceid-settings .danger{margin-top:7px}
 .compact-danger{margin-top:7px!important}
 
 .password-panel[hidden]{display:none}
-.password-toggle{margin-top:9px}
 .reset-link{height:38px!important;font-size:10px!important;opacity:.72}
-.security-modal.is-quick-unlock .modal-icon{font-size:38px}
-.security-modal.is-quick-unlock h2{margin-bottom:4px}
-.security-modal.is-quick-unlock>p{margin-top:4px;margin-bottom:14px}
-.security-modal.is-quick-unlock .faceid-btn{margin-top:8px}
-
 
 /* Interface mobile : fond plus sobre, liste prioritaire et commandes tactiles */
 :root{--text:#f7f9fb;--muted:rgba(225,232,238,.62);--line:rgba(255,255,255,.105);--green:#78dda8;--danger:#ff8794}
@@ -77,7 +64,6 @@ body{background:radial-gradient(85% 55% at 50% -12%,rgba(102,157,137,.16),transp
 .tabs{background:rgba(19,25,30,.92);border-color:rgba(255,255,255,.10);box-shadow:0 12px 30px rgba(0,0,0,.20)}
 .tab{font-size:13px}
 .tab.is-active{background:#eaf4ef;color:#173126;box-shadow:0 6px 16px rgba(0,0,0,.14)}
-
 
 /* Thème premium prune / rose cohérent avec le dashboard */
 :root{
@@ -219,7 +205,6 @@ body{
   color:#4b2d3b
 }
 
-
 /* Visuels produits premium — même renderer que le popup dashboard */
 .media,.list-icon{
   background:transparent!important;
@@ -249,7 +234,6 @@ body{
 .list-main .list-icon{
   filter:drop-shadow(0 4px 7px rgba(12,6,10,.12));
 }
-
 
 /* Swipe d'achat : glisser vers la gauche, puis laisser le feedback respirer */
 .list-row{
@@ -324,7 +308,6 @@ body{
   transform:translateX(-12px);
 }
 
-
 /* Premium raster product sheets — mobile catalogue + Ma liste */
 .media,
 .list-icon,
@@ -395,7 +378,6 @@ body{
     height:44px;
   }
 }
-
 
 /* Swipe premium — le ✓ s'efface et laisse place à la capsule « Acheté ! » */
 .swipe-action{
@@ -485,7 +467,6 @@ body{
     inset 0 1px 0 rgba(255,255,255,.36),
     inset 0 -1px 0 rgba(94,40,68,.20);
 }
-
 
 /* Swipe premium v21 — ✓ indépendant, fondu réel, capsule Acheté progressive */
 .list-row{
@@ -638,7 +619,6 @@ body{
   transform:translateX(-20px) scale(.985)!important;
   border-bottom-color:transparent!important;
 }
-
 
 /* ===== UI v23 — 4 écrans validés ===== */
 :root{
@@ -1401,54 +1381,6 @@ svg{display:block}
   font-size:14px;
   line-height:1.35;
 }
-.faceid-btn{
-  width:100%;
-  height:58px;
-  margin:0;
-  border:0;
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:11px;
-  background:linear-gradient(160deg,#47aa6a,#2f9454);
-  color:#fff;
-  box-shadow:0 9px 20px rgba(29,133,68,.16);
-  font-size:18px;
-  font-weight:810;
-}
-.faceid-btn svg{
-  width:29px;
-  height:29px;
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.8;
-}
-.faceid-btn span{
-  display:inline;
-  width:auto;
-  height:auto;
-  margin:0;
-  border:0;
-  border-radius:0;
-  font-size:inherit;
-}
-.password-toggle{
-  height:54px;
-  margin-top:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  font-size:15px;
-}
-.password-toggle svg{
-  width:22px;
-  height:22px;
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.8;
-}
 .password-panel{margin-top:10px;text-align:left}
 .password-panel[hidden]{display:none}
 .security-modal .password-panel .primary{width:100%;margin-top:14px}
@@ -1478,8 +1410,6 @@ svg{display:block}
   font-size:11px;
   line-height:1.2;
 }
-.security-modal.is-quick-unlock .modal-icon{font-size:inherit}
-.security-modal.is-quick-unlock h2{margin:0}
 
 /* DIALOGUE DE DÉTAIL DES RÉGLAGES */
 .dialog{
@@ -1502,11 +1432,6 @@ svg{display:block}
   background:#248e4f;
   color:#fff;
 }
-.faceid-settings{
-  border-color:#e4e8e3;
-  background:#f7faf6;
-}
-.faceid-settings small{color:#7c848b}
 .danger{
   border-color:#f3c6c3;
   background:#fff1ef;
@@ -1550,7 +1475,6 @@ svg{display:block}
   .security-hero h2{font-size:36px}
   .security-benefits small{font-size:10px}
 }
-
 
 /* ===== UI v24 — accueil fidèle à la maquette validée ===== */
 .security-overlay{
@@ -1669,24 +1593,6 @@ svg{display:block}
 .security-dynamic{display:none;margin:7px auto 10px!important;color:#747a77!important;font-size:11px!important;line-height:1.3!important}
 .security-modal.is-creating .security-card-copy{display:none}
 .security-modal.is-creating .security-dynamic{display:block}
-.faceid-btn{
-  height:51px!important;
-  border-radius:17px!important;
-  background:linear-gradient(160deg,#4cad6c,#319653)!important;
-  box-shadow:0 8px 18px rgba(34,132,69,.16)!important;
-  font-size:17px!important;
-}
-.faceid-btn svg{width:27px!important;height:27px!important}
-.password-toggle{
-  height:49px!important;
-  margin-top:9px!important;
-  border-radius:17px!important;
-  background:rgba(255,255,255,.92)!important;
-  border:1px solid #e3e7e2!important;
-  color:#141a16!important;
-  font-size:14px!important;
-  box-shadow:0 4px 13px rgba(50,67,56,.04)!important;
-}
 .security-modal .password-panel{margin-top:9px!important}
 .security-modal .password-panel .field{margin-top:9px!important}
 .security-modal .password-panel .field input{height:42px!important}
@@ -1754,10 +1660,8 @@ svg{display:block}
   .security-benefits i{width:42px;height:42px}
 }
 
-
 /* ===== UI v26 — zoom verrouillé ===== */
 html,body{touch-action:pan-x pan-y}
-
 
 /* ===== UI v27 — états sécurité cohérents ===== */
 [hidden]{display:none!important}
@@ -1769,14 +1673,9 @@ html,body{touch-action:pan-x pan-y}
 .security-shell.is-form-mode .security-modal{
   top:35%!important;
 }
-.security-modal.is-creating .faceid-btn,
-.security-modal.is-creating .password-toggle{
-  display:none!important;
-}
 @media(max-height:720px){
   .security-shell.is-form-mode .security-modal{top:31%!important}
 }
-
 
 /* ===== UI v29 — accueil HD calé sur la référence 2 ===== */
 .security-overlay{
@@ -1867,18 +1766,6 @@ html,body{touch-action:pan-x pan-y}
   font-size:12px!important;
   line-height:1.28!important;
 }
-.faceid-btn{
-  height:46px!important;
-  border-radius:16px!important;
-  font-size:16px!important;
-}
-.faceid-btn svg{width:25px!important;height:25px!important}
-.password-toggle{
-  height:44px!important;
-  margin-top:8px!important;
-  border-radius:16px!important;
-  font-size:13.5px!important;
-}
 .security-modal .setup-error{min-height:0!important}
 .security-modal .setup-error:empty{display:none!important}
 .security-note{display:none!important}
@@ -1911,7 +1798,6 @@ html,body{touch-action:pan-x pan-y}
   .security-shell.is-form-mode .security-modal{top:29.5%!important}
   .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 10px))!important}
 }
-
 
 /* ===== UI v30 — raccords fond + placement référence ===== */
 .security-overlay::before{
@@ -1957,7 +1843,6 @@ html,body{touch-action:pan-x pan-y}
   .security-shell::before{top:68.8%!important}
 }
 
-
 /* ===== UI v32 — suppression du bandeau central ===== */
 .security-overlay{
   background:
@@ -1986,7 +1871,6 @@ html,body{touch-action:pan-x pan-y}
   mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.9) 14%,#000 24%,#000 100%);
 }
 
-
 /* ===== UI v33 — décor jusqu’en haut ===== */
 .security-overlay::before{
   top:0!important;
@@ -1994,7 +1878,6 @@ html,body{touch-action:pan-x pan-y}
   height:100%!important;
   background-position:left top!important;
 }
-
 
 /* ===== UI v36 — référence 2 finale ===== */
 /* Un seul fond de scène sur l'overlay : plus aucun panneau central ni raccord de pseudo-élément. */
@@ -2091,21 +1974,6 @@ html,body{touch-action:pan-x pan-y}
   font-size:12.5px!important;
   line-height:1.3!important;
 }
-.faceid-btn{
-  height:50px!important;
-  border-radius:17px!important;
-  font-size:16.5px!important;
-}
-.faceid-btn svg{
-  width:27px!important;
-  height:27px!important;
-}
-.password-toggle{
-  height:48px!important;
-  margin-top:9px!important;
-  border-radius:17px!important;
-  font-size:14px!important;
-}
 .security-note{
   display:none!important;
 }
@@ -2137,7 +2005,6 @@ html,body{touch-action:pan-x pan-y}
   .security-shell.is-form-mode .security-modal{top:27.8%!important}
   .security-benefits{bottom:max(17px,calc(env(safe-area-inset-bottom) + 8px))!important}
 }
-
 
 /* ===== UI v38 — fond généré propre, UI séparée ===== */
 .security-overlay{
@@ -2188,7 +2055,6 @@ html,body{touch-action:pan-x pan-y}
   .security-note{top:69.8%!important}
   .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px))!important}
 }
-
 
 /* ===== UI v40 — image générée validée ===== */
 /* Fond décoratif uniquement : toute l'interface reste en HTML/CSS au-dessus. */
@@ -2278,7 +2144,6 @@ body:has(#securityOverlay.is-visible){
   }
 }
 
-
 /* ===== UI v46 — alignement exact sur la référence mobile ===== */
 .security-settings-pill{
   display:none!important;
@@ -2312,9 +2177,6 @@ body:has(#securityOverlay.is-visible){
   .security-note{top:71.6%!important}
   .security-benefits{bottom:max(22px,calc(env(safe-area-inset-bottom) + 13px))!important}
 }
-
-
-
 
 /* ===== UI v48 — proportions de la liste alignées sur la référence ===== */
 @media(max-width:520px){
@@ -2444,7 +2306,6 @@ body:has(#securityOverlay.is-visible){
   }
 }
 
-
 /* v49 — alignement bord à bord mesuré sur viewport iPhone. */
 @media(max-width:520px){
   .list-view{
@@ -2461,7 +2322,6 @@ body:has(#securityOverlay.is-visible){
   }
 }
 
-
 /* ===== UI v50 — navigation abaissée dans la zone sûre ===== */
 @media(max-width:520px){
   .app>.tabs{
@@ -2472,7 +2332,6 @@ body:has(#securityOverlay.is-visible){
   }
 }
 
-
 /* v51 — boutons bas sans bande vide ni rognage. */
 @media(max-width:520px){
   .app>.tabs .tab{
@@ -2482,7 +2341,6 @@ body:has(#securityOverlay.is-visible){
   }
 }
 
-
 /* ===== UI v53 — attendre la fin du zoom de lancement avant l’UI sécurité ===== */
 body.is-launching #securityOverlay.is-visible .security-hero,
 body.is-launching #securityOverlay.is-visible .security-modal,
@@ -2490,7 +2348,6 @@ body.is-launching #securityOverlay.is-visible .security-note,
 body.is-launching #securityOverlay.is-visible .security-benefits{
   visibility:hidden!important;
 }
-
 
 /* ===== UI v56 — même échelle mobile sur Catalogue et Réglages ===== */
 @media(max-width:520px){
@@ -2662,7 +2519,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   }
 }
 
-
 /* ===== UI v59 — marges symétriques, catégories sans cadre, navigation rapprochée ===== */
 @media(max-width:520px){
   .list-view,
@@ -2689,7 +2545,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   }
 }
 
-
 /* ===== UI v61 — version visible sur chaque page ===== */
 .page-version{
   display:inline-block;
@@ -2705,8 +2560,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   vertical-align:1px;
   white-space:nowrap;
 }
-
-
 
 /* ===== UI v62 — titres iPhone rendus sur des pixels entiers ===== */
 @media(max-width:520px){
@@ -2727,7 +2580,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   }
 }
 
-
 /* ===== UI v63 — géométrie entière de l’en-tête iPhone ===== */
 @media(max-width:520px){
   .list-view .page-header>div,
@@ -2747,7 +2599,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     vertical-align:baseline;
   }
 }
-
 
 /* ===== UI v64 — marges fixes, filtres sans halo, navigation remplie ===== */
 @media(max-width:520px){
@@ -2800,7 +2651,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   }
 }
 
-
 /* ===== UI v65 — neutralise le compositing WebKit autour des titres ===== */
 html,
 body{
@@ -2832,7 +2682,6 @@ body{
   }
 }
 
-
 /* ===== UI v66 — titres descendus sous la zone haute iPhone ===== */
 @media(max-width:520px){
   .list-view{
@@ -2852,7 +2701,6 @@ body{
     min-height:104px!important;
   }
 }
-
 
 /* ===== UI v67 — navigation active soulignée, sans pavé ===== */
 @media(max-width:520px){
@@ -2898,7 +2746,6 @@ body{
   }
 }
 
-
 /* ===== UI v68 — remonte légèrement les en-têtes ===== */
 @media(max-width:520px){
   .list-view{
@@ -2919,7 +2766,6 @@ body{
   }
 }
 
-
 /* ===== UI v69 — remonte encore les en-têtes de 10 px ===== */
 @media(max-width:520px){
   .list-view{
@@ -2939,7 +2785,6 @@ body{
     min-height:82px!important;
   }
 }
-
 
 /* ===== UI v70 — quantité catalogue + / image -1 ===== */
 .product .badge,
@@ -2964,7 +2809,6 @@ body{
   cursor:default;
 }
 
-
 /* ===== UI v71 — réglages simplifiés + contenu descendu de 20 px ===== */
 @media(max-width:520px){
   .settings-scroll{
@@ -2972,14 +2816,12 @@ body{
   }
 }
 
-
 /* ===== UI v72 — prolonge le fond entre les tuiles jusqu'aux bords ===== */
 @media(max-width:520px){
   .catalog-view .products{
     padding:1px 7px 8px!important;
   }
 }
-
 
 /* ===== UI v73 — étend la grille produit jusqu'aux bords sans déplacer les cartes ===== */
 @media(max-width:520px){
@@ -2989,7 +2831,6 @@ body{
     padding:1px 19px 8px!important;
   }
 }
-
 
 /* ===== UI v74 — connexion Home Assistant dédiée ===== */
 .settings-row-end{
@@ -3045,7 +2886,6 @@ body{
   backdrop-filter:blur(8px);
 }
 
-
 /* ===== UI v76 — prolonge visuellement les interstices sur les bords ===== */
 @media(max-width:520px){
   .catalog-view .products{
@@ -3061,7 +2901,6 @@ body{
       )!important;
   }
 }
-
 
 /* ===== UI v77 — catalogue réellement bord à bord, contenu aligné ===== */
 @media(max-width:520px){
@@ -3091,8 +2930,6 @@ body{
   }
 }
 
-
-
 /* ===== UI v78 — bandeau bas réduit de 10 px et navigation réalignée ===== */
 @media(max-width:520px){
   .app{
@@ -3108,7 +2945,6 @@ body{
     bottom:25px!important;
   }
 }
-
 
 /* ===== UI v79 — réserve la zone du bouton + dans les cartes catalogue ===== */
 @media(max-width:520px){

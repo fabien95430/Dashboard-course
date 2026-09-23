@@ -26,25 +26,6 @@ La connexion Home Assistant enregistrée sur un appareil est protégée par un m
 
 Le coffre chiffré est stocké localement par le navigateur sous la clé `courses-secure-vault-v1`.
 
-### Face ID / biométrie
-
-Sur les appareils compatibles, l'application peut aussi être déverrouillée avec WebAuthn et la vérification biométrique de l'appareil :
-
-- le bouton **Activer Face ID** crée une passkey locale/plateforme ;
-- l'extension WebAuthn `prf` produit un secret cryptographique lié à cette passkey ;
-- ce secret chiffre une seconde copie du coffre OAuth avec AES-GCM ;
-- le secret PRF lui-même n'est jamais enregistré dans `localStorage` ;
-- à l'ouverture verrouillée, l'application tente automatiquement Face ID une seule fois ;
-- l'écran reste volontairement minimal : **Face ID** puis **Connexion avec mot de passe** en secours ;
-- le champ mot de passe n'est affiché que lorsque l'utilisateur demande cette méthode ;
-- Face ID doit être activé séparément sur chaque appareil/navigateur.
-
-Sur iPhone, iOS peut utiliser Face ID et, selon ses règles de sécurité, proposer le code de l'appareil comme mécanisme de secours. Sur un autre appareil, le mécanisme équivalent peut être Touch ID, Windows Hello ou une autre vérification de plateforme.
-
-Le coffre Face ID local est stocké sous la clé `courses-faceid-v1`. Il ne contient ni le secret PRF ni le mot de passe local.
-
-> Cette protection réduit fortement le risque en cas d'accès aux fichiers de stockage du navigateur. Un appareil déjà déverrouillé et une application déjà déverrouillée restent naturellement accessibles pendant la session active.
-
 ## Visuels produits
 
 Le Catalogue et **Ma liste** utilisent le même renderer de visuels premium que le popup Courses du dashboard Home Assistant. Les anciens emoji et leurs cadres ont été retirés.
@@ -83,7 +64,7 @@ Au premier appairage :
 3. créer le mot de passe local de l'application ;
 4. sélectionner la liste `todo.*` si plusieurs listes existent.
 
-Aux ouvertures suivantes, l'utilisateur peut déverrouiller avec Face ID s'il l'a activé, ou utiliser le mot de passe local en secours. Le mot de passe Home Assistant n'est pas stocké par l'application.
+Aux ouvertures suivantes, l'utilisateur déverrouille le coffre avec le mot de passe local. Le mot de passe Home Assistant n'est pas stocké par l'application.
 
 ## GitHub Pages
 
@@ -108,7 +89,7 @@ URL : `https://fabien95430.github.io/Dashboard-course/`
 
 L’interface mobile repose sur quatre écrans cohérents : déverrouillage sécurisé, **Ma liste**, **Catalogue** et **Réglages**. Le rendu est mobile-first, utilise toute la largeur disponible, conserve les visuels produits premium et n’ajoute aucun framework ni dépendance externe.
 
-L’onglet **Réglages** expose uniquement les fonctions réellement disponibles : connexion Home Assistant, liste active, sécurité locale, Face ID, état de synchronisation, verrouillage manuel et déconnexion.
+L’onglet **Réglages** expose uniquement les fonctions réellement disponibles : connexion Home Assistant, liste active, sécurité locale, état de synchronisation, verrouillage manuel et déconnexion.
 
 
 ## Règle d’affichage iPhone installé
