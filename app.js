@@ -317,8 +317,9 @@ function sprite(product,compact=false){
   const width=sheet.cols*100,height=sheet.rows*100;
   const safeTop=0;
   const safeLeft=0;
-  const safeRight=position.category==='Maison'?10:4;
-  const safeBottom=position.category==='Maison'||position.category==='Boissons'?9:4;
+  const isDishware=position.category==='Maison'&&position.sub==='Vaisselle';
+  const safeRight=isDishware?2:(position.category==='Maison'?10:4);
+  const safeBottom=isDishware?2:((position.category==='Maison'||position.category==='Boissons')?9:4);
   return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+';--sprite-safe-top:'+safeTop+'%;--sprite-safe-right:'+safeRight+'%;--sprite-safe-bottom:'+safeBottom+'%;--sprite-safe-left:'+safeLeft+'%" aria-hidden="true">'+
     '<img src="'+sheet.src+'" alt="" loading="eager" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
