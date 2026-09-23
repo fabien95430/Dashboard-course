@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=82">
+  <link rel="stylesheet" href="./styles.css?v=84">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -40,7 +40,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v83</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v84</span></p>
         </div>
         <button id="settingsBtn" class="icon-btn" type="button" aria-label="Ouvrir les réglages">
           <svg><use href="#i-gear"></use></svg>
@@ -59,7 +59,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v83</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v84</span></p>
         </div>
         <button id="catalogSearchBtn" class="icon-btn" type="button" aria-label="Rechercher dans le catalogue">
           <svg><use href="#i-search"></use></svg>
@@ -79,7 +79,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v83</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v84</span></p>
         </div>
       </header>
 
@@ -116,7 +116,7 @@
           <div class="settings-card">
             <button id="settingsListBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
-              <span class="settings-copy"><strong>Liste Home Assistant</strong><small id="settingsListSummary">Liste active</small></span>
+              <span class="settings-copy"><strong>Sélections personnalisées</strong><small>Tri, ouverture et catalogue</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
           </div>
@@ -223,14 +223,9 @@
   </dialog>
 
 
-  <dialog id="preferencesDialog" class="dialog preferences-dialog" tabindex="-1">
+  <dialog id="preferencesDialog" class="dialog preferences-dialog">
     <h3>Préférences</h3>
     <p class="dialog-intro">Personnalisez l’affichage et le comportement de l’application.</p>
-
-    <label class="field">
-      <span>Liste Home Assistant</span>
-      <select id="preferencesEntitySelect"></select>
-    </label>
 
     <label class="field">
       <span>Tri de Ma liste</span>
@@ -290,6 +285,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=83"></script>
+  <script src="./app.js?v=84"></script>
 </body>
 </html>

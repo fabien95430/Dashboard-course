@@ -3043,3 +3043,10 @@ body{
   .preference-toggle{min-height:62px;padding:9px 10px}
   .preference-toggle-copy strong{font-size:13px}
 }
+
+
+/* ===== UI v84 — préférences sans sélection HA ni contour de focus ===== */
+.preferences-dialog:focus,
+.preferences-dialog:focus-visible{
+  outline:none;
+}

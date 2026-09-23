@@ -626,13 +626,10 @@ function renderView(){
 function renderSettingsPage(){
   const connection=$('#settingsConnectionSummary');
   const connectionDot=$('#settingsConnectionDot');
-  const list=$('#settingsListSummary');
   const connected=!state.locked&&state.ws?.readyState===WebSocket.OPEN;
   if(connection)connection.textContent=connected?'Connecté':(state.locked?'Verrouillé':'Connexion…');
   if(connection)connection.classList.toggle('is-connected',connected);
   if(connectionDot)connectionDot.classList.toggle('is-online',connected);
-  const activeEntity=state.entities.find(entry=>entry.id===state.entity);
-  if(list)list.textContent=activeEntity?.name||state.entity||'Aucune liste';
 }
 
 
@@ -1211,31 +1208,15 @@ async function saveConnectionSettings(){
 
 function openPreferences(){
   const dialog=$('#preferencesDialog');
-  const select=$('#preferencesEntitySelect');
-  const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
-  if(state.demo){
-    select.innerHTML='<option value="">Mode test — aucune liste Home Assistant</option>';
-    select.disabled=true;
-  }else{
-    select.disabled=!choices.length;
-    select.innerHTML=choices.length
-      ? choices.map(entry=>'<option value="'+esc(entry.id)+'">'+esc(entry.name)+' — '+esc(entry.id)+'</option>').join('')
-      : '<option value="">Aucune liste disponible</option>';
-    if(choices.some(entry=>entry.id===state.entity))select.value=state.entity;
-  }
   $('#preferencesListSort').value=state.preferences.listSort;
   $('#preferencesStartView').value=state.preferences.startView;
   $('#preferencesHideAdded').checked=state.preferences.hideAdded;
   $('#preferencesSmartFavorites').checked=state.preferences.smartFavorites;
   dialog.showModal();
-  requestAnimationFrame(()=>{try{dialog.focus({preventScroll:true})}catch{dialog.focus()}});
 }
-async function savePreferencesSettings(){
-  const select=$('#preferencesEntitySelect');
-  const nextEntity=!state.demo&&!select.disabled?(select.value||state.entity):state.entity;
+function savePreferencesSettings(){
   const nextSort=$('#preferencesListSort').value;
   const nextStartView=$('#preferencesStartView').value;
-  const changedEntity=!!nextEntity&&nextEntity!==state.entity;
   state.preferences={
     listSort:['added','category','alpha'].includes(nextSort)?nextSort:DEFAULT_PREFERENCES.listSort,
     startView:['list','catalog'].includes(nextStartView)?nextStartView:DEFAULT_PREFERENCES.startView,
@@ -1243,20 +1224,10 @@ async function savePreferencesSettings(){
     smartFavorites:$('#preferencesSmartFavorites').checked
   };
   persistPreferences();
-  if(changedEntity){
-    state.entity=nextEntity;
-    localStorage.setItem(STORAGE.entity,nextEntity);
-    localStorage.setItem(STORAGE.entityPreference,nextEntity);
-  }
   $('#preferencesDialog').close();
-  if(changedEntity&&!state.demo&&state.ws?.readyState===WebSocket.OPEN){
-    await subscribe();
-    await refreshItems();
-  }else{
-    renderProducts();
-    renderList();
-    renderSettingsPage();
-  }
+  renderProducts();
+  renderList();
+  renderSettingsPage();
   toast('Préférences enregistrées');
 }
 
