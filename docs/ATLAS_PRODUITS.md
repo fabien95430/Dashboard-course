@@ -42,6 +42,20 @@ La reconstruction validée de Maison conserve :
 
 Ces valeurs sont une référence pour Maison, pas une règle à recopier aveuglément sur les autres catégories. Pour chaque nouvel atlas, calculer une taille de cellule adaptée au plus grand produit tout en conservant le ratio attendu.
 
+## Référence Boissons v5
+
+La reconstruction validée de Boissons conserve :
+
+- grille : **12 colonnes × 4 lignes** ;
+- ratio de cellule : **1** ;
+- cellule : **190 × 190 px** ;
+- atlas final : **2280 × 760 px** ;
+- 48 produits conservés dans le même ordre ;
+- pixels produits copiés à leur taille source, sans upscale ;
+- fond transparent et gouttières régulières ;
+- débordements entre les lignes supprimés ;
+- recadrage spécifique Boissons supprimé côté application.
+
 ## Garde-fous
 
 - `catalog.js` reste la source du catalogue : ne pas changer les noms ou l'ordre uniquement pour faciliter l'atlas.

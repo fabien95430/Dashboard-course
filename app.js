@@ -264,7 +264,7 @@ const PRODUCT_SHEETS=Object.freeze({
   'Frais':{src:'./bring-photo-v4-frais.webp.png?v=14',cols:12,rows:8,ratio:1},
   'Fruits & Légumes':{src:'./bring-photo-v4-fruits-legumes.webp.png?v=14',cols:12,rows:6,ratio:1},
   'Épicerie':{src:'./bring-photo-v4-epicerie.webp.png?v=14',cols:12,rows:8,ratio:1},
-  'Boissons':{src:'./bring-photo-v4-boissons.webp.png?v=14',cols:12,rows:4,ratio:1},
+  'Boissons':{src:'./bring-photo-v5-boissons.webp.png?v=15',cols:12,rows:4,ratio:1},
   'Maison':{src:'./bring-photo-v5-maison.webp.png?v=15',cols:12,rows:7,ratio:.875}
 });
 
@@ -436,8 +436,9 @@ function sprite(product,compact=false){
   const width=sheet.cols*100,height=sheet.rows*100;
   const safeTop=0;
   const safeLeft=0;
-  const safeRight=position.category==='Maison'?0:4;
-  const safeBottom=position.category==='Maison'?0:(position.category==='Boissons'?9:4);
+  const hasIsolatedAtlas=position.category==='Maison'||position.category==='Boissons';
+  const safeRight=hasIsolatedAtlas?0:4;
+  const safeBottom=hasIsolatedAtlas?0:4;
   return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+';--sprite-safe-top:'+safeTop+'%;--sprite-safe-right:'+safeRight+'%;--sprite-safe-bottom:'+safeBottom+'%;--sprite-safe-left:'+safeLeft+'%" aria-hidden="true">'+
     '<img src="'+sheet.src+'" alt="" loading="eager" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
