@@ -2088,15 +2088,6 @@ body:has(#securityOverlay.is-visible){
   }
 }
 
-/* v51 — boutons bas sans bande vide ni rognage. */
-@media(max-width:520px){
-  .app>.tabs .tab{
-    height:92px!important;
-    align-self:center!important;
-    transform:translateY(4px)!important;
-  }
-}
-
 /* ===== UI v53 — attendre la fin du zoom de lancement avant l’UI sécurité ===== */
 body.is-launching #securityOverlay.is-visible .security-hero,
 body.is-launching #securityOverlay.is-visible .security-modal,
@@ -2275,32 +2266,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   }
 }
 
-/* ===== UI v59 — marges symétriques, catégories sans cadre, navigation rapprochée ===== */
-@media(max-width:520px){
-  .list-view,
-  .catalog-view,
-  .settings-view{
-    margin-left:auto!important;
-    margin-right:auto!important;
-  }
-
-  .catalog-view .categories{
-    background:transparent!important;
-    border:0!important;
-    box-shadow:none!important;
-    outline:0!important;
-  }
-
-  .app>.tabs{
-    padding-top:0!important;
-  }
-  .app>.tabs .tab{
-    align-self:start!important;
-    margin-top:4px!important;
-    transform:none!important;
-  }
-}
-
 /* ===== UI v61 — version visible sur chaque page ===== */
 .page-version{
   display:inline-block;
@@ -2438,26 +2403,6 @@ body{
   }
 }
 
-/* ===== UI v66 — titres descendus sous la zone haute iPhone ===== */
-@media(max-width:520px){
-  .list-view{
-    grid-template-rows:104px 42px minmax(0,1fr)!important;
-  }
-  .catalog-view{
-    grid-template-rows:104px 42px 42px minmax(0,1fr)!important;
-  }
-  .settings-view{
-    grid-template-rows:104px minmax(0,1fr)!important;
-  }
-
-  .list-view .page-header,
-  .catalog-view .page-header,
-  .settings-view .page-header{
-    height:104px!important;
-    min-height:104px!important;
-  }
-}
-
 /* ===== UI v67 — navigation active soulignée, sans pavé ===== */
 @media(max-width:520px){
   .app>.tabs{
@@ -2502,27 +2447,7 @@ body{
   }
 }
 
-/* ===== UI v68 — remonte légèrement les en-têtes ===== */
-@media(max-width:520px){
-  .list-view{
-    grid-template-rows:92px 42px minmax(0,1fr)!important;
-  }
-  .catalog-view{
-    grid-template-rows:92px 42px 42px minmax(0,1fr)!important;
-  }
-  .settings-view{
-    grid-template-rows:92px minmax(0,1fr)!important;
-  }
-
-  .list-view .page-header,
-  .catalog-view .page-header,
-  .settings-view .page-header{
-    height:92px!important;
-    min-height:92px!important;
-  }
-}
-
-/* ===== UI v69 — remonte encore les en-têtes de 10 px ===== */
+/* ===== UI v108 — géométrie finale des en-têtes iPhone ===== */
 @media(max-width:520px){
   .list-view{
     grid-template-rows:82px 42px minmax(0,1fr)!important;
@@ -2683,22 +2608,6 @@ body{
     margin-right:0!important;
     padding:1px 19px 8px!important;
     background:transparent!important;
-  }
-}
-
-/* ===== UI v78 — bandeau bas réduit de 10 px et navigation réalignée ===== */
-@media(max-width:520px){
-  .app{
-    grid-template-rows:minmax(0,1fr) 104px!important;
-  }
-  .app>.tabs{
-    height:104px!important;
-  }
-  .app>.tabs .tab{
-    height:100px!important;
-  }
-  .app>.tabs .tab::after{
-    bottom:25px!important;
   }
 }
 
@@ -2933,30 +2842,7 @@ body{
 }
 
 
-/* ===== UI v88 — bandeau bas réduit de 10 px, boutons recentrés sans descendre ===== */
-@media(max-width:520px){
-  .app{
-    grid-template-rows:minmax(0,1fr) 94px!important;
-  }
-  .app>.tabs{
-    height:94px!important;
-  }
-  .app>.tabs .tab{
-    height:90px!important;
-    align-self:center!important;
-    margin-top:0!important;
-  }
-  .app>.tabs .tab>svg,
-  .app>.tabs .tab>span{
-    transform:translateY(-12px)!important;
-  }
-  .app>.tabs .tab::after{
-    bottom:23px!important;
-  }
-}
-
-
-/* ===== UI v89 — bandeau bas réduit de 5 px supplémentaires ===== */
+/* ===== UI v108 — géométrie finale de la navigation basse ===== */
 @media(max-width:520px){
   .app{
     grid-template-rows:minmax(0,1fr) 89px!important;
