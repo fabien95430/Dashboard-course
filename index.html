@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=85">
+  <link rel="stylesheet" href="./styles.css?v=86">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -40,7 +40,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v85</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v86</span></p>
         </div>
         <button id="settingsBtn" class="icon-btn" type="button" aria-label="Ouvrir les réglages">
           <svg><use href="#i-gear"></use></svg>
@@ -59,7 +59,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v85</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v86</span></p>
         </div>
         <button id="catalogSearchBtn" class="icon-btn" type="button" aria-label="Rechercher dans le catalogue">
           <svg><use href="#i-search"></use></svg>
@@ -79,7 +79,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v85</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v86</span></p>
         </div>
       </header>
 
@@ -223,7 +223,7 @@
   </dialog>
 
 
-  <dialog id="preferencesDialog" class="dialog preferences-dialog">
+  <dialog id="preferencesDialog" class="dialog preferences-dialog" tabindex="-1">
     <h3>Préférences</h3>
     <p class="dialog-intro">Personnalisez l’affichage et le comportement de l’application.</p>
 
@@ -274,17 +274,51 @@
     </div>
   </dialog>
 
-  <dialog id="settingsDialog" class="dialog">
-    <h3>Connexion et sécurité</h3>
-    <label class="field"><span>Liste Home Assistant</span><select id="entitySelect"></select></label>
-    <label class="field"><span>Adresse Home Assistant</span><input id="settingsHaUrl" type="url" autocomplete="url"></label>
-    <div class="dialog-actions"><button id="cancelSettings" type="button">Annuler</button><button id="saveSettings" class="primary" type="button">Enregistrer</button></div>
-    <button id="lockNowBtn" class="secondary" type="button">Verrouiller maintenant</button>
-    <button id="logoutBtn" class="danger" type="button">Déconnecter cette appli</button>
+  <dialog id="settingsDialog" class="dialog security-settings-dialog" tabindex="-1">
+    <h3>Mot de passe et verrouillage</h3>
+    <p class="dialog-intro">Protection locale de l’accès à vos courses sur cet appareil.</p>
+
+    <div class="security-settings-summary">
+      <div class="security-setting-info">
+        <span class="security-setting-icon"><svg><use href="#i-shield"></use></svg></span>
+        <span class="security-setting-copy"><strong>Coffre local chiffré</strong><small>Actif sur cet appareil</small></span>
+        <span class="security-setting-state">Actif</span>
+      </div>
+      <div class="security-setting-info">
+        <span class="security-setting-icon"><svg><use href="#i-lock"></use></svg></span>
+        <span class="security-setting-copy"><strong>Verrouillage automatique</strong><small>Après 5 min d’inactivité</small></span>
+      </div>
+    </div>
+
+    <button id="changePasswordBtn" class="security-action-row" type="button">
+      <span class="security-setting-icon"><svg><use href="#i-lock"></use></svg></span>
+      <span class="security-setting-copy"><strong>Changer le mot de passe local</strong><small>Vérifie l’ancien mot de passe puis rechiffre le coffre</small></span>
+      <svg class="chevron"><use href="#i-chevron"></use></svg>
+    </button>
+
+    <div id="changePasswordPanel" class="change-password-panel" hidden>
+      <label class="field">
+        <span>Mot de passe actuel</span>
+        <input id="currentLocalPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
+      </label>
+      <label class="field">
+        <span>Nouveau mot de passe</span>
+        <input id="newLocalPassword" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+      </label>
+      <label class="field">
+        <span>Confirmer le nouveau mot de passe</span>
+        <input id="confirmNewLocalPassword" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+      </label>
+      <div id="changePasswordError" class="setup-error" role="alert"></div>
+      <button id="savePasswordChange" class="primary security-password-save" type="button">Changer le mot de passe</button>
+    </div>
+
+    <button id="lockNowBtn" class="secondary security-lock-now" type="button">Verrouiller maintenant</button>
+    <div class="dialog-actions"><button id="cancelSettings" type="button">Fermer</button></div>
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=84"></script>
+  <script src="./app.js?v=86"></script>
 </body>
 </html>

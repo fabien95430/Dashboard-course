@@ -1161,6 +1161,22 @@ async function removeGroup(name,row=null){
     else {syncProductSelection();renderList()}
   }
 }
+function showNeutralDialog(dialog){
+  if(!dialog)return;
+  dialog.showModal();
+  requestAnimationFrame(()=>{
+    const active=document.activeElement;
+    if(active&&active!==dialog&&dialog.contains(active))active.blur?.();
+    try{dialog.focus({preventScroll:true})}catch(_){dialog.focus()}
+  });
+}
+function clearPasswordChangeForm(){
+  $('#currentLocalPassword').value='';
+  $('#newLocalPassword').value='';
+  $('#confirmNewLocalPassword').value='';
+  $('#changePasswordError').textContent='';
+  $('#changePasswordPanel').hidden=true;
+}
 function openConnectionSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
   const urlInput=$('#connectionHaUrl');
@@ -1175,12 +1191,7 @@ function openConnectionSettings(){
   const dialog=$('#connectionDialog');
   select?.blur();
   urlInput?.blur();
-  dialog.showModal();
-  requestAnimationFrame(()=>{
-    select?.blur();
-    urlInput?.blur();
-    try{dialog.focus({preventScroll:true})}catch{dialog.focus()}
-  });
+  showNeutralDialog(dialog);
 }
 async function saveConnectionSettings(){
   const nextUrl=normalizeHaUrl($('#connectionHaUrl').value);
@@ -1212,7 +1223,7 @@ function openPreferences(){
   $('#preferencesStartView').value=state.preferences.startView;
   $('#preferencesHideAdded').checked=state.preferences.hideAdded;
   $('#preferencesSmartFavorites').checked=state.preferences.smartFavorites;
-  dialog.showModal();
+  showNeutralDialog(dialog);
 }
 function savePreferencesSettings(){
   const nextSort=$('#preferencesListSort').value;
@@ -1233,32 +1244,31 @@ function savePreferencesSettings(){
 
 function openSettings(){
   if(state.demo){showSetup('Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.');return}
-  $('#settingsHaUrl').value=state.haUrl;
-  const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
-  $('#entitySelect').innerHTML=choices.map(e=>'<option value="'+esc(e.id)+'" '+(e.id===state.entity?'selected':'')+'>'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
-  renderSettingsPage();
-  $('#settingsDialog').showModal();
+  clearPasswordChangeForm();
+  showNeutralDialog($('#settingsDialog'));
 }
-async function saveSettings(){
-  const nextUrl=normalizeHaUrl($('#settingsHaUrl').value);
-  const nextEntity=$('#entitySelect').value||state.entity;
-  if(!nextUrl)return;
-  const changedUrl=nextUrl!==state.haUrl;
-  const changedEntity=!!nextEntity&&nextEntity!==state.entity;
-  if(nextEntity){
-    state.entity=nextEntity;
-    localStorage.setItem(STORAGE.entity,nextEntity);
-    localStorage.setItem(STORAGE.entityPreference,nextEntity);
-  }
-  $('#settingsDialog').close();
-  if(changedUrl){
-    await revoke();
-    state.haUrl=nextUrl;
-    $('#haUrlInput').value=nextUrl;
-    $('#setupError').textContent='Adresse modifiée : reconnecte Home Assistant.';
-  }else{
-    if(changedEntity)await subscribe();
-    await refreshItems();armIdleLock();
+async function changeLocalPassword(){
+  const current=$('#currentLocalPassword').value;
+  const next=$('#newLocalPassword').value;
+  const confirm=$('#confirmNewLocalPassword').value;
+  const error=$('#changePasswordError');
+  const button=$('#savePasswordChange');
+  error.textContent='';
+  if(!current){error.textContent='Entre le mot de passe actuel.';return}
+  if(next.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
+  if(next!==confirm){error.textContent='Les deux nouveaux mots de passe ne correspondent pas.';return}
+  button.disabled=true;
+  try{
+    const payload=await decryptVault(vaultRecord(),current);
+    await storeSecureVault(payload.refresh_token,payload.ha_url,next);
+    clearUnlockGuard();
+    clearPasswordChangeForm();
+    armIdleLock();
+    toast('Mot de passe modifié');
+  }catch(_){
+    error.textContent='Mot de passe actuel incorrect ou coffre illisible.';
+  }finally{
+    button.disabled=false;
   }
 }
 async function init(){
@@ -1330,10 +1340,17 @@ $('#cancelConnectionSettings').onclick=()=>$('#connectionDialog').close();
 $('#saveConnectionSettings').onclick=saveConnectionSettings;
 $('#cancelPreferences').onclick=()=>$('#preferencesDialog').close();
 $('#savePreferences').onclick=savePreferencesSettings;
-$('#cancelSettings').onclick=()=>$('#settingsDialog').close();
-$('#saveSettings').onclick=saveSettings;
-$('#lockNowBtn').onclick=()=>{$('#settingsDialog').close();lockApp('Verrouillage manuel.')};
-$('#logoutBtn').onclick=revoke;
+$('#changePasswordBtn').onclick=()=>{
+  const panel=$('#changePasswordPanel');
+  const opening=panel.hidden;
+  if(!opening){clearPasswordChangeForm();return}
+  panel.hidden=false;
+  $('#changePasswordError').textContent='';
+};
+$('#savePasswordChange').onclick=changeLocalPassword;
+$('#confirmNewLocalPassword').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
+$('#cancelSettings').onclick=()=>{clearPasswordChangeForm();$('#settingsDialog').close()};
+$('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();$('#settingsDialog').close();lockApp('Verrouillage manuel.')};
 $('#productSearch').oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
 $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
 document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
