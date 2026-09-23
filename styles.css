@@ -776,9 +776,9 @@ svg{display:block}
 }
 .product:active{transform:scale(.98)}
 .product.is-selected{
-  background:linear-gradient(180deg,#f5fbf4,#eaf7e9);
+  background:linear-gradient(180deg,#efffe9,#dff9df);
   color:#101914;
-  border-color:rgba(31,135,73,.14);
+  border-color:rgba(31,155,73,.34);
 }
 .media{
   width:100%;
