@@ -706,6 +706,21 @@ function listDomMatchesCurrentState(){
       &&row.classList.contains('is-busy')===state.productBusy.has(key);
   });
 }
+function removeRenderedListRow(row){
+  syncProductSelection();
+  const root=$('#listItems');
+  if(!row||!root||!root.contains(row)){renderList();return}
+  row.remove();
+  const rows=[...root.querySelectorAll('.list-row')];
+  const count=$('#listCount');
+  if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
+  if(!rows.length){renderList();return}
+  const canReorder=rows.length>1;
+  rows.forEach(entry=>{
+    const grip=entry.querySelector('.row-grip');
+    if(grip)grip.disabled=!canReorder;
+  });
+}
 function listReorderUnavailableMessage(){
   if(state.listReorderBusy)return 'Réorganisation en cours';
   if(norm(state.listQuery))return 'Efface la recherche pour réorganiser la liste';
@@ -1409,7 +1424,7 @@ async function removeGroup(name,row=null){
   state.pendingRemoval.add(key);
   const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
   state.items=state.items.filter(keepOtherItems);
-  renderSelectionAndList();
+  removeRenderedListRow(row);
 
   try{
     if(state.demo){
@@ -1432,7 +1447,7 @@ async function removeGroup(name,row=null){
     state.pendingRemoval.delete(key);
     state.productBusy.delete(key);
     if(!state.demo)await refreshItems();
-    else {renderSelectionAndList()}
+    else syncProductSelection();
   }
 }
 function showNeutralDialog(dialog){

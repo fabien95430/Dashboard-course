@@ -1,5 +1,5 @@
-const CACHE='courses-app-v116-final-refactor';
-const SHELL=['./welcome-cart-transparent-v46.png','./welcome-background-v40.webp','./','./index.html','./styles.css?v=116','./catalog.js','./app.js?v=116','./manifest.webmanifest?v=43','./icon-premium-v40.svg','./icon.svg','./bring-photo-v5-frais.webp.png?v=15','./bring-photo-v5-fruits-legumes.webp.png?v=15','./bring-photo-v5-epicerie.webp.png?v=15','./bring-photo-v5-boissons.webp.png?v=15','./bring-photo-v5-maison.webp.png?v=15'];
+const CACHE='courses-app-v117-stable-row-removal';
+const SHELL=['./welcome-cart-transparent-v46.png','./welcome-background-v40.webp','./','./index.html','./styles.css?v=117','./catalog.js','./app.js?v=117','./manifest.webmanifest?v=43','./icon-premium-v40.svg','./icon.svg','./bring-photo-v5-frais.webp.png?v=15','./bring-photo-v5-fruits-legumes.webp.png?v=15','./bring-photo-v5-epicerie.webp.png?v=15','./bring-photo-v5-boissons.webp.png?v=15','./bring-photo-v5-maison.webp.png?v=15'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
