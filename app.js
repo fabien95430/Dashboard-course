@@ -708,14 +708,29 @@ function bindListReorder(root){
       event.stopPropagation();
       const pointerId=event.pointerId;
       const originalOrder=visibleListOrder(root).join('\u0000');
-      row.classList.add('is-dragging');
+      const startRect=row.getBoundingClientRect();
+      const startClientY=event.clientY;
+      const preview=row.cloneNode(true);
+      preview.classList.add('is-drag-preview');
+      preview.setAttribute('aria-hidden','true');
+      preview.querySelectorAll('button').forEach(button=>button.tabIndex=-1);
+      preview.style.left=startRect.left+'px';
+      preview.style.top=startRect.top+'px';
+      preview.style.width=startRect.width+'px';
+      preview.style.height=startRect.height+'px';
+      document.body.appendChild(preview);
+      row.classList.add('is-drag-origin');
       handle.classList.add('is-active');
       root.classList.add('is-reordering');
       navigator.vibrate?.(5);
       try{handle.setPointerCapture(pointerId)}catch(_){}
+      const movePreview=clientY=>{
+        preview.style.transform='translate3d(0,'+(clientY-startClientY)+'px,0) scale(1.015)';
+      };
       const move=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
         moveEvent.preventDefault();
+        movePreview(moveEvent.clientY);
         const bounds=root.getBoundingClientRect();
         if(moveEvent.clientY<bounds.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
         else if(moveEvent.clientY>bounds.bottom-48)root.scrollTop+=12;
@@ -729,8 +744,7 @@ function bindListReorder(root){
         else root.appendChild(row);
         if(row.nextElementSibling!==previousNext)navigator.vibrate?.(3);
       };
-      const cleanup=()=>{
-        row.classList.remove('is-dragging');
+      const stopTracking=()=>{
         handle.classList.remove('is-active');
         root.classList.remove('is-reordering');
         document.removeEventListener('pointermove',move,true);
@@ -738,15 +752,32 @@ function bindListReorder(root){
         document.removeEventListener('pointercancel',cancel,true);
         try{handle.releasePointerCapture(pointerId)}catch(_){}
       };
+      const revealRow=()=>{
+        preview.remove();
+        row.classList.remove('is-drag-origin');
+      };
       const finish=upEvent=>{
         if(upEvent.pointerId!==pointerId)return;
-        cleanup();
+        upEvent.preventDefault();
+        stopTracking();
         const changed=visibleListOrder(root).join('\u0000')!==originalOrder;
-        if(changed)persistListReorder(root,row.dataset.key||'');
+        const targetRect=row.getBoundingClientRect();
+        preview.classList.add('is-settling');
+        requestAnimationFrame(()=>{
+          preview.style.left=targetRect.left+'px';
+          preview.style.top=targetRect.top+'px';
+          preview.style.transform='translate3d(0,0,0) scale(1)';
+          preview.style.opacity='1';
+        });
+        setTimeout(()=>{
+          revealRow();
+          if(changed)persistListReorder(root,row.dataset.key||'');
+        },190);
       };
       const cancel=cancelEvent=>{
         if(cancelEvent.pointerId!==pointerId)return;
-        cleanup();
+        stopTracking();
+        revealRow();
         if(visibleListOrder(root).join('\u0000')!==originalOrder)renderList();
       };
       document.addEventListener('pointermove',move,{passive:false,capture:true});
