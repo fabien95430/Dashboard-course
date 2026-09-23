@@ -1655,7 +1655,7 @@ $('#refreshBtn').onclick=async()=>{
   button?.classList.add('is-refreshing');
   if(button)button.disabled=true;
   try{
-    await Promise.all([refreshItems(),new Promise(resolve=>setTimeout(resolve,550))]);
+    await refreshItems();
   }finally{
     button?.classList.remove('is-refreshing');
     if(button)button.disabled=false;

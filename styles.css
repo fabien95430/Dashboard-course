@@ -743,7 +743,7 @@ svg{display:block}
 .icon-btn:active{transform:scale(.96)}
 .icon-btn:disabled{cursor:default}
 .icon-btn svg{width:29px;height:29px}
-.icon-btn.is-refreshing svg{animation:header-refresh-spin .7s linear infinite}
+.icon-btn.is-refreshing svg{animation:header-refresh-spin .3s linear infinite}
 @keyframes header-refresh-spin{to{transform:rotate(360deg)}}
 
 /* Recherche */
