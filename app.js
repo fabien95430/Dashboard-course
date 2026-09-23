@@ -315,9 +315,11 @@ function sprite(product,compact=false){
   const fallback=premiumProductVisual(product,compact);
   const left=-(position.col*100),top=-(position.row*100);
   const width=sheet.cols*100,height=sheet.rows*100;
-  const safeX=position.category==='Maison'?11:7;
-  const safeY=7;
-  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+';--sprite-safe-x:'+safeX+'%;--sprite-safe-y:'+safeY+'%" aria-hidden="true">'+
+  const safeTop=5;
+  const safeLeft=5;
+  const safeRight=position.category==='Maison'?20:7;
+  const safeBottom=position.category==='Maison'||position.category==='Boissons'?16:7;
+  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+';--sprite-safe-top:'+safeTop+'%;--sprite-safe-right:'+safeRight+'%;--sprite-safe-bottom:'+safeBottom+'%;--sprite-safe-left:'+safeLeft+'%" aria-hidden="true">'+
     '<img src="'+sheet.src+'" alt="" loading="eager" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
   '</span>';
