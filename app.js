@@ -298,6 +298,7 @@ let state={
   productBusy:new Set(),
   pendingRemoval:new Set(),
   purchaseUndo:new Map(),
+  listReorderBusy:false,
   usage:loadJson(STORAGE.usage,{})||{},
   preferences:INITIAL_PREFERENCES
 };
@@ -603,7 +604,7 @@ function renderList(){
       '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong><small>'+esc(categoryLabel)+'</small></span>'+
       quantity+
       '<button class="undo-purchase" type="button" data-name="'+esc(group.summary)+'" hidden>Annuler</button>'+
-      '<span class="row-grip" aria-hidden="true">≡</span>'+
+      '<button class="row-grip" type="button" data-name="'+esc(group.summary)+'" aria-label="Déplacer '+esc(group.summary)+'">≡</button>'+
     '</div>';
   }).join('');
   el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
@@ -614,6 +615,142 @@ function renderList(){
   el.querySelectorAll('.undo-purchase').forEach(button=>button.onclick=event=>{
     event.stopPropagation();
     undoPurchase(button.dataset.name||'',button.closest('.list-row'));
+  });
+  bindListReorder(el);
+}
+function listReorderUnavailableMessage(){
+  if(state.listReorderBusy)return 'Réorganisation en cours';
+  if(norm(state.listQuery))return 'Efface la recherche pour réorganiser la liste';
+  if(state.preferences.listSort!=='added')return 'Choisis « Ordre d’ajout » pour réorganiser la liste';
+  return '';
+}
+function visibleListOrder(root){
+  return [...root.querySelectorAll('.list-row')].map(row=>row.dataset.key||'').filter(Boolean);
+}
+function applyDemoListOrder(orderKeys){
+  const buckets=new Map(orderKeys.map(key=>[key,[]]));
+  const extras=[],completed=[];
+  state.items.forEach(item=>{
+    if(String(item?.status||'needs_action')==='completed'){completed.push(item);return}
+    const summary=String(item?.summary??item?.name??item?.item??'').trim();
+    const key=norm(summary);
+    if(buckets.has(key))buckets.get(key).push(item);
+    else extras.push(item);
+  });
+  state.items=[...orderKeys.flatMap(key=>buckets.get(key)||[]),...extras,...completed];
+  saveJson(DEMO_KEY,state.items);
+}
+async function persistListReorder(root,movedKey){
+  if(state.listReorderBusy)return;
+  const orderKeys=visibleListOrder(root);
+  const movedIndex=orderKeys.indexOf(movedKey);
+  if(movedIndex<0)return;
+  const groupsByKey=new Map(activeGroups().map(group=>[norm(group.summary),group]));
+  const movedGroup=groupsByKey.get(movedKey);
+  if(!movedGroup)return;
+  state.listReorderBusy=true;
+  try{
+    if(state.demo){
+      applyDemoListOrder(orderKeys);
+      navigator.vibrate?.(8);
+      toast('Ordre enregistré');
+      renderList();
+      return;
+    }
+    if(!state.entity)throw new Error('Liste Home Assistant indisponible');
+    const movedUids=movedGroup.uids.filter(Boolean);
+    if(!movedUids.length)throw new Error('Identifiant de l’article indisponible');
+    let previousUid='';
+    for(let index=movedIndex-1;index>=0&&!previousUid;index--){
+      const previousGroup=groupsByKey.get(orderKeys[index]);
+      previousUid=previousGroup?.uids?.filter(Boolean).at(-1)||'';
+    }
+    for(const uid of movedUids){
+      const payload={type:'todo/item/move',entity_id:state.entity,uid};
+      if(previousUid)payload.previous_uid=previousUid;
+      await request(payload);
+      previousUid=uid;
+    }
+    navigator.vibrate?.(8);
+    toast('Ordre enregistré');
+    await refreshItems();
+  }catch(error){
+    const message=String(error?.message||'').toLowerCase();
+    toast(message.includes('support')||message.includes('reorder')?'Cette liste ne permet pas la réorganisation':'Réorganisation impossible');
+    if(!state.demo)await refreshItems();
+    else renderList();
+  }finally{
+    state.listReorderBusy=false;
+  }
+}
+function bindListReorder(root){
+  root.querySelectorAll('.row-grip').forEach(handle=>{
+    const row=handle.closest('.list-row');
+    if(!row)return;
+    handle.addEventListener('keydown',event=>{
+      if(event.key!=='ArrowUp'&&event.key!=='ArrowDown')return;
+      event.preventDefault();
+      const unavailable=listReorderUnavailableMessage();
+      if(unavailable){toast(unavailable);return}
+      const rows=[...root.querySelectorAll('.list-row')];
+      const index=rows.indexOf(row);
+      const nextIndex=event.key==='ArrowUp'?index-1:index+1;
+      if(index<0||nextIndex<0||nextIndex>=rows.length)return;
+      if(event.key==='ArrowUp')root.insertBefore(row,rows[nextIndex]);
+      else rows[nextIndex].after(row);
+      navigator.vibrate?.(4);
+      persistListReorder(root,row.dataset.key||'');
+    });
+    handle.addEventListener('pointerdown',event=>{
+      if(event.button!==undefined&&event.button!==0)return;
+      const unavailable=listReorderUnavailableMessage();
+      if(unavailable){toast(unavailable);return}
+      event.preventDefault();
+      event.stopPropagation();
+      const pointerId=event.pointerId;
+      const originalOrder=visibleListOrder(root).join('\u0000');
+      row.classList.add('is-dragging');
+      handle.classList.add('is-active');
+      try{handle.setPointerCapture(pointerId)}catch(_){}
+      const move=moveEvent=>{
+        if(moveEvent.pointerId!==pointerId)return;
+        moveEvent.preventDefault();
+        const bounds=root.getBoundingClientRect();
+        if(moveEvent.clientY<bounds.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
+        else if(moveEvent.clientY>bounds.bottom-48)root.scrollTop+=12;
+        const siblings=[...root.querySelectorAll('.list-row')].filter(entry=>entry!==row);
+        const before=siblings.find(entry=>{
+          const rect=entry.getBoundingClientRect();
+          return moveEvent.clientY<rect.top+rect.height/2;
+        });
+        const previousNext=row.nextElementSibling;
+        if(before)root.insertBefore(row,before);
+        else root.appendChild(row);
+        if(row.nextElementSibling!==previousNext)navigator.vibrate?.(3);
+      };
+      const cleanup=()=>{
+        row.classList.remove('is-dragging');
+        handle.classList.remove('is-active');
+        handle.removeEventListener('pointermove',move);
+        handle.removeEventListener('pointerup',finish);
+        handle.removeEventListener('pointercancel',cancel);
+        try{handle.releasePointerCapture(pointerId)}catch(_){}
+      };
+      const finish=upEvent=>{
+        if(upEvent.pointerId!==pointerId)return;
+        cleanup();
+        const changed=visibleListOrder(root).join('\u0000')!==originalOrder;
+        if(changed)persistListReorder(root,row.dataset.key||'');
+      };
+      const cancel=cancelEvent=>{
+        if(cancelEvent.pointerId!==pointerId)return;
+        cleanup();
+        if(visibleListOrder(root).join('\u0000')!==originalOrder)renderList();
+      };
+      handle.addEventListener('pointermove',move,{passive:false});
+      handle.addEventListener('pointerup',finish);
+      handle.addEventListener('pointercancel',cancel);
+    });
   });
 }
 function undoPurchase(name,row){
