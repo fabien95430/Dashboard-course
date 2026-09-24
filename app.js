@@ -857,13 +857,16 @@ function bindListReorder(root){
         if(moveEvent.clientY<bounds.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
         else if(moveEvent.clientY>bounds.bottom-48)root.scrollTop+=12;
         const siblings=[...root.querySelectorAll('.list-row')].filter(entry=>entry!==row);
-        const before=siblings.find(entry=>{
+        const target=siblings.find(entry=>{
           const rect=entry.getBoundingClientRect();
-          return moveEvent.clientY<rect.top+rect.height/2;
+          return moveEvent.clientX>=rect.left&&moveEvent.clientX<=rect.right
+            &&moveEvent.clientY>=rect.top&&moveEvent.clientY<=rect.bottom;
         });
+        if(!target)return;
+        const targetRect=target.getBoundingClientRect();
         const previousNext=row.nextElementSibling;
-        if(before)root.insertBefore(row,before);
-        else root.appendChild(row);
+        if(moveEvent.clientY<targetRect.top+targetRect.height/2)root.insertBefore(row,target);
+        else target.after(row);
         if(row.nextElementSibling!==previousNext)navigator.vibrate?.(3);
       };
       const stopTracking=()=>{
