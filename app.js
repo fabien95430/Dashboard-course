@@ -697,14 +697,28 @@ function listDomMatchesCurrentState(){
   if(!rows.length)return false;
   const rendered=[...root.querySelectorAll('.list-row')];
   if(rendered.length!==rows.length)return false;
+  const canReorder=rows.length>1;
   return rows.every((group,index)=>{
     const row=rendered[index],key=norm(group.summary);
     const quantity=group.count>1?'x'+group.count:'';
+    const grip=row.querySelector('.row-grip');
     return row.dataset.key===key
       &&row.dataset.name===group.summary
       &&(row.querySelector('.list-qty')?.textContent||'')===quantity
-      &&row.classList.contains('is-busy')===state.productBusy.has(key);
+      &&row.classList.contains('is-busy')===state.productBusy.has(key)
+      &&!!grip
+      &&grip.disabled===!canReorder;
   });
+}
+function updateListReorderAvailability(root){
+  if(!root)return false;
+  const rows=[...root.querySelectorAll('.list-row')];
+  const canReorder=rows.length>1;
+  rows.forEach(entry=>{
+    const grip=entry.querySelector('.row-grip');
+    if(grip)grip.disabled=!canReorder;
+  });
+  return canReorder;
 }
 function removeRenderedListRow(row){
   syncProductSelection();
@@ -715,13 +729,10 @@ function removeRenderedListRow(row){
   const count=$('#listCount');
   if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
   if(!rows.length){renderList();return}
-  const canReorder=rows.length>1;
-  rows.forEach(entry=>{
-    const grip=entry.querySelector('.row-grip');
-    if(grip)grip.disabled=!canReorder;
-  });
+  updateListReorderAvailability(root);
 }
-function listReorderUnavailableMessage(){
+function listReorderUnavailableMessage(root=null){
+  if(root&&!updateListReorderAvailability(root))return 'La réorganisation nécessite au moins 2 articles';
   if(state.listReorderBusy)return 'Réorganisation en cours';
   if(norm(state.listQuery))return 'Efface la recherche pour réorganiser la liste';
   if(state.preferences.listSort!=='added')return 'Choisis « Ordre d’ajout » pour réorganiser la liste';
@@ -745,6 +756,7 @@ function applyDemoListOrder(orderKeys){
 async function persistListReorder(root,movedKey){
   if(state.listReorderBusy)return;
   const orderKeys=visibleListOrder(root);
+  if(orderKeys.length<2){updateListReorderAvailability(root);return}
   const movedIndex=orderKeys.indexOf(movedKey);
   if(movedIndex<0)return;
   const groupsByKey=new Map(activeGroups().map(group=>[norm(group.summary),group]));
@@ -791,7 +803,7 @@ function bindListReorder(root){
     handle.addEventListener('keydown',event=>{
       if(event.key!=='ArrowUp'&&event.key!=='ArrowDown')return;
       event.preventDefault();
-      const unavailable=listReorderUnavailableMessage();
+      const unavailable=listReorderUnavailableMessage(root);
       if(unavailable){toast(unavailable);return}
       const rows=[...root.querySelectorAll('.list-row')];
       const index=rows.indexOf(row);
@@ -804,7 +816,7 @@ function bindListReorder(root){
     });
     handle.addEventListener('pointerdown',event=>{
       if(event.button!==undefined&&event.button!==0)return;
-      const unavailable=listReorderUnavailableMessage();
+      const unavailable=listReorderUnavailableMessage(root);
       if(unavailable){toast(unavailable);return}
       event.preventDefault();
       event.stopPropagation();
