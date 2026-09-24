@@ -828,6 +828,14 @@ function bindListReorder(root){
       preview.classList.add('is-drag-preview');
       preview.setAttribute('aria-hidden','true');
       preview.querySelectorAll('button').forEach(button=>button.tabIndex=-1);
+      const sourceIcon=row.querySelector('.list-icon');
+      const previewIcon=preview.querySelector('.list-icon');
+      let iconPlaceholder=null;
+      if(sourceIcon&&previewIcon){
+        iconPlaceholder=sourceIcon.cloneNode(false);
+        sourceIcon.replaceWith(iconPlaceholder);
+        previewIcon.replaceWith(sourceIcon);
+      }
       preview.style.left=startRect.left+'px';
       preview.style.top=startRect.top+'px';
       preview.style.width=startRect.width+'px';
@@ -867,6 +875,7 @@ function bindListReorder(root){
         try{handle.releasePointerCapture(pointerId)}catch(_){}
       };
       const revealRow=()=>{
+        if(iconPlaceholder?.isConnected&&sourceIcon)iconPlaceholder.replaceWith(sourceIcon);
         preview.remove();
         row.classList.remove('is-drag-origin');
       };
