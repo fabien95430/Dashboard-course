@@ -852,10 +852,6 @@ function bindListReorder(root){
       const move=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
         moveEvent.preventDefault();
-        movePreview(moveEvent.clientY);
-        const bounds=root.getBoundingClientRect();
-        if(moveEvent.clientY<bounds.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
-        else if(moveEvent.clientY>bounds.bottom-48)root.scrollTop+=12;
         const siblings=[...root.querySelectorAll('.list-row')].filter(entry=>entry!==row);
         const target=siblings.find(entry=>{
           const rect=entry.getBoundingClientRect();
@@ -863,6 +859,10 @@ function bindListReorder(root){
             &&moveEvent.clientY>=rect.top&&moveEvent.clientY<=rect.bottom;
         });
         if(!target)return;
+        movePreview(moveEvent.clientY);
+        const bounds=root.getBoundingClientRect();
+        if(moveEvent.clientY<bounds.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
+        else if(moveEvent.clientY>bounds.bottom-48)root.scrollTop+=12;
         const targetRect=target.getBoundingClientRect();
         const previousNext=row.nextElementSibling;
         if(moveEvent.clientY<targetRect.top+targetRect.height/2)root.insertBefore(row,target);
