@@ -2727,3 +2727,23 @@ body{
   .tabs .tab>svg,
   .tabs .tab>span{transition:none}
 }
+
+
+/* v127 — sections visuelles lorsque Ma liste est triée par catégorie */
+.list-category-heading{
+  margin:16px 9px 8px;
+  color:#40544a;
+  font-size:18px;
+  line-height:1.15;
+  font-weight:800;
+  letter-spacing:-.2px;
+}
+.list-category-heading:first-child{
+  margin-top:4px;
+}
+@media(max-width:390px){
+  .list-category-heading{
+    margin:14px 8px 7px;
+    font-size:17px;
+  }
+}

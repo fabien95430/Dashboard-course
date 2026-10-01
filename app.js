@@ -698,11 +698,17 @@ function renderList(){
     el.innerHTML='<div class="empty">'+message+'</div>';
     return;
   }
+  let previousCategory='';
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=catalogProductFor(group.summary),busy=state.productBusy.has(key);
+    const category=product?.category||'Autres';
     const categoryLabel=product?.sub||product?.category||'Article';
     const quantity=group.count>1?'<span class="list-qty">x'+group.count+'</span>':'';
-    return '<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
+    const categoryHeading=state.preferences.listSort==='category'&&category!==previousCategory
+      ?'<div class="list-category-heading" role="heading" aria-level="2">'+esc(category)+'</div>'
+      :'';
+    previousCategory=category;
+    return categoryHeading+'<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
       '<button class="purchase-check" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'><svg><use href="#i-check"></use></svg></button>'+
       '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
       '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong><small>'+esc(categoryLabel)+'</small></span>'+
@@ -758,6 +764,9 @@ function removeRenderedListRow(row){
   const root=$('#listItems');
   if(!row||!root||!root.contains(row)){renderList();return}
   row.remove();
+  root.querySelectorAll('.list-category-heading').forEach(heading=>{
+    if(!heading.nextElementSibling?.classList.contains('list-row'))heading.remove();
+  });
   const rows=[...root.querySelectorAll('.list-row')];
   const count=$('#listCount');
   if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
