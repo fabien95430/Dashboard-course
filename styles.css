@@ -2747,3 +2747,32 @@ body{
     font-size:17px;
   }
 }
+
+
+/* v129 — Liquid Glass tactile plus vert */
+.tabs::before{
+  border-color:rgba(57,181,96,calc(.58 + var(--nav-liquid-lift) * .18));
+  background:
+    radial-gradient(76% 46% at 50% 1%,rgba(255,255,255,calc(.88 + var(--nav-liquid-lift) * .10)),transparent 72%),
+    radial-gradient(42% 72% at 8% 50%,rgba(219,255,230,calc(.28 + var(--nav-liquid-lift) * .10)),transparent 70%),
+    radial-gradient(42% 72% at 92% 50%,rgba(190,248,209,calc(.22 + var(--nav-liquid-lift) * .08)),transparent 70%),
+    linear-gradient(180deg,rgba(103,220,139,calc(.72 - var(--nav-liquid-lift) * .08)),rgba(38,170,88,calc(.46 - var(--nav-liquid-lift) * .05)));
+  box-shadow:
+    inset 1.5px 1.5px 0 -0.5px rgba(255,255,255,calc(.94 + var(--nav-liquid-lift) * .06)),
+    inset -1px -1px 0 -0.25px rgba(22,118,59,calc(.28 + var(--nav-liquid-lift) * .14)),
+    inset 0 0 10px rgba(229,255,236,calc(.42 + var(--nav-liquid-lift) * .12)),
+    0 calc(3px + var(--nav-liquid-lift) * 5px) calc(11px + var(--nav-liquid-lift) * 12px) rgba(20,121,55,calc(.18 + var(--nav-liquid-lift) * .08));
+}
+.tabs .tab{touch-action:manipulation}
+.tabs .tab.is-active{touch-action:none;color:#076c38!important}
+.tabs .tab.is-liquid-under{color:#076c38!important}
+.tabs .tab.is-liquid-under>svg,
+.tabs .tab.is-liquid-under>span{
+  text-shadow:0 1px 8px rgba(6,108,56,.24);
+}
+@media(max-width:520px){
+  .app>.tabs::before{
+    top:3px;
+    height:62px;
+  }
+}
