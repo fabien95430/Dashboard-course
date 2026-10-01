@@ -846,27 +846,31 @@ function bindListReorder(root){
       root.classList.add('is-reordering');
       navigator.vibrate?.(5);
       try{handle.setPointerCapture(pointerId)}catch(_){}
-      const movePreview=clientY=>{
-        preview.style.transform='translate3d(0,'+(clientY-startClientY)+'px,0) scale(1.015)';
+      const grabOffsetY=startClientY-startRect.top;
+      const movePreview=top=>{
+        preview.style.transform='translate3d(0,'+(top-startRect.top)+'px,0) scale(1.015)';
       };
       const move=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
         moveEvent.preventDefault();
-        const siblings=[...root.querySelectorAll('.list-row')].filter(entry=>entry!==row);
-        const target=siblings.find(entry=>{
-          const rect=entry.getBoundingClientRect();
-          return moveEvent.clientX>=rect.left&&moveEvent.clientX<=rect.right
-            &&moveEvent.clientY>=rect.top&&moveEvent.clientY<=rect.bottom;
-        });
-        if(!target)return;
-        movePreview(moveEvent.clientY);
-        const bounds=root.getBoundingClientRect();
-        if(moveEvent.clientY<bounds.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
-        else if(moveEvent.clientY>bounds.bottom-48)root.scrollTop+=12;
-        const targetRect=target.getBoundingClientRect();
+        const rows=[...root.querySelectorAll('.list-row')];
+        if(rows.length<2)return;
+        const rowRects=rows.map(entry=>({entry,rect:entry.getBoundingClientRect()}));
+        const listTop=Math.min(...rowRects.map(item=>item.rect.top));
+        const listBottom=Math.max(...rowRects.map(item=>item.rect.bottom));
+        const rootRect=root.getBoundingClientRect();
+        if(moveEvent.clientX<rootRect.left||moveEvent.clientX>rootRect.right)return;
+        const maxTop=Math.max(listTop,listBottom-startRect.height);
+        const previewTop=Math.min(maxTop,Math.max(listTop,moveEvent.clientY-grabOffsetY));
+        movePreview(previewTop);
+        if(moveEvent.clientY<rootRect.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
+        else if(moveEvent.clientY>rootRect.bottom-48)root.scrollTop+=12;
+        const previewCenter=previewTop+startRect.height/2;
+        const siblings=rowRects.filter(item=>item.entry!==row);
+        const before=siblings.find(item=>previewCenter<item.rect.top+item.rect.height/2);
         const previousNext=row.nextElementSibling;
-        if(moveEvent.clientY<targetRect.top+targetRect.height/2)root.insertBefore(row,target);
-        else target.after(row);
+        if(before)root.insertBefore(row,before.entry);
+        else siblings.at(-1)?.entry.after(row);
         if(row.nextElementSibling!==previousNext)navigator.vibrate?.(3);
       };
       const stopTracking=()=>{
