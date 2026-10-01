@@ -3545,7 +3545,7 @@ body{
 
   .app>.tabs .tab.is-active,
   .app>.tabs .tab.is-liquid-under{
-    color:#0b6f3e!important;
+    color:#ff9500!important;
   }
 
   .app>.tabs .tab.is-active>svg,
@@ -3561,5 +3561,13 @@ body{
   .app>.tabs .tab.is-liquid-under>svg,
   .app>.tabs .tab.is-liquid-under>span{
     transform:scale(1.08)!important;
+  }
+}
+
+
+/* v151 — icône et texte actifs orange */
+@media(max-width:520px){
+  .app>.tabs .tab.is-active span{
+    text-shadow:0 1px 0 rgba(255,255,255,.46),0 1px 6px rgba(255,149,0,.18)!important;
   }
 }
