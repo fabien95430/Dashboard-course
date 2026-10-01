@@ -773,12 +773,23 @@ function removeRenderedListRow(row){
   if(!rows.length){renderList();return}
   updateListReorderAvailability(root);
 }
-function listReorderUnavailableMessage(root=null){
+function listRowCategory(row){
+  return catalogProductFor(row?.dataset?.name||'')?.category||'Autres';
+}
+function reorderableListRows(root,row=null){
+  const rows=[...root.querySelectorAll('.list-row')];
+  if(state.preferences.listSort!=='category'||!row)return rows;
+  const category=listRowCategory(row);
+  return rows.filter(entry=>listRowCategory(entry)===category);
+}
+function listReorderUnavailableMessage(root=null,row=null){
   if(root&&!updateListReorderAvailability(root))return 'La réorganisation nécessite au moins 2 articles';
   if(state.listReorderBusy)return 'Réorganisation en cours';
   if(norm(state.listQuery))return 'Efface la recherche pour réorganiser la liste';
   if(state.listCategoryFilter!=='Toutes')return 'Affiche toutes les catégories pour réorganiser la liste';
-  if(state.preferences.listSort!=='added')return 'Choisis « Ordre d’ajout » pour réorganiser la liste';
+  if(state.preferences.listSort==='alpha')return 'Le tri A à Z ne permet pas la réorganisation';
+  if(state.preferences.listSort==='category'&&root&&row&&reorderableListRows(root,row).length<2)return 'La réorganisation nécessite au moins 2 articles dans cette catégorie';
+  if(state.preferences.listSort!=='added'&&state.preferences.listSort!=='category')return 'Réorganisation indisponible';
   return '';
 }
 function visibleListOrder(root){
@@ -846,9 +857,9 @@ function bindListReorder(root){
     handle.addEventListener('keydown',event=>{
       if(event.key!=='ArrowUp'&&event.key!=='ArrowDown')return;
       event.preventDefault();
-      const unavailable=listReorderUnavailableMessage(root);
+      const unavailable=listReorderUnavailableMessage(root,row);
       if(unavailable){toast(unavailable);return}
-      const rows=[...root.querySelectorAll('.list-row')];
+      const rows=reorderableListRows(root,row);
       const index=rows.indexOf(row);
       const nextIndex=event.key==='ArrowUp'?index-1:index+1;
       if(index<0||nextIndex<0||nextIndex>=rows.length)return;
@@ -859,7 +870,7 @@ function bindListReorder(root){
     });
     handle.addEventListener('pointerdown',event=>{
       if(event.button!==undefined&&event.button!==0)return;
-      const unavailable=listReorderUnavailableMessage(root);
+      const unavailable=listReorderUnavailableMessage(root,row);
       if(unavailable){toast(unavailable);return}
       event.preventDefault();
       event.stopPropagation();
@@ -896,7 +907,7 @@ function bindListReorder(root){
       const move=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
         moveEvent.preventDefault();
-        const rows=[...root.querySelectorAll('.list-row')];
+        const rows=reorderableListRows(root,row);
         if(rows.length<2)return;
         const rowRects=rows.map(entry=>({entry,rect:entry.getBoundingClientRect()}));
         const listTop=Math.min(...rowRects.map(item=>item.rect.top));
