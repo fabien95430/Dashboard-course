@@ -3407,3 +3407,11 @@ body{
     width:calc(100vw - 18px)!important;
   }
 }
+
+
+/* v143 — navigation plus basse */
+@media(max-width:520px){
+  .app>.tabs{
+    transform:translate(-50%,24px)!important;
+  }
+}
