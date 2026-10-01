@@ -376,6 +376,7 @@ let state={
   listCategoryFilter:'Toutes',
   view:INITIAL_PREFERENCES.startView,
   reconnectTimer:null,
+  reconnectPromise:null,
   intentionalClose:false,
   demo:false,
   lockTimer:null,
@@ -1347,6 +1348,7 @@ function closeSocket(){
 function clearLockTimers(){
   clearTimeout(state.lockTimer);state.lockTimer=null;
   clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
+  clearTimeout(state.reconnectTimer);state.reconnectTimer=null;
   state.backgroundedAt=0;
 }
 function armBackgroundLock(){
@@ -1436,24 +1438,46 @@ async function exchangeCodeRaw(code,returnedState){
   if(!response.ok)throw new Error('Home Assistant a refusé la connexion');
   return response.json();
 }
+function authRejectedError(message){
+  const error=new Error(message);
+  error.authRejected=true;
+  return error;
+}
 async function refreshAccessToken(){
   if(!state.refreshToken||!state.haUrl)throw new Error('Application verrouillée');
   const body=new URLSearchParams({grant_type:'refresh_token',refresh_token:state.refreshToken,client_id:CLIENT_ID});
-  const response=await fetch(state.haUrl+'/auth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
-  if(!response.ok)throw new Error('Session Home Assistant expirée ou révoquée');
+  let response;
+  try{
+    response=await fetch(state.haUrl+'/auth/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+  }catch(_){
+    throw new Error('Home Assistant est momentanément inaccessible');
+  }
+  if(!response.ok){
+    if([400,401,403].includes(response.status))throw authRejectedError('Session Home Assistant expirée ou révoquée');
+    throw new Error('Home Assistant est momentanément indisponible');
+  }
   const data=await response.json();
   state.accessToken=String(data.access_token||'');
   state.accessTokenExpiresAt=Date.now()+Number(data.expires_in||1800)*1000;
-  if(!state.accessToken)throw new Error('Jeton Home Assistant absent');
+  if(!state.accessToken)throw new Error('Réponse Home Assistant incomplète');
   return state.accessToken;
 }
-async function connectAuthorized(token){
+function scheduleReconnect(){
+  clearTimeout(state.reconnectTimer);state.reconnectTimer=null;
+  if(state.locked||!state.refreshToken||document.visibilityState==='hidden')return;
+  state.reconnectTimer=setTimeout(()=>{
+    state.reconnectTimer=null;
+    if(!state.locked&&state.refreshToken&&document.visibilityState!=='hidden')connectFromRefresh();
+  },HA_TIMING.reconnectDelayMs);
+}
+async function connectAuthorized(token,reuseKnownEntity=false){
   state.accessToken=token;
   state.locked=false;
   hideSetup();hideSecurity();
   status('is-waiting','Connexion…','Home Assistant');
   await connectWs(token);
-  await discoverEntities();
+  clearTimeout(state.reconnectTimer);state.reconnectTimer=null;
+  if(!(reuseKnownEntity&&state.entity&&state.entities.length))await discoverEntities();
   state.loading=true;
   renderList();
   status('is-waiting','Connexion…','Liste Home Assistant');
@@ -1462,14 +1486,30 @@ async function connectAuthorized(token){
   armIdleLock();
 }
 async function connectFromRefresh(){
-  try{
-    const token=await refreshAccessToken();
-    await connectAuthorized(token);
-  }catch(error){
-    wipeMemoryCredentials();state.locked=true;
-    status('is-error','Connexion refusée',error.message||'Session invalide');
-    showSecurity('unlock','La connexion Home Assistant n’a pas pu être renouvelée. Utilise le mot de passe ou réinitialise la connexion.');
-  }
+  if(state.reconnectPromise)return state.reconnectPromise;
+  const reconnect=(async()=>{
+    try{
+      const token=await refreshAccessToken();
+      if(state.locked||!state.refreshToken)return;
+      const reuseKnownEntity=!!state.entity&&state.entities.length>0;
+      await connectAuthorized(token,reuseKnownEntity);
+    }catch(error){
+      if(state.locked)return;
+      if(error?.authRejected){
+        closeSocket();
+        wipeMemoryCredentials();state.locked=true;
+        status('is-error','Connexion refusée',error.message||'Session invalide');
+        showSecurity('unlock','La connexion Home Assistant a été refusée. Déverrouille l’application pour réessayer.');
+        return;
+      }
+      status('is-waiting','Reconnexion…',error.message||'Home Assistant momentanément indisponible');
+      armIdleLock();
+      scheduleReconnect();
+    }
+  })();
+  state.reconnectPromise=reconnect;
+  try{return await reconnect}
+  finally{if(state.reconnectPromise===reconnect)state.reconnectPromise=null}
 }
 async function completeSecurityAction(){
   const password=UI.securityPassword.value;
@@ -1611,7 +1651,7 @@ function connectWs(token){
     ws.onmessage=event=>{
       let msg;try{msg=JSON.parse(event.data)}catch(_){return}
       if(msg.type==='auth_required'){ws.send(JSON.stringify({type:'auth',access_token:token}));return}
-      if(msg.type==='auth_invalid'){clearTimeout(timeout);reject(new Error('Autorisation Home Assistant invalide'));return}
+      if(msg.type==='auth_invalid'){clearTimeout(timeout);reject(authRejectedError('Autorisation Home Assistant invalide'));return}
       if(msg.type==='auth_ok'){authed=true;clearTimeout(timeout);resolve();return}
       if(msg.type==='result'&&state.pending.has(msg.id)){const p=state.pending.get(msg.id);state.pending.delete(msg.id);clearTimeout(p.timer);msg.success?p.resolve(msg.result):p.reject(new Error(msg.error?.message||'Erreur Home Assistant'));return}
       if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id===state.entity)scheduleListRefresh();
@@ -1619,7 +1659,7 @@ function connectWs(token){
     ws.onerror=()=>{if(!authed){clearTimeout(timeout);reject(new Error('WebSocket Home Assistant indisponible'))}};
     ws.onclose=()=>{
       state.pending.forEach(p=>{clearTimeout(p.timer);p.reject(new Error('Connexion interrompue'))});state.pending.clear();
-      if(authed&&!state.intentionalClose&&!state.locked&&state.refreshToken){status('is-waiting','Reconnexion…','Home Assistant');clearTimeout(state.reconnectTimer);state.reconnectTimer=setTimeout(connectFromRefresh,HA_TIMING.reconnectDelayMs)}
+      if(authed&&!state.intentionalClose&&!state.locked&&state.refreshToken){status('is-waiting','Reconnexion…','Home Assistant');scheduleReconnect()}
     };
   });
 }
