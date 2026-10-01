@@ -2731,7 +2731,7 @@ body{
 
 /* v127 — sections visuelles lorsque Ma liste est triée par catégorie */
 .list-category-heading{
-  margin:16px 9px 8px;
+  margin:22px 9px 9px;
   color:#40544a;
   font-size:18px;
   line-height:1.15;
@@ -2743,7 +2743,7 @@ body{
 }
 @media(max-width:390px){
   .list-category-heading{
-    margin:14px 8px 7px;
+    margin:20px 8px 8px;
     font-size:17px;
   }
 }

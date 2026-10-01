@@ -698,20 +698,22 @@ function renderList(){
     el.innerHTML='<div class="empty">'+message+'</div>';
     return;
   }
+  const showCategorySections=state.preferences.listSort==='category';
   let previousCategory='';
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=catalogProductFor(group.summary),busy=state.productBusy.has(key);
     const category=product?.category||'Autres';
     const categoryLabel=product?.sub||product?.category||'Article';
+    const itemDetail=showCategorySections?'':'<small>'+esc(categoryLabel)+'</small>';
     const quantity=group.count>1?'<span class="list-qty">x'+group.count+'</span>':'';
-    const categoryHeading=state.preferences.listSort==='category'&&category!==previousCategory
+    const categoryHeading=showCategorySections&&category!==previousCategory
       ?'<div class="list-category-heading" role="heading" aria-level="2">'+esc(category)+'</div>'
       :'';
     previousCategory=category;
     return categoryHeading+'<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
       '<button class="purchase-check" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'><svg><use href="#i-check"></use></svg></button>'+
       '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
-      '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong><small>'+esc(categoryLabel)+'</small></span>'+
+      '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong>'+itemDetail+'</span>'+
       quantity+
       '<button class="undo-purchase" type="button" data-name="'+esc(group.summary)+'" hidden>Annuler</button>'+
       '<button class="row-grip" type="button" data-name="'+esc(group.summary)+'" aria-label="Déplacer '+esc(group.summary)+'" '+(canReorder?'':'disabled')+'>≡</button>'+
