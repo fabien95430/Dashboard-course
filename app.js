@@ -380,6 +380,7 @@ let state={
   demo:false,
   lockTimer:null,
   backgroundLockTimer:null,
+  backgroundedAt:0,
   resumeToList:false,
   productBusy:new Set(),
   pendingRemoval:new Set(),
@@ -1346,6 +1347,18 @@ function closeSocket(){
 function clearLockTimers(){
   clearTimeout(state.lockTimer);state.lockTimer=null;
   clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
+  state.backgroundedAt=0;
+}
+function armBackgroundLock(){
+  if(state.demo||state.locked||!vaultRecord())return;
+  if(!state.backgroundedAt)state.backgroundedAt=Date.now();
+  clearTimeout(state.backgroundLockTimer);
+  const remaining=Math.max(0,SECURITY.backgroundLockMs-(Date.now()-state.backgroundedAt));
+  state.backgroundLockTimer=setTimeout(()=>{
+    state.backgroundLockTimer=null;
+    if(state.locked||state.demo||!vaultRecord())return;
+    lockApp('Verrouillage après passage en arrière-plan.');
+  },remaining);
 }
 function armIdleLock(){
   clearTimeout(state.lockTimer);
@@ -2127,7 +2140,13 @@ function bindUiEvents(){
 }
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
 function resumeForegroundSession(){
+  const backgroundedAt=state.backgroundedAt;
   clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
+  state.backgroundedAt=0;
+  if(backgroundedAt&&!state.locked&&!state.demo&&vaultRecord()&&Date.now()-backgroundedAt>=SECURITY.backgroundLockMs){
+    lockApp('Verrouillage après passage en arrière-plan.');
+    return;
+  }
   if(state.resumeToList){
     state.resumeToList=false;
     state.view='list';
@@ -2162,8 +2181,7 @@ function resumeForegroundSession(){
 }
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'){
-    clearTimeout(state.backgroundLockTimer);
-    if(!state.locked&&!state.demo&&vaultRecord())state.backgroundLockTimer=setTimeout(()=>lockApp('Verrouillage après passage en arrière-plan.'),SECURITY.backgroundLockMs);
+    armBackgroundLock();
     return;
   }
   resumeForegroundSession();
@@ -2173,9 +2191,9 @@ window.addEventListener('online',()=>{
   if(!state.locked&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN&&state.ws?.readyState!==WebSocket.CONNECTING)connectFromRefresh();
 });
 window.addEventListener('pagehide',()=>{
-  clearLockTimers();closeSocket();wipeMemoryCredentials();
+  closeSocket();
   state.resumeToList=true;
-  if(vaultRecord()&&!state.demo)state.locked=true;
+  armBackgroundLock();
 });
 window.addEventListener('pageshow',()=>{
   resumeForegroundSession();
