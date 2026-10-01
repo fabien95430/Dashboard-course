@@ -366,6 +366,8 @@ let state={
   pendingRemoval:new Set(),
   purchaseUndo:new Map(),
   listReorderBusy:false,
+  listRefreshTimer:null,
+  listReorderRefreshPending:false,
   usage:loadJson(STORAGE.usage,{})||{},
   preferences:INITIAL_PREFERENCES
 };
@@ -809,6 +811,28 @@ function applyDemoListOrder(orderKeys){
   state.items=[...orderKeys.flatMap(key=>buckets.get(key)||[]),...extras,...completed];
   saveJson(DEMO_KEY,state.items);
 }
+function applyLocalListMove(orderKeys,movedKey){
+  const movedIndex=orderKeys.indexOf(movedKey);
+  if(movedIndex<0)return;
+  const previousKey=movedIndex>0?orderKeys[movedIndex-1]:'';
+  const moved=[],remaining=[];
+  state.items.forEach(item=>{
+    if(isPendingItem(item)&&norm(itemSummary(item))===movedKey)moved.push(item);
+    else remaining.push(item);
+  });
+  if(!moved.length)return;
+  let insertAt=-1;
+  if(previousKey){
+    for(let index=remaining.length-1;index>=0;index--){
+      if(isPendingItem(remaining[index])&&norm(itemSummary(remaining[index]))===previousKey){insertAt=index+1;break}
+    }
+  }
+  if(insertAt<0){
+    insertAt=remaining.findIndex(isPendingItem);
+    if(insertAt<0)insertAt=remaining.length;
+  }
+  state.items=[...remaining.slice(0,insertAt),...moved,...remaining.slice(insertAt)];
+}
 async function persistListReorder(root,movedKey){
   if(state.listReorderBusy)return;
   const orderKeys=visibleListOrder(root);
@@ -819,12 +843,12 @@ async function persistListReorder(root,movedKey){
   const movedGroup=groupsByKey.get(movedKey);
   if(!movedGroup)return;
   state.listReorderBusy=true;
+  let verifyAfterReorder=false;
   try{
     if(state.demo){
       applyDemoListOrder(orderKeys);
       navigator.vibrate?.(8);
       toast('Ordre enregistré');
-      renderList();
       return;
     }
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
@@ -839,16 +863,22 @@ async function persistListReorder(root,movedKey){
       await todoMove(uid,previousUid);
       previousUid=uid;
     }
+    applyLocalListMove(orderKeys,movedKey);
+    verifyAfterReorder=true;
     navigator.vibrate?.(8);
     toast('Ordre enregistré');
-    await refreshItems();
   }catch(error){
     const message=String(error?.message||'').toLowerCase();
     toast(message.includes('support')||message.includes('reorder')?'Cette liste ne permet pas la réorganisation':'Réorganisation impossible');
+    state.listReorderRefreshPending=false;
     if(!state.demo)await refreshItems();
     else renderList();
   }finally{
     state.listReorderBusy=false;
+    if(!state.demo&&(verifyAfterReorder||state.listReorderRefreshPending)){
+      state.listReorderRefreshPending=false;
+      scheduleListRefresh();
+    }
   }
 }
 function bindListReorder(root){
@@ -1520,6 +1550,17 @@ function todoMove(uid,previousUid=''){
   if(previousUid)payload.previous_uid=previousUid;
   return request(payload);
 }
+function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){
+  if(state.listReorderBusy){
+    state.listReorderRefreshPending=true;
+    return;
+  }
+  clearTimeout(state.listRefreshTimer);
+  state.listRefreshTimer=setTimeout(()=>{
+    state.listRefreshTimer=null;
+    refreshItems();
+  },delay);
+}
 function connectWs(token){
   return new Promise((resolve,reject)=>{
     state.intentionalClose=false;
@@ -1532,7 +1573,7 @@ function connectWs(token){
       if(msg.type==='auth_invalid'){clearTimeout(timeout);reject(new Error('Autorisation Home Assistant invalide'));return}
       if(msg.type==='auth_ok'){authed=true;clearTimeout(timeout);resolve();return}
       if(msg.type==='result'&&state.pending.has(msg.id)){const p=state.pending.get(msg.id);state.pending.delete(msg.id);clearTimeout(p.timer);msg.success?p.resolve(msg.result):p.reject(new Error(msg.error?.message||'Erreur Home Assistant'));return}
-      if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id===state.entity)setTimeout(refreshItems,HA_TIMING.eventRefreshDelayMs);
+      if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id===state.entity)scheduleListRefresh();
     };
     ws.onerror=()=>{if(!authed){clearTimeout(timeout);reject(new Error('WebSocket Home Assistant indisponible'))}};
     ws.onclose=()=>{
