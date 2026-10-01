@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=132">
+  <link rel="stylesheet" href="./styles.css?v=133">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -42,7 +42,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v132</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v133</span></p>
         </div>
         <div class="page-header-actions">
           <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
@@ -55,23 +55,30 @@
       </header>
 
       <div id="listFilterBackdrop" class="list-filter-backdrop" hidden></div>
-      <div id="listFilterMenu" class="list-filter-menu" role="dialog" aria-label="Trier et filtrer Ma liste" hidden>
-        <div class="list-filter-section" role="radiogroup" aria-label="Trier la liste">
-          <strong class="list-filter-title">Trier la liste</strong>
+      <div id="listFilterMenu" class="list-filter-menu" role="dialog" aria-modal="true" aria-label="Trier et filtrer Ma liste" hidden>
+        <div class="list-filter-handle" aria-hidden="true"></div>
+        <div class="list-filter-sheet-head">
+          <strong>Trier la liste</strong>
+          <button id="listFilterCloseBtn" class="list-filter-close" type="button" aria-label="Fermer le tri et les filtres">×</button>
+        </div>
+        <div class="list-filter-section list-filter-sort-options" role="radiogroup" aria-label="Trier la liste">
           <button class="list-filter-option" type="button" data-list-sort="added" role="radio">
+            <svg class="list-filter-choice-icon"><use href="#i-list"></use></svg>
             <span>Ordre d’ajout</span><i aria-hidden="true"></i>
           </button>
           <button class="list-filter-option" type="button" data-list-sort="alpha" role="radio">
+            <span class="list-filter-alpha-icon" aria-hidden="true">A↕Z</span>
             <span>A → Z</span><i aria-hidden="true"></i>
           </button>
           <button class="list-filter-option" type="button" data-list-sort="category" role="radio">
+            <svg class="list-filter-choice-icon"><use href="#i-grid"></use></svg>
             <span>Par catégorie</span><i aria-hidden="true"></i>
           </button>
         </div>
         <div class="list-filter-section list-filter-categories" role="radiogroup" aria-label="Filtrer par catégorie">
           <strong class="list-filter-title">Filtrer par catégorie</strong>
           <button class="list-filter-option" type="button" data-list-category="Toutes" role="radio">
-            <span>Toutes les catégories</span><i aria-hidden="true"></i>
+            <span>Toutes</span><i aria-hidden="true"></i>
           </button>
           <button class="list-filter-option" type="button" data-list-category="Frais" role="radio">
             <span>Frais</span><i aria-hidden="true"></i>
@@ -103,7 +110,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v132</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v133</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -123,7 +130,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v132</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v133</span></p>
         </div>
       </header>
 
@@ -363,6 +370,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=132"></script>
+  <script src="./app.js?v=133"></script>
 </body>
 </html>

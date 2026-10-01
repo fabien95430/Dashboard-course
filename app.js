@@ -223,6 +223,7 @@ const UI = Object.freeze({
   listFilterBtn: document.getElementById('listFilterBtn'),
   listFilterMenu: document.getElementById('listFilterMenu'),
   listFilterBackdrop: document.getElementById('listFilterBackdrop'),
+  listFilterCloseBtn: document.getElementById('listFilterCloseBtn'),
   catalogRefreshBtn: document.getElementById('catalogRefreshBtn')
 });
 const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -1959,6 +1960,7 @@ function bindUiEvents(){
     setListFilterMenuOpen(UI.listFilterMenu.hidden);
   };
   UI.listFilterBackdrop.onclick=()=>setListFilterMenuOpen(false);
+  UI.listFilterCloseBtn.onclick=()=>setListFilterMenuOpen(false);
   UI.listFilterMenu.querySelectorAll('[data-list-sort]').forEach(button=>button.onclick=()=>{
     const next=button.dataset.listSort;
     if(!['added','category','alpha'].includes(next))return;
