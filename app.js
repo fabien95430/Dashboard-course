@@ -17,6 +17,7 @@ const CATEGORY_META = {
   'Favoris': { label:'Favoris' }
 };
 const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Favoris'];
+const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Fruits & Légumes','Épicerie','Frais','Boissons','Maison']);
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
   "Lait sans lactose":"Lait s. lact.",
@@ -169,7 +170,8 @@ const STORAGE = {
   entity:'courses-external-entity-v1',
   entityPreference:'courses-external-entity-preference-v1',
   usage:'courses-external-usage-v1',
-  preferences:'courses-preferences-v1'
+  preferences:'courses-preferences-v1',
+  missingProducts:'courses-missing-products-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
 const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
@@ -218,6 +220,10 @@ const UI = Object.freeze({
   preferencesStartView: document.getElementById('preferencesStartView'),
   preferencesHideAdded: document.getElementById('preferencesHideAdded'),
   preferencesSmartFavorites: document.getElementById('preferencesSmartFavorites'),
+  missingProductsDialog: document.getElementById('missingProductsDialog'),
+  missingProductName: document.getElementById('missingProductName'),
+  missingCategoryGrid: document.getElementById('missingCategoryGrid'),
+  missingProductsList: document.getElementById('missingProductsList'),
   savePasswordChange: document.getElementById('savePasswordChange'),
   refreshBtn: document.getElementById('refreshBtn'),
   listFilterBtn: document.getElementById('listFilterBtn'),
@@ -285,6 +291,18 @@ function readPreferences(){
 }
 function persistPreferences(){saveJson(STORAGE.preferences,state.preferences)}
 const INITIAL_PREFERENCES=readPreferences();
+function readMissingProducts(){
+  const saved=loadJson(STORAGE.missingProducts,[]);
+  if(!Array.isArray(saved))return [];
+  return saved.slice(-100).map((entry,index)=>{
+    const name=String(entry?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
+    if(!name)return null;
+    const category=MISSING_PRODUCT_CATEGORIES.includes(entry?.category)?entry.category:'';
+    const id=String(entry?.id||('legacy-'+index+'-'+norm(name)));
+    return {id,name,category};
+  }).filter(Boolean);
+}
+function persistMissingProducts(){saveJson(STORAGE.missingProducts,state.missingProducts)}
 
 const COURSES_ENTITY='todo.courses';
 const URL_ENTITY='todo.url';
@@ -369,6 +387,8 @@ let state={
   listReorderBusy:false,
   listRefreshTimer:null,
   listReorderRefreshPending:false,
+  missingProductCategory:'',
+  missingProducts:readMissingProducts(),
   usage:loadJson(STORAGE.usage,{})||{},
   preferences:INITIAL_PREFERENCES
 };
@@ -1223,6 +1243,12 @@ function renderSettingsPage(){
   if(connection)connection.textContent=connected?'Connecté':(state.locked?'Verrouillé':'Connexion…');
   if(connection)connection.classList.toggle('is-connected',connected);
   if(connectionDot)connectionDot.classList.toggle('is-online',connected);
+  const missingCount=$('#settingsMissingProductsCount');
+  if(missingCount){
+    const count=state.missingProducts.length;
+    missingCount.textContent=String(count);
+    missingCount.hidden=count===0;
+  }
 }
 
 
@@ -1364,6 +1390,7 @@ function lockApp(message='Application verrouillée.'){
   if(state.demo||!vaultRecord())return;
   if(UI.connectionDialog.open)UI.connectionDialog.close();
   if(UI.preferencesDialog.open)UI.preferencesDialog.close();
+  if(UI.missingProductsDialog.open)UI.missingProductsDialog.close();
   if(UI.settingsDialog.open)UI.settingsDialog.close();
   clearLockTimers();
   closeSocket();
@@ -1824,6 +1851,80 @@ async function saveConnectionSettings(){
   }
 }
 
+function missingCategoryLabel(category){
+  return category==='Frais'?'Produits frais':(CATEGORY_META[category]?.label||category);
+}
+function renderMissingCategorySelection(){
+  if(!UI.missingCategoryGrid)return;
+  UI.missingCategoryGrid.querySelectorAll('[data-missing-category]').forEach(button=>{
+    const active=(button.dataset.missingCategory||'')===state.missingProductCategory;
+    button.classList.toggle('is-active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+}
+function renderMissingProducts(){
+  renderMissingCategorySelection();
+  const list=UI.missingProductsList;
+  const count=state.missingProducts.length;
+  const listCount=$('#missingProductsListCount');
+  if(listCount)listCount.textContent=String(count);
+  if(!list)return;
+  if(!count){
+    list.innerHTML='<div class="missing-products-empty">Aucun produit noté pour le moment.</div>';
+    return;
+  }
+  list.innerHTML=state.missingProducts.map(item=>{
+    const category=item.category?'<small>'+esc(missingCategoryLabel(item.category))+'</small>':'';
+    return '<div class="missing-product-row">'+
+      '<span class="missing-product-mark" aria-hidden="true"><svg><use href="#i-cart"></use></svg></span>'+
+      '<span class="missing-product-copy"><strong>'+esc(item.name)+'</strong>'+category+'</span>'+
+      '<button class="missing-product-remove" type="button" data-remove-missing="'+esc(item.id)+'" aria-label="Supprimer '+esc(item.name)+'"><svg><use href="#i-trash"></use></svg></button>'+
+    '</div>';
+  }).join('');
+}
+function openMissingProducts(){
+  state.missingProductCategory='';
+  UI.missingProductName.value='';
+  renderMissingProducts();
+  showNeutralDialog(UI.missingProductsDialog);
+}
+function setMissingProductCategory(category){
+  const next=String(category||'');
+  if(!MISSING_PRODUCT_CATEGORIES.includes(next))return;
+  state.missingProductCategory=next;
+  renderMissingCategorySelection();
+  navigator.vibrate?.(4);
+}
+function addMissingProduct(){
+  const name=String(UI.missingProductName.value||'').trim().replace(/\s+/g,' ').slice(0,80);
+  if(!name){
+    UI.missingProductName.focus();
+    toast('Indique le nom du produit');
+    return;
+  }
+  if(state.missingProducts.some(item=>norm(item.name)===norm(name))){
+    toast('Ce produit est déjà noté');
+    return;
+  }
+  state.missingProducts.push({id:secureRandomToken(8),name,category:state.missingProductCategory});
+  persistMissingProducts();
+  UI.missingProductName.value='';
+  state.missingProductCategory='';
+  renderMissingProducts();
+  renderSettingsPage();
+  navigator.vibrate?.(8);
+  toast('Produit ajouté');
+}
+function removeMissingProduct(id){
+  const next=state.missingProducts.filter(item=>item.id!==id);
+  if(next.length===state.missingProducts.length)return;
+  state.missingProducts=next;
+  persistMissingProducts();
+  renderMissingProducts();
+  renderSettingsPage();
+  navigator.vibrate?.(6);
+}
+
 function openPreferences(){
   const dialog=UI.preferencesDialog;
   UI.preferencesListSort.value=state.preferences.listSort;
@@ -1984,12 +2085,21 @@ function bindUiEvents(){
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;
   $('#settingsListBtn').onclick=openPreferences;
+  $('#settingsMissingProductsBtn').onclick=openMissingProducts;
   $('#settingsLockBtn').onclick=()=>lockApp(STATUS_TEXT.manualLockReason);
   $('#settingsLogoutBtn').onclick=revoke;
   $('#cancelConnectionSettings').onclick=()=>UI.connectionDialog.close();
   $('#saveConnectionSettings').onclick=saveConnectionSettings;
   $('#cancelPreferences').onclick=()=>UI.preferencesDialog.close();
   $('#savePreferences').onclick=savePreferencesSettings;
+  $('#closeMissingProducts').onclick=()=>UI.missingProductsDialog.close();
+  $('#addMissingProduct').onclick=addMissingProduct;
+  UI.missingProductName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addMissingProduct()}};
+  UI.missingCategoryGrid.querySelectorAll('[data-missing-category]').forEach(button=>button.onclick=()=>setMissingProductCategory(button.dataset.missingCategory||''));
+  UI.missingProductsList.onclick=event=>{
+    const button=event.target.closest('[data-remove-missing]');
+    if(button)removeMissingProduct(button.dataset.removeMissing||'');
+  };
   $('#changePasswordBtn').onclick=()=>{
     const panel=UI.changePasswordPanel;
     const opening=panel.hidden;

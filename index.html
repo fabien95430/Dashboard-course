@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=134">
+  <link rel="stylesheet" href="./styles.css?v=135">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -32,7 +32,8 @@
     <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M7.2 5.5a8 8 0 1 0 9.6 0"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
-    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M14 8l4 4-4 4M18 12H8"/></symbol>\n    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13h6l-1 9 9-12h-6.2l.7-8Z"/></symbol>
+    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M14 8l4 4-4 4M18 12H8"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="m6.5 7 .8 13h9.4l.8-13"/><path d="M10 11v5M14 11v5"/></symbol>\n    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13h6l-1 9 9-12h-6.2l.7-8Z"/></symbol>
   </svg>
 
   <main id="app" class="app is-locked">
@@ -42,7 +43,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v134</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v135</span></p>
         </div>
         <div class="page-header-actions">
           <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
@@ -110,7 +111,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v134</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v135</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -130,7 +131,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v134</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v135</span></p>
         </div>
       </header>
 
@@ -169,6 +170,14 @@
               <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
               <span class="settings-copy"><strong>Sélections personnalisées</strong><small>Tri, ouverture et catalogue</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
+            </button>
+            <button id="settingsMissingProductsBtn" class="settings-row missing-products-settings-row" type="button">
+              <span class="settings-icon settings-icon-missing"><svg><use href="#i-cart"></use></svg></span>
+              <span class="settings-copy"><strong>Produits manquants</strong><small>Noter les produits absents du catalogue</small></span>
+              <span class="settings-row-end">
+                <span id="settingsMissingProductsCount" class="settings-count" hidden>0</span>
+                <svg class="chevron"><use href="#i-chevron"></use></svg>
+              </span>
             </button>
           </div>
         </section>
@@ -325,6 +334,42 @@
     </div>
   </dialog>
 
+  <dialog id="missingProductsDialog" class="dialog missing-products-dialog" tabindex="-1">
+    <div class="missing-products-header">
+      <div>
+        <h3>Produits manquants</h3>
+        <p class="dialog-intro">Ajoutez ici les produits absents du catalogue. Cette liste reste sur cet appareil.</p>
+      </div>
+      <button id="closeMissingProducts" class="missing-products-close" type="button" aria-label="Fermer"><span aria-hidden="true">×</span></button>
+    </div>
+
+    <div class="missing-products-add">
+      <input id="missingProductName" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" placeholder="Nom du produit" aria-label="Nom du produit">
+      <button id="addMissingProduct" class="primary" type="button">Ajouter</button>
+    </div>
+
+    <section class="missing-category-panel" aria-labelledby="missingCategoryTitle">
+      <div class="missing-category-heading">
+        <strong id="missingCategoryTitle">Choisir une catégorie</strong>
+        <small>Optionnel</small>
+      </div>
+      <div id="missingCategoryGrid" class="missing-category-grid">
+        <button class="missing-category-choice is-active" type="button" data-missing-category="" aria-pressed="true"><span>Aucune</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Fruits &amp; Légumes" aria-pressed="false"><span>Fruits &amp; légumes</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Épicerie" aria-pressed="false"><span>Épicerie</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Frais" aria-pressed="false"><span>Produits frais</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Boissons" aria-pressed="false"><span>Boissons</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Maison" aria-pressed="false"><span>Maison</span></button>
+      </div>
+    </section>
+
+    <div class="missing-products-list-heading">
+      <strong>Liste des produits</strong>
+      <span id="missingProductsListCount">0</span>
+    </div>
+    <div id="missingProductsList" class="missing-products-list"></div>
+  </dialog>
+
   <dialog id="settingsDialog" class="dialog security-settings-dialog" tabindex="-1">
     <h3>Mot de passe et verrouillage</h3>
     <p class="dialog-intro">Protection locale de l’accès à vos courses sur cet appareil.</p>
@@ -370,6 +415,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=134"></script>
+  <script src="./app.js?v=135"></script>
 </body>
 </html>
