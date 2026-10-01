@@ -3303,3 +3303,107 @@ body{
   .missing-category-panel{padding:11px}
   .missing-category-choice{font-size:11.5px}
 }
+
+
+/* v140 — navigation flottante iOS 26 */
+@media(max-width:520px){
+  .app{
+    grid-template-rows:minmax(0,1fr)!important;
+    padding-bottom:0!important;
+  }
+
+  .app .tabs::after{
+    display:none!important;
+    content:none!important;
+  }
+
+  .app>.tabs{
+    position:fixed!important;
+    z-index:40!important;
+    left:50%!important;
+    right:auto!important;
+    bottom:calc(env(safe-area-inset-bottom) + 8px)!important;
+    width:min(calc(100vw - 24px),520px)!important;
+    height:76px!important;
+    margin:0!important;
+    padding:5px!important;
+    transform:translateX(-50%)!important;
+    align-self:auto!important;
+    border:1px solid rgba(255,255,255,.46)!important;
+    border-radius:38px!important;
+    background:
+      linear-gradient(180deg,rgba(70,109,79,.64),rgba(42,82,56,.54))!important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.52),
+      inset 0 -1px 0 rgba(20,69,39,.16),
+      0 14px 34px rgba(28,63,40,.20)!important;
+    -webkit-backdrop-filter:blur(26px) saturate(1.28) brightness(1.04)!important;
+    backdrop-filter:blur(26px) saturate(1.28) brightness(1.04)!important;
+    overflow:hidden!important;
+  }
+
+  .app>.tabs::before{
+    top:5px!important;
+    height:64px!important;
+    border-radius:32px!important;
+    border-color:rgba(255,255,255,calc(.30 + var(--nav-liquid-lift) * .24))!important;
+    background:
+      radial-gradient(86% 56% at 50% -4%,rgba(255,255,255,calc(.34 + var(--nav-liquid-lift) * .16)),transparent 68%),
+      radial-gradient(44% 84% at 5% 50%,rgba(187,255,209,calc(.16 + var(--nav-liquid-lift) * .12)),transparent 72%),
+      radial-gradient(44% 84% at 95% 50%,rgba(143,241,178,calc(.12 + var(--nav-liquid-lift) * .10)),transparent 72%),
+      linear-gradient(180deg,rgba(25,169,78,calc(.88 - var(--nav-liquid-lift) * .08)),rgba(5,125,54,calc(.88 - var(--nav-liquid-lift) * .06)))!important;
+    box-shadow:
+      inset 1.5px 1.5px 0 -0.5px rgba(255,255,255,calc(.70 + var(--nav-liquid-lift) * .18)),
+      inset -1px -1px 0 rgba(0,72,30,calc(.26 + var(--nav-liquid-lift) * .14)),
+      0 calc(5px + var(--nav-liquid-lift) * 5px) calc(14px + var(--nav-liquid-lift) * 12px) rgba(0,78,34,calc(.24 + var(--nav-liquid-lift) * .08))!important;
+    -webkit-backdrop-filter:blur(calc(9px - var(--nav-liquid-lift) * 4px)) saturate(1.2) brightness(calc(1.02 + var(--nav-liquid-lift) * .08))!important;
+    backdrop-filter:blur(calc(9px - var(--nav-liquid-lift) * 4px)) saturate(1.2) brightness(calc(1.02 + var(--nav-liquid-lift) * .08))!important;
+  }
+
+  .app>.tabs .tab{
+    height:64px!important;
+    align-self:center!important;
+    margin:0!important;
+    border-radius:32px!important;
+    color:rgba(255,255,255,.84)!important;
+    gap:4px!important;
+  }
+
+  .app>.tabs .tab>svg,
+  .app>.tabs .tab>span{
+    transform:none!important;
+  }
+
+  .app>.tabs .tab.is-active,
+  .app>.tabs .tab.is-liquid-under{
+    color:#fff!important;
+  }
+
+  .app>.tabs .tab.is-active span{
+    font-weight:790!important;
+    text-shadow:0 1px 6px rgba(0,58,27,.24)!important;
+  }
+
+  .app>.tabs .tab.is-liquid-under>svg,
+  .app>.tabs .tab.is-liquid-under>span{
+    transform:scale(1.08)!important;
+  }
+
+  .catalog-view .products{
+    padding-bottom:calc(104px + env(safe-area-inset-bottom))!important;
+  }
+
+  .list-items{
+    padding-bottom:calc(104px + env(safe-area-inset-bottom))!important;
+  }
+
+  .settings-scroll{
+    padding-bottom:calc(104px + env(safe-area-inset-bottom))!important;
+  }
+}
+
+@media(max-width:390px){
+  .app>.tabs{
+    width:calc(100vw - 18px)!important;
+  }
+}
