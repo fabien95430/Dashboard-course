@@ -352,6 +352,29 @@ const PRODUCT_SHEETS=Object.freeze({
   'Boissons':{src:'./bring-photo-v5-boissons.webp.png?v=15',cols:12,rows:4,ratio:1},
   'Maison':{src:'./bring-photo-v5-maison.webp.png?v=15',cols:12,rows:7,ratio:.875}
 });
+let productSheetsWarmupStarted=false;
+async function warmProductSheets(){
+  if(productSheetsWarmupStarted)return;
+  productSheetsWarmupStarted=true;
+  for(const sheet of Object.values(PRODUCT_SHEETS)){
+    try{
+      const image=new Image();
+      image.decoding='async';
+      image.src=sheet.src;
+      if(typeof image.decode==='function')await image.decode();
+      else await new Promise(resolve=>{
+        if(image.complete){resolve();return}
+        image.onload=resolve;
+        image.onerror=resolve;
+      });
+    }catch(_){}
+  }
+}
+function scheduleProductSheetsWarmup(){
+  const run=()=>{void warmProductSheets()};
+  if('requestIdleCallback' in window)window.requestIdleCallback(run,{timeout:1200});
+  else setTimeout(run,300);
+}
 
 let state={
   haUrl:'',
@@ -2241,5 +2264,6 @@ window.addEventListener('pageshow',()=>{
 ['gesturestart','gesturechange','gestureend'].forEach(name=>document.addEventListener(name,event=>event.preventDefault(),{passive:false}));
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{}));
 bindUiEvents();
+scheduleProductSheetsWarmup();
 renderView();init();
 })();
