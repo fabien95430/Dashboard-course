@@ -2191,7 +2191,6 @@ window.addEventListener('online',()=>{
   if(!state.locked&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN&&state.ws?.readyState!==WebSocket.CONNECTING)connectFromRefresh();
 });
 window.addEventListener('pagehide',()=>{
-  closeSocket();
   state.resumeToList=true;
   armBackgroundLock();
 });
