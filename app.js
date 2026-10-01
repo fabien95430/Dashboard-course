@@ -985,7 +985,7 @@ function undoPurchase(name,row){
   toast('Article conservé');
 }
 
-const bottomNavLiquid={x:0,vx:0,tx:0,w:0,tw:0,vw:0,lift:0,vl:0,tl:0,last:0,ready:false,frame:0};
+const bottomNavLiquid={x:0,vx:0,tx:0,w:0,tw:0,vw:0,lift:0,vl:0,tl:0,last:0,ready:false,frame:0,scrub:null,justScrubbed:false};
 function bottomNavReduced(){
   return Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
@@ -1000,6 +1000,31 @@ function bottomNavContain(x,w,sx,minLeft,maxRight){
   let center=x+w/2;
   center=Math.max(minLeft+visual/2,Math.min(maxRight-visual/2,center));
   return {x:center-w/2,sx:visual/w};
+}
+function bottomNavRubber(distance,dimension=60){
+  const d=Math.abs(distance);
+  return Math.sign(distance)*(1-1/(d*0.55/dimension+1))*dimension;
+}
+function bottomNavScrubTarget(){
+  const st=bottomNavLiquid,items=bottomNavItems(),track=document.querySelector('.tabs');
+  if(!track||!items.length||!st.scrub)return st.tx;
+  const rect=track.getBoundingClientRect();
+  const x=st.scrub.clientX-rect.left-track.clientLeft-st.w/2;
+  const min=items[0].offsetLeft;
+  const last=items[items.length-1];
+  const max=last.offsetLeft+last.offsetWidth-st.w;
+  if(x<min)return min+bottomNavRubber(x-min);
+  if(x>max)return max+bottomNavRubber(x-max);
+  return x;
+}
+function bottomNavNearest(){
+  const st=bottomNavLiquid,center=st.x+st.w/2;
+  let best=null,bestDistance=Infinity;
+  bottomNavItems().forEach(item=>{
+    const distance=Math.abs(item.offsetLeft+item.offsetWidth/2-center);
+    if(distance<bestDistance){bestDistance=distance;best=item}
+  });
+  return best;
 }
 function markBottomNavUnder(clear=false){
   const st=bottomNavLiquid,center=st.x+st.w/2;
@@ -1034,6 +1059,10 @@ function stepBottomNavLiquid(time){
   const st=bottomNavLiquid;
   const dt=st.last?Math.min(0.032,Math.max(0.001,(time-st.last)/1000)):1/60;
   st.last=time;
+  if(st.scrub){
+    st.tx=bottomNavScrubTarget();
+    st.tl=1;
+  }
   const steps=Math.max(1,Math.ceil(dt/0.008));
   const h=dt/steps;
   for(let i=0;i<steps;i+=1){
@@ -1044,10 +1073,10 @@ function stepBottomNavLiquid(time){
     st.vl+=(360*(st.tl-st.lift)-22*st.vl)*h;
     st.lift+=st.vl*h;
   }
-  if(st.tl===1&&Math.abs(st.tx-st.x)<10)st.tl=0;
+  if(!st.scrub&&st.tl===1&&Math.abs(st.tx-st.x)<10)st.tl=0;
   markBottomNavUnder();
   paintBottomNavLiquid();
-  const settled=Math.abs(st.tx-st.x)<0.25&&Math.abs(st.vx)<4
+  const settled=!st.scrub&&Math.abs(st.tx-st.x)<0.25&&Math.abs(st.vx)<4
     &&Math.abs(st.tw-st.w)<0.25&&Math.abs(st.tl-st.lift)<0.004&&Math.abs(st.vl)<0.05;
   if(settled){
     Object.assign(st,{x:st.tx,vx:0,w:st.tw,vw:0,lift:st.tl,vl:0});
@@ -1076,6 +1105,67 @@ function syncBottomNavLiquid(animate=true){
     st.last=0;
     st.frame=requestAnimationFrame(stepBottomNavLiquid);
   }
+}
+function startBottomNavLiquid(){
+  const st=bottomNavLiquid;
+  if(st.frame)return;
+  st.last=0;
+  st.frame=requestAnimationFrame(stepBottomNavLiquid);
+}
+function bindBottomNavLiquid(){
+  const track=document.querySelector('.tabs');
+  if(!track||track.dataset.liquidBound==='1')return;
+  track.dataset.liquidBound='1';
+  track.addEventListener('pointerdown',event=>{
+    if(!event.isPrimary||event.button>0)return;
+    const item=event.target?.closest?.('.tab');
+    if(!item||!item.classList.contains('is-active'))return;
+    if(!bottomNavLiquid.ready)syncBottomNavLiquid(false);
+    bottomNavLiquid.scrub={id:event.pointerId,clientX:event.clientX,startX:event.clientX,moved:false};
+    try{track.setPointerCapture(event.pointerId)}catch(_){}
+    bottomNavLiquid.tl=1;
+    if(bottomNavReduced()){
+      bottomNavLiquid.lift=1;
+      paintBottomNavLiquid();
+    }else{
+      startBottomNavLiquid();
+    }
+  });
+  track.addEventListener('pointermove',event=>{
+    const scrub=bottomNavLiquid.scrub;
+    if(!scrub||event.pointerId!==scrub.id)return;
+    scrub.clientX=event.clientX;
+    if(Math.abs(event.clientX-scrub.startX)>6)scrub.moved=true;
+    if(bottomNavReduced()){
+      bottomNavLiquid.x=bottomNavScrubTarget();
+      markBottomNavUnder();
+      paintBottomNavLiquid();
+    }else{
+      startBottomNavLiquid();
+    }
+  });
+  const finish=(event,cancelled)=>{
+    const scrub=bottomNavLiquid.scrub;
+    if(!scrub||event.pointerId!==scrub.id)return;
+    const moved=scrub.moved;
+    bottomNavLiquid.scrub=null;
+    try{track.releasePointerCapture(event.pointerId)}catch(_){}
+    bottomNavLiquid.tl=0;
+    const target=moved&&!cancelled?bottomNavNearest():null;
+    if(moved&&!cancelled){
+      bottomNavLiquid.justScrubbed=true;
+      setTimeout(()=>{bottomNavLiquid.justScrubbed=false},0);
+    }
+    if(target&&!target.classList.contains('is-active')){
+      state.view=target.dataset.view||'list';
+      navigator.vibrate?.(4);
+      renderView();
+    }else{
+      syncBottomNavLiquid(!bottomNavReduced());
+    }
+  };
+  track.addEventListener('pointerup',event=>finish(event,false));
+  track.addEventListener('pointercancel',event=>finish(event,true));
 }
 
 function renderView(){
@@ -1864,12 +1954,14 @@ function bindUiEvents(){
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!UI.listFilterMenu.hidden)setListFilterMenuOpen(false)});
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{
+    if(bottomNavLiquid.justScrubbed)return;
     const next=button.dataset.view||'list';
     if(next===state.view){syncBottomNavLiquid(false);return}
     state.view=next;
     navigator.vibrate?.(4);
     renderView();
   });
+  bindBottomNavLiquid();
   window.addEventListener('resize',()=>syncBottomNavLiquid(false),{passive:true});
 }
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
