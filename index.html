@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=124">
+  <link rel="stylesheet" href="./styles.css?v=125">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -28,6 +28,7 @@
     <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
     <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.1 8.2A7 7 0 0 1 18.8 7L20 12M4 12l1.2 5A7 7 0 0 0 18 15.8"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.4A8 8 0 0 0 6.25 5.25L4 7.5"/><path d="M4 4v3.5h3.5"/><path d="M4 16.6a8 8 0 0 0 13.75 2.15L20 16.5"/><path d="M20 20v-3.5h-3.5"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
     <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M7.2 5.5a8 8 0 1 0 9.6 0"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
@@ -41,12 +42,54 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v124</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v125</span></p>
         </div>
-        <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
-          <svg><use href="#i-refresh"></use></svg>
-        </button>
+        <div class="page-header-actions">
+          <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
+            <svg><use href="#i-refresh"></use></svg>
+          </button>
+          <button id="listFilterBtn" class="icon-btn list-filter-btn" type="button" aria-label="Trier ou filtrer la liste" aria-expanded="false" aria-controls="listFilterMenu">
+            <svg><use href="#i-filter"></use></svg>
+          </button>
+        </div>
       </header>
+
+      <div id="listFilterBackdrop" class="list-filter-backdrop" hidden></div>
+      <div id="listFilterMenu" class="list-filter-menu" role="dialog" aria-label="Trier et filtrer Ma liste" hidden>
+        <div class="list-filter-section" role="radiogroup" aria-label="Trier la liste">
+          <strong class="list-filter-title">Trier la liste</strong>
+          <button class="list-filter-option" type="button" data-list-sort="added" role="radio">
+            <span>Ordre d’ajout</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-sort="alpha" role="radio">
+            <span>A → Z</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-sort="category" role="radio">
+            <span>Par catégorie</span><i aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="list-filter-section list-filter-categories" role="radiogroup" aria-label="Filtrer par catégorie">
+          <strong class="list-filter-title">Filtrer par catégorie</strong>
+          <button class="list-filter-option" type="button" data-list-category="Toutes" role="radio">
+            <span>Toutes les catégories</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Frais" role="radio">
+            <span>Frais</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Fruits &amp; Légumes" role="radio">
+            <span>Fruits &amp; Légumes</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Épicerie" role="radio">
+            <span>Épicerie</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Boissons" role="radio">
+            <span>Boissons</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Maison" role="radio">
+            <span>Maison</span><i aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
 
       <label class="searchbox page-search">
         <svg><use href="#i-search"></use></svg>
@@ -60,7 +103,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v124</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v125</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -80,7 +123,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v124</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v125</span></p>
         </div>
       </header>
 
@@ -320,6 +363,6 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./catalog.js"></script>
-  <script src="./app.js?v=124"></script>
+  <script src="./app.js?v=125"></script>
 </body>
 </html>

@@ -2534,3 +2534,116 @@ body{
     bottom:20px!important;
   }
 }
+
+
+/* v125 — filtre/tri rapide de Ma liste, sans état affiché hors du menu */
+.page-header-actions{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.list-filter-btn svg{
+  width:27px;
+  height:27px;
+  stroke-width:1.9;
+}
+.list-view{position:relative}
+.list-filter-backdrop{
+  position:absolute;
+  inset:0;
+  z-index:30;
+  border:0;
+  background:rgba(19,26,22,.42);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.list-filter-backdrop[hidden],
+.list-filter-menu[hidden]{display:none!important}
+.list-filter-menu{
+  position:absolute;
+  z-index:31;
+  top:100px;
+  right:8px;
+  width:min(322px,calc(100% - 24px));
+  max-height:calc(100% - 118px);
+  overflow:auto;
+  overscroll-behavior:contain;
+  border:1px solid rgba(35,58,43,.08);
+  border-radius:25px;
+  background:rgba(255,255,255,.985);
+  box-shadow:0 22px 54px rgba(35,52,41,.24),inset 0 1px 0 rgba(255,255,255,.92);
+  padding:10px 12px 12px;
+  color:#121a16;
+  -webkit-overflow-scrolling:touch;
+}
+.list-filter-menu::before{
+  content:"";
+  position:absolute;
+  top:-8px;
+  right:24px;
+  width:16px;
+  height:16px;
+  background:rgba(255,255,255,.985);
+  transform:rotate(45deg);
+  border-left:1px solid rgba(35,58,43,.06);
+  border-top:1px solid rgba(35,58,43,.06);
+}
+.list-filter-section{
+  position:relative;
+  display:grid;
+}
+.list-filter-section+.list-filter-section{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid #edf0ec;
+}
+.list-filter-title{
+  padding:5px 10px 7px;
+  color:#7f8891;
+  font-size:13px;
+  line-height:1.1;
+  font-weight:720;
+}
+.list-filter-option{
+  width:100%;
+  min-height:48px;
+  border:0;
+  border-radius:15px;
+  background:transparent;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 24px;
+  align-items:center;
+  gap:10px;
+  padding:0 12px;
+  text-align:left;
+  color:#161c19;
+  font-size:16px;
+  font-weight:650;
+}
+.list-filter-option+ .list-filter-option{margin-top:2px}
+.list-filter-option:active{background:#f3f7f3}
+.list-filter-option i{
+  width:21px;
+  height:21px;
+  border:2px solid #c7cdd1;
+  border-radius:50%;
+  position:relative;
+}
+.list-filter-option.is-selected{
+  background:#eef8ed;
+  color:#126f3d;
+}
+.list-filter-option.is-selected i{border-color:#22a457}
+.list-filter-option.is-selected i::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:#22a457;
+}
+@media(max-width:390px){
+  .page-header-actions{gap:7px}
+  .page-header-actions .icon-btn{width:52px;height:52px}
+  .list-filter-menu{right:4px;width:min(310px,calc(100% - 16px))}
+}

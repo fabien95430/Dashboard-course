@@ -220,6 +220,9 @@ const UI = Object.freeze({
   preferencesSmartFavorites: document.getElementById('preferencesSmartFavorites'),
   savePasswordChange: document.getElementById('savePasswordChange'),
   refreshBtn: document.getElementById('refreshBtn'),
+  listFilterBtn: document.getElementById('listFilterBtn'),
+  listFilterMenu: document.getElementById('listFilterMenu'),
+  listFilterBackdrop: document.getElementById('listFilterBackdrop'),
   catalogRefreshBtn: document.getElementById('catalogRefreshBtn')
 });
 const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -351,6 +354,7 @@ let state={
   category:'Toutes',
   productQuery:'',
   listQuery:'',
+  listCategoryFilter:'Toutes',
   view:INITIAL_PREFERENCES.startView,
   reconnectTimer:null,
   intentionalClose:false,
@@ -573,6 +577,35 @@ function sortedGroups(groups){
   }
   return rows;
 }
+function visibleListGroups(groups=activeGroups()){
+  const needle=norm(state.listQuery),category=state.listCategoryFilter;
+  return groups.filter(group=>{
+    if(needle&&!norm(group.summary).includes(needle))return false;
+    if(category==='Toutes')return true;
+    return catalogProductFor(group.summary)?.category===category;
+  });
+}
+function renderListFilterMenuState(){
+  if(!UI.listFilterMenu)return;
+  UI.listFilterMenu.querySelectorAll('[data-list-sort]').forEach(button=>{
+    const selected=button.dataset.listSort===state.preferences.listSort;
+    button.classList.toggle('is-selected',selected);
+    button.setAttribute('aria-checked',String(selected));
+  });
+  UI.listFilterMenu.querySelectorAll('[data-list-category]').forEach(button=>{
+    const selected=button.dataset.listCategory===state.listCategoryFilter;
+    button.classList.toggle('is-selected',selected);
+    button.setAttribute('aria-checked',String(selected));
+  });
+}
+function setListFilterMenuOpen(open){
+  if(!UI.listFilterMenu||!UI.listFilterBackdrop||!UI.listFilterBtn)return;
+  const visible=!!open;
+  UI.listFilterMenu.hidden=!visible;
+  UI.listFilterBackdrop.hidden=!visible;
+  UI.listFilterBtn.setAttribute('aria-expanded',String(visible));
+  if(visible)renderListFilterMenuState();
+}
 function selectedSet(){return new Set(activeGroups().map(g=>norm(g.summary)))}
 
 function status(kind,title,detail=''){
@@ -654,14 +687,14 @@ function renderSelectionAndList(){
 }
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery);
-  const rows=sortedGroups(groups.filter(group=>!needle||norm(group.summary).includes(needle)));
+  const rows=sortedGroups(visibleListGroups(groups));
   const canReorder=rows.length>1;
   const el=$('#listItems');
   if(!el)return;
   const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
   if(state.loading&&!groups.length){el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';return}
   if(!rows.length){
-    const message=needle?'Aucun article trouvé.':(state.error?'Liste indisponible.':'La liste est vide.');
+    const message=needle?'Aucun article trouvé.':(state.listCategoryFilter!=='Toutes'?'Aucun article dans cette catégorie.':(state.error?'Liste indisponible.':'La liste est vide.'));
     el.innerHTML='<div class="empty">'+message+'</div>';
     return;
   }
@@ -692,8 +725,8 @@ function renderList(){
 function listDomMatchesCurrentState(){
   const root=$('#listItems');
   if(!root)return false;
-  const groups=activeGroups(),needle=norm(state.listQuery);
-  const rows=sortedGroups(groups.filter(group=>!needle||norm(group.summary).includes(needle)));
+  const groups=activeGroups();
+  const rows=sortedGroups(visibleListGroups(groups));
   if(!rows.length)return false;
   const rendered=[...root.querySelectorAll('.list-row')];
   if(rendered.length!==rows.length)return false;
@@ -735,6 +768,7 @@ function listReorderUnavailableMessage(root=null){
   if(root&&!updateListReorderAvailability(root))return 'La réorganisation nécessite au moins 2 articles';
   if(state.listReorderBusy)return 'Réorganisation en cours';
   if(norm(state.listQuery))return 'Efface la recherche pour réorganiser la liste';
+  if(state.listCategoryFilter!=='Toutes')return 'Affiche toutes les catégories pour réorganiser la liste';
   if(state.preferences.listSort!=='added')return 'Choisis « Ordre d’ajout » pour réorganiser la liste';
   return '';
 }
@@ -931,6 +965,7 @@ function undoPurchase(name,row){
   toast('Article conservé');
 }
 function renderView(){
+  if(state.view!=='list')setListFilterMenuOpen(false);
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
   $('#listView').classList.toggle('is-active',state.view==='list');
   $('#settingsView').classList.toggle('is-active',state.view==='settings');
@@ -1555,6 +1590,7 @@ function savePreferencesSettings(){
   UI.preferencesDialog.close();
   renderProducts();
   renderList();
+  renderListFilterMenuState();
   renderSettingsPage();
   toast('Préférences enregistrées');
 }
@@ -1664,6 +1700,29 @@ function bindUiEvents(){
     hideSetup();hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
   };
   UI.refreshBtn.onclick=()=>refreshFromHeader(UI.refreshBtn);
+  UI.listFilterBtn.onclick=event=>{
+    event.stopPropagation();
+    setListFilterMenuOpen(UI.listFilterMenu.hidden);
+  };
+  UI.listFilterBackdrop.onclick=()=>setListFilterMenuOpen(false);
+  UI.listFilterMenu.querySelectorAll('[data-list-sort]').forEach(button=>button.onclick=()=>{
+    const next=button.dataset.listSort;
+    if(!['added','category','alpha'].includes(next))return;
+    state.preferences={...state.preferences,listSort:next};
+    persistPreferences();
+    UI.preferencesListSort.value=next;
+    renderList();
+    renderListFilterMenuState();
+    navigator.vibrate?.(4);
+  });
+  UI.listFilterMenu.querySelectorAll('[data-list-category]').forEach(button=>button.onclick=()=>{
+    const next=button.dataset.listCategory||'Toutes';
+    if(!['Toutes','Frais','Fruits & Légumes','Épicerie','Boissons','Maison'].includes(next))return;
+    state.listCategoryFilter=next;
+    renderList();
+    renderListFilterMenuState();
+    navigator.vibrate?.(4);
+  });
   $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
   UI.catalogRefreshBtn.onclick=()=>refreshFromHeader(UI.catalogRefreshBtn);
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
@@ -1688,6 +1747,7 @@ function bindUiEvents(){
   $('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp(STATUS_TEXT.manualLockReason)};
   UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!UI.listFilterMenu.hidden)setListFilterMenuOpen(false)});
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{state.view=button.dataset.view||'list';renderView()});
 }
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
