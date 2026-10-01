@@ -2192,7 +2192,7 @@ window.addEventListener('online',()=>{
 });
 window.addEventListener('pagehide',()=>{
   state.resumeToList=true;
-  armBackgroundLock();
+  if(document.visibilityState==='hidden')armBackgroundLock();
 });
 window.addEventListener('pageshow',()=>{
   resumeForegroundSession();
