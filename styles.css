@@ -4094,3 +4094,32 @@ body{
   }
 }
 
+/* v168 — délai unique de verrouillage activité / arrière-plan */
+.security-setting-lock{
+  cursor:pointer;
+}
+.security-lock-select{
+  min-width:76px;
+  height:36px;
+  border:1px solid #dfe5df;
+  border-radius:12px;
+  background:#fff;
+  color:#172019;
+  padding:0 28px 0 10px;
+  outline:0;
+  font-size:12px;
+  font-weight:760;
+}
+.security-lock-select:focus{
+  border-color:#b8d6c0;
+  box-shadow:0 0 0 3px rgba(24,130,67,.08);
+}
+@media(max-width:390px){
+  .security-lock-select{
+    min-width:72px;
+    height:34px;
+    padding-left:9px;
+    font-size:11.5px;
+  }
+}
+

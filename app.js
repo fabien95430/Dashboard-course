@@ -171,7 +171,8 @@ const STORAGE = {
   entityPreference:'courses-external-entity-preference-v1',
   usage:'courses-external-usage-v1',
   preferences:'courses-preferences-v1',
-  missingProducts:'courses-missing-products-v1'
+  missingProducts:'courses-missing-products-v1',
+  autoLockMinutes:'courses-auto-lock-minutes-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
 const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
@@ -184,11 +185,10 @@ const SECURITY = Object.freeze({
   kdf:'PBKDF2-SHA256',
   iterations:600000,
   minPasswordLength:10,
-  idleLockMs:5*60*1000,
-  backgroundLockMs:30*1000,
   unlockDelayBaseMs:2000,
   unlockDelayMaxMs:30000
 });
+const AUTO_LOCK_MINUTES=Object.freeze([5,10,20,30]);
 const UTF8 = new TextEncoder();
 const UTF8_DECODER = new TextDecoder();
 const CLIENT_ID = location.origin;
@@ -214,6 +214,7 @@ const UI = Object.freeze({
   currentLocalPassword: document.getElementById('currentLocalPassword'),
   newLocalPassword: document.getElementById('newLocalPassword'),
   changePasswordPanel: document.getElementById('changePasswordPanel'),
+  autoLockSelect: document.getElementById('autoLockSelect'),
   connectionHaUrl: document.getElementById('connectionHaUrl'),
   connectionEntitySelect: document.getElementById('connectionEntitySelect'),
   preferencesListSort: document.getElementById('preferencesListSort'),
@@ -289,6 +290,11 @@ function readPreferences(){
   };
 }
 function persistPreferences(){saveJson(STORAGE.preferences,state.preferences)}
+function readAutoLockMinutes(){
+  const saved=Number(localStorage.getItem(STORAGE.autoLockMinutes));
+  return AUTO_LOCK_MINUTES.includes(saved)?saved:5;
+}
+function autoLockDelayMs(){return state.autoLockMinutes*60*1000}
 const INITIAL_PREFERENCES=readPreferences();
 function readMissingProducts(){
   const saved=loadJson(STORAGE.missingProducts,[]);
@@ -413,6 +419,7 @@ let state={
   listReorderRefreshPending:false,
   missingProductCategory:'',
   missingProducts:readMissingProducts(),
+  autoLockMinutes:readAutoLockMinutes(),
   usage:loadJson(STORAGE.usage,{})||{},
   preferences:INITIAL_PREFERENCES
 };
@@ -1508,7 +1515,7 @@ function armBackgroundLock(){
   if(state.demo||state.locked||!vaultRecord())return;
   if(!state.backgroundedAt)state.backgroundedAt=Date.now();
   clearTimeout(state.backgroundLockTimer);
-  const remaining=Math.max(0,SECURITY.backgroundLockMs-(Date.now()-state.backgroundedAt));
+  const remaining=Math.max(0,autoLockDelayMs()-(Date.now()-state.backgroundedAt));
   state.backgroundLockTimer=setTimeout(()=>{
     state.backgroundLockTimer=null;
     if(state.locked||state.demo||!vaultRecord())return;
@@ -1518,7 +1525,7 @@ function armBackgroundLock(){
 function armIdleLock(){
   clearTimeout(state.lockTimer);
   if(state.demo||state.locked||!vaultRecord())return;
-  state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),SECURITY.idleLockMs);
+  state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),autoLockDelayMs());
 }
 function showSecurity(mode,message=''){
   const overlay=UI.securityOverlay;
@@ -2170,7 +2177,16 @@ function savePreferencesSettings(){
 function openSettings(){
   if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
   clearPasswordChangeForm();
+  if(UI.autoLockSelect)UI.autoLockSelect.value=String(state.autoLockMinutes);
   showNeutralDialog(UI.settingsDialog);
+}
+function setAutoLockMinutes(value){
+  const next=Number(value);
+  if(!AUTO_LOCK_MINUTES.includes(next))return;
+  state.autoLockMinutes=next;
+  localStorage.setItem(STORAGE.autoLockMinutes,String(next));
+  armIdleLock();
+  toast('Verrouillage après '+next+' min');
 }
 async function changeLocalPassword(){
   const current=UI.currentLocalPassword.value;
@@ -2299,6 +2315,7 @@ function bindUiEvents(){
   UI.catalogRefreshBtn.onclick=()=>refreshFromHeader(UI.catalogRefreshBtn);
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;
+  if(UI.autoLockSelect)UI.autoLockSelect.onchange=()=>setAutoLockMinutes(UI.autoLockSelect.value);
   $('#settingsListBtn').onclick=openPreferences;
   $('#settingsMissingProductsBtn').onclick=openMissingProducts;
   bindDialogBackdropClose(UI.connectionDialog);
@@ -2345,7 +2362,7 @@ function resumeForegroundSession(){
   const backgroundedAt=state.backgroundedAt;
   clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
   state.backgroundedAt=0;
-  if(backgroundedAt&&!state.locked&&!state.demo&&vaultRecord()&&Date.now()-backgroundedAt>=SECURITY.backgroundLockMs){
+  if(backgroundedAt&&!state.locked&&!state.demo&&vaultRecord()&&Date.now()-backgroundedAt>=autoLockDelayMs()){
     lockApp('Verrouillage après passage en arrière-plan.');
     return;
   }
