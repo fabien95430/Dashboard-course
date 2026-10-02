@@ -1117,6 +1117,55 @@ function markBottomNavUnder(clear=false){
     if(item.classList.contains('is-liquid-under')!==under)item.classList.toggle('is-liquid-under',under);
   });
 }
+function bottomNavEnsureLensCopies(items=bottomNavItems()){
+  items.forEach(item=>{
+    if(item.querySelector('.tab-lens-copy'))return;
+    const icon=item.querySelector('svg');
+    const label=item.querySelector('span');
+    if(!icon||!label)return;
+    const copy=document.createElement('i');
+    copy.className='tab-lens-copy';
+    copy.setAttribute('aria-hidden','true');
+    copy.append(icon.cloneNode(true),label.cloneNode(true));
+    item.append(copy);
+  });
+}
+function paintBottomNavLensContent(track,items,visualLeft,visualRight,lift,speed){
+  bottomNavEnsureLensCopies(items);
+  const st=bottomNavLiquid;
+  const moving=Boolean(st.scrub)||lift>0.035||Math.abs(st.vx)>18;
+  track.classList.toggle('is-liquid-moving',moving);
+  const reduced=bottomNavReduced();
+  const intensity=Math.min(1,Math.max(0,lift*.72+speed*.55));
+  const scale=reduced?1:1+intensity*.16;
+  const shift=reduced?0:Math.max(-3.5,Math.min(3.5,st.vx/360));
+  track.style.setProperty('--nav-lens-content-scale',scale.toFixed(4));
+  track.style.setProperty('--nav-lens-content-shift',shift.toFixed(2)+'px');
+  items.forEach(item=>{
+    const copy=item.querySelector('.tab-lens-copy');
+    if(!copy)return;
+    if(!moving){
+      copy.style.opacity='0';
+      copy.style.clipPath='inset(0 100% 0 0)';
+      copy.style.webkitClipPath='inset(0 100% 0 0)';
+      return;
+    }
+    const itemLeft=item.offsetLeft;
+    const itemRight=itemLeft+item.offsetWidth;
+    const overlapLeft=Math.max(itemLeft,visualLeft);
+    const overlapRight=Math.min(itemRight,visualRight);
+    if(overlapRight<=overlapLeft){
+      copy.style.opacity='0';
+      return;
+    }
+    const clipLeft=Math.max(0,overlapLeft-itemLeft);
+    const clipRight=Math.max(0,itemRight-overlapRight);
+    const clip=`inset(0 ${clipRight.toFixed(2)}px 0 ${clipLeft.toFixed(2)}px)`;
+    copy.style.clipPath=clip;
+    copy.style.webkitClipPath=clip;
+    copy.style.opacity='1';
+  });
+}
 function paintBottomNavLiquid(){
   const track=document.querySelector('.tabs');
   if(!track)return;
@@ -1128,13 +1177,17 @@ function paintBottomNavLiquid(){
   const minLeft=items[0].offsetLeft;
   const last=items[items.length-1];
   const maxRight=last.offsetLeft+last.offsetWidth;
-  const box=bottomNavContain(st.x,st.w,1+lift*0.09+speed*0.18,minLeft,maxRight);
-  const sy=1+lift*0.14-speed*0.12;
+  const box=bottomNavContain(st.x,st.w,1+lift*0.11+speed*0.30,minLeft,maxRight);
+  const sy=1+lift*0.16-speed*0.05;
+  const visualWidth=st.w*box.sx;
+  const visualLeft=box.x+(st.w-visualWidth)/2;
+  const visualRight=visualLeft+visualWidth;
   track.style.setProperty('--nav-liquid-x',box.x.toFixed(2)+'px');
   track.style.setProperty('--nav-liquid-w',st.w.toFixed(2)+'px');
   track.style.setProperty('--nav-liquid-sx',box.sx.toFixed(4));
   track.style.setProperty('--nav-liquid-sy',sy.toFixed(4));
   track.style.setProperty('--nav-liquid-lift',Math.max(0,Math.min(1,lift)).toFixed(3));
+  paintBottomNavLensContent(track,items,visualLeft,visualRight,Math.max(0,Math.min(1,lift)),speed);
 }
 function stepBottomNavLiquid(time){
   bottomNavLiquid.frame=0;
