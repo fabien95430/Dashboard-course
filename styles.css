@@ -3742,111 +3742,183 @@ body{
   }
 }
 
-/* v159 — réglages verre dépoli */
-.settings-view{
-  background:
-    radial-gradient(88% 48% at 6% 14%,rgba(105,177,128,.14),transparent 72%),
-    radial-gradient(76% 46% at 98% 36%,rgba(235,199,145,.13),transparent 70%),
-    radial-gradient(74% 48% at 50% 82%,rgba(118,169,151,.10),transparent 72%);
+/* v160 — réglages aérés, fond d’origine et commandes modernisées */
+.settings-section{
+  margin-bottom:24px;
 }
-
-.settings-header .page-version{
-  border:1px solid rgba(255,255,255,.72);
-  background:rgba(255,255,255,.38);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.58);
-  -webkit-backdrop-filter:blur(10px) saturate(1.06);
-  backdrop-filter:blur(10px) saturate(1.06);
-}
-
 .settings-section h2{
-  color:#10251b;
+  margin-bottom:11px;
 }
-
 .section-icon{
-  border:1px solid rgba(255,255,255,.72);
-  background:linear-gradient(145deg,rgba(232,249,235,.84),rgba(217,242,224,.64));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.72),
-    0 4px 12px rgba(35,91,55,.07);
+  width:34px;
+  height:34px;
+  border-radius:11px;
+  border:1px solid rgba(18,112,64,.08);
+  background:linear-gradient(180deg,#eef8ef,#e5f3e7);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
+}
+.section-icon svg{
+  width:19px;
+  height:19px;
+  stroke-width:1.9;
 }
 
 .settings-card{
-  border:1px solid rgba(255,255,255,.76);
-  background:
-    linear-gradient(145deg,rgba(255,255,255,.68),rgba(248,250,247,.46));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.82),
-    0 10px 28px rgba(43,66,49,.075);
-  -webkit-backdrop-filter:blur(18px) saturate(1.08);
-  backdrop-filter:blur(18px) saturate(1.08);
+  display:grid;
+  gap:9px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
 }
-
 .settings-row{
-  border-bottom-color:rgba(106,123,112,.13);
+  min-height:78px;
+  border:1px solid rgba(33,55,40,.055);
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(57,75,62,.055);
+  transition:transform .14s ease,background .14s ease,box-shadow .14s ease;
 }
-
+.settings-row:last-child{
+  border-bottom:1px solid rgba(33,55,40,.055);
+}
 .settings-row:active{
-  background:rgba(255,255,255,.34);
+  background:#f8fbf7;
+  transform:scale(.988);
+  box-shadow:0 3px 10px rgba(57,75,62,.045);
 }
 
 .settings-icon{
-  border:1px solid rgba(255,255,255,.76);
-  background:linear-gradient(145deg,rgba(231,249,235,.88),rgba(217,244,225,.68));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.80),
-    0 5px 14px rgba(28,105,57,.07);
+  width:48px;
+  height:48px;
+  border-radius:15px;
+  border:1px solid rgba(18,112,64,.07);
+  background:linear-gradient(180deg,#edf9ef,#e4f4e7);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86);
+}
+.settings-icon svg{
+  width:23px;
+  height:23px;
+  stroke-width:1.85;
 }
 
+.settings-copy{
+  gap:3px;
+}
 .settings-copy strong{
-  color:#141b17;
+  font-weight:770;
+  letter-spacing:-.15px;
 }
-
 .settings-copy small{
-  color:#818b95;
+  color:#7f8993;
 }
 
-.chevron{
-  color:#7b858d;
+.settings-view .chevron{
+  width:27px!important;
+  height:27px!important;
+  padding:5px;
+  border-radius:50%;
+  background:#f2f5f2;
+  color:#768079;
+  stroke-width:1.9!important;
 }
-
+.settings-row-end{
+  gap:7px;
+}
+.sync-dot{
+  width:12px;
+  height:12px;
+  border:2px solid #fff;
+  box-shadow:0 0 0 1px rgba(80,96,86,.10);
+}
 .sync-dot.is-online{
-  background:#17ad4e;
-  box-shadow:
-    0 0 0 5px rgba(234,248,237,.78),
-    0 4px 10px rgba(23,173,78,.16);
+  background:#19a844;
+  box-shadow:0 0 0 4px #edf8ef;
 }
 
 .settings-count{
-  background:linear-gradient(180deg,#31aa63,#249653);
-  border:1px solid rgba(255,255,255,.50);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.28),
-    0 5px 13px rgba(36,142,79,.16);
+  min-width:26px;
+  height:26px;
+  padding:0 7px;
+  border:2px solid #fff;
+  background:#289b58;
+  box-shadow:0 4px 10px rgba(36,142,79,.14);
 }
 
 .settings-logout{
-  border:1px solid rgba(255,255,255,.74);
-  background:
-    linear-gradient(145deg,rgba(255,235,232,.82),rgba(255,218,215,.60));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.78),
-    0 8px 22px rgba(177,56,56,.07);
-  -webkit-backdrop-filter:blur(16px) saturate(1.05);
-  backdrop-filter:blur(16px) saturate(1.05);
+  height:60px;
+  margin:2px 0 8px;
+  border:1px solid rgba(215,25,32,.08);
+  border-radius:20px;
+  background:#fff0ee;
+  box-shadow:0 6px 18px rgba(151,45,45,.045);
+  transition:transform .14s ease,background .14s ease;
 }
-
 .settings-logout:active{
-  background:
-    linear-gradient(145deg,rgba(255,229,226,.88),rgba(255,208,205,.68));
+  background:#ffe7e4;
+  transform:scale(.988);
 }
 
 @media(max-width:520px){
-  .settings-card{
-    border-radius:20px!important;
+  .settings-scroll{
+    padding-top:18px!important;
   }
-
+  .settings-section{
+    margin-bottom:18px!important;
+  }
+  .settings-section h2{
+    margin:0 0 9px 6px!important;
+    gap:8px!important;
+  }
+  .section-icon{
+    width:30px!important;
+    height:30px!important;
+    border-radius:10px!important;
+  }
+  .section-icon svg{
+    width:17px!important;
+    height:17px!important;
+  }
+  .settings-card{
+    gap:8px!important;
+    border-radius:0!important;
+  }
+  .settings-row{
+    min-height:66px!important;
+    grid-template-columns:44px minmax(0,1fr) 27px!important;
+    gap:10px!important;
+    padding:9px 11px!important;
+    border-radius:18px!important;
+  }
+  .settings-row.missing-products-settings-row{
+    grid-template-columns:44px minmax(0,1fr) auto!important;
+  }
+  .settings-icon{
+    width:42px!important;
+    height:42px!important;
+    border-radius:13px!important;
+  }
+  .settings-icon svg{
+    width:21px!important;
+    height:21px!important;
+  }
+  .settings-copy strong{
+    font-size:14.5px!important;
+  }
+  .settings-copy small{
+    font-size:11.5px!important;
+  }
+  .settings-view .chevron{
+    width:25px!important;
+    height:25px!important;
+    padding:5px!important;
+  }
   .settings-logout{
-    border-radius:20px!important;
+    height:54px!important;
+    margin:2px 0 6px!important;
+    border-radius:18px!important;
+    font-size:15px!important;
   }
 }
 
