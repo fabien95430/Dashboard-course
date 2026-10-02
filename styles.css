@@ -4001,3 +4001,96 @@ body{
     filter:drop-shadow(0 1px 2px rgba(0,138,70,.12))!important;
   }
 }
+
+/* v166 — finalise les boutons/icônes des Réglages */
+.settings-title-line{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.settings-title-line strong{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Le compteur reste près du libellé, jamais collé à la flèche. */
+.settings-row.missing-products-settings-row{
+  grid-template-columns:52px minmax(0,1fr) 24px;
+}
+.settings-title-line .settings-count{
+  flex:0 0 auto;
+  min-width:24px;
+  height:24px;
+  padding:0 6px;
+  border:0;
+  font-size:11px;
+  box-shadow:none;
+}
+
+/* Voyant Home Assistant simple : aucun halo ni élément parasite. */
+.sync-dot,
+.sync-dot.is-online{
+  width:11px;
+  height:11px;
+  border:0;
+  box-shadow:none;
+}
+.sync-dot{
+  background:#b7beb9;
+}
+.sync-dot.is-online{
+  background:#18aa4b;
+}
+#settingsConnectionBtn .settings-row-end{
+  gap:14px;
+}
+
+/* Chevrons sobres : pas de pastille grise autour. */
+.settings-view .chevron{
+  width:20px!important;
+  height:20px!important;
+  padding:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#7d858d;
+  stroke-width:2!important;
+}
+
+/* Déconnexion présente mais volontairement discrète. */
+.settings-logout{
+  border:1px solid rgba(86,98,90,.14);
+  background:rgba(255,255,255,.70);
+  color:#69727b;
+  box-shadow:0 4px 14px rgba(57,75,62,.035);
+  font-weight:700;
+}
+.settings-logout:active{
+  background:#f5f7f4;
+  color:#555e66;
+}
+
+@media(max-width:520px){
+  .settings-row.missing-products-settings-row{
+    grid-template-columns:44px minmax(0,1fr) 27px!important;
+  }
+  .settings-title-line{
+    gap:7px;
+  }
+  .settings-title-line .settings-count{
+    min-width:22px;
+    height:22px;
+    padding:0 6px;
+    font-size:10.5px;
+  }
+  #settingsConnectionBtn .settings-row-end{
+    gap:12px;
+  }
+  .settings-view .chevron{
+    width:19px!important;
+    height:19px!important;
+  }
+}
+
