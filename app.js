@@ -229,7 +229,6 @@ const UI = Object.freeze({
   listFilterBtn: document.getElementById('listFilterBtn'),
   listFilterMenu: document.getElementById('listFilterMenu'),
   listFilterBackdrop: document.getElementById('listFilterBackdrop'),
-  listFilterCloseBtn: document.getElementById('listFilterCloseBtn'),
   catalogRefreshBtn: document.getElementById('catalogRefreshBtn')
 });
 const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -1977,6 +1976,16 @@ function showNeutralDialog(dialog){
     try{dialog.focus({preventScroll:true})}catch(_){dialog.focus()}
   });
 }
+function bindDialogBackdropClose(dialog,beforeClose){
+  if(!dialog)return;
+  dialog.addEventListener('click',event=>{
+    const rect=dialog.getBoundingClientRect();
+    const outside=event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom;
+    if(!outside)return;
+    beforeClose?.();
+    dialog.close();
+  });
+}
 function clearPasswordChangeForm(){
   UI.currentLocalPassword.value='';
   UI.newLocalPassword.value='';
@@ -2234,7 +2243,6 @@ function bindUiEvents(){
     setListFilterMenuOpen(UI.listFilterMenu.hidden);
   };
   UI.listFilterBackdrop.onclick=()=>setListFilterMenuOpen(false);
-  UI.listFilterCloseBtn.onclick=()=>setListFilterMenuOpen(false);
   UI.listFilterMenu.querySelectorAll('[data-list-sort]').forEach(button=>button.onclick=()=>{
     const next=button.dataset.listSort;
     if(!['added','category','alpha'].includes(next))return;
@@ -2259,13 +2267,16 @@ function bindUiEvents(){
   $('#settingsSecurityBtn').onclick=openSettings;
   $('#settingsListBtn').onclick=openPreferences;
   $('#settingsMissingProductsBtn').onclick=openMissingProducts;
+  bindDialogBackdropClose(UI.connectionDialog);
+  bindDialogBackdropClose(UI.preferencesDialog);
+  bindDialogBackdropClose(UI.missingProductsDialog);
+  bindDialogBackdropClose(UI.settingsDialog,clearPasswordChangeForm);
   $('#settingsLockBtn').onclick=()=>lockApp(STATUS_TEXT.manualLockReason);
   $('#settingsLogoutBtn').onclick=revoke;
   $('#cancelConnectionSettings').onclick=()=>UI.connectionDialog.close();
   $('#saveConnectionSettings').onclick=saveConnectionSettings;
   $('#cancelPreferences').onclick=()=>UI.preferencesDialog.close();
   $('#savePreferences').onclick=savePreferencesSettings;
-  $('#closeMissingProducts').onclick=()=>UI.missingProductsDialog.close();
   $('#addMissingProduct').onclick=addMissingProduct;
   UI.missingProductName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addMissingProduct()}};
   UI.missingCategoryGrid.querySelectorAll('[data-missing-category]').forEach(button=>button.onclick=()=>setMissingProductCategory(button.dataset.missingCategory||''));
@@ -2282,7 +2293,6 @@ function bindUiEvents(){
   };
   UI.savePasswordChange.onclick=changeLocalPassword;
   UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
-  $('#cancelSettings').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close()};
   $('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp(STATUS_TEXT.manualLockReason)};
   UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
