@@ -3705,3 +3705,12 @@ body{
     transform:none!important;
   }
 }
+
+
+/* v155 — réaligne le texte de transition */
+@media(max-width:520px){
+  .app>.tabs .tab-lens-copy>span{
+    transform:none!important;
+    transform-origin:center!important;
+  }
+}
