@@ -682,33 +682,9 @@ function renderCategories(){
   el.innerHTML=CATALOG_CATEGORY_ORDER.map(category=>'<button type="button" class="cat '+(state.category===category?'is-active':'')+'" data-category="'+esc(category)+'"><span class="cat-label">'+esc(CATEGORY_META[category].label)+'</span></button>').join('');
   el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>{state.category=button.dataset.category||'Toutes';state.productQuery='';UI.productSearch.value='';renderCategories();renderProducts()});
 }
-function renderProducts(){
-  const el=$('#products'),products=visibleProducts();
-  if(!el)return;
-  const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
-  const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
-  if(!products.length){el.innerHTML='<div class="empty is-wide">Aucun produit ne correspond à cette recherche.</div>';return}
-  el.innerHTML=products.map(product=>{
-    const quantity=quantities.get(norm(product.name))||0,active=quantity>0;
-    const addLabel='Ajouter une unité de '+product.name+'. Quantité '+quantity;
-    const removeLabel=active?'Retirer une unité de '+product.name+'. Quantité '+quantity:'Aucune unité de '+product.name+' à retirer';
-    return '<div class="product '+(active?'is-selected':'')+'" data-name="'+esc(product.name)+'" data-quantity="'+quantity+'">'+
-      '<button type="button" class="badge" aria-label="'+esc(addLabel)+'">'+(active?quantity:'+')+'</button>'+
-      '<button type="button" class="media" aria-label="'+esc(removeLabel)+'" '+(active?'':'disabled')+'>'+sprite(product)+'</button>'+
-      '<span class="product-copy"><span class="pname">'+esc(productDisplayName(product.name))+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>'+
-    '</div>';
-  }).join('');
-  el.querySelectorAll('.product').forEach(card=>{
-    const name=card.dataset.name||'';
-    const add=card.querySelector('.badge');if(add)add.onclick=()=>incrementProduct(name);
-    const remove=card.querySelector('.media');if(remove)remove.onclick=()=>decrementProduct(name);
-  });
-}
-function setProductQuantity(name,quantity){
-  const key=norm(name),value=Math.max(0,Number(quantity)||0);
-  const card=[...document.querySelectorAll('#products .product')].find(entry=>norm(entry.dataset.name)===key);
-  if(!card)return;
-  const active=value>0;
+const productCardCache=new Map();
+function updateProductCardQuantity(card,name,quantity){
+  const value=Math.max(0,Number(quantity)||0),active=value>0;
   card.dataset.quantity=String(value);
   card.classList.toggle('is-selected',active);
   const badge=card.querySelector('.badge');
@@ -721,6 +697,48 @@ function setProductQuantity(name,quantity){
     media.disabled=!active;
     media.setAttribute('aria-label',active?'Retirer une unité de '+name+'. Quantité '+value:'Aucune unité de '+name+' à retirer');
   }
+}
+function productCard(product){
+  const key=norm(product.name);
+  let card=productCardCache.get(key);
+  if(card)return card;
+  card=document.createElement('div');
+  card.className='product';
+  card.dataset.name=product.name;
+  card.innerHTML=
+    '<button type="button" class="badge"></button>'+
+    '<button type="button" class="media">'+sprite(product)+'</button>'+
+    '<span class="product-copy"><span class="pname">'+esc(productDisplayName(product.name))+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>';
+  const add=card.querySelector('.badge');if(add)add.onclick=()=>incrementProduct(product.name);
+  const remove=card.querySelector('.media');if(remove)remove.onclick=()=>decrementProduct(product.name);
+  productCardCache.set(key,card);
+  return card;
+}
+function renderProducts(){
+  const el=$('#products'),products=visibleProducts();
+  if(!el)return;
+  const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
+  const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
+  if(!products.length){
+    const empty=document.createElement('div');
+    empty.className='empty is-wide';
+    empty.textContent='Aucun produit ne correspond à cette recherche.';
+    el.replaceChildren(empty);
+    return;
+  }
+  const fragment=document.createDocumentFragment();
+  products.forEach(product=>{
+    const card=productCard(product);
+    updateProductCardQuantity(card,product.name,quantities.get(norm(product.name))||0);
+    fragment.appendChild(card);
+  });
+  el.replaceChildren(fragment);
+}
+function setProductQuantity(name,quantity){
+  const key=norm(name);
+  const card=[...document.querySelectorAll('#products .product')].find(entry=>norm(entry.dataset.name)===key);
+  if(!card)return;
+  updateProductCardQuantity(card,name,quantity);
 }
 function syncProductSelection(){
   if(state.preferences.hideAdded){renderProducts();return}
