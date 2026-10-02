@@ -1138,8 +1138,8 @@ function markBottomNavUnder(clear=false){
 function bottomNavEnsureLensCopies(items=bottomNavItems()){
   items.forEach(item=>{
     if(item.querySelector('.tab-lens-copy'))return;
-    const icon=item.querySelector('svg');
-    const label=item.querySelector('span');
+    const icon=[...item.children].find(node=>node.tagName==='svg');
+    const label=[...item.children].find(node=>node.tagName==='SPAN');
     if(!icon||!label)return;
     const copy=document.createElement('i');
     copy.className='tab-lens-copy';
@@ -1147,6 +1147,28 @@ function bottomNavEnsureLensCopies(items=bottomNavItems()){
     copy.append(icon.cloneNode(true),label.cloneNode(true));
     item.append(copy);
   });
+}
+function bottomNavAlignLensCopy(item,copy){
+  const icon=[...item.children].find(node=>node.tagName==='svg');
+  const label=[...item.children].find(node=>node.tagName==='SPAN');
+  const copyIcon=[...copy.children].find(node=>node.tagName==='svg');
+  const copyLabel=[...copy.children].find(node=>node.tagName==='SPAN');
+  if(!icon||!label||!copyIcon||!copyLabel)return;
+  const itemRect=item.getBoundingClientRect();
+  const place=(source,target)=>{
+    const rect=source.getBoundingClientRect();
+    target.style.left=(rect.left-itemRect.left).toFixed(2)+'px';
+    target.style.top=(rect.top-itemRect.top).toFixed(2)+'px';
+    target.style.width=rect.width.toFixed(2)+'px';
+    target.style.height=rect.height.toFixed(2)+'px';
+  };
+  const labelStyle=getComputedStyle(label);
+  ['font-family','font-size','font-weight','font-style','line-height','letter-spacing','text-transform','font-kerning','font-variation-settings'].forEach(prop=>{
+    const value=labelStyle.getPropertyValue(prop);
+    if(value)copyLabel.style.setProperty(prop,value,'important');
+  });
+  place(icon,copyIcon);
+  place(label,copyLabel);
 }
 function paintBottomNavLensContent(track,items,visualLeft,visualRight,lift,speed){
   bottomNavEnsureLensCopies(items);
@@ -1168,6 +1190,7 @@ function paintBottomNavLensContent(track,items,visualLeft,visualRight,lift,speed
       copy.style.webkitClipPath='inset(0 100% 0 0)';
       return;
     }
+    bottomNavAlignLensCopy(item,copy);
     const itemLeft=item.offsetLeft;
     const itemRight=itemLeft+item.offsetWidth;
     const overlapLeft=Math.max(itemLeft,visualLeft);
