@@ -3954,3 +3954,14 @@ body{
     top:4px!important;
   }
 }
+
+
+/* v164 — centrage vertical réel de la lentille */
+@media(max-width:520px){
+  .app>.tabs::before{
+    top:50%!important;
+    transform:
+      translate3d(var(--nav-liquid-x),-50%,0)
+      scale(var(--nav-liquid-sx),var(--nav-liquid-sy))!important;
+  }
+}
