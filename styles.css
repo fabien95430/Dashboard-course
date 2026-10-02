@@ -3965,3 +3965,39 @@ body{
       scale(var(--nav-liquid-sx),var(--nav-liquid-sy))!important;
   }
 }
+
+
+/* v165 — lentille plus compacte et vert renforcé */
+@media(max-width:520px){
+  .app>.tabs::before{
+    height:48px!important;
+    border-radius:24px!important;
+  }
+
+  .app>.tabs .tab.is-active{
+    color:#008a46!important;
+  }
+
+  .app>.tabs .tab.is-active>span{
+    font-weight:850!important;
+  }
+
+  .app>.tabs .tab.is-active>svg{
+    stroke-width:2.08!important;
+    filter:drop-shadow(0 1px 2px rgba(0,138,70,.12))!important;
+  }
+
+  .app>.tabs .tab-lens-copy{
+    color:#008a46!important;
+  }
+
+  .app>.tabs .tab-lens-copy>span{
+    font-weight:850!important;
+    text-shadow:0 1px 3px rgba(0,138,70,.10)!important;
+  }
+
+  .app>.tabs .tab-lens-copy>svg{
+    stroke-width:2.08!important;
+    filter:drop-shadow(0 1px 2px rgba(0,138,70,.12))!important;
+  }
+}
