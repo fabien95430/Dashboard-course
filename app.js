@@ -1169,6 +1169,35 @@ function bottomNavAlignLensCopy(item,copy){
   place(icon,copyIcon);
   place(label,copyLabel);
 }
+function bottomNavMaskOriginalContent(item,visualLeft=null,visualRight=null){
+  const itemRect=item.getBoundingClientRect();
+  const sources=[...item.children].filter(node=>node.tagName==='svg'||node.tagName==='SPAN');
+  sources.forEach(source=>{
+    if(visualLeft===null||visualRight===null){
+      source.style.webkitMaskImage='';
+      source.style.maskImage='';
+      return;
+    }
+    const rect=source.getBoundingClientRect();
+    if(!rect.width)return;
+    const sourceLeft=item.offsetLeft+(rect.left-itemRect.left);
+    const sourceRight=sourceLeft+rect.width;
+    const overlapLeft=Math.max(sourceLeft,visualLeft);
+    const overlapRight=Math.min(sourceRight,visualRight);
+    if(overlapRight<=overlapLeft){
+      source.style.webkitMaskImage='';
+      source.style.maskImage='';
+      return;
+    }
+    const left=Math.max(0,overlapLeft-sourceLeft);
+    const right=Math.min(rect.width,overlapRight-sourceLeft);
+    const mask=left<=0.01&&right>=rect.width-0.01
+      ?'linear-gradient(transparent,transparent)'
+      :`linear-gradient(to right,#000 0,#000 ${left.toFixed(2)}px,transparent ${left.toFixed(2)}px,transparent ${right.toFixed(2)}px,#000 ${right.toFixed(2)}px,#000 100%)`;
+    source.style.webkitMaskImage=mask;
+    source.style.maskImage=mask;
+  });
+}
 function paintBottomNavLensContent(track,items,visualLeft,visualRight,lift,speed){
   bottomNavEnsureLensCopies(items);
   const st=bottomNavLiquid;
@@ -1187,6 +1216,7 @@ function paintBottomNavLensContent(track,items,visualLeft,visualRight,lift,speed
       copy.style.opacity='0';
       copy.style.clipPath='inset(0 100% 0 0)';
       copy.style.webkitClipPath='inset(0 100% 0 0)';
+      bottomNavMaskOriginalContent(item);
       return;
     }
     bottomNavAlignLensCopy(item,copy);
@@ -1196,8 +1226,10 @@ function paintBottomNavLensContent(track,items,visualLeft,visualRight,lift,speed
     const overlapRight=Math.min(itemRight,visualRight);
     if(overlapRight<=overlapLeft){
       copy.style.opacity='0';
+      bottomNavMaskOriginalContent(item);
       return;
     }
+    bottomNavMaskOriginalContent(item,visualLeft,visualRight);
     const clipLeft=Math.max(0,overlapLeft-itemLeft);
     const clipRight=Math.max(0,itemRight-overlapRight);
     const clip=`inset(0 ${clipRight.toFixed(2)}px 0 ${clipLeft.toFixed(2)}px)`;
