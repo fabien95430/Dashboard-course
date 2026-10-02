@@ -3714,3 +3714,30 @@ body{
     transform-origin:center!important;
   }
 }
+
+
+/* v158 — superposition exacte du contenu de lentille */
+@media(max-width:520px){
+  .app>.tabs .tab-lens-copy{
+    display:block!important;
+  }
+
+  .app>.tabs .tab-lens-copy>svg,
+  .app>.tabs .tab-lens-copy>span{
+    position:absolute!important;
+    margin:0!important;
+  }
+
+  .app>.tabs .tab-lens-copy>span{
+    display:block!important;
+    padding:0!important;
+    white-space:nowrap!important;
+    transform:none!important;
+  }
+
+  .app>.tabs .tab-lens-copy>svg{
+    transform:
+      translateX(var(--nav-lens-content-shift,0px))
+      scale(var(--nav-lens-content-scale,1))!important;
+  }
+}
