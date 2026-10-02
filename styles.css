@@ -3946,3 +3946,11 @@ body{
     backdrop-filter:blur(20px) saturate(.82)!important;
   }
 }
+
+
+/* v163 — capsule centrée verticalement */
+@media(max-width:520px){
+  .app>.tabs::before{
+    top:4px!important;
+  }
+}
