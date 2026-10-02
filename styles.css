@@ -3934,3 +3934,15 @@ body{
       0 6px 16px rgba(42,49,45,.13)!important;
   }
 }
+
+
+/* v162 — verre de barre plus neutre */
+@media(max-width:520px){
+  .app>.tabs{
+    border-color:rgba(88,96,91,.14)!important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.94),rgba(250,251,250,.88))!important;
+    -webkit-backdrop-filter:blur(20px) saturate(.82)!important;
+    backdrop-filter:blur(20px) saturate(.82)!important;
+  }
+}
