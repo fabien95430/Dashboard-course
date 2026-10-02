@@ -3922,3 +3922,15 @@ body{
   }
 }
 
+
+
+/* v161 — capsule sans contour vert */
+@media(max-width:520px){
+  .app>.tabs.is-liquid-moving::before{
+    border-color:rgba(121,127,123,.14)!important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.90),
+      inset 0 -1px 0 rgba(255,255,255,.18),
+      0 6px 16px rgba(42,49,45,.13)!important;
+  }
+}
