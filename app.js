@@ -2305,9 +2305,7 @@ function bindUiEvents(){
   bindDialogBackdropClose(UI.settingsDialog,clearPasswordChangeForm);
   $('#settingsLockBtn').onclick=()=>lockApp(STATUS_TEXT.manualLockReason);
   $('#settingsLogoutBtn').onclick=revoke;
-  $('#cancelConnectionSettings').onclick=()=>UI.connectionDialog.close();
   $('#saveConnectionSettings').onclick=saveConnectionSettings;
-  $('#cancelPreferences').onclick=()=>UI.preferencesDialog.close();
   $('#savePreferences').onclick=savePreferencesSettings;
   $('#addMissingProduct').onclick=addMissingProduct;
   UI.missingProductName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addMissingProduct()}};
