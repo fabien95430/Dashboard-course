@@ -1256,10 +1256,10 @@ function paintBottomNavLiquid(){
   const minLeft=items[0].offsetLeft;
   const last=items[items.length-1];
   const maxRight=last.offsetLeft+last.offsetWidth;
-  const lensW=st.w*0.90;
+  const lensW=st.w*0.84;
   const lensX=st.x+(st.w-lensW)/2;
-  const box=bottomNavContain(lensX,lensW,1+lift*0.11+speed*0.30,minLeft,maxRight);
-  const sy=1+lift*0.16-speed*0.05;
+  const box=bottomNavContain(lensX,lensW,1+lift*0.08+speed*0.22,minLeft,maxRight);
+  const sy=1+lift*0.09-speed*0.03;
   const visualWidth=lensW*box.sx;
   const visualLeft=box.x+(lensW-visualWidth)/2;
   const visualRight=visualLeft+visualWidth;
