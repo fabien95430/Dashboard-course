@@ -2034,8 +2034,8 @@ function openConnectionSettings(){
   const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
   const select=UI.connectionEntitySelect;
   if(select){
-    select.innerHTML='<option value="" selected>Choisir une liste</option>'+choices.map(e=>'<option value="'+esc(e.id)+'">'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
-    select.value='';
+    select.innerHTML='<option value="">Choisir une liste</option>'+choices.map(e=>'<option value="'+esc(e.id)+'">'+esc(e.name)+' — '+esc(e.id)+'</option>').join('');
+    select.value=state.entity||'';
   }
   renderSettingsPage();
   const dialog=UI.connectionDialog;
