@@ -3741,3 +3741,112 @@ body{
       scale(var(--nav-lens-content-scale,1))!important;
   }
 }
+
+/* v159 — réglages verre dépoli */
+.settings-view{
+  background:
+    radial-gradient(88% 48% at 6% 14%,rgba(105,177,128,.14),transparent 72%),
+    radial-gradient(76% 46% at 98% 36%,rgba(235,199,145,.13),transparent 70%),
+    radial-gradient(74% 48% at 50% 82%,rgba(118,169,151,.10),transparent 72%);
+}
+
+.settings-header .page-version{
+  border:1px solid rgba(255,255,255,.72);
+  background:rgba(255,255,255,.38);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.58);
+  -webkit-backdrop-filter:blur(10px) saturate(1.06);
+  backdrop-filter:blur(10px) saturate(1.06);
+}
+
+.settings-section h2{
+  color:#10251b;
+}
+
+.section-icon{
+  border:1px solid rgba(255,255,255,.72);
+  background:linear-gradient(145deg,rgba(232,249,235,.84),rgba(217,242,224,.64));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.72),
+    0 4px 12px rgba(35,91,55,.07);
+}
+
+.settings-card{
+  border:1px solid rgba(255,255,255,.76);
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.68),rgba(248,250,247,.46));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.82),
+    0 10px 28px rgba(43,66,49,.075);
+  -webkit-backdrop-filter:blur(18px) saturate(1.08);
+  backdrop-filter:blur(18px) saturate(1.08);
+}
+
+.settings-row{
+  border-bottom-color:rgba(106,123,112,.13);
+}
+
+.settings-row:active{
+  background:rgba(255,255,255,.34);
+}
+
+.settings-icon{
+  border:1px solid rgba(255,255,255,.76);
+  background:linear-gradient(145deg,rgba(231,249,235,.88),rgba(217,244,225,.68));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.80),
+    0 5px 14px rgba(28,105,57,.07);
+}
+
+.settings-copy strong{
+  color:#141b17;
+}
+
+.settings-copy small{
+  color:#818b95;
+}
+
+.chevron{
+  color:#7b858d;
+}
+
+.sync-dot.is-online{
+  background:#17ad4e;
+  box-shadow:
+    0 0 0 5px rgba(234,248,237,.78),
+    0 4px 10px rgba(23,173,78,.16);
+}
+
+.settings-count{
+  background:linear-gradient(180deg,#31aa63,#249653);
+  border:1px solid rgba(255,255,255,.50);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    0 5px 13px rgba(36,142,79,.16);
+}
+
+.settings-logout{
+  border:1px solid rgba(255,255,255,.74);
+  background:
+    linear-gradient(145deg,rgba(255,235,232,.82),rgba(255,218,215,.60));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.78),
+    0 8px 22px rgba(177,56,56,.07);
+  -webkit-backdrop-filter:blur(16px) saturate(1.05);
+  backdrop-filter:blur(16px) saturate(1.05);
+}
+
+.settings-logout:active{
+  background:
+    linear-gradient(145deg,rgba(255,229,226,.88),rgba(255,208,205,.68));
+}
+
+@media(max-width:520px){
+  .settings-card{
+    border-radius:20px!important;
+  }
+
+  .settings-logout{
+    border-radius:20px!important;
+  }
+}
+
