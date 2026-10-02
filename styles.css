@@ -4123,3 +4123,12 @@ body{
   }
 }
 
+
+
+/* v169 — lentille plus contenue dans la barre */
+@media(max-width:520px){
+  .app>.tabs::before{
+    height:44px!important;
+    border-radius:22px!important;
+  }
+}
