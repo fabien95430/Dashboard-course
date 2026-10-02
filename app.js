@@ -1296,7 +1296,7 @@ function bindBottomNavLiquid(){
     if(target&&!target.classList.contains('is-active')){
       state.view=target.dataset.view||'list';
       navigator.vibrate?.(4);
-      renderView();
+      showView();
     }else{
       syncBottomNavLiquid(!bottomNavReduced());
     }
@@ -1305,13 +1305,16 @@ function bindBottomNavLiquid(){
   track.addEventListener('pointercancel',event=>finish(event,true));
 }
 
-function renderView(){
+function showView(){
   if(state.view!=='list')setListFilterMenuOpen(false);
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
   $('#listView').classList.toggle('is-active',state.view==='list');
   $('#settingsView').classList.toggle('is-active',state.view==='settings');
   document.querySelectorAll('.tab').forEach(button=>button.classList.toggle('is-active',button.dataset.view===state.view));
   syncBottomNavLiquid(true);
+}
+function renderView(){
+  showView();
   renderCategories();renderProducts();renderList();renderSettingsPage();
 }
 function renderSettingsPage(){
@@ -2249,7 +2252,7 @@ function bindUiEvents(){
     if(next===state.view){syncBottomNavLiquid(false);return}
     state.view=next;
     navigator.vibrate?.(4);
-    renderView();
+    showView();
   });
   bindBottomNavLiquid();
   window.addEventListener('resize',()=>syncBottomNavLiquid(false),{passive:true});
