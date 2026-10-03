@@ -1,14 +1,16 @@
 /* Catalogue Produits / Plats — UI légère, cohérente avec le thème clair de l'app */
 .catalog-view{grid-template-rows:112px 58px auto minmax(0,1fr)!important;gap:12px!important}
-.catalog-controls{min-width:0;display:grid;grid-template-rows:46px 54px;gap:8px}
+.catalog-controls{min-width:0;display:grid;grid-template-rows:46px 40px;gap:12px}
 
-/* Switch Produits / Plats : mini lentille iOS, même langage que la navigation basse */
+/* Switch Produits / Plats : lentille compacte alignée sur la navigation basse */
 .catalog-mode-switch{
   --catalog-lens-x:3px;
   --catalog-lens-w:calc(50% - 3px);
   position:relative;
-  width:100%;
+  justify-self:center;
+  width:calc(100% - 28px);
   height:46px;
+  margin:0 14px;
   padding:3px;
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -26,21 +28,17 @@
   left:0;
   width:var(--catalog-lens-w);
   height:40px;
-  border:1px solid rgba(12,115,61,.08);
+  border:1px solid rgba(121,127,123,.14);
   border-radius:21px;
   pointer-events:none;
   transform:translate3d(var(--catalog-lens-x),0,0);
-  background:
-    radial-gradient(78% 54% at 50% 0%,rgba(255,255,255,.94),transparent 78%),
-    linear-gradient(180deg,rgba(240,250,239,.98),rgba(226,244,229,.94));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.98),
-    0 7px 18px rgba(16,117,61,.10);
+  background:linear-gradient(180deg,rgba(241,242,241,.96),rgba(226,228,226,.86));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86),0 4px 12px rgba(42,49,45,.12);
   transition:transform .42s cubic-bezier(.22,.78,.18,1),width .42s cubic-bezier(.22,.78,.18,1),box-shadow .24s ease;
   will-change:transform,width;
 }
 .catalog-mode-switch.is-switching .catalog-mode-lens{
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.98),0 9px 22px rgba(16,117,61,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 6px 16px rgba(42,49,45,.14);
 }
 .catalog-mode{
   position:relative;
@@ -65,31 +63,36 @@
 .catalog-mode.is-active>span:last-child{font-weight:800}
 .catalog-mode.is-active .catalog-mode-fork{filter:none;opacity:1}
 
-/* Les deux modes partagent exactement le langage visuel des catégories Produits */
+/* Sous-catégories : taille compacte validée, même rendu Produits / Plats */
 .catalog-controls>.categories,.dish-filters{
   min-width:0;
-  height:54px;
+  height:40px;
   display:flex;
   align-items:center;
   gap:9px;
   overflow-x:auto;
-  padding:1px 2px 5px;
+  padding:0 2px;
   scrollbar-width:none;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior-inline:contain;
 }
 .catalog-controls>.categories::-webkit-scrollbar,.dish-filters::-webkit-scrollbar{display:none}
-.catalog-controls>.categories .cat{height:48px!important;padding:0 22px!important}
+.catalog-controls>.categories .cat{
+  height:40px!important;
+  padding:0 14px!important;
+  border-radius:20px!important;
+}
+.catalog-controls>.categories .cat-label{font-size:14px!important}
 .dish-filter{
   flex:0 0 auto;
-  height:48px;
-  padding:0 22px;
+  height:40px;
+  padding:0 14px;
   border:1px solid rgba(27,49,35,.055);
-  border-radius:24px;
+  border-radius:20px;
   background:rgba(255,255,255,.94);
   color:#41474b;
   box-shadow:0 5px 17px rgba(57,75,62,.055);
-  font-size:15px;
+  font-size:14px;
   font-weight:720;
   white-space:nowrap;
 }
@@ -196,12 +199,12 @@
 @keyframes dishCartPulse{to{transform:scale(.88);opacity:.6}}
 
 @media(max-width:390px){
-  .catalog-controls{grid-template-rows:44px 52px;gap:7px}
-  .catalog-mode-switch{height:44px}
-  .catalog-mode-lens{height:38px}
+  .catalog-controls{grid-template-rows:46px 40px;gap:12px}
+  .catalog-mode-switch{height:46px;width:calc(100% - 28px);margin-left:14px;margin-right:14px}
+  .catalog-mode-lens{height:40px}
   .catalog-mode{font-size:13px}
-  .catalog-controls>.categories,.dish-filters{height:52px;gap:8px}
-  .catalog-controls>.categories .cat,.dish-filter{height:46px!important;padding-left:18px!important;padding-right:18px!important;font-size:14px}
+  .catalog-controls>.categories,.dish-filters{height:40px;gap:8px}
+  .catalog-controls>.categories .cat,.dish-filter{height:40px!important;padding-left:14px!important;padding-right:14px!important;font-size:14px}
   .dishes-grid{grid-auto-rows:190px;gap:8px}
   .dish-card{grid-template-rows:121px minmax(0,1fr)}
   .dish-dialog[open]{grid-template-rows:205px auto minmax(0,1fr) auto}
