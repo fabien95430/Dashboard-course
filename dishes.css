@@ -40,3 +40,8 @@
   .catalog-controls>.categories .cat[data-category="Toutes"]{min-width:0!important}
   .catalog-controls,.dish-filters,.dishes-grid{background:transparent!important;border:0!important;box-shadow:none!important}
 }
+
+/* iOS : même compositing de la grille Plats que la grille Produits */
+@media(max-width:520px){
+  .dishes-grid{-webkit-overflow-scrolling:auto!important}
+}
