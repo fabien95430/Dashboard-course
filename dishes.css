@@ -9,3 +9,20 @@
   .dishes-grid{margin-left:0!important;margin-right:0!important;padding:1px 19px 8px!important}
 }
 @media(max-width:390px){.catalog-controls{gap:8px!important}}
+
+/* Mobile : géométrie exacte du Catalogue Produits avant l'intégration de Plats */
+@media(max-width:520px){
+  .catalog-view{grid-template-rows:82px 42px auto minmax(0,1fr)!important;gap:8px!important}
+  .catalog-view .page-search{height:42px!important;margin-left:13px!important;margin-right:13px!important;grid-template-columns:24px minmax(0,1fr) auto!important;gap:8px!important;padding:0 14px!important;border-radius:22px!important}
+  .catalog-controls{grid-template-rows:46px 48px!important;gap:8px!important}
+  .catalog-controls>.categories,.dish-filters{height:48px!important;margin-left:12px!important;margin-right:12px!important;gap:7px!important;padding:0!important}
+  .catalog-controls>.categories .cat,.dish-filter{height:48px!important;padding-left:22px!important;padding-right:22px!important;border-radius:24px!important;font-size:15px!important}
+  .catalog-controls>.categories .cat-label{font-size:15px!important}
+  .dishes-grid{margin-left:0!important;margin-right:0!important;padding:1px 19px 8px!important}
+}
+@media(max-width:390px){
+  .catalog-view{grid-template-rows:82px 42px auto minmax(0,1fr)!important}
+  .catalog-controls{grid-template-rows:46px 48px!important;gap:8px!important}
+  .catalog-controls>.categories,.dish-filters{height:48px!important;margin-left:12px!important;margin-right:12px!important;gap:7px!important}
+  .catalog-controls>.categories .cat,.dish-filter{height:48px!important;padding-left:22px!important;padding-right:22px!important;font-size:15px!important}
+}
