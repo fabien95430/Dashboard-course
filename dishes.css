@@ -26,3 +26,11 @@
   .catalog-controls>.categories,.dish-filters{height:48px!important;margin-left:12px!important;margin-right:12px!important;gap:7px!important}
   .catalog-controls>.categories .cat,.dish-filter{height:48px!important;padding-left:22px!important;padding-right:22px!important;font-size:15px!important}
 }
+
+/* Mobile : dimensions des catégories identiques à la version avant Plats */
+@media(max-width:520px){
+  .catalog-controls{grid-template-rows:46px 38px!important}
+  .catalog-controls>.categories,.dish-filters{height:38px!important}
+  .catalog-controls>.categories .cat,.dish-filter{height:38px!important;padding-left:16px!important;padding-right:16px!important;border-radius:20px!important;font-size:13px!important}
+  .catalog-controls>.categories .cat-label{font-size:13px!important}
+}
