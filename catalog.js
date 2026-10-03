@@ -11,14 +11,14 @@
   'use strict';
   const style=document.createElement('link');
   style.rel='stylesheet';
-  style.href='./dishes.css?v=1';
+  style.href='./dishes.css?v=2';
   style.dataset.catalogDishes='style';
   document.head.appendChild(style);
 
   const load=()=>{
     if(document.querySelector('script[data-catalog-dishes]'))return;
     const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=1';
+    script.src='./dishes-ui.js?v=2';
     script.async=false;
     script.dataset.catalogDishes='script';
     document.body.appendChild(script);
