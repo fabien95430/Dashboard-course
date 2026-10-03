@@ -9,11 +9,11 @@
 
 (() => {
   'use strict';
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v170';});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v171';});
 
   const style=document.createElement('link');
   style.rel='stylesheet';
-  style.href='./dishes.css?v=2';
+  style.href='./dishes.css?v=3';
   style.dataset.catalogDishes='style';
   document.head.appendChild(style);
 
