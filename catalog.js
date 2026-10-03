@@ -9,6 +9,8 @@
 
 (() => {
   'use strict';
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v170';});
+
   const style=document.createElement('link');
   style.rel='stylesheet';
   style.href='./dishes.css?v=2';
