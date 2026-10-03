@@ -5,55 +5,55 @@ const CATALOG=window.COURSES_CATALOG;
 if(!CATALOG)return;
 
 const DISHES=Object.freeze([
-  {name:'Spaghetti carbonara',emoji:'🍝',tags:['Pâtes','Rapides'],ingredients:['Spaghetti','Lardons','Œufs','Parmesan','Crème fraîche']},
-  {name:'Spaghetti bolognaise',emoji:'🍝',tags:['Pâtes','Viandes'],ingredients:['Spaghetti','Viande hachée','Sauce tomate','Oignons jaunes']},
-  {name:'Penne poulet crème',emoji:'🍝',tags:['Pâtes','Poulet'],ingredients:['Penne','Poulet','Crème fraîche','Champignons','Parmesan']},
-  {name:'Pâtes tomate mozzarella',emoji:'🍅',tags:['Pâtes','Végé','Rapides'],ingredients:['Penne','Sauce tomate','Mozzarella','Basilic']},
-  {name:'Lasagnes bolognaise',emoji:'🥘',tags:['Pâtes','Viandes'],ingredients:['Lasagnes','Viande hachée','Sauce tomate','Fromage râpé','Crème fraîche']},
-  {name:'Tagliatelles au saumon',emoji:'🍝',tags:['Pâtes','Poissons'],ingredients:['Tagliatelles','Saumon','Crème fraîche','Citron']},
-  {name:'Pâtes pesto poulet',emoji:'🍝',tags:['Pâtes','Poulet','Rapides'],ingredients:['Penne','Poulet','Pesto','Parmesan']},
-  {name:'Penne chorizo poivrons',emoji:'🍝',tags:['Pâtes','Viandes'],ingredients:['Penne','Chorizo','Sauce tomate','Poivrons']},
+  {name:'Spaghetti carbonara',photoId:'12116165',tags:['Pâtes','Rapides'],ingredients:['Spaghetti','Lardons','Œufs','Parmesan','Crème fraîche']},
+  {name:'Spaghetti bolognaise',photoId:'15500451',tags:['Pâtes','Viandes'],ingredients:['Spaghetti','Viande hachée','Sauce tomate','Oignons jaunes']},
+  {name:'Penne poulet crème',photoId:'4730661',tags:['Pâtes','Poulet'],ingredients:['Penne','Poulet','Crème fraîche','Champignons','Parmesan']},
+  {name:'Pâtes tomate mozzarella',photoId:'19217442',tags:['Pâtes','Végé','Rapides'],ingredients:['Penne','Sauce tomate','Mozzarella','Basilic']},
+  {name:'Lasagnes bolognaise',photoId:'18273993',tags:['Pâtes','Viandes'],ingredients:['Lasagnes','Viande hachée','Sauce tomate','Fromage râpé','Crème fraîche']},
+  {name:'Tagliatelles au saumon',photoId:'15529617',tags:['Pâtes','Poissons'],ingredients:['Tagliatelles','Saumon','Crème fraîche','Citron']},
+  {name:'Pâtes pesto poulet',photoId:'4730680',tags:['Pâtes','Poulet','Rapides'],ingredients:['Penne','Poulet','Pesto','Parmesan']},
+  {name:'Penne chorizo poivrons',photoId:'3851029',tags:['Pâtes','Viandes'],ingredients:['Penne','Chorizo','Sauce tomate','Poivrons']},
 
-  {name:'Burger maison',emoji:'🍔',tags:['Viandes','Rapides'],ingredients:['Pains burger','Steaks hachés','Emmental','Tomates','Salade verte','Oignons rouges']},
-  {name:'Tacos bœuf',emoji:'🌮',tags:['Viandes','Rapides'],ingredients:['Galettes de blé','Viande hachée','Fromage râpé','Tomates','Salade verte','Avocat']},
-  {name:'Chili con carne',emoji:'🌶️',tags:['Viandes'],ingredients:['Viande hachée','Haricots rouges','Tomates pelées','Maïs en boîte','Oignons jaunes']},
-  {name:'Couscous merguez',emoji:'🥘',tags:['Viandes'],ingredients:['Couscous','Merguez','Carottes','Courgettes','Pois chiches']},
-  {name:'Steak pommes de terre',emoji:'🥩',tags:['Viandes'],ingredients:['Steaks hachés','Pommes de terre','Salade verte']},
-  {name:'Saucisses pommes de terre',emoji:'🌭',tags:['Viandes'],ingredients:['Saucisses','Pommes de terre','Oignons jaunes']},
-  {name:'Tartiflette',emoji:'🧀',tags:['Viandes'],ingredients:['Pommes de terre','Reblochon','Lardons','Oignons jaunes','Crème fraîche']},
-  {name:'Raclette',emoji:'🧀',tags:['Viandes'],ingredients:['Raclette','Pommes de terre','Jambon blanc','Jambon cru','Rosette']},
+  {name:'Burger maison',photoId:'2089717',tags:['Viandes','Rapides'],ingredients:['Pains burger','Steaks hachés','Emmental','Tomates','Salade verte','Oignons rouges']},
+  {name:'Tacos bœuf',photoId:'38948386',tags:['Viandes','Rapides'],ingredients:['Galettes de blé','Viande hachée','Fromage râpé','Tomates','Salade verte','Avocat']},
+  {name:'Chili con carne',photoId:'14866629',tags:['Viandes'],ingredients:['Viande hachée','Haricots rouges','Tomates pelées','Maïs en boîte','Oignons jaunes']},
+  {name:'Couscous merguez',photoId:'36916123',tags:['Viandes'],ingredients:['Couscous','Merguez','Carottes','Courgettes','Pois chiches']},
+  {name:'Steak pommes de terre',photoId:'19503815',tags:['Viandes'],ingredients:['Steaks hachés','Pommes de terre','Salade verte']},
+  {name:'Saucisses pommes de terre',photoId:'19503824',tags:['Viandes'],ingredients:['Saucisses','Pommes de terre','Oignons jaunes']},
+  {name:'Tartiflette',photoId:'20426624',tags:['Viandes'],ingredients:['Pommes de terre','Reblochon','Lardons','Oignons jaunes','Crème fraîche']},
+  {name:'Raclette',photoId:'14269237',tags:['Viandes'],ingredients:['Raclette','Pommes de terre','Jambon blanc','Jambon cru','Rosette']},
 
-  {name:'Poulet curry',emoji:'🍛',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Lait de coco','Oignons jaunes']},
-  {name:'Poulet riz légumes',emoji:'🍚',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Poivrons','Courgettes','Carottes']},
-  {name:'Wrap poulet crudités',emoji:'🌯',tags:['Poulet','Rapides'],ingredients:['Wraps','Poulet','Salade verte','Tomates','Avocat']},
-  {name:'Poulet crème champignons',emoji:'🍗',tags:['Poulet'],ingredients:['Poulet','Crème fraîche','Champignons','Riz basmati']},
-  {name:'Salade César',emoji:'🥗',tags:['Poulet','Rapides'],ingredients:['Salade verte','Poulet','Parmesan','Croûtons','Œufs']},
-  {name:'Poulet tomate mozzarella',emoji:'🍗',tags:['Poulet'],ingredients:['Escalopes de poulet','Mozzarella','Tomates','Sauce tomate']},
-  {name:'Poulet brocoli riz',emoji:'🍚',tags:['Poulet'],ingredients:['Poulet','Brocoli','Riz basmati','Crème fraîche']},
-  {name:'Fajitas poulet',emoji:'🌯',tags:['Poulet','Rapides'],ingredients:['Galettes de blé','Poulet','Poivrons','Oignons rouges','Avocat']},
+  {name:'Poulet curry',photoId:'27352275',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Lait de coco','Oignons jaunes']},
+  {name:'Poulet riz légumes',photoId:'20258760',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Poivrons','Courgettes','Carottes']},
+  {name:'Wrap poulet crudités',photoId:'29535635',tags:['Poulet','Rapides'],ingredients:['Wraps','Poulet','Salade verte','Tomates','Avocat']},
+  {name:'Poulet crème champignons',photoId:'5713768',tags:['Poulet'],ingredients:['Poulet','Crème fraîche','Champignons','Riz basmati']},
+  {name:'Salade César',photoId:'8251537',tags:['Poulet','Rapides'],ingredients:['Salade verte','Poulet','Parmesan','Croûtons','Œufs']},
+  {name:'Poulet tomate mozzarella',photoId:'33158330',tags:['Poulet'],ingredients:['Escalopes de poulet','Mozzarella','Tomates','Sauce tomate']},
+  {name:'Poulet brocoli riz',photoId:'21822134',tags:['Poulet'],ingredients:['Poulet','Brocoli','Riz basmati','Crème fraîche']},
+  {name:'Fajitas poulet',photoId:'32371281',tags:['Poulet','Rapides'],ingredients:['Galettes de blé','Poulet','Poivrons','Oignons rouges','Avocat']},
 
-  {name:'Saumon riz brocoli',emoji:'🐟',tags:['Poissons'],ingredients:['Saumon','Riz basmati','Brocoli','Citron']},
-  {name:'Cabillaud pommes de terre',emoji:'🐟',tags:['Poissons'],ingredients:['Cabillaud','Pommes de terre','Haricots verts','Citron']},
-  {name:'Crevettes nouilles asiatiques',emoji:'🍤',tags:['Poissons'],ingredients:['Crevettes','Nouilles chinoises','Poivrons','Carottes','Sauce soja']},
-  {name:'Salade saumon avocat',emoji:'🥗',tags:['Poissons','Rapides'],ingredients:['Saumon fumé','Avocat','Salade verte','Tomates','Citron']},
-  {name:'Salade thon riz maïs',emoji:'🥗',tags:['Poissons','Rapides'],ingredients:['Thon en boîte','Riz long','Maïs en boîte','Tomates','Concombres']},
-  {name:'Moules frites',emoji:'🦪',tags:['Poissons','Rapides'],ingredients:['Moules','Frites surgelées']},
+  {name:'Saumon riz brocoli',photoId:'10156758',tags:['Poissons'],ingredients:['Saumon','Riz basmati','Brocoli','Citron']},
+  {name:'Cabillaud pommes de terre',photoId:'32645261',tags:['Poissons'],ingredients:['Cabillaud','Pommes de terre','Haricots verts','Citron']},
+  {name:'Crevettes nouilles asiatiques',photoId:'17952224',tags:['Poissons'],ingredients:['Crevettes','Nouilles chinoises','Poivrons','Carottes','Sauce soja']},
+  {name:'Salade saumon avocat',photoId:'9001197',tags:['Poissons','Rapides'],ingredients:['Saumon fumé','Avocat','Salade verte','Tomates','Citron']},
+  {name:'Salade thon riz maïs',photoId:'9218773',tags:['Poissons','Rapides'],ingredients:['Thon en boîte','Riz long','Maïs en boîte','Tomates','Concombres']},
+  {name:'Moules frites',photoId:'10432619',tags:['Poissons','Rapides'],ingredients:['Moules','Frites surgelées']},
 
-  {name:'Hot-dog',emoji:'🌭',tags:['Viandes','Rapides'],ingredients:['Pains hot-dog','Saucisses','Oignons jaunes']},
-  {name:'Omelette jambon fromage',emoji:'🍳',tags:['Viandes','Rapides'],ingredients:['Œufs','Jambon blanc','Fromage râpé','Champignons']},
-  {name:'Croque-monsieur',emoji:'🥪',tags:['Viandes','Rapides'],ingredients:['Pain de mie','Jambon blanc','Emmental']},
-  {name:'Pizza wrap',emoji:'🍕',tags:['Viandes','Rapides'],ingredients:['Wraps','Sauce tomate','Mozzarella','Jambon blanc']},
-  {name:'Bruschetta tomate mozzarella',emoji:'🥖',tags:['Végé','Rapides'],ingredients:['Baguette','Tomates','Mozzarella','Basilic']},
-  {name:'Sandwich poulet',emoji:'🥪',tags:['Poulet','Rapides'],ingredients:['Pain','Blanc de poulet','Salade verte','Tomates']},
+  {name:'Hot-dog',photoId:'4113456',tags:['Viandes','Rapides'],ingredients:['Pains hot-dog','Saucisses','Oignons jaunes']},
+  {name:'Omelette jambon fromage',photoId:'12310569',tags:['Viandes','Rapides'],ingredients:['Œufs','Jambon blanc','Fromage râpé','Champignons']},
+  {name:'Croque-monsieur',photoId:'1391301',tags:['Viandes','Rapides'],ingredients:['Pain de mie','Jambon blanc','Emmental']},
+  {name:'Pizza wrap',photoId:'16423835',tags:['Viandes','Rapides'],ingredients:['Wraps','Sauce tomate','Mozzarella','Jambon blanc']},
+  {name:'Bruschetta tomate mozzarella',photoId:'4409496',tags:['Végé','Rapides'],ingredients:['Baguette','Tomates','Mozzarella','Basilic']},
+  {name:'Sandwich poulet',photoId:'9211149',tags:['Poulet','Rapides'],ingredients:['Pain','Blanc de poulet','Salade verte','Tomates']},
 
-  {name:'Curry pois chiches',emoji:'🍛',tags:['Végé'],ingredients:['Pois chiches','Lait de coco','Tomates pelées','Épinards','Riz basmati']},
-  {name:'Buddha bowl quinoa',emoji:'🥗',tags:['Végé'],ingredients:['Quinoa','Avocat','Pois chiches','Carottes','Concombres']},
-  {name:'Gratin de courgettes',emoji:'🥒',tags:['Végé'],ingredients:['Courgettes','Crème fraîche','Fromage râpé','Œufs']},
-  {name:'Ratatouille',emoji:'🍆',tags:['Végé'],ingredients:['Tomates','Courgettes','Aubergines','Poivrons','Oignons jaunes']},
-  {name:'Salade chèvre noix',emoji:'🥗',tags:['Végé','Rapides'],ingredients:['Salade verte','Chèvre','Noix','Tomates']},
-  {name:'Pâtes pesto mozzarella',emoji:'🍝',tags:['Pâtes','Végé','Rapides'],ingredients:['Penne','Pesto','Mozzarella','Tomates']},
-  {name:'Chili sin carne',emoji:'🌶️',tags:['Végé'],ingredients:['Haricots rouges','Maïs en boîte','Tomates pelées','Poivrons','Oignons jaunes']},
-  {name:'Riz champignons parmesan',emoji:'🍚',tags:['Végé'],ingredients:['Riz long','Champignons','Parmesan','Crème fraîche']}
+  {name:'Curry pois chiches',photoId:'6544375',tags:['Végé'],ingredients:['Pois chiches','Lait de coco','Tomates pelées','Épinards','Riz basmati']},
+  {name:'Buddha bowl quinoa',photoId:'8286776',tags:['Végé'],ingredients:['Quinoa','Avocat','Pois chiches','Carottes','Concombres']},
+  {name:'Gratin de courgettes',photoId:'16824040',tags:['Végé'],ingredients:['Courgettes','Crème fraîche','Fromage râpé','Œufs']},
+  {name:'Ratatouille',photoId:'36863876',tags:['Végé'],ingredients:['Tomates','Courgettes','Aubergines','Poivrons','Oignons jaunes']},
+  {name:'Salade chèvre noix',photoId:'25524078',tags:['Végé','Rapides'],ingredients:['Salade verte','Chèvre','Noix','Tomates']},
+  {name:'Pâtes pesto mozzarella',photoId:'18171195',tags:['Pâtes','Végé','Rapides'],ingredients:['Penne','Pesto','Mozzarella','Tomates']},
+  {name:'Chili sin carne',photoId:'36040965',tags:['Végé'],ingredients:['Haricots rouges','Maïs en boîte','Tomates pelées','Poivrons','Oignons jaunes']},
+  {name:'Riz champignons parmesan',photoId:'31779539',tags:['Végé'],ingredients:['Riz long','Champignons','Parmesan','Crème fraîche']}
 ]);
 
 const FILTERS=['Tous','Pâtes','Viandes','Poulet','Poissons','Rapides','Végé','Favoris'];
@@ -61,6 +61,7 @@ const STORAGE_MODE='courses-catalog-mode-v1';
 const STORAGE_FAVORITES='courses-dish-favorites-v1';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const photoUrl=id=>'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=900&h=650&fit=crop';
 
 let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';
 let filter='Tous';
@@ -68,6 +69,7 @@ let favorites=readFavorites();
 let drivingCatalog=false;
 let busyDish='';
 let controls;
+let modeSwitch;
 let dishFilters;
 let dishesGrid;
 let dishCount;
@@ -77,7 +79,17 @@ let productCategories;
 let productsGrid;
 let catalogView;
 let catalogSubtitle;
+let dishDialog;
+let dishSheetPhoto;
+let dishSheetTitle;
+let dishSheetList;
+let dishSheetCount;
+let dishSheetFavorite;
+let dishConfirmButton;
+let currentDish=null;
+let selectedIngredients=new Set();
 let toastTimer=0;
+let lensTimer=0;
 
 function readFavorites(){
   try{return new Set(JSON.parse(localStorage.getItem(STORAGE_FAVORITES)||'[]').map(String))}catch(_){return new Set()}
@@ -118,11 +130,12 @@ function buildUi(){
   controls=document.createElement('div');
   controls.className='catalog-controls';
 
-  const modeSwitch=document.createElement('div');
+  modeSwitch=document.createElement('div');
   modeSwitch.className='catalog-mode-switch';
   modeSwitch.setAttribute('role','tablist');
   modeSwitch.setAttribute('aria-label','Type de catalogue');
   modeSwitch.innerHTML=
+    '<span class="catalog-mode-lens" aria-hidden="true"></span>'+ 
     '<button type="button" class="catalog-mode" data-mode="products" role="tab"><svg><use href="#i-grid"></use></svg><span>Produits</span></button>'+ 
     '<button type="button" class="catalog-mode" data-mode="dishes" role="tab"><span class="catalog-mode-fork" aria-hidden="true">🍴</span><span>Plats</span></button>';
 
@@ -147,13 +160,48 @@ function buildUi(){
   productCategories.before(controls);
   controls.append(modeSwitch,productCategories,dishFilters);
   productsGrid.insertAdjacentElement('afterend',dishesGrid);
+  buildDishDialog();
 
   modeSwitch.querySelectorAll('.catalog-mode').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
   searchInput.addEventListener('input',()=>{if(mode==='dishes'&&!drivingCatalog)renderDishes()});
+  window.addEventListener('resize',()=>requestAnimationFrame(()=>syncModeLens(false)),{passive:true});
+  document.querySelector('.tab[data-view="catalog"]')?.addEventListener('click',()=>requestAnimationFrame(()=>syncModeLens(false)));
 
   validateDishes();
   setMode(mode,true);
   return true;
+}
+function buildDishDialog(){
+  dishDialog=document.createElement('dialog');
+  dishDialog.className='dish-dialog';
+  dishDialog.id='dishDialog';
+  dishDialog.innerHTML=
+    '<div class="dish-sheet-photo-wrap">'+
+      '<img class="dish-sheet-photo" alt="" decoding="async" referrerpolicy="no-referrer">'+
+      '<button type="button" class="dish-sheet-close" aria-label="Fermer">‹</button>'+ 
+      '<button type="button" class="dish-sheet-favorite" aria-label="Ajouter aux favoris">♡</button>'+ 
+    '</div>'+ 
+    '<div class="dish-sheet-head">'+
+      '<h2></h2>'+ 
+      '<p><svg><use href="#i-cart"></use></svg><strong class="dish-sheet-count">0 ingrédient à ajouter</strong></p>'+ 
+    '</div>'+ 
+    '<div class="dish-sheet-list" aria-label="Ingrédients à ajouter"></div>'+ 
+    '<div class="dish-sheet-footer">'+
+      '<div class="dish-sheet-note"><span aria-hidden="true">ⓘ</span><div><strong>Sel, huile, poivre non inclus</strong><small>Ces ingrédients de base sont à ajouter manuellement si nécessaire.</small></div></div>'+ 
+      '<button type="button" class="dish-sheet-add"><svg><use href="#i-cart"></use></svg><span>Ajouter à ma liste</span></button>'+ 
+    '</div>';
+  document.body.appendChild(dishDialog);
+  dishSheetPhoto=dishDialog.querySelector('.dish-sheet-photo');
+  dishSheetTitle=dishDialog.querySelector('h2');
+  dishSheetList=dishDialog.querySelector('.dish-sheet-list');
+  dishSheetCount=dishDialog.querySelector('.dish-sheet-count');
+  dishSheetFavorite=dishDialog.querySelector('.dish-sheet-favorite');
+  dishConfirmButton=dishDialog.querySelector('.dish-sheet-add');
+  dishDialog.querySelector('.dish-sheet-close').addEventListener('click',closeDishSheet);
+  dishSheetFavorite.addEventListener('click',()=>{if(currentDish)toggleFavorite(currentDish.name,true)});
+  dishConfirmButton.addEventListener('click',confirmDishAdd);
+  dishDialog.addEventListener('click',event=>{if(event.target===dishDialog)closeDishSheet()});
+  dishDialog.addEventListener('cancel',event=>{event.preventDefault();closeDishSheet()});
 }
 function validateDishes(){
   const missing=[];
@@ -181,15 +229,26 @@ function setMode(next,initial=false){
   dishCount.hidden=!dishes;
   searchInput.placeholder=dishes?'Rechercher un plat…':'Rechercher un produit…';
   if(catalogSubtitle){
-    catalogSubtitle.firstChild.textContent=dishes?'Choisissez un plat et ajoutez ses ingrédients ':'Trouvez et ajoutez vos produits ';
+    catalogSubtitle.firstChild.textContent=dishes?'Choisissez un plat et vérifiez ses ingrédients ':'Trouvez et ajoutez vos produits ';
   }
-  controls.querySelectorAll('.catalog-mode').forEach(button=>{
+  modeSwitch.querySelectorAll('.catalog-mode').forEach(button=>{
     const active=button.dataset.mode===mode;
     button.classList.toggle('is-active',active);
     button.setAttribute('aria-selected',active?'true':'false');
   });
+  syncModeLens(!initial);
   renderDishFilters();
   if(dishes)renderDishes();
+}
+function syncModeLens(animate=true){
+  if(!modeSwitch)return;
+  const active=modeSwitch.querySelector('.catalog-mode.is-active');
+  if(!active||!active.offsetWidth)return;
+  clearTimeout(lensTimer);
+  modeSwitch.classList.toggle('is-switching',animate);
+  modeSwitch.style.setProperty('--catalog-lens-x',active.offsetLeft+'px');
+  modeSwitch.style.setProperty('--catalog-lens-w',active.offsetWidth+'px');
+  if(animate)lensTimer=setTimeout(()=>modeSwitch.classList.remove('is-switching'),430);
 }
 function renderDishFilters(){
   if(!dishFilters)return;
@@ -215,12 +274,11 @@ function renderDishes(){
   }
   dishesGrid.innerHTML=dishes.map(dish=>{
     const favorite=favorites.has(dish.name);
-    const busy=busyDish===dish.name;
-    return '<article class="dish-card '+(busy?'is-busy':'')+'" data-dish="'+escapeHtml(dish.name)+'" tabindex="0" role="button" aria-label="Ajouter les ingrédients de '+escapeHtml(dish.name)+'">'+
-      '<div class="dish-visual dish-tone-'+toneForDish(dish)+'"><span>'+dish.emoji+'</span></div>'+ 
+    return '<article class="dish-card" data-dish="'+escapeHtml(dish.name)+'" tabindex="0" role="button" aria-label="Voir les ingrédients de '+escapeHtml(dish.name)+'">'+
+      '<div class="dish-visual"><img src="'+photoUrl(dish.photoId)+'" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>'+ 
       '<button type="button" class="dish-favorite '+(favorite?'is-active':'')+'" aria-label="'+(favorite?'Retirer des favoris':'Ajouter aux favoris')+'" aria-pressed="'+(favorite?'true':'false')+'">'+(favorite?'♥':'♡')+'</button>'+ 
       '<div class="dish-copy"><strong>'+escapeHtml(dish.name)+'</strong><small>'+dish.ingredients.length+' ingrédients</small></div>'+ 
-      '<span class="dish-add" aria-hidden="true">'+(busy?'<i></i>':'+')+'</span>'+ 
+      '<span class="dish-add" aria-hidden="true">+</span>'+ 
       '</article>';
   }).join('');
 
@@ -229,22 +287,80 @@ function renderDishes(){
     if(!dish)return;
     const favoriteButton=card.querySelector('.dish-favorite');
     favoriteButton.addEventListener('click',event=>{event.stopPropagation();toggleFavorite(dish.name)});
-    card.addEventListener('click',event=>{if(!event.target.closest('.dish-favorite'))addDish(dish)});
-    card.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.dish-favorite')){event.preventDefault();addDish(dish)}});
+    card.addEventListener('click',event=>{if(!event.target.closest('.dish-favorite'))openDishSheet(dish)});
+    card.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.dish-favorite')){event.preventDefault();openDishSheet(dish)}});
   });
 }
-function toneForDish(dish){
-  if(dish.tags.includes('Pâtes'))return 'pasta';
-  if(dish.tags.includes('Poulet'))return 'chicken';
-  if(dish.tags.includes('Poissons'))return 'fish';
-  if(dish.tags.includes('Végé'))return 'veggie';
-  if(dish.tags.includes('Viandes'))return 'meat';
-  return 'quick';
-}
-function toggleFavorite(name){
+function toggleFavorite(name,fromSheet=false){
   if(favorites.has(name))favorites.delete(name);else favorites.add(name);
   saveFavorites();
   renderDishes();
+  if(fromSheet&&currentDish)renderDishSheetFavorite();
+}
+function openDishSheet(dish){
+  if(busyDish)return;
+  currentDish=dish;
+  selectedIngredients=new Set(dish.ingredients);
+  dishSheetPhoto.src=photoUrl(dish.photoId);
+  dishSheetPhoto.alt=dish.name;
+  dishSheetTitle.textContent=dish.name;
+  renderDishSheetFavorite();
+  renderDishSheetIngredients();
+  if(typeof dishDialog.showModal==='function')dishDialog.showModal();
+  else dishDialog.setAttribute('open','');
+  document.documentElement.classList.add('dish-sheet-open');
+}
+function closeDishSheet(){
+  if(!dishDialog||busyDish)return;
+  if(dishDialog.open)dishDialog.close();else dishDialog.removeAttribute('open');
+  document.documentElement.classList.remove('dish-sheet-open');
+  currentDish=null;
+  selectedIngredients.clear();
+}
+function renderDishSheetFavorite(){
+  if(!currentDish)return;
+  const favorite=favorites.has(currentDish.name);
+  dishSheetFavorite.textContent=favorite?'♥':'♡';
+  dishSheetFavorite.classList.toggle('is-active',favorite);
+  dishSheetFavorite.setAttribute('aria-pressed',favorite?'true':'false');
+  dishSheetFavorite.setAttribute('aria-label',favorite?'Retirer des favoris':'Ajouter aux favoris');
+}
+function renderDishSheetIngredients(){
+  if(!currentDish)return;
+  dishSheetList.innerHTML=currentDish.ingredients.map(name=>{
+    const selected=selectedIngredients.has(name);
+    return '<button type="button" class="dish-ingredient '+(selected?'is-selected':'')+'" data-ingredient="'+escapeHtml(name)+'" aria-pressed="'+(selected?'true':'false')+'">'+
+      '<span class="dish-ingredient-name">'+escapeHtml(name)+'</span>'+ 
+      '<span class="dish-ingredient-check" aria-hidden="true">'+(selected?'✓':'')+'</span>'+ 
+      '</button>';
+  }).join('');
+  dishSheetList.querySelectorAll('.dish-ingredient').forEach(row=>row.addEventListener('click',()=>{
+    const name=row.dataset.ingredient||'';
+    if(selectedIngredients.has(name))selectedIngredients.delete(name);else selectedIngredients.add(name);
+    renderDishSheetIngredients();
+  }));
+  const count=selectedIngredients.size;
+  dishSheetCount.textContent=count+' ingrédient'+(count>1?'s':'')+' à ajouter';
+  dishConfirmButton.disabled=count===0||Boolean(busyDish);
+  dishConfirmButton.querySelector('span').textContent=count?'Ajouter à ma liste':'Sélectionnez un ingrédient';
+}
+async function confirmDishAdd(){
+  if(!currentDish||busyDish||!selectedIngredients.size)return;
+  const dish=currentDish;
+  const ingredients=dish.ingredients.filter(name=>selectedIngredients.has(name));
+  dishConfirmButton.classList.add('is-busy');
+  dishConfirmButton.disabled=true;
+  dishConfirmButton.querySelector('span').textContent='Ajout en cours…';
+  const result=await addDish(dish,ingredients);
+  dishConfirmButton.classList.remove('is-busy');
+  if(dishDialog.open)dishDialog.close();else dishDialog.removeAttribute('open');
+  document.documentElement.classList.remove('dish-sheet-open');
+  currentDish=null;
+  selectedIngredients.clear();
+  navigator.vibrate?.(result.added?[12,35,12]:10);
+  if(result.failed){showToast('Ajout partiel · '+result.added+' ajouté'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
+  if(!result.added){showToast('Les ingrédients sélectionnés sont déjà dans Ma liste');return}
+  showToast(dish.name+' · '+result.added+' ingrédient'+(result.added>1?'s':'')+' ajouté'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà présent'+(result.present>1?'s':''):' '));
 }
 function setHiddenCatalogQuery(value){
   drivingCatalog=true;
@@ -277,15 +393,14 @@ async function addIngredient(name){
   addButton.click();
   return await waitForAdded(card,before)?'added':'failed';
 }
-async function addDish(dish){
-  if(busyDish)return;
+async function addDish(dish,ingredients){
+  if(busyDish)return {added:0,present:0,failed:0};
   busyDish=dish.name;
   const userQuery=searchInput.value;
   catalogView.classList.add('dish-driving');
-  renderDishes();
   let added=0,present=0,failed=0;
   try{
-    for(const ingredient of dish.ingredients){
+    for(const ingredient of ingredients){
       const result=await addIngredient(ingredient);
       if(result==='added')added+=1;
       else if(result==='present')present+=1;
@@ -298,10 +413,7 @@ async function addDish(dish){
     busyDish='';
     renderDishes();
   }
-  navigator.vibrate?.(added?[12,35,12]:10);
-  if(failed){showToast('Ajout partiel · '+added+' ajouté'+(added>1?'s':'')+' · '+failed+' erreur'+(failed>1?'s':''));return}
-  if(!added){showToast('Tous les ingrédients sont déjà dans Ma liste');return}
-  showToast(dish.name+' · '+added+' ingrédient'+(added>1?'s':'')+' ajouté'+(added>1?'s':'')+(present?' · '+present+' déjà présent'+(present>1?'s':''):''));
+  return {added,present,failed};
 }
 
 function init(){buildUi()}
