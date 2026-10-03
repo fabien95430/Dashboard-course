@@ -40,12 +40,45 @@ function positionBadge(){
   badge.style.top=(iconRect.top-tabRect.top-7)+'px';
 }
 
+async function syncAppIconBadge(count){
+  if(typeof navigator.setAppBadge!=='function')return;
+  try{
+    if(count>0){
+      await navigator.setAppBadge(count);
+    }else if(typeof navigator.clearAppBadge==='function'){
+      await navigator.clearAppBadge();
+    }else{
+      await navigator.setAppBadge(0);
+    }
+  }catch(_){}
+}
+
 function syncBadge(){
   const count=Math.max(0,Number(source.textContent)||0);
   badge.textContent=count>99?'99+':String(count);
   badge.style.display=count>0&&!source.hidden?'grid':'none';
   if(count>0&&!source.hidden)requestAnimationFrame(positionBadge);
+  void syncAppIconBadge(count);
 }
+
+async function requestBadgePermission(){
+  if(typeof navigator.setAppBadge!=='function'||!('Notification' in window)||Notification.permission!=='default')return;
+  try{
+    const permission=await Notification.requestPermission();
+    if(permission==='granted')syncBadge();
+  }catch(_){}
+}
+
+const missingProductsButton=document.getElementById('settingsMissingProductsBtn');
+const addMissingProductButton=document.getElementById('addMissingProduct');
+const missingProductName=document.getElementById('missingProductName');
+missingProductsButton?.addEventListener('click',()=>{
+  const count=Math.max(0,Number(source.textContent)||0);
+  if(count>0)void requestBadgePermission();
+});
+addMissingProductButton?.addEventListener('click',()=>{
+  if(String(missingProductName?.value||'').trim())void requestBadgePermission();
+});
 
 new MutationObserver(syncBadge).observe(source,{attributes:true,childList:true,characterData:true,subtree:true});
 window.addEventListener('resize',()=>requestAnimationFrame(positionBadge),{passive:true});
