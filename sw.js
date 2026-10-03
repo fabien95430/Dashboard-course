@@ -1,13 +1,11 @@
-const CACHE='courses-app-v173-catalog-rhythm';
-const SHELL=['./welcome-cart-transparent-v46.png','./welcome-background-v40.webp','./','./index.html','./styles.css?v=169','./catalog.js','./app.js?v=169','./dishes.css?v=1','./dishes-ui.js?v=1','./manifest.webmanifest?v=43','./icon-premium-v40.svg','./icon.svg','./bring-photo-v5-frais.webp.png?v=15','./bring-photo-v5-fruits-legumes.webp.png?v=15','./bring-photo-v5-epicerie.webp.png?v=15','./bring-photo-v5-boissons.webp.png?v=15','./bring-photo-v5-maison.webp.png?v=15'];
+const CACHE='courses-app-v170-r1';
+const SHELL=['./welcome-cart-transparent-v46.png','./welcome-background-v40.webp','./','./index.html','./styles.css?v=170','./catalog.js?v=170','./app.js?v=170','./dishes.css?v=2','./dishes-ui.js?v=2','./manifest.webmanifest?v=43','./icon-premium-v40.svg','./icon.svg','./bring-photo-v5-frais.webp.png?v=15','./bring-photo-v5-fruits-legumes.webp.png?v=15','./bring-photo-v5-epicerie.webp.png?v=15','./bring-photo-v5-boissons.webp.png?v=15','./bring-photo-v5-maison.webp.png?v=15'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin||event.request.method!=='GET')return;
-  const networkRequest=event.request.mode==='navigate'
-    ?new Request(event.request,{cache:'reload'})
-    :event.request;
+  const networkRequest=new Request(event.request,{cache:'reload'});
   event.respondWith(fetch(networkRequest).then(response=>{
     const copy=response.clone();
     caches.open(CACHE).then(cache=>cache.put(event.request,copy));
