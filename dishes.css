@@ -1,0 +1,46 @@
+/* Catalogue Produits / Plats — extension légère, sans modifier le renderer produit existant */
+.catalog-view{grid-template-rows:42px 46px auto minmax(0,1fr)!important;gap:9px!important}
+.catalog-controls{min-width:0;display:grid;grid-template-rows:40px 39px;gap:7px}
+.catalog-mode-switch{width:100%;height:40px;padding:3px;display:grid;grid-template-columns:1fr 1fr;gap:3px;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(19,25,30,.82);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.catalog-mode{min-width:0;border:0;border-radius:12px;background:transparent;color:rgba(238,244,248,.68);display:flex;align-items:center;justify-content:center;gap:7px;font-size:12px;font-weight:760;transition:background .16s ease,color .16s ease,transform .12s ease}
+.catalog-mode:active{transform:scale(.98)}
+.catalog-mode svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8}
+.catalog-mode-fork{font-size:15px;line-height:1;filter:grayscale(1) brightness(1.65)}
+.catalog-mode.is-active{color:#10281c;background:linear-gradient(180deg,#80efaf,#55dc8a);box-shadow:0 5px 15px rgba(39,184,103,.16),inset 0 1px 0 rgba(255,255,255,.34)}
+.catalog-mode.is-active .catalog-mode-fork{filter:none}
+.catalog-controls>.categories,.dish-filters{min-width:0;height:39px;display:flex;align-items:center;gap:7px;overflow-x:auto;padding:0 1px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
+.catalog-controls>.categories::-webkit-scrollbar,.dish-filters::-webkit-scrollbar{display:none}
+.catalog-controls>.categories .cat{flex:0 0 auto!important;min-width:0!important;width:auto!important;height:34px!important;padding:0 13px!important;border-radius:999px!important;grid-template-rows:1fr!important}
+.catalog-controls>.categories .cat-label{font-size:11.5px!important}
+.dish-filter{flex:0 0 auto;height:34px;padding:0 13px;border:1px solid rgba(255,255,255,.10);border-radius:999px;background:rgba(24,31,36,.84);color:rgba(241,246,249,.77);font-size:11.5px;font-weight:730;white-space:nowrap}
+.dish-filter.is-active{color:#10281c;background:linear-gradient(180deg,#80efaf,#55dc8a);border-color:rgba(122,239,173,.78);box-shadow:0 4px 12px rgba(38,183,102,.13)}
+.dishes-grid{min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:174px;gap:9px;padding:1px 2px 8px}
+.dish-card{position:relative;min-width:0;overflow:hidden;border:1px solid rgba(255,255,255,.10);border-radius:17px;background:linear-gradient(145deg,rgba(28,35,41,.96),rgba(20,26,31,.95));box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 20px rgba(0,0,0,.14);display:grid;grid-template-rows:104px minmax(0,1fr);cursor:pointer;outline:none;transition:transform .12s ease,border-color .16s ease,opacity .16s ease}
+.dish-card:active{transform:scale(.978)}
+.dish-card:focus-visible{border-color:rgba(111,232,160,.72)}
+.dish-card.is-busy{pointer-events:none;opacity:.72}
+.dish-visual{display:grid;place-items:center;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.065)}
+.dish-visual::before,.dish-visual::after{content:"";position:absolute;border-radius:50%;filter:blur(1px)}
+.dish-visual::before{width:105px;height:105px;left:-24px;top:-40px;background:rgba(255,255,255,.11)}
+.dish-visual::after{width:76px;height:76px;right:-18px;bottom:-32px;background:rgba(0,0,0,.11)}
+.dish-visual>span{position:relative;z-index:1;font-size:55px;line-height:1;filter:drop-shadow(0 8px 13px rgba(0,0,0,.22));transform:translateY(2px)}
+.dish-tone-pasta{background:linear-gradient(145deg,#5a3420,#30251f)}
+.dish-tone-meat{background:linear-gradient(145deg,#53292b,#302126)}
+.dish-tone-chicken{background:linear-gradient(145deg,#57411f,#302a20)}
+.dish-tone-fish{background:linear-gradient(145deg,#244a50,#202e35)}
+.dish-tone-veggie{background:linear-gradient(145deg,#29513b,#203129)}
+.dish-tone-quick{background:linear-gradient(145deg,#3f374f,#272431)}
+.dish-copy{min-width:0;padding:9px 36px 8px 10px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.dish-copy strong{font-size:12.5px;line-height:1.12;font-weight:760;letter-spacing:-.1px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.dish-copy small{font-size:10px;color:rgba(225,232,238,.60);white-space:nowrap}
+.dish-add{position:absolute;right:9px;bottom:11px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#61e594;color:#10281b;font-size:19px;font-weight:800;line-height:1;box-shadow:0 3px 9px rgba(31,178,94,.18)}
+.dish-add i{width:11px;height:11px;border:2px solid rgba(16,40,27,.28);border-top-color:#10281b;border-radius:50%;animation:dishSpin .7s linear infinite}
+@keyframes dishSpin{to{transform:rotate(360deg)}}
+.dish-favorite{position:absolute;right:8px;top:8px;z-index:3;width:28px;height:28px;border:1px solid rgba(255,255,255,.14);border-radius:50%;background:rgba(11,15,18,.48);backdrop-filter:blur(8px);color:#fff;font-size:19px;line-height:1;display:grid;place-items:center;padding:0}
+.dish-favorite.is-active{color:#6de7a0}
+.dish-empty{grid-column:1/-1;min-height:130px;display:grid;place-items:center;text-align:center;color:rgba(225,232,238,.62);font-size:12px;padding:22px}
+.catalog-view.dish-driving .page-search{position:relative}
+.catalog-view.dish-driving #productSearch{color:transparent!important;caret-color:transparent!important}
+.catalog-view.dish-driving .page-search::after{content:"Ajout des ingrédients…";position:absolute;left:42px;right:54px;top:50%;transform:translateY(-50%);color:rgba(238,244,248,.70);font-size:13px;font-weight:620;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:370px){.catalog-mode-switch{height:38px}.catalog-controls{grid-template-rows:38px 37px;gap:6px}.dish-filter,.catalog-controls>.categories .cat{height:32px!important;padding-left:11px!important;padding-right:11px!important}.dishes-grid{grid-auto-rows:160px;gap:8px}.dish-card{grid-template-rows:94px minmax(0,1fr)}.dish-visual>span{font-size:49px}}
+@media(min-width:520px){.dishes-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
