@@ -6,3 +6,23 @@
     favorites: ['Lait','Œufs','Beurre','Fromage râpé','Pain','Bananes','Pommes','Eau plate','Café moulu','Spaghetti','Riz basmati','Papier toilette']
   });
 })();
+
+(() => {
+  'use strict';
+  const style=document.createElement('link');
+  style.rel='stylesheet';
+  style.href='./dishes.css?v=1';
+  style.dataset.catalogDishes='style';
+  document.head.appendChild(style);
+
+  const load=()=>{
+    if(document.querySelector('script[data-catalog-dishes]'))return;
+    const script=document.createElement('script');
+    script.src='./dishes-ui.js?v=1';
+    script.async=false;
+    script.dataset.catalogDishes='script';
+    document.body.appendChild(script);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});
+  else load();
+})();
