@@ -1,7 +1,7 @@
 @import url("./dish-detail.css?v=5");
 
 /* v179 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v187"!important}
+.catalog-view .page-header h1::after{content:"v188"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
@@ -204,4 +204,21 @@
   .dish-sheet-head .dish-servings-control{grid-template-columns:27px 34px 27px!important}
   .dish-sheet-head .dish-servings-step{width:27px!important;height:27px!important}
   .dish-sheet-head .dish-servings-value{width:34px!important;height:27px!important;line-height:27px!important}
+}
+
+/* v188 — sélecteur Produits / Plats avant la recherche */
+.catalog-view{
+  grid-template-rows:112px 46px 58px 48px minmax(0,1fr)!important;
+}
+.catalog-controls{display:contents!important}
+.catalog-view>.page-header{order:0}
+.catalog-mode-switch{order:1}
+.catalog-view>.page-search{order:2}
+.catalog-controls>.categories,.dish-filters{order:3}
+.catalog-view>#products,.catalog-view>.dishes-grid{order:4}
+@media(max-width:520px){
+  .catalog-view{
+    grid-template-rows:82px 46px 42px 38px minmax(0,1fr)!important;
+    gap:8px!important;
+  }
 }
