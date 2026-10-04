@@ -1840,7 +1840,8 @@ async function discoverEntities(){
   }
   return state.entity;
 }
-async function subscribe(){try{await request({type:'subscribe_trigger',trigger:{platform:'state',entity_id:state.entity}})}catch(_){}}
+async function subscribe(){try{await request({type:'subscribe_trigger',trigger:{platform:'state',entity_id:state.entity}})}catch(_){}
+}
 async function refreshItems(){
   if(state.demo){
     state.items=loadJson(DEMO_KEY,[])||[];
@@ -2212,6 +2213,347 @@ async function changeLocalPassword(){
     button.disabled=false;
   }
 }
+
+const OFFLINE_STORAGE_VERSION=1;
+STORAGE.offline='courses-offline-v1';
+Object.assign(state,{
+  offlineKey:null,
+  offlineSalt:null,
+  offlinePending:[],
+  offlineLoaded:false,
+  offlineSyncing:null
+});
+function offlineRecord(){return loadJson(STORAGE.offline,null)}
+function offlineAad(){return UTF8.encode('courses-offline-v1|'+CLIENT_ID+'|'+normalizeHaUrl(state.haUrl))}
+function socketReady(){return !!state.ws&&state.ws.readyState===WebSocket.OPEN}
+function showOfflineStatus(){
+  const pending=state.offlinePending.length;
+  const title=socketReady()&&pending?'Synchronisation en attente':'Hors ligne';
+  const detail=pending
+    ?pending+' achat'+(pending>1?'s':'')+' à synchroniser'
+    :(state.offlineLoaded?'Dernière liste enregistrée':'Aucune liste enregistrée');
+  status('is-waiting',title,detail);
+}
+async function deriveOfflineKey(salt){
+  if(!state.refreshToken)throw new Error('Application verrouillée');
+  return deriveVaultKey(state.refreshToken,salt,SECURITY.iterations);
+}
+async function ensureOfflineKey(record=null){
+  if(state.offlineKey&&state.offlineSalt)return state.offlineKey;
+  let salt;
+  if(record?.salt){
+    if(Number(record.version)!==OFFLINE_STORAGE_VERSION||record.kdf!==SECURITY.kdf||Number(record.iterations)!==SECURITY.iterations)throw new Error('Cache hors ligne incompatible');
+    salt=base64ToBytes(record.salt);
+    if(salt.length<16)throw new Error('Cache hors ligne invalide');
+  }else{
+    salt=crypto.getRandomValues(new Uint8Array(16));
+  }
+  state.offlineKey=await deriveOfflineKey(salt);
+  state.offlineSalt=salt;
+  return state.offlineKey;
+}
+async function encryptOfflinePayload(payload){
+  const key=await ensureOfflineKey(offlineRecord());
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const plain=UTF8.encode(JSON.stringify(payload));
+  const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:offlineAad()},key,plain);
+  return {
+    version:OFFLINE_STORAGE_VERSION,
+    kdf:SECURITY.kdf,
+    iterations:SECURITY.iterations,
+    salt:bytesToBase64(state.offlineSalt),
+    iv:bytesToBase64(iv),
+    ciphertext:bytesToBase64(new Uint8Array(cipher))
+  };
+}
+async function decryptOfflinePayload(record){
+  if(!record||Number(record.version)!==OFFLINE_STORAGE_VERSION||record.kdf!==SECURITY.kdf||Number(record.iterations)!==SECURITY.iterations)throw new Error('Cache hors ligne incompatible');
+  const salt=base64ToBytes(record.salt),iv=base64ToBytes(record.iv),cipher=base64ToBytes(record.ciphertext);
+  if(salt.length<16||iv.length!==12||cipher.length<16)throw new Error('Cache hors ligne invalide');
+  const key=await deriveOfflineKey(salt);
+  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:offlineAad()},key,cipher);
+  const payload=JSON.parse(UTF8_DECODER.decode(plain));
+  if(!payload||!Array.isArray(payload.items)||!Array.isArray(payload.pending))throw new Error('Cache hors ligne invalide');
+  state.offlineKey=key;
+  state.offlineSalt=salt;
+  return payload;
+}
+function sanitizeOfflinePending(actions){
+  if(!Array.isArray(actions))return [];
+  return actions.slice(-500).map(action=>{
+    const entity=String(action?.entity||'').trim();
+    const uids=Array.isArray(action?.uids)?[...new Set(action.uids.map(uid=>String(uid||'').trim()).filter(Boolean))]:[];
+    if(action?.type!=='complete'||!entity.startsWith('todo.')||!uids.length)return null;
+    return {
+      id:String(action.id||secureRandomToken(8)),
+      type:'complete',
+      entity,
+      uids,
+      name:String(action.name||'').trim().slice(0,80),
+      createdAt:Number(action.createdAt)||Date.now()
+    };
+  }).filter(Boolean);
+}
+async function persistOfflineState(){
+  if(state.demo||state.locked||!state.refreshToken||!state.entity)return false;
+  try{
+    const secure=await encryptOfflinePayload({
+      entity:state.entity,
+      items:state.items,
+      pending:state.offlinePending,
+      updated_at:Date.now()
+    });
+    saveJson(STORAGE.offline,secure);
+    state.offlineLoaded=true;
+    return true;
+  }catch(error){
+    console.warn('courses-app: offline cache write',error);
+    return false;
+  }
+}
+async function restoreOfflineState(){
+  if(state.demo||state.locked||!state.refreshToken)return false;
+  const record=offlineRecord();
+  if(!record)return false;
+  try{
+    const payload=await decryptOfflinePayload(record);
+    const entity=String(payload.entity||'').trim();
+    if(!entity.startsWith('todo.')||(state.entity&&state.entity!==entity))return false;
+    if(!state.entity){
+      state.entity=entity;
+      localStorage.setItem(STORAGE.entity,entity);
+    }
+    state.items=payload.items.filter(item=>item&&typeof item==='object');
+    state.offlinePending=sanitizeOfflinePending(payload.pending).filter(action=>action.entity===entity);
+    state.offlineLoaded=true;
+    state.loading=false;
+    state.error='';
+    renderSelectionAndList();
+    showOfflineStatus();
+    return true;
+  }catch(error){
+    state.offlineKey=null;
+    state.offlineSalt=null;
+    console.warn('courses-app: offline cache read',error);
+    return false;
+  }
+}
+function isTransientHaError(error){
+  const message=String(error?.message||'').toLowerCase();
+  return navigator.onLine===false||!socketReady()||/connexion|websocket|ne répond pas|momentanément|inaccessible|interrompue|distante impossible/.test(message);
+}
+async function queueOfflineCompletion(name,uids){
+  const clean=[...new Set((Array.isArray(uids)?uids:[]).map(uid=>String(uid||'').trim()).filter(Boolean))];
+  if(!clean.length)throw new Error('Identifiant de l’article indisponible');
+  const queued=new Set(state.offlinePending.filter(action=>action.entity===state.entity&&action.type==='complete').flatMap(action=>action.uids));
+  const remaining=clean.filter(uid=>!queued.has(uid));
+  const action=remaining.length?{
+    id:secureRandomToken(8),
+    type:'complete',
+    entity:state.entity,
+    uids:remaining,
+    name:String(name||'').trim().slice(0,80),
+    createdAt:Date.now()
+  }:null;
+  if(action)state.offlinePending.push(action);
+  const saved=await persistOfflineState();
+  if(!saved){
+    if(action)state.offlinePending=state.offlinePending.filter(entry=>entry.id!==action.id);
+    throw new Error('Stockage hors ligne indisponible');
+  }
+  showOfflineStatus();
+}
+async function syncOfflinePending(){
+  const actions=state.offlinePending.filter(action=>action.entity===state.entity);
+  if(!actions.length||!state.entity||!socketReady())return;
+  if(state.offlineSyncing)return state.offlineSyncing;
+  const syncing=(async()=>{
+    const result=await todoList();
+    const remoteItems=Array.isArray(result?.items)?result.items:[];
+    const remotePending=new Set(remoteItems.filter(isPendingItem).map(itemUid).filter(Boolean));
+    for(const action of actions){
+      for(const uid of action.uids){
+        if(!remotePending.has(uid))continue;
+        await completeTodoItem(uid);
+        remotePending.delete(uid);
+      }
+      state.offlinePending=state.offlinePending.filter(entry=>entry.id!==action.id);
+      await persistOfflineState();
+    }
+  })();
+  state.offlineSyncing=syncing;
+  try{return await syncing}
+  finally{if(state.offlineSyncing===syncing)state.offlineSyncing=null}
+}
+
+const onlineScheduleReconnect=scheduleReconnect;
+scheduleReconnect=function(){
+  if(navigator.onLine===false){
+    clearTimeout(state.reconnectTimer);state.reconnectTimer=null;
+    if(state.offlineLoaded)showOfflineStatus();
+    return;
+  }
+  return onlineScheduleReconnect();
+};
+const onlineConnectFromRefresh=connectFromRefresh;
+connectFromRefresh=async function(){
+  if(!state.demo&&!state.locked&&state.refreshToken&&!state.offlineLoaded)await restoreOfflineState();
+  if(!state.demo&&!state.locked&&state.refreshToken&&navigator.onLine===false){
+    state.loading=false;
+    renderSelectionAndList();
+    showOfflineStatus();
+    armIdleLock();
+    return;
+  }
+  const result=await onlineConnectFromRefresh();
+  if(!state.demo&&!state.locked&&state.offlineLoaded&&!socketReady())showOfflineStatus();
+  return result;
+};
+const onlineRefreshItems=refreshItems;
+refreshItems=async function(){
+  if(state.demo)return onlineRefreshItems();
+  if(!state.entity){
+    const restored=state.offlineLoaded||await restoreOfflineState();
+    if(restored)return;
+    return onlineRefreshItems();
+  }
+  if(!socketReady()){
+    state.loading=false;
+    const restored=state.offlineLoaded||await restoreOfflineState();
+    if(restored){
+      state.error='';
+      renderSelectionAndList();
+      showOfflineStatus();
+      return;
+    }
+    return onlineRefreshItems();
+  }
+  try{
+    if(state.offlinePending.some(action=>action.entity===state.entity))await syncOfflinePending();
+    const result=await todoList();
+    const incoming=Array.isArray(result?.items)?result.items:[];
+    state.items=incoming.filter(item=>!state.pendingRemoval.has(norm(itemSummary(item))));
+    state.loading=false;
+    state.error='';
+    await persistOfflineState();
+    syncProductSelection();
+    if(!listDomMatchesCurrentState())renderList();
+    status('','Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
+  }catch(error){
+    state.loading=false;
+    const restored=state.offlineLoaded||await restoreOfflineState();
+    if(restored){
+      state.error='';
+      renderSelectionAndList();
+      showOfflineStatus();
+      return;
+    }
+    state.error=error.message||'Liste Courses indisponible';
+    renderList();
+    status('is-error','Courses indisponible',state.error);
+  }
+};
+const onlineRemoveGroup=removeGroup;
+removeGroup=async function(name,row=null){
+  const item=String(name||'').trim();
+  if(!item)return;
+  if(state.demo)return onlineRemoveGroup(name,row);
+  const key=norm(item);
+  if(state.productBusy.has(key))return;
+  const group=activeGroups().find(entry=>norm(entry.summary)===key);
+  if(!group)return;
+
+  state.productBusy.add(key);
+  let undoToken=null;
+  if(row){
+    undoToken={cancelled:false};
+    state.purchaseUndo.set(key,undoToken);
+    row.classList.add('is-purchased','is-busy');
+    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
+    const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=false;
+    navigator.vibrate?.(8);
+    await new Promise(resolve=>setTimeout(resolve,PURCHASE_HOLD_MS));
+    if(undoToken.cancelled)return;
+    row.classList.add('is-removing');
+    await new Promise(resolve=>setTimeout(resolve,PURCHASE_EXIT_MS));
+    if(undoToken.cancelled)return;
+    state.purchaseUndo.delete(key);
+  }
+
+  state.pendingRemoval.add(key);
+  const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
+  const previousItems=state.items;
+  state.items=state.items.filter(keepOtherItems);
+  removeRenderedListRow(row);
+  let queuedOffline=false;
+
+  try{
+    if(!state.entity)throw new Error('Liste Home Assistant indisponible');
+    const uids=group.uids.filter(Boolean);
+    if(!uids.length)throw new Error('Identifiant de l’article indisponible');
+    if(!socketReady()){
+      await queueOfflineCompletion(item,uids);
+      queuedOffline=true;
+      toast(item+' acheté');
+      return;
+    }
+    try{
+      await Promise.all(uids.map(completeTodoItem));
+      toast(item+' acheté');
+    }catch(error){
+      if(!isTransientHaError(error))throw error;
+      await queueOfflineCompletion(item,uids);
+      queuedOffline=true;
+      toast(item+' acheté');
+    }
+  }catch(error){
+    if(!queuedOffline&&!socketReady()){
+      state.items=previousItems;
+      renderSelectionAndList();
+    }
+    toast('Suppression impossible');
+    status('is-error','Erreur',error.message||'Suppression impossible');
+  }finally{
+    state.purchaseUndo.delete(key);
+    state.pendingRemoval.delete(key);
+    state.productBusy.delete(key);
+    if(queuedOffline){
+      syncProductSelection();
+      showOfflineStatus();
+    }else if(socketReady()){
+      await refreshItems();
+    }else if(state.offlineLoaded){
+      showOfflineStatus();
+    }
+  }
+};
+const onlineWipeMemoryCredentials=wipeMemoryCredentials;
+wipeMemoryCredentials=function(){
+  onlineWipeMemoryCredentials();
+  state.offlineKey=null;
+  state.offlineSalt=null;
+  state.offlinePending=[];
+  state.offlineLoaded=false;
+  state.offlineSyncing=null;
+};
+const onlineClearLocalConnectionData=clearLocalConnectionData;
+clearLocalConnectionData=function(){
+  onlineClearLocalConnectionData();
+  deleteKey(STORAGE.offline);
+};
+const onlineRenderSettingsPage=renderSettingsPage;
+renderSettingsPage=function(){
+  onlineRenderSettingsPage();
+  if(state.locked||socketReady()||!state.offlineLoaded)return;
+  const connection=$('#settingsConnectionSummary');
+  const connectionDot=$('#settingsConnectionDot');
+  if(connection){
+    connection.textContent='Hors ligne';
+    connection.classList.remove('is-connected');
+  }
+  if(connectionDot)connectionDot.classList.remove('is-online');
+};
+
 async function init(){
   renderView();
   if(!window.crypto?.subtle){
