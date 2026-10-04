@@ -1,7 +1,7 @@
 @import url("./dish-detail.css?v=5");
 
 /* v179 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v193"!important}
+.catalog-view .page-header h1::after{content:"v194"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
@@ -223,7 +223,7 @@
   }
 }
 
-/* v192 — commandes de fiche minimalistes abaissées de 15 px */
+/* v194 — commandes de fiche centrées dans les gouttières latérales */
 .dish-sheet-close,.dish-sheet-favorite{
   top:max(29px,calc(env(safe-area-inset-top) + 23px))!important;
   border-radius:0!important;
@@ -237,6 +237,8 @@
   -webkit-tap-highlight-color:transparent!important;
   text-shadow:0 2px 5px rgba(0,0,0,.86),0 0 12px rgba(0,0,0,.48)!important;
 }
+.dish-sheet-close{left:max(8px,env(safe-area-inset-left))!important}
+.dish-sheet-favorite{right:max(8px,env(safe-area-inset-right))!important}
 .dish-sheet-close:focus,.dish-sheet-favorite:focus{outline:none!important}
 .dish-sheet-close:focus-visible,.dish-sheet-favorite:focus-visible{
   outline:none!important;
