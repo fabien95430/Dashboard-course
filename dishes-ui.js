@@ -13,7 +13,6 @@ const DISHES=Object.freeze([
   {name:'Tagliatelles au saumon',photoId:'15529617',tags:['Pâtes','Poissons'],ingredients:['Tagliatelles','Saumon','Crème fraîche','Citron']},
   {name:'Pâtes pesto poulet',photoId:'4730680',tags:['Pâtes','Poulet','Rapides'],ingredients:['Penne','Poulet','Pesto','Parmesan']},
   {name:'Penne chorizo poivrons',photoId:'3851029',tags:['Pâtes','Viandes'],ingredients:['Penne','Chorizo','Sauce tomate','Poivrons']},
-
   {name:'Burger maison',photoId:'2089717',tags:['Viandes','Rapides'],ingredients:['Pains burger','Steaks hachés','Emmental','Tomates','Salade verte','Oignons rouges']},
   {name:'Tacos bœuf',photoId:'38948386',tags:['Viandes','Rapides'],ingredients:['Galettes de blé','Viande hachée','Fromage râpé','Tomates','Salade verte','Avocat']},
   {name:'Chili con carne',photoId:'14866629',tags:['Viandes'],ingredients:['Viande hachée','Haricots rouges','Tomates pelées','Maïs en boîte','Oignons jaunes']},
@@ -22,7 +21,6 @@ const DISHES=Object.freeze([
   {name:'Saucisses pommes de terre',photoId:'19503824',tags:['Viandes'],ingredients:['Saucisses','Pommes de terre','Oignons jaunes']},
   {name:'Tartiflette',photoId:'20426624',tags:['Viandes'],ingredients:['Pommes de terre','Reblochon','Lardons','Oignons jaunes','Crème fraîche']},
   {name:'Raclette',photoId:'14269237',tags:['Viandes'],ingredients:['Raclette','Pommes de terre','Jambon blanc','Jambon cru','Rosette']},
-
   {name:'Poulet curry',photoId:'27352275',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Lait de coco','Oignons jaunes']},
   {name:'Poulet riz légumes',photoId:'20258760',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Poivrons','Courgettes','Carottes']},
   {name:'Wrap poulet crudités',photoId:'29535635',tags:['Poulet','Rapides'],ingredients:['Wraps','Poulet','Salade verte','Tomates','Avocat']},
@@ -31,21 +29,18 @@ const DISHES=Object.freeze([
   {name:'Poulet tomate mozzarella',photoId:'33158330',tags:['Poulet'],ingredients:['Escalopes de poulet','Mozzarella','Tomates','Sauce tomate']},
   {name:'Poulet brocoli riz',photoId:'21822134',tags:['Poulet'],ingredients:['Poulet','Brocoli','Riz basmati','Crème fraîche']},
   {name:'Fajitas poulet',photoId:'32371281',tags:['Poulet','Rapides'],ingredients:['Galettes de blé','Poulet','Poivrons','Oignons rouges','Avocat']},
-
   {name:'Saumon riz brocoli',photoId:'10156758',tags:['Poissons'],ingredients:['Saumon','Riz basmati','Brocoli','Citron']},
   {name:'Cabillaud pommes de terre',photoId:'32645261',tags:['Poissons'],ingredients:['Cabillaud','Pommes de terre','Haricots verts','Citron']},
   {name:'Crevettes nouilles asiatiques',photoId:'17952224',tags:['Poissons'],ingredients:['Crevettes','Nouilles chinoises','Poivrons','Carottes','Sauce soja']},
   {name:'Salade saumon avocat',photoId:'9001197',tags:['Poissons','Rapides'],ingredients:['Saumon fumé','Avocat','Salade verte','Tomates','Citron']},
   {name:'Salade thon riz maïs',photoId:'9218773',tags:['Poissons','Rapides'],ingredients:['Thon en boîte','Riz long','Maïs en boîte','Tomates','Concombres']},
   {name:'Moules frites',photoId:'10432619',tags:['Poissons','Rapides'],ingredients:['Moules','Frites surgelées']},
-
   {name:'Hot-dog',photoId:'4113456',tags:['Viandes','Rapides'],ingredients:['Pains hot-dog','Saucisses','Oignons jaunes']},
   {name:'Omelette jambon fromage',photoId:'12310569',tags:['Viandes','Rapides'],ingredients:['Œufs','Jambon blanc','Fromage râpé','Champignons']},
   {name:'Croque-monsieur',photoId:'1391301',tags:['Viandes','Rapides'],ingredients:['Pain de mie','Jambon blanc','Emmental']},
   {name:'Pizza wrap',photoId:'16423835',tags:['Viandes','Rapides'],ingredients:['Wraps','Sauce tomate','Mozzarella','Jambon blanc']},
   {name:'Bruschetta tomate mozzarella',photoId:'4409496',tags:['Végé','Rapides'],ingredients:['Baguette','Tomates','Mozzarella','Basilic']},
   {name:'Sandwich poulet',photoId:'9211149',tags:['Poulet','Rapides'],ingredients:['Pain','Blanc de poulet','Salade verte','Tomates']},
-
   {name:'Curry pois chiches',photoId:'6544375',tags:['Végé'],ingredients:['Pois chiches','Lait de coco','Tomates pelées','Épinards','Riz basmati']},
   {name:'Buddha bowl quinoa',photoId:'8286776',tags:['Végé'],ingredients:['Quinoa','Avocat','Pois chiches','Carottes','Concombres']},
   {name:'Gratin de courgettes',photoId:'16824040',tags:['Végé'],ingredients:['Courgettes','Crème fraîche','Fromage râpé','Œufs']},
@@ -53,15 +48,53 @@ const DISHES=Object.freeze([
   {name:'Salade chèvre noix',photoId:'25524078',tags:['Végé','Rapides'],ingredients:['Salade verte','Chèvre','Noix','Tomates']},
   {name:'Pâtes pesto mozzarella',photoId:'18171195',tags:['Pâtes','Végé','Rapides'],ingredients:['Penne','Pesto','Mozzarella','Tomates']},
   {name:'Chili sin carne',photoId:'36040965',tags:['Végé'],ingredients:['Haricots rouges','Maïs en boîte','Tomates pelées','Poivrons','Oignons jaunes']},
-  {name:'Riz champignons parmesan',photoId:'31779539',tags:['Végé'],ingredients:['Riz long','Champignons','Parmesan','Crème fraîche']}
+  {name:'Riz champignons parmesan',photoId:'31779539',tags:['Végé'],ingredients:['Riz long','Champignons','Parmesan','Crème fraîche']},
+  {name:'Poulet parmesan tomate',photoId:'',tags:['Poulet'],ingredients:['Escalopes de poulet','Sauce tomate','Parmesan','Mozzarella','Chapelure']},
+  {name:'Poulet miel moutarde',photoId:'',tags:['Poulet'],ingredients:['Poulet','Miel','Moutarde','Crème fraîche']},
+  {name:'Poulet teriyaki riz',photoId:'',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Sauce soja','Miel','Gingembre']},
+  {name:'Poulet paprika crème',photoId:'',tags:['Poulet'],ingredients:['Poulet','Crème fraîche','Riz basmati','Oignons jaunes']},
+  {name:'Poulet pommes de terre au four',photoId:'',tags:['Poulet'],ingredients:['Poulet','Pommes de terre','Oignons jaunes','Romarin frais']},
+  {name:'Riz poulet curry coco',photoId:'',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Lait de coco','Curry']},
+  {name:'Riz sauté poulet légumes',photoId:'',tags:['Poulet'],ingredients:['Poulet','Riz basmati','Poivrons','Carottes','Œufs','Sauce soja']},
+  {name:'Riz crevettes légumes',photoId:'',tags:['Poissons'],ingredients:['Crevettes','Riz basmati','Poivrons','Carottes','Œufs','Sauce soja']},
+  {name:'Bœuf riz poivrons',photoId:'',tags:['Viandes'],ingredients:['Bœuf','Riz basmati','Poivrons','Oignons jaunes','Sauce soja']},
+  {name:'Bœuf sauce tomate pommes de terre',photoId:'',tags:['Viandes'],ingredients:['Bœuf','Pommes de terre','Sauce tomate','Oignons jaunes','Carottes']},
+  {name:'Hachis parmentier',photoId:'',tags:['Viandes'],ingredients:['Viande hachée','Pommes de terre','Lait','Beurre','Oignons jaunes']},
+  {name:'Boulettes sauce tomate',photoId:'',tags:['Viandes'],ingredients:['Viande hachée','Sauce tomate','Œufs','Chapelure','Oignons jaunes']},
+  {name:'Gratin pommes de terre jambon',photoId:'',tags:['Viandes'],ingredients:['Pommes de terre','Jambon blanc','Crème fraîche','Fromage râpé']},
+  {name:'Gratin brocoli poulet',photoId:'',tags:['Poulet'],ingredients:['Brocoli','Poulet','Crème fraîche','Fromage râpé']},
+  {name:'Quiche lorraine',photoId:'',tags:['Viandes'],ingredients:['Farine','Beurre','Œufs','Lardons','Crème fraîche']},
+  {name:'Quiche poireaux chèvre',photoId:'',tags:['Végé'],ingredients:['Farine','Beurre','Poireaux','Chèvre','Œufs','Crème fraîche']},
+  {name:'Tarte tomate mozzarella',photoId:'',tags:['Végé'],ingredients:['Farine','Beurre','Tomates','Mozzarella','Moutarde','Basilic']},
+  {name:'Salade poulet avocat',photoId:'',tags:['Poulet','Rapides'],ingredients:['Poulet','Avocat','Salade verte','Tomates']},
+  {name:'Salade César saumon',photoId:'',tags:['Poissons','Rapides'],ingredients:['Salade verte','Saumon','Parmesan','Croûtons','Œufs']},
+  {name:'Salade mozzarella avocat',photoId:'',tags:['Végé','Rapides'],ingredients:['Mozzarella','Avocat','Tomates','Salade verte']},
+  {name:'Saumon pommes de terre',photoId:'',tags:['Poissons'],ingredients:['Saumon','Pommes de terre','Citron']},
+  {name:'Saumon crème épinards',photoId:'',tags:['Poissons'],ingredients:['Saumon','Crème fraîche','Épinards','Riz basmati']},
+  {name:'Cabillaud riz légumes',photoId:'',tags:['Poissons'],ingredients:['Cabillaud','Riz basmati','Poivrons','Courgettes','Carottes']},
+  {name:'Crevettes curry coco',photoId:'',tags:['Poissons'],ingredients:['Crevettes','Riz basmati','Lait de coco','Curry']},
+  {name:'Poêlée pommes de terre saucisses',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Pommes de terre','Oignons jaunes']},
+  {name:'Poêlée poulet courgettes',photoId:'',tags:['Poulet'],ingredients:['Poulet','Courgettes','Oignons jaunes','Ail']},
+  {name:'Croque poulet fromage',photoId:'',tags:['Poulet','Rapides'],ingredients:['Pain de mie','Blanc de poulet','Emmental']},
+  {name:'Boulettes riz',photoId:'',tags:['Enfants'],ingredients:['Viande hachée','Riz basmati','Sauce tomate','Œufs','Chapelure']},
+  {name:'Coquillettes jambon',photoId:'',tags:['Enfants'],ingredients:['Coquillettes','Jambon blanc','Crème fraîche','Fromage râpé']},
+  {name:'Couscous poulet légumes',photoId:'',tags:['Enfants'],ingredients:['Couscous','Poulet','Carottes','Courgettes']},
+  {name:'Gratin pommes de terre',photoId:'',tags:['Enfants'],ingredients:['Pommes de terre','Crème fraîche','Fromage râpé']},
+  {name:'Pâtes jambon',photoId:'',tags:['Enfants'],ingredients:['Penne','Jambon blanc','Crème fraîche']},
+  {name:'Purée carotte poulet',photoId:'',tags:['Enfants'],ingredients:['Pommes de terre','Carottes','Poulet','Lait','Beurre']},
+  {name:'Risotto poulet',photoId:'',tags:['Enfants'],ingredients:['Riz long','Poulet','Parmesan','Crème fraîche']},
+  {name:'Saumon brocoli',photoId:'',tags:['Enfants'],ingredients:['Saumon','Brocoli','Riz basmati']},
+  {name:'Steak frites',photoId:'',tags:['Enfants'],ingredients:['Steaks hachés','Frites surgelées']},
+  {name:'Velouté carottes',photoId:'',tags:['Enfants'],ingredients:['Carottes','Pommes de terre','Crème fraîche','Oignons jaunes']}
 ]);
 
-const FILTERS=['Tous','Pâtes','Viandes','Poulet','Poissons','Rapides','Végé','Favoris'];
+const FILTERS=['Tous','Pâtes','Viandes','Poulet','Poissons','Rapides','Enfants','Végé','Favoris'];
 const STORAGE_MODE='courses-catalog-mode-v1';
 const STORAGE_FAVORITES='courses-dish-favorites-v1';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const photoUrl=id=>'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=900&h=650&fit=crop';
+const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eee9df"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f4ea" stroke="#c9bca9" stroke-width="12"/><ellipse cx="450" cy="330" rx="175" ry="105" fill="#e4d7c4"/><text x="450" y="565" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="34" font-weight="700" fill="#756b60">Photo à venir</text></svg>');
+const photoUrl=id=>id?'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=900&h=650&fit=crop':DISH_PLACEHOLDER;
 
 let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';
 let filter='Tous';
@@ -471,7 +504,7 @@ async function addDish(dish,ingredients){
 }
 
 function init(){
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v175'});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v179'});
   buildUi();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
