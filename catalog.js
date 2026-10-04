@@ -9,7 +9,7 @@
 
 (() => {
   'use strict';
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v173';});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v174';});
 
   const style=document.createElement('link');
   style.rel='stylesheet';
@@ -19,7 +19,7 @@
 
   const liquidStyle=document.createElement('link');
   liquidStyle.rel='stylesheet';
-  liquidStyle.href='./catalog-liquid.css?v=2';
+  liquidStyle.href='./catalog-liquid.css?v=3';
   liquidStyle.dataset.catalogLiquid='style';
   document.head.appendChild(liquidStyle);
 
