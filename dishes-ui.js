@@ -93,8 +93,15 @@ const STORAGE_MODE='courses-catalog-mode-v1';
 const STORAGE_FAVORITES='courses-dish-favorites-v1';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eee9df"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f4ea" stroke="#c9bca9" stroke-width="12"/><ellipse cx="450" cy="330" rx="175" ry="105" fill="#e4d7c4"/><text x="450" y="565" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="34" font-weight="700" fill="#756b60">Photo à venir</text></svg>');
-const photoUrl=id=>id?'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=900&h=650&fit=crop':DISH_PLACEHOLDER;
+const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eef1eb"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f7f2" stroke="#cbd2c8" stroke-width="12"/><text x="450" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="30" font-weight="700" fill="#708076">Photo indisponible</text></svg>');
+const DISH_SPECIAL_SLUGS=Object.freeze({
+  'Tagliatelles au saumon':'tagliatelles-saumon',
+  'Gratin de courgettes':'gratin-courgettes',
+  'Poulet pommes de terre au four':'poulet-pommes-de-terre-four'
+});
+const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poulet légumes','Gratin pommes de terre','Pâtes jambon','Purée carotte poulet','Risotto poulet','Saumon brocoli','Steak frites','Velouté carottes']);
+const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';
 
 let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';
 let filter='Tous';
@@ -155,6 +162,19 @@ function makeButton(label,value,className){
   button.dataset.value=value;
   button.textContent=label;
   return button;
+}
+function useDishImage(image,name){
+  if(!image)return;
+  image.dataset.dishImage=name;
+  image.src=dishPhotoUrl(name);
+}
+function bindDishImageFallback(image){
+  if(!image||image.dataset.dishImageFallbackBound==='1')return;
+  image.dataset.dishImageFallbackBound='1';
+  image.addEventListener('error',()=>{
+    if(image.getAttribute('src')===DISH_PLACEHOLDER)return;
+    image.src=DISH_PLACEHOLDER;
+  });
 }
 function buildUi(){
   catalogView=document.getElementById('catalogView');
@@ -233,6 +253,7 @@ function buildDishDialog(){
     '</div>';
   document.body.appendChild(dishDialog);
   dishSheetPhoto=dishDialog.querySelector('.dish-sheet-photo');
+  bindDishImageFallback(dishSheetPhoto);
   dishSheetTitle=dishDialog.querySelector('h2');
   dishSheetList=dishDialog.querySelector('.dish-sheet-list');
   dishSheetCount=dishDialog.querySelector('.dish-sheet-count');
@@ -328,10 +349,12 @@ function dishCard(dish){
   card.setAttribute('role','button');
   card.setAttribute('aria-label','Voir les ingrédients de '+dish.name);
   card.innerHTML=
-    '<div class="dish-visual"><img src="'+photoUrl(dish.photoId)+'" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>'+ 
+    '<div class="dish-visual"><img src="'+dishPhotoUrl(dish.name)+'" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>'+ 
     '<button type="button" class="dish-favorite" aria-label="Ajouter aux favoris" aria-pressed="false">♡</button>'+ 
     '<div class="dish-copy"><strong>'+escapeHtml(dish.name)+'</strong><small>'+dish.ingredients.length+' ingrédients</small></div>'+ 
     '<span class="dish-add" aria-hidden="true">+</span>';
+  const cardImage=card.querySelector('.dish-visual img');
+  bindDishImageFallback(cardImage);
   const favoriteButton=card.querySelector('.dish-favorite');
   favoriteButton.addEventListener('click',event=>{event.stopPropagation();toggleFavorite(dish.name)});
   card.addEventListener('click',event=>{if(!event.target.closest('.dish-favorite'))openDishSheet(dish)});
@@ -365,7 +388,7 @@ function openDishSheet(dish){
   if(busyDish)return;
   currentDish=dish;
   selectedIngredients=new Set(dish.ingredients);
-  dishSheetPhoto.src=photoUrl(dish.photoId);
+  useDishImage(dishSheetPhoto,dish.name);
   dishSheetPhoto.alt=dish.name;
   dishSheetTitle.textContent=dish.name;
   dishSheetTags.innerHTML=dish.tags.slice(0,2).map(tag=>'<span>'+escapeHtml(tag)+'</span>').join('');
@@ -527,7 +550,7 @@ async function addDish(dish,ingredients){
 }
 
 function init(){
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v190'});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v192'});
   buildUi();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();

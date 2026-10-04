@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v192';
+const APP_VERSION='v193';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -21,6 +21,7 @@ const CHILD_DISHES=new Set([
   'Steak frites',
   'Velouté carottes'
 ]);
+const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eef1eb"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f7f2" stroke="#cbd2c8" stroke-width="12"/><text x="450" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="30" font-weight="700" fill="#708076">Photo indisponible</text></svg>');
 const slugify=value=>String(value||'')
   .toLowerCase()
   .replace(/œ/g,'oe')
@@ -40,7 +41,7 @@ function syncPageVersions(){
   if(!document.getElementById('app-version-ui')){
     const style=document.createElement('style');
     style.id='app-version-ui';
-    style.textContent='.catalog-view .page-header h1::after{content:none!important}';
+    style.textContent='.catalog-view .page-header h1::after{content:none!important}.dish-card img[src^="https://images.pexels.com/"],.dish-sheet-photo[src^="https://images.pexels.com/"]{visibility:hidden!important}';
     document.head.appendChild(style);
   }
 }
@@ -49,12 +50,41 @@ function localDishImage(name){
   const slug=SPECIAL_SLUGS[name]||slugify(name);
   return './www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+slug+'.png';
 }
+function sameImageSource(image,source){
+  const current=image?.getAttribute?.('src')||'';
+  if(current===source)return true;
+  try{return image.src===new URL(source,document.baseURI).href}catch(_){return false}
+}
+function bindImageFallback(image){
+  if(!image||image.dataset.localImageFallbackBound==='1')return;
+  image.dataset.localImageFallbackBound='1';
+  image.addEventListener('error',()=>{
+    const name=image.dataset.localDish||'';
+    if(!name)return;
+    const current=image.getAttribute('src')||'';
+    if(!sameImageSource(image,localDishImage(name))&&current!==DISH_PLACEHOLDER)return;
+    image.dataset.localImageFailed=name;
+    if(current!==DISH_PLACEHOLDER)image.src=DISH_PLACEHOLDER;
+  });
+}
+function localizeImage(image,name){
+  if(!name||!image)return;
+  bindImageFallback(image);
+  const source=localDishImage(name);
+  const current=image.getAttribute('src')||'';
+  if(image.dataset.localImageFailed===name&&current===DISH_PLACEHOLDER){
+    image.dataset.localDish=name;
+    return;
+  }
+  image.dataset.localDish=name;
+  if(sameImageSource(image,source))return;
+  delete image.dataset.localImageFailed;
+  image.src=source;
+}
 function localizeCard(card){
   const name=card?.dataset?.dish||'';
   const image=card?.querySelector?.('.dish-visual img');
-  if(!name||!image||image.dataset.localDish===name)return;
-  image.src=localDishImage(name);
-  image.dataset.localDish=name;
+  localizeImage(image,name);
 }
 function localizeCards(grid){
   grid?.querySelectorAll?.('.dish-card').forEach(localizeCard);
@@ -63,9 +93,16 @@ function localizeDialog(dialog){
   if(!dialog?.open)return;
   const name=dialog.querySelector('.dish-sheet-head h2')?.textContent?.trim()||'';
   const image=dialog.querySelector('.dish-sheet-photo');
-  if(!name||!image||image.dataset.localDish===name)return;
-  image.src=localDishImage(name);
-  image.dataset.localDish=name;
+  localizeImage(image,name);
+}
+function retryLocalImages(){
+  const grid=document.getElementById('dishes');
+  grid?.querySelectorAll?.('.dish-card img').forEach(image=>delete image.dataset.localImageFailed);
+  const dialog=document.getElementById('dishDialog');
+  const dialogImage=dialog?.querySelector?.('.dish-sheet-photo');
+  if(dialogImage)delete dialogImage.dataset.localImageFailed;
+  localizeCards(grid);
+  localizeDialog(dialog);
 }
 
 let gridObserver=null;
@@ -86,19 +123,20 @@ function bind(){
   if(grid&&!gridObserver){
     localizeCards(grid);
     gridObserver=new MutationObserver(()=>localizeCards(grid));
-    gridObserver.observe(grid,{childList:true});
+    gridObserver.observe(grid,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});
   }
   const dialog=document.getElementById('dishDialog');
   if(dialog&&!dialogObserver){
     localizeDialog(dialog);
     dialogObserver=new MutationObserver(()=>localizeDialog(dialog));
-    dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open']});
+    dialogObserver.observe(dialog,{attributes:true,subtree:true,attributeFilter:['open','src']});
   }
   if(gridObserver&&dialogObserver)bootstrapObserver.disconnect();
 }
 
 versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
 bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
+window.addEventListener('online',retryLocalImages,{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
 })();
