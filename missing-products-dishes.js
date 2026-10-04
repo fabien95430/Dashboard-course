@@ -87,19 +87,11 @@ function initMissingProductsAndDishes(){
     #missingProductsDialog .missing-mode-switch.is-swapping .missing-mode-button.is-active{transform:scale(1.035)}
     #missingProductsDialog .missing-category-grid{display:none!important}
     #missingProductsDialog .missing-category-heading{margin-bottom:8px!important}
-    #missingProductsDialog .missing-category-trigger{width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;border:1px solid rgba(33,55,43,.10);border-radius:15px;background:rgba(255,255,255,.72);color:#27342d;font-size:13px;font-weight:720;text-align:left}
-    #missingProductsDialog .missing-category-trigger::after{content:'›';font-size:22px;line-height:1;color:#7e8982;transform:rotate(90deg)}
-    #missingProductsDialog .missing-category-popup{position:fixed;z-index:30;inset:0;display:grid;align-items:end;padding:18px;background:rgba(17,25,20,.18);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .18s ease,visibility 0s linear .18s}
-    #missingProductsDialog .missing-category-popup.is-open{opacity:1;visibility:visible;transition-delay:0s}
-    #missingProductsDialog .missing-category-sheet{width:min(100%,380px);max-height:min(62vh,470px);margin:0 auto;padding:8px 10px calc(10px + env(safe-area-inset-bottom));border-radius:22px;background:rgba(252,253,251,.98);box-shadow:0 22px 60px rgba(22,34,27,.22);overflow:auto;transform:translateY(18px) scale(.985);transition:transform .24s cubic-bezier(.22,.9,.28,1)}
-    #missingProductsDialog .missing-category-popup.is-open .missing-category-sheet{transform:translateY(0) scale(1)}
-    #missingProductsDialog .missing-category-sheet-title{display:block;padding:9px 12px 8px;color:#34423a;font-size:13px;font-weight:820}
-    #missingProductsDialog .missing-category-option{width:100%;min-height:44px;display:flex;align-items:center;padding:0 13px;border:0;border-radius:13px;background:transparent;color:#202a24;font-size:13px;font-weight:680;text-align:left}
-    #missingProductsDialog .missing-category-option+ .missing-category-option{border-top:1px solid rgba(33,55,43,.065);border-top-left-radius:0;border-top-right-radius:0}
-    #missingProductsDialog .missing-category-option.is-selected{background:rgba(14,142,76,.10);color:#0b6f3e;font-weight:800}
+    #missingProductsDialog .missing-category-select{width:100%;height:46px;border:1px solid #e3e8e2;border-radius:14px;background:#fff;color:#27342d;padding:0 13px;font-size:13px;font-weight:720;outline:none}
+    #missingProductsDialog .missing-category-select:focus{border-color:#cbd8cf;box-shadow:0 0 0 3px rgba(38,144,82,.08)}
     #missingProductsDialog .missing-dishes-list[hidden]{display:none!important}
     #missingProductsDialog .missing-product-row.is-dish .missing-product-mark{font-size:17px;line-height:1}
-    @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-lens,#missingProductsDialog .missing-mode-button,#missingProductsDialog .missing-category-popup,#missingProductsDialog .missing-category-sheet{transition:none!important}}
+    @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-lens,#missingProductsDialog .missing-mode-button{transition:none!important}}
   `;
   document.head.appendChild(style);
 
@@ -110,19 +102,10 @@ function initMissingProductsAndDishes(){
   modeSwitch.innerHTML='<span class="missing-mode-lens" aria-hidden="true"></span><button class="missing-mode-button is-active" type="button" data-missing-mode="products" role="tab" aria-selected="true">Produits</button><button class="missing-mode-button" type="button" data-missing-mode="dishes" role="tab" aria-selected="false">Plats</button>';
   addRow.before(modeSwitch);
 
-  const categoryTrigger=document.createElement('button');
-  categoryTrigger.className='missing-category-trigger';
-  categoryTrigger.type='button';
-  categoryTrigger.setAttribute('aria-haspopup','dialog');
-  categoryTrigger.setAttribute('aria-expanded','false');
-  categoryPanel.appendChild(categoryTrigger);
-
-  const categoryPopup=document.createElement('div');
-  categoryPopup.className='missing-category-popup';
-  categoryPopup.setAttribute('aria-hidden','true');
-  categoryPopup.innerHTML='<div class="missing-category-sheet" role="dialog" aria-modal="true" aria-label="Choisir une catégorie"><strong class="missing-category-sheet-title">Choisir une catégorie</strong><div class="missing-category-options"></div></div>';
-  dialog.appendChild(categoryPopup);
-  const categoryOptions=categoryPopup.querySelector('.missing-category-options');
+  const categorySelect=document.createElement('select');
+  categorySelect.className='missing-category-select';
+  categorySelect.setAttribute('aria-label','Choisir une catégorie');
+  categoryPanel.appendChild(categorySelect);
 
   const dishesList=document.createElement('div');
   dishesList.id='missingDishesList';
@@ -144,29 +127,13 @@ function initMissingProductsAndDishes(){
     return button?.textContent?.trim()||(category||'Aucune');
   }
   function categoryLabel(category){return category||'Aucune'}
-  function currentCategory(){return mode==='dishes'?dishCategory:selectedProductCategory()}
-  function currentCategoryLabel(){return mode==='dishes'?categoryLabel(dishCategory):productCategoryLabel(selectedProductCategory())}
-
-  function closeCategoryPopup(){
-    categoryPopup.classList.remove('is-open');
-    categoryPopup.setAttribute('aria-hidden','true');
-    categoryTrigger.setAttribute('aria-expanded','false');
-  }
-  function openCategoryPopup(){
-    renderCategoryOptions();
-    categoryPopup.classList.add('is-open');
-    categoryPopup.setAttribute('aria-hidden','false');
-    categoryTrigger.setAttribute('aria-expanded','true');
-  }
-  function renderCategoryOptions(){
+  function renderCategorySelect(){
+    const selected=mode==='dishes'?dishCategory:selectedProductCategory();
     const options=mode==='dishes'
       ?DISH_CATEGORIES.map(value=>({value,label:categoryLabel(value)}))
       :[...categoryGrid.querySelectorAll('[data-missing-category]')].map(button=>({value:button.dataset.missingCategory||'',label:button.textContent.trim()}));
-    const selected=currentCategory();
-    categoryOptions.innerHTML=options.map(option=>'<button class="missing-category-option '+(option.value===selected?'is-selected':'')+'" type="button" data-missing-popup-category="'+escapeHtml(option.value)+'">'+escapeHtml(option.label)+'</button>').join('');
-  }
-  function syncCategoryTrigger(){
-    categoryTrigger.textContent=currentCategoryLabel();
+    categorySelect.innerHTML=options.map(option=>'<option value="'+escapeHtml(option.value)+'">'+escapeHtml(option.label)+'</option>').join('');
+    categorySelect.value=selected;
   }
   function renderDishes(){
     dishes=readDishes();
@@ -202,15 +169,13 @@ function initMissingProductsAndDishes(){
     }else{
       listCount.textContent=String(productCount());
     }
-    syncCategoryTrigger();
-    if(categoryPopup.classList.contains('is-open'))renderCategoryOptions();
+    renderCategorySelect();
   }
   function setMode(next,{animate=true,clearInput=true}={}){
     if(next!=='products'&&next!=='dishes')return;
     if(mode===next){renderMode();return}
     mode=next;
     if(clearInput)input.value='';
-    closeCategoryPopup();
     if(animate&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
       modeSwitch.classList.add('is-swapping');
       clearTimeout(swapTimer);
@@ -261,20 +226,15 @@ function initMissingProductsAndDishes(){
   });
   modeSwitch.addEventListener('pointercancel',()=>{pointerStart=null});
 
-  categoryTrigger.addEventListener('click',openCategoryPopup);
-  categoryPopup.addEventListener('click',event=>{
-    if(event.target===categoryPopup){closeCategoryPopup();return}
-    const option=event.target.closest('[data-missing-popup-category]');
-    if(!option)return;
-    const category=option.dataset.missingPopupCategory||'';
+  categorySelect.addEventListener('change',()=>{
+    const category=categorySelect.value||'';
     if(mode==='dishes'){
       dishCategory=DISH_CATEGORIES.includes(category)?category:'';
     }else{
       const original=[...categoryGrid.querySelectorAll('[data-missing-category]')].find(button=>(button.dataset.missingCategory||'')===category);
       original?.click();
     }
-    syncCategoryTrigger();
-    closeCategoryPopup();
+    renderCategorySelect();
     navigator.vibrate?.(4);
   });
 
@@ -297,7 +257,7 @@ function initMissingProductsAndDishes(){
 
   new MutationObserver(()=>{
     if(mode==='products'){
-      syncCategoryTrigger();
+      renderCategorySelect();
       listCount.textContent=String(productCount());
     }
   }).observe(categoryGrid,{attributes:true,subtree:true,attributeFilter:['class','aria-pressed']});
@@ -305,16 +265,14 @@ function initMissingProductsAndDishes(){
   settingsButton.addEventListener('click',()=>{
     setMode('products',{animate:false,clearInput:false});
     requestAnimationFrame(()=>{
-      syncCategoryTrigger();
+      renderCategorySelect();
       listCount.textContent=String(productCount());
     });
   });
   dialog.addEventListener('close',()=>{
-    closeCategoryPopup();
     setMode('products',{animate:false,clearInput:false});
   });
 
-  syncCategoryTrigger();
   renderMode();
   syncCombinedCount();
 }
