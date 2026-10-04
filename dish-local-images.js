@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v199';
+const APP_VERSION='v200';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -104,6 +104,14 @@ function retryLocalImages(){
   localizeCards(grid);
   localizeDialog(dialog);
 }
+function loadListSwipe(){
+  if(document.querySelector('script[data-list-swipe]'))return;
+  const script=document.createElement('script');
+  script.src='./list-swipe.js?v=1';
+  script.async=false;
+  script.dataset.listSwipe='1';
+  document.body.appendChild(script);
+}
 
 let gridObserver=null;
 let dialogObserver=null;
@@ -137,6 +145,11 @@ function bind(){
 versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
 bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
 window.addEventListener('online',retryLocalImages,{passive:true});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
-else bind();
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',bind,{once:true});
+  document.addEventListener('DOMContentLoaded',loadListSwipe,{once:true});
+}else{
+  bind();
+  loadListSwipe();
+}
 })();
