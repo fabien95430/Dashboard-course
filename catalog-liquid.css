@@ -1,5 +1,5 @@
-/* v173 — texte progressif et lentille centrée comme la navigation basse */
-.catalog-view .page-header h1::after{content:"v173"!important}
+/* v174 — lentille plus basse et centrée uniformément */
+.catalog-view .page-header h1::after{content:"v174"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
@@ -10,7 +10,8 @@
 .catalog-mode>svg,.catalog-mode-fork{display:none!important}
 .catalog-mode-lens{
   top:50%!important;
-  height:40px!important;
+  height:36px!important;
+  border-radius:19px!important;
   transform-origin:center!important;
   transform:translate3d(var(--catalog-lens-x),-50%,0) scale(var(--catalog-liquid-sx),var(--catalog-liquid-sy))!important;
   transition:none!important;
