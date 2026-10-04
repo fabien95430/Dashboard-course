@@ -1,5 +1,7 @@
-/* v174 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v174"!important}
+@import url("./dish-detail.css?v=1");
+
+/* v175 — lentille plus basse et centrée uniformément */
+.catalog-view .page-header h1::after{content:"v175"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
