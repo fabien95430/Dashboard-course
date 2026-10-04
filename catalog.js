@@ -9,7 +9,7 @@
 
 (() => {
   'use strict';
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v172';});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v173';});
 
   const style=document.createElement('link');
   style.rel='stylesheet';
@@ -19,14 +19,14 @@
 
   const liquidStyle=document.createElement('link');
   liquidStyle.rel='stylesheet';
-  liquidStyle.href='./catalog-liquid.css?v=1';
+  liquidStyle.href='./catalog-liquid.css?v=2';
   liquidStyle.dataset.catalogLiquid='style';
   document.head.appendChild(liquidStyle);
 
   const loadLiquid=()=>{
     if(document.querySelector('script[data-catalog-liquid]'))return;
     const liquid=document.createElement('script');
-    liquid.src='./catalog-liquid.js?v=1';
+    liquid.src='./catalog-liquid.js?v=2';
     liquid.async=false;
     liquid.dataset.catalogLiquid='script';
     document.body.appendChild(liquid);
