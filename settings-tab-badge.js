@@ -90,7 +90,10 @@ syncBadge();
 
 const STORAGE_PREFERRED_SERVINGS='courses-dish-preferred-servings-v1';
 const STORAGE_SERVINGS='courses-dish-servings-v1';
+const STORAGE_PREFERRED_CATALOG_MODE='courses-catalog-preferred-mode-v1';
+const STORAGE_CATALOG_MODE='courses-catalog-mode-v1';
 const SERVING_OPTIONS=Object.freeze([2,4,5]);
+const CATALOG_MODE_OPTIONS=Object.freeze(['products','dishes']);
 const DEFAULT_SERVINGS=4;
 
 function readPreferredServings(){
@@ -107,6 +110,21 @@ function persistPreferredServings(value){
     localStorage.setItem(STORAGE_PREFERRED_SERVINGS,String(value));
     localStorage.setItem(STORAGE_SERVINGS,String(value));
   }catch(_){}
+}
+
+function readPreferredCatalogMode(){
+  try{
+    const preferred=localStorage.getItem(STORAGE_PREFERRED_CATALOG_MODE);
+    if(CATALOG_MODE_OPTIONS.includes(preferred))return preferred;
+    return localStorage.getItem(STORAGE_CATALOG_MODE)==='dishes'?'dishes':'products';
+  }catch(_){
+    return 'products';
+  }
+}
+
+function persistPreferredCatalogMode(value){
+  if(!CATALOG_MODE_OPTIONS.includes(value))return;
+  try{localStorage.setItem(STORAGE_PREFERRED_CATALOG_MODE,value)}catch(_){}
 }
 
 function syncDishServings(value){
@@ -127,42 +145,96 @@ function watchDishServings(){
   observer.observe(document.body,{childList:true,subtree:true});
 }
 
-function initPreferredServings(){
+function applyPreferredCatalogMode(){
+  const catalogView=document.getElementById('catalogView');
+  if(!catalogView?.classList.contains('is-active'))return false;
+  const preferred=readPreferredCatalogMode();
+  const button=document.querySelector(`.catalog-mode[data-mode="${preferred}"]`);
+  if(!button)return false;
+  if(!button.classList.contains('is-active'))button.click();
+  return true;
+}
+
+function watchCatalogEntry(){
+  const catalogView=document.getElementById('catalogView');
+  if(!catalogView)return;
+  let applied=false;
+  const sync=()=>{
+    if(!catalogView.classList.contains('is-active')){
+      applied=false;
+      return;
+    }
+    if(applied)return;
+    applied=applyPreferredCatalogMode();
+  };
+  new MutationObserver(sync).observe(catalogView,{
+    attributes:true,
+    attributeFilter:['class'],
+    childList:true,
+    subtree:true
+  });
+  sync();
+}
+
+function initPreferencesExtras(){
   const dialog=document.getElementById('preferencesDialog');
   const startView=document.getElementById('preferencesStartView');
   const saveButton=document.getElementById('savePreferences');
   if(!dialog||!startView||!saveButton)return;
 
-  let select=document.getElementById('preferencesServings');
-  if(!select){
+  const startField=startView.closest('.field');
+
+  let catalogModeSelect=document.getElementById('preferencesCatalogMode');
+  if(!catalogModeSelect){
+    const field=document.createElement('label');
+    field.className='field';
+    field.innerHTML='<span>Ouverture du Catalogue</span><select id="preferencesCatalogMode" aria-label="Ouverture du Catalogue"><option value="products">Produits</option><option value="dishes">Plats</option></select>';
+    startField?.after(field);
+    catalogModeSelect=field.querySelector('select');
+  }
+
+  let servingsSelect=document.getElementById('preferencesServings');
+  if(!servingsSelect){
     const field=document.createElement('label');
     field.className='field';
     field.innerHTML='<span>Nombre de personnes</span><select id="preferencesServings" aria-label="Nombre de personnes"><option value="2">2 personnes</option><option value="4">4 personnes</option><option value="5">5 personnes</option></select>';
-    startView.closest('.field')?.after(field);
-    select=field.querySelector('select');
+    (catalogModeSelect?.closest('.field')||startField)?.after(field);
+    servingsSelect=field.querySelector('select');
   }
-  if(!select)return;
+  if(!catalogModeSelect||!servingsSelect)return;
 
-  const initial=readPreferredServings();
-  persistPreferredServings(initial);
-  select.value=String(initial);
+  const initialServings=readPreferredServings();
+  const initialCatalogMode=readPreferredCatalogMode();
+  persistPreferredServings(initialServings);
+  persistPreferredCatalogMode(initialCatalogMode);
+  servingsSelect.value=String(initialServings);
+  catalogModeSelect.value=initialCatalogMode;
   watchDishServings();
+  watchCatalogEntry();
 
-  const syncSelect=()=>{select.value=String(readPreferredServings())};
-  dialog.addEventListener('close',syncSelect);
-  document.getElementById('settingsPreferencesBtn')?.addEventListener('click',syncSelect);
+  const syncSelects=()=>{
+    servingsSelect.value=String(readPreferredServings());
+    catalogModeSelect.value=readPreferredCatalogMode();
+  };
+  dialog.addEventListener('close',syncSelects);
+  document.getElementById('settingsPreferencesBtn')?.addEventListener('click',syncSelects);
   saveButton.addEventListener('click',()=>{
-    const next=Number(select.value);
-    if(!SERVING_OPTIONS.includes(next))return;
-    persistPreferredServings(next);
-    syncDishServings(next);
+    const nextServings=Number(servingsSelect.value);
+    if(SERVING_OPTIONS.includes(nextServings)){
+      persistPreferredServings(nextServings);
+      syncDishServings(nextServings);
+    }
+    const nextCatalogMode=catalogModeSelect.value;
+    if(CATALOG_MODE_OPTIONS.includes(nextCatalogMode)){
+      persistPreferredCatalogMode(nextCatalogMode);
+    }
   },true);
 }
 
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',initPreferredServings,{once:true});
+  document.addEventListener('DOMContentLoaded',initPreferencesExtras,{once:true});
 }else{
-  initPreferredServings();
+  initPreferencesExtras();
 }
 })();
 
