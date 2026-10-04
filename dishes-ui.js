@@ -84,6 +84,7 @@ let dishSheetPhoto;
 let dishSheetTitle;
 let dishSheetList;
 let dishSheetCount;
+let dishSheetTags;
 let dishSheetFavorite;
 let dishConfirmButton;
 let currentDish=null;
@@ -92,6 +93,7 @@ let toastTimer=0;
 let lensTimer=0;
 const ingredientThumbCache=new Map();
 let ingredientThumbRequest=0;
+let ingredientThumbUserQuery=null;
 
 function readFavorites(){
   try{return new Set(JSON.parse(localStorage.getItem(STORAGE_FAVORITES)||'[]').map(String))}catch(_){return new Set()}
@@ -185,7 +187,10 @@ function buildDishDialog(){
     '</div>'+ 
     '<div class="dish-sheet-head">'+
       '<h2></h2>'+ 
-      '<p><svg><use href="#i-cart"></use></svg><strong class="dish-sheet-count">0 ingrédient à ajouter</strong></p>'+ 
+      '<div class="dish-sheet-meta">'+
+        '<p><svg><use href="#i-cart"></use></svg><strong class="dish-sheet-count">0 ingrédient</strong></p>'+ 
+        '<div class="dish-sheet-tags" aria-hidden="true"></div>'+ 
+      '</div>'+ 
     '</div>'+ 
     '<div class="dish-sheet-list" aria-label="Ingrédients à ajouter"></div>'+ 
     '<div class="dish-sheet-footer">'+
@@ -197,6 +202,7 @@ function buildDishDialog(){
   dishSheetTitle=dishDialog.querySelector('h2');
   dishSheetList=dishDialog.querySelector('.dish-sheet-list');
   dishSheetCount=dishDialog.querySelector('.dish-sheet-count');
+  dishSheetTags=dishDialog.querySelector('.dish-sheet-tags');
   dishSheetFavorite=dishDialog.querySelector('.dish-sheet-favorite');
   dishConfirmButton=dishDialog.querySelector('.dish-sheet-add');
   dishDialog.querySelector('.dish-sheet-close').addEventListener('click',closeDishSheet);
@@ -306,6 +312,7 @@ function openDishSheet(dish){
   dishSheetPhoto.src=photoUrl(dish.photoId);
   dishSheetPhoto.alt=dish.name;
   dishSheetTitle.textContent=dish.name;
+  dishSheetTags.innerHTML=dish.tags.slice(0,2).map(tag=>'<span>'+escapeHtml(tag)+'</span>').join('');
   renderDishSheetFavorite();
   renderDishSheetIngredients();
   if(typeof dishDialog.showModal==='function')dishDialog.showModal();
@@ -313,9 +320,16 @@ function openDishSheet(dish){
   document.documentElement.classList.add('dish-sheet-open');
   void primeDishIngredientThumbs(dish);
 }
+function cancelIngredientThumbs(){
+  ingredientThumbRequest+=1;
+  if(ingredientThumbUserQuery!==null){
+    setHiddenCatalogQuery(ingredientThumbUserQuery);
+    ingredientThumbUserQuery=null;
+  }
+}
 function closeDishSheet(){
   if(!dishDialog||busyDish)return;
-  ingredientThumbRequest+=1;
+  cancelIngredientThumbs();
   if(dishDialog.open)dishDialog.close();else dishDialog.removeAttribute('open');
   document.documentElement.classList.remove('dish-sheet-open');
   currentDish=null;
@@ -332,8 +346,9 @@ function renderDishSheetFavorite(){
 async function primeDishIngredientThumbs(dish){
   const missing=dish.ingredients.filter(name=>!ingredientThumbCache.has(name));
   if(!missing.length||busyDish)return;
+  if(ingredientThumbUserQuery===null)ingredientThumbUserQuery=searchInput.value;
+  const userQuery=ingredientThumbUserQuery;
   const token=++ingredientThumbRequest;
-  const userQuery=searchInput.value;
   try{
     for(const name of missing){
       if(token!==ingredientThumbRequest||currentDish!==dish||busyDish)return;
@@ -356,6 +371,7 @@ async function primeDishIngredientThumbs(dish){
   }finally{
     if(token===ingredientThumbRequest&&!busyDish){
       setHiddenCatalogQuery(userQuery);
+      ingredientThumbUserQuery=null;
       await nextPaint();
     }
   }
@@ -377,12 +393,13 @@ function renderDishSheetIngredients(){
     renderDishSheetIngredients();
   }));
   const count=selectedIngredients.size;
-  dishSheetCount.textContent=count+' ingrédient'+(count>1?'s':'')+' à ajouter';
+  dishSheetCount.textContent=count+' ingrédient'+(count>1?'s':'');
   dishConfirmButton.disabled=count===0||Boolean(busyDish);
   dishConfirmButton.querySelector('span').textContent=count?'Ajouter à ma liste':'Sélectionnez un ingrédient';
 }
 async function confirmDishAdd(){
   if(!currentDish||busyDish||!selectedIngredients.size)return;
+  cancelIngredientThumbs();
   const dish=currentDish;
   const ingredients=dish.ingredients.filter(name=>selectedIngredients.has(name));
   dishConfirmButton.classList.add('is-busy');
