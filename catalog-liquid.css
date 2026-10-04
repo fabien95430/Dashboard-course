@@ -1,7 +1,7 @@
 @import url("./dish-detail.css?v=5");
 
 /* v179 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v190"!important}
+.catalog-view .page-header h1::after{content:"v191"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
@@ -223,20 +223,21 @@
   }
 }
 
-/* v189 — commandes de fiche lisibles sur les photos */
+/* v191 — commandes de fiche minimalistes sur les photos */
 .dish-sheet-close,.dish-sheet-favorite{
-  border-radius:50%!important;
-  background:rgba(16,24,19,.38)!important;
-  box-shadow:0 3px 14px rgba(0,0,0,.22)!important;
-  -webkit-backdrop-filter:blur(12px) saturate(1.1)!important;
-  backdrop-filter:blur(12px) saturate(1.1)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
   outline:none!important;
   -webkit-appearance:none!important;
   appearance:none!important;
   -webkit-tap-highlight-color:transparent!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.86),0 0 12px rgba(0,0,0,.48)!important;
 }
 .dish-sheet-close:focus,.dish-sheet-favorite:focus{outline:none!important}
 .dish-sheet-close:focus-visible,.dish-sheet-favorite:focus-visible{
-  outline:2px solid rgba(255,255,255,.92)!important;
-  outline-offset:2px!important;
+  outline:none!important;
+  text-shadow:0 0 2px rgba(255,255,255,.95),0 2px 8px rgba(0,0,0,.9),0 0 14px rgba(0,0,0,.55)!important;
 }
