@@ -1,6 +1,9 @@
 (() => {
 'use strict';
 
+const APP_VERSION='v181';
+window.COURSES_APP_VERSION=APP_VERSION;
+
 const SPECIAL_SLUGS=Object.freeze({
   'Tagliatelles au saumon':'tagliatelles-saumon',
   'Gratin de courgettes':'gratin-courgettes',
@@ -25,6 +28,22 @@ const slugify=value=>String(value||'')
   .replace(/[\u0300-\u036f]/g,'')
   .replace(/[^a-z0-9]+/g,'-')
   .replace(/^-+|-+$/g,'');
+
+function syncPageVersions(){
+  document.querySelectorAll('.page-header').forEach(header=>{
+    const title=header.querySelector('h1');
+    const badge=header.querySelector('.page-version');
+    if(!title||!badge)return;
+    if(badge.parentElement!==title)title.appendChild(badge);
+    if(badge.textContent!==APP_VERSION)badge.textContent=APP_VERSION;
+  });
+  if(!document.getElementById('app-version-ui')){
+    const style=document.createElement('style');
+    style.id='app-version-ui';
+    style.textContent='.catalog-view .page-header h1::after{content:none!important}';
+    document.head.appendChild(style);
+  }
+}
 
 function localDishImage(name){
   const slug=SPECIAL_SLUGS[name]||slugify(name);
@@ -51,9 +70,18 @@ function localizeDialog(dialog){
 
 let gridObserver=null;
 let dialogObserver=null;
+let versionFrame=0;
 const bootstrapObserver=new MutationObserver(()=>bind());
+const versionObserver=new MutationObserver(()=>{
+  if(versionFrame)return;
+  versionFrame=requestAnimationFrame(()=>{
+    versionFrame=0;
+    syncPageVersions();
+  });
+});
 
 function bind(){
+  syncPageVersions();
   const grid=document.getElementById('dishes');
   if(grid&&!gridObserver){
     localizeCards(grid);
@@ -69,6 +97,7 @@ function bind(){
   if(gridObserver&&dialogObserver)bootstrapObserver.disconnect();
 }
 
+versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
 bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();

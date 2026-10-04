@@ -8,6 +8,12 @@ Ne pas faire un commit par fichier ni plusieurs commits d’essai.
 
 Un nouveau commit n’est autorisé qu’après un nouveau feu vert explicite de l’utilisateur, sauf contrainte Git réelle imposant techniquement une nouvelle opération.
 
+## Version visible
+
+Les badges de version `.page-version` doivent rester affichés à côté des titres principaux `h1` de Ma liste, Catalogue et Réglages.
+
+À chaque modification fonctionnelle, visuelle ou technique de l’application, incrémenter la version globale et afficher exactement la même version sur toutes les pages dans le même commit. Ne jamais laisser des numéros de version différents selon les vues.
+
 ## Atlas de visuels produits
 
 Avant toute modification d'un atlas produit, lire `docs/ATLAS_PRODUITS.md`.
@@ -15,4 +21,3 @@ Avant toute modification d'un atlas produit, lire `docs/ATLAS_PRODUITS.md`.
 La méthode de référence est celle utilisée pour reconstruire l'atlas **Maison v5** : isoler réellement chaque produit, conserver ses pixels source, le recentrer dans une cellule transparente plus grande avec des gouttières régulières, puis supprimer les compensations de recadrage propres à la catégorie lorsque le nouvel atlas les rend inutiles.
 
 Ne pas revenir à des recadrages CSS/JS globaux ou à des exceptions produit par produit tant qu'une reconstruction propre de l'atlas permet de corriger le problème.
-
