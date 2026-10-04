@@ -409,6 +409,39 @@ const RECIPE_QUANTITIES=Object.freeze({
   'Velouté carottes':{'Carottes':6,'Pommes de terre':2,'Oignons jaunes':1}
 });
 
+// Un multiplicateur correspond à une unité réellement achetée dans le catalogue.
+// Les quantités de recette ci-dessus restent des unités culinaires (tranches, pièces, etc.).
+const PURCHASE_PACK_SIZE=Object.freeze({
+  'Œufs':6,
+  'Poulet':4,
+  'Pains burger':4,
+  'Pains hot-dog':4,
+  'Wraps':6,
+  'Galettes de blé':8,
+  'Jambon blanc':4,
+  'Pain de mie':12,
+  'Emmental':8,
+  'Blanc de poulet':4,
+  'Pain':4,
+  'Ail':8,
+  'Gingembre':3
+});
+
+// Quand une recette n'a pas de quantité en pièces, une unité d'achat couvre
+// généralement ce nombre de portions avant de proposer ×2, ×3, etc.
+const PURCHASE_SERVINGS=Object.freeze({
+  'Spaghetti':5,'Penne':5,'Coquillettes':5,'Tagliatelles':5,'Lasagnes':4,
+  'Riz basmati':5,'Riz long':5,'Quinoa':5,'Couscous':5,'Nouilles chinoises':4,
+  'Crème fraîche':6,'Parmesan':6,'Fromage râpé':6,'Emmental':8,
+  'Sauce tomate':6,'Pesto':6,'Sauce soja':12,'Miel':12,'Moutarde':12,'Curry':12,
+  'Lait de coco':4,'Tomates pelées':4,'Haricots rouges':4,'Pois chiches':4,'Maïs en boîte':4,'Thon en boîte':4,
+  'Frites surgelées':4,'Haricots verts':4,'Épinards':4,'Champignons':4,'Salade verte':4,
+  'Farine':12,'Beurre':8,'Lait':8,'Chapelure':12,'Croûtons':6,'Basilic':8,'Romarin frais':8,
+  'Viande hachée':4,'Bœuf':4,'Crevettes':4,'Moules':4,'Saumon fumé':4,
+  'Lardons':4,'Chorizo':4,'Jambon blanc':4,'Jambon cru':4,'Rosette':4,
+  'Raclette':4,'Reblochon':4,'Chèvre':4
+});
+
 let dialog=null;
 let list=null;
 let confirmButton=null;
@@ -434,8 +467,12 @@ function saveServings(){
 function dishName(){return dialog?.querySelector('.dish-sheet-head h2')?.textContent?.trim()||''}
 function ingredientQuantity(name){
   const base=Number(RECIPE_QUANTITIES[dishName()]?.[name]);
-  if(Number.isFinite(base)&&base>0)return Math.max(1,Math.ceil(base*servings/BASE_SERVINGS));
-  return Math.max(1,Math.ceil(servings/BASE_SERVINGS));
+  if(Number.isFinite(base)&&base>0){
+    const packSize=Math.max(1,Number(PURCHASE_PACK_SIZE[name])||1);
+    return Math.max(1,Math.ceil((base*servings/BASE_SERVINGS)/packSize));
+  }
+  const coveredServings=Math.max(1,Number(PURCHASE_SERVINGS[name])||BASE_SERVINGS);
+  return Math.max(1,Math.ceil(servings/coveredServings));
 }
 function applyQuantities(){
   if(!list)return;
@@ -595,7 +632,7 @@ function initDishServings(){
   productsGrid=document.getElementById('products');
   catalogView=document.getElementById('catalogView');
   if(!dialog||!list||!confirmButton||!searchInput||!productsGrid)return;
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v179'});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v180'});
   buildServingsControl();
   const listObserver=new MutationObserver(()=>applyQuantities());
   listObserver.observe(list,{childList:true});
