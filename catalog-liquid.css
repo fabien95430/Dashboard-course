@@ -1,7 +1,7 @@
 @import url("./dish-detail.css?v=5");
 
 /* v179 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v198"!important}
+.catalog-view .page-header h1::after{content:"v199"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
@@ -245,10 +245,10 @@
   text-shadow:0 0 2px rgba(255,255,255,.95),0 2px 8px rgba(0,0,0,.9),0 0 14px rgba(0,0,0,.55)!important;
 }
 
-/* v198 — réserve de scroll sous la navigation pour la dernière rangée de plats */
+/* v199 — réserve de scroll alignée sur l'espacement du haut */
 @media(max-width:520px){
   .catalog-view>.dishes-grid{
-    padding-bottom:calc(105px + env(safe-area-inset-bottom))!important;
-    scroll-padding-bottom:calc(105px + env(safe-area-inset-bottom))!important;
+    padding-bottom:calc(97px + env(safe-area-inset-bottom))!important;
+    scroll-padding-bottom:calc(97px + env(safe-area-inset-bottom))!important;
   }
 }
