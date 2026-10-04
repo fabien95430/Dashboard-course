@@ -84,3 +84,83 @@ new MutationObserver(syncBadge).observe(source,{attributes:true,childList:true,c
 window.addEventListener('resize',()=>requestAnimationFrame(positionBadge),{passive:true});
 syncBadge();
 })();
+
+(() => {
+'use strict';
+
+const STORAGE_PREFERRED_SERVINGS='courses-dish-preferred-servings-v1';
+const STORAGE_SERVINGS='courses-dish-servings-v1';
+const SERVING_OPTIONS=Object.freeze([2,4,5]);
+const DEFAULT_SERVINGS=4;
+
+function readPreferredServings(){
+  try{
+    const value=Number(localStorage.getItem(STORAGE_PREFERRED_SERVINGS));
+    return SERVING_OPTIONS.includes(value)?value:DEFAULT_SERVINGS;
+  }catch(_){
+    return DEFAULT_SERVINGS;
+  }
+}
+
+function persistPreferredServings(value){
+  try{
+    localStorage.setItem(STORAGE_PREFERRED_SERVINGS,String(value));
+    localStorage.setItem(STORAGE_SERVINGS,String(value));
+  }catch(_){}
+}
+
+function syncDishServings(value){
+  try{localStorage.setItem(STORAGE_SERVINGS,String(value))}catch(_){}
+  const input=document.querySelector('.dish-servings-value');
+  if(!input)return false;
+  input.value=String(value);
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  return true;
+}
+
+function watchDishServings(value){
+  if(syncDishServings(value))return;
+  const observer=new MutationObserver(()=>{
+    if(syncDishServings(value))observer.disconnect();
+  });
+  observer.observe(document.body,{childList:true,subtree:true});
+}
+
+function initPreferredServings(){
+  const dialog=document.getElementById('preferencesDialog');
+  const startView=document.getElementById('preferencesStartView');
+  const saveButton=document.getElementById('savePreferences');
+  if(!dialog||!startView||!saveButton)return;
+
+  let select=document.getElementById('preferencesServings');
+  if(!select){
+    const field=document.createElement('label');
+    field.className='field';
+    field.innerHTML='<span>Nombre de personnes</span><select id="preferencesServings" aria-label="Nombre de personnes"><option value="2">2 personnes</option><option value="4">4 personnes</option><option value="5">5 personnes</option></select>';
+    startView.closest('.field')?.after(field);
+    select=field.querySelector('select');
+  }
+  if(!select)return;
+
+  const initial=readPreferredServings();
+  persistPreferredServings(initial);
+  select.value=String(initial);
+  watchDishServings(initial);
+
+  const syncSelect=()=>{select.value=String(readPreferredServings())};
+  dialog.addEventListener('close',syncSelect);
+  document.getElementById('settingsPreferencesBtn')?.addEventListener('click',syncSelect);
+  saveButton.addEventListener('click',()=>{
+    const next=Number(select.value);
+    if(!SERVING_OPTIONS.includes(next))return;
+    persistPreferredServings(next);
+    syncDishServings(next);
+  },true);
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initPreferredServings,{once:true});
+}else{
+  initPreferredServings();
+}
+})();
