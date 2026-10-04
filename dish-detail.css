@@ -16,12 +16,20 @@
   object-position:center!important;
 }
 .dish-sheet-close,.dish-sheet-favorite{
-  top:16px!important;
-  width:42px!important;
-  height:42px!important;
+  top:15px!important;
+  width:38px!important;
+  height:38px!important;
+  border:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  text-shadow:0 2px 8px rgba(0,0,0,.42);
 }
-.dish-sheet-close{left:16px!important}
-.dish-sheet-favorite{right:16px!important}
+.dish-sheet-close{left:14px!important;font-size:38px!important}
+.dish-sheet-favorite{right:14px!important;font-size:30px!important}
+.dish-sheet-favorite.is-active{color:#fff!important}
 .dish-sheet-head{
   position:relative;
   z-index:2;
@@ -36,11 +44,22 @@
   line-height:1.03!important;
   letter-spacing:-.65px!important;
 }
+.dish-sheet-meta{
+  min-width:0;
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.dish-sheet-meta::-webkit-scrollbar{display:none}
 .dish-sheet-head p{
+  flex:0 0 auto;
   width:max-content;
   max-width:100%;
   min-height:34px;
-  margin:10px 0 0!important;
+  margin:0!important;
   padding:0 12px;
   gap:7px!important;
   border:1px solid #e7ebe6;
@@ -54,6 +73,27 @@
 .dish-sheet-count{
   font-size:13px!important;
   font-weight:730!important;
+  white-space:nowrap;
+}
+.dish-sheet-tags{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.dish-sheet-tags span{
+  min-height:34px;
+  padding:0 12px;
+  display:inline-flex;
+  align-items:center;
+  border:1px solid #e7ebe6;
+  border-radius:17px;
+  background:#f8faf7;
+  color:#53605a;
+  font-size:13px;
+  line-height:1;
+  font-weight:730;
+  white-space:nowrap;
 }
 .dish-sheet-list{
   position:relative;
@@ -167,6 +207,7 @@
   .dish-dialog[open]{grid-template-rows:clamp(210px,31dvh,270px) auto minmax(0,1fr) auto!important}
   .dish-sheet-head{margin-top:-20px!important;padding:17px 16px 9px!important}
   .dish-sheet-head h2{font-size:24px!important}
+  .dish-sheet-meta{margin-top:8px}
   .dish-sheet-list{padding-left:12px!important;padding-right:12px!important}
   .dish-sheet-footer{padding-left:12px!important;padding-right:12px!important}
   .dish-ingredient{min-height:57px!important;grid-template-columns:46px minmax(0,1fr) 32px!important}
