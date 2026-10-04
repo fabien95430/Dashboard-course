@@ -1,7 +1,7 @@
 @import url("./dish-detail.css?v=5");
 
 /* v179 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v188"!important}
+.catalog-view .page-header h1::after{content:"v189"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
@@ -221,4 +221,22 @@
     grid-template-rows:82px 46px 42px 38px minmax(0,1fr)!important;
     gap:8px!important;
   }
+}
+
+/* v189 — commandes de fiche lisibles sur les photos */
+.dish-sheet-close,.dish-sheet-favorite{
+  border-radius:50%!important;
+  background:rgba(16,24,19,.38)!important;
+  box-shadow:0 3px 14px rgba(0,0,0,.22)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(1.1)!important;
+  backdrop-filter:blur(12px) saturate(1.1)!important;
+  outline:none!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.dish-sheet-close:focus,.dish-sheet-favorite:focus{outline:none!important}
+.dish-sheet-close:focus-visible,.dish-sheet-favorite:focus-visible{
+  outline:2px solid rgba(255,255,255,.92)!important;
+  outline-offset:2px!important;
 }
