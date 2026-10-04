@@ -31,7 +31,7 @@
     liquid.dataset.catalogLiquid='script';
     document.body.appendChild(liquid);
   };
-  const load=()=>{
+  const loadDishes=()=>{
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
     const script=document.createElement('script');
     script.src='./dishes-ui.js?v=2';
@@ -39,6 +39,15 @@
     script.dataset.catalogDishes='script';
     script.addEventListener('load',loadLiquid,{once:true});
     document.body.appendChild(script);
+  };
+  const load=()=>{
+    if(document.querySelector('script[data-dish-local-images]')){loadDishes();return}
+    const images=document.createElement('script');
+    images.src='./dish-local-images.js?v=1';
+    images.async=false;
+    images.dataset.dishLocalImages='script';
+    images.addEventListener('load',loadDishes,{once:true});
+    document.body.appendChild(images);
   };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});
   else load();
