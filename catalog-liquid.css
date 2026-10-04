@@ -1,7 +1,7 @@
 @import url("./dish-detail.css?v=5");
 
-/* v178 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v178"!important}
+/* v179 — lentille plus basse et centrée uniformément */
+.catalog-view .page-header h1::after{content:"v179"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
@@ -64,7 +64,7 @@
   text-shadow:none!important;
 }
 
-/* v178 — Nombre de personnes sur la ligne Ingrédients */
+/* v179 — Nombre de personnes sur la ligne Ingrédients */
 .dish-sheet-head .dish-servings{
   position:absolute!important;
   z-index:4;
@@ -112,6 +112,23 @@
   overflow:hidden!important;
   text-overflow:ellipsis!important;
 }
+
+/* v179 — Quantités d'achat lisibles en multiplicateur, sans grammage */
+.dish-ingredient-check{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:1px!important;
+}
+.dish-ingredient-check::before{
+  content:"×"!important;
+  display:inline!important;
+  color:inherit!important;
+  font-size:.82em!important;
+  line-height:1!important;
+  font-weight:850!important;
+}
+
 @media(max-width:390px){
   .dish-sheet-head .dish-servings{right:11px;bottom:-33px;gap:4px!important}
   .dish-sheet-head .dish-servings>strong{font-size:10px!important}
