@@ -369,7 +369,46 @@ const RECIPE_QUANTITIES=Object.freeze({
   'Salade chèvre noix':{'Tomates':2},
   'Pâtes pesto mozzarella':{'Mozzarella':2,'Tomates':3},
   'Chili sin carne':{'Poivrons':2,'Oignons jaunes':2},
-  'Riz champignons parmesan':{}
+  'Riz champignons parmesan':{},
+
+  'Poulet parmesan tomate':{'Escalopes de poulet':4,'Mozzarella':2},
+  'Poulet miel moutarde':{'Poulet':4,'Pommes de terre':8},
+  'Poulet teriyaki riz':{'Poulet':4,'Gingembre':1},
+  'Poulet paprika crème':{'Poulet':4,'Poivrons':2},
+  'Poulet pommes de terre au four':{'Poulet':4,'Pommes de terre':8,'Oignons jaunes':2},
+  'Riz poulet curry coco':{'Poulet':4,'Oignons jaunes':2},
+  'Riz sauté poulet légumes':{'Poulet':4,'Carottes':2,'Poivrons':2,'Œufs':4},
+  'Riz crevettes légumes':{'Carottes':2,'Poivrons':2},
+  'Bœuf riz poivrons':{'Bœuf':4,'Poivrons':3,'Oignons jaunes':2},
+  'Bœuf sauce tomate pommes de terre':{'Bœuf':4,'Pommes de terre':8,'Oignons jaunes':2,'Carottes':2},
+  'Hachis parmentier':{'Pommes de terre':8,'Oignons jaunes':2},
+  'Boulettes sauce tomate':{'Oignons jaunes':1},
+  'Gratin pommes de terre jambon':{'Pommes de terre':8,'Jambon blanc':4},
+  'Gratin brocoli poulet':{'Poulet':4,'Brocoli':2},
+  'Quiche lorraine':{'Œufs':4},
+  'Quiche poireaux chèvre':{'Œufs':4,'Poireaux':3},
+  'Tarte tomate mozzarella':{'Tomates':4,'Mozzarella':2},
+  'Salade poulet avocat':{'Poulet':4,'Avocat':2,'Tomates':2,'Concombres':1},
+  'Salade César saumon':{'Saumon':4,'Œufs':2,'Citron':1},
+  'Salade mozzarella avocat':{'Mozzarella':2,'Avocat':2,'Tomates':3,'Concombres':1},
+  'Saumon pommes de terre':{'Saumon':4,'Pommes de terre':8,'Citron':1},
+  'Saumon crème épinards':{'Saumon':4,'Citron':1},
+  'Cabillaud riz légumes':{'Cabillaud':4,'Carottes':2,'Courgettes':2,'Poivrons':2,'Citron':1},
+  'Crevettes curry coco':{'Oignons jaunes':2},
+  'Poêlée pommes de terre saucisses':{'Saucisses':4,'Pommes de terre':8,'Oignons jaunes':2,'Poivrons':2},
+  'Poêlée poulet courgettes':{'Poulet':4,'Courgettes':3,'Oignons jaunes':1,'Tomates':3},
+  'Croque poulet fromage':{'Pain de mie':8,'Blanc de poulet':4,'Emmental':4,'Tomates':2},
+
+  'Boulettes riz':{'Carottes':2},
+  'Coquillettes jambon':{'Jambon blanc':4},
+  'Couscous poulet légumes':{'Poulet':4,'Carottes':2,'Courgettes':1},
+  'Gratin de pommes de terre':{'Pommes de terre':4},
+  'Pâtes jambon':{'Jambon blanc':4},
+  'Purée carotte poulet':{'Poulet':4,'Carottes':4,'Pommes de terre':4},
+  'Risotto poulet':{'Poulet':4},
+  'Saumon brocoli':{'Saumon':4,'Brocoli':2,'Citron':1},
+  'Steak frites':{'Steaks hachés':4},
+  'Velouté de carottes':{'Carottes':4,'Pommes de terre':2}
 });
 
 let dialog=null;
@@ -558,7 +597,7 @@ function initDishServings(){
   productsGrid=document.getElementById('products');
   catalogView=document.getElementById('catalogView');
   if(!dialog||!list||!confirmButton||!searchInput||!productsGrid)return;
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v177'});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v180'});
   buildServingsControl();
   const listObserver=new MutationObserver(()=>applyQuantities());
   listObserver.observe(list,{childList:true});
