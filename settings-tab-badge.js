@@ -247,3 +247,72 @@ script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
 })();
+
+(() => {
+'use strict';
+
+function initMissingProductsDialogFrame(){
+  const dialog=document.getElementById('missingProductsDialog');
+  if(!dialog)return;
+
+  let floorHeight=0;
+  let pinnedTop=null;
+  let frame=0;
+
+  function clearFrame(){
+    if(frame){
+      cancelAnimationFrame(frame);
+      frame=0;
+    }
+    floorHeight=0;
+    pinnedTop=null;
+    dialog.style.removeProperty('top');
+    dialog.style.removeProperty('bottom');
+    dialog.style.removeProperty('margin');
+    dialog.style.removeProperty('min-height');
+  }
+
+  function pinFrame(){
+    frame=0;
+    if(!dialog.open)return;
+    const rect=dialog.getBoundingClientRect();
+    if(pinnedTop===null)pinnedTop=rect.top;
+    floorHeight=Math.max(floorHeight,rect.height);
+    dialog.style.top=Math.round(pinnedTop)+'px';
+    dialog.style.bottom='auto';
+    dialog.style.margin='0 auto';
+    dialog.style.minHeight=Math.ceil(floorHeight)+'px';
+  }
+
+  function scheduleFrame(){
+    if(frame)cancelAnimationFrame(frame);
+    frame=requestAnimationFrame(pinFrame);
+  }
+
+  new MutationObserver(()=>{
+    if(!dialog.open){
+      clearFrame();
+      return;
+    }
+    scheduleFrame();
+  }).observe(dialog,{
+    attributes:true,
+    attributeFilter:['open','hidden','class'],
+    childList:true,
+    subtree:true
+  });
+
+  dialog.addEventListener('close',clearFrame);
+  window.addEventListener('orientationchange',()=>{
+    if(!dialog.open)return;
+    clearFrame();
+    requestAnimationFrame(scheduleFrame);
+  },{passive:true});
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initMissingProductsDialogFrame,{once:true});
+}else{
+  initMissingProductsDialogFrame();
+}
+})();
