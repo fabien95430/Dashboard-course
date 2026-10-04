@@ -118,10 +118,11 @@ function syncDishServings(value){
   return true;
 }
 
-function watchDishServings(value){
-  if(syncDishServings(value))return;
+function watchDishServings(){
+  const sync=()=>syncDishServings(readPreferredServings());
+  if(sync())return;
   const observer=new MutationObserver(()=>{
-    if(syncDishServings(value))observer.disconnect();
+    if(sync())observer.disconnect();
   });
   observer.observe(document.body,{childList:true,subtree:true});
 }
@@ -145,7 +146,7 @@ function initPreferredServings(){
   const initial=readPreferredServings();
   persistPreferredServings(initial);
   select.value=String(initial);
-  watchDishServings(initial);
+  watchDishServings();
 
   const syncSelect=()=>{select.value=String(readPreferredServings())};
   dialog.addEventListener('close',syncSelect);
