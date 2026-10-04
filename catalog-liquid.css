@@ -1,25 +1,52 @@
-/* v172 — même effet liquide que la navigation basse, sans icônes */
-.catalog-view .page-header h1::after{content:"v172"!important}
+/* v173 — texte progressif et lentille centrée comme la navigation basse */
+.catalog-view .page-header h1::after{content:"v173"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
   --catalog-liquid-sy:1;
+  --catalog-lens-content-scale:1;
+  --catalog-lens-content-shift:0px;
 }
 .catalog-mode>svg,.catalog-mode-fork{display:none!important}
 .catalog-mode-lens{
+  top:50%!important;
+  height:40px!important;
   transform-origin:center!important;
-  transform:translate3d(var(--catalog-lens-x),0,0) scale(var(--catalog-liquid-sx),var(--catalog-liquid-sy))!important;
+  transform:translate3d(var(--catalog-lens-x),-50%,0) scale(var(--catalog-liquid-sx),var(--catalog-liquid-sy))!important;
   transition:none!important;
 }
 .catalog-mode{gap:0!important;touch-action:manipulation}
 .catalog-mode:active{transform:none!important}
-.catalog-mode.is-active{touch-action:none}
+.catalog-mode.is-active{touch-action:none;color:#0b6f3e!important}
 .catalog-mode>span{
   transition:transform .2s cubic-bezier(.3,1.4,.5,1),text-shadow .16s ease;
 }
 .catalog-mode.is-liquid-under>span{
   transform:scale(1.08);
   text-shadow:0 1px 7px rgba(8,115,61,.16);
+}
+.catalog-mode>.catalog-mode-lens-copy{
+  position:absolute;
+  z-index:2;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  color:#0b6f3e!important;
+  font:inherit;
+  font-style:normal;
+  -webkit-clip-path:inset(0 100% 0 0);
+  clip-path:inset(0 100% 0 0);
+}
+.catalog-mode>.catalog-mode-lens-copy>span{
+  position:absolute!important;
+  display:block!important;
+  margin:0!important;
+  color:inherit!important;
+  white-space:nowrap!important;
+  transform:translateX(var(--catalog-lens-content-shift,0px)) scale(var(--catalog-lens-content-scale,1))!important;
+  transform-origin:center;
+  text-shadow:none!important;
+  will-change:transform;
 }
 .catalog-mode-switch.is-liquid-moving .catalog-mode-lens{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.90),inset 0 -1px 0 rgba(255,255,255,.18),0 6px 16px rgba(42,49,45,.13)!important;
