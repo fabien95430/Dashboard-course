@@ -4,6 +4,8 @@
 const CATALOG=window.COURSES_CATALOG;
 if(!CATALOG)return;
 
+const DISH_PLACEHOLDER='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 900 650%22%3E%3Crect width=%22900%22 height=%22650%22 fill=%22%23eef2eb%22/%3E%3Cellipse cx=%22450%22 cy=%22342%22 rx=%22240%22 ry=%22118%22 fill=%22%23f9faf7%22 stroke=%22%23cfd8cf%22 stroke-width=%2214%22/%3E%3Cellipse cx=%22450%22 cy=%22335%22 rx=%22135%22 ry=%2262%22 fill=%22%23dfe8dd%22/%3E%3Cpath d=%22M292 168v122M273 168v62M292 168v62M311 168v62M608 168v122%22 stroke=%22%23829683%22 stroke-width=%2212%22 stroke-linecap=%22round%22/%3E%3C/svg%3E';
+
 const DISHES=Object.freeze([
   {name:'Spaghetti carbonara',photoId:'12116165',tags:['Pâtes','Rapides'],ingredients:['Spaghetti','Lardons','Œufs','Parmesan','Crème fraîche']},
   {name:'Spaghetti bolognaise',photoId:'15500451',tags:['Pâtes','Viandes'],ingredients:['Spaghetti','Viande hachée','Sauce tomate','Oignons jaunes']},
@@ -53,15 +55,54 @@ const DISHES=Object.freeze([
   {name:'Salade chèvre noix',photoId:'25524078',tags:['Végé','Rapides'],ingredients:['Salade verte','Chèvre','Noix','Tomates']},
   {name:'Pâtes pesto mozzarella',photoId:'18171195',tags:['Pâtes','Végé','Rapides'],ingredients:['Penne','Pesto','Mozzarella','Tomates']},
   {name:'Chili sin carne',photoId:'36040965',tags:['Végé'],ingredients:['Haricots rouges','Maïs en boîte','Tomates pelées','Poivrons','Oignons jaunes']},
-  {name:'Riz champignons parmesan',photoId:'31779539',tags:['Végé'],ingredients:['Riz long','Champignons','Parmesan','Crème fraîche']}
+  {name:'Riz champignons parmesan',photoId:'31779539',tags:['Végé'],ingredients:['Riz long','Champignons','Parmesan','Crème fraîche']},
+
+  {name:'Poulet parmesan tomate',photoId:null,tags:['Poulet'],ingredients:['Escalopes de poulet','Sauce tomate','Parmesan','Mozzarella','Basilic']},
+  {name:'Poulet miel moutarde',photoId:null,tags:['Poulet'],ingredients:['Poulet','Miel','Moutarde','Crème fraîche','Pommes de terre']},
+  {name:'Poulet teriyaki riz',photoId:null,tags:['Poulet'],ingredients:['Poulet','Riz basmati','Sauce soja','Miel','Gingembre']},
+  {name:'Poulet paprika crème',photoId:null,tags:['Poulet'],ingredients:['Poulet','Crème fraîche','Poivrons','Riz basmati']},
+  {name:'Poulet pommes de terre au four',photoId:null,tags:['Poulet'],ingredients:['Poulet','Pommes de terre','Oignons jaunes','Romarin frais']},
+  {name:'Riz poulet curry coco',photoId:null,tags:['Poulet'],ingredients:['Poulet','Riz basmati','Lait de coco','Curry','Oignons jaunes']},
+  {name:'Riz sauté poulet légumes',photoId:null,tags:['Poulet','Rapides'],ingredients:['Poulet','Riz long','Carottes','Poivrons','Œufs','Sauce soja']},
+  {name:'Riz crevettes légumes',photoId:null,tags:['Poissons','Rapides'],ingredients:['Crevettes','Riz long','Carottes','Poivrons','Petits pois','Sauce soja']},
+  {name:'Bœuf riz poivrons',photoId:null,tags:['Viandes'],ingredients:['Bœuf','Riz basmati','Poivrons','Oignons jaunes','Sauce soja']},
+  {name:'Bœuf sauce tomate pommes de terre',photoId:null,tags:['Viandes'],ingredients:['Bœuf','Pommes de terre','Sauce tomate','Oignons jaunes','Carottes']},
+  {name:'Hachis parmentier',photoId:null,tags:['Viandes'],ingredients:['Viande hachée','Pommes de terre','Oignons jaunes','Beurre','Fromage râpé']},
+  {name:'Boulettes sauce tomate',photoId:null,tags:['Viandes'],ingredients:['Viande hachée','Sauce tomate','Oignons jaunes','Parmesan']},
+  {name:'Gratin pommes de terre jambon',photoId:null,tags:['Viandes'],ingredients:['Pommes de terre','Jambon blanc','Crème fraîche','Fromage râpé']},
+  {name:'Gratin brocoli poulet',photoId:null,tags:['Poulet'],ingredients:['Poulet','Brocoli','Crème fraîche','Fromage râpé']},
+  {name:'Quiche lorraine',photoId:null,tags:['Viandes'],ingredients:['Farine','Beurre','Œufs','Crème fraîche','Lardons','Fromage râpé']},
+  {name:'Quiche poireaux chèvre',photoId:null,tags:['Végé'],ingredients:['Farine','Beurre','Œufs','Crème fraîche','Poireaux','Chèvre']},
+  {name:'Tarte tomate mozzarella',photoId:null,tags:['Végé'],ingredients:['Farine','Beurre','Tomates','Mozzarella','Basilic']},
+  {name:'Salade poulet avocat',photoId:null,tags:['Poulet','Rapides'],ingredients:['Poulet','Avocat','Salade verte','Tomates','Concombres']},
+  {name:'Salade César saumon',photoId:null,tags:['Poissons','Rapides'],ingredients:['Saumon','Salade verte','Parmesan','Croûtons','Œufs','Citron']},
+  {name:'Salade mozzarella avocat',photoId:null,tags:['Végé','Rapides'],ingredients:['Mozzarella','Avocat','Salade verte','Tomates','Concombres']},
+  {name:'Saumon pommes de terre',photoId:null,tags:['Poissons'],ingredients:['Saumon','Pommes de terre','Haricots verts','Citron']},
+  {name:'Saumon crème épinards',photoId:null,tags:['Poissons'],ingredients:['Saumon','Épinards','Crème fraîche','Citron','Riz basmati']},
+  {name:'Cabillaud riz légumes',photoId:null,tags:['Poissons'],ingredients:['Cabillaud','Riz basmati','Carottes','Courgettes','Poivrons','Citron']},
+  {name:'Crevettes curry coco',photoId:null,tags:['Poissons'],ingredients:['Crevettes','Lait de coco','Curry','Riz basmati','Oignons jaunes']},
+  {name:'Poêlée pommes de terre saucisses',photoId:null,tags:['Viandes'],ingredients:['Saucisses','Pommes de terre','Oignons jaunes','Poivrons']},
+  {name:'Poêlée poulet courgettes',photoId:null,tags:['Poulet','Rapides'],ingredients:['Poulet','Courgettes','Oignons jaunes','Tomates','Riz basmati']},
+  {name:'Croque poulet fromage',photoId:null,tags:['Poulet','Rapides'],ingredients:['Pain de mie','Blanc de poulet','Emmental','Tomates','Salade verte']},
+
+  {name:'Boulettes riz',photoId:null,tags:['Enfants'],ingredients:['Viande hachée','Riz long','Sauce tomate','Carottes']},
+  {name:'Coquillettes jambon',photoId:null,tags:['Enfants'],ingredients:['Coquillettes','Jambon blanc','Fromage râpé','Crème fraîche']},
+  {name:'Couscous poulet légumes',photoId:null,tags:['Enfants'],ingredients:['Couscous','Poulet','Carottes','Courgettes','Pois chiches']},
+  {name:'Gratin de pommes de terre',photoId:null,tags:['Enfants'],ingredients:['Pommes de terre','Crème fraîche','Fromage râpé']},
+  {name:'Pâtes jambon',photoId:null,tags:['Enfants'],ingredients:['Penne','Jambon blanc','Crème fraîche','Fromage râpé']},
+  {name:'Purée carotte poulet',photoId:null,tags:['Enfants'],ingredients:['Poulet','Carottes','Pommes de terre','Beurre']},
+  {name:'Risotto poulet',photoId:null,tags:['Enfants'],ingredients:['Riz long','Poulet','Bouillon cubes','Parmesan']},
+  {name:'Saumon brocoli',photoId:null,tags:['Enfants'],ingredients:['Saumon','Brocoli','Riz basmati','Citron']},
+  {name:'Steak frites',photoId:null,tags:['Enfants'],ingredients:['Steaks hachés','Frites surgelées']},
+  {name:'Velouté de carottes',photoId:null,tags:['Enfants'],ingredients:['Carottes','Pommes de terre','Crème fraîche']}
 ]);
 
-const FILTERS=['Tous','Pâtes','Viandes','Poulet','Poissons','Rapides','Végé','Favoris'];
+const FILTERS=['Tous','Pâtes','Viandes','Poulet','Poissons','Rapides','Végé','Enfants','Favoris'];
 const STORAGE_MODE='courses-catalog-mode-v1';
 const STORAGE_FAVORITES='courses-dish-favorites-v1';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const photoUrl=id=>'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=900&h=650&fit=crop';
+const photoUrl=id=>id?'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=900&h=650&fit=crop':DISH_PLACEHOLDER;
 
 let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';
 let filter='Tous';
@@ -471,7 +512,7 @@ async function addDish(dish,ingredients){
 }
 
 function init(){
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v175'});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v180'});
   buildUi();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
