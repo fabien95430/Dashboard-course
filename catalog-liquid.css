@@ -1,7 +1,7 @@
 @import url("./dish-detail.css?v=5");
 
 /* v179 — lentille plus basse et centrée uniformément */
-.catalog-view .page-header h1::after{content:"v189"!important}
+.catalog-view .page-header h1::after{content:"v190"!important}
 .catalog-mode-switch{
   --catalog-liquid-lift:0;
   --catalog-liquid-sx:1;
