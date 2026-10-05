@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v214';
+const APP_VERSION='v215';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -75,6 +75,14 @@ function installVisualWarmupStyle(){
   style.id='courses-startup-visual-warmup';
   style.textContent='html.courses-product-visuals-warming #listItems .list-icon{visibility:hidden!important}';
   document.head.appendChild(style);
+}
+function installMissingProductsFixes(){
+  if(document.querySelector('script[data-missing-products-fixes]'))return;
+  const script=document.createElement('script');
+  script.src='./missing-products-fixes.js?v=1';
+  script.defer=true;
+  script.dataset.missingProductsFixes='1';
+  document.head.appendChild(script);
 }
 async function warmVisual(src,priority='auto'){
   if(retainedVisuals.has(src))return true;
@@ -280,6 +288,7 @@ function bind(){
 
 syncPageVersions();
 installVisualWarmupStyle();
+installMissingProductsFixes();
 void warmProductVisuals();
 scheduleDishVisualWarmup();
 versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
