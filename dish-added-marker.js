@@ -96,7 +96,7 @@ function ensureStyle(){
       text-overflow:clip!important;
     }
     #dishDialog .dish-ingredient.is-partially-listed .dish-ingredient-name::after{
-      content:"Déjà ×" attr(data-list-quantity) " · +" attr(data-missing-quantity) " nécessaire";
+      content:attr(data-list-quantity) " déjà dans Ma liste · " attr(data-missing-quantity) " à ajouter";
       display:block;
       margin-top:3px;
       color:#b27014;
@@ -202,8 +202,14 @@ function syncDialogGuard(){
     const target=Math.max(1,Number(row.dataset.recipeQuantity)||1);
     const sufficient=current>=target;
     const partial=current>0&&current<target;
+    const missing=Math.max(0,target-current);
     row.dataset.listQuantity=String(current);
-    row.dataset.missingQuantity=String(Math.max(0,target-current));
+    row.dataset.missingQuantity=String(missing);
+    const nameLabel=row.querySelector('.dish-ingredient-name');
+    if(nameLabel){
+      nameLabel.dataset.listQuantity=String(current);
+      nameLabel.dataset.missingQuantity=String(missing);
+    }
     row.classList.toggle('is-already-listed',sufficient);
     row.classList.toggle('is-partially-listed',partial);
     row.disabled=sufficient;
