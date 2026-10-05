@@ -95,7 +95,7 @@ function ensureStyle(){
       text-overflow:clip!important;
     }
     #dishDialog .dish-ingredient.is-already-listed .dish-ingredient-name::after{
-      content:"Déjà suffisant";
+      content:"Déjà dans Ma liste";
       display:block;
       margin-top:3px;
       color:#168647;
@@ -243,7 +243,7 @@ function syncDialogGuard(){
   if(!button||!label||button.classList.contains('is-busy'))return;
   if(!available){
     button.disabled=true;
-    label.textContent='Tout est déjà suffisant';
+    label.textContent='Tout est déjà dans Ma liste';
     return;
   }
   button.disabled=selected===0;
