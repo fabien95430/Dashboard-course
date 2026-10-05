@@ -3,26 +3,38 @@
 
 const STORAGE_DISHES='courses-missing-dishes-v1';
 const DISH_CATEGORIES=Object.freeze(['','Pâtes','Viandes','Poulet','Poissons','Rapides','Enfants','Végé']);
+const DISH_STATUSES=Object.freeze(['draft','running','added','error']);
+const VAPID_ENTITY='input_text.courses_vapid_public_key';
+const HA_REQUEST_TIMEOUT_MS=12000;
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
+function sanitizeDish(item,index=0){
+  const name=String(item?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
+  if(!name)return null;
+  const category=DISH_CATEGORIES.includes(item?.category)?item.category:'';
+  const id=String(item?.id||('dish-'+index+'-'+normalize(name)));
+  let status=DISH_STATUSES.includes(item?.status)?item.status:'draft';
+  const requestId=String(item?.requestId||'').slice(0,80);
+  let error=String(item?.error||'').trim().slice(0,180);
+  const submittedAt=Number(item?.submittedAt)||0;
+  if(status==='running'&&submittedAt&&Date.now()-submittedAt>60*60*1000){
+    status='error';
+    error='Le traitement n’a pas confirmé sa fin. Réessaie l’intégration.';
+  }
+  return {id,name,category,status,requestId,error,submittedAt};
+}
 function readDishes(){
   try{
     const saved=JSON.parse(localStorage.getItem(STORAGE_DISHES)||'[]');
     if(!Array.isArray(saved))return [];
-    return saved.slice(-100).map((item,index)=>{
-      const name=String(item?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
-      if(!name)return null;
-      const category=DISH_CATEGORIES.includes(item?.category)?item.category:'';
-      const id=String(item?.id||('dish-'+index+'-'+normalize(name)));
-      return {id,name,category};
-    }).filter(Boolean);
+    return saved.slice(-100).map(sanitizeDish).filter(Boolean);
   }catch(_){
     return [];
   }
 }
 function saveDishes(items){
-  try{localStorage.setItem(STORAGE_DISHES,JSON.stringify(items.slice(-100)))}catch(_){}
+  try{localStorage.setItem(STORAGE_DISHES,JSON.stringify(items.slice(-100).map(sanitizeDish).filter(Boolean)))}catch(_){}
   syncCombinedCount();
 }
 function randomId(){
@@ -38,12 +50,216 @@ function productCount(){
     return Array.isArray(saved)?saved.length:0;
   }catch(_){return 0}
 }
+function pendingDishCount(){return readDishes().filter(item=>item.status!=='added').length}
 function syncCombinedCount(){
   const source=document.getElementById('settingsMissingProductsCount');
   if(!source)return;
-  const total=productCount()+readDishes().length;
+  const total=productCount()+pendingDishCount();
   if(source.textContent!==String(total))source.textContent=String(total);
   if(source.hidden!==(total===0))source.hidden=total===0;
+}
+
+let haSocket=null;
+let haSeq=900000000;
+const haPending=new Map();
+
+function rejectHaPending(message='Connexion Home Assistant interrompue'){
+  haPending.forEach(pending=>{
+    clearTimeout(pending.timer);
+    pending.reject(new Error(message));
+  });
+  haPending.clear();
+}
+function bindHaSocket(socket){
+  if(!socket||socket===haSocket)return;
+  haSocket=socket;
+  socket.addEventListener('message',event=>{
+    let message;
+    try{message=JSON.parse(event.data)}catch(_){return}
+    if(message.type!=='result'||!haPending.has(message.id))return;
+    const pending=haPending.get(message.id);
+    haPending.delete(message.id);
+    clearTimeout(pending.timer);
+    if(message.success)pending.resolve(message.result);
+    else pending.reject(new Error(message.error?.message||'Erreur Home Assistant'));
+  });
+  socket.addEventListener('close',()=>{
+    if(haSocket!==socket)return;
+    haSocket=null;
+    rejectHaPending();
+  });
+}
+function installHaBridge(){
+  if(!('WebSocket' in window)||window.__coursesDishIntegrationBridge)return;
+  window.__coursesDishIntegrationBridge=true;
+  const nativeSend=WebSocket.prototype.send;
+  WebSocket.prototype.send=function(data){
+    try{
+      const url=String(this.url||'');
+      if(url.includes('/api/websocket'))bindHaSocket(this);
+    }catch(_){}
+    return nativeSend.call(this,data);
+  };
+}
+async function waitForHaSocket(){
+  if(haSocket?.readyState===WebSocket.OPEN)return haSocket;
+  document.getElementById('refreshBtn')?.click();
+  const started=Date.now();
+  while(Date.now()-started<1200){
+    if(haSocket?.readyState===WebSocket.OPEN)return haSocket;
+    await new Promise(resolve=>setTimeout(resolve,60));
+  }
+  throw new Error('Déverrouille et connecte Home Assistant avant de lancer l’intégration.');
+}
+async function haRequest(payload){
+  const socket=await waitForHaSocket();
+  return new Promise((resolve,reject)=>{
+    const id=haSeq++;
+    const timer=setTimeout(()=>{
+      haPending.delete(id);
+      reject(new Error('Home Assistant ne répond pas.'));
+    },HA_REQUEST_TIMEOUT_MS);
+    haPending.set(id,{resolve,reject,timer});
+    try{socket.send(JSON.stringify({id,...payload}))}
+    catch(error){
+      clearTimeout(timer);
+      haPending.delete(id);
+      reject(error);
+    }
+  });
+}
+async function haCallService(domain,service,serviceData={}){
+  return haRequest({type:'call_service',domain,service,service_data:serviceData});
+}
+
+function base64UrlToBytes(value){
+  const padding='='.repeat((4-value.length%4)%4);
+  const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(base64);
+  return Uint8Array.from(raw,char=>char.charCodeAt(0));
+}
+async function readVapidPublicKey(){
+  try{
+    const states=await haRequest({type:'get_states'});
+    const entity=Array.isArray(states)?states.find(item=>item?.entity_id===VAPID_ENTITY):null;
+    const key=String(entity?.state||'').trim();
+    return key.length>=80?key:'';
+  }catch(_){
+    return '';
+  }
+}
+async function pushSubscriptionData(){
+  const empty={push_endpoint:'',push_p256dh:'',push_auth:'',push_public_key:''};
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))return empty;
+  let permission=Notification.permission;
+  if(permission==='default'){
+    try{permission=await Notification.requestPermission()}catch(_){return empty}
+  }
+  if(permission!=='granted')return empty;
+  const publicKey=await readVapidPublicKey();
+  if(!publicKey)return empty;
+  try{
+    const registration=await navigator.serviceWorker.ready;
+    let subscription=await registration.pushManager.getSubscription();
+    if(!subscription){
+      subscription=await registration.pushManager.subscribe({
+        userVisibleOnly:true,
+        applicationServerKey:base64UrlToBytes(publicKey)
+      });
+    }
+    const json=subscription.toJSON();
+    return {
+      push_endpoint:String(subscription.endpoint||''),
+      push_p256dh:String(json.keys?.p256dh||''),
+      push_auth:String(json.keys?.auth||''),
+      push_public_key:publicKey
+    };
+  }catch(_){
+    return empty;
+  }
+}
+
+function statusLabel(item){
+  if(item.status==='running')return 'En cours…';
+  if(item.status==='added')return 'Ajouté';
+  if(item.status==='error')return 'Erreur';
+  return 'En attente';
+}
+function updateDish(id,patch){
+  const dishes=readDishes();
+  const index=dishes.findIndex(item=>item.id===id);
+  if(index<0)return null;
+  dishes[index]=sanitizeDish({...dishes[index],...patch},index);
+  saveDishes(dishes);
+  return dishes[index];
+}
+function findDishByLaunch(name,requestId){
+  const dishes=readDishes();
+  const normalized=normalize(name);
+  return dishes.find(item=>requestId&&item.requestId===requestId)
+    ||dishes.find(item=>normalize(item.name)===normalized)
+    ||null;
+}
+function markRenderedDishesAdded(){
+  const cards=[...document.querySelectorAll('#dishes .dish-card[data-dish]')];
+  if(!cards.length)return false;
+  const rendered=new Set(cards.map(card=>normalize(card.dataset.dish)));
+  const dishes=readDishes();
+  let changed=false;
+  dishes.forEach(item=>{
+    if(item.status==='added'||!rendered.has(normalize(item.name)))return;
+    item.status='added';
+    item.error='';
+    changed=true;
+  });
+  if(changed)saveDishes(dishes);
+  return changed;
+}
+
+function revealDishInCatalog(name){
+  const run=()=>{
+    if(document.getElementById('app')?.classList.contains('is-locked'))return false;
+    document.querySelector('.tab[data-view="catalog"]')?.click();
+    const dishMode=document.querySelector('.catalog-mode[data-mode="dishes"]');
+    if(dishMode&&!dishMode.classList.contains('is-active'))dishMode.click();
+    const search=document.getElementById('productSearch');
+    if(search){
+      search.value=name;
+      search.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+    const match=[...document.querySelectorAll('#dishes .dish-card[data-dish]')].find(card=>normalize(card.dataset.dish)===normalize(name));
+    if(match){
+      match.scrollIntoView({block:'center',behavior:'smooth'});
+      return true;
+    }
+    return false;
+  };
+  if(run())return;
+  const observer=new MutationObserver(()=>{
+    if(!run())return;
+    observer.disconnect();
+  });
+  observer.observe(document.documentElement,{attributes:true,childList:true,subtree:true,attributeFilter:['class']});
+  setTimeout(()=>observer.disconnect(),8000);
+}
+function consumeNotificationLaunch(){
+  const url=new URL(location.href);
+  const name=String(url.searchParams.get('courses_dish')||'').trim();
+  const status=String(url.searchParams.get('courses_status')||'');
+  const requestId=String(url.searchParams.get('courses_request')||'');
+  if(!name||!['added','error'].includes(status))return;
+  const item=findDishByLaunch(name,requestId);
+  if(item){
+    updateDish(item.id,{
+      status,
+      error:status==='error'?'L’intégration automatique a échoué. Réessaie depuis cette liste.':''
+    });
+  }
+  url.searchParams.delete('courses_dish');
+  url.searchParams.delete('courses_status');
+  url.searchParams.delete('courses_request');
+  history.replaceState({},'',url.pathname+url.search+url.hash);
+  if(status==='added')revealDishInCatalog(name);
 }
 
 function initMissingProductsAndDishes(){
@@ -73,7 +289,7 @@ function initMissingProductsAndDishes(){
   const dialogTitle=dialog.querySelector('.missing-products-header h3');
   const dialogIntro=dialog.querySelector('.missing-products-header .dialog-intro');
   if(dialogTitle)dialogTitle.textContent='Produits & plats manquants';
-  if(dialogIntro)dialogIntro.textContent='Ajoutez ici les produits ou plats absents du catalogue. Cette liste reste sur cet appareil.';
+  if(dialogIntro)dialogIntro.textContent='Ajoutez ici les produits ou plats absents du catalogue. Les plats peuvent ensuite être intégrés automatiquement.';
 
   const style=document.createElement('style');
   style.id='missing-products-dishes-ui';
@@ -90,7 +306,19 @@ function initMissingProductsAndDishes(){
     #missingProductsDialog .missing-category-select{width:100%;height:46px;border:1px solid #e3e8e2;border-radius:14px;background:#fff;color:#27342d;padding:0 13px;font-size:13px;font-weight:720;outline:none}
     #missingProductsDialog .missing-category-select:focus{border-color:#cbd8cf;box-shadow:0 0 0 3px rgba(38,144,82,.08)}
     #missingProductsDialog .missing-dishes-list[hidden]{display:none!important}
-    #missingProductsDialog .missing-product-row.is-dish .missing-product-mark{font-size:17px;line-height:1}
+    #missingProductsDialog .missing-product-row.is-dish{gap:10px;align-items:center}
+    #missingProductsDialog .missing-product-row.is-dish .missing-product-mark{font-size:17px;line-height:1;flex:0 0 auto}
+    #missingProductsDialog .missing-product-row.is-dish .missing-product-copy{min-width:0;flex:1 1 auto}
+    #missingProductsDialog .missing-dish-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto}
+    #missingProductsDialog .missing-dish-status{display:inline-flex;align-items:center;min-height:28px;padding:0 9px;border-radius:999px;background:#eef2ef;color:#6f7a73;font-size:10px;font-weight:800;white-space:nowrap}
+    #missingProductsDialog .missing-dish-status.is-running{background:#edf3ff;color:#41669b}
+    #missingProductsDialog .missing-dish-status.is-added{background:#e8f5ed;color:#117442}
+    #missingProductsDialog .missing-dish-status.is-error{background:#fff0ef;color:#b33d35}
+    #missingProductsDialog .missing-dish-integrate{border:0;border-radius:999px;min-height:30px;padding:0 11px;background:#e5f2e9;color:#0b7040;font-size:10px;font-weight:850;white-space:nowrap}
+    #missingProductsDialog .missing-dish-integrate:disabled{opacity:.52}
+    #missingProductsDialog .missing-dish-error{display:block;margin-top:3px;color:#ad4941;font-size:10px;line-height:1.25;font-weight:600}
+    #missingProductsDialog .missing-product-remove:disabled{opacity:.3}
+    @media(max-width:430px){#missingProductsDialog .missing-product-row.is-dish{align-items:flex-start;flex-wrap:wrap}#missingProductsDialog .missing-dish-actions{width:100%;padding-left:27px;justify-content:flex-start}}
     @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-lens,#missingProductsDialog .missing-mode-button{transition:none!important}}
   `;
   document.head.appendChild(style);
@@ -118,13 +346,10 @@ function initMissingProductsAndDishes(){
   let dishCategory='';
   let swapTimer=0;
   let pointerStart=null;
+  const integrationBusy=new Set();
 
   function selectedProductCategory(){
     return categoryGrid.querySelector('.missing-category-choice.is-active')?.dataset?.missingCategory||'';
-  }
-  function productCategoryLabel(category){
-    const button=[...categoryGrid.querySelectorAll('[data-missing-category]')].find(item=>(item.dataset.missingCategory||'')===category);
-    return button?.textContent?.trim()||(category||'Aucune');
   }
   function categoryLabel(category){return category||'Aucune'}
   function renderCategorySelect(){
@@ -136,6 +361,7 @@ function initMissingProductsAndDishes(){
     categorySelect.value=selected;
   }
   function renderDishes(){
+    markRenderedDishesAdded();
     dishes=readDishes();
     if(!dishes.length){
       dishesList.innerHTML='<div class="missing-products-empty">Aucun plat noté pour le moment.</div>';
@@ -143,10 +369,19 @@ function initMissingProductsAndDishes(){
     }
     dishesList.innerHTML=dishes.map(item=>{
       const category=item.category?'<small>'+escapeHtml(item.category)+'</small>':'';
-      return '<div class="missing-product-row is-dish">'+
+      const error=item.error?'<small class="missing-dish-error">'+escapeHtml(item.error)+'</small>':'';
+      const busy=integrationBusy.has(item.id)||item.status==='running';
+      const statusClass=item.status==='running'?' is-running':item.status==='added'?' is-added':item.status==='error'?' is-error':'';
+      const action=item.status==='added'
+        ?'<span class="missing-dish-status is-added">Ajouté</span>'
+        :item.status==='running'
+          ?'<span class="missing-dish-status is-running">En cours…</span>'
+          :'<button class="missing-dish-integrate" type="button" data-integrate-missing-dish="'+escapeHtml(item.id)+'" '+(busy?'disabled':'')+'>'+(item.status==='error'?'Réessayer':'Intégrer')+'</button><span class="missing-dish-status'+statusClass+'">'+escapeHtml(statusLabel(item))+'</span>';
+      return '<div class="missing-product-row is-dish" data-missing-dish-row="'+escapeHtml(item.id)+'">'+
         '<span class="missing-product-mark" aria-hidden="true">•</span>'+
-        '<span class="missing-product-copy"><strong>'+escapeHtml(item.name)+'</strong>'+category+'</span>'+
-        '<button class="missing-product-remove" type="button" data-remove-missing-dish="'+escapeHtml(item.id)+'" aria-label="Supprimer '+escapeHtml(item.name)+'"><svg><use href="#i-trash"></use></svg></button>'+
+        '<span class="missing-product-copy"><strong>'+escapeHtml(item.name)+'</strong>'+category+error+'</span>'+
+        '<span class="missing-dish-actions">'+action+'</span>'+
+        '<button class="missing-product-remove" type="button" data-remove-missing-dish="'+escapeHtml(item.id)+'" aria-label="Supprimer '+escapeHtml(item.name)+'" '+(item.status==='running'?'disabled':'')+'><svg><use href="#i-trash"></use></svg></button>'+
       '</div>';
     }).join('');
   }
@@ -192,7 +427,7 @@ function initMissingProductsAndDishes(){
     }
     dishes=readDishes();
     if(dishes.some(item=>normalize(item.name)===normalize(name)))return;
-    dishes.push({id:randomId(),name,category:dishCategory});
+    dishes.push({id:randomId(),name,category:dishCategory,status:'draft',requestId:'',error:'',submittedAt:0});
     saveDishes(dishes);
     input.value='';
     dishCategory='';
@@ -201,12 +436,44 @@ function initMissingProductsAndDishes(){
   }
   function removeDish(id){
     dishes=readDishes();
-    const next=dishes.filter(item=>item.id!==id);
+    const item=dishes.find(entry=>entry.id===id);
+    if(item?.status==='running')return;
+    const next=dishes.filter(entry=>entry.id!==id);
     if(next.length===dishes.length)return;
     dishes=next;
     saveDishes(dishes);
     renderMode();
     navigator.vibrate?.(6);
+  }
+  async function integrateDish(id){
+    if(integrationBusy.has(id))return;
+    const item=readDishes().find(entry=>entry.id===id);
+    if(!item||item.status==='added'||item.status==='running')return;
+    integrationBusy.add(id);
+    renderDishes();
+    const requestId=randomId();
+    try{
+      const push=await pushSubscriptionData();
+      await haCallService('rest_command','courses_integrate_dish',{
+        dish_name:item.name,
+        dish_category:item.category,
+        request_id:requestId,
+        ...push
+      });
+      updateDish(id,{status:'running',requestId,error:'',submittedAt:Date.now()});
+      navigator.vibrate?.(10);
+    }catch(error){
+      updateDish(id,{
+        status:'error',
+        requestId:'',
+        error:String(error?.message||'Intégration impossible.').slice(0,180),
+        submittedAt:0
+      });
+      navigator.vibrate?.(6);
+    }finally{
+      integrationBusy.delete(id);
+      renderDishes();
+    }
   }
 
   modeSwitch.addEventListener('click',event=>{
@@ -251,8 +518,13 @@ function initMissingProductsAndDishes(){
     addDish();
   },true);
   dishesList.addEventListener('click',event=>{
-    const button=event.target.closest('[data-remove-missing-dish]');
-    if(button)removeDish(button.dataset.removeMissingDish||'');
+    const integrate=event.target.closest('[data-integrate-missing-dish]');
+    if(integrate){
+      void integrateDish(integrate.dataset.integrateMissingDish||'');
+      return;
+    }
+    const remove=event.target.closest('[data-remove-missing-dish]');
+    if(remove)removeDish(remove.dataset.removeMissingDish||'');
   });
 
   new MutationObserver(()=>{
@@ -261,6 +533,12 @@ function initMissingProductsAndDishes(){
       listCount.textContent=String(productCount());
     }
   }).observe(categoryGrid,{attributes:true,subtree:true,attributeFilter:['class','aria-pressed']});
+
+  const renderedDishObserver=new MutationObserver(()=>{
+    if(!markRenderedDishesAdded())return;
+    if(mode==='dishes')renderDishes();
+  });
+  renderedDishObserver.observe(document.documentElement,{childList:true,subtree:true});
 
   settingsButton.addEventListener('click',()=>{
     setMode('products',{animate:false,clearInput:false});
@@ -275,8 +553,10 @@ function initMissingProductsAndDishes(){
 
   renderMode();
   syncCombinedCount();
+  consumeNotificationLaunch();
 }
 
+installHaBridge();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initMissingProductsAndDishes,{once:true});
 else initMissingProductsAndDishes();
 })();

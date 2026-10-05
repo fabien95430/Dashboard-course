@@ -1,0 +1,125 @@
+name: Intégrer un plat
+
+on:
+  repository_dispatch:
+    types: [courses_dish_request]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: courses-dish-integration
+  cancel-in-progress: false
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    env:
+      DISH_NAME: ${{ github.event.client_payload.name }}
+      DISH_CATEGORY: ${{ github.event.client_payload.category }}
+      REQUEST_ID: ${{ github.event.client_payload.request_id }}
+      PUSH_ENDPOINT: ${{ github.event.client_payload.push_endpoint }}
+      PUSH_P256DH: ${{ github.event.client_payload.push_p256dh }}
+      PUSH_AUTH: ${{ github.event.client_payload.push_auth }}
+      PUSH_PUBLIC_KEY: ${{ github.event.client_payload.push_public_key }}
+      COURSES_BASE_URL: https://fabien95430.github.io/Dashboard-course/
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      COURSES_VAPID_PRIVATE_KEY: ${{ secrets.COURSES_VAPID_PRIVATE_KEY }}
+
+    steps:
+      - name: Récupérer main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Préparer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Préparer Node pour le Web Push
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Générer et intégrer le plat
+        id: integrate
+        continue-on-error: true
+        run: python3 scripts/integrate_dish.py
+
+      - name: Lire le résultat
+        id: result
+        if: always()
+        shell: python
+        run: |
+          import json, os
+          from pathlib import Path
+          data={}
+          path=Path('.courses-dish-result.json')
+          if path.exists():
+              try: data=json.loads(path.read_text(encoding='utf-8'))
+              except Exception: pass
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
+              for key in ('ok','already_exists','version','filename','name'):
+                  value=data.get(key,'')
+                  out.write(f"{key}={str(value).lower() if isinstance(value,bool) else value}\n")
+
+      - name: Vérifier que main n'a pas changé pendant la génération
+        id: race_check
+        if: steps.integrate.outcome == 'success' && steps.result.outputs.already_exists != 'true'
+        run: |
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+
+      - name: Commit atomique du plat
+        id: commit
+        if: steps.integrate.outcome == 'success' && steps.result.outputs.already_exists != 'true' && steps.race_check.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dishes-ui.js dish-local-images.js sw.js "www/Plats/${{ steps.result.outputs.filename }}"
+          git diff --cached --check
+          git commit -m "v${{ steps.result.outputs.version }}: ajoute le plat ${DISH_NAME}"
+          git push origin HEAD:main
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Confirmer le déploiement GitHub Pages
+        id: deploy
+        if: steps.integrate.outcome == 'success' && (steps.result.outputs.already_exists == 'true' || steps.commit.outcome == 'success')
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.result.outputs.version }}"
+          file="${{ steps.result.outputs.filename }}"
+          for attempt in $(seq 1 36); do
+            version_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}dish-local-images.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
+            if printf '%s' "$version_body" | grep -Fq "const APP_VERSION='v${version}'" \
+              && curl -fsSIL --max-time 12 "${COURSES_BASE_URL}www/Plats/${file}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
+              echo "Déploiement v${version} confirmé."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Le déploiement GitHub Pages n'a pas été confirmé." >&2
+          exit 1
+
+      - name: Installer l'émetteur Web Push
+        if: always()
+        run: npm install --no-save --no-package-lock web-push@3.6.7
+
+      - name: Notification Courses — succès
+        if: steps.integrate.outcome == 'success' && steps.deploy.outcome == 'success'
+        env:
+          PUSH_STATUS: added
+        run: node scripts/send_web_push.mjs
+
+      - name: Notification Courses — erreur
+        if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success')
+        env:
+          PUSH_STATUS: error
+        run: node scripts/send_web_push.mjs
+
+      - name: Signaler un échec d'intégration
+        if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success')
+        run: exit 1

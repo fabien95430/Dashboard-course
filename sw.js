@@ -1,4 +1,4 @@
-const CACHE='courses-app-v211-r1';
+const CACHE='courses-app-v212-r1';
 const VISUAL_CACHE='courses-visuals-v1';
 const PRODUCT_VISUALS=[
   './bring-photo-v5-frais.webp.png?v=15',
@@ -111,4 +111,37 @@ self.addEventListener('fetch',event=>{
     if(hit)return hit;
     return event.request.mode==='navigate'?caches.match('./index.html'):Response.error();
   })));
+});
+
+self.addEventListener('push',event=>{
+  let payload={};
+  try{payload=event.data?.json?.()||{}}catch(_){
+    try{payload={body:event.data?.text?.()||''}}catch(__){payload={}}
+  }
+  const title=String(payload.title||'Courses');
+  const body=String(payload.body||'Le catalogue a été mis à jour.');
+  const tag=String(payload.tag||'courses-catalog-update');
+  const url=String(payload.url||'./');
+  event.waitUntil(self.registration.showNotification(title,{
+    body,
+    tag,
+    icon:'./apple-touch-icon.png',
+    data:{url},
+    renotify:true
+  }));
+});
+
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const target=new URL(String(event.notification.data?.url||'./'),self.location.href).href;
+  event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(async clients=>{
+    for(const client of clients){
+      try{
+        if(new URL(client.url).origin!==self.location.origin)continue;
+        if('navigate' in client)await client.navigate(target);
+        if('focus' in client)return client.focus();
+      }catch(_){}
+    }
+    return self.clients.openWindow?self.clients.openWindow(target):undefined;
+  }));
 });
