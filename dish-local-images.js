@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v207';
+const APP_VERSION='v208';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -22,6 +22,23 @@ const CHILD_DISHES=new Set([
   'Velouté carottes'
 ]);
 const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eef1eb"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f7f2" stroke="#cbd2c8" stroke-width="12"/><text x="450" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="30" font-weight="700" fill="#708076">Photo indisponible</text></svg>');
+const PRODUCT_VISUALS=Object.freeze([
+  './bring-photo-v5-frais.webp.png?v=15',
+  './bring-photo-v5-fruits-legumes.webp.png?v=15',
+  './bring-photo-v5-epicerie.webp.png?v=15',
+  './bring-photo-v5-boissons.webp.png?v=15',
+  './bring-photo-v5-maison.webp.png?v=15'
+]);
+const PRIMARY_DISH_VISUALS=Object.freeze([
+  './www/Plats/spaghetti-carbonara.png',
+  './www/Plats/spaghetti-bolognaise.png',
+  './www/Plats/penne-poulet-creme.png',
+  './www/Plats/pates-tomate-mozzarella.png',
+  './www/Plats/lasagnes-bolognaise.png',
+  './www/Plats/tagliatelles-saumon.png'
+]);
+const retainedVisuals=new Map();
+let renderedDishWarmupQueued=false;
 const slugify=value=>String(value||'')
   .toLowerCase()
   .replace(/œ/g,'oe')
@@ -44,6 +61,61 @@ function syncPageVersions(){
     style.textContent='.catalog-view .page-header h1::after{content:none!important}.dish-card img[src^="https://images.pexels.com/"],.dish-sheet-photo[src^="https://images.pexels.com/"]{visibility:hidden!important}';
     document.head.appendChild(style);
   }
+}
+
+function installVisualWarmupStyle(){
+  if(document.getElementById('courses-startup-visual-warmup'))return;
+  const style=document.createElement('style');
+  style.id='courses-startup-visual-warmup';
+  style.textContent='html.courses-product-visuals-warming #listItems .list-icon{visibility:hidden!important}';
+  document.head.appendChild(style);
+}
+async function warmVisual(src,priority='auto'){
+  if(retainedVisuals.has(src))return true;
+  const image=new Image();
+  image.decoding='async';
+  try{image.fetchPriority=priority}catch(_){}
+  image.src=src;
+  try{
+    if(typeof image.decode==='function')await image.decode();
+    else await new Promise(resolve=>{
+      if(image.complete){resolve();return}
+      image.onload=resolve;
+      image.onerror=resolve;
+    });
+    retainedVisuals.set(src,image);
+    return true;
+  }catch(_){return false}
+}
+async function warmProductVisuals(){
+  document.documentElement.classList.add('courses-product-visuals-warming');
+  try{
+    const work=Promise.allSettled(PRODUCT_VISUALS.map(src=>warmVisual(src,'high')));
+    await Promise.race([work,new Promise(resolve=>setTimeout(resolve,3500))]);
+  }finally{
+    document.documentElement.classList.remove('courses-product-visuals-warming');
+  }
+}
+function scheduleDishVisualWarmup(){
+  const run=()=>{void Promise.allSettled(PRIMARY_DISH_VISUALS.map(src=>warmVisual(src,'low')))};
+  if('requestIdleCallback' in window)window.requestIdleCallback(run,{timeout:1800});
+  else setTimeout(run,500);
+}
+function warmRenderedDishCards(){
+  const images=[...document.querySelectorAll('#dishes .dish-card img')].slice(0,8);
+  images.forEach((image,index)=>{
+    image.loading='eager';
+    try{image.fetchPriority=index<4?'high':'auto'}catch(_){}
+    if(typeof image.decode==='function')void image.decode().catch(()=>{});
+  });
+}
+function queueRenderedDishWarmup(){
+  if(renderedDishWarmupQueued)return;
+  renderedDishWarmupQueued=true;
+  requestAnimationFrame(()=>{
+    renderedDishWarmupQueued=false;
+    warmRenderedDishCards();
+  });
 }
 
 function localDishImage(name){
@@ -116,6 +188,12 @@ const versionObserver=new MutationObserver(()=>{
     syncPageVersions();
   });
 });
+const dishWarmupObserver=new MutationObserver(mutations=>{
+  if(!mutations.some(mutation=>mutation.addedNodes.length))return;
+  if(!document.querySelector('#dishes .dish-card img'))return;
+  queueRenderedDishWarmup();
+  dishWarmupObserver.disconnect();
+});
 
 function bind(){
   syncPageVersions();
@@ -134,8 +212,16 @@ function bind(){
   if(gridObserver&&dialogObserver)bootstrapObserver.disconnect();
 }
 
+syncPageVersions();
+installVisualWarmupStyle();
+void warmProductVisuals();
+scheduleDishVisualWarmup();
 versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
 bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
+dishWarmupObserver.observe(document.documentElement,{childList:true,subtree:true});
+document.addEventListener('click',event=>{
+  if(event.target.closest?.('.catalog-mode[data-mode="dishes"],.tab[data-view="catalog"]'))setTimeout(queueRenderedDishWarmup,0);
+},true);
 window.addEventListener('online',retryLocalImages,{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
