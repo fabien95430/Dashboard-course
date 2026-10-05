@@ -52,25 +52,50 @@ function ensureStyle(){
       line-height:1!important;
       box-shadow:0 4px 10px rgba(19,118,62,.20)!important;
     }
+    #dishes .dish-card.is-partial{
+      border-color:#dfa242!important;
+      background:linear-gradient(180deg,#fffaf1 0%,#f8ecd8 100%)!important;
+      box-shadow:inset 0 0 0 1px rgba(190,126,24,.08),0 7px 22px rgba(150,105,35,.09)!important;
+    }
+    #dishes .dish-card.is-partial .dish-add{
+      background:#d99124!important;
+      color:#fff!important;
+      font-size:11px!important;
+      font-weight:850!important;
+      line-height:1!important;
+      box-shadow:0 4px 10px rgba(150,92,11,.18)!important;
+    }
   `;
   document.head.appendChild(style);
 }
-function markerActive(name){
+function markerState(name){
   const entry=entries[name];
-  if(!entry)return false;
-  if(trustedListNames===null||!entry.ingredients.length)return true;
-  return entry.ingredients.every(item=>trustedListNames.has(normalize(item)));
+  if(!entry)return {state:'none',present:0,total:0};
+  const total=entry.ingredients.length;
+  if(trustedListNames===null||!total)return {state:'complete',present:total,total};
+  const present=entry.ingredients.reduce((count,item)=>count+(trustedListNames.has(normalize(item))?1:0),0);
+  return {
+    state:present===total?'complete':(present>0?'partial':'none'),
+    present,
+    total
+  };
 }
 function syncCard(card){
   if(!card)return;
   const name=String(card.dataset.dish||'').trim();
   if(!name)return;
-  const active=markerActive(name);
-  card.classList.toggle('is-added',active);
+  const markerStateValue=markerState(name);
+  const complete=markerStateValue.state==='complete';
+  const partial=markerStateValue.state==='partial';
+  card.classList.toggle('is-added',complete);
+  card.classList.toggle('is-partial',partial);
   const marker=card.querySelector('.dish-add');
-  const markerText=active?'✓':'+';
+  const markerText=complete?'✓':(partial?markerStateValue.present+'/'+markerStateValue.total:'+');
   if(marker&&marker.textContent!==markerText)marker.textContent=markerText;
-  const label='Voir les ingrédients de '+name+(active?', ajouté à Ma liste':'');
+  const suffix=complete
+    ?', ajouté à Ma liste'
+    :(partial?', '+markerStateValue.present+' sur '+markerStateValue.total+' ingrédients dans Ma liste':'');
+  const label='Voir les ingrédients de '+name+suffix;
   if(card.getAttribute('aria-label')!==label)card.setAttribute('aria-label',label);
 }
 function syncCards(){
