@@ -68,8 +68,10 @@ function syncCard(card){
   const active=markerActive(name);
   card.classList.toggle('is-added',active);
   const marker=card.querySelector('.dish-add');
-  if(marker)marker.textContent=active?'✓':'+';
-  card.setAttribute('aria-label','Voir les ingrédients de '+name+(active?', ajouté à Ma liste':''));
+  const markerText=active?'✓':'+';
+  if(marker&&marker.textContent!==markerText)marker.textContent=markerText;
+  const label='Voir les ingrédients de '+name+(active?', ajouté à Ma liste':'');
+  if(card.getAttribute('aria-label')!==label)card.setAttribute('aria-label',label);
 }
 function syncCards(){
   document.querySelectorAll('#dishes .dish-card').forEach(syncCard);
