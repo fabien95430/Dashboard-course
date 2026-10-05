@@ -6,12 +6,13 @@ const STORAGE_RUNNING='courses-missing-dishes-running-v1';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const HA_REQUEST_TIMEOUT_MS=12000;
 const CHATGPT_WEB_URL='https://chatgpt.com/';
-const CHATGPT_APP_URL='com.openai.chat://';
+const CHATGPT_APP_URL='com.openai.chat://chatgpt.com/';
 
 let haSocket=null;
 let haSeq=950000000;
 const haPending=new Map();
 let pushDataPromise=null;
+let pushDataCache=null;
 
 function readJson(key,fallback){
   try{
@@ -141,6 +142,21 @@ function haRequest(payload){
 function haCallService(domain,service,serviceData={}){
   return haRequest({type:'call_service',domain,service,service_data:serviceData});
 }
+function sendHaServiceNow(domain,service,serviceData={}){
+  if(haSocket?.readyState!==WebSocket.OPEN)return false;
+  try{
+    haSocket.send(JSON.stringify({
+      id:haSeq++,
+      type:'call_service',
+      domain,
+      service,
+      service_data:serviceData
+    }));
+    return true;
+  }catch(_){
+    return false;
+  }
+}
 function base64UrlToBytes(value){
   const padding='='.repeat((4-value.length%4)%4);
   const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');
@@ -185,9 +201,11 @@ async function createPushSubscriptionData(){
   }
 }
 function pushSubscriptionData(){
+  if(pushDataCache?.push_endpoint)return Promise.resolve(pushDataCache);
   if(pushDataPromise)return pushDataPromise;
   pushDataPromise=createPushSubscriptionData().then(data=>{
-    if(!data.push_endpoint)pushDataPromise=null;
+    if(data.push_endpoint)pushDataCache=data;
+    else pushDataPromise=null;
     return data;
   },error=>{
     pushDataPromise=null;
@@ -195,23 +213,31 @@ function pushSubscriptionData(){
   });
   return pushDataPromise;
 }
-function primePushSubscription(){
-  if(!('Notification' in window)||Notification.permission!=='granted')return;
+function primePushSubscription(requestPermission=false){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='default'&&!requestPermission)return;
+  if(Notification.permission==='denied')return;
   void pushSubscriptionData();
 }
 async function registerDishNotificationWatch(id){
   const item=readDishes().find(entry=>String(entry?.id||'')===String(id||''));
   if(!item)return false;
   const requestId=randomId();
+  const serviceData={
+    dish_name:String(item.name||''),
+    dish_category:String(item.category||''),
+    request_id:requestId
+  };
+  if(pushDataCache?.push_endpoint&&pushDataCache.push_p256dh&&pushDataCache.push_auth&&pushDataCache.push_public_key){
+    if(sendHaServiceNow('rest_command','courses_integrate_dish',{...serviceData,...pushDataCache}))return true;
+  }
   try{
     const push=await pushSubscriptionData();
     if(!push.push_endpoint||!push.push_p256dh||!push.push_auth||!push.push_public_key){
       throw new Error('Notifications iOS indisponibles sur cet appareil.');
     }
     await haCallService('rest_command','courses_integrate_dish',{
-      dish_name:String(item.name||''),
-      dish_category:String(item.category||''),
-      request_id:requestId,
+      ...serviceData,
       ...push
     });
     return true;
@@ -273,19 +299,11 @@ function openNativeChatGpt(){
   },1400);
   return {opener:null};
 }
-function armChatGptOpenOverride(readyPromise=null){
+function armChatGptOpenOverride(){
   const nativeOpen=window.open;
   const patched=function(url,target,features){
     if(!String(url||'').startsWith(CHATGPT_WEB_URL))return nativeOpen.call(window,url,target,features);
-    const launch=()=>openNativeChatGpt();
-    if(readyPromise){
-      Promise.race([
-        Promise.resolve(readyPromise),
-        new Promise(resolve=>setTimeout(resolve,3500))
-      ]).finally(launch);
-      return {opener:null};
-    }
-    return launch();
+    return openNativeChatGpt();
   };
   window.open=patched;
   queueMicrotask(()=>{
@@ -309,7 +327,8 @@ function bindDialog(dialog){
       const id=integrate.dataset.integrateMissingDish||'';
       setRunning(id,true);
       queueMicrotask(()=>decorateRows(dialog));
-      armChatGptOpenOverride(registerDishNotificationWatch(id));
+      void registerDishNotificationWatch(id);
+      armChatGptOpenOverride();
       return;
     }
     armChatGptOpenOverride();
@@ -318,7 +337,7 @@ function bindDialog(dialog){
   const observer=new MutationObserver(()=>decorateRows(dialog));
   observer.observe(dialog,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
   dialog.addEventListener('close',()=>pruneRunning());
-  document.getElementById('settingsMissingProductsBtn')?.addEventListener('click',primePushSubscription);
+  document.getElementById('settingsMissingProductsBtn')?.addEventListener('click',()=>primePushSubscription(true));
   decorateRows(dialog);
   primePushSubscription();
   return true;
