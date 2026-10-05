@@ -85,7 +85,7 @@ const DISHES=Object.freeze([
   {name:'Risotto poulet',photoId:'',tags:['Enfants'],ingredients:['Riz long','Poulet','Parmesan','Crème fraîche']},
   {name:'Saumon brocoli',photoId:'',tags:['Enfants'],ingredients:['Saumon','Brocoli','Riz basmati']},
   {name:'Steak frites',photoId:'',tags:['Enfants'],ingredients:['Steaks hachés','Frites surgelées']},
-  {name:'Velouté carottes',photoId:'',tags:['Enfants'],ingredients:['Carottes','Pommes de terre','Crème fraîche','Oignons jaunes']}
+  {name:'Velouté carottes',photoId:'',tags:['Enfants'],ingredients:['Carottes','Pommes de terre','Crème fraîche','Oignons jaunes']},
   {name:'Crème brûlée',photoId:'',tags:['Végé','Enfants'],ingredients:['Crème liquide','Œufs','Sucre','Vanille']},
 ]);
 
