@@ -45,7 +45,7 @@ function ensureStyle(){
     #dishes .dish-card.is-added{
       border-color:#27a85f!important;
       background:linear-gradient(180deg,#edf6f1 0%,#dcebe3 100%)!important;
-      box-shadow:inset 0 0 0 1px rgba(34,151,82,.08),0 7px 22px rgba(40,119,73,.10)!important;
+      box-shadow:0 7px 22px rgba(57,75,62,.065)!important;
     }
     #dishes .dish-card.is-added .dish-add{
       background:#29a85f!important;
@@ -58,7 +58,7 @@ function ensureStyle(){
     #dishes .dish-card.is-partial{
       border-color:#dfa242!important;
       background:linear-gradient(180deg,#fffaf1 0%,#f8ecd8 100%)!important;
-      box-shadow:inset 0 0 0 1px rgba(190,126,24,.08),0 7px 22px rgba(150,105,35,.09)!important;
+      box-shadow:0 7px 22px rgba(57,75,62,.065)!important;
     }
     #dishes .dish-card.is-partial .dish-add{
       background:#d99124!important;
@@ -67,6 +67,17 @@ function ensureStyle(){
       font-weight:850!important;
       line-height:1!important;
       box-shadow:0 4px 10px rgba(150,92,11,.18)!important;
+    }
+    #dishes .dish-card.is-added:focus,
+    #dishes .dish-card.is-partial:focus{
+      outline:none!important;
+    }
+    @media(hover:hover) and (pointer:fine){
+      #dishes .dish-card.is-added:focus-visible,
+      #dishes .dish-card.is-partial:focus-visible{
+        outline:2px solid rgba(22,134,71,.28)!important;
+        outline-offset:1px!important;
+      }
     }
     #dishDialog .dish-ingredient.is-already-listed{
       border-color:rgba(22,134,71,.12)!important;
