@@ -10,9 +10,11 @@ let pendingTimer=0;
 let gridObserver=null;
 let listObserver=null;
 let toastObserver=null;
+let dialogObserver=null;
 let observedGrid=null;
 let observedList=null;
 let observedToast=null;
+let observedDialog=null;
 
 function readEntries(){
   try{
@@ -65,6 +67,43 @@ function ensureStyle(){
       line-height:1!important;
       box-shadow:0 4px 10px rgba(150,92,11,.18)!important;
     }
+    #dishDialog .dish-ingredient.is-already-listed{
+      border-color:rgba(22,134,71,.12)!important;
+      background:rgba(235,241,234,.86)!important;
+      color:#65736b!important;
+      opacity:.82!important;
+      cursor:default!important;
+    }
+    #dishDialog .dish-ingredient.is-already-listed .dish-ingredient-name{
+      color:#65736b!important;
+      white-space:normal!important;
+      overflow:visible!important;
+      text-overflow:clip!important;
+    }
+    #dishDialog .dish-ingredient.is-already-listed .dish-ingredient-name::after{
+      content:"Déjà dans Ma liste";
+      display:block;
+      margin-top:3px;
+      color:#168647;
+      font-size:10.5px;
+      line-height:1.05;
+      font-weight:760;
+    }
+    #dishDialog .dish-ingredient.is-already-listed .dish-ingredient-check{
+      border-color:rgba(22,134,71,.18)!important;
+      background:#e1ece3!important;
+      color:transparent!important;
+      font-size:0!important;
+      box-shadow:none!important;
+    }
+    #dishDialog .dish-ingredient.is-already-listed .dish-ingredient-check::before{content:none!important}
+    #dishDialog .dish-ingredient.is-already-listed .dish-ingredient-check::after{
+      content:"✓";
+      color:#168647;
+      font-size:14px;
+      line-height:1;
+      font-weight:900;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -107,13 +146,72 @@ function listIsUnfiltered(){
   const selected=document.querySelector('#listFilterMenu [data-list-category][aria-checked="true"]');
   return !selected||(selected.dataset.listCategory||'Toutes')==='Toutes';
 }
-function reconcileList(){
-  if(!listIsUnfiltered())return;
+function readListNames(){
+  if(!listIsUnfiltered())return null;
   const list=document.getElementById('listItems');
-  if(!list||list.querySelector('.empty .spinner'))return;
-  const rows=[...list.querySelectorAll('.list-row[data-name]')];
-  trustedListNames=new Set(rows.map(row=>normalize(row.dataset.name||'')).filter(Boolean));
+  if(!list||list.querySelector('.empty .spinner'))return null;
+  return new Set([...list.querySelectorAll('.list-row[data-name]')].map(row=>normalize(row.dataset.name||'')).filter(Boolean));
+}
+function syncDialogGuard(){
+  const dialog=document.getElementById('dishDialog');
+  if(!dialog?.open)return;
+  if(trustedListNames===null){
+    const names=readListNames();
+    if(names!==null)trustedListNames=names;
+  }
+  if(trustedListNames===null)return;
+  const rows=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')];
+  let available=0;
+  let selected=0;
+  rows.forEach(row=>{
+    const name=String(row.dataset.ingredient||'');
+    const listed=trustedListNames.has(normalize(name));
+    row.classList.toggle('is-already-listed',listed);
+    row.disabled=listed;
+    row.setAttribute('aria-disabled',listed?'true':'false');
+    if(listed){
+      row.setAttribute('aria-pressed','false');
+      return;
+    }
+    available+=1;
+    const active=row.classList.contains('is-selected');
+    row.setAttribute('aria-pressed',active?'true':'false');
+    if(active)selected+=1;
+  });
+  const count=dialog.querySelector('.dish-sheet-count');
+  if(count)count.textContent=selected+' ingrédient'+(selected>1?'s':'');
+  const button=dialog.querySelector('.dish-sheet-add');
+  const label=button?.querySelector('span');
+  if(!button||!label||button.classList.contains('is-busy'))return;
+  if(!available){
+    button.disabled=true;
+    label.textContent='Tout est déjà dans Ma liste';
+    return;
+  }
+  button.disabled=selected===0;
+  label.textContent=selected?'Ajouter à ma liste':'Sélectionnez un ingrédient';
+}
+function reconcileList(){
+  const names=readListNames();
+  if(names===null)return;
+  trustedListNames=names;
   syncCards();
+  syncDialogGuard();
+}
+function removeListedSelections(dialog){
+  const names=[...dialog.querySelectorAll('.dish-ingredient.is-already-listed.is-selected[data-ingredient]')]
+    .map(row=>String(row.dataset.ingredient||''))
+    .filter(Boolean);
+  if(!names.length)return false;
+  names.forEach(name=>{
+    const row=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')]
+      .find(item=>String(item.dataset.ingredient||'')===name);
+    if(!row?.classList.contains('is-selected'))return;
+    row.disabled=false;
+    row.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+  });
+  syncDialogGuard();
+  return true;
 }
 function clearPending(){
   pending=null;
@@ -124,7 +222,8 @@ function trackPendingFromButton(button){
   const dialog=button?.closest?.('#dishDialog');
   if(!dialog||button.disabled)return;
   const name=dialog.querySelector('.dish-sheet-head h2')?.textContent?.trim()||'';
-  const ingredients=[...dialog.querySelectorAll('.dish-ingredient.is-selected[data-ingredient]')]
+  const ingredients=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')]
+    .filter(row=>row.classList.contains('is-selected')||row.classList.contains('is-already-listed'))
     .map(row=>String(row.dataset.ingredient||'').trim())
     .filter(Boolean);
   if(!name||!ingredients.length)return;
@@ -173,11 +272,32 @@ function bindObservers(){
     toastObserver=new MutationObserver(consumeToast);
     toastObserver.observe(toast,{attributes:true,childList:true,characterData:true,subtree:true,attributeFilter:['class']});
   }
+  const dialog=document.getElementById('dishDialog');
+  if(dialog&&dialog!==observedDialog){
+    dialogObserver?.disconnect();
+    observedDialog=dialog;
+    dialogObserver=new MutationObserver(()=>requestAnimationFrame(syncDialogGuard));
+    dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open'],childList:true,subtree:true});
+    requestAnimationFrame(syncDialogGuard);
+  }
 }
 
 document.addEventListener('click',event=>{
   const addButton=event.target.closest?.('#dishDialog .dish-sheet-add');
-  if(addButton)trackPendingFromButton(addButton);
+  if(addButton){
+    const dialog=addButton.closest('#dishDialog');
+    syncDialogGuard();
+    if(dialog&&removeListedSelections(dialog)){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      requestAnimationFrame(()=>{
+        syncDialogGuard();
+        if(!addButton.disabled)addButton.click();
+      });
+      return;
+    }
+    trackPendingFromButton(addButton);
+  }
   if(event.target.closest?.('#listFilterMenu [data-list-category]'))requestAnimationFrame(()=>requestAnimationFrame(reconcileList));
 },true);
 document.addEventListener('input',event=>{
