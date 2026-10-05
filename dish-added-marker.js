@@ -43,6 +43,7 @@ function ensureStyle(){
   style.id='dish-added-marker-style';
   style.textContent=`
     #dishes .dish-card.is-added{
+      border-width:1.5px!important;
       border-color:#27a85f!important;
       background:linear-gradient(180deg,#edf6f1 0%,#dcebe3 100%)!important;
       box-shadow:0 7px 22px rgba(57,75,62,.065)!important;
@@ -56,6 +57,7 @@ function ensureStyle(){
       box-shadow:0 4px 10px rgba(19,118,62,.20)!important;
     }
     #dishes .dish-card.is-partial{
+      border-width:1.5px!important;
       border-color:#dfa242!important;
       background:linear-gradient(180deg,#fffaf1 0%,#f8ecd8 100%)!important;
       box-shadow:0 7px 22px rgba(57,75,62,.065)!important;
