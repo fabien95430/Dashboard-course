@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v209';
+const APP_VERSION='v210';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -126,21 +126,9 @@ function waitForDishWarmupSlot(){
 }
 async function warmDishSource(src){
   if(warmedDishVisuals.has(src))return true;
-  if(retainedVisuals.has(src)){
-    warmedDishVisuals.add(src);
-    return true;
-  }
-  try{
-    if('caches' in window&&await caches.match(src)){
-      warmedDishVisuals.add(src);
-      return true;
-    }
-    const response=await fetch(src,{cache:'force-cache'});
-    if(!response.ok)return false;
-    await response.blob();
-    warmedDishVisuals.add(src);
-    return true;
-  }catch(_){return false}
+  const warmed=await warmVisual(src,'low');
+  if(warmed)warmedDishVisuals.add(src);
+  return warmed;
 }
 async function warmCapturedDishVisuals(){
   if(dishVisualWarmupRunning||!appUnlocked())return;
