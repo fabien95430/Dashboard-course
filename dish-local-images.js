@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v220';
+const APP_VERSION='v221';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -76,12 +76,64 @@ function installVisualWarmupStyle(){
   style.textContent='html.courses-product-visuals-warming #listItems .list-icon{visibility:hidden!important}';
   document.head.appendChild(style);
 }
+const CHATGPT_WEB_URL='https://chatgpt.com/';
+const CHATGPT_IOS_URL='chatgpt://';
+
+function openExternalApp(url){
+  const link=document.createElement('a');
+  link.href=url;
+  link.setAttribute('aria-hidden','true');
+  link.tabIndex=-1;
+  link.style.position='fixed';
+  link.style.width='1px';
+  link.style.height='1px';
+  link.style.opacity='0';
+  link.style.pointerEvents='none';
+  document.body.appendChild(link);
+  link.click();
+  queueMicrotask(()=>link.remove());
+  return {opener:null};
+}
+function installExternalAppHandoff(){
+  const bind=()=>{
+    const dialog=document.getElementById('missingProductsDialog');
+    if(!dialog||dialog.dataset.externalAppHandoffBound==='1')return false;
+    dialog.dataset.externalAppHandoffBound='1';
+    const nativeOpen=window.open;
+    dialog.addEventListener('click',event=>{
+      if(!event.target.closest?.('[data-integrate-missing-dish],[data-integrate-missing-product]'))return;
+      const patched=function(url,target,features){
+        if(!String(url||'').startsWith(CHATGPT_WEB_URL))return nativeOpen.call(window,url,target,features);
+        return openExternalApp(CHATGPT_IOS_URL);
+      };
+      window.open=patched;
+      queueMicrotask(()=>{
+        if(window.open===patched)window.open=nativeOpen;
+      });
+    },true);
+    return true;
+  };
+  const start=()=>{
+    if(bind())return;
+    const observer=new MutationObserver(()=>{
+      if(bind())observer.disconnect();
+    });
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+    setTimeout(()=>observer.disconnect(),10000);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
+}
 function installMissingProductsFixes(){
-  if(document.querySelector('script[data-missing-products-fixes]'))return;
+  if(document.querySelector('script[data-missing-products-fixes]')){
+    installExternalAppHandoff();
+    return;
+  }
   const script=document.createElement('script');
   script.src='./missing-products-fixes.js?v=3';
   script.defer=true;
   script.dataset.missingProductsFixes='1';
+  script.addEventListener('load',installExternalAppHandoff,{once:true});
   document.head.appendChild(script);
 }
 async function warmVisual(src,priority='auto'){
