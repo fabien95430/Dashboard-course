@@ -2,10 +2,9 @@
 'use strict';
 
 const STORAGE_DISHES='courses-missing-dishes-v1';
+const STORAGE_PRODUCTS='courses-missing-products-v1';
 const DISH_CATEGORIES=Object.freeze(['','Pâtes','Viandes','Poulet','Poissons','Rapides','Enfants','Végé']);
-const DISH_STATUSES=Object.freeze(['draft','running','added','error']);
-const VAPID_ENTITY='input_text.courses_vapid_public_key';
-const HA_REQUEST_TIMEOUT_MS=12000;
+const CHATGPT_URL='https://chatgpt.com/';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
@@ -14,15 +13,7 @@ function sanitizeDish(item,index=0){
   if(!name)return null;
   const category=DISH_CATEGORIES.includes(item?.category)?item.category:'';
   const id=String(item?.id||('dish-'+index+'-'+normalize(name)));
-  let status=DISH_STATUSES.includes(item?.status)?item.status:'draft';
-  const requestId=String(item?.requestId||'').slice(0,80);
-  let error=String(item?.error||'').trim().slice(0,180);
-  const submittedAt=Number(item?.submittedAt)||0;
-  if(status==='running'&&submittedAt&&Date.now()-submittedAt>60*60*1000){
-    status='error';
-    error='Le traitement n’a pas confirmé sa fin. Réessaie l’intégration.';
-  }
-  return {id,name,category,status,requestId,error,submittedAt};
+  return {id,name,category};
 }
 function readDishes(){
   try{
@@ -37,6 +28,24 @@ function saveDishes(items){
   try{localStorage.setItem(STORAGE_DISHES,JSON.stringify(items.slice(-100).map(sanitizeDish).filter(Boolean)))}catch(_){}
   syncCombinedCount();
 }
+function sanitizeProduct(item,index=0){
+  const name=String(item?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
+  if(!name)return null;
+  return {
+    id:String(item?.id||('product-'+index+'-'+normalize(name))),
+    name,
+    category:String(item?.category||'').trim().slice(0,80)
+  };
+}
+function readProducts(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STORAGE_PRODUCTS)||'[]');
+    if(!Array.isArray(saved))return [];
+    return saved.slice(-100).map(sanitizeProduct).filter(Boolean);
+  }catch(_){
+    return [];
+  }
+}
 function randomId(){
   if(globalThis.crypto?.getRandomValues){
     const bytes=crypto.getRandomValues(new Uint8Array(8));
@@ -44,13 +53,8 @@ function randomId(){
   }
   return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 }
-function productCount(){
-  try{
-    const saved=JSON.parse(localStorage.getItem('courses-missing-products-v1')||'[]');
-    return Array.isArray(saved)?saved.length:0;
-  }catch(_){return 0}
-}
-function pendingDishCount(){return readDishes().filter(item=>item.status!=='added').length}
+function productCount(){return readProducts().length}
+function pendingDishCount(){return readDishes().length}
 function syncCombinedCount(){
   const source=document.getElementById('settingsMissingProductsCount');
   if(!source)return;
@@ -58,208 +62,116 @@ function syncCombinedCount(){
   if(source.textContent!==String(total))source.textContent=String(total);
   if(source.hidden!==(total===0))source.hidden=total===0;
 }
-
-let haSocket=null;
-let haSeq=900000000;
-const haPending=new Map();
-
-function rejectHaPending(message='Connexion Home Assistant interrompue'){
-  haPending.forEach(pending=>{
-    clearTimeout(pending.timer);
-    pending.reject(new Error(message));
-  });
-  haPending.clear();
+function appNotify(title,detail=''){
+  const toast=document.getElementById('toast');
+  if(!toast)return;
+  toast.textContent=detail?title+' — '+detail:title;
+  toast.classList.add('is-visible');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>toast.classList.remove('is-visible'),3000);
 }
-function bindHaSocket(socket){
-  if(!socket||socket===haSocket)return;
-  haSocket=socket;
-  socket.addEventListener('message',event=>{
-    let message;
-    try{message=JSON.parse(event.data)}catch(_){return}
-    if(message.type!=='result'||!haPending.has(message.id))return;
-    const pending=haPending.get(message.id);
-    haPending.delete(message.id);
-    clearTimeout(pending.timer);
-    if(message.success)pending.resolve(message.result);
-    else pending.reject(new Error(message.error?.message||'Erreur Home Assistant'));
-  });
-  socket.addEventListener('close',()=>{
-    if(haSocket!==socket)return;
-    haSocket=null;
-    rejectHaPending();
-  });
+function notifyRequest(name){
+  appNotify('Demande d’ajout en cours',name+' sera ajouté prochainement.');
 }
-function installHaBridge(){
-  if(!('WebSocket' in window)||window.__coursesDishIntegrationBridge)return;
-  window.__coursesDishIntegrationBridge=true;
-  const nativeSend=WebSocket.prototype.send;
-  WebSocket.prototype.send=function(data){
-    try{
-      const url=String(this.url||'');
-      if(url.includes('/api/websocket'))bindHaSocket(this);
-    }catch(_){}
-    return nativeSend.call(this,data);
-  };
+function notifyAdded(type,name){
+  const title=type==='dish'?'Plat ajouté':'Produit ajouté';
+  appNotify(title,name+' est maintenant disponible dans le catalogue.');
 }
-async function waitForHaSocket(){
-  if(haSocket?.readyState===WebSocket.OPEN)return haSocket;
-  document.getElementById('refreshBtn')?.click();
-  const started=Date.now();
-  while(Date.now()-started<1200){
-    if(haSocket?.readyState===WebSocket.OPEN)return haSocket;
-    await new Promise(resolve=>setTimeout(resolve,60));
+function fallbackCopy(text){
+  const area=document.createElement('textarea');
+  area.value=text;
+  area.setAttribute('readonly','');
+  area.style.position='fixed';
+  area.style.opacity='0';
+  area.style.pointerEvents='none';
+  document.body.appendChild(area);
+  area.focus({preventScroll:true});
+  area.select();
+  let copied=false;
+  try{copied=document.execCommand('copy')}catch(_){}
+  area.remove();
+  return copied;
+}
+function launchChatGpt(prompt){
+  fallbackCopy(prompt);
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(prompt).catch(()=>{});
   }
-  throw new Error('Déverrouille et connecte Home Assistant avant de lancer l’intégration.');
-}
-async function haRequest(payload){
-  const socket=await waitForHaSocket();
-  return new Promise((resolve,reject)=>{
-    const id=haSeq++;
-    const timer=setTimeout(()=>{
-      haPending.delete(id);
-      reject(new Error('Home Assistant ne répond pas.'));
-    },HA_REQUEST_TIMEOUT_MS);
-    haPending.set(id,{resolve,reject,timer});
-    try{socket.send(JSON.stringify({id,...payload}))}
-    catch(error){
-      clearTimeout(timer);
-      haPending.delete(id);
-      reject(error);
-    }
-  });
-}
-async function haCallService(domain,service,serviceData={}){
-  return haRequest({type:'call_service',domain,service,service_data:serviceData});
-}
-
-function base64UrlToBytes(value){
-  const padding='='.repeat((4-value.length%4)%4);
-  const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');
-  const raw=atob(base64);
-  return Uint8Array.from(raw,char=>char.charCodeAt(0));
-}
-async function readVapidPublicKey(){
-  try{
-    const states=await haRequest({type:'get_states'});
-    const entity=Array.isArray(states)?states.find(item=>item?.entity_id===VAPID_ENTITY):null;
-    const key=String(entity?.state||'').trim();
-    return key.length>=80?key:'';
-  }catch(_){
-    return '';
+  const opened=window.open(CHATGPT_URL,'_blank');
+  if(opened){
+    try{opened.opener=null}catch(_){}
+  }else{
+    location.href=CHATGPT_URL;
   }
 }
-async function pushSubscriptionData(){
-  const empty={push_endpoint:'',push_p256dh:'',push_auth:'',push_public_key:''};
-  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))return empty;
-  let permission=Notification.permission;
-  if(permission==='default'){
-    try{permission=await Notification.requestPermission()}catch(_){return empty}
-  }
-  if(permission!=='granted')return empty;
-  const publicKey=await readVapidPublicKey();
-  if(!publicKey)return empty;
-  try{
-    const registration=await navigator.serviceWorker.ready;
-    let subscription=await registration.pushManager.getSubscription();
-    if(!subscription){
-      subscription=await registration.pushManager.subscribe({
-        userVisibleOnly:true,
-        applicationServerKey:base64UrlToBytes(publicKey)
-      });
-    }
-    const json=subscription.toJSON();
-    return {
-      push_endpoint:String(subscription.endpoint||''),
-      push_p256dh:String(json.keys?.p256dh||''),
-      push_auth:String(json.keys?.auth||''),
-      push_public_key:publicKey
-    };
-  }catch(_){
-    return empty;
-  }
+function buildProductPrompt(item){
+  const category=item.category||'non précisée';
+  return [
+    'Tu travailles sur le projet Application Course.',
+    '',
+    'SOURCE DE VÉRITÉ : dépôt GitHub fabien95430/Dashboard-course, branche main.',
+    'Avant toute modification, lis le dépôt actuel et comprends l’implémentation existante. Ne te base pas sur une ancienne conversation.',
+    '',
+    'Demande : intégrer le produit « '+item.name+' » dans le catalogue.',
+    'Catégorie proposée par l’utilisateur : '+category+'.',
+    '',
+    'Exécute directement cette demande : le feu vert est donné.',
+    '',
+    'Contraintes obligatoires :',
+    '- Faire le changement minimum nécessaire, sans refondre ce qui fonctionne.',
+    '- catalog.js reste la source du catalogue.',
+    '- Conserver l’architecture HTML/CSS/JS statique, GitHub Pages et Home Assistant.',
+    '- Ne jamais réduire la sécurité : OAuth, WebSocket, coffre chiffré, verrouillage et biométrie restent intacts.',
+    '- Préserver mobile-first et les safe areas iOS.',
+    '- Ne pas ajouter de framework, backend ou dépendance externe.',
+    '- Pour le produit, choisir le sous-groupe cohérent dans catalog.js après lecture du catalogue actuel.',
+    '- Lire et respecter docs/ATLAS_PRODUITS.md, PRODUCT_SHEETS, POSITIONS et le renderer sprite actuel.',
+    '- Ajouter/mettre à jour le visuel du produit dans l’atlas concerné en conservant strictement l’ordre des cellules et le rendu existant. Ne pas dégrader les autres produits.',
+    '- Versionner le visuel/cache selon les conventions actuelles pour que l’image arrive réellement dans l’application.',
+    '- Vérifier les impacts sur Ma liste, Catalogue, Home Assistant, sécurité, mode test et mobile.',
+    '',
+    'À la fin, vérifie le résultat puis commit directement sur main avec un message conforme aux versions actuelles.'
+  ].join('\n');
 }
-
-function statusLabel(item){
-  if(item.status==='running')return 'En cours…';
-  if(item.status==='added')return 'Ajouté';
-  if(item.status==='error')return 'Erreur';
-  return 'En attente';
+function buildDishPrompt(item){
+  const category=item.category||'non précisée';
+  return [
+    'Tu travailles sur le projet Application Course.',
+    '',
+    'SOURCE DE VÉRITÉ : dépôt GitHub fabien95430/Dashboard-course, branche main.',
+    'Avant toute modification, lis le dépôt actuel et comprends l’implémentation existante. Ne te base pas sur une ancienne conversation.',
+    '',
+    'Demande : intégrer le plat « '+item.name+' » dans l’application.',
+    'Catégorie/tag proposé par l’utilisateur : '+category+'.',
+    '',
+    'Exécute directement cette demande : le feu vert est donné.',
+    '',
+    'Contraintes obligatoires :',
+    '- Faire le changement minimum nécessaire, sans refondre ce qui fonctionne.',
+    '- catalog.js reste la source des ingrédients : utiliser uniquement des noms de produits qui existent réellement dans catalog.js.',
+    '- Respecter la structure actuelle des plats dans dishes-ui.js et les conventions de dish-local-images.js.',
+    '- Choisir les tags adaptés parmi ceux déjà utilisés par l’application.',
+    '- Générer une seule image finale pour ce plat, jamais un atlas ni un collage.',
+    '- L’image doit être harmonisée avec les autres photos de plats : même cadrage, même ambiance, plat entier ou presque entier, pas de texte, logo, watermark, main ou personne.',
+    '- Stocker l’image locale dans www/Plats selon la convention actuelle et mettre à jour les versions/cache nécessaires pour qu’elle arrive réellement dans l’application.',
+    '- Conserver l’architecture HTML/CSS/JS statique, GitHub Pages et Home Assistant.',
+    '- Ne jamais réduire la sécurité : OAuth, WebSocket, coffre chiffré, verrouillage et biométrie restent intacts.',
+    '- Préserver mobile-first et les safe areas iOS.',
+    '- Ne pas ajouter de framework, backend ou dépendance externe.',
+    '- Vérifier les impacts sur Ma liste, Catalogue, Home Assistant, sécurité, mode test et mobile.',
+    '',
+    'À la fin, vérifie le résultat puis commit directement sur main avec un message conforme aux versions actuelles.'
+  ].join('\n');
 }
-function updateDish(id,patch){
-  const dishes=readDishes();
-  const index=dishes.findIndex(item=>item.id===id);
-  if(index<0)return null;
-  dishes[index]=sanitizeDish({...dishes[index],...patch},index);
-  saveDishes(dishes);
-  return dishes[index];
-}
-function findDishByLaunch(name,requestId){
-  const dishes=readDishes();
-  const normalized=normalize(name);
-  return dishes.find(item=>requestId&&item.requestId===requestId)
-    ||dishes.find(item=>normalize(item.name)===normalized)
-    ||null;
-}
-function markRenderedDishesAdded(){
-  const cards=[...document.querySelectorAll('#dishes .dish-card[data-dish]')];
-  if(!cards.length)return false;
-  const rendered=new Set(cards.map(card=>normalize(card.dataset.dish)));
-  const dishes=readDishes();
-  let changed=false;
-  dishes.forEach(item=>{
-    if(item.status==='added'||!rendered.has(normalize(item.name)))return;
-    item.status='added';
-    item.error='';
-    changed=true;
-  });
-  if(changed)saveDishes(dishes);
-  return changed;
-}
-
-function revealDishInCatalog(name){
-  const run=()=>{
-    if(document.getElementById('app')?.classList.contains('is-locked'))return false;
-    document.querySelector('.tab[data-view="catalog"]')?.click();
-    const dishMode=document.querySelector('.catalog-mode[data-mode="dishes"]');
-    if(dishMode&&!dishMode.classList.contains('is-active'))dishMode.click();
-    const search=document.getElementById('productSearch');
-    if(search){
-      search.value=name;
-      search.dispatchEvent(new Event('input',{bubbles:true}));
-    }
-    const match=[...document.querySelectorAll('#dishes .dish-card[data-dish]')].find(card=>normalize(card.dataset.dish)===normalize(name));
-    if(match){
-      match.scrollIntoView({block:'center',behavior:'smooth'});
-      return true;
-    }
-    return false;
-  };
-  if(run())return;
-  const observer=new MutationObserver(()=>{
-    if(!run())return;
-    observer.disconnect();
-  });
-  observer.observe(document.documentElement,{attributes:true,childList:true,subtree:true,attributeFilter:['class']});
-  setTimeout(()=>observer.disconnect(),8000);
-}
-function consumeNotificationLaunch(){
-  const url=new URL(location.href);
-  const name=String(url.searchParams.get('courses_dish')||'').trim();
-  const status=String(url.searchParams.get('courses_status')||'');
-  const requestId=String(url.searchParams.get('courses_request')||'');
-  if(!name||!['added','error'].includes(status))return;
-  const item=findDishByLaunch(name,requestId);
-  if(item){
-    updateDish(item.id,{
-      status,
-      error:status==='error'?'L’intégration automatique a échoué. Réessaie depuis cette liste.':''
+function catalogProductLookup(){
+  const lookup=new Map();
+  const groups=window.COURSES_CATALOG?.groups||{};
+  Object.entries(groups).forEach(([category,subgroups])=>{
+    Object.values(subgroups||{}).forEach(names=>{
+      (Array.isArray(names)?names:[]).forEach(name=>lookup.set(normalize(name),category));
     });
-  }
-  url.searchParams.delete('courses_dish');
-  url.searchParams.delete('courses_status');
-  url.searchParams.delete('courses_request');
-  history.replaceState({},'',url.pathname+url.search+url.hash);
-  if(status==='added')revealDishInCatalog(name);
+  });
+  return lookup;
 }
 
 function initMissingProductsAndDishes(){
@@ -289,7 +201,7 @@ function initMissingProductsAndDishes(){
   const dialogTitle=dialog.querySelector('.missing-products-header h3');
   const dialogIntro=dialog.querySelector('.missing-products-header .dialog-intro');
   if(dialogTitle)dialogTitle.textContent='Produits & plats manquants';
-  if(dialogIntro)dialogIntro.textContent='Ajoutez ici les produits ou plats absents du catalogue. Les plats peuvent ensuite être intégrés automatiquement.';
+  if(dialogIntro)dialogIntro.textContent='Ajoutez ici les produits ou plats absents du catalogue. Les demandes restent ici jusqu’à leur ajout.';
 
   const style=document.createElement('style');
   style.id='missing-products-dishes-ui';
@@ -306,19 +218,14 @@ function initMissingProductsAndDishes(){
     #missingProductsDialog .missing-category-select{width:100%;height:46px;border:1px solid #e3e8e2;border-radius:14px;background:#fff;color:#27342d;padding:0 13px;font-size:13px;font-weight:720;outline:none}
     #missingProductsDialog .missing-category-select:focus{border-color:#cbd8cf;box-shadow:0 0 0 3px rgba(38,144,82,.08)}
     #missingProductsDialog .missing-dishes-list[hidden]{display:none!important}
+    #missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:38px minmax(0,1fr) auto 42px!important;gap:8px!important}
     #missingProductsDialog .missing-product-row.is-dish{gap:10px;align-items:center}
     #missingProductsDialog .missing-product-row.is-dish .missing-product-mark{font-size:17px;line-height:1;flex:0 0 auto}
     #missingProductsDialog .missing-product-row.is-dish .missing-product-copy{min-width:0;flex:1 1 auto}
     #missingProductsDialog .missing-dish-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto}
-    #missingProductsDialog .missing-dish-status{display:inline-flex;align-items:center;min-height:28px;padding:0 9px;border-radius:999px;background:#eef2ef;color:#6f7a73;font-size:10px;font-weight:800;white-space:nowrap}
-    #missingProductsDialog .missing-dish-status.is-running{background:#edf3ff;color:#41669b}
-    #missingProductsDialog .missing-dish-status.is-added{background:#e8f5ed;color:#117442}
-    #missingProductsDialog .missing-dish-status.is-error{background:#fff0ef;color:#b33d35}
-    #missingProductsDialog .missing-dish-integrate{border:0;border-radius:999px;min-height:30px;padding:0 11px;background:#e5f2e9;color:#0b7040;font-size:10px;font-weight:850;white-space:nowrap}
-    #missingProductsDialog .missing-dish-integrate:disabled{opacity:.52}
-    #missingProductsDialog .missing-dish-error{display:block;margin-top:3px;color:#ad4941;font-size:10px;line-height:1.25;font-weight:600}
+    #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{border:0;border-radius:999px;min-height:40px;padding:0 14px;background:#e5f4e9;color:#0b7040;font-size:12px;font-weight:850;white-space:nowrap}
     #missingProductsDialog .missing-product-remove:disabled{opacity:.3}
-    @media(max-width:430px){#missingProductsDialog .missing-product-row.is-dish{align-items:flex-start;flex-wrap:wrap}#missingProductsDialog .missing-dish-actions{width:100%;padding-left:27px;justify-content:flex-start}}
+    @media(max-width:390px){#missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:32px minmax(0,1fr) auto 40px!important;gap:6px!important}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{padding:0 11px!important;font-size:11px!important}}
     @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-lens,#missingProductsDialog .missing-mode-button{transition:none!important}}
   `;
   document.head.appendChild(style);
@@ -346,7 +253,9 @@ function initMissingProductsAndDishes(){
   let dishCategory='';
   let swapTimer=0;
   let pointerStart=null;
-  const integrationBusy=new Set();
+  let productEnhanceQueued=false;
+  let knownProductIds=new Set(readProducts().map(item=>item.id));
+  const completedThisSession=new Set();
 
   function selectedProductCategory(){
     return categoryGrid.querySelector('.missing-category-choice.is-active')?.dataset?.missingCategory||'';
@@ -361,7 +270,6 @@ function initMissingProductsAndDishes(){
     categorySelect.value=selected;
   }
   function renderDishes(){
-    markRenderedDishesAdded();
     dishes=readDishes();
     if(!dishes.length){
       dishesList.innerHTML='<div class="missing-products-empty">Aucun plat noté pour le moment.</div>';
@@ -369,19 +277,11 @@ function initMissingProductsAndDishes(){
     }
     dishesList.innerHTML=dishes.map(item=>{
       const category=item.category?'<small>'+escapeHtml(item.category)+'</small>':'';
-      const error=item.error?'<small class="missing-dish-error">'+escapeHtml(item.error)+'</small>':'';
-      const busy=integrationBusy.has(item.id)||item.status==='running';
-      const statusClass=item.status==='running'?' is-running':item.status==='added'?' is-added':item.status==='error'?' is-error':'';
-      const action=item.status==='added'
-        ?'<span class="missing-dish-status is-added">Ajouté</span>'
-        :item.status==='running'
-          ?'<span class="missing-dish-status is-running">En cours…</span>'
-          :'<button class="missing-dish-integrate" type="button" data-integrate-missing-dish="'+escapeHtml(item.id)+'" '+(busy?'disabled':'')+'>'+(item.status==='error'?'Réessayer':'Intégrer')+'</button><span class="missing-dish-status'+statusClass+'">'+escapeHtml(statusLabel(item))+'</span>';
       return '<div class="missing-product-row is-dish" data-missing-dish-row="'+escapeHtml(item.id)+'">'+
         '<span class="missing-product-mark" aria-hidden="true">•</span>'+
-        '<span class="missing-product-copy"><strong>'+escapeHtml(item.name)+'</strong>'+category+error+'</span>'+
-        '<span class="missing-dish-actions">'+action+'</span>'+
-        '<button class="missing-product-remove" type="button" data-remove-missing-dish="'+escapeHtml(item.id)+'" aria-label="Supprimer '+escapeHtml(item.name)+'" '+(item.status==='running'?'disabled':'')+'><svg><use href="#i-trash"></use></svg></button>'+
+        '<span class="missing-product-copy"><strong>'+escapeHtml(item.name)+'</strong>'+category+'</span>'+
+        '<span class="missing-dish-actions"><button class="missing-dish-integrate" type="button" data-integrate-missing-dish="'+escapeHtml(item.id)+'">Intégrer</button></span>'+
+        '<button class="missing-product-remove" type="button" data-remove-missing-dish="'+escapeHtml(item.id)+'" aria-label="Supprimer '+escapeHtml(item.name)+'"><svg><use href="#i-trash"></use></svg></button>'+
       '</div>';
     }).join('');
   }
@@ -403,6 +303,7 @@ function initMissingProductsAndDishes(){
       listCount.textContent=String(dishes.length);
     }else{
       listCount.textContent=String(productCount());
+      queueEnhanceProducts();
     }
     renderCategorySelect();
   }
@@ -427,17 +328,17 @@ function initMissingProductsAndDishes(){
     }
     dishes=readDishes();
     if(dishes.some(item=>normalize(item.name)===normalize(name)))return;
-    dishes.push({id:randomId(),name,category:dishCategory,status:'draft',requestId:'',error:'',submittedAt:0});
+    const item={id:randomId(),name,category:dishCategory};
+    dishes.push(item);
     saveDishes(dishes);
     input.value='';
     dishCategory='';
     renderMode();
+    notifyRequest(name);
     navigator.vibrate?.(8);
   }
   function removeDish(id){
     dishes=readDishes();
-    const item=dishes.find(entry=>entry.id===id);
-    if(item?.status==='running')return;
     const next=dishes.filter(entry=>entry.id!==id);
     if(next.length===dishes.length)return;
     dishes=next;
@@ -445,35 +346,107 @@ function initMissingProductsAndDishes(){
     renderMode();
     navigator.vibrate?.(6);
   }
-  async function integrateDish(id){
-    if(integrationBusy.has(id))return;
+  function integrateDish(id){
     const item=readDishes().find(entry=>entry.id===id);
-    if(!item||item.status==='added'||item.status==='running')return;
-    integrationBusy.add(id);
-    renderDishes();
-    const requestId=randomId();
-    try{
-      const push=await pushSubscriptionData();
-      await haCallService('rest_command','courses_integrate_dish',{
-        dish_name:item.name,
-        dish_category:item.category,
-        request_id:requestId,
-        ...push
-      });
-      updateDish(id,{status:'running',requestId,error:'',submittedAt:Date.now()});
-      navigator.vibrate?.(10);
-    }catch(error){
-      updateDish(id,{
-        status:'error',
-        requestId:'',
-        error:String(error?.message||'Intégration impossible.').slice(0,180),
-        submittedAt:0
-      });
-      navigator.vibrate?.(6);
-    }finally{
-      integrationBusy.delete(id);
-      renderDishes();
+    if(!item)return;
+    launchChatGpt(buildDishPrompt(item));
+    navigator.vibrate?.(10);
+  }
+  function integrateProduct(id){
+    const item=readProducts().find(entry=>entry.id===id);
+    if(!item)return;
+    launchChatGpt(buildProductPrompt(item));
+    navigator.vibrate?.(10);
+  }
+  function enhanceProductRows(){
+    productEnhanceQueued=false;
+    const products=readProducts();
+    const rows=[...productList.querySelectorAll('.missing-product-row')];
+    rows.forEach((row,index)=>{
+      const item=products[index];
+      if(!item)return;
+      row.dataset.missingProductRow=item.id;
+      row.classList.add('has-integration-action');
+      let integrate=row.querySelector('[data-integrate-missing-product]');
+      if(!integrate){
+        integrate=document.createElement('button');
+        integrate.type='button';
+        integrate.className='missing-product-integrate';
+        integrate.textContent='Intégrer';
+        const remove=row.querySelector('[data-remove-missing]');
+        if(remove)row.insertBefore(integrate,remove);
+        else row.appendChild(integrate);
+      }
+      integrate.dataset.integrateMissingProduct=item.id;
+    });
+  }
+  function queueEnhanceProducts(){
+    if(productEnhanceQueued)return;
+    productEnhanceQueued=true;
+    requestAnimationFrame(()=>{
+      enhanceProductRows();
+      reconcileProducts();
+    });
+  }
+  function reconcileProducts(){
+    if(document.documentElement.classList.contains('courses-product-visuals-warming'))return;
+    const catalog=catalogProductLookup();
+    if(!catalog.size)return;
+    const products=readProducts();
+    products.forEach(item=>{
+      if(!catalog.has(normalize(item.name))||completedThisSession.has('product:'+item.id))return;
+      const row=[...productList.querySelectorAll('[data-missing-product-row]')].find(entry=>entry.dataset.missingProductRow===item.id);
+      const remove=row?.querySelector('[data-remove-missing]');
+      if(!remove)return;
+      completedThisSession.add('product:'+item.id);
+      notifyAdded('product',item.name);
+      remove.click();
+    });
+    syncCombinedCount();
+  }
+  function dishImageReady(item){
+    const card=[...document.querySelectorAll('#dishes .dish-card[data-dish]')].find(entry=>normalize(entry.dataset.dish)===normalize(item.name));
+    if(!card)return false;
+    const image=card.querySelector('img');
+    if(!image)return false;
+    const src=String(image.getAttribute('src')||'');
+    const localPhoto=src.includes('/www/Plats/')||src.includes('www/Plats/');
+    if(!localPhoto)return false;
+    if(image.complete&&image.naturalWidth>0)return true;
+    if(!image.dataset.missingDishLoadWatch){
+      image.dataset.missingDishLoadWatch='1';
+      image.addEventListener('load',()=>reconcileDishes(),{once:true});
     }
+    return false;
+  }
+  function reconcileDishes(){
+    const current=readDishes();
+    const completed=current.filter(item=>dishImageReady(item));
+    if(!completed.length)return false;
+    const completedIds=new Set(completed.map(item=>item.id));
+    saveDishes(current.filter(item=>!completedIds.has(item.id)));
+    completed.forEach(item=>{
+      if(completedThisSession.has('dish:'+item.id))return;
+      completedThisSession.add('dish:'+item.id);
+      notifyAdded('dish',item.name);
+    });
+    if(mode==='dishes'){
+      dishes=readDishes();
+      renderDishes();
+      listCount.textContent=String(dishes.length);
+    }
+    return true;
+  }
+  function syncNewProductRequests(){
+    const products=readProducts();
+    const nextIds=new Set(products.map(item=>item.id));
+    products.forEach(item=>{
+      if(!knownProductIds.has(item.id))notifyRequest(item.name);
+    });
+    knownProductIds=nextIds;
+    if(mode==='products')listCount.textContent=String(products.length);
+    syncCombinedCount();
+    queueEnhanceProducts();
   }
 
   modeSwitch.addEventListener('click',event=>{
@@ -517,10 +490,18 @@ function initMissingProductsAndDishes(){
     event.stopImmediatePropagation();
     addDish();
   },true);
+
+  productList.addEventListener('click',event=>{
+    const integrate=event.target.closest('[data-integrate-missing-product]');
+    if(!integrate)return;
+    event.preventDefault();
+    event.stopPropagation();
+    integrateProduct(integrate.dataset.integrateMissingProduct||'');
+  });
   dishesList.addEventListener('click',event=>{
     const integrate=event.target.closest('[data-integrate-missing-dish]');
     if(integrate){
-      void integrateDish(integrate.dataset.integrateMissingDish||'');
+      integrateDish(integrate.dataset.integrateMissingDish||'');
       return;
     }
     const remove=event.target.closest('[data-remove-missing-dish]');
@@ -528,23 +509,26 @@ function initMissingProductsAndDishes(){
   });
 
   new MutationObserver(()=>{
-    if(mode==='products'){
-      renderCategorySelect();
-      listCount.textContent=String(productCount());
-    }
+    if(mode==='products')renderCategorySelect();
   }).observe(categoryGrid,{attributes:true,subtree:true,attributeFilter:['class','aria-pressed']});
 
-  const renderedDishObserver=new MutationObserver(()=>{
-    if(!markRenderedDishesAdded())return;
-    if(mode==='dishes')renderDishes();
+  const productObserver=new MutationObserver(syncNewProductRequests);
+  productObserver.observe(productList,{childList:true,subtree:true});
+
+  const renderedDishObserver=new MutationObserver(()=>{reconcileDishes()});
+  renderedDishObserver.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});
+
+  const visualWarmupObserver=new MutationObserver(()=>{
+    if(!document.documentElement.classList.contains('courses-product-visuals-warming'))queueEnhanceProducts();
   });
-  renderedDishObserver.observe(document.documentElement,{childList:true,subtree:true});
+  visualWarmupObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
   settingsButton.addEventListener('click',()=>{
     setMode('products',{animate:false,clearInput:false});
     requestAnimationFrame(()=>{
       renderCategorySelect();
-      listCount.textContent=String(productCount());
+      syncNewProductRequests();
+      reconcileDishes();
     });
   });
   dialog.addEventListener('close',()=>{
@@ -553,10 +537,10 @@ function initMissingProductsAndDishes(){
 
   renderMode();
   syncCombinedCount();
-  consumeNotificationLaunch();
+  queueEnhanceProducts();
+  reconcileDishes();
 }
 
-installHaBridge();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initMissingProductsAndDishes,{once:true});
 else initMissingProductsAndDishes();
 })();
