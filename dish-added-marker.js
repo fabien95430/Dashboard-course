@@ -85,9 +85,8 @@ function listIsUnfiltered(){
 function reconcileList(){
   if(!listIsUnfiltered())return;
   const list=document.getElementById('listItems');
-  if(!list)return;
+  if(!list||list.querySelector('.empty .spinner'))return;
   const rows=[...list.querySelectorAll('.list-row[data-name]')];
-  if(!rows.length&&trustedListNames===null)return;
   trustedListNames=new Set(rows.map(row=>normalize(row.dataset.name||'')).filter(Boolean));
   syncCards();
 }
