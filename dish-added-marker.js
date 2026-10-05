@@ -5,6 +5,7 @@ const STORAGE='courses-added-dishes-v1';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 let entries=readEntries();
 let trustedListNames=null;
+let trustedListQuantities=null;
 let pending=null;
 let pendingTimer=0;
 let gridObserver=null;
@@ -81,10 +82,24 @@ function ensureStyle(){
       text-overflow:clip!important;
     }
     #dishDialog .dish-ingredient.is-already-listed .dish-ingredient-name::after{
-      content:"Déjà dans Ma liste";
+      content:"Déjà suffisant";
       display:block;
       margin-top:3px;
       color:#168647;
+      font-size:10.5px;
+      line-height:1.05;
+      font-weight:760;
+    }
+    #dishDialog .dish-ingredient.is-partially-listed .dish-ingredient-name{
+      white-space:normal!important;
+      overflow:visible!important;
+      text-overflow:clip!important;
+    }
+    #dishDialog .dish-ingredient.is-partially-listed .dish-ingredient-name::after{
+      content:"Déjà ×" attr(data-list-quantity) " · +" attr(data-missing-quantity) " nécessaire";
+      display:block;
+      margin-top:3px;
+      color:#b27014;
       font-size:10.5px;
       line-height:1.05;
       font-weight:760;
@@ -146,30 +161,54 @@ function listIsUnfiltered(){
   const selected=document.querySelector('#listFilterMenu [data-list-category][aria-checked="true"]');
   return !selected||(selected.dataset.listCategory||'Toutes')==='Toutes';
 }
-function readListNames(){
+function rowListQuantity(row){
+  const text=String(row?.querySelector?.('.list-qty')?.textContent||'');
+  const match=text.match(/(\d+)/);
+  return match?Math.max(1,Number(match[1])||1):1;
+}
+function readListState(){
   if(!listIsUnfiltered())return null;
   const list=document.getElementById('listItems');
   if(!list||list.querySelector('.empty .spinner'))return null;
-  return new Set([...list.querySelectorAll('.list-row[data-name]')].map(row=>normalize(row.dataset.name||'')).filter(Boolean));
+  const names=new Set();
+  const quantities=new Map();
+  [...list.querySelectorAll('.list-row[data-name]')].forEach(row=>{
+    const key=normalize(row.dataset.name||'');
+    if(!key)return;
+    const quantity=rowListQuantity(row);
+    names.add(key);
+    quantities.set(key,(quantities.get(key)||0)+quantity);
+  });
+  return {names,quantities};
+}
+function ensureTrustedListState(){
+  if(trustedListNames!==null&&trustedListQuantities!==null)return true;
+  const state=readListState();
+  if(state===null)return false;
+  trustedListNames=state.names;
+  trustedListQuantities=state.quantities;
+  return true;
 }
 function syncDialogGuard(){
   const dialog=document.getElementById('dishDialog');
-  if(!dialog?.open)return;
-  if(trustedListNames===null){
-    const names=readListNames();
-    if(names!==null)trustedListNames=names;
-  }
-  if(trustedListNames===null)return;
+  if(!dialog?.open||!ensureTrustedListState())return;
   const rows=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')];
   let available=0;
   let selected=0;
   rows.forEach(row=>{
     const name=String(row.dataset.ingredient||'');
-    const listed=trustedListNames.has(normalize(name));
-    row.classList.toggle('is-already-listed',listed);
-    row.disabled=listed;
-    row.setAttribute('aria-disabled',listed?'true':'false');
-    if(listed){
+    const key=normalize(name);
+    const current=Math.max(0,Number(trustedListQuantities.get(key))||0);
+    const target=Math.max(1,Number(row.dataset.recipeQuantity)||1);
+    const sufficient=current>=target;
+    const partial=current>0&&current<target;
+    row.dataset.listQuantity=String(current);
+    row.dataset.missingQuantity=String(Math.max(0,target-current));
+    row.classList.toggle('is-already-listed',sufficient);
+    row.classList.toggle('is-partially-listed',partial);
+    row.disabled=sufficient;
+    row.setAttribute('aria-disabled',sufficient?'true':'false');
+    if(sufficient){
       row.setAttribute('aria-pressed','false');
       return;
     }
@@ -185,16 +224,17 @@ function syncDialogGuard(){
   if(!button||!label||button.classList.contains('is-busy'))return;
   if(!available){
     button.disabled=true;
-    label.textContent='Tout est déjà dans Ma liste';
+    label.textContent='Tout est déjà suffisant';
     return;
   }
   button.disabled=selected===0;
   label.textContent=selected?'Ajouter à ma liste':'Sélectionnez un ingrédient';
 }
 function reconcileList(){
-  const names=readListNames();
-  if(names===null)return;
-  trustedListNames=names;
+  const state=readListState();
+  if(state===null)return;
+  trustedListNames=state.names;
+  trustedListQuantities=state.quantities;
   syncCards();
   syncDialogGuard();
 }
@@ -239,11 +279,12 @@ function consumeToast(){
     clearPending();
     return;
   }
-  const success=message==='Les ingrédients sélectionnés sont déjà dans Ma liste'||message.startsWith(pending.name+' · ');
+  const success=message==='Les ingrédients sélectionnés sont déjà dans Ma liste'||message==='Les quantités nécessaires sont déjà dans Ma liste'||message.startsWith(pending.name+' · ');
   if(!success)return;
   entries[pending.name]={ingredients:[...new Set(pending.ingredients)],at:Date.now()};
   saveEntries();
   trustedListNames=null;
+  trustedListQuantities=null;
   syncCards();
   clearPending();
 }
@@ -277,7 +318,7 @@ function bindObservers(){
     dialogObserver?.disconnect();
     observedDialog=dialog;
     dialogObserver=new MutationObserver(()=>requestAnimationFrame(syncDialogGuard));
-    dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open'],childList:true,subtree:true});
+    dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open','data-recipe-quantity'],childList:true,subtree:true});
     requestAnimationFrame(syncDialogGuard);
   }
 }
