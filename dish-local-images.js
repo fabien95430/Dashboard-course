@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v202';
+const APP_VERSION='v203';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -176,8 +176,26 @@ function retryLocalImages(){
   localizeCards(grid);
   localizeDialog(dialog);
 }
+let listSwipeObserver=null;
 function loadListSwipe(){
-  if(document.querySelector('script[data-list-swipe]'))return;
+  if(document.querySelector('script[data-list-swipe]')){
+    listSwipeObserver?.disconnect();
+    listSwipeObserver=null;
+    return;
+  }
+  const app=document.getElementById('app');
+  if(!app||app.classList.contains('is-locked')){
+    if(app&&!listSwipeObserver){
+      listSwipeObserver=new MutationObserver(()=>{
+        if(app.classList.contains('is-locked'))return;
+        listSwipeObserver.disconnect();
+        listSwipeObserver=null;
+        loadListSwipe();
+      });
+      listSwipeObserver.observe(app,{attributes:true,attributeFilter:['class']});
+    }
+    return;
+  }
   const script=document.createElement('script');
   script.src='./list-swipe.js?v=1';
   script.async=false;
