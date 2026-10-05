@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v208';
+const APP_VERSION='v209';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -37,8 +37,13 @@ const PRIMARY_DISH_VISUALS=Object.freeze([
   './www/Plats/lasagnes-bolognaise.png',
   './www/Plats/tagliatelles-saumon.png'
 ]);
+const DISH_WARMUP_BATCH_SIZE=2;
 const retainedVisuals=new Map();
+const capturedDishVisuals=new Set(PRIMARY_DISH_VISUALS);
+const warmedDishVisuals=new Set();
 let renderedDishWarmupQueued=false;
+let dishVisualWarmupRunning=false;
+let dishUnlockObserver=null;
 const slugify=value=>String(value||'')
   .toLowerCase()
   .replace(/œ/g,'oe')
@@ -101,15 +106,87 @@ function scheduleDishVisualWarmup(){
   if('requestIdleCallback' in window)window.requestIdleCallback(run,{timeout:1800});
   else setTimeout(run,500);
 }
+function captureRenderedDishVisuals(){
+  const images=[...document.querySelectorAll('#dishes .dish-card img')];
+  images.forEach(image=>{
+    const src=image.getAttribute('src')||'';
+    if(src&&!src.startsWith('data:'))capturedDishVisuals.add(src);
+  });
+  return images;
+}
+function appUnlocked(){
+  const app=document.getElementById('app');
+  return Boolean(app&&!app.classList.contains('is-locked'));
+}
+function waitForDishWarmupSlot(){
+  return new Promise(resolve=>{
+    if('requestIdleCallback' in window)window.requestIdleCallback(()=>resolve(),{timeout:900});
+    else setTimeout(resolve,120);
+  });
+}
+async function warmDishSource(src){
+  if(warmedDishVisuals.has(src))return true;
+  if(retainedVisuals.has(src)){
+    warmedDishVisuals.add(src);
+    return true;
+  }
+  try{
+    if('caches' in window&&await caches.match(src)){
+      warmedDishVisuals.add(src);
+      return true;
+    }
+    const response=await fetch(src,{cache:'force-cache'});
+    if(!response.ok)return false;
+    await response.blob();
+    warmedDishVisuals.add(src);
+    return true;
+  }catch(_){return false}
+}
+async function warmCapturedDishVisuals(){
+  if(dishVisualWarmupRunning||!appUnlocked())return;
+  dishVisualWarmupRunning=true;
+  try{
+    const sources=[...capturedDishVisuals];
+    for(let index=0;index<sources.length;index+=DISH_WARMUP_BATCH_SIZE){
+      await waitForDishWarmupSlot();
+      const batch=sources.slice(index,index+DISH_WARMUP_BATCH_SIZE).filter(src=>!warmedDishVisuals.has(src));
+      if(batch.length)await Promise.allSettled(batch.map(warmDishSource));
+    }
+  }finally{
+    dishVisualWarmupRunning=false;
+  }
+}
+function scheduleCapturedDishWarmup(){
+  captureRenderedDishVisuals();
+  if(appUnlocked()){
+    void warmCapturedDishVisuals();
+    return;
+  }
+  const app=document.getElementById('app');
+  if(!app||dishUnlockObserver)return;
+  dishUnlockObserver=new MutationObserver(()=>{
+    if(!appUnlocked())return;
+    dishUnlockObserver.disconnect();
+    dishUnlockObserver=null;
+    queueRenderedDishWarmup();
+  });
+  dishUnlockObserver.observe(app,{attributes:true,attributeFilter:['class']});
+}
 function warmRenderedDishCards(){
-  const images=[...document.querySelectorAll('#dishes .dish-card img')].slice(0,8);
-  images.forEach((image,index)=>{
+  const images=captureRenderedDishVisuals();
+  if(!appUnlocked()){
+    scheduleCapturedDishWarmup();
+    return;
+  }
+  images.slice(0,8).forEach((image,index)=>{
     image.loading='eager';
     try{image.fetchPriority=index<4?'high':'auto'}catch(_){}
     if(typeof image.decode==='function')void image.decode().catch(()=>{});
   });
+  scheduleCapturedDishWarmup();
 }
 function queueRenderedDishWarmup(){
+  captureRenderedDishVisuals();
   if(renderedDishWarmupQueued)return;
   renderedDishWarmupQueued=true;
   requestAnimationFrame(()=>{
@@ -223,6 +300,7 @@ document.addEventListener('click',event=>{
   if(event.target.closest?.('.catalog-mode[data-mode="dishes"],.tab[data-view="catalog"]'))setTimeout(queueRenderedDishWarmup,0);
 },true);
 window.addEventListener('online',retryLocalImages,{passive:true});
+window.addEventListener('online',queueRenderedDishWarmup,{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
 })();
