@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v203';
+const APP_VERSION='v204';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -176,32 +176,6 @@ function retryLocalImages(){
   localizeCards(grid);
   localizeDialog(dialog);
 }
-let listSwipeObserver=null;
-function loadListSwipe(){
-  if(document.querySelector('script[data-list-swipe]')){
-    listSwipeObserver?.disconnect();
-    listSwipeObserver=null;
-    return;
-  }
-  const app=document.getElementById('app');
-  if(!app||app.classList.contains('is-locked')){
-    if(app&&!listSwipeObserver){
-      listSwipeObserver=new MutationObserver(()=>{
-        if(app.classList.contains('is-locked'))return;
-        listSwipeObserver.disconnect();
-        listSwipeObserver=null;
-        loadListSwipe();
-      });
-      listSwipeObserver.observe(app,{attributes:true,attributeFilter:['class']});
-    }
-    return;
-  }
-  const script=document.createElement('script');
-  script.src='./list-swipe.js?v=1';
-  script.async=false;
-  script.dataset.listSwipe='1';
-  document.body.appendChild(script);
-}
 
 let gridObserver=null;
 let dialogObserver=null;
@@ -249,11 +223,6 @@ document.addEventListener('click',event=>{
   if(event.target.closest?.('.catalog-mode[data-mode="dishes"],.tab[data-view="catalog"]'))setTimeout(queueRenderedDishWarmup,0);
 },true);
 window.addEventListener('online',retryLocalImages,{passive:true});
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',bind,{once:true});
-  document.addEventListener('DOMContentLoaded',loadListSwipe,{once:true});
-}else{
-  bind();
-  loadListSwipe();
-}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
+else bind();
 })();
