@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v213';
+const APP_VERSION='v214';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -19,7 +19,8 @@ const CHILD_DISHES=new Set([
   'Risotto poulet',
   'Saumon brocoli',
   'Steak frites',
-  'Velouté carottes'
+  'Velouté carottes',
+  'Crème brûlée'
 ]);
 const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eef1eb"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f7f2" stroke="#cbd2c8" stroke-width="12"/><text x="450" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="30" font-weight="700" fill="#708076">Photo indisponible</text></svg>');
 const PRODUCT_VISUALS=Object.freeze([

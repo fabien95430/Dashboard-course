@@ -86,6 +86,7 @@ const DISHES=Object.freeze([
   {name:'Saumon brocoli',photoId:'',tags:['Enfants'],ingredients:['Saumon','Brocoli','Riz basmati']},
   {name:'Steak frites',photoId:'',tags:['Enfants'],ingredients:['Steaks hachés','Frites surgelées']},
   {name:'Velouté carottes',photoId:'',tags:['Enfants'],ingredients:['Carottes','Pommes de terre','Crème fraîche','Oignons jaunes']}
+  {name:'Crème brûlée',photoId:'',tags:['Végé','Enfants'],ingredients:['Crème liquide','Œufs','Sucre','Vanille']},
 ]);
 
 const FILTERS=['Tous','Pâtes','Viandes','Poulet','Poissons','Rapides','Enfants','Végé','Favoris'];
@@ -99,7 +100,7 @@ const DISH_SPECIAL_SLUGS=Object.freeze({
   'Gratin de courgettes':'gratin-courgettes',
   'Poulet pommes de terre au four':'poulet-pommes-de-terre-four'
 });
-const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poulet légumes','Gratin pommes de terre','Pâtes jambon','Purée carotte poulet','Risotto poulet','Saumon brocoli','Steak frites','Velouté carottes']);
+const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poulet légumes','Gratin pommes de terre','Pâtes jambon','Purée carotte poulet','Risotto poulet','Saumon brocoli','Steak frites','Velouté carottes','Crème brûlée']);
 const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';
 
