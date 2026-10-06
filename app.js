@@ -788,7 +788,7 @@ function renderList(){
       '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong>'+itemDetail+'</span>'+
       quantity+
       '<button class="undo-purchase" type="button" data-name="'+esc(group.summary)+'" hidden>Annuler</button>'+
-      '<button class="row-grip" type="button" data-name="'+esc(group.summary)+'" aria-label="Déplacer '+esc(group.summary)+'" '+(canReorder?'':'disabled')+'>≡</button>'+
+      '<button class="row-grip list-row-more" type="button" data-name="'+esc(group.summary)+'" aria-label="Actions pour '+esc(group.summary)+'" aria-haspopup="menu">•••</button>'+
     '</div>';
   }).join('');
   el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
@@ -819,18 +819,14 @@ function listDomMatchesCurrentState(){
       &&row.dataset.name===group.summary
       &&(row.querySelector('.list-qty')?.textContent||'')===quantity
       &&row.classList.contains('is-busy')===state.productBusy.has(key)
-      &&!!grip
-      &&grip.disabled===!canReorder;
+      &&!!grip;
   });
 }
 function updateListReorderAvailability(root){
   if(!root)return false;
   const rows=[...root.querySelectorAll('.list-row')];
   const canReorder=rows.length>1;
-  rows.forEach(entry=>{
-    const grip=entry.querySelector('.row-grip');
-    if(grip)grip.disabled=!canReorder;
-  });
+  rows.forEach(entry=>entry.classList.toggle('is-reorder-disabled',!canReorder));
   return canReorder;
 }
 function removeRenderedListRow(row){
@@ -951,133 +947,111 @@ async function persistListReorder(root,movedKey){
     }
   }
 }
+let listRowMenu=null;
+function closeListRowMenu(){
+  if(!listRowMenu)return;
+  listRowMenu.anchor?.setAttribute('aria-expanded','false');
+  listRowMenu.menu.remove();
+  listRowMenu=null;
+}
+function openListRowMenu(row,anchor){
+  closeListRowMenu();
+  const name=row.dataset.name||'';
+  const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));
+  if(!group)return;
+  const menu=document.createElement('div');
+  menu.className='list-row-menu';
+  menu.setAttribute('role','menu');
+  const quantity=document.createElement('div');
+  quantity.className='list-row-menu-quantity';
+  quantity.innerHTML='<span>Quantité</span><div><button type="button" data-list-qty="-1" aria-label="Diminuer">−</button><strong>'+group.count+'</strong><button type="button" data-list-qty="1" aria-label="Augmenter">+</button></div>';
+  quantity.querySelectorAll('[data-list-qty]').forEach(button=>button.onclick=async event=>{
+    event.stopPropagation();
+    const delta=Number(button.dataset.listQty)||0;
+    closeListRowMenu();
+    if(delta>0)await incrementProduct(name);else if(group.count>1)await decrementProduct(name);
+    else await removeGroup(name,row);
+  });
+  const remove=document.createElement('button');
+  remove.type='button';
+  remove.className='list-row-menu-delete';
+  remove.setAttribute('role','menuitem');
+  remove.textContent='Supprimer';
+  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
+  menu.append(quantity,remove);
+  document.body.appendChild(menu);
+  const rect=anchor.getBoundingClientRect(),width=Math.min(250,window.innerWidth-28);
+  menu.style.width=width+'px';
+  const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
+  const below=rect.bottom+8,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-8);
+  menu.style.left=left+'px';menu.style.top=top+'px';
+  anchor.setAttribute('aria-expanded','true');
+  listRowMenu={menu,anchor};
+}
 function bindListReorder(root){
-  root.querySelectorAll('.row-grip').forEach(handle=>{
-    if(handle.disabled)return;
-    const row=handle.closest('.list-row');
-    if(!row)return;
-    handle.addEventListener('keydown',event=>{
-      if(event.key!=='ArrowUp'&&event.key!=='ArrowDown')return;
-      event.preventDefault();
-      const unavailable=listReorderUnavailableMessage(root,row);
-      if(unavailable){toast(unavailable);return}
-      const rows=reorderableListRows(root,row);
-      const index=rows.indexOf(row);
-      const nextIndex=event.key==='ArrowUp'?index-1:index+1;
-      if(index<0||nextIndex<0||nextIndex>=rows.length)return;
-      if(event.key==='ArrowUp')root.insertBefore(row,rows[nextIndex]);
-      else rows[nextIndex].after(row);
-      navigator.vibrate?.(4);
-      persistListReorder(root,row.dataset.key||'');
-    });
-    handle.addEventListener('pointerdown',event=>{
+  root.querySelectorAll('.list-row').forEach(row=>{
+    const action=row.querySelector('.row-grip');
+    if(action){
+      action.onclick=event=>{event.stopPropagation();openListRowMenu(row,action)};
+      action.addEventListener('keydown',event=>{
+        if(event.key!=='ArrowUp'&&event.key!=='ArrowDown')return;
+        event.preventDefault();
+        const unavailable=listReorderUnavailableMessage(root,row);
+        if(unavailable){toast(unavailable);return}
+        const rows=reorderableListRows(root,row),index=rows.indexOf(row),nextIndex=event.key==='ArrowUp'?index-1:index+1;
+        if(index<0||nextIndex<0||nextIndex>=rows.length)return;
+        if(event.key==='ArrowUp')root.insertBefore(row,rows[nextIndex]);else rows[nextIndex].after(row);
+        navigator.vibrate?.(4);persistListReorder(root,row.dataset.key||'');
+      });
+    }
+    row.addEventListener('pointerdown',event=>{
       if(event.button!==undefined&&event.button!==0)return;
+      if(event.target.closest('button'))return;
       const unavailable=listReorderUnavailableMessage(root,row);
-      if(unavailable){toast(unavailable);return}
-      event.preventDefault();
-      event.stopPropagation();
-      const pointerId=event.pointerId;
-      const originalOrder=visibleListOrder(root).join('\u0000');
-      const startRect=row.getBoundingClientRect();
-      const startClientY=event.clientY;
-      const preview=row.cloneNode(true);
-      preview.classList.add('is-drag-preview');
-      preview.setAttribute('aria-hidden','true');
-      preview.querySelectorAll('button').forEach(button=>button.tabIndex=-1);
-      const sourceIcon=row.querySelector('.list-icon');
-      const previewIcon=preview.querySelector('.list-icon');
-      let iconPlaceholder=null;
-      if(sourceIcon&&previewIcon){
-        iconPlaceholder=sourceIcon.cloneNode(false);
-        sourceIcon.replaceWith(iconPlaceholder);
-        previewIcon.replaceWith(sourceIcon);
-      }
-      preview.style.left=startRect.left+'px';
-      preview.style.top=startRect.top+'px';
-      preview.style.width=startRect.width+'px';
-      preview.style.height=startRect.height+'px';
-      document.body.appendChild(preview);
-      row.classList.add('is-drag-origin');
-      handle.classList.add('is-active');
-      root.classList.add('is-reordering');
-      navigator.vibrate?.(5);
-      try{handle.setPointerCapture(pointerId)}catch(_){}
-      const grabOffsetY=startClientY-startRect.top;
-      let lastClientY=startClientY;
-      const movePreview=top=>{
-        preview.style.transform='translate3d(0,'+(top-startRect.top)+'px,0) scale(1.015)';
-      };
-      const move=moveEvent=>{
+      if(unavailable)return;
+      const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
+      let timer=setTimeout(()=>beginDrag(event),360),dragging=false;
+      const preMove=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
-        moveEvent.preventDefault();
-        const rows=reorderableListRows(root,row);
-        if(rows.length<2)return;
-        const rootRect=root.getBoundingClientRect();
-        if(moveEvent.clientX<rootRect.left||moveEvent.clientX>rootRect.right)return;
-        const movingUp=moveEvent.clientY<lastClientY;
-        lastClientY=moveEvent.clientY;
-        if(moveEvent.clientY<rootRect.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);
-        else if(moveEvent.clientY>rootRect.bottom-48)root.scrollTop+=12;
-        const rowRects=rows.map(entry=>({entry,rect:entry.getBoundingClientRect()}));
-        const listTop=Math.min(...rowRects.map(item=>item.rect.top));
-        const listBottom=Math.max(...rowRects.map(item=>item.rect.bottom));
-        const maxTop=Math.max(listTop,listBottom-startRect.height);
-        const previewTop=Math.min(maxTop,Math.max(listTop,moveEvent.clientY-grabOffsetY));
-        movePreview(previewTop);
-        const previewCenter=previewTop+startRect.height/2;
-        const siblings=rowRects.filter(item=>item.entry!==row);
-        const before=siblings.find(item=>{
-          const middle=item.rect.top+item.rect.height/2;
-          return movingUp?previewCenter<=middle:previewCenter<middle;
-        });
-        const previousNext=row.nextElementSibling;
-        if(before)root.insertBefore(row,before.entry);
-        else siblings.at(-1)?.entry.after(row);
-        if(row.nextElementSibling!==previousNext)navigator.vibrate?.(3);
+        if(Math.hypot(moveEvent.clientX-startX,moveEvent.clientY-startY)>8){clearTimeout(timer);cleanupPre()}
       };
-      const stopTracking=()=>{
-        handle.classList.remove('is-active');
-        root.classList.remove('is-reordering');
-        document.removeEventListener('pointermove',move,true);
-        document.removeEventListener('pointerup',finish,true);
-        document.removeEventListener('pointercancel',cancel,true);
-        try{handle.releasePointerCapture(pointerId)}catch(_){}
-      };
-      const revealRow=()=>{
-        if(iconPlaceholder?.isConnected&&sourceIcon)iconPlaceholder.replaceWith(sourceIcon);
-        preview.remove();
-        row.classList.remove('is-drag-origin');
-      };
-      const finish=upEvent=>{
-        if(upEvent.pointerId!==pointerId)return;
-        upEvent.preventDefault();
-        stopTracking();
-        const changed=visibleListOrder(root).join('\u0000')!==originalOrder;
-        const targetRect=row.getBoundingClientRect();
-        preview.classList.add('is-settling');
-        requestAnimationFrame(()=>{
-          preview.style.left=targetRect.left+'px';
-          preview.style.top=targetRect.top+'px';
-          preview.style.transform='translate3d(0,0,0) scale(1)';
-          preview.style.opacity='1';
-        });
-        setTimeout(()=>{
-          revealRow();
-          if(changed)persistListReorder(root,row.dataset.key||'');
-        },190);
-      };
-      const cancel=cancelEvent=>{
-        if(cancelEvent.pointerId!==pointerId)return;
-        stopTracking();
-        revealRow();
-        if(visibleListOrder(root).join('\u0000')!==originalOrder)renderList();
-      };
-      document.addEventListener('pointermove',move,{passive:false,capture:true});
-      document.addEventListener('pointerup',finish,{capture:true});
-      document.addEventListener('pointercancel',cancel,{capture:true});
+      const preEnd=endEvent=>{if(endEvent.pointerId!==pointerId)return;clearTimeout(timer);cleanupPre()};
+      const cleanupPre=()=>{document.removeEventListener('pointermove',preMove,true);document.removeEventListener('pointerup',preEnd,true);document.removeEventListener('pointercancel',preEnd,true)};
+      document.addEventListener('pointermove',preMove,{passive:true,capture:true});
+      document.addEventListener('pointerup',preEnd,{capture:true});
+      document.addEventListener('pointercancel',preEnd,{capture:true});
+      function beginDrag(startEvent){
+        cleanupPre();dragging=true;closeListRowMenu();
+        const originalOrder=visibleListOrder(root).join('\u0000'),startRect=row.getBoundingClientRect(),startClientY=startY;
+        const preview=row.cloneNode(true);preview.classList.add('is-drag-preview');preview.setAttribute('aria-hidden','true');preview.querySelectorAll('button').forEach(button=>button.tabIndex=-1);
+        const sourceIcon=row.querySelector('.list-icon'),previewIcon=preview.querySelector('.list-icon');let iconPlaceholder=null;
+        if(sourceIcon&&previewIcon){iconPlaceholder=sourceIcon.cloneNode(false);sourceIcon.replaceWith(iconPlaceholder);previewIcon.replaceWith(sourceIcon)}
+        preview.style.left=startRect.left+'px';preview.style.top=startRect.top+'px';preview.style.width=startRect.width+'px';preview.style.height=startRect.height+'px';
+        document.body.appendChild(preview);row.classList.add('is-drag-origin');root.classList.add('is-reordering');navigator.vibrate?.(5);
+        try{row.setPointerCapture(pointerId)}catch(_){}
+        const grabOffsetY=startClientY-startRect.top;let lastClientY=startClientY;
+        const movePreview=top=>{preview.style.transform='translate3d(0,'+(top-startRect.top)+'px,0) scale(1.015)'};
+        const move=moveEvent=>{
+          if(moveEvent.pointerId!==pointerId)return;moveEvent.preventDefault();
+          const rows=reorderableListRows(root,row);if(rows.length<2)return;
+          const rootRect=root.getBoundingClientRect();if(moveEvent.clientX<rootRect.left||moveEvent.clientX>rootRect.right)return;
+          const movingUp=moveEvent.clientY<lastClientY;lastClientY=moveEvent.clientY;
+          if(moveEvent.clientY<rootRect.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);else if(moveEvent.clientY>rootRect.bottom-48)root.scrollTop+=12;
+          const rowRects=rows.map(entry=>({entry,rect:entry.getBoundingClientRect()})),listTop=Math.min(...rowRects.map(item=>item.rect.top)),listBottom=Math.max(...rowRects.map(item=>item.rect.bottom)),maxTop=Math.max(listTop,listBottom-startRect.height),previewTop=Math.min(maxTop,Math.max(listTop,moveEvent.clientY-grabOffsetY));
+          movePreview(previewTop);const previewCenter=previewTop+startRect.height/2,siblings=rowRects.filter(item=>item.entry!==row),before=siblings.find(item=>{const middle=item.rect.top+item.rect.height/2;return movingUp?previewCenter<=middle:previewCenter<middle}),previousNext=row.nextElementSibling;
+          if(before)root.insertBefore(row,before.entry);else siblings.at(-1)?.entry.after(row);if(row.nextElementSibling!==previousNext)navigator.vibrate?.(3);
+        };
+        const stopTracking=()=>{root.classList.remove('is-reordering');document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',finish,true);document.removeEventListener('pointercancel',cancel,true);try{row.releasePointerCapture(pointerId)}catch(_){}};
+        const revealRow=()=>{if(iconPlaceholder?.isConnected&&sourceIcon)iconPlaceholder.replaceWith(sourceIcon);preview.remove();row.classList.remove('is-drag-origin')};
+        const finish=upEvent=>{if(upEvent.pointerId!==pointerId)return;upEvent.preventDefault();stopTracking();const changed=visibleListOrder(root).join('\u0000')!==originalOrder,targetRect=row.getBoundingClientRect();preview.classList.add('is-settling');requestAnimationFrame(()=>{preview.style.left=targetRect.left+'px';preview.style.top=targetRect.top+'px';preview.style.transform='translate3d(0,0,0) scale(1)';preview.style.opacity='1'});setTimeout(()=>{revealRow();if(changed)persistListReorder(root,row.dataset.key||'')},190)};
+        const cancel=cancelEvent=>{if(cancelEvent.pointerId!==pointerId)return;stopTracking();revealRow();if(visibleListOrder(root).join('\u0000')!==originalOrder)renderList()};
+        document.addEventListener('pointermove',move,{passive:false,capture:true});document.addEventListener('pointerup',finish,{capture:true});document.addEventListener('pointercancel',cancel,{capture:true});
+      }
     });
   });
 }
+document.addEventListener('pointerdown',event=>{if(listRowMenu&&!listRowMenu.menu.contains(event.target)&&event.target!==listRowMenu.anchor)closeListRowMenu()});
+
 function undoPurchase(name,row){
   const key=norm(name),token=state.purchaseUndo.get(key);
   if(!token)return;
