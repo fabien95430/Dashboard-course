@@ -27,6 +27,9 @@ function ensureStyles(){
       -webkit-clip-path:none!important;
       clip-path:none!important;
     }
+    .product.has-single-product-image .premium-sprite.is-single-product-image{
+      transform:translateY(5px)!important;
+    }
     .premium-sprite.is-single-product-image>img{
       top:11%!important;
       left:11%!important;
@@ -41,6 +44,11 @@ function ensureStyles(){
     .premium-sprite.is-single-product-image.is-compact>img{
       transform:translateY(1px)!important;
     }
+    @media(max-width:520px){
+      .catalog-view .product.has-single-product-image .media{
+        padding-right:0!important;
+      }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -51,6 +59,7 @@ function decorateCard(card){
   const image=sprite?.querySelector(':scope > img');
   if(!sprite||!image)return;
   const source=imageSource(name);
+  card.classList.add('has-single-product-image');
   if(image.dataset.singleProductSource===source)return;
   image.dataset.singleProductSource=source;
   sprite.classList.add('is-single-product-image');
