@@ -47,10 +47,19 @@ function triggerOpenAi(row){
 }
 function positionMenu(menu,anchor){
   const rect=anchor.getBoundingClientRect();
-  const width=Math.min(250,Math.max(214,window.innerWidth-28));
+  const dialog=document.getElementById('missingProductsDialog');
+  const dialogRect=dialog?.getBoundingClientRect?.();
+  const margin=14;
+  const leftBound=Math.max(margin,(dialogRect?.left||0)+margin);
+  const rightBound=Math.min(window.innerWidth-margin,(dialogRect?.right||window.innerWidth)-margin);
+  const topBound=Math.max(margin,(dialogRect?.top||0)+margin);
+  const bottomBound=Math.min(window.innerHeight-margin,(dialogRect?.bottom||window.innerHeight)-margin);
+  const width=Math.min(250,Math.max(214,rightBound-leftBound));
   menu.style.width=width+'px';
-  menu.style.left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width))+'px';
-  menu.style.top=Math.min(window.innerHeight-menu.offsetHeight-14,rect.bottom+8)+'px';
+  menu.style.left=Math.max(leftBound,Math.min(rightBound-width,rect.right-width))+'px';
+  const below=rect.bottom+8;
+  const above=rect.top-menu.offsetHeight-8;
+  menu.style.top=(below+menu.offsetHeight<=bottomBound?below:Math.max(topBound,above))+'px';
 }
 function startHold(button,row){
   if(button.disabled||button.classList.contains('is-disabled'))return;
@@ -201,7 +210,7 @@ function installStyle(){
     #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error){background:#edf7f0!important;color:#19804a!important}
     #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error){background:#fff4d9!important;color:#9b6811!important}
     #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error){background:#fff0e8!important;color:#ad5b39!important}
-    #missingProductsDialog .missing-product-copy .missing-dish-progress{display:none!important}
+    #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:none!important}
     #missingProductsDialog .missing-product-remove{display:none!important}
     #missingProductsDialog .missing-row-more{width:36px;height:36px;min-width:36px;padding:0;border:1px solid #e5e9e5;border-radius:12px;background:#f8faf8;color:#4b5650;display:grid;place-items:center;font-size:13px;font-weight:900;letter-spacing:1px;box-shadow:none}
     #missingProductsDialog .missing-row-more:active{transform:scale(.96);background:#f1f5f2}
