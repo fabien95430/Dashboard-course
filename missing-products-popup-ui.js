@@ -98,21 +98,9 @@ function bindHold(button,row){
 }
 function openRowMenu(row,anchor){
   closeMenu();
-  const type=row.hasAttribute('data-missing-dish-row')?'dish':'product';
   const menu=document.createElement('div');
   menu.className='missing-row-menu';
   menu.setAttribute('role','menu');
-  if(type==='dish'){
-    const magic=row.querySelector('[data-openai-missing-dish]');
-    const openAi=document.createElement('button');
-    openAi.type='button';
-    openAi.className='missing-row-menu-item missing-row-openai';
-    openAi.setAttribute('role','menuitem');
-    openAi.innerHTML='<span class="missing-menu-icon" aria-hidden="true">✦</span><span><strong>Intégrer via OpenAI</strong><small>Maintenir 0,8 s pour confirmer</small></span>';
-    if(!magic||magic.disabled){openAi.disabled=true;openAi.classList.add('is-disabled');}
-    bindHold(openAi,row);
-    menu.appendChild(openAi);
-  }
   const remove=document.createElement('button');
   remove.type='button';
   remove.className='missing-row-menu-item is-danger';

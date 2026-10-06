@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v270';
+const APP_VERSION='v271';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -81,14 +81,14 @@ function installVisualWarmupStyle(){
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
-    script.src='./missing-products-fixes.js?v=12';
+    script.src='./missing-products-fixes.js?v=13';
     script.defer=true;
     script.dataset.missingProductsFixes='1';
     document.head.appendChild(script);
   }
   if(!document.querySelector('script[data-missing-products-popup-ui]')){
     const script=document.createElement('script');
-    script.src='./missing-products-popup-ui.js?v=8';
+    script.src='./missing-products-popup-ui.js?v=9';
     script.defer=true;
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);

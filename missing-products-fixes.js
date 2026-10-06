@@ -269,15 +269,7 @@ function decorateRunningRows(dialog,type,running){
   dialog.querySelectorAll(rowSelector).forEach(row=>{
     const id=String(row.dataset[rowData]||'');
     const active=running.has(id);
-    const copy=row.querySelector('.missing-product-copy');
-    let progress=copy?.querySelector('.missing-dish-progress');
-    if(active&&!progress&&copy){
-      progress=document.createElement('small');
-      progress.className='missing-dish-progress';
-      progress.textContent='En cours…';
-      copy.appendChild(progress);
-    }
-    if(!active&&progress)progress.remove();
+    row.querySelector('.missing-dish-progress')?.remove();
     const integrate=row.querySelector(integrateSelector);
     if(integrate){
       integrate.disabled=active;
