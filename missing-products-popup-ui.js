@@ -170,6 +170,37 @@ function syncRunning(row){
   integrate.classList.toggle('is-running-label',running);
   row.classList.toggle('is-running-request',running);
 }
+function bindModeSwitch(dialog){
+  const modeSwitch=dialog.querySelector('.missing-mode-switch');
+  if(!modeSwitch||modeSwitch.dataset.popupModeGuard==='1')return false;
+  modeSwitch.dataset.popupModeGuard='1';
+  modeSwitch.addEventListener('click',event=>event.stopPropagation());
+  return true;
+}
+function resetModeLens(dialog){
+  const modeSwitch=dialog.querySelector('.missing-mode-switch');
+  if(!modeSwitch)return;
+  modeSwitch.classList.remove('is-liquid-moving');
+  modeSwitch.style.setProperty('--sx','1');
+  modeSwitch.style.setProperty('--sy','1');
+  modeSwitch.style.setProperty('--missing-lens-content-scale','1');
+  modeSwitch.style.setProperty('--missing-lens-content-shift','0px');
+  modeSwitch.querySelectorAll('.missing-mode-button').forEach(button=>{
+    button.classList.remove('is-liquid-under');
+    const label=[...button.children].find(node=>node.tagName==='SPAN');
+    if(label){
+      label.style.webkitMaskImage='';
+      label.style.maskImage='';
+    }
+    const copy=button.querySelector('.missing-mode-lens-copy');
+    if(copy){
+      copy.style.opacity='0';
+      copy.style.clipPath='inset(0 100% 0 0)';
+      copy.style.webkitClipPath='inset(0 100% 0 0)';
+    }
+  });
+  if(dialog.open)requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
+}
 function decorateRow(row){
   if(!(row instanceof HTMLElement))return;
   const type=rowType(row);
@@ -183,6 +214,8 @@ function decorate(){
   decorateFrame=0;
   const dialog=document.getElementById('missingProductsDialog');
   if(!dialog)return;
+  const bound=bindModeSwitch(dialog);
+  if(bound&&dialog.open)requestAnimationFrame(()=>resetModeLens(dialog));
   dialog.querySelectorAll('[data-missing-product-row],[data-missing-dish-row]').forEach(decorateRow);
 }
 function queueDecorate(){
@@ -194,6 +227,7 @@ function installStyle(){
   const style=document.createElement('style');
   style.id='missing-products-popup-ui-style';
   style.textContent=`
+    #missingProductsDialog #missingProductsList[hidden],#missingProductsDialog #missingDishesList[hidden]{display:none!important}
     #missingProductsDialog .missing-products-header h3{font-size:22px!important;line-height:1.08!important;letter-spacing:-.35px!important;margin-bottom:0!important}
     #missingProductsDialog .dialog-intro{font-size:13px!important;line-height:1.38!important;margin-top:7px!important}
     #missingProductsDialog .missing-products-add{gap:8px!important;margin-bottom:10px!important}
@@ -245,8 +279,12 @@ function bind(){
   if(!dialog)return false;
   if(dialog.dataset.missingPopupUiBound==='1'){queueDecorate();return true;}
   dialog.dataset.missingPopupUiBound='1';
-  new MutationObserver(queueDecorate).observe(dialog,{childList:true,subtree:true,attributes:true,attributeFilter:['class','disabled','hidden']});
-  dialog.addEventListener('close',closeMenu);
+  bindModeSwitch(dialog);
+  new MutationObserver(mutations=>{
+    queueDecorate();
+    if(mutations.some(mutation=>mutation.target===dialog&&mutation.attributeName==='open'))resetModeLens(dialog);
+  }).observe(dialog,{childList:true,subtree:true,attributes:true,attributeFilter:['class','disabled','hidden','open']});
+  dialog.addEventListener('close',()=>{closeMenu();resetModeLens(dialog)});
   dialog.addEventListener('scroll',closeMenu,{passive:true});
   queueDecorate();
   return true;
