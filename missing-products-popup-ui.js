@@ -120,7 +120,7 @@ function openRowMenu(row,anchor){
     native?.click();
   });
   menu.appendChild(remove);
-  document.body.appendChild(menu);
+  (document.getElementById('missingProductsDialog')||document.body).appendChild(menu);
   openMenu=menu;
   anchor.setAttribute('aria-expanded','true');
   requestAnimationFrame(()=>positionMenu(menu,anchor));
@@ -217,7 +217,7 @@ function installStyle(){
     #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:78px!important;min-height:36px!important;padding:0 10px!important;font-size:11px!important}
     #missingProductsDialog .missing-product-integrate.is-running-label,#missingProductsDialog .missing-dish-integrate.is-running-label{background:#eef3ef!important;color:#7b8d82!important;opacity:1!important}
     #missingProductsDialog .missing-dish-magic{display:none!important}
-    .missing-row-menu{position:fixed;z-index:3000;padding:7px;border:1px solid rgba(47,68,54,.09);border-radius:18px;background:rgba(255,255,255,.98);box-shadow:0 18px 48px rgba(30,42,34,.20);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .missing-row-menu{position:fixed;z-index:2147483647;padding:7px;border:1px solid rgba(47,68,54,.09);border-radius:18px;background:rgba(255,255,255,.98);box-shadow:0 18px 48px rgba(30,42,34,.20);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
     .missing-row-menu-item{position:relative;width:100%;min-height:50px;padding:8px 10px;border:0;border-radius:13px;background:transparent;color:#172019;display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center;text-align:left;overflow:hidden;touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
     .missing-row-menu-item+.missing-row-menu-item{border-top:1px solid #eef1ee;border-top-left-radius:0;border-top-right-radius:0}
     .missing-row-menu-item:active{background:#f4f7f4}
