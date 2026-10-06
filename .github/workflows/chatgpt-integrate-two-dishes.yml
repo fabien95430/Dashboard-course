@@ -3,7 +3,6 @@ name: ChatGPT integrate two dishes
 on:
   push:
     branches: [chatgpt-integrate-sushis-saucisse-lentille]
-    paths: [.chatgpt/READY]
 
 permissions:
   contents: write
