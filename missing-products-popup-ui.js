@@ -181,24 +181,31 @@ function installStyle(){
   style.id='missing-products-popup-ui-style';
   style.textContent=`
     #missingProductsDialog .missing-products-header h3{font-size:22px!important;line-height:1.08!important;letter-spacing:-.35px!important;margin-bottom:0!important}
-    #missingProductsDialog .dialog-intro{font-size:13.5px!important;line-height:1.4!important;margin-top:8px!important}
-    #missingProductsDialog .missing-product-row.missing-request-row{position:relative!important;display:grid!important;grid-template-columns:56px minmax(0,1fr) auto 42px!important;gap:10px!important;min-height:78px!important;padding:10px!important;align-items:center!important;overflow:visible!important}
+    #missingProductsDialog .dialog-intro{font-size:13px!important;line-height:1.38!important;margin-top:7px!important}
+    #missingProductsDialog .missing-products-add{gap:8px!important;margin-bottom:10px!important}
+    #missingProductsDialog .missing-products-add #missingProductName{height:46px!important;border-radius:15px!important;padding:0 14px!important;font-size:15px!important}
+    #missingProductsDialog .missing-products-add #addMissingProduct.primary{height:46px!important;min-width:92px!important;border-radius:15px!important;padding:0 15px!important;font-size:14px!important}
+    #missingProductsDialog .missing-category-panel{margin-bottom:16px!important;padding:10px!important;border-radius:18px!important}
+    #missingProductsDialog .missing-category-panel .missing-category-heading{margin-bottom:7px!important}
+    #missingProductsDialog .missing-category-panel .missing-category-select{height:44px!important;border-radius:14px!important;font-size:13px!important}
+    #missingProductsDialog .missing-product-row.missing-request-row{position:relative!important;display:grid!important;grid-template-columns:48px minmax(0,1fr) auto 36px!important;gap:8px!important;min-height:68px!important;padding:8px!important;align-items:center!important;overflow:visible!important}
     #missingProductsDialog .missing-product-row.missing-request-row .missing-product-mark{display:none!important}
-    #missingProductsDialog .missing-request-thumb{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(54,75,60,.045)}
-    #missingProductsDialog .missing-request-thumb svg{width:42px;height:42px;display:block}
+    #missingProductsDialog .missing-request-thumb{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(54,75,60,.045)}
+    #missingProductsDialog .missing-request-thumb svg{width:36px;height:36px;display:block}
     #missingProductsDialog .missing-request-thumb.is-product{background:linear-gradient(145deg,#eef7ed,#e5efe6)}
     #missingProductsDialog .missing-request-thumb.is-dish{background:linear-gradient(145deg,#fff6df,#f8e9c1)}
     #missingProductsDialog .missing-request-thumb.is-dessert{background:linear-gradient(145deg,#fff0e7,#f8d9c9)}
-    #missingProductsDialog .missing-product-copy{align-self:center!important;gap:5px!important}
-    #missingProductsDialog .missing-product-copy strong{font-size:15px!important}
+    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy{align-self:center!important;gap:4px!important;min-width:0!important}
+    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy strong{font-size:14.5px!important;line-height:1.22!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
+    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){padding:4px 8px!important;font-size:9.5px!important;line-height:1.15!important}
     #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error){background:#edf7f0!important;color:#19804a!important}
     #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error){background:#fff4d9!important;color:#9b6811!important}
     #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error){background:#fff0e8!important;color:#ad5b39!important}
+    #missingProductsDialog .missing-product-copy .missing-dish-progress{display:none!important}
     #missingProductsDialog .missing-product-remove{display:none!important}
-    #missingProductsDialog .missing-row-more{width:42px;height:42px;min-width:42px;padding:0;border:1px solid #e5e9e5;border-radius:14px;background:#f8faf8;color:#4b5650;display:grid;place-items:center;font-size:14px;font-weight:900;letter-spacing:1px;box-shadow:none}
+    #missingProductsDialog .missing-row-more{width:36px;height:36px;min-width:36px;padding:0;border:1px solid #e5e9e5;border-radius:12px;background:#f8faf8;color:#4b5650;display:grid;place-items:center;font-size:13px;font-weight:900;letter-spacing:1px;box-shadow:none}
     #missingProductsDialog .missing-row-more:active{transform:scale(.96);background:#f1f5f2}
-    #missingProductsDialog .missing-dish-progress{display:none!important}
-    #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:94px!important}
+    #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:78px!important;min-height:36px!important;padding:0 10px!important;font-size:11px!important}
     #missingProductsDialog .missing-product-integrate.is-running-label,#missingProductsDialog .missing-dish-integrate.is-running-label{background:#eef3ef!important;color:#7b8d82!important;opacity:1!important}
     #missingProductsDialog .missing-dish-magic{display:none!important}
     .missing-row-menu{position:fixed;z-index:3000;padding:7px;border:1px solid rgba(47,68,54,.09);border-radius:18px;background:rgba(255,255,255,.98);box-shadow:0 18px 48px rgba(30,42,34,.20);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
@@ -214,7 +221,7 @@ function installStyle(){
     .missing-row-openai:before{content:"";position:absolute;inset:0;transform:scaleX(0);transform-origin:left center;background:rgba(35,144,90,.10);pointer-events:none}
     .missing-row-openai.is-holding:before{animation:missingOpenAiHold ${HOLD_MS}ms linear forwards}
     @keyframes missingOpenAiHold{to{transform:scaleX(1)}}
-    @media(max-width:390px){#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:50px minmax(0,1fr) auto 38px!important;gap:7px!important;padding:9px!important;min-height:70px!important}#missingProductsDialog .missing-request-thumb{width:50px;height:50px;border-radius:14px}#missingProductsDialog .missing-request-thumb svg{width:37px;height:37px}#missingProductsDialog .missing-row-more{width:38px;height:38px;min-width:38px;border-radius:12px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:82px!important;padding-left:10px!important;padding-right:10px!important}}
+    @media(max-width:390px){#missingProductsDialog .missing-products-add #missingProductName{height:44px!important;font-size:14px!important}#missingProductsDialog .missing-products-add #addMissingProduct.primary{height:44px!important;min-width:84px!important;padding:0 12px!important;font-size:13px!important}#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr) auto 34px!important;gap:6px!important;padding:7px!important;min-height:62px!important}#missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px}#missingProductsDialog .missing-request-thumb svg{width:33px;height:33px}#missingProductsDialog .missing-row-more{width:34px;height:34px;min-width:34px;border-radius:11px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:70px!important;min-height:34px!important;padding-left:8px!important;padding-right:8px!important;font-size:10.5px!important}}
     @media(prefers-reduced-motion:reduce){.missing-row-openai.is-holding:before{animation-duration:1ms}}
   `;
   document.head.appendChild(style);
