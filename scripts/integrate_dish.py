@@ -15,12 +15,32 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULT_PATH = ROOT / ".courses-dish-result.json"
-ALLOWED_TAGS = ["Pâtes", "Viandes", "Poulet", "Poissons", "Rapides", "Enfants", "Végé"]
 SPECIAL_SLUGS = {
     "Tagliatelles au saumon": "tagliatelles-saumon",
     "Gratin de courgettes": "gratin-courgettes",
     "Poulet pommes de terre au four": "poulet-pommes-de-terre-four",
 }
+
+
+def load_allowed_tags() -> list[str]:
+    text = (ROOT / "dishes-ui.js").read_text(encoding="utf-8")
+    match = re.search(r"const FILTERS=\[(.*?)\];", text, flags=re.S)
+    if not match:
+        raise RuntimeError("Filtres de plats introuvables dans dishes-ui.js")
+    values = re.findall(r"'((?:\\.|[^'])*)'", match.group(1))
+    tags: list[str] = []
+    for value in values:
+        value = value.replace("\\'", "'").replace("\\\\", "\\")
+        if value in {"Tous", "Favoris"}:
+            continue
+        if value and value not in tags:
+            tags.append(value)
+    if not tags:
+        raise RuntimeError("Aucune catégorie de plat trouvée dans dishes-ui.js")
+    return tags
+
+
+ALLOWED_TAGS = load_allowed_tags()
 
 
 def fail(message: str) -> "NoReturn":

@@ -3,15 +3,26 @@
 
 const STORAGE_DISHES='courses-missing-dishes-v1';
 const STORAGE_PRODUCTS='courses-missing-products-v1';
-const DISH_CATEGORIES=Object.freeze(['','Pâtes','Viandes','Poulet','Poissons','Rapides','Enfants','Végé']);
 const CHATGPT_URL='https://chatgpt.com/';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
+function catalogDishCategories(){
+  const categories=[...document.querySelectorAll('.dish-filter[data-value]')]
+    .map(button=>String(button.dataset.value||'').trim())
+    .filter(value=>value&&value!=='Tous'&&value!=='Favoris');
+  return [...new Set(categories)];
+}
+function sanitizeDishCategory(value){
+  const category=String(value||'').trim().replace(/\s+/g,' ').slice(0,80);
+  if(!category)return '';
+  const categories=catalogDishCategories();
+  return !categories.length||categories.includes(category)?category:'';
+}
 function sanitizeDish(item,index=0){
   const name=String(item?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
   if(!name)return null;
-  const category=DISH_CATEGORIES.includes(item?.category)?item.category:'';
+  const category=sanitizeDishCategory(item?.category);
   const id=String(item?.id||('dish-'+index+'-'+normalize(name)));
   return {id,name,category};
 }
@@ -265,7 +276,7 @@ function initMissingProductsAndDishes(){
   function renderCategorySelect(){
     const selected=mode==='dishes'?dishCategory:selectedProductCategory();
     const options=mode==='dishes'
-      ?DISH_CATEGORIES.map(value=>({value,label:categoryLabel(value)}))
+      ?['',...catalogDishCategories()].map(value=>({value,label:categoryLabel(value)}))
       :[...categoryGrid.querySelectorAll('[data-missing-category]')].map(button=>({value:button.dataset.missingCategory||'',label:button.textContent.trim()}));
     categorySelect.innerHTML=options.map(option=>'<option value="'+escapeHtml(option.value)+'">'+escapeHtml(option.label)+'</option>').join('');
     categorySelect.value=selected;
@@ -484,7 +495,8 @@ function initMissingProductsAndDishes(){
   categorySelect.addEventListener('change',()=>{
     const category=categorySelect.value||'';
     if(mode==='dishes'){
-      dishCategory=DISH_CATEGORIES.includes(category)?category:'';
+      const categories=catalogDishCategories();
+      dishCategory=!category||categories.includes(category)?category:'';
     }else{
       const original=[...categoryGrid.querySelectorAll('[data-missing-category]')].find(button=>(button.dataset.missingCategory||'')===category);
       original?.click();
@@ -529,6 +541,17 @@ function initMissingProductsAndDishes(){
 
   const productObserver=new MutationObserver(syncNewProductRequests);
   productObserver.observe(productList,{childList:true,subtree:true});
+
+  let catalogCategoryObserver=null;
+  if(!catalogDishCategories().length){
+    catalogCategoryObserver=new MutationObserver(()=>{
+      if(!catalogDishCategories().length)return;
+      catalogCategoryObserver.disconnect();
+      catalogCategoryObserver=null;
+      if(mode==='dishes')renderCategorySelect();
+    });
+    catalogCategoryObserver.observe(document.documentElement,{childList:true,subtree:true});
+  }
 
   const renderedCatalogObserver=new MutationObserver(()=>{
     reconcileProducts();

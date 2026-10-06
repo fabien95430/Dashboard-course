@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-"""Run the existing dish integrator with Dessert support and the validated dessert visual direction."""
+"""Run the existing dish integrator with the validated dessert visual direction."""
 
 from __future__ import annotations
 
 import integrate_dish as base
-
-if "Dessert" not in base.ALLOWED_TAGS:
-    base.ALLOWED_TAGS.append("Dessert")
 
 _original_image_prompt = base.image_prompt
 
