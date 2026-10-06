@@ -126,6 +126,7 @@ self.addEventListener('push',event=>{
     body,
     tag,
     icon:'./apple-touch-icon.png',
+    badge:'./apple-touch-icon.png',
     data:{url},
     renotify:true
   }));
