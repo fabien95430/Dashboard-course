@@ -119,7 +119,7 @@ function openRowMenu(row,anchor){
     event.stopPropagation();
     const native=row.querySelector('.missing-product-remove');
     if(native){
-      const nativeClick=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});
+      const nativeClick=new MouseEvent('click',{bubbles:true,cancelable:true,view:window,clientX:native.getBoundingClientRect().left+1,clientY:native.getBoundingClientRect().top+1});
       native.dispatchEvent(nativeClick);
     }
     closeMenu();
