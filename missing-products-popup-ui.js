@@ -34,6 +34,10 @@ function closeMenu(){
   if(openMenu){openMenu.remove();openMenu=null;}
   document.querySelectorAll('#missingProductsDialog .missing-row-more[aria-expanded="true"]').forEach(button=>button.setAttribute('aria-expanded','false'));
 }
+function resetPopupInteraction(dialog){
+  closeMenu();
+  resetModeLens(dialog);
+}
 function stopHold(){
   if(holdTimer){clearTimeout(holdTimer);holdTimer=0;}
   if(holdButton){holdButton.classList.remove('is-holding');holdButton=null;}
@@ -249,7 +253,7 @@ function installStyle(){
     #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error){background:#edf7f0!important;color:#19804a!important}
     #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error){background:#fff4d9!important;color:#9b6811!important}
     #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error){background:#fff0e8!important;color:#ad5b39!important}
-    #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:none!important}
+    #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:inline-flex!important;width:max-content!important}
     #missingProductsDialog .missing-product-remove{display:none!important}
     #missingProductsDialog .missing-row-more{width:36px;height:36px;min-width:36px;padding:0;border:1px solid #e5e9e5;border-radius:12px;background:#f8faf8;color:#4b5650;display:grid;place-items:center;font-size:13px;font-weight:900;letter-spacing:1px;box-shadow:none}
     #missingProductsDialog .missing-row-more:active{transform:scale(.96);background:#f1f5f2}
@@ -284,7 +288,8 @@ function bind(){
     queueDecorate();
     if(mutations.some(mutation=>mutation.target===dialog&&mutation.attributeName==='open'))resetModeLens(dialog);
   }).observe(dialog,{childList:true,subtree:true,attributes:true,attributeFilter:['class','disabled','hidden','open']});
-  dialog.addEventListener('close',()=>{closeMenu();resetModeLens(dialog)});
+  dialog.addEventListener('close',()=>resetPopupInteraction(dialog));
+  dialog.addEventListener('cancel',()=>resetPopupInteraction(dialog));
   dialog.addEventListener('scroll',closeMenu,{passive:true});
   queueDecorate();
   return true;
