@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v249';
+const APP_VERSION='v250';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -95,7 +95,7 @@ function installMissingProductsFixes(){
 function installCatalogQuantities(){
   if(document.querySelector('script[data-catalog-quantities]'))return;
   const script=document.createElement('script');
-  script.src='./catalog-quantities.js?v=1';
+  script.src='./catalog-quantities.js?v=2';
   script.defer=true;
   script.dataset.catalogQuantities='1';
   document.head.appendChild(script);
