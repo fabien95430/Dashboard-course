@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v264';
+const APP_VERSION='v265';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -361,7 +361,7 @@ syncPageVersions();
 installVisualWarmupStyle();
 installMissingProductsFixes();
 installCatalogQuantities();
-installPurchaseIntelligence();
+// Test v265: purchase-intelligence temporairement désactivé pour isoler la régression tactile.
 bindSecurityKeyboardViewport();
 void warmProductVisuals();
 scheduleDishVisualWarmup();
