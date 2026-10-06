@@ -4,8 +4,7 @@
 const STORAGE_DISHES='courses-missing-dishes-v1';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const HA_REQUEST_TIMEOUT_MS=12000;
-const LONG_PRESS_MS=700;
-const MOVE_TOLERANCE_PX=14;
+const OPENAI_COOLDOWN_MS=30000;
 
 let haSocket=null;
 let haSeq=980000000;
@@ -13,9 +12,7 @@ const haPending=new Map();
 let pushDataPromise=null;
 let pushDataCache=null;
 let permissionPromise=null;
-let activePress=null;
-let suppressDishId='';
-let suppressUntil=0;
+const openAiCooldown=new Set();
 
 function readJson(key,fallback){
   try{
@@ -208,97 +205,93 @@ async function integrateDishWithOpenAi(id){
   }
 }
 
-function clearPressTimer(){
-  if(activePress?.timer)clearTimeout(activePress.timer);
+function installOpenAiStyle(){
+  if(document.getElementById('courses-openai-split-button-style'))return;
+  const style=document.createElement('style');
+  style.id='courses-openai-split-button-style';
+  style.textContent=`
+    #missingProductsDialog .missing-dish-actions{gap:0!important;align-items:stretch!important}
+    #missingProductsDialog .missing-dish-integrate{border-radius:999px 0 0 999px!important;padding-left:14px!important;padding-right:13px!important}
+    #missingProductsDialog .missing-dish-openai{display:grid!important;place-items:center!important;width:40px!important;min-width:40px!important;min-height:40px!important;padding:0!important;border:0!important;border-left:1px solid rgba(11,112,64,.16)!important;border-radius:0 999px 999px 0!important;background:#d8eee0!important;color:#0b7040!important;font-size:18px!important;font-weight:900!important;line-height:1!important;box-shadow:inset 1px 0 0 rgba(255,255,255,.42)!important;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    #missingProductsDialog .missing-dish-openai:active{transform:scale(.96)}
+    #missingProductsDialog .missing-dish-openai:disabled{opacity:.45!important;transform:none!important}
+    #missingProductsDialog .missing-dish-openai:focus-visible{outline:2px solid rgba(11,112,64,.25)!important;outline-offset:2px!important}
+    @media(max-width:390px){#missingProductsDialog .missing-dish-integrate{padding-left:11px!important;padding-right:10px!important}#missingProductsDialog .missing-dish-openai{width:36px!important;min-width:36px!important;min-height:40px!important;font-size:16px!important}}
+  `;
+  document.head.appendChild(style);
 }
-function resetPress(){
-  clearPressTimer();
-  activePress=null;
-}
-function startDishLongPress(event,button){
-  if(!event.isPrimary||event.button>0||button.disabled)return;
-  resetPress();
-  const id=String(button.dataset.integrateMissingDish||'');
-  if(!id)return;
-  const state={
-    pointerId:event.pointerId,
-    id,
-    button,
-    x:event.clientX,
-    y:event.clientY,
-    fired:false,
-    timer:0
-  };
-  state.timer=setTimeout(()=>{
-    if(activePress!==state)return;
-    state.fired=true;
-    suppressDishId=id;
-    suppressUntil=Date.now()+2000;
-    button.classList.add('is-openai-running');
-    button.setAttribute('aria-busy','true');
-    navigator.vibrate?.([18,35,18]);
-    void integrateDishWithOpenAi(id).finally(()=>{
-      button.classList.remove('is-openai-running');
-      button.removeAttribute('aria-busy');
-    });
-  },LONG_PRESS_MS);
-  activePress=state;
-}
-function installLongPress(){
-  if(document.documentElement.dataset.coursesOpenAiLongPress==='1')return;
-  document.documentElement.dataset.coursesOpenAiLongPress='1';
-
-  if(!document.getElementById('courses-openai-long-press-style')){
-    const style=document.createElement('style');
-    style.id='courses-openai-long-press-style';
-    style.textContent='#missingProductsDialog .missing-dish-integrate{touch-action:manipulation;-webkit-user-select:none;user-select:none}#missingProductsDialog .missing-dish-integrate.is-openai-running{opacity:.55!important}';
-    document.head.appendChild(style);
-  }
-
-  document.addEventListener('pointerdown',event=>{
-    const button=event.target.closest?.('[data-integrate-missing-dish]');
-    if(button)startDishLongPress(event,button);
-  },true);
-  document.addEventListener('pointermove',event=>{
-    const state=activePress;
-    if(!state||state.pointerId!==event.pointerId||state.fired)return;
-    if(Math.hypot(event.clientX-state.x,event.clientY-state.y)>MOVE_TOLERANCE_PX)resetPress();
-  },true);
-  document.addEventListener('pointerup',event=>{
-    const state=activePress;
-    if(!state||state.pointerId!==event.pointerId)return;
-    clearPressTimer();
-    if(state.fired){
-      event.preventDefault();
-      event.stopPropagation();
+function decorateOpenAiButtons(){
+  const dialog=document.getElementById('missingProductsDialog');
+  if(!dialog)return false;
+  dialog.querySelectorAll('[data-missing-dish-row]').forEach(row=>{
+    const id=String(row.dataset.missingDishRow||'');
+    const actions=row.querySelector('.missing-dish-actions');
+    if(!id||!actions)return;
+    let button=actions.querySelector('[data-openai-missing-dish]');
+    if(!button){
+      button=document.createElement('button');
+      button.type='button';
+      button.className='missing-dish-openai';
+      button.innerHTML='<span aria-hidden="true">✦</span>';
+      actions.appendChild(button);
     }
-    activePress=null;
-  },true);
-  document.addEventListener('pointercancel',event=>{
-    if(activePress?.pointerId===event.pointerId)resetPress();
-  },true);
-  document.addEventListener('contextmenu',event=>{
-    if(event.target.closest?.('[data-integrate-missing-dish]'))event.preventDefault();
-  },true);
+    button.dataset.openaiMissingDish=id;
+    button.title='Intégration OpenAI';
+    button.setAttribute('aria-label','Intégrer ce plat avec OpenAI');
+    button.disabled=openAiCooldown.has(id);
+    button.setAttribute('aria-disabled',String(button.disabled));
+  });
+  return true;
+}
+function bindOpenAiUi(){
+  if(document.documentElement.dataset.coursesOpenAiSplitButton==='1')return;
+  document.documentElement.dataset.coursesOpenAiSplitButton='1';
+  installOpenAiStyle();
+
   document.addEventListener('click',event=>{
-    const settings=event.target.closest?.('#settingsMissingProductsBtn');
-    if(settings){
+    if(event.target.closest?.('#settingsMissingProductsBtn')){
       void ensureNotificationPermission().then(permission=>{
         if(permission==='granted')void pushSubscriptionData();
       });
     }
-    const button=event.target.closest?.('[data-integrate-missing-dish]');
+    const button=event.target.closest?.('[data-openai-missing-dish]');
     if(!button)return;
-    const id=String(button.dataset.integrateMissingDish||'');
-    if(id===suppressDishId&&Date.now()<suppressUntil){
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      suppressDishId='';
-      suppressUntil=0;
-    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const id=String(button.dataset.openaiMissingDish||'');
+    if(!id||button.disabled||openAiCooldown.has(id))return;
+    openAiCooldown.add(id);
+    button.disabled=true;
+    button.setAttribute('aria-disabled','true');
+    button.setAttribute('aria-busy','true');
+    navigator.vibrate?.(12);
+    void integrateDishWithOpenAi(id).then(ok=>{
+      if(!ok)openAiCooldown.delete(id);
+    }).finally(()=>{
+      button.removeAttribute('aria-busy');
+      decorateOpenAiButtons();
+    });
+    setTimeout(()=>{
+      openAiCooldown.delete(id);
+      decorateOpenAiButtons();
+    },OPENAI_COOLDOWN_MS);
   },true);
+
+  const bindDialog=()=>{
+    const dialog=document.getElementById('missingProductsDialog');
+    if(!dialog)return false;
+    decorateOpenAiButtons();
+    new MutationObserver(()=>decorateOpenAiButtons()).observe(dialog,{childList:true,subtree:true});
+    return true;
+  };
+  if(bindDialog())return;
+  const observer=new MutationObserver(()=>{
+    if(bindDialog())observer.disconnect();
+  });
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(()=>observer.disconnect(),10000);
 }
 
 installHaBridge();
-installLongPress();
+bindOpenAiUi();
 })();
