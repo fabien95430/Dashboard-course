@@ -221,9 +221,22 @@ function pushSubscriptionData(){
   });
   return pushDataPromise;
 }
-async function optionalPushData(){
-  const empty={push_endpoint:'',push_p256dh:'',push_auth:'',push_public_key:''};
-  try{return await pushSubscriptionData()}catch(_){return empty}
+async function requiredPushData(){
+  if(!notificationSupported()||!('PushManager' in window)){
+    throw new Error('Web Push indisponible sur cet appareil.');
+  }
+  const permission=await ensureNotificationPermission();
+  if(permission!=='granted'){
+    throw new Error('Notifications non autorisées. Active-les pour Courses dans les réglages iOS.');
+  }
+  const push=await pushSubscriptionData();
+  if(push.push_endpoint&&push.push_p256dh&&push.push_auth&&push.push_public_key)return push;
+  let publicKey='';
+  try{publicKey=await readVapidPublicKey()}catch(_){}
+  if(!publicKey){
+    throw new Error('Clé VAPID publique absente dans Home Assistant.');
+  }
+  throw new Error('Souscription Web Push impossible. Réessaie après avoir rouvert l’application.');
 }
 async function integrateDishWithOpenAi(id){
   const item=readDishes().find(entry=>String(entry?.id||'')===String(id||''));
@@ -233,8 +246,14 @@ async function integrateDishWithOpenAi(id){
     dish_category:String(item.category||''),
     request_id:randomId()
   };
+  let push;
   try{
-    const push=await optionalPushData();
+    push=await requiredPushData();
+  }catch(error){
+    appNotify('Notification requise',String(error?.message||'Impossible d’armer la notification de fin.').slice(0,140));
+    return false;
+  }
+  try{
     await haCallService('rest_command','courses_integrate_dish_openai',{...serviceData,...push});
     appNotify('Intégration OpenAI lancée',String(item.name||''));
     return true;
@@ -257,6 +276,7 @@ function installOpenAiStyle(){
     #missingProductsDialog .missing-dish-openai:focus-visible{outline:2px solid rgba(11,112,64,.25)!important;outline-offset:2px!important}
     #missingProductsDialog .missing-dish-progress{display:inline-flex!important;width:max-content!important;margin-top:1px!important;padding:4px 8px!important;border-radius:999px!important;background:#eef1ef!important;color:#6f7973!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}
     #missingProductsDialog .missing-product-integrate.is-running,#missingProductsDialog .missing-dish-integrate.is-running{background:#edf0ee!important;color:#7a837e!important;opacity:1!important;box-shadow:none!important}
+    #missingProductsDialog .missing-dish-integrate.is-added{background:#edf0ee!important;color:#65736b!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-openai.is-running{background:#edf0ee!important;color:#8a928d!important;border-left-color:#dfe4e1!important;opacity:1!important}
     @media(max-width:390px){#missingProductsDialog .missing-dish-integrate{padding-left:11px!important;padding-right:10px!important}#missingProductsDialog .missing-dish-openai{width:36px!important;min-width:36px!important;min-height:40px!important;font-size:16px!important}}
   `;
@@ -268,17 +288,20 @@ function decorateRunningRows(dialog,type,running){
   const integrateSelector=type==='product'?'[data-integrate-missing-product]':'[data-integrate-missing-dish]';
   dialog.querySelectorAll(rowSelector).forEach(row=>{
     const id=String(row.dataset[rowData]||'');
-    const active=running.has(id);
+    const added=type==='dish'&&(row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request'));
+    const active=!added&&running.has(id);
     row.querySelector('.missing-dish-progress')?.remove();
     const integrate=row.querySelector(integrateSelector);
     if(integrate){
-      integrate.disabled=active;
+      integrate.disabled=added||active;
       integrate.classList.toggle('is-running',active);
-      integrate.setAttribute('aria-disabled',String(active));
-      const label=active?'En cours…':'Intégrer';
+      integrate.classList.toggle('is-added',added);
+      integrate.setAttribute('aria-disabled',String(added||active));
+      const label=added?'Ajouté ✓':active?'En cours…':'Intégrer';
       if(integrate.textContent!==label)integrate.textContent=label;
     }
     row.classList.toggle('is-running-request',active);
+    if(type==='dish')row.classList.toggle('is-added-request',added);
   });
 }
 function decorateOpenAiButtons(){
@@ -300,11 +323,12 @@ function decorateOpenAiButtons(){
       button.innerHTML='<span aria-hidden="true">✦</span>';
       actions.appendChild(button);
     }
-    const running=runningDishes.has(id);
+    const added=row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request');
+    const running=!added&&runningDishes.has(id);
     button.dataset.openaiMissingDish=id;
-    button.title='Intégration OpenAI';
-    button.setAttribute('aria-label',running?'Intégration de ce plat en cours':'Intégrer ce plat avec OpenAI');
-    button.disabled=running||openAiCooldown.has(id);
+    button.title=added?'Plat déjà ajouté':'Intégration OpenAI';
+    button.setAttribute('aria-label',added?'Plat déjà ajouté':running?'Intégration de ce plat en cours':'Intégrer ce plat avec OpenAI');
+    button.disabled=added||running||openAiCooldown.has(id);
     button.classList.toggle('is-running',running);
     button.setAttribute('aria-disabled',String(button.disabled));
   });
