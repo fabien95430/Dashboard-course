@@ -2,6 +2,9 @@
 'use strict';
 
 const STORAGE_DISHES='courses-missing-dishes-v1';
+const STORAGE_PRODUCTS='courses-missing-products-v1';
+const STORAGE_RUNNING_DISHES='courses-missing-dishes-running-v1';
+const STORAGE_RUNNING_PRODUCTS='courses-missing-products-running-v1';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const HA_REQUEST_TIMEOUT_MS=12000;
 const OPENAI_COOLDOWN_MS=30000;
@@ -25,6 +28,42 @@ function readJson(key,fallback){
 function readDishes(){
   const value=readJson(STORAGE_DISHES,[]);
   return Array.isArray(value)?value:[];
+}
+function readProducts(){
+  const value=readJson(STORAGE_PRODUCTS,[]);
+  return Array.isArray(value)?value:[];
+}
+function runningKey(type){return type==='product'?STORAGE_RUNNING_PRODUCTS:STORAGE_RUNNING_DISHES}
+function readRunning(type){
+  const value=readJson(runningKey(type),[]);
+  return new Set(Array.isArray(value)?value.map(String):[]);
+}
+function saveRunning(type,running){
+  try{localStorage.setItem(runningKey(type),JSON.stringify([...running]))}catch(_){}
+}
+function currentIds(type){
+  const items=type==='product'?readProducts():readDishes();
+  return new Set(items.map(item=>String(item?.id||'')).filter(Boolean));
+}
+function pruneRunning(type){
+  const current=currentIds(type);
+  const running=readRunning(type);
+  let changed=false;
+  [...running].forEach(id=>{
+    if(current.has(id))return;
+    running.delete(id);
+    changed=true;
+  });
+  if(changed)saveRunning(type,running);
+  return running;
+}
+function setRunning(type,id,active){
+  const value=String(id||'');
+  if(!value)return;
+  const running=readRunning(type);
+  if(active)running.add(value);
+  else running.delete(value);
+  saveRunning(type,running);
 }
 function randomId(){
   if(globalThis.crypto?.getRandomValues){
@@ -216,13 +255,46 @@ function installOpenAiStyle(){
     #missingProductsDialog .missing-dish-openai:active{transform:scale(.96)}
     #missingProductsDialog .missing-dish-openai:disabled{opacity:.45!important;transform:none!important}
     #missingProductsDialog .missing-dish-openai:focus-visible{outline:2px solid rgba(11,112,64,.25)!important;outline-offset:2px!important}
+    #missingProductsDialog .missing-dish-progress{display:inline-flex!important;width:max-content!important;margin-top:1px!important;padding:4px 8px!important;border-radius:999px!important;background:#eef1ef!important;color:#6f7973!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}
+    #missingProductsDialog .missing-product-integrate.is-running,#missingProductsDialog .missing-dish-integrate.is-running{background:#edf0ee!important;color:#7a837e!important;opacity:1!important;box-shadow:none!important}
+    #missingProductsDialog .missing-dish-openai.is-running{background:#edf0ee!important;color:#8a928d!important;border-left-color:#dfe4e1!important;opacity:1!important}
     @media(max-width:390px){#missingProductsDialog .missing-dish-integrate{padding-left:11px!important;padding-right:10px!important}#missingProductsDialog .missing-dish-openai{width:36px!important;min-width:36px!important;min-height:40px!important;font-size:16px!important}}
   `;
   document.head.appendChild(style);
 }
+function decorateRunningRows(dialog,type,running){
+  const rowSelector=type==='product'?'[data-missing-product-row]':'[data-missing-dish-row]';
+  const rowData=type==='product'?'missingProductRow':'missingDishRow';
+  const integrateSelector=type==='product'?'[data-integrate-missing-product]':'[data-integrate-missing-dish]';
+  dialog.querySelectorAll(rowSelector).forEach(row=>{
+    const id=String(row.dataset[rowData]||'');
+    const active=running.has(id);
+    const copy=row.querySelector('.missing-product-copy');
+    let progress=copy?.querySelector('.missing-dish-progress');
+    if(active&&!progress&&copy){
+      progress=document.createElement('small');
+      progress.className='missing-dish-progress';
+      progress.textContent='En cours…';
+      copy.appendChild(progress);
+    }
+    if(!active&&progress)progress.remove();
+    const integrate=row.querySelector(integrateSelector);
+    if(integrate){
+      integrate.disabled=active;
+      integrate.classList.toggle('is-running',active);
+      integrate.setAttribute('aria-disabled',String(active));
+      integrate.textContent=active?'En cours…':'Intégrer';
+    }
+    row.classList.toggle('is-running-request',active);
+  });
+}
 function decorateOpenAiButtons(){
   const dialog=document.getElementById('missingProductsDialog');
   if(!dialog)return false;
+  const runningProducts=pruneRunning('product');
+  const runningDishes=pruneRunning('dish');
+  decorateRunningRows(dialog,'product',runningProducts);
+  decorateRunningRows(dialog,'dish',runningDishes);
   dialog.querySelectorAll('[data-missing-dish-row]').forEach(row=>{
     const id=String(row.dataset.missingDishRow||'');
     const actions=row.querySelector('.missing-dish-actions');
@@ -235,10 +307,12 @@ function decorateOpenAiButtons(){
       button.innerHTML='<span aria-hidden="true">✦</span>';
       actions.appendChild(button);
     }
+    const running=runningDishes.has(id);
     button.dataset.openaiMissingDish=id;
     button.title='Intégration OpenAI';
-    button.setAttribute('aria-label','Intégrer ce plat avec OpenAI');
-    button.disabled=openAiCooldown.has(id);
+    button.setAttribute('aria-label',running?'Intégration de ce plat en cours':'Intégrer ce plat avec OpenAI');
+    button.disabled=running||openAiCooldown.has(id);
+    button.classList.toggle('is-running',running);
     button.setAttribute('aria-disabled',String(button.disabled));
   });
   return true;
@@ -255,26 +329,43 @@ function bindOpenAiUi(){
       });
     }
     const button=event.target.closest?.('[data-openai-missing-dish]');
-    if(!button)return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    const id=String(button.dataset.openaiMissingDish||'');
-    if(!id||button.disabled||openAiCooldown.has(id))return;
-    openAiCooldown.add(id);
-    button.disabled=true;
-    button.setAttribute('aria-disabled','true');
-    button.setAttribute('aria-busy','true');
-    navigator.vibrate?.(12);
-    void integrateDishWithOpenAi(id).then(ok=>{
-      if(!ok)openAiCooldown.delete(id);
-    }).finally(()=>{
-      button.removeAttribute('aria-busy');
-      decorateOpenAiButtons();
-    });
-    setTimeout(()=>{
-      openAiCooldown.delete(id);
-      decorateOpenAiButtons();
-    },OPENAI_COOLDOWN_MS);
+    if(button){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const id=String(button.dataset.openaiMissingDish||'');
+      if(!id||button.disabled||openAiCooldown.has(id))return;
+      setRunning('dish',id,true);
+      openAiCooldown.add(id);
+      button.disabled=true;
+      button.classList.add('is-running');
+      button.setAttribute('aria-disabled','true');
+      button.setAttribute('aria-busy','true');
+      queueMicrotask(decorateOpenAiButtons);
+      navigator.vibrate?.(12);
+      void integrateDishWithOpenAi(id).then(ok=>{
+        if(!ok){
+          openAiCooldown.delete(id);
+          setRunning('dish',id,false);
+        }
+      }).finally(()=>{
+        button.removeAttribute('aria-busy');
+        decorateOpenAiButtons();
+      });
+      setTimeout(()=>{
+        openAiCooldown.delete(id);
+        decorateOpenAiButtons();
+      },OPENAI_COOLDOWN_MS);
+      return;
+    }
+    const integrate=event.target.closest?.('[data-integrate-missing-dish],[data-integrate-missing-product]');
+    if(!integrate||integrate.disabled)return;
+    const type=integrate.matches('[data-integrate-missing-product]')?'product':'dish';
+    const id=type==='product'
+      ?String(integrate.dataset.integrateMissingProduct||'')
+      :String(integrate.dataset.integrateMissingDish||'');
+    if(!id)return;
+    setRunning(type,id,true);
+    queueMicrotask(decorateOpenAiButtons);
   },true);
 
   const bindDialog=()=>{
@@ -282,6 +373,10 @@ function bindOpenAiUi(){
     if(!dialog)return false;
     decorateOpenAiButtons();
     new MutationObserver(()=>decorateOpenAiButtons()).observe(dialog,{childList:true,subtree:true});
+    dialog.addEventListener('close',()=>{
+      pruneRunning('product');
+      pruneRunning('dish');
+    });
     return true;
   };
   if(bindDialog())return;
