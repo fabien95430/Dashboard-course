@@ -30,9 +30,9 @@ if(requestId)target.searchParams.set('courses_request',requestId);
 const success=status==='added';
 const itemLabel=itemType==='product'?'produit':'plat';
 const payload={
-  title:'Courses',
+  title:success?'Ajout terminé':'Courses',
   body:success
-    ?`✅ ${itemName} est maintenant disponible dans le catalogue.`
+    ?`${itemName} est maintenant disponible dans le catalogue.`
     :`⚠️ L’intégration du ${itemLabel} « ${itemName} » a échoué.`,
   tag:requestId?`courses-${itemType}-${requestId}`:`courses-${itemType}-integration`,
   status:success?'added':'error',

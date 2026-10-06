@@ -122,10 +122,9 @@ function armRequestCreationNotification(){
     if(!created.length)return;
     await permission;
     for(const item of created){
-      const label=item.type==='dish'?'plat':'produit';
       await showSystemNotification(
-        'Demande d’ajout créée',
-        `${item.name} a bien été enregistré comme ${label} à ajouter.`,
+        'Demande d’ajout',
+        `${item.name} a bien été ajouté aux demandes.`,
         `courses-request-${item.type}-${item.id}`,
         './'
       );
