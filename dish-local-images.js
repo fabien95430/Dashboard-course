@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v246';
+const APP_VERSION='v247';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -91,6 +91,14 @@ function installMissingProductsFixes(){
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);
   }
+}
+function installCatalogQuantities(){
+  if(document.querySelector('script[data-catalog-quantities]'))return;
+  const script=document.createElement('script');
+  script.src='./catalog-quantities.js?v=1';
+  script.defer=true;
+  script.dataset.catalogQuantities='1';
+  document.head.appendChild(script);
 }
 async function warmVisual(src,priority='auto'){
   if(retainedVisuals.has(src))return true;
@@ -297,6 +305,7 @@ function bind(){
 syncPageVersions();
 installVisualWarmupStyle();
 installMissingProductsFixes();
+installCatalogQuantities();
 void warmProductVisuals();
 scheduleDishVisualWarmup();
 versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
