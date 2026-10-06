@@ -999,7 +999,7 @@ function bindListReorder(root){
       const unavailable=listReorderUnavailableMessage(root,row);
       if(unavailable)return;
       const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
-      let timer=setTimeout(()=>beginDrag(event),500);
+      let timer=setTimeout(()=>beginDrag(event),250);
       const preMove=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
         if(Math.hypot(moveEvent.clientX-startX,moveEvent.clientY-startY)>12){clearTimeout(timer);cleanupPre()}
