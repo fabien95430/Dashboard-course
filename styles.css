@@ -4157,3 +4157,7 @@ body{
 .row-grip.list-row-more{width:38px!important;margin-right:8px!important;justify-self:end!important}
 .list-row-menu{padding:5px!important;border-radius:14px!important;background:rgba(255,255,255,.98)!important;box-shadow:0 12px 30px rgba(36,50,41,.18)!important}
 .list-row-menu-delete{height:40px!important;border-top:0!important;border-radius:10px!important;padding:0 12px!important}
+
+
+/* Ma liste — empêche la sélection de texte pendant le maintien tactile */
+.list-row,.list-row *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
