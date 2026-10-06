@@ -9,7 +9,7 @@
 
 (() => {
   'use strict';
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v269';});
+  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v270';});
 
   const style=document.createElement('link');
   style.rel='stylesheet';
