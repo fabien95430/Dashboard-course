@@ -1,4 +1,4 @@
-const CACHE='courses-app-v256-test-r3';
+const CACHE='courses-app-v255-test-r4';
 const VISUAL_CACHE='courses-visuals-v1';
 const PRODUCT_VISUALS=[
   './bring-photo-v5-frais.webp.png?v=15',
