@@ -3,9 +3,28 @@
 
 from __future__ import annotations
 
+import os
+
 import integrate_dish as base
 
 _original_image_prompt = base.image_prompt
+
+
+def require_web_push() -> None:
+    required = (
+        "PUSH_ENDPOINT",
+        "PUSH_P256DH",
+        "PUSH_AUTH",
+        "PUSH_PUBLIC_KEY",
+        "COURSES_VAPID_PRIVATE_KEY",
+    )
+    missing = [name for name in required if not os.getenv(name, "").strip()]
+    if missing:
+        raise SystemExit(
+            "Configuration Web Push incomplète : "
+            + ", ".join(missing)
+            + ". L’intégration automatique n’est pas lancée sans notification de fin."
+        )
 
 
 def dessert_image_prompt(name: str, metadata: dict, child: bool) -> str:
@@ -30,4 +49,5 @@ def dessert_image_prompt(name: str, metadata: dict, child: bool) -> str:
 base.image_prompt = dessert_image_prompt
 
 if __name__ == "__main__":
+    require_web_push()
     base.main()
