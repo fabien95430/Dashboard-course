@@ -7,14 +7,12 @@ const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const HA_REQUEST_TIMEOUT_MS=12000;
 const CHATGPT_WEB_URL='https://chatgpt.com/';
 const CHATGPT_APP_URL='com.openai.chat://chatgpt.com/';
-const SWIPE_ACTION_WIDTH=88;
 
 let haSocket=null;
 let haSeq=950000000;
 const haPending=new Map();
 let pushDataPromise=null;
 let pushDataCache=null;
-let openSwipeRow=null;
 
 function readJson(key,fallback){
   try{
@@ -257,153 +255,32 @@ function installStyle(){
   style.textContent=`
     #missingProductsDialog #missingProductsList[hidden],
     #missingProductsDialog #missingDishesList[hidden]{display:none!important}
-    #missingProductsDialog .missing-products-header h3{font-size:22px!important;line-height:1.08!important;letter-spacing:-.3px!important}
-    #missingProductsDialog .missing-dish-progress{display:none!important}
-    #missingProductsDialog .missing-dish-integrate.is-running{position:relative!important;min-width:96px!important;padding-left:34px!important;background:#eef8f2!important;color:#4d9472!important;opacity:1!important}
-    #missingProductsDialog .missing-dish-integrate.is-running::before{content:"";position:absolute;left:13px;top:50%;width:12px;height:12px;margin-top:-7px;border:2px solid rgba(47,143,92,.22);border-top-color:#2f8f5c;border-radius:50%;animation:missingRequestSpin .8s linear infinite}
-    @keyframes missingRequestSpin{to{transform:rotate(360deg)}}
-    #missingProductsDialog .missing-product-row.has-swipe-delete{position:relative!important;display:block!important;min-height:70px!important;padding:0!important;border:0!important;border-radius:20px!important;background:#ff453a!important;box-shadow:0 6px 18px #394b3e0b!important;overflow:hidden!important;isolation:isolate!important}
-    #missingProductsDialog .missing-row-surface{position:relative!important;z-index:2!important;width:100%!important;min-height:70px!important;box-sizing:border-box!important;padding:10px!important;border:1px solid #edf0ec!important;border-radius:20px!important;background:#fff!important;display:grid!important;align-items:center!important;gap:8px!important;transform:translate3d(0,0,0);transition:transform .24s cubic-bezier(.22,.78,.18,1)!important;touch-action:pan-y!important;will-change:transform}
-    #missingProductsDialog .missing-product-row.has-swipe-delete.is-dish .missing-row-surface{grid-template-columns:minmax(0,1fr) auto!important}
-    #missingProductsDialog .missing-product-row.has-swipe-delete:not(.is-dish) .missing-row-surface{grid-template-columns:38px minmax(0,1fr) auto!important}
-    #missingProductsDialog .missing-product-row.has-swipe-delete .missing-product-remove{position:absolute!important;z-index:1!important;top:0!important;right:0!important;width:${SWIPE_ACTION_WIDTH}px!important;min-width:${SWIPE_ACTION_WIDTH}px!important;height:100%!important;border:0!important;border-radius:0 20px 20px 0!important;background:linear-gradient(160deg,#ff6258,#ef3f36)!important;color:#fff!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;padding:0 6px!important;box-shadow:none!important}
-    #missingProductsDialog .missing-product-row.has-swipe-delete .missing-product-remove svg{width:19px!important;height:19px!important;stroke-width:2!important}
-    #missingProductsDialog .missing-product-row.has-swipe-delete .missing-remove-label{display:block!important;color:#fff!important;font-size:10px!important;line-height:1!important;font-weight:780!important}
-    #missingProductsDialog .missing-product-row.has-swipe-delete .missing-product-remove:focus-visible{outline:2px solid rgba(255,255,255,.9)!important;outline-offset:-4px!important}
-    @media(max-width:390px){#missingProductsDialog .missing-products-header h3{font-size:22px!important}#missingProductsDialog .missing-product-row.has-swipe-delete:not(.is-dish) .missing-row-surface{grid-template-columns:32px minmax(0,1fr) auto!important;gap:6px!important}}
-    @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-row-surface{transition:none!important}#missingProductsDialog .missing-dish-integrate.is-running::before{animation:none!important}}
+    #missingProductsDialog .missing-dish-progress{display:inline-flex!important;width:max-content!important;margin-top:1px;padding:4px 8px!important;border-radius:999px;background:#eef3ff!important;color:#41669b!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}
+    #missingProductsDialog .missing-dish-integrate.is-running{opacity:.52!important}
   `;
   document.head.appendChild(style);
-}
-
-function setSwipePosition(row,offset,{animate=true,open=false}={}){
-  const surface=row?.querySelector('.missing-row-surface');
-  const remove=row?.querySelector('.missing-product-remove');
-  if(!surface||!remove)return;
-  surface.style.transition=animate?'':'none';
-  surface.style.transform='translate3d('+offset+'px,0,0)';
-  row.classList.toggle('is-swipe-open',open);
-  remove.tabIndex=open?0:-1;
-  remove.setAttribute('aria-hidden',open?'false':'true');
-  if(open)openSwipeRow=row;
-  else if(openSwipeRow===row)openSwipeRow=null;
-  if(!animate)requestAnimationFrame(()=>surface.style.removeProperty('transition'));
-}
-function closeSwipeRow(row=openSwipeRow,animate=true){
-  if(!row)return;
-  setSwipePosition(row,0,{animate,open:false});
-}
-function prepareSwipeRow(row){
-  if(!row||row.dataset.swipeDeleteBound==='1')return;
-  const remove=row.querySelector(':scope > .missing-product-remove');
-  if(!remove)return;
-  const isDish=row.classList.contains('is-dish');
-  if(!isDish&&!row.classList.contains('has-integration-action'))return;
-
-  row.dataset.swipeDeleteBound='1';
-  row.classList.add('has-swipe-delete');
-  const surface=document.createElement('div');
-  surface.className='missing-row-surface';
-  surface.setAttribute('aria-label','Balayez vers la gauche pour afficher Supprimer');
-  [...row.childNodes].forEach(node=>{
-    if(node===remove)return;
-    surface.appendChild(node);
-  });
-  row.insertBefore(surface,remove);
-  if(!remove.querySelector('.missing-remove-label')){
-    const label=document.createElement('span');
-    label.className='missing-remove-label';
-    label.textContent='Supprimer';
-    remove.appendChild(label);
-  }
-  setSwipePosition(row,0,{animate:false,open:false});
-
-  let gesture=null;
-  let suppressClickUntil=0;
-  surface.addEventListener('pointerdown',event=>{
-    if(!event.isPrimary||event.button>0||event.target.closest('button,a,input,select,textarea'))return;
-    if(openSwipeRow&&openSwipeRow!==row)closeSwipeRow(openSwipeRow);
-    gesture={
-      id:event.pointerId,
-      x:event.clientX,
-      y:event.clientY,
-      base:row.classList.contains('is-swipe-open')?-SWIPE_ACTION_WIDTH:0,
-      offset:row.classList.contains('is-swipe-open')?-SWIPE_ACTION_WIDTH:0,
-      axis:'',
-      moved:false,
-      buzzed:false
-    };
-    try{surface.setPointerCapture(event.pointerId)}catch(_){}
-  });
-  surface.addEventListener('pointermove',event=>{
-    if(!gesture||event.pointerId!==gesture.id)return;
-    const dx=event.clientX-gesture.x;
-    const dy=event.clientY-gesture.y;
-    if(!gesture.axis){
-      if(Math.max(Math.abs(dx),Math.abs(dy))<5)return;
-      gesture.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';
-    }
-    if(gesture.axis!=='x')return;
-    event.preventDefault();
-    gesture.moved=true;
-    let offset=gesture.base+dx;
-    if(offset>0)offset*=.18;
-    if(offset<-SWIPE_ACTION_WIDTH)offset=-SWIPE_ACTION_WIDTH+(offset+SWIPE_ACTION_WIDTH)*.18;
-    offset=Math.max(-SWIPE_ACTION_WIDTH-16,Math.min(12,offset));
-    gesture.offset=offset;
-    setSwipePosition(row,offset,{animate:false,open:row.classList.contains('is-swipe-open')});
-    if(!gesture.buzzed&&offset<=-SWIPE_ACTION_WIDTH*.55){
-      gesture.buzzed=true;
-      navigator.vibrate?.(4);
-    }
-  },{passive:false});
-  const finish=event=>{
-    if(!gesture||event.pointerId!==gesture.id)return;
-    const state=gesture;
-    gesture=null;
-    try{surface.releasePointerCapture(event.pointerId)}catch(_){}
-    if(state.axis!=='x')return;
-    const shouldOpen=state.offset<=-SWIPE_ACTION_WIDTH*.42;
-    setSwipePosition(row,shouldOpen?-SWIPE_ACTION_WIDTH:0,{animate:true,open:shouldOpen});
-    if(shouldOpen)navigator.vibrate?.(5);
-    if(state.moved)suppressClickUntil=performance.now()+280;
-  };
-  surface.addEventListener('pointerup',finish);
-  surface.addEventListener('pointercancel',finish);
-  surface.addEventListener('click',event=>{
-    if(performance.now()<suppressClickUntil){
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      return;
-    }
-    if(row.classList.contains('is-swipe-open')&&!event.target.closest('button,a,input,select,textarea')){
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      closeSwipeRow(row);
-    }
-  },true);
-  remove.addEventListener('click',()=>{
-    if(openSwipeRow===row)openSwipeRow=null;
-  },true);
-}
-function prepareSwipeRows(dialog){
-  dialog.querySelectorAll('.missing-product-row').forEach(prepareSwipeRow);
 }
 function decorateRows(dialog){
   const running=pruneRunning();
   dialog.querySelectorAll('[data-missing-dish-row]').forEach(row=>{
     const id=String(row.dataset.missingDishRow||'');
     const active=running.has(id);
-    row.querySelector('.missing-dish-progress')?.remove();
+    const copy=row.querySelector('.missing-product-copy');
+    let progress=copy?.querySelector('.missing-dish-progress');
+    if(active&&!progress&&copy){
+      progress=document.createElement('small');
+      progress.className='missing-dish-progress';
+      progress.textContent='En cours…';
+      copy.appendChild(progress);
+    }
+    if(!active&&progress)progress.remove();
     const button=row.querySelector('[data-integrate-missing-dish]');
     if(button){
       button.disabled=active;
       button.classList.toggle('is-running',active);
       button.setAttribute('aria-disabled',String(active));
-      button.textContent=active?'En cours…':'Intégrer';
     }
   });
-  prepareSwipeRows(dialog);
 }
 
 function openNativeChatGpt(){
@@ -457,17 +334,9 @@ function bindDialog(dialog){
     armChatGptOpenOverride();
   },true);
 
-  dialog.addEventListener('pointerdown',event=>{
-    if(!openSwipeRow||openSwipeRow.contains(event.target))return;
-    closeSwipeRow(openSwipeRow);
-  },true);
-
   const observer=new MutationObserver(()=>decorateRows(dialog));
   observer.observe(dialog,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
-  dialog.addEventListener('close',()=>{
-    pruneRunning();
-    closeSwipeRow(openSwipeRow,false);
-  });
+  dialog.addEventListener('close',()=>pruneRunning());
   document.getElementById('settingsMissingProductsBtn')?.addEventListener('click',()=>primePushSubscription(true));
   decorateRows(dialog);
   primePushSubscription();
