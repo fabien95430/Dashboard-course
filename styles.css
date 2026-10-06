@@ -4147,3 +4147,9 @@ body{
 
 /* v248 — une fois l'appui long reconnu, le navigateur laisse le drag piloter la ligne */
 .list-row.is-reorder-dragging{touch-action:none!important}
+
+/* v251 — actions compactes et proportions Ma liste */
+.purchase-check{width:38px!important;height:38px!important}
+.row-grip.list-row-more{width:38px!important;margin-right:8px!important;justify-self:end!important}
+.list-row-menu{padding:5px!important;border-radius:14px!important;background:rgba(255,255,255,.98)!important;box-shadow:0 12px 30px rgba(36,50,41,.18)!important}
+.list-row-menu-delete{height:40px!important;border-top:0!important;border-radius:10px!important;padding:0 12px!important}
