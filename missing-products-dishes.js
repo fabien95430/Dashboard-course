@@ -250,6 +250,7 @@ function initMissingProductsAndDishes(){
 
   let dishes=readDishes();
   let mode='products';
+  let lastMode='products';
   let dishCategory='';
   let swapTimer=0;
   let pointerStart=null;
@@ -311,6 +312,7 @@ function initMissingProductsAndDishes(){
     if(next!=='products'&&next!=='dishes')return;
     if(mode===next){renderMode();return}
     mode=next;
+    lastMode=next;
     if(clearInput)input.value='';
     if(animate&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
       modeSwitch.classList.add('is-swapping');
@@ -540,7 +542,7 @@ function initMissingProductsAndDishes(){
   visualWarmupObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
   settingsButton.addEventListener('click',()=>{
-    setMode('products',{animate:false,clearInput:false});
+    setMode(lastMode,{animate:false,clearInput:false});
     requestAnimationFrame(()=>{
       renderCategorySelect();
       syncNewProductRequests();
@@ -548,7 +550,7 @@ function initMissingProductsAndDishes(){
     });
   });
   dialog.addEventListener('close',()=>{
-    setMode('products',{animate:false,clearInput:false});
+    lastMode=mode;
   });
 
   renderMode();
