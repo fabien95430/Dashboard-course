@@ -86,6 +86,9 @@ const DISHES=Object.freeze([
   {name:'Saumon brocoli',photoId:'',tags:['Enfants'],ingredients:['Saumon','Brocoli','Riz basmati']},
   {name:'Steak frites',photoId:'',tags:['Enfants'],ingredients:['Steaks hachés','Frites surgelées']},
   {name:'Velouté carottes',photoId:'',tags:['Enfants'],ingredients:['Carottes','Pommes de terre','Crème fraîche','Oignons jaunes']},
+  {name:'Steak tartare',photoId:'',tags:['Viandes'],ingredients:['Bœuf','Œufs','Oignons rouges']},
+  {name:'Sushis',photoId:'',tags:['Poissons'],ingredients:['Saumon','Riz long','Avocat','Concombres']},
+  {name:'Saucisse lentille',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Lentilles','Carottes','Oignons jaunes']},
   {name:'Crème brûlée',photoId:'',tags:['Végé','Dessert'],ingredients:['Crème liquide','Œufs','Sucre','Vanille']},
 ]);
 
