@@ -957,33 +957,22 @@ function closeListRowMenu(){
 function openListRowMenu(row,anchor){
   closeListRowMenu();
   const name=row.dataset.name||'';
-  const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));
-  if(!group)return;
+  if(!activeGroups().some(entry=>norm(entry.summary)===norm(name)))return;
   const menu=document.createElement('div');
   menu.className='list-row-menu';
   menu.setAttribute('role','menu');
-  const quantity=document.createElement('div');
-  quantity.className='list-row-menu-quantity';
-  quantity.innerHTML='<span>Quantité</span><div><button type="button" data-list-qty="-1" aria-label="Diminuer">−</button><strong>'+group.count+'</strong><button type="button" data-list-qty="1" aria-label="Augmenter">+</button></div>';
-  quantity.querySelectorAll('[data-list-qty]').forEach(button=>button.onclick=async event=>{
-    event.stopPropagation();
-    const delta=Number(button.dataset.listQty)||0;
-    closeListRowMenu();
-    if(delta>0)await incrementProduct(name);else if(group.count>1)await decrementProduct(name);
-    else await removeGroup(name,row);
-  });
   const remove=document.createElement('button');
   remove.type='button';
   remove.className='list-row-menu-delete';
   remove.setAttribute('role','menuitem');
   remove.textContent='Supprimer';
   remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
-  menu.append(quantity,remove);
+  menu.append(remove);
   document.body.appendChild(menu);
-  const rect=anchor.getBoundingClientRect(),width=Math.min(250,window.innerWidth-28);
+  const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
   menu.style.width=width+'px';
   const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
-  const below=rect.bottom+8,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-8);
+  const below=rect.bottom+7,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-7);
   menu.style.left=left+'px';menu.style.top=top+'px';
   anchor.setAttribute('aria-expanded','true');
   listRowMenu={menu,anchor};
@@ -1010,10 +999,10 @@ function bindListReorder(root){
       const unavailable=listReorderUnavailableMessage(root,row);
       if(unavailable)return;
       const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
-      let timer=setTimeout(()=>beginDrag(event),360),dragging=false;
+      let timer=setTimeout(()=>beginDrag(event),200);
       const preMove=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
-        if(Math.hypot(moveEvent.clientX-startX,moveEvent.clientY-startY)>8){clearTimeout(timer);cleanupPre()}
+        if(Math.hypot(moveEvent.clientX-startX,moveEvent.clientY-startY)>12){clearTimeout(timer);cleanupPre()}
       };
       const preEnd=endEvent=>{if(endEvent.pointerId!==pointerId)return;clearTimeout(timer);cleanupPre()};
       const cleanupPre=()=>{document.removeEventListener('pointermove',preMove,true);document.removeEventListener('pointerup',preEnd,true);document.removeEventListener('pointercancel',preEnd,true)};
