@@ -306,7 +306,6 @@ async function registerNotificationWatch(type,id){
     });
     return true;
   }catch(error){
-    setRunning(type,id,false);
     appNotify('Notification non armée',String(error?.message||'Réessaie après avoir vérifié les notifications.').slice(0,140));
     return false;
   }

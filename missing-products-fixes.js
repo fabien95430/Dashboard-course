@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 
-const CORE_URL='./missing-products-fixes-core.js?v=5';
+const CORE_URL='./missing-products-fixes-core.js?v=6';
 const STORAGE_DISHES='courses-missing-dishes-v1';
 const STORAGE_PRODUCTS='courses-missing-products-v1';
 const STORAGE_QUEUED='courses-missing-git-queued-v1';
