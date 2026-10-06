@@ -157,6 +157,16 @@ function ensureThumb(row,type){
 function syncRunning(row){
   const integrate=row.querySelector('[data-integrate-missing-product],[data-integrate-missing-dish]');
   if(!integrate)return;
+  const added=row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request');
+  if(added){
+    integrate.disabled=true;
+    integrate.textContent='Ajouté ✓';
+    integrate.classList.remove('is-running-label');
+    integrate.classList.add('is-added-label');
+    row.classList.remove('is-running-request');
+    return;
+  }
+  integrate.classList.remove('is-added-label');
   const running=integrate.classList.contains('is-running')||integrate.disabled;
   integrate.textContent=running?'En cours…':'Intégrer';
   integrate.classList.toggle('is-running-label',running);
@@ -247,6 +257,10 @@ function installStyle(){
     #missingProductsDialog .missing-row-more:active{transform:scale(.96);background:#f1f5f2}
     #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:78px!important;min-height:36px!important;padding:0 10px!important;font-size:11px!important}
     #missingProductsDialog .missing-product-integrate.is-running-label,#missingProductsDialog .missing-dish-integrate.is-running-label{background:#eef3ef!important;color:#7b8d82!important;opacity:1!important}
+    #missingProductsDialog .missing-dish-integrate.is-added-label{background:#edf0ee!important;color:#65736b!important;opacity:1!important}
+    #missingProductsDialog .is-added-request .missing-product-copy strong{color:#748078!important}
+    #missingProductsDialog .is-added-request .missing-request-thumb{filter:saturate(.45);opacity:.72}
+    #missingProductsDialog .is-added-request .missing-row-more{color:#7f8983!important}
     #missingProductsDialog .missing-dish-magic{display:none!important}
     .missing-row-menu{position:fixed;z-index:2147483647;padding:7px;border:1px solid rgba(47,68,54,.09);border-radius:18px;background:rgba(255,255,255,.98);box-shadow:0 18px 48px rgba(30,42,34,.20);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
     .missing-row-menu-item{position:relative;width:100%;min-height:50px;padding:8px 10px;border:0;border-radius:13px;background:transparent;color:#172019;display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center;text-align:left;overflow:hidden;touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
