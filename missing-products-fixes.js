@@ -367,7 +367,15 @@ function bindOpenAiUi(){
     const dialog=document.getElementById('missingProductsDialog');
     if(!dialog)return false;
     decorateOpenAiButtons();
-    new MutationObserver(()=>decorateOpenAiButtons()).observe(dialog,{childList:true,subtree:true});
+    let decorateQueued=false;
+    new MutationObserver(()=>{
+      if(decorateQueued)return;
+      decorateQueued=true;
+      queueMicrotask(()=>{
+        decorateQueued=false;
+        decorateOpenAiButtons();
+      });
+    }).observe(dialog,{childList:true,subtree:true});
     dialog.addEventListener('close',()=>{
       pruneRunning('product');
       pruneRunning('dish');
