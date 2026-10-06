@@ -8,6 +8,7 @@ const STORAGE_RUNNING_PRODUCTS='courses-missing-products-running-v1';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const PRODUCT_RELAY_PREFIX='__courses_product__:';
 const HA_REQUEST_TIMEOUT_MS=12000;
+const AUTO_COOLDOWN_MS=30000;
 
 let haSocket=null;
 let haSeq=950000000;
@@ -15,6 +16,7 @@ const haPending=new Map();
 let pushDataPromise=null;
 let pushDataCache=null;
 let permissionPromise=null;
+const autoCooldown=new Set();
 
 function readJson(key,fallback){
   try{
@@ -309,6 +311,30 @@ async function registerNotificationWatch(type,id){
     return false;
   }
 }
+async function optionalPushData(){
+  const empty={push_endpoint:'',push_p256dh:'',push_auth:'',push_public_key:''};
+  if(pushDataCache?.push_endpoint)return pushDataCache;
+  if(!notificationSupported()||Notification.permission!=='granted')return empty;
+  try{return await pushSubscriptionData()}catch(_){return empty}
+}
+async function integrateDishWithOpenAi(id){
+  const item=readItems('dish').find(entry=>String(entry?.id||'')===String(id||''));
+  if(!item)return false;
+  const serviceData={
+    dish_name:String(item.name||''),
+    dish_category:String(item.category||''),
+    request_id:randomId()
+  };
+  try{
+    const push=await optionalPushData();
+    await haCallService('rest_command','courses_integrate_dish_openai',{...serviceData,...push});
+    appNotify('Intégration automatique lancée',String(item.name||''));
+    return true;
+  }catch(error){
+    appNotify('Intégration automatique impossible',String(error?.message||'Réessaie après avoir vérifié Home Assistant.').slice(0,140));
+    return false;
+  }
+}
 
 function installStyle(){
   if(document.getElementById('missing-products-fixes-style'))return;
@@ -320,6 +346,11 @@ function installStyle(){
     #missingProductsDialog .missing-dish-progress{display:inline-flex!important;width:max-content!important;margin-top:1px;padding:4px 8px!important;border-radius:999px;background:#eef3ff!important;color:#41669b!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}
     #missingProductsDialog .missing-dish-integrate.is-running,
     #missingProductsDialog .missing-product-integrate.is-running{opacity:.52!important}
+    #missingProductsDialog .missing-dish-magic{width:36px!important;height:36px!important;min-width:36px!important;padding:0!important;border:1px solid #d9ece1!important;border-radius:12px!important;background:#f5fbf7!important;color:#23905a!important;display:grid!important;place-items:center!important;font-size:17px!important;line-height:1!important;font-weight:800!important;box-shadow:none!important}
+    #missingProductsDialog .missing-dish-magic:active{transform:scale(.95)}
+    #missingProductsDialog .missing-dish-magic:disabled{opacity:.38!important;transform:none!important}
+    #missingProductsDialog .missing-dish-magic:focus-visible{outline:2px solid rgba(35,144,90,.24)!important;outline-offset:2px!important}
+    @media(max-width:390px){#missingProductsDialog .missing-dish-magic{width:32px!important;height:32px!important;min-width:32px!important;border-radius:11px!important;font-size:15px!important}}
   `;
   document.head.appendChild(style);
 }
@@ -346,6 +377,24 @@ function decorateTypeRows(dialog,type){
       button.classList.toggle('is-running',active);
       button.setAttribute('aria-disabled',String(active));
     }
+    if(type==='dish'){
+      const actions=row.querySelector('.missing-dish-actions');
+      if(actions){
+        let magic=actions.querySelector('[data-openai-missing-dish]');
+        if(!magic){
+          magic=document.createElement('button');
+          magic.type='button';
+          magic.className='missing-dish-magic';
+          magic.innerHTML='<span aria-hidden="true">✦</span>';
+          magic.title='Intégration automatique';
+          actions.appendChild(magic);
+        }
+        magic.dataset.openaiMissingDish=id;
+        magic.setAttribute('aria-label','Intégrer automatiquement ce plat');
+        magic.disabled=active||autoCooldown.has(id);
+        magic.setAttribute('aria-disabled',String(magic.disabled));
+      }
+    }
   });
 }
 function decorateRows(dialog){
@@ -364,6 +413,25 @@ function bindDialog(dialog){
 
   dialog.addEventListener('click',event=>{
     if(event.target.closest?.('#addMissingProduct'))armRequestCreationNotification();
+    const magic=event.target.closest?.('[data-openai-missing-dish]');
+    if(magic){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const id=magic.dataset.openaiMissingDish||'';
+      if(!id||magic.disabled)return;
+      autoCooldown.add(id);
+      decorateRows(dialog);
+      navigator.vibrate?.(10);
+      void integrateDishWithOpenAi(id).then(ok=>{
+        if(!ok)autoCooldown.delete(id);
+        decorateRows(dialog);
+      });
+      setTimeout(()=>{
+        autoCooldown.delete(id);
+        decorateRows(dialog);
+      },AUTO_COOLDOWN_MS);
+      return;
+    }
     const integrate=event.target.closest?.('[data-integrate-missing-dish],[data-integrate-missing-product]');
     if(!integrate)return;
     const type=integrate.matches('[data-integrate-missing-product]')?'product':'dish';
