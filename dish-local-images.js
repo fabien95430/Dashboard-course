@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v255';
+const APP_VERSION='v256';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -99,6 +99,14 @@ function installCatalogQuantities(){
   script.src='./catalog-quantities.js?v=3';
   script.defer=true;
   script.dataset.catalogQuantities='1';
+  document.head.appendChild(script);
+}
+function installPurchaseIntelligence(){
+  if(document.querySelector('script[data-purchase-intelligence]'))return;
+  const script=document.createElement('script');
+  script.src='./purchase-intelligence.js?v=1';
+  script.defer=true;
+  script.dataset.purchaseIntelligence='1';
   document.head.appendChild(script);
 }
 function securityViewportHeight(){
@@ -353,6 +361,7 @@ syncPageVersions();
 installVisualWarmupStyle();
 installMissingProductsFixes();
 installCatalogQuantities();
+installPurchaseIntelligence();
 bindSecurityKeyboardViewport();
 void warmProductVisuals();
 scheduleDishVisualWarmup();
