@@ -121,7 +121,7 @@
   gap:1px!important;
 }
 .dish-ingredient-check::before{
-  content:"×"!important;
+  content:none!important;
   display:inline!important;
   color:inherit!important;
   font-size:.82em!important;
