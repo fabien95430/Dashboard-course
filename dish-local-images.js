@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v265';
+const APP_VERSION='v266';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -80,7 +80,7 @@ function installVisualWarmupStyle(){
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
-    script.src='./missing-products-fixes.js?v=11';
+    script.src='./missing-products-fixes.js?v=12';
     script.defer=true;
     script.dataset.missingProductsFixes='1';
     document.head.appendChild(script);
@@ -361,7 +361,7 @@ syncPageVersions();
 installVisualWarmupStyle();
 installMissingProductsFixes();
 installCatalogQuantities();
-// Test v265: purchase-intelligence temporairement désactivé pour isoler la régression tactile.
+installPurchaseIntelligence();
 bindSecurityKeyboardViewport();
 void warmProductVisuals();
 scheduleDishVisualWarmup();
