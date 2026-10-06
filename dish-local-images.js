@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v222';
+const APP_VERSION='v223';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -31,12 +31,12 @@ const PRODUCT_VISUALS=Object.freeze([
   './bring-photo-v5-maison.webp.png?v=15'
 ]);
 const PRIMARY_DISH_VISUALS=Object.freeze([
-  './www/Plats/spaghetti-carbonara.png',
-  './www/Plats/spaghetti-bolognaise.png',
-  './www/Plats/penne-poulet-creme.png',
-  './www/Plats/pates-tomate-mozzarella.png',
-  './www/Plats/lasagnes-bolognaise.png',
-  './www/Plats/tagliatelles-saumon.png'
+  './www/Plats/spaghetti-carbonara.png?v='+APP_VERSION,
+  './www/Plats/spaghetti-bolognaise.png?v='+APP_VERSION,
+  './www/Plats/penne-poulet-creme.png?v='+APP_VERSION,
+  './www/Plats/pates-tomate-mozzarella.png?v='+APP_VERSION,
+  './www/Plats/lasagnes-bolognaise.png?v='+APP_VERSION,
+  './www/Plats/tagliatelles-saumon.png?v='+APP_VERSION
 ]);
 const DISH_WARMUP_BATCH_SIZE=2;
 const retainedVisuals=new Map();
@@ -246,7 +246,7 @@ function queueRenderedDishWarmup(){
 
 function localDishImage(name){
   const slug=SPECIAL_SLUGS[name]||slugify(name);
-  return './www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+slug+'.png';
+  return './www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+slug+'.png?v='+encodeURIComponent(APP_VERSION);
 }
 function sameImageSource(image,source){
   const current=image?.getAttribute?.('src')||'';
