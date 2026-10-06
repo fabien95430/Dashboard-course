@@ -1,4 +1,4 @@
-name: Notifier l’intégration d’un plat
+name: Notifier l’intégration du catalogue
 
 on:
   repository_dispatch:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: courses-dish-watch-${{ github.event.client_payload.request_id }}
+  group: courses-catalog-watch-${{ github.event.client_payload.request_id }}
   cancel-in-progress: false
 
 jobs:
@@ -43,6 +43,7 @@ jobs:
         continue-on-error: true
         shell: python
         run: |
+          import json
           import os
           import re
           import subprocess
@@ -50,9 +51,12 @@ jobs:
           import unicodedata
           from pathlib import Path
 
-          dish_name=os.environ.get('DISH_NAME','').strip()
-          if not dish_name:
-              raise SystemExit('Nom du plat manquant.')
+          raw_name=os.environ.get('DISH_NAME','').strip()
+          product_prefix='__courses_product__:'
+          item_type='product' if raw_name.startswith(product_prefix) else 'dish'
+          item_name=raw_name[len(product_prefix):].strip() if item_type=='product' else raw_name
+          if not item_name:
+              raise SystemExit('Nom de l’élément manquant.')
 
           def normalize(value):
               value=str(value or '').replace('œ','oe').lower()
@@ -68,18 +72,38 @@ jobs:
               'Poulet pommes de terre au four':'poulet-pommes-de-terre-four',
           }
 
-          def read_names():
+          def app_version():
+              version_text=Path('dish-local-images.js').read_text(encoding='utf-8')
+              match=re.search(r"const APP_VERSION='v(\d+)'",version_text)
+              return match.group(1) if match else None
+
+          def product_exists():
+              text=Path('catalog.js').read_text(encoding='utf-8')
+              if 'groups:' not in text or '\n    meta:' not in text:
+                  return False
+              groups=text.split('groups:',1)[1].split('\n    meta:',1)[0]
+              return json.dumps(item_name,ensure_ascii=False) in groups
+
+          def read_dish_names():
               text=Path('dishes-ui.js').read_text(encoding='utf-8')
               matches=re.findall(r"name:'((?:\\.|[^'])*)'",text)
               return {normalize(value.replace("\\'","'").replace('\\\\','\\')) for value in matches}
 
-          def find_ready_dish():
+          def find_ready_item():
               subprocess.run(['git','fetch','--quiet','origin','main'],check=True)
               subprocess.run(['git','reset','--hard','--quiet','origin/main'],check=True)
-              if normalize(dish_name) not in read_names():
+              version=app_version()
+              if not version:
                   return None
 
-              slug=special.get(dish_name,slugify(dish_name))
+              if item_type=='product':
+                  if not product_exists():
+                      return None
+                  return version,''
+
+              if normalize(item_name) not in read_dish_names():
+                  return None
+              slug=special.get(item_name,slugify(item_name))
               candidates=[
                   Path('www/Plats')/(slug+'.png'),
                   Path('www/Plats')/('enfant-'+slug+'.png'),
@@ -87,18 +111,13 @@ jobs:
               image=next((path for path in candidates if path.is_file()),None)
               if not image:
                   return None
-
-              version_text=Path('dish-local-images.js').read_text(encoding='utf-8')
-              match=re.search(r"const APP_VERSION='v(\d+)'",version_text)
-              if not match:
-                  return None
-              return match.group(1),image.name
+              return version,image.name
 
           deadline=time.time()+45*60
           found=None
           while time.time()<deadline:
               try:
-                  found=find_ready_dish()
+                  found=find_ready_item()
               except Exception as error:
                   print(f'Veille temporairement indisponible: {error}')
               if found:
@@ -106,14 +125,16 @@ jobs:
               time.sleep(15)
 
           if not found:
-              raise SystemExit("Le plat et son image n'ont pas été détectés sur main dans les 45 minutes.")
+              raise SystemExit("L’élément demandé n’a pas été détecté sur main dans les 45 minutes.")
 
           version,filename=found
           output=Path(os.environ['GITHUB_OUTPUT'])
           with output.open('a',encoding='utf-8') as stream:
               stream.write(f'version={version}\n')
               stream.write(f'filename={filename}\n')
-          print(f'Plat détecté sur main: {dish_name} — v{version} — {filename}')
+              stream.write(f'item_type={item_type}\n')
+              stream.write(f'item_name={item_name}\n')
+          print(f'Élément détecté sur main: {item_type} — {item_name} — v{version}')
 
       - name: Confirmer le déploiement GitHub Pages
         id: deploy
@@ -123,18 +144,27 @@ jobs:
         run: |
           set -euo pipefail
           expected="${{ steps.wait.outputs.version }}"
+          type="${{ steps.wait.outputs.item_type }}"
+          item="${{ steps.wait.outputs.item_name }}"
           file="${{ steps.wait.outputs.filename }}"
           for attempt in $(seq 1 48); do
             version_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}dish-local-images.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
             deployed="$(printf '%s' "$version_body" | sed -n "s/.*const APP_VERSION='v\([0-9][0-9]*\)'.*/\1/p" | head -n 1)"
-            if [ -n "$deployed" ] && [ "$deployed" -ge "$expected" ] \
-              && curl -fsSIL --max-time 12 "${COURSES_BASE_URL}www/Plats/${file}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
-              echo "Déploiement du plat confirmé en v${deployed}."
-              exit 0
+            if [ -n "$deployed" ] && [ "$deployed" -ge "$expected" ]; then
+              if [ "$type" = "product" ]; then
+                catalog_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}catalog.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
+                if printf '%s' "$catalog_body" | grep -Fq -- "$item"; then
+                  echo "Déploiement du produit confirmé en v${deployed}."
+                  exit 0
+                fi
+              elif curl -fsSIL --max-time 12 "${COURSES_BASE_URL}www/Plats/${file}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
+                echo "Déploiement du plat confirmé en v${deployed}."
+                exit 0
+              fi
             fi
             sleep 10
           done
-          echo "Le déploiement GitHub Pages du plat n'a pas été confirmé." >&2
+          echo "Le déploiement GitHub Pages de l’élément n'a pas été confirmé." >&2
           exit 1
 
       - name: Préparer Node pour le Web Push
