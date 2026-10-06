@@ -999,18 +999,19 @@ function bindListReorder(root){
       const unavailable=listReorderUnavailableMessage(root,row);
       if(unavailable)return;
       const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
+      row.classList.add('is-reorder-arming');
       let timer=setTimeout(()=>beginDrag(event),200);
       const preMove=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
         if(Math.hypot(moveEvent.clientX-startX,moveEvent.clientY-startY)>12){clearTimeout(timer);cleanupPre()}
       };
       const preEnd=endEvent=>{if(endEvent.pointerId!==pointerId)return;clearTimeout(timer);cleanupPre()};
-      const cleanupPre=()=>{document.removeEventListener('pointermove',preMove,true);document.removeEventListener('pointerup',preEnd,true);document.removeEventListener('pointercancel',preEnd,true)};
+      const cleanupPre=()=>{row.classList.remove('is-reorder-arming');document.removeEventListener('pointermove',preMove,true);document.removeEventListener('pointerup',preEnd,true);document.removeEventListener('pointercancel',preEnd,true)};
       document.addEventListener('pointermove',preMove,{passive:true,capture:true});
       document.addEventListener('pointerup',preEnd,{capture:true});
       document.addEventListener('pointercancel',preEnd,{capture:true});
       function beginDrag(startEvent){
-        cleanupPre();dragging=true;closeListRowMenu();
+        cleanupPre();closeListRowMenu();
         const originalOrder=visibleListOrder(root).join('\u0000'),startRect=row.getBoundingClientRect(),startClientY=startY;
         const preview=row.cloneNode(true);preview.classList.add('is-drag-preview');preview.setAttribute('aria-hidden','true');preview.querySelectorAll('button').forEach(button=>button.tabIndex=-1);
         const sourceIcon=row.querySelector('.list-icon'),previewIcon=preview.querySelector('.list-icon');let iconPlaceholder=null;
