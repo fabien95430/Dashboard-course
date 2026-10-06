@@ -2,8 +2,11 @@
 'use strict';
 
 const STORAGE_DISHES='courses-missing-dishes-v1';
-const STORAGE_RUNNING='courses-missing-dishes-running-v1';
+const STORAGE_PRODUCTS='courses-missing-products-v1';
+const STORAGE_RUNNING_DISHES='courses-missing-dishes-running-v1';
+const STORAGE_RUNNING_PRODUCTS='courses-missing-products-running-v1';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
+const PRODUCT_RELAY_PREFIX='__courses_product__:';
 const HA_REQUEST_TIMEOUT_MS=12000;
 
 let haSocket=null;
@@ -11,6 +14,7 @@ let haSeq=950000000;
 const haPending=new Map();
 let pushDataPromise=null;
 let pushDataCache=null;
+let permissionPromise=null;
 
 function readJson(key,fallback){
   try{
@@ -20,38 +24,39 @@ function readJson(key,fallback){
     return fallback;
   }
 }
-function readDishes(){
-  const saved=readJson(STORAGE_DISHES,[]);
+function readItems(type){
+  const saved=readJson(type==='product'?STORAGE_PRODUCTS:STORAGE_DISHES,[]);
   return Array.isArray(saved)?saved:[];
 }
-function readRunning(){
-  const saved=readJson(STORAGE_RUNNING,[]);
+function runningKey(type){return type==='product'?STORAGE_RUNNING_PRODUCTS:STORAGE_RUNNING_DISHES}
+function readRunning(type){
+  const saved=readJson(runningKey(type),[]);
   return new Set(Array.isArray(saved)?saved.map(String):[]);
 }
-function saveRunning(running){
-  try{localStorage.setItem(STORAGE_RUNNING,JSON.stringify([...running]))}catch(_){}
+function saveRunning(type,running){
+  try{localStorage.setItem(runningKey(type),JSON.stringify([...running]))}catch(_){}
 }
-function currentDishIds(){
-  return new Set(readDishes().map(item=>String(item?.id||'')).filter(Boolean));
+function currentIds(type){
+  return new Set(readItems(type).map(item=>String(item?.id||'')).filter(Boolean));
 }
-function pruneRunning(){
-  const current=currentDishIds();
-  const running=readRunning();
+function pruneRunning(type){
+  const current=currentIds(type);
+  const running=readRunning(type);
   let changed=false;
   [...running].forEach(id=>{
     if(current.has(id))return;
     running.delete(id);
     changed=true;
   });
-  if(changed)saveRunning(running);
+  if(changed)saveRunning(type,running);
   return running;
 }
-function setRunning(id,active){
+function setRunning(type,id,active){
   if(!id)return;
-  const running=readRunning();
+  const running=readRunning(type);
   if(active)running.add(String(id));
   else running.delete(String(id));
-  saveRunning(running);
+  saveRunning(type,running);
 }
 function randomId(){
   if(globalThis.crypto?.getRandomValues){
@@ -67,6 +72,63 @@ function appNotify(title,detail=''){
   toast.classList.add('is-visible');
   clearTimeout(toast._t);
   toast._t=setTimeout(()=>toast.classList.remove('is-visible'),3500);
+}
+function notificationSupported(){
+  return 'Notification' in window&&'serviceWorker' in navigator;
+}
+function ensureNotificationPermission(){
+  if(!notificationSupported())return Promise.resolve('unsupported');
+  if(Notification.permission!=='default')return Promise.resolve(Notification.permission);
+  if(permissionPromise)return permissionPromise;
+  permissionPromise=Promise.resolve().then(()=>Notification.requestPermission()).catch(()=>Notification.permission).finally(()=>{permissionPromise=null});
+  return permissionPromise;
+}
+async function showSystemNotification(title,body,tag,url='./'){
+  if(!notificationSupported()||Notification.permission!=='granted')return false;
+  try{
+    const registration=await navigator.serviceWorker.ready;
+    await registration.showNotification(title,{
+      body,
+      tag,
+      icon:'./apple-touch-icon.png',
+      data:{url},
+      renotify:false
+    });
+    return true;
+  }catch(_){
+    return false;
+  }
+}
+function pendingRequests(){
+  const pending=new Map();
+  readItems('product').forEach(item=>{
+    const id=String(item?.id||'');
+    if(id)pending.set('product:'+id,{type:'product',id,name:String(item?.name||'').trim()});
+  });
+  readItems('dish').forEach(item=>{
+    const id=String(item?.id||'');
+    if(id)pending.set('dish:'+id,{type:'dish',id,name:String(item?.name||'').trim()});
+  });
+  return pending;
+}
+function armRequestCreationNotification(){
+  const before=pendingRequests();
+  const permission=ensureNotificationPermission();
+  setTimeout(async()=>{
+    const after=pendingRequests();
+    const created=[...after.entries()].filter(([key])=>!before.has(key)).map(([,item])=>item);
+    if(!created.length)return;
+    await permission;
+    for(const item of created){
+      const label=item.type==='dish'?'plat':'produit';
+      await showSystemNotification(
+        'Demande d’ajout créée',
+        `${item.name} a bien été enregistré comme ${label} à ajouter.`,
+        `courses-request-${item.type}-${item.id}`,
+        './'
+      );
+    }
+  },80);
 }
 
 function rejectHaPending(message='Connexion Home Assistant interrompue'){
@@ -217,12 +279,14 @@ function primePushSubscription(requestPermission=false){
   if(Notification.permission==='denied')return;
   void pushSubscriptionData();
 }
-async function registerDishNotificationWatch(id){
-  const item=readDishes().find(entry=>String(entry?.id||'')===String(id||''));
+async function registerNotificationWatch(type,id){
+  const item=readItems(type).find(entry=>String(entry?.id||'')===String(id||''));
   if(!item)return false;
   const requestId=randomId();
+  const itemName=String(item.name||'');
+  const relayName=type==='product'?PRODUCT_RELAY_PREFIX+itemName:itemName;
   const serviceData={
-    dish_name:String(item.name||''),
+    dish_name:relayName,
     dish_category:String(item.category||''),
     request_id:requestId
   };
@@ -240,7 +304,7 @@ async function registerDishNotificationWatch(id){
     });
     return true;
   }catch(error){
-    setRunning(id,false);
+    setRunning(type,id,false);
     appNotify('Notification non armée',String(error?.message||'Réessaie après avoir vérifié les notifications.').slice(0,140));
     return false;
   }
@@ -254,14 +318,18 @@ function installStyle(){
     #missingProductsDialog #missingProductsList[hidden],
     #missingProductsDialog #missingDishesList[hidden]{display:none!important}
     #missingProductsDialog .missing-dish-progress{display:inline-flex!important;width:max-content!important;margin-top:1px;padding:4px 8px!important;border-radius:999px;background:#eef3ff!important;color:#41669b!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}
-    #missingProductsDialog .missing-dish-integrate.is-running{opacity:.52!important}
+    #missingProductsDialog .missing-dish-integrate.is-running,
+    #missingProductsDialog .missing-product-integrate.is-running{opacity:.52!important}
   `;
   document.head.appendChild(style);
 }
-function decorateRows(dialog){
-  const running=pruneRunning();
-  dialog.querySelectorAll('[data-missing-dish-row]').forEach(row=>{
-    const id=String(row.dataset.missingDishRow||'');
+function decorateTypeRows(dialog,type){
+  const running=pruneRunning(type);
+  const rowSelector=type==='product'?'[data-missing-product-row]':'[data-missing-dish-row]';
+  const rowData=type==='product'?'missingProductRow':'missingDishRow';
+  const buttonSelector=type==='product'?'[data-integrate-missing-product]':'[data-integrate-missing-dish]';
+  dialog.querySelectorAll(rowSelector).forEach(row=>{
+    const id=String(row.dataset[rowData]||'');
     const active=running.has(id);
     const copy=row.querySelector('.missing-product-copy');
     let progress=copy?.querySelector('.missing-dish-progress');
@@ -272,13 +340,17 @@ function decorateRows(dialog){
       copy.appendChild(progress);
     }
     if(!active&&progress)progress.remove();
-    const button=row.querySelector('[data-integrate-missing-dish]');
+    const button=row.querySelector(buttonSelector);
     if(button){
       button.disabled=active;
       button.classList.toggle('is-running',active);
       button.setAttribute('aria-disabled',String(active));
     }
   });
+}
+function decorateRows(dialog){
+  decorateTypeRows(dialog,'product');
+  decorateTypeRows(dialog,'dish');
 }
 
 function bindDialog(dialog){
@@ -291,20 +363,31 @@ function bindDialog(dialog){
   categorySelect.addEventListener('click',event=>event.stopPropagation(),true);
 
   dialog.addEventListener('click',event=>{
+    if(event.target.closest?.('#addMissingProduct'))armRequestCreationNotification();
     const integrate=event.target.closest?.('[data-integrate-missing-dish],[data-integrate-missing-product]');
     if(!integrate)return;
-    if(integrate.matches('[data-integrate-missing-dish]')){
-      const id=integrate.dataset.integrateMissingDish||'';
-      setRunning(id,true);
-      queueMicrotask(()=>decorateRows(dialog));
-      void registerDishNotificationWatch(id);
-    }
+    const type=integrate.matches('[data-integrate-missing-product]')?'product':'dish';
+    const id=type==='product'?(integrate.dataset.integrateMissingProduct||''):(integrate.dataset.integrateMissingDish||'');
+    setRunning(type,id,true);
+    queueMicrotask(()=>decorateRows(dialog));
+    void registerNotificationWatch(type,id);
+  },true);
+
+  const input=dialog.querySelector('#missingProductName');
+  input?.addEventListener('keydown',event=>{
+    if(event.key==='Enter')armRequestCreationNotification();
   },true);
 
   const observer=new MutationObserver(()=>decorateRows(dialog));
   observer.observe(dialog,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
-  dialog.addEventListener('close',()=>pruneRunning());
-  document.getElementById('settingsMissingProductsBtn')?.addEventListener('click',()=>primePushSubscription(true));
+  dialog.addEventListener('close',()=>{
+    pruneRunning('product');
+    pruneRunning('dish');
+  });
+  document.getElementById('settingsMissingProductsBtn')?.addEventListener('click',()=>{
+    void ensureNotificationPermission();
+    primePushSubscription(true);
+  });
   decorateRows(dialog);
   primePushSubscription();
   return true;
