@@ -114,10 +114,15 @@ function openRowMenu(row,anchor){
   remove.className='missing-row-menu-item is-danger';
   remove.setAttribute('role','menuitem');
   remove.innerHTML='<span class="missing-menu-icon" aria-hidden="true">⌫</span><span><strong>Supprimer</strong></span>';
-  remove.addEventListener('click',()=>{
+  remove.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
     const native=row.querySelector('.missing-product-remove');
+    if(native){
+      const nativeClick=new MouseEvent('click',{bubbles:true,cancelable:true,view:window});
+      native.dispatchEvent(nativeClick);
+    }
     closeMenu();
-    native?.click();
   });
   menu.appendChild(remove);
   (document.getElementById('missingProductsDialog')||document.body).appendChild(menu);
