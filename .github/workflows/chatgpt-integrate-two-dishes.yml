@@ -32,7 +32,7 @@ jobs:
       - name: Switch to current main safely
         shell: bash
         env:
-          EXPECTED_HEAD: c93d231075bd6010a9a3afd53b7f2143d2daba1e
+          EXPECTED_HEAD: 7d24df910f1d9a2c71c0b4e109dffd8271f80c55
         run: |
           set -euo pipefail
           git fetch origin main
@@ -79,13 +79,13 @@ jobs:
           local_path=Path('dish-local-images.js')
           local=local_path.read_text(encoding='utf-8')
           m=re.search(r"const APP_VERSION='v(\d+)'",local)
-          if not m or int(m.group(1))!=231: raise SystemExit('Version globale inattendue')
-          local=local[:m.start()]+"const APP_VERSION='v232'"+local[m.end():]
+          if not m or int(m.group(1))!=232: raise SystemExit('Version globale inattendue')
+          local=local[:m.start()]+"const APP_VERSION='v233'"+local[m.end():]
           local_path.write_text(local,encoding='utf-8')
 
           sw_path=Path('sw.js')
           sw=sw_path.read_text(encoding='utf-8')
-          sw,count=re.subn(r"const CACHE='courses-app-v\d+-r\d+'","const CACHE='courses-app-v232-r1'",sw,count=1)
+          sw,count=re.subn(r"const CACHE='courses-app-v\d+-r\d+'","const CACHE='courses-app-v233-r1'",sw,count=1)
           if count!=1: raise SystemExit('Version cache introuvable')
           sw_path.write_text(sw,encoding='utf-8')
 
@@ -109,8 +109,8 @@ jobs:
           node --check sw.js
           grep -Fq "{name:'Sushis'" dishes-ui.js
           grep -Fq "{name:'Saucisse lentille'" dishes-ui.js
-          grep -Fq "const APP_VERSION='v232'" dish-local-images.js
-          grep -Fq "const CACHE='courses-app-v232-r1'" sw.js
+          grep -Fq "const APP_VERSION='v233'" dish-local-images.js
+          grep -Fq "const CACHE='courses-app-v233-r1'" sw.js
           test -s www/Plats/sushis.png
           test -s www/Plats/saucisse-lentille.png
           test -e requests/done/courses-dish-677a498fd40cc602.json
@@ -119,5 +119,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A dishes-ui.js dish-local-images.js sw.js www/Plats requests/pending requests/done
           git diff --cached --check
-          git commit -m "v232: ajoute Sushis et Saucisse lentille"
+          git commit -m "v233: ajoute Sushis et Saucisse lentille"
           git push origin HEAD:main
