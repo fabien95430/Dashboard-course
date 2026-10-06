@@ -6,7 +6,10 @@ const auth=String(process.env.PUSH_AUTH||'').trim();
 const publicKey=String(process.env.PUSH_PUBLIC_KEY||'').trim();
 const privateKey=String(process.env.COURSES_VAPID_PRIVATE_KEY||'').trim();
 const status=String(process.env.PUSH_STATUS||'error');
-const dishName=String(process.env.DISH_NAME||'Plat').trim();
+const rawName=String(process.env.DISH_NAME||'').trim();
+const productPrefix='__courses_product__:';
+const itemType=rawName.startsWith(productPrefix)?'product':'dish';
+const itemName=(itemType==='product'?rawName.slice(productPrefix.length):rawName).trim()||(itemType==='product'?'Produit':'Plat');
 const requestId=String(process.env.REQUEST_ID||'').trim();
 const baseUrl=String(process.env.COURSES_BASE_URL||'https://fabien95430.github.io/Dashboard-course/').trim();
 
@@ -20,19 +23,21 @@ if(!publicKey||!privateKey){
 }
 
 const target=new URL(baseUrl);
-target.searchParams.set('courses_dish',dishName);
+target.searchParams.set(itemType==='product'?'courses_product':'courses_dish',itemName);
 target.searchParams.set('courses_status',status==='added'?'added':'error');
 if(requestId)target.searchParams.set('courses_request',requestId);
 
 const success=status==='added';
+const itemLabel=itemType==='product'?'produit':'plat';
 const payload={
   title:'Courses',
   body:success
-    ?`✅ ${dishName} est maintenant disponible dans le catalogue.`
-    :`⚠️ L’intégration de « ${dishName} » a échoué.`,
-  tag:requestId?`courses-dish-${requestId}`:'courses-dish-integration',
+    ?`✅ ${itemName} est maintenant disponible dans le catalogue.`
+    :`⚠️ L’intégration du ${itemLabel} « ${itemName} » a échoué.`,
+  tag:requestId?`courses-${itemType}-${requestId}`:`courses-${itemType}-integration`,
   status:success?'added':'error',
-  dishName,
+  itemType,
+  itemName,
   requestId,
   url:target.toString()
 };
