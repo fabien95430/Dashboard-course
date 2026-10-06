@@ -5,8 +5,6 @@ const STORAGE_DISHES='courses-missing-dishes-v1';
 const STORAGE_RUNNING='courses-missing-dishes-running-v1';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const HA_REQUEST_TIMEOUT_MS=12000;
-const CHATGPT_WEB_URL='https://chatgpt.com/';
-const CHATGPT_APP_URL='com.openai.chat://chatgpt.com/';
 
 let haSocket=null;
 let haSeq=950000000;
@@ -283,34 +281,6 @@ function decorateRows(dialog){
   });
 }
 
-function openNativeChatGpt(){
-  let fallbackTimer=0;
-  const stopFallback=()=>{
-    if(document.visibilityState!=='hidden')return;
-    clearTimeout(fallbackTimer);
-    document.removeEventListener('visibilitychange',stopFallback);
-  };
-  document.addEventListener('visibilitychange',stopFallback);
-  try{window.location.href=CHATGPT_APP_URL}catch(_){}
-  fallbackTimer=setTimeout(()=>{
-    document.removeEventListener('visibilitychange',stopFallback);
-    if(document.visibilityState==='hidden')return;
-    window.location.href=CHATGPT_WEB_URL;
-  },1400);
-  return {opener:null};
-}
-function armChatGptOpenOverride(){
-  const nativeOpen=window.open;
-  const patched=function(url,target,features){
-    if(!String(url||'').startsWith(CHATGPT_WEB_URL))return nativeOpen.call(window,url,target,features);
-    return openNativeChatGpt();
-  };
-  window.open=patched;
-  queueMicrotask(()=>{
-    if(window.open===patched)window.open=nativeOpen;
-  });
-}
-
 function bindDialog(dialog){
   if(!dialog||dialog.dataset.missingFixesBound==='1')return false;
   const categorySelect=dialog.querySelector('.missing-category-select');
@@ -328,10 +298,7 @@ function bindDialog(dialog){
       setRunning(id,true);
       queueMicrotask(()=>decorateRows(dialog));
       void registerDishNotificationWatch(id);
-      armChatGptOpenOverride();
-      return;
     }
-    armChatGptOpenOverride();
   },true);
 
   const observer=new MutationObserver(()=>decorateRows(dialog));
