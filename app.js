@@ -999,14 +999,13 @@ function bindListReorder(root){
       const unavailable=listReorderUnavailableMessage(root,row);
       if(unavailable)return;
       const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
-      row.classList.add('is-reorder-arming');
-      let timer=setTimeout(()=>beginDrag(event),200);
+      let timer=setTimeout(()=>beginDrag(event),1500);
       const preMove=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
         if(Math.hypot(moveEvent.clientX-startX,moveEvent.clientY-startY)>12){clearTimeout(timer);cleanupPre()}
       };
       const preEnd=endEvent=>{if(endEvent.pointerId!==pointerId)return;clearTimeout(timer);cleanupPre()};
-      const cleanupPre=()=>{row.classList.remove('is-reorder-arming');document.removeEventListener('pointermove',preMove,true);document.removeEventListener('pointerup',preEnd,true);document.removeEventListener('pointercancel',preEnd,true)};
+      const cleanupPre=()=>{document.removeEventListener('pointermove',preMove,true);document.removeEventListener('pointerup',preEnd,true);document.removeEventListener('pointercancel',preEnd,true)};
       document.addEventListener('pointermove',preMove,{passive:true,capture:true});
       document.addEventListener('pointerup',preEnd,{capture:true});
       document.addEventListener('pointercancel',preEnd,{capture:true});
