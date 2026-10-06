@@ -2,10 +2,8 @@ name: ChatGPT integrate two dishes
 
 on:
   push:
-    branches:
-      - chatgpt-integrate-sushis-saucisse-lentille
-    paths:
-      - .chatgpt/READY
+    branches: [chatgpt-integrate-sushis-saucisse-lentille]
+    paths: [.chatgpt/READY]
 
 permissions:
   contents: write
@@ -15,8 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout transport branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -24,8 +21,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .chatgpt/sushi.*.b64 | base64 -d > /tmp/sushis.jpg
-          cat .chatgpt/saucisse.*.b64 | base64 -d > /tmp/saucisse-lentille.jpg
+          cat .chatgpt/sushi.part*.b64 | base64 -d > /tmp/sushis.jpg
+          cat .chatgpt/saucisse.part*.b64 | base64 -d > /tmp/saucisse-lentille.jpg
           test -s /tmp/sushis.jpg
           test -s /tmp/saucisse-lentille.jpg
 
@@ -40,128 +37,87 @@ jobs:
           set -euo pipefail
           git fetch origin main
           actual="$(git rev-parse origin/main)"
-          if [ "$actual" != "$EXPECTED_HEAD" ]; then
-            echo "main changed: expected $EXPECTED_HEAD, got $actual" >&2
-            exit 1
-          fi
+          test "$actual" = "$EXPECTED_HEAD"
           git checkout -B main origin/main
 
-      - name: Integrate Sushis and Saucisse lentille
+      - name: Integrate both dishes
         shell: python
         run: |
           from pathlib import Path
           from PIL import Image
-          import json, re, shutil
+          import json,re,shutil
 
-          expected = [
-              (Path('requests/pending/courses-dish-677a498fd40cc602.json'), 'Sushis', 'Poissons'),
-              (Path('requests/pending/courses-dish-bf346a5f638d9259.json'), 'Saucisse lentille', 'Viandes'),
+          expected=[
+            (Path('requests/pending/courses-dish-677a498fd40cc602.json'),'Sushis','Poissons'),
+            (Path('requests/pending/courses-dish-bf346a5f638d9259.json'),'Saucisse lentille','Viandes'),
           ]
-          for path, name, category in expected:
-              if not path.is_file():
-                  raise SystemExit(f'Requête absente: {path}')
-              payload=json.loads(path.read_text(encoding='utf-8'))
-              if payload.get('type')!='dish' or payload.get('name')!=name or payload.get('category')!=category:
-                  raise SystemExit(f'Requête inattendue: {path}')
+          for path,name,category in expected:
+            payload=json.loads(path.read_text(encoding='utf-8'))
+            if payload.get('type')!='dish' or payload.get('name')!=name or payload.get('category')!=category:
+              raise SystemExit(f'Requête inattendue: {path}')
 
           dishes_path=Path('dishes-ui.js')
           dishes=dishes_path.read_text(encoding='utf-8')
           for name in ('Sushis','Saucisse lentille'):
-              if re.search(r"\{name:'"+re.escape(name)+r"'", dishes):
-                  raise SystemExit(f'Plat déjà présent: {name}')
+            if re.search(r"\{name:'"+re.escape(name)+r"'",dishes):
+              raise SystemExit(f'Plat déjà présent: {name}')
 
           catalog=Path('catalog.js').read_text(encoding='utf-8')
           required=['Riz long','Saumon','Avocat','Concombres','Sauce soja','Saucisses','Lentilles','Carottes','Oignons jaunes']
-          missing=[item for item in required if json.dumps(item,ensure_ascii=False) not in catalog]
-          if missing:
-              raise SystemExit('Produits catalogue absents: '+', '.join(missing))
+          missing=[x for x in required if json.dumps(x,ensure_ascii=False) not in catalog]
+          if missing: raise SystemExit('Produits catalogue absents: '+', '.join(missing))
 
           entries=(
-              "  {name:'Sushis',photoId:'',tags:['Poissons'],ingredients:['Riz long','Saumon','Avocat','Concombres','Sauce soja']},\n"
-              "  {name:'Saucisse lentille',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Lentilles','Carottes','Oignons jaunes']},\n"
+            "  {name:'Sushis',photoId:'',tags:['Poissons'],ingredients:['Riz long','Saumon','Avocat','Concombres','Sauce soja']},\n"
+            "  {name:'Saucisse lentille',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Lentilles','Carottes','Oignons jaunes']},\n"
           )
           marker='\n]);\n\nconst FILTERS='
           pos=dishes.find(marker)
-          if pos < 0:
-              raise SystemExit('Fin de DISHES introuvable')
-          dishes=dishes[:pos]+'\n'+entries+dishes[pos:]
-          dishes_path.write_text(dishes,encoding='utf-8')
+          if pos<0: raise SystemExit('Fin de DISHES introuvable')
+          dishes_path.write_text(dishes[:pos]+'\n'+entries+dishes[pos:],encoding='utf-8')
 
           local_path=Path('dish-local-images.js')
           local=local_path.read_text(encoding='utf-8')
           m=re.search(r"const APP_VERSION='v(\d+)'",local)
-          if not m:
-              raise SystemExit('Version globale introuvable')
-          old=int(m.group(1))
-          if old != 231:
-              raise SystemExit(f'Version inattendue: v{old}')
-          new=old+1
-          local=local[:m.start()]+f"const APP_VERSION='v{new}'"+local[m.end():]
+          if not m or int(m.group(1))!=231: raise SystemExit('Version globale inattendue')
+          local=local[:m.start()]+"const APP_VERSION='v232'"+local[m.end():]
           local_path.write_text(local,encoding='utf-8')
 
           sw_path=Path('sw.js')
           sw=sw_path.read_text(encoding='utf-8')
-          sw,count=re.subn(r"const CACHE='courses-app-v\d+-r\d+'",f"const CACHE='courses-app-v{new}-r1'",sw,count=1)
-          if count != 1:
-              raise SystemExit('Version cache introuvable')
+          sw,count=re.subn(r"const CACHE='courses-app-v\d+-r\d+'","const CACHE='courses-app-v232-r1'",sw,count=1)
+          if count!=1: raise SystemExit('Version cache introuvable')
           sw_path.write_text(sw,encoding='utf-8')
 
-          out=Path('www/Plats')
-          out.mkdir(parents=True,exist_ok=True)
-          for source,target in [('/tmp/sushis.jpg',out/'sushis.png'),('/tmp/saucisse-lentille.jpg',out/'saucisse-lentille.png')]:
-              if target.exists():
-                  raise SystemExit(f'Visuel déjà présent: {target}')
-              image=Image.open(source).convert('RGB')
-              if image.size != (1536,1024):
-                  raise SystemExit(f'Dimensions inattendues pour {source}: {image.size}')
-              image.save(target,'PNG',optimize=True)
+          for source,target in [('/tmp/sushis.jpg',Path('www/Plats/sushis.png')),('/tmp/saucisse-lentille.jpg',Path('www/Plats/saucisse-lentille.png'))]:
+            if target.exists(): raise SystemExit(f'Visuel déjà présent: {target}')
+            image=Image.open(source).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+            image.save(target,'PNG',optimize=True)
 
-          done=Path('requests/done')
-          done.mkdir(parents=True,exist_ok=True)
+          done=Path('requests/done'); done.mkdir(parents=True,exist_ok=True)
           for pending,_,_ in expected:
-              target=done/pending.name
-              if target.exists():
-                  raise SystemExit(f'Demande déjà terminée: {target}')
-              shutil.move(str(pending),str(target))
+            target=done/pending.name
+            if target.exists(): raise SystemExit(f'Demande déjà terminée: {target}')
+            shutil.move(str(pending),str(target))
 
-          print(f'Integrated both dishes in v{new}')
-
-      - name: Validate JavaScript and staged scope
+      - name: Validate and commit atomically
         shell: bash
         run: |
           set -euo pipefail
           node --check dishes-ui.js
           node --check dish-local-images.js
           node --check sw.js
-          test -s www/Plats/sushis.png
-          test -s www/Plats/saucisse-lentille.png
           grep -Fq "{name:'Sushis'" dishes-ui.js
           grep -Fq "{name:'Saucisse lentille'" dishes-ui.js
           grep -Fq "const APP_VERSION='v232'" dish-local-images.js
           grep -Fq "const CACHE='courses-app-v232-r1'" sw.js
-          test ! -e requests/pending/courses-dish-677a498fd40cc602.json
-          test ! -e requests/pending/courses-dish-bf346a5f638d9259.json
+          test -s www/Plats/sushis.png
+          test -s www/Plats/saucisse-lentille.png
           test -e requests/done/courses-dish-677a498fd40cc602.json
           test -e requests/done/courses-dish-bf346a5f638d9259.json
-
-      - name: Commit atomically to main
-        shell: bash
-        run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dishes-ui.js dish-local-images.js sw.js \
-            www/Plats/sushis.png www/Plats/saucisse-lentille.png \
-            requests/pending/courses-dish-677a498fd40cc602.json \
-            requests/pending/courses-dish-bf346a5f638d9259.json \
-            requests/done/courses-dish-677a498fd40cc602.json \
-            requests/done/courses-dish-bf346a5f638d9259.json
+          git add -A dishes-ui.js dish-local-images.js sw.js www/Plats requests/pending requests/done
           git diff --cached --check
-          git diff --cached --name-status
           git commit -m "v232: ajoute Sushis et Saucisse lentille"
           git push origin HEAD:main
-
-      - name: Remove transport branch
-        if: success()
-        shell: bash
-        run: git push origin --delete "${GITHUB_REF_NAME}" || true
