@@ -2,8 +2,8 @@
 'use strict';
 
 // Seuls les produits avec un conditionnement d'achat suffisamment stable
-// ont une référence fixe. Les produits au poids / à la coupe / à la pièce
-// restent volontairement sans quantité sur leur tuile.
+// ont une référence fixe. Les autres gardent un libellé court indiquant
+// leur mode d'achat (poids, coupe ou pièce).
 const PACKS=Object.freeze({
   'Spaghetti':{label:'500 g',amount:500,unit:'g'},
   'Penne':{label:'500 g',amount:500,unit:'g'},
@@ -48,6 +48,20 @@ const PACKS=Object.freeze({
   'Croûtons':{label:'100 g',amount:100,unit:'g'},
   'Vanille':{label:'5 sachets',amount:5,unit:'piece'}
 });
+
+const PRODUCT_META=new Map();
+Object.entries(window.COURSES_CATALOG?.groups||{}).forEach(([category,subgroups])=>{
+  Object.entries(subgroups||{}).forEach(([sub,names])=>{
+    (Array.isArray(names)?names:[]).forEach(name=>PRODUCT_META.set(name,{category,sub}));
+  });
+});
+const CUT_SUBS=new Set(['Charcuterie']);
+const WEIGHT_SUBS=new Set([
+  'Fromages','Viandes',
+  'Fruits classiques','Légumes du quotidien','Légumes variés',
+  'Pommes de terre & aromates'
+]);
+const WEIGHT_PRODUCTS=new Set(['Saumon','Cabillaud','Thon frais','Truite','Crevettes','Moules','Saumon fumé']);
 
 // Besoin culinaire, indépendant du conditionnement du produit.
 const NEED_PER_PERSON=Object.freeze({
@@ -119,6 +133,23 @@ function packFor(name){
   const pack=PACKS[name];
   return pack&&Number(pack.amount)>0?pack:null;
 }
+function compactPackLabel(pack){
+  const label=String(pack?.label||'').trim();
+  let match=label.match(/^Boîte de (\d+)$/i);
+  if(match)return 'Boîte ×'+match[1];
+  match=label.match(/^(\d+)\s*pièces?$/i);
+  if(match)return '×'+match[1];
+  match=label.match(/^(\d+)\s*sachets?$/i);
+  if(match)return 'Sachet ×'+match[1];
+  return label;
+}
+function saleModeLabel(name){
+  const meta=PRODUCT_META.get(name);
+  if(RECIPE_UNITS[name]==='piece'||meta?.sub==='Boulangerie'||meta?.sub==='Salades & herbes')return 'Pièce';
+  if(CUT_SUBS.has(meta?.sub))return 'Coupe';
+  if(WEIGHT_SUBS.has(meta?.sub)||WEIGHT_PRODUCTS.has(name))return 'Poids';
+  return 'Pièce';
+}
 function needFor(name){
   const currentServings=servings();
   const dishNeed=Number(DISH_NEEDS_FOR_FOUR[currentDish()]?.[name]);
@@ -155,8 +186,36 @@ function ensureStyles(){
   const style=document.createElement('style');
   style.id='courses-product-quantities-style';
   style.textContent=`
-    #products .product .pcat[data-pack-reference="1"]{color:#69776f;font-weight:760}
-    #products .product .pcat[hidden]{display:none!important}
+    #products .product .product-pack-badge{
+      position:absolute!important;
+      z-index:2!important;
+      top:6px!important;
+      left:6px!important;
+      height:17px!important;
+      max-width:45px!important;
+      padding:0 5px!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      border:1px solid rgba(27,49,35,.08)!important;
+      border-radius:999px!important;
+      background:rgba(248,250,246,.92)!important;
+      color:#5f6e66!important;
+      box-shadow:0 2px 7px rgba(46,64,52,.08)!important;
+      font-size:8px!important;
+      line-height:1!important;
+      font-weight:780!important;
+      letter-spacing:-.08px!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      pointer-events:none!important;
+    }
+    #products .product.is-selected .product-pack-badge{
+      background:rgba(255,255,255,.82)!important;
+      color:#365447!important;
+    }
+    #products .product .pcat{display:block!important}
     #dishDialog .dish-ingredient-name{display:flex!important;flex-direction:column!important;gap:2px!important}
     #dishDialog .dish-ingredient-pack{display:block!important;color:#718078!important;font-size:10.5px!important;line-height:1.05!important;font-weight:720!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
     #dishDialog .dish-ingredient-check{font-size:12px!important;letter-spacing:-.2px!important}
@@ -168,19 +227,25 @@ function decorateProducts(){
   products.querySelectorAll('.product[data-name]').forEach(card=>{
     const name=String(card.dataset.name||'');
     const pack=packFor(name);
+    const meta=PRODUCT_META.get(name);
     const detail=card.querySelector('.pcat');
-    if(!detail)return;
-    if(pack){
-      detail.textContent=pack.label;
-      detail.hidden=false;
-      detail.dataset.packReference='1';
-      detail.title='Conditionnement de référence : '+pack.label;
-      return;
+    const subcategory=String(meta?.sub||meta?.category||'');
+    if(detail){
+      if(detail.textContent!==subcategory)detail.textContent=subcategory;
+      detail.hidden=!subcategory;
+      delete detail.dataset.packReference;
+      if(subcategory)detail.title=subcategory;
+      else detail.removeAttribute('title');
     }
-    detail.textContent='';
-    detail.hidden=true;
-    delete detail.dataset.packReference;
-    detail.removeAttribute('title');
+    let reference=card.querySelector('.product-pack-badge');
+    if(!reference){
+      reference=document.createElement('span');
+      reference.className='product-pack-badge';
+      card.appendChild(reference);
+    }
+    const referenceText=pack?compactPackLabel(pack):saleModeLabel(name);
+    if(reference.textContent!==referenceText)reference.textContent=referenceText;
+    reference.title=pack?'Conditionnement de référence : '+pack.label:'Mode d’achat : '+referenceText;
   });
 }
 function decorateDishRows(){
