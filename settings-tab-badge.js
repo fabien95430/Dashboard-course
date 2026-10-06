@@ -265,6 +265,7 @@ function initMissingProductsDialogFrame(){
   const dialog=document.getElementById('missingProductsDialog');
   if(!dialog)return;
 
+  const DIALOG_TOP_OFFSET=18;
   let floorHeight=0;
   let pinnedTop=null;
   let frame=0;
@@ -286,7 +287,7 @@ function initMissingProductsDialogFrame(){
     frame=0;
     if(!dialog.open)return;
     const rect=dialog.getBoundingClientRect();
-    if(pinnedTop===null)pinnedTop=rect.top;
+    if(pinnedTop===null)pinnedTop=rect.top+DIALOG_TOP_OFFSET;
     floorHeight=Math.max(floorHeight,rect.height);
     dialog.style.top=Math.round(pinnedTop)+'px';
     dialog.style.bottom='auto';
