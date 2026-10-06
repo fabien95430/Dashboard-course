@@ -5,6 +5,7 @@ const CATALOG=window.COURSES_CATALOG;
 if(!CATALOG?.groups)return;
 
 const STORAGE_KEY='courses-purchase-intelligence-v1';
+const ENABLED_KEY='courses-purchase-intelligence-enabled-v1';
 const HISTORY_DAYS=400;
 const DAY=86400000;
 const SAME_TRIP=18*60*60*1000;
@@ -98,6 +99,41 @@ let dishObserver=null;
 let refreshFrame=0;
 const pending=new Map();
 
+function isEnabled(){
+  try{return localStorage.getItem(ENABLED_KEY)!=='0'}catch(_){return true}
+}
+function setEnabled(value){
+  const enabled=value!==false;
+  try{localStorage.setItem(ENABLED_KEY,enabled?'1':'0')}catch(_){}
+  if(!enabled){
+    pending.forEach(token=>{if(token?.timer)clearTimeout(token.timer)});
+    pending.clear();
+  }
+  syncPreferenceToggle();
+  scheduleDish();
+  return enabled;
+}
+function syncPreferenceToggle(){
+  const input=document.getElementById('preferencesPurchaseHistory');
+  if(input)input.checked=isEnabled();
+}
+function installPreferenceToggle(){
+  const dialog=document.getElementById('preferencesDialog');
+  const options=dialog?.querySelector('.preference-options');
+  if(!options)return false;
+  let input=document.getElementById('preferencesPurchaseHistory');
+  if(!input){
+    const row=document.createElement('label');
+    row.className='preference-toggle';
+    row.dataset.purchaseHistoryToggle='1';
+    row.innerHTML='<span class="preference-toggle-copy"><strong>Historique des achats</strong><small>Utilise les achats récents pour éviter les doublons.</small></span><span class="preference-switch"><input id="preferencesPurchaseHistory" type="checkbox" aria-label="Historique des achats"><span aria-hidden="true"></span></span>';
+    options.appendChild(row);
+    input=row.querySelector('#preferencesPurchaseHistory');
+    input?.addEventListener('change',()=>setEnabled(input.checked));
+  }
+  syncPreferenceToggle();
+  return true;
+}
 function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
 function median(values){
   const sorted=values.filter(Number.isFinite).slice().sort((a,b)=>a-b);
@@ -167,6 +203,7 @@ function persist(){
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(_){}
 }
 function record(name,qty=1,at=Date.now()){
+  if(!isEnabled())return;
   const meta=META.get(norm(name));
   if(!meta)return;
   const key=norm(meta.name),events=Array.isArray(state.purchases[key])?state.purchases[key]:[],last=events.at(-1);
@@ -176,6 +213,7 @@ function record(name,qty=1,at=Date.now()){
 }
 function profile(name){return state.products[norm(name)]||null}
 function recent(name,at=Date.now()){
+  if(!isEnabled())return null;
   const p=profile(name);
   if(!p?.lastAt)return null;
   const age=Math.max(0,(at-p.lastAt)/DAY);
@@ -186,6 +224,7 @@ function rowQty(row){
   return Number.isFinite(value)&&value>0?value:1;
 }
 function watchPurchase(button){
+  if(!isEnabled())return;
   const row=button?.closest?.('.list-row'),name=String(button?.dataset?.name||row?.dataset?.name||'').trim();
   if(!name)return;
   const key=norm(name),previous=pending.get(key);
@@ -199,6 +238,7 @@ function cancelPurchase(button){
   const token=pending.get(key);if(token?.timer)clearTimeout(token.timer);pending.delete(key);
 }
 function consumeToast(){
+  if(!isEnabled())return;
   const text=String(document.getElementById('toast')?.textContent||'').trim();
   if(!text.endsWith(' acheté'))return;
   for(const [key,token] of pending){
@@ -216,12 +256,25 @@ function styles(){
     #dishDialog .dish-ingredient-recent{display:block!important;margin-top:1px!important;color:#8b958f!important;font-size:9.8px!important;line-height:1.05!important;font-weight:720!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}`;
   document.head.appendChild(style);
 }
-function clearRecent(row){
-  row.classList.remove('is-recent-purchase');delete row.dataset.recentPurchase;row.querySelector('.dish-ingredient-recent')?.remove();
+function clearRecent(row,restoreSelection=false){
+  const autoDeselected=row.dataset.recentPurchaseDefault==='1';
+  const overridden=row.dataset.recentPurchaseOverride==='1';
+  row.classList.remove('is-recent-purchase');
+  delete row.dataset.recentPurchase;
+  row.querySelector('.dish-ingredient-recent')?.remove();
+  if(restoreSelection&&autoDeselected&&!overridden&&row.getAttribute('aria-pressed')==='false'){
+    delete row.dataset.recentPurchaseDefault;
+    row.click();
+  }
 }
 function decorateDish(){
   const dialog=document.getElementById('dishDialog');if(!dialog?.open)return;
-  dialog.querySelectorAll('.dish-ingredient[data-ingredient]').forEach(row=>{
+  const rows=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')];
+  if(!isEnabled()){
+    rows.forEach(row=>clearRecent(row,true));
+    return;
+  }
+  rows.forEach(row=>{
     const name=String(row.dataset.ingredient||'');
     if(!name||row.disabled||row.hasAttribute('disabled')||row.dataset.recentPurchaseOverride==='1'||!recent(name)){clearRecent(row);return}
     row.classList.add('is-recent-purchase');row.dataset.recentPurchase='1';
@@ -257,11 +310,16 @@ function init(){
   try{const p=navigator.storage?.persist?.();if(p&&typeof p.catch==='function')p.catch(()=>{})}catch(_){}
   prune();rebuild();try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(_){}
   styles();bindPurchases();
+  if(!installPreferenceToggle()){
+    const preferencesObserver=new MutationObserver(()=>{if(installPreferenceToggle())preferencesObserver.disconnect()});
+    preferencesObserver.observe(document.documentElement,{childList:true,subtree:true});
+    setTimeout(()=>preferencesObserver.disconnect(),10000);
+  }
   if(!bindDish()){
     const observer=new MutationObserver(()=>{if(bindDish())observer.disconnect()});
     observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),10000);
   }
-  window.COURSES_PURCHASE_INTELLIGENCE=Object.freeze({retentionDays:HISTORY_DAYS,profileFor:name=>profile(name),isRecent:name=>Boolean(recent(name))});
+  window.COURSES_PURCHASE_INTELLIGENCE=Object.freeze({retentionDays:HISTORY_DAYS,profileFor:name=>profile(name),isRecent:name=>Boolean(recent(name)),isEnabled,setEnabled});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
