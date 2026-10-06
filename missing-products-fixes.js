@@ -283,7 +283,8 @@ function decorateRunningRows(dialog,type,running){
       integrate.disabled=active;
       integrate.classList.toggle('is-running',active);
       integrate.setAttribute('aria-disabled',String(active));
-      integrate.textContent=active?'En cours…':'Intégrer';
+      const label=active?'En cours…':'Intégrer';
+      if(integrate.textContent!==label)integrate.textContent=label;
     }
     row.classList.toggle('is-running-request',active);
   });
