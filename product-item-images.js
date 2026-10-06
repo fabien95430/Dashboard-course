@@ -45,7 +45,7 @@ function ensureStyles(){
       transform:translateY(1px)!important;
     }
     @media(max-width:520px){
-      .catalog-view .product.has-single-product-image .media{
+      .catalog-view .product .media{
         padding-right:0!important;
       }
     }
