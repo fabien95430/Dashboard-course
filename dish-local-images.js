@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v251';
+const APP_VERSION='v252';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -45,6 +45,7 @@ const warmedDishVisuals=new Set();
 let renderedDishWarmupQueued=false;
 let dishVisualWarmupRunning=false;
 let dishUnlockObserver=null;
+let securityKeyboardBaseline=0;
 const slugify=value=>String(value||'')
   .toLowerCase()
   .replace(/œ/g,'oe')
@@ -99,6 +100,52 @@ function installCatalogQuantities(){
   script.defer=true;
   script.dataset.catalogQuantities='1';
   document.head.appendChild(script);
+}
+function securityViewportHeight(){
+  return Math.round(window.visualViewport?.height||window.innerHeight||document.documentElement.clientHeight||0);
+}
+function isSecurityPasswordField(target=document.activeElement){
+  return target===document.getElementById('securityPassword')||target===document.getElementById('securityConfirm');
+}
+function syncSecurityKeyboardState(){
+  const shell=document.querySelector('.security-shell');
+  if(!shell)return;
+  const overlay=document.getElementById('securityOverlay');
+  const active=isSecurityPasswordField();
+  if(!overlay?.classList.contains('is-visible')||!active){
+    shell.classList.remove('is-password-open');
+    if(!active)securityKeyboardBaseline=0;
+    return;
+  }
+  const current=securityViewportHeight();
+  if(!securityKeyboardBaseline)securityKeyboardBaseline=current;
+  shell.classList.toggle('is-password-open',securityKeyboardBaseline-current>120);
+}
+function bindSecurityKeyboardViewport(){
+  if(document.documentElement.dataset.securityKeyboardViewport==='1')return;
+  document.documentElement.dataset.securityKeyboardViewport='1';
+  document.addEventListener('focus',event=>{
+    if(!isSecurityPasswordField(event.target))return;
+    securityKeyboardBaseline=securityViewportHeight();
+    Promise.resolve().then(syncSecurityKeyboardState);
+  },true);
+  document.addEventListener('blur',event=>{
+    if(!isSecurityPasswordField(event.target))return;
+    securityKeyboardBaseline=0;
+    requestAnimationFrame(syncSecurityKeyboardState);
+  },true);
+  window.visualViewport?.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
+  window.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
+  window.addEventListener('pageshow',()=>{
+    securityKeyboardBaseline=0;
+    requestAnimationFrame(syncSecurityKeyboardState);
+  },{passive:true});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState!=='visible')return;
+    securityKeyboardBaseline=0;
+    requestAnimationFrame(syncSecurityKeyboardState);
+  });
+  requestAnimationFrame(syncSecurityKeyboardState);
 }
 async function warmVisual(src,priority='auto'){
   if(retainedVisuals.has(src))return true;
@@ -306,6 +353,7 @@ syncPageVersions();
 installVisualWarmupStyle();
 installMissingProductsFixes();
 installCatalogQuantities();
+bindSecurityKeyboardViewport();
 void warmProductVisuals();
 scheduleDishVisualWarmup();
 versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
