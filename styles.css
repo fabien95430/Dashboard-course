@@ -4144,3 +4144,6 @@ body{
 .list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:15px}
 .list-row-menu-delete{width:100%;height:42px;border:0;border-top:1px solid #edf0ed;background:transparent;color:#c13f48;text-align:left;padding:8px;font-size:14px;font-weight:780}
 .list-row.is-reordering{touch-action:none}
+
+/* v248 — une fois l'appui long reconnu, le navigateur laisse le drag piloter la ligne */
+.list-row.is-reorder-dragging{touch-action:none!important}
