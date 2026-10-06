@@ -20,8 +20,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .chatgpt/sushi.part*.b64 | base64 -d > /tmp/sushis.jpg
-          cat .chatgpt/saucisse.part*.b64 | base64 -d > /tmp/saucisse-lentille.jpg
+          : > /tmp/sushis.jpg
+          for part in .chatgpt/sushi.part*.b64; do base64 -d "$part" >> /tmp/sushis.jpg; done
+          : > /tmp/saucisse-lentille.jpg
+          for part in .chatgpt/saucisse.part*.b64; do base64 -d "$part" >> /tmp/saucisse-lentille.jpg; done
           test -s /tmp/sushis.jpg
           test -s /tmp/saucisse-lentille.jpg
 
