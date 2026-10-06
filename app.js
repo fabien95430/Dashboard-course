@@ -551,7 +551,7 @@ function premiumProductVisual(product, compact = false) {
 function sprite(product,compact=false){
   const position=POSITIONS.get(norm(product?.name));
   const sheet=position&&PRODUCT_SHEETS[position.category];
-  if(!position||!sheet)return premiumProductVisual(product,compact);
+  if(!position||!sheet||position.col>=sheet.cols||position.row>=sheet.rows)return premiumProductVisual(product,compact);
   const fallback=premiumProductVisual(product,compact);
   const left=-(position.col*100),top=-(position.row*100);
   const width=sheet.cols*100,height=sheet.rows*100;
