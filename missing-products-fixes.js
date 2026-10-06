@@ -323,11 +323,6 @@ function bindOpenAiUi(){
   installOpenAiStyle();
 
   document.addEventListener('click',event=>{
-    if(event.target.closest?.('#settingsMissingProductsBtn')){
-      void ensureNotificationPermission().then(permission=>{
-        if(permission==='granted')void pushSubscriptionData();
-      });
-    }
     const button=event.target.closest?.('[data-openai-missing-dish]');
     if(button){
       event.preventDefault();
