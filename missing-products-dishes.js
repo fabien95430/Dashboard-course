@@ -2,6 +2,7 @@
 'use strict';
 
 const STORAGE_DISHES='courses-missing-dishes-v1';
+const STORAGE_ADDED_DISHES='courses-missing-dishes-added-v1';
 const STORAGE_PRODUCTS='courses-missing-products-v1';
 const CHATGPT_URL='https://chatgpt.com/';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -38,6 +39,29 @@ function readDishes(){
 function saveDishes(items){
   try{localStorage.setItem(STORAGE_DISHES,JSON.stringify(items.slice(-100).map(sanitizeDish).filter(Boolean)))}catch(_){}
   syncCombinedCount();
+}
+function readAddedDishes(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STORAGE_ADDED_DISHES)||'[]');
+    if(!Array.isArray(saved))return [];
+    return saved.slice(-50).map(sanitizeDish).filter(Boolean);
+  }catch(_){
+    return [];
+  }
+}
+function saveAddedDishes(items){
+  try{localStorage.setItem(STORAGE_ADDED_DISHES,JSON.stringify(items.slice(-50).map(sanitizeDish).filter(Boolean)))}catch(_){}
+}
+function rememberAddedDish(item){
+  const added=readAddedDishes().filter(entry=>entry.id!==item.id&&normalize(entry.name)!==normalize(item.name));
+  added.push(item);
+  saveAddedDishes(added);
+}
+function forgetAddedDish(id){
+  const added=readAddedDishes();
+  const next=added.filter(entry=>entry.id!==id);
+  if(next.length!==added.length)saveAddedDishes(next);
+  return next.length!==added.length;
 }
 function sanitizeProduct(item,index=0){
   const name=String(item?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
@@ -283,16 +307,23 @@ function initMissingProductsAndDishes(){
   }
   function renderDishes(){
     dishes=readDishes();
-    if(!dishes.length){
+    const added=readAddedDishes();
+    const rows=[...dishes.map(item=>({item,added:false})),...added.map(item=>({item,added:true}))];
+    if(!rows.length){
       dishesList.innerHTML='<div class="missing-products-empty">Aucun plat noté pour le moment.</div>';
       return;
     }
-    dishesList.innerHTML=dishes.map(item=>{
+    dishesList.innerHTML=rows.map(entry=>{
+      const item=entry.item;
       const category=item.category?'<small>'+escapeHtml(item.category)+'</small>':'';
-      return '<div class="missing-product-row is-dish" data-missing-dish-row="'+escapeHtml(item.id)+'">'+
+      const addedClass=entry.added?' is-added-request':'';
+      const addedData=entry.added?' data-missing-dish-added="1"':'';
+      const addedButton=entry.added?' disabled aria-disabled="true"':'';
+      const label=entry.added?'Ajouté ✓':'Intégrer';
+      return '<div class="missing-product-row is-dish'+addedClass+'" data-missing-dish-row="'+escapeHtml(item.id)+'"'+addedData+'>'+
         '<span class="missing-product-mark" aria-hidden="true">•</span>'+
         '<span class="missing-product-copy"><strong>'+escapeHtml(item.name)+'</strong>'+category+'</span>'+
-        '<span class="missing-dish-actions"><button class="missing-dish-integrate" type="button" data-integrate-missing-dish="'+escapeHtml(item.id)+'">Intégrer</button></span>'+
+        '<span class="missing-dish-actions"><button class="missing-dish-integrate" type="button" data-integrate-missing-dish="'+escapeHtml(item.id)+'"'+addedButton+'>'+label+'</button></span>'+
         '<button class="missing-product-remove" type="button" data-remove-missing-dish="'+escapeHtml(item.id)+'" aria-label="Supprimer '+escapeHtml(item.name)+'"><svg><use href="#i-trash"></use></svg></button>'+
       '</div>';
     }).join('');
@@ -340,7 +371,8 @@ function initMissingProductsAndDishes(){
       return;
     }
     dishes=readDishes();
-    if(dishes.some(item=>normalize(item.name)===normalize(name)))return;
+    const alreadyAdded=readAddedDishes();
+    if([...dishes,...alreadyAdded].some(item=>normalize(item.name)===normalize(name)))return;
     const item={id:randomId(),name,category:dishCategory};
     dishes.push(item);
     saveDishes(dishes);
@@ -353,9 +385,11 @@ function initMissingProductsAndDishes(){
   function removeDish(id){
     dishes=readDishes();
     const next=dishes.filter(entry=>entry.id!==id);
-    if(next.length===dishes.length)return;
+    const removedPending=next.length!==dishes.length;
+    const removedAdded=forgetAddedDish(id);
+    if(!removedPending&&!removedAdded)return;
     dishes=next;
-    saveDishes(dishes);
+    if(removedPending)saveDishes(dishes);
     renderMode();
     navigator.vibrate?.(6);
   }
@@ -449,6 +483,7 @@ function initMissingProductsAndDishes(){
     const current=readDishes();
     const completed=current.filter(item=>dishImageReady(item));
     if(!completed.length)return false;
+    completed.forEach(rememberAddedDish);
     const completedIds=new Set(completed.map(item=>item.id));
     saveDishes(current.filter(item=>!completedIds.has(item.id)));
     completed.forEach(item=>{
