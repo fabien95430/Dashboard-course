@@ -2,24 +2,28 @@
 
 Ce document décrit le fonctionnement de l’historique intelligent implémenté dans `purchase-intelligence.js`.
 
-L’objectif n’est pas de gérer un stock exact ni de remplacer une date limite de consommation. Le moteur estime si un produit acheté récemment est probablement encore disponible à la maison afin d’éviter de le recommander inutilement lorsqu’un plat est ajouté.
+Le moteur ne cherche pas à maintenir un stock comptable exact. Il construit un **stock probabiliste local** afin d’éviter de recommander inutilement un produit récemment acheté, tout en tenant compte de sa durée probable de disponibilité, des quantités, de la taille du foyer, des habitudes observées et des plats déjà planifiés.
 
-## Principe général
+Il ne remplace jamais une DLC, une DDM, l’étiquette d’un produit ni le jugement de l’utilisateur.
 
-Lorsqu’un produit de **Ma liste** est réellement marqué comme acheté, l’application mémorise localement :
+## Objectif
 
-- le produit ;
-- la date de l’achat ;
-- la quantité achetée ;
-- le nombre de personnes configuré à ce moment-là.
+Le principe fonctionnel est le suivant :
 
-Lorsqu’un plat est ensuite ouvert, chaque ingrédient est comparé à cet historique. Si le moteur estime qu’il reste encore une quantité suffisante du produit, l’ingrédient est affiché comme **Acheté récemment** et il est désélectionné automatiquement.
+1. un produit est réellement marqué comme acheté dans **Ma liste** ;
+2. l’application crédite localement une quantité probable ;
+3. cette quantité décroît avec le temps selon le profil du produit et les habitudes du foyer ;
+4. lorsqu’un plat est ajouté et qu’il utilise un produit que le moteur avait automatiquement considéré comme encore disponible, la quantité correspondante est débitée du stock probabiliste ;
+5. un produit n’est automatiquement écarté d’une recommandation que si la quantité estimée restante est suffisante **et** si sa fenêtre de disponibilité n’est pas dépassée ;
+6. l’utilisateur peut toujours forcer l’ajout d’un ingrédient, ce qui devient un signal d’apprentissage.
 
-Cette décision reste toujours réversible : l’utilisateur peut sélectionner manuellement l’ingrédient. Ce choix est respecté et devient un signal d’apprentissage pour les recommandations futures.
+L’objectif principal est d’éviter qu’un même achat soit utilisé virtuellement plusieurs fois dans plusieurs plats.
 
 ## Source des produits
 
-Le moteur ne possède pas son propre catalogue. Il construit ses métadonnées depuis `window.COURSES_CATALOG`, donc depuis le catalogue courant fourni par `catalog.js`.
+Le moteur n’a pas son propre catalogue.
+
+Il construit ses métadonnées depuis `window.COURSES_CATALOG`, donc depuis `catalog.js`, qui reste la source de vérité du catalogue.
 
 Une règle peut être définie à trois niveaux :
 
@@ -27,21 +31,21 @@ Une règle peut être définie à trois niveaux :
 2. sous-catégorie ;
 3. catégorie générale.
 
-La règle la plus précise disponible est utilisée.
+La règle la plus précise disponible est prioritaire.
 
 Chaque règle peut contenir :
 
-- `days` : durée de disponibilité probable de référence ;
+- `days` : durée probable de disponibilité de référence ;
 - `factor` : facteur de prudence appliqué à l’apprentissage ;
-- `shelf` : plafond maximal de disponibilité pour les produits sensibles.
+- `shelf` : plafond maximal pour les produits sensibles.
 
-## Produits périssables et plafond de sécurité
+## Produits périssables
 
-Pour les produits périssables, `shelf` constitue une limite dure.
+Pour les produits périssables, `shelf` est une limite dure.
 
-Même si l’historique du foyer montre qu’un produit est généralement racheté après une durée plus longue, la durée calculée ne peut jamais dépasser ce plafond.
+Même si l’historique du foyer suggère une durée plus longue, la période pendant laquelle le moteur peut considérer le produit comme disponible ne dépasse jamais ce plafond.
 
-Exemples actuels :
+Exemples de règles actuelles :
 
 - steaks hachés : `2` jours, plafond `2` jours ;
 - saumon frais : `2` jours, plafond `2` jours ;
@@ -50,239 +54,301 @@ Exemples actuels :
 - lait : `6` jours, plafond `7` jours ;
 - œufs : `21` jours, plafond `28` jours.
 
-Ces valeurs sont des fenêtres pratiques destinées à éviter les doublons. Elles ne sont pas des DLC, ne remplacent pas l’étiquette du produit et ne constituent pas une garantie de conservation.
+Ces valeurs servent uniquement à la recommandation.
 
-## Historique conservé
+## Données conservées
 
-Les achats et les retours utilisateurs sont conservés au maximum pendant `400` jours.
-
-Les données sont stockées localement sous la clé :
+La clé locale reste :
 
 `courses-purchase-intelligence-v1`
 
-Le stockage contient notamment :
+Le nom de clé est conservé pour migrer les historiques existants sans les perdre.
 
-- `purchases` : achats enregistrés ;
+Le format interne courant est en version `3` et contient notamment :
+
+- `purchases` : achats confirmés ;
 - `feedback` : corrections manuelles ;
-- `products` : profils recalculés ;
-- `household` : taille de foyer utilisée lors du dernier calcul ;
+- `consumptions` : débits probabilistes produits par les plats planifiés ;
+- `products` : profils recalculés du catalogue ;
+- `household` : taille du foyer utilisée lors du dernier calcul ;
 - `updatedAt` : date du dernier recalcul.
 
-Aucune donnée de cet historique n’est envoyée vers un backend externe par ce module.
+Les événements sont conservés au maximum `400` jours.
 
-## Quand un achat est enregistré
+Les données restent dans le stockage local du navigateur. Ce module n’envoie pas cet historique vers un backend externe.
 
-Un clic sur la coche d’achat prépare l’enregistrement, mais l’achat n’est réellement ajouté à l’historique qu’après confirmation par le toast `<nom du produit> acheté`.
+## Enregistrement d’un achat
 
-La quantité est lue depuis la ligne de **Ma liste**.
+Un simple clic sur la coche d’achat ne suffit pas.
 
-Deux achats du même produit réalisés dans une fenêtre de `18` heures sont regroupés en un seul événement. Les quantités sont additionnées. Cela permet de considérer plusieurs validations proches comme une même course plutôt que comme plusieurs cycles de consommation.
+Le moteur prépare l’événement, puis attend la confirmation visuelle du flux existant : le toast `<produit> acheté`.
+
+Une fois cette confirmation reçue, il mémorise :
+
+- la date ;
+- la quantité réellement présente sur la ligne de **Ma liste** ;
+- la taille du foyer ;
+- le début du cycle d’achat.
+
+### Courses rapprochées
+
+Deux validations du même produit espacées de moins de `18` heures sont regroupées dans un même cycle.
+
+Les quantités sont additionnées.
+
+Le cycle possède :
+
+- `firstAt` : début stable du cycle ;
+- `at` : achat le plus récent du cycle.
+
+`firstAt` permet de rattacher correctement les débits de plats au même lot logique, même lorsqu’un complément d’achat est enregistré quelques heures plus tard.
 
 ## Annulation d’un achat
 
-Après un achat enregistré, le moteur conserve temporairement les informations nécessaires pour annuler cet événement pendant `2` minutes.
+Lorsque l’action d’achat est annulée dans la fenêtre prévue par l’interface, l’événement ajouté par le moteur est également annulé.
 
-Si l’utilisateur utilise **Annuler**, l’événement ajouté est retiré ou, lorsqu’il avait été fusionné avec un événement précédent, l’état précédent est restauré.
+Si l’achat avait été fusionné avec un cycle existant, l’état précédent du cycle est restauré.
 
-Ainsi, une mauvaise validation ne doit pas polluer l’apprentissage.
+Cela évite qu’une action annulée contamine l’apprentissage.
 
-## Nombre de personnes
+## Taille du foyer
 
-Le moteur réutilise les préférences déjà présentes dans l’application :
+Le moteur lit la préférence déjà utilisée pour les plats :
 
 - `courses-dish-preferred-servings-v1` ;
-- `courses-dish-servings-v1`.
+- puis `courses-dish-servings-v1`.
 
-Si aucune valeur exploitable n’est disponible, le calcul utilise `4` personnes.
+La valeur de repli est `4`.
 
-Le modèle normalise les anciens échantillons selon la taille du foyer qui était enregistrée au moment de l’achat ou du feedback, puis les transpose à la taille du foyer actuelle.
+La taille du foyer influence les durées apprises : à quantité comparable, un foyer plus grand est supposé consommer plus rapidement.
 
-Le facteur utilisé est basé sur :
+Lorsqu’elle change dans les préférences, les profils sont recalculés sans perdre l’historique précédent.
 
-`(2 / nombre_de_personnes) ^ 0.42`
+Les événements historiques conservent la taille du foyer applicable au moment où ils ont été créés afin de normaliser les comparaisons.
 
-avec un bornage entre `0.62` et `1.18`.
+## Apprentissage des habitudes
 
-Conséquence : à quantité d’achat comparable, un foyer plus grand consomme généralement le produit plus vite et la fenêtre de disponibilité estimée diminue.
+Pour chaque produit, le moteur observe les intervalles entre achats.
 
-Un changement du nombre de personnes déclenche un recalcul du modèle, sans supprimer l’historique existant.
+Les derniers intervalles sont normalisés selon la taille du foyer puis comparés à la règle de référence.
 
-## Apprentissage à partir des habitudes d’achat
+Le moteur utilise notamment :
 
-Pour chaque produit, le moteur calcule les intervalles entre achats successifs.
+- jusqu’aux `12` derniers intervalles d’achat ;
+- jusqu’aux `12` derniers retours manuels ;
+- une médiane ;
+- un quantile prudent ;
+- une mesure de dispersion ;
+- un niveau de confiance qui augmente avec le nombre de signaux.
 
-Les intervalles inférieurs à `0,75` jour sont ignorés pour éviter qu’une même période de courses soit interprétée comme un cycle de consommation complet.
+Les retours manuels ont davantage de poids qu’un simple intervalle d’achat car ils indiquent directement que l’estimation précédente était trop optimiste.
 
-Jusqu’aux `12` derniers intervalles d’achat sont utilisés.
+Avec peu d’historique, la règle catalogue domine.
 
-Le modèle combine ensuite :
+Avec davantage d’historique, les habitudes observées prennent progressivement plus de poids.
 
-- la durée de référence de la règle du produit ;
-- les intervalles observés entre achats ;
-- les corrections manuelles de l’utilisateur ;
-- la taille du foyer ;
-- la stabilité des habitudes ;
-- les quantités achetées.
+## Quantité achetée
 
-Il ne remplace donc pas immédiatement la règle initiale par la moyenne observée. L’apprentissage augmente progressivement avec la quantité de preuves disponibles.
+La quantité d’un achat n’est pas ignorée.
 
-## Robustesse du calcul
+Le moteur compare la dernière quantité achetée aux quantités habituelles du même produit.
 
-Le moteur évite de se baser directement sur une moyenne simple.
+Une quantité supérieure à l’habitude peut allonger modérément la période probable de disponibilité.
 
-Il utilise notamment :
+Une quantité inférieure peut la réduire.
 
-- la médiane des observations ;
-- le quantile `40 %` comme cible prudente ;
-- la médiane des écarts absolus pour mesurer la stabilité ;
-- une confiance croissante avec le nombre d’échantillons.
+Le plafond `shelf` reste prioritaire pour les produits périssables.
 
-Les corrections manuelles ont plus de poids qu’un simple intervalle d’achat : elles sont comptées deux fois dans l’ensemble appris et leur contribution à la confiance est pondérée plus fortement.
+## Quantité nécessaire à un plat
 
-La confiance reste bornée entre `0,22` et `0,90`.
+Les lignes d’ingrédients des plats exposent `data-recipe-quantity`.
 
-Avant l’application éventuelle du plafond `shelf`, la durée apprise reste également bornée afin d’éviter les dérives extrêmes : elle ne peut pas descendre sous environ `32 %` de la durée de référence adaptée au foyer ni dépasser trois fois cette durée.
+Cette valeur représente le nombre d’unités d’achat nécessaires pour le nombre de personnes choisi.
 
-## Prise en compte des quantités achetées
+Le moteur ne se contente donc pas de demander :
 
-Le moteur conserve la quantité du dernier achat et observe aussi jusqu’aux `10` dernières quantités achetées pour déterminer une quantité typique.
+> « Est-ce que ce produit est probablement encore présent ? »
 
-Si le dernier achat est plus important que d’habitude, la fenêtre de disponibilité peut être allongée. S’il est plus faible, elle peut être raccourcie.
+Il demande :
 
-L’ajustement est basé sur la racine carrée du rapport :
+> « Est-ce qu’il en reste probablement assez pour ce plat ? »
 
-`dernière quantité / quantité typique`
+Si une seule unité est estimée disponible et qu’un plat en demande deux, l’ingrédient n’est pas automatiquement écarté.
 
-avec un bornage entre `0,75` et `1,65`.
+## Stock probabiliste
 
-Le plafond `shelf` est appliqué après cet ajustement, donc une grosse quantité achetée ne permet jamais de dépasser la limite d’un produit périssable.
+Le stock probabiliste s’appuie sur le dernier cycle d’achat du produit.
 
-## Estimation de la quantité restante
+Il combine deux mécanismes.
 
-La durée seule ne suffit pas pour décider qu’un ingrédient est encore disponible.
+### 1. Débit explicite des plats planifiés
 
-Le moteur estime aussi une quantité restante à partir du dernier achat. Cette quantité décroît progressivement jusqu’à zéro pendant la fenêtre `recentDays` :
+Lorsqu’un plat est ajouté avec succès, le moteur regarde les ingrédients qu’il avait lui-même :
 
-`quantité restante ≈ dernière quantité × (1 - âge / recentDays)`
+- marqués **Acheté récemment** ;
+- désélectionnés automatiquement ;
+- considérés en quantité suffisante au moment de l’ajout.
 
-La valeur est arrondie vers le haut pour produire une estimation d’unités encore disponibles.
+Ces ingrédients représentent les produits que le plat prévoit d’utiliser depuis le stock déjà présent.
 
-Un ingrédient est considéré comme **Acheté récemment** uniquement si :
+Après confirmation de l’ajout du plat, leur quantité est débitée dans `consumptions`.
 
-1. l’achat se trouve encore dans sa fenêtre de disponibilité ;
-2. la quantité estimée restante est au moins égale à la quantité nécessaire pour le plat.
+Les ingrédients restés sélectionnés ne sont pas débités : ils sont destinés à être achetés.
 
-## Quantité nécessaire au plat
+Les ingrédients ajoutés manuellement après un override ne sont pas débités non plus.
 
-Le moteur lit `data-recipe-quantity` sur la ligne de l’ingrédient du plat.
+### 2. Décroissance temporelle
 
-Cette valeur est calculée par la logique de quantités des plats et tient compte du nombre de personnes sélectionné.
+Après les débits explicites, le solde restant continue de décroître avec le temps pendant la fenêtre `recentDays`.
 
-Exemple : si le moteur estime qu’il reste une seule unité d’un produit mais que le plat en demande deux, le produit n’est pas masqué : il reste sélectionné pour être acheté.
+Schématiquement :
 
-Cela évite le cas où un produit serait considéré comme disponible simplement parce qu’il en reste un peu alors que la quantité est insuffisante pour la recette.
+`solde explicite = quantité achetée - quantités réservées par des plats`
 
-## Correction manuelle et apprentissage direct
+puis :
 
-Lorsqu’un ingrédient est marqué **Acheté récemment**, il est désélectionné automatiquement.
+`stock estimé = solde explicite × facteur temporel`
 
-Si l’utilisateur le sélectionne quand même manuellement :
+Le résultat est ramené à un nombre d’unités d’achat entières.
 
-- l’override est respecté immédiatement ;
-- le marquage **Acheté récemment** est retiré pour cette ligne ;
-- le temps écoulé depuis le dernier achat est enregistré comme feedback direct.
+Une fois `recentDays` atteint, le stock estimé devient nul, même si aucun plat ne l’a explicitement consommé.
 
-Ce feedback signifie en pratique : **le produit n’était plus suffisamment disponible malgré l’estimation actuelle**.
+## Pourquoi les débits sont liés à un cycle
 
-Les feedbacks trop proches sont filtrés : un nouveau feedback identique n’est pas enregistré dans les `6` heures suivant le précédent.
+Chaque événement de consommation contient `cycleAt`.
 
-Jusqu’aux `12` derniers feedbacks par produit sont conservés.
+Il correspond au `firstAt` du cycle d’achat qu’il consomme.
 
-Lors des recalculs suivants, ces corrections tirent plus rapidement la durée estimée vers une valeur plus courte et mieux adaptée au foyer réel.
+Ainsi, lorsqu’un nouvel achat indépendant est enregistré, les débits d’un ancien cycle ne viennent pas diminuer le nouveau stock.
 
-## Comportement dans la fiche d’un plat
+Cela évite par exemple qu’un plat planifié avant un réapprovisionnement consomme virtuellement les produits nouvellement achetés.
 
-Lorsque le dialogue d’un plat est ouvert, le moteur observe les lignes d’ingrédients et les changements de quantité.
+## Confirmation d’un plat
 
-Pour un produit considéré comme encore disponible :
+Le moteur ne débite pas le stock au simple clic sur le bouton du plat.
 
-- la ligne reçoit la classe `is-recent-purchase` ;
-- le texte **Acheté récemment** est ajouté ;
-- l’ingrédient est désélectionné automatiquement s’il était sélectionné par défaut ;
-- l’utilisateur peut le sélectionner manuellement à tout moment.
+Il mémorise temporairement les ingrédients concernés puis attend le toast de réussite du flux existant.
 
-Si l’historique est désactivé dans les préférences, les décorations sont retirées et les sélections automatiques précédemment retirées sont restaurées lorsqu’elles n’ont pas été remplacées par un choix manuel.
+Les débits sont enregistrés uniquement lorsqu’un ajout est confirmé.
 
-## Préférence utilisateur
+Un message **Ajout partiel** annule la réservation en attente et ne débite pas le stock probabiliste.
 
-L’option **Historique des achats** se trouve dans les préférences de l’application.
+Le suivi temporaire expire également automatiquement s’il n’obtient pas de confirmation.
 
-Elle est activée par défaut sauf si la clé :
+## Exemple
 
-`courses-purchase-intelligence-enabled-v1`
+Supposons un achat de `2` mozzarellas.
 
-vaut `0`.
+Le moteur considère initialement deux unités disponibles, sous réserve de la fenêtre de péremption.
 
-Lorsqu’elle est désactivée :
+Un premier plat nécessite une mozzarella.
 
-- aucun nouvel achat n’est enregistré par ce module ;
-- les décisions **Acheté récemment** ne sont plus appliquées ;
-- les opérations en attente sont annulées ;
-- l’historique existant n’est pas détruit.
+La mozzarella est indiquée **Acheté récemment**, désélectionnée, puis le plat est ajouté avec succès.
 
-Une réactivation permet donc de reprendre avec les données déjà disponibles.
+Le moteur enregistre alors un débit probable de `1`.
 
-## API interne exposée
+Il ne reste plus qu’une unité explicite avant application de la décroissance temporelle.
 
-Le module expose `window.COURSES_PURCHASE_INTELLIGENCE` avec les fonctions suivantes :
+Si un second plat demande une mozzarella, elle peut encore être considérée disponible.
 
-- `retentionDays` : durée de rétention de l’historique ;
-- `profileFor(name)` : profil calculé d’un produit ;
-- `isRecent(name, qty)` : indique si une quantité donnée est probablement encore disponible ;
-- `explain(name, qty)` : renvoie soit le résultat détaillé de la décision courante, soit le profil calculé ;
-- `isEnabled()` : état de la préférence ;
-- `setEnabled(value)` : activation ou désactivation.
+Si un autre plat en demande deux, le moteur ne considère plus le stock suffisant et laisse l’ingrédient à acheter.
 
-`explain()` est utile pour diagnostiquer une recommandation sans modifier l’état.
+Un nouvel achat crée un nouveau cycle et repart avec la nouvelle quantité sans subir les débits du cycle précédent.
 
-## Ce que le moteur ne fait pas
+## Override utilisateur
 
-Le moteur ne doit pas être interprété comme un inventaire de stock exact.
+**Acheté récemment** n’est jamais un blocage.
 
-Il ne :
+L’utilisateur peut sélectionner manuellement l’ingrédient.
 
-- connaît pas la DLC réelle d’un paquet acheté ;
-- ne sait pas si un produit a été jeté, donné ou consommé exceptionnellement vite ;
-- ne bloque jamais définitivement l’achat d’un produit ;
-- ne remplace pas la décision de l’utilisateur ;
-- ne modifie pas directement la liste Home Assistant `Courses` ;
-- ne crée aucun polling permanent ;
-- n’ajoute aucun backend ou service externe.
+Le moteur :
 
-## Invariants à préserver lors d’une évolution
+1. respecte immédiatement ce choix ;
+2. retire l’état visuel **Acheté récemment** pour cette ligne ;
+3. enregistre un feedback indiquant combien de temps s’est écoulé depuis le dernier achat.
 
-Toute modification future de cette logique doit conserver les points suivants :
+Ce signal aide les recommandations futures à devenir plus prudentes.
 
-1. `catalog.js` reste la source des produits.
-2. La liste Home Assistant `Courses` reste prioritaire pour **Ma liste**.
-3. Le moteur reste une aide à la recommandation, jamais un blocage absolu.
-4. Les produits périssables conservent un plafond de sécurité indépendant de l’apprentissage.
-5. Les quantités nécessaires au plat doivent être prises en compte avant de masquer un ingrédient.
-6. Un choix manuel de l’utilisateur doit toujours pouvoir outrepasser la recommandation automatique.
-7. Les annulations d’achat ne doivent pas rester dans l’historique.
-8. Le changement de taille du foyer doit recalculer le modèle sans effacer l’historique.
-9. Le fonctionnement reste local et ne doit pas introduire de polling permanent.
-10. OAuth, WebSocket Home Assistant, coffre chiffré, verrouillage, biométrie et safe areas iOS ne doivent pas être affaiblis ou contournés.
+## Cas des produits déjà dans Ma liste
+
+La logique de **Ma liste** reste prioritaire.
+
+Si la quantité nécessaire est déjà présente dans la liste Home Assistant, le garde existant du dialogue de plat continue de s’appliquer.
+
+Le stock probabiliste ne remplace pas cette règle et n’écrit pas directement dans Home Assistant.
+
+## Activation
+
+La préférence **Historique des achats** permet d’activer ou désactiver le moteur.
+
+Lorsque le moteur est désactivé :
+
+- aucun nouvel achat n’est appris ;
+- aucun nouveau débit de plat n’est enregistré ;
+- les ingrédients ne sont plus automatiquement écartés par cet historique ;
+- les données existantes ne sont pas détruites.
+
+Une réactivation permet donc de reprendre avec l’historique local déjà présent.
+
+## API de diagnostic
+
+Le module expose `window.COURSES_PURCHASE_INTELLIGENCE`.
+
+Les méthodes principales sont :
+
+- `profileFor(name)` : profil appris ;
+- `stockFor(name, at?)` : estimation détaillée du stock probabiliste ;
+- `isRecent(name, qty?)` : indique si la quantité demandée est probablement disponible ;
+- `explain(name, qty?)` : renvoie le détail utile à l’explication de la décision ;
+- `isEnabled()` ;
+- `setEnabled(value)`.
+
+Cette API est destinée au diagnostic et aux intégrations internes. Le stockage local reste la source du moteur.
+
+## Limites assumées
+
+Le moteur reste probabiliste.
+
+Il ne sait pas directement :
+
+- si un produit a été jeté ;
+- si un produit a été consommé hors d’un plat de l’application ;
+- si une quantité réelle diffère du conditionnement modélisé ;
+- si un plat planifié a finalement été cuisiné ;
+- si un plat utilisant uniquement des produits déjà disponibles a été consommé lorsqu’aucune action d’ajout n’est confirmée.
+
+Un débit de plat est donc une **réservation/consommation probable**, pas une preuve de consommation physique.
+
+Le feedback manuel et les achats suivants servent de mécanismes de correction.
+
+## Invariants à préserver
+
+Toute évolution de ce moteur doit conserver les invariants suivants :
+
+- `catalog.js` reste la source du catalogue ;
+- la liste Home Assistant `Courses` reste prioritaire pour **Ma liste** ;
+- aucune synchronisation permanente par polling ;
+- aucun backend ou service externe supplémentaire pour cet historique ;
+- aucun affaiblissement d’OAuth, du WebSocket, du coffre chiffré, du verrouillage ou de la biométrie ;
+- les plafonds `shelf` restent prioritaires sur l’apprentissage ;
+- un produit marqué récent reste toujours sélectionnable manuellement ;
+- les débits de plats ne portent que sur les produits que le moteur avait lui-même considérés comme disponibles ;
+- un débit n’est appliqué qu’après confirmation de réussite ;
+- les débits d’un cycle ne doivent pas contaminer un nouveau cycle d’achat ;
+- mobile-first et safe areas iOS restent inchangés.
 
 ## Fichiers liés
 
-Les principaux fichiers à consulter avant toute modification sont :
+La logique principale se trouve dans :
 
-- `purchase-intelligence.js` : moteur d’historique et de recommandation ;
-- `catalog.js` : catalogue et métadonnées produits ;
-- `catalog-liquid.js` : calcul des quantités nécessaires aux plats et gestion du nombre de personnes ;
-- `settings-tab-badge.js` : préférence du nombre de personnes ;
-- `dish-local-images.js` : chargement du moteur et version applicative ;
-- `sw.js` : cache de la PWA.
+- `purchase-intelligence.js`.
 
-Avant de modifier l’un de ces comportements, toujours relire l’implémentation courante sur `main`. Ce document décrit l’architecture actuelle mais le code reste la source de vérité technique.
+Elle dépend du comportement existant de :
+
+- `catalog.js` pour les produits et catégories ;
+- `catalog-liquid.js` pour les quantités d’achat nécessaires aux plats ;
+- `dishes-ui.js` pour le dialogue de plat ;
+- `dish-added-marker.js` pour le comportement de protection des produits déjà dans **Ma liste** ;
+- `app.js` et Home Assistant pour le flux normal de **Ma liste**.
+
+La version et le cache de `purchase-intelligence.js` sont pilotés par les mécanismes existants de l’application.

@@ -11,6 +11,7 @@ const HISTORY_DAYS=400;
 const DAY=86400000;
 const SAME_TRIP=18*60*60*1000;
 const WATCH_TTL=20000;
+const DISH_WATCH_TTL=90000;
 const UNDO_TTL=2*60*1000;
 const LABEL='Acheté récemment';
 
@@ -94,6 +95,8 @@ let state=readState();
 let toastObserver=null;
 let dishObserver=null;
 let refreshFrame=0;
+let dishPending=null;
+let dishPendingTimer=0;
 
 function clamp(value,min,max){return Math.max(min,Math.min(max,value))}
 function quantile(values,q=.5){
@@ -115,12 +118,18 @@ function readHousehold(){
 function isEnabled(){
   try{return localStorage.getItem(ENABLED_KEY)!=='0'}catch(_){return true}
 }
+function clearDishPending(){
+  dishPending=null;
+  if(dishPendingTimer)clearTimeout(dishPendingTimer);
+  dishPendingTimer=0;
+}
 function setEnabled(value){
   const enabled=value!==false;
   try{localStorage.setItem(ENABLED_KEY,enabled?'1':'0')}catch(_){}
   if(!enabled){
     pending.forEach(token=>{if(token?.timer)clearTimeout(token.timer)});
     pending.clear();
+    clearDishPending();
   }
   syncPreferenceToggle();scheduleDish();return enabled;
 }
@@ -145,17 +154,29 @@ function readState(){
   try{
     const value=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
     if(value?.purchases&&typeof value.purchases==='object'){
-      return {version:2,purchases:value.purchases,feedback:value.feedback&&typeof value.feedback==='object'?value.feedback:{},products:{},household:0,updatedAt:Number(value.updatedAt)||0};
+      return {
+        version:3,
+        purchases:value.purchases,
+        feedback:value.feedback&&typeof value.feedback==='object'?value.feedback:{},
+        consumptions:value.consumptions&&typeof value.consumptions==='object'?value.consumptions:{},
+        products:{},
+        household:0,
+        updatedAt:Number(value.updatedAt)||0
+      };
     }
   }catch(_){}
-  return {version:2,purchases:{},feedback:{},products:{},household:0,updatedAt:0};
+  return {version:3,purchases:{},feedback:{},consumptions:{},products:{},household:0,updatedAt:0};
 }
 function prune(){
   const cutoff=Date.now()-HISTORY_DAYS*DAY;
   Object.keys(state.purchases).forEach(key=>{
     const events=(Array.isArray(state.purchases[key])?state.purchases[key]:[])
       .filter(event=>Number(event?.at)>=cutoff)
-      .map(event=>({at:Number(event.at),qty:Math.max(1,Number(event.qty)||1),household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))})).sort((a,b)=>a.at-b.at);
+      .map(event=>{
+        const at=Number(event.at);
+        const firstAt=Math.min(at,Number(event.firstAt)||at);
+        return {at,firstAt,qty:Math.max(1,Number(event.qty)||1),household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))};
+      }).sort((a,b)=>a.at-b.at);
     if(events.length)state.purchases[key]=events;else delete state.purchases[key];
   });
   Object.keys(state.feedback).forEach(key=>{
@@ -163,6 +184,18 @@ function prune(){
       .filter(event=>Number(event?.at)>=cutoff&&Number(event?.days)>.1)
       .map(event=>({at:Number(event.at),days:Number(event.days),household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))})).sort((a,b)=>a.at-b.at).slice(-12);
     if(events.length)state.feedback[key]=events;else delete state.feedback[key];
+  });
+  Object.keys(state.consumptions).forEach(key=>{
+    const events=(Array.isArray(state.consumptions[key])?state.consumptions[key]:[])
+      .filter(event=>Number(event?.at)>=cutoff&&Number(event?.qty)>0&&Number(event?.cycleAt)>0)
+      .map(event=>({
+        at:Number(event.at),
+        cycleAt:Number(event.cycleAt),
+        qty:Math.max(1,Math.ceil(Number(event.qty)||1)),
+        dish:String(event.dish||'').trim().slice(0,100),
+        household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))
+      })).sort((a,b)=>a.at-b.at).slice(-120);
+    if(events.length)state.consumptions[key]=events;else delete state.consumptions[key];
   });
 }
 function baseRule(meta){
@@ -173,6 +206,12 @@ function baseRule(meta){
 }
 function eventsFor(name){return state.purchases[norm(name)]||[]}
 function feedbackFor(name){return state.feedback[norm(name)]||[]}
+function consumptionsFor(name){return state.consumptions[norm(name)]||[]}
+function consumedForCycle(name,cycleAt){
+  const cycle=Number(cycleAt)||0;
+  if(!cycle)return 0;
+  return consumptionsFor(name).reduce((total,event)=>total+(Number(event.cycleAt)===cycle?Math.max(1,Number(event.qty)||1):0),0);
+}
 function adaptiveProfile(meta,household=readHousehold()){
   const base=baseRule(meta),events=eventsFor(meta.name),intervals=[];
   const householdFactor=clamp(Math.pow(2/Math.max(1,household),.42),.62,1.18);
@@ -206,13 +245,23 @@ function adaptiveProfile(meta,household=readHousehold()){
   const typicalQty=median(quantities)||1,last=events.at(-1),lastQty=Math.max(1,Number(last?.qty)||1);
   if(last&&quantities.length>=2)days*=clamp(Math.sqrt(lastQty/Math.max(1,typicalQty)),.75,1.65);
   if(base.shelf>0)days=Math.min(days,base.shelf);
-  return {days:Math.max(1,Math.round(days)),base,typicalQty,lastQty,purchaseSamples:purchaseSamples.length,feedbackSamples:directSamples.length};
+  const cycleAt=Number(last?.firstAt||last?.at)||0;
+  const consumedQty=last?consumedForCycle(meta.name,cycleAt):0;
+  return {
+    days:Math.max(1,Math.round(days)),base,typicalQty,lastQty,cycleAt,consumedQty,
+    purchaseSamples:purchaseSamples.length,feedbackSamples:directSamples.length
+  };
 }
 function rebuild(household=readHousehold()){
   const products={};
   META.forEach((meta,key)=>{
     const events=eventsFor(meta.name),model=adaptiveProfile(meta,household);
-    products[key]={name:meta.name,category:meta.category,sub:meta.sub,baseDays:model.base.days,recentDays:model.days,samples:model.purchaseSamples,feedbackSamples:model.feedbackSamples,lastAt:Number(events.at(-1)?.at)||0,lastQty:model.lastQty,typicalQty:model.typicalQty,household};
+    products[key]={
+      name:meta.name,category:meta.category,sub:meta.sub,baseDays:model.base.days,recentDays:model.days,
+      samples:model.purchaseSamples,feedbackSamples:model.feedbackSamples,lastAt:Number(events.at(-1)?.at)||0,
+      cycleAt:model.cycleAt,lastQty:model.lastQty,consumedQty:model.consumedQty,
+      stockQty:Math.max(0,model.lastQty-model.consumedQty),typicalQty:model.typicalQty,household
+    };
   });
   state.products=products;state.household=household;state.updatedAt=Date.now();
 }
@@ -229,9 +278,14 @@ function record(name,qty=1,at=Date.now()){
   const meta=META.get(norm(name));if(!meta)return null;
   const key=norm(meta.name),events=Array.isArray(state.purchases[key])?state.purchases[key]:[],last=events.at(-1);
   const merges=Boolean(last&&at-last.at<=SAME_TRIP);
-  const snapshot=merges?{mode:'merge',at:last.at,qty:last.qty,household:last.household}:{mode:'push'};
-  if(merges){last.qty=Math.max(1,Number(last.qty)||1)+Math.max(1,Number(qty)||1);last.at=Math.max(last.at,at);last.household=readHousehold()}
-  else events.push({at,qty:Math.max(1,Number(qty)||1),household:readHousehold()});
+  const snapshot=merges?{mode:'merge',at:last.at,firstAt:last.firstAt,qty:last.qty,household:last.household}:{mode:'push'};
+  if(merges){
+    last.firstAt=Number(last.firstAt)||Number(last.at)||at;
+    last.qty=Math.max(1,Number(last.qty)||1)+Math.max(1,Number(qty)||1);
+    last.at=Math.max(last.at,at);last.household=readHousehold();
+  }else{
+    events.push({at,firstAt:at,qty:Math.max(1,Number(qty)||1),household:readHousehold()});
+  }
   state.purchases[key]=events;persist();scheduleDish();
   const undo={key,name:meta.name,snapshot,recordedAt:at,timer:0};
   undo.timer=setTimeout(()=>undoRecords.delete(key),UNDO_TTL);undoRecords.set(key,undo);return undo;
@@ -241,7 +295,12 @@ function undoRecorded(name){
   if(undo.timer)clearTimeout(undo.timer);undoRecords.delete(key);
   const events=Array.isArray(state.purchases[key])?state.purchases[key]:[];
   if(undo.snapshot.mode==='merge'){
-    if(events.length)events[events.length-1]={at:undo.snapshot.at,qty:undo.snapshot.qty,household:undo.snapshot.household||readHousehold()};
+    if(events.length)events[events.length-1]={
+      at:undo.snapshot.at,
+      firstAt:Number(undo.snapshot.firstAt)||undo.snapshot.at,
+      qty:undo.snapshot.qty,
+      household:undo.snapshot.household||readHousehold()
+    };
   }else if(events.length){events.pop()}
   if(events.length)state.purchases[key]=events;else delete state.purchases[key];
   persist();scheduleDish();return true;
@@ -255,14 +314,24 @@ function recordFeedback(name,at=Date.now()){
   events.push({at,days,household:readHousehold()});state.feedback[key]=events.slice(-12);persist();
 }
 function profile(name){ensureModel();return state.products[norm(name)]||null}
+function stockEstimate(name,at=Date.now()){
+  const p=profile(name);if(!p?.lastAt)return null;
+  const age=Math.max(0,(at-p.lastAt)/DAY);
+  const consumedQty=consumedForCycle(name,p.cycleAt||p.lastAt);
+  const afterExplicit=Math.max(0,Math.max(1,Number(p.lastQty)||1)-consumedQty);
+  const ratio=age>=p.recentDays?0:Math.max(0,1-age/Math.max(1,p.recentDays));
+  const estimatedQty=Math.max(0,Math.ceil(afterExplicit*ratio-1e-6));
+  return {
+    profile:p,ageDays:age,purchasedQty:p.lastQty,consumedQty,afterExplicitQty:afterExplicit,
+    estimatedQty,cycleAt:p.cycleAt||p.lastAt
+  };
+}
 function recent(name,at=Date.now(),requiredQty=1){
   if(!isEnabled())return null;
-  const p=profile(name);if(!p?.lastAt)return null;
-  const age=Math.max(0,(at-p.lastAt)/DAY),needed=Math.max(1,Math.ceil(Number(requiredQty)||1));
-  if(age>=p.recentDays)return null;
-  const remaining=Math.max(0,Math.ceil(p.lastQty*(1-age/Math.max(1,p.recentDays))-1e-6));
-  if(remaining<needed)return null;
-  return {profile:p,ageDays:age,requiredQty:needed,estimatedQty:remaining};
+  const stock=stockEstimate(name,at);if(!stock)return null;
+  const needed=Math.max(1,Math.ceil(Number(requiredQty)||1));
+  if(stock.ageDays>=stock.profile.recentDays||stock.estimatedQty<needed)return null;
+  return {...stock,requiredQty:needed};
 }
 function rowQty(row){
   const value=Number(String(row?.querySelector('.list-qty')?.textContent||'').replace(/[^0-9]/g,''));
@@ -283,13 +352,61 @@ function cancelPurchase(button){
   const token=pending.get(key);if(token?.timer)clearTimeout(token.timer);pending.delete(key);
   if(name)undoRecorded(name);
 }
+function watchDishConsumption(button){
+  if(!isEnabled()){clearDishPending();return}
+  const dialog=button?.closest?.('#dishDialog');
+  if(!dialog||button.disabled){clearDishPending();return}
+  const dish=dialog.querySelector('.dish-sheet-head h2')?.textContent?.trim()||'';
+  if(!dish){clearDishPending();return}
+  const now=Date.now();
+  const items=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')].map(row=>{
+    if(row.dataset.recentPurchaseDefault!=='1'||row.dataset.recentPurchaseOverride==='1'||row.getAttribute('aria-pressed')!=='false')return null;
+    if(!row.classList.contains('is-recent-purchase'))return null;
+    const name=String(row.dataset.ingredient||'').trim(),qty=rowRequiredQty(row);
+    const match=name?recent(name,now,qty):null;
+    if(!match)return null;
+    return {name,qty,cycleAt:Number(match.cycleAt)||Number(match.profile?.lastAt)||0};
+  }).filter(Boolean);
+  clearDishPending();
+  if(!items.length)return;
+  dishPending={dish,items,at:now};
+  dishPendingTimer=setTimeout(clearDishPending,DISH_WATCH_TTL);
+}
+function recordDishConsumptions(token,at=Date.now()){
+  if(!isEnabled()||!token?.items?.length)return false;
+  let changed=false;
+  token.items.forEach(item=>{
+    const meta=META.get(norm(item.name));if(!meta)return;
+    const p=profile(meta.name);if(!p?.lastAt)return;
+    const cycleAt=Number(item.cycleAt)||0;
+    if(!cycleAt||Number(p.cycleAt||p.lastAt)!==cycleAt)return;
+    const stock=stockEstimate(meta.name,at);if(!stock?.estimatedQty)return;
+    const qty=Math.min(Math.max(1,Math.ceil(Number(item.qty)||1)),stock.estimatedQty);
+    if(qty<=0)return;
+    const key=norm(meta.name),events=Array.isArray(state.consumptions[key])?state.consumptions[key]:[];
+    events.push({at,cycleAt,qty,dish:String(token.dish||'').trim().slice(0,100),household:readHousehold()});
+    state.consumptions[key]=events.slice(-120);changed=true;
+  });
+  if(changed){persist();scheduleDish()}
+  return changed;
+}
 function consumeToast(){
   if(!isEnabled())return;
-  const text=String(document.getElementById('toast')?.textContent||'').trim();if(!text.endsWith(' acheté'))return;
-  for(const [key,token] of pending){
-    if(text!==token.name+' acheté')continue;
-    if(token.timer)clearTimeout(token.timer);pending.delete(key);record(token.name,token.qty);break;
+  const text=String(document.getElementById('toast')?.textContent||'').trim();if(!text)return;
+  if(text.endsWith(' acheté')){
+    for(const [key,token] of pending){
+      if(text!==token.name+' acheté')continue;
+      if(token.timer)clearTimeout(token.timer);pending.delete(key);record(token.name,token.qty);break;
+    }
+    return;
   }
+  if(!dishPending)return;
+  if(text.startsWith('Ajout partiel')){clearDishPending();return}
+  const success=text==='Les ingrédients sélectionnés sont déjà dans Ma liste'
+    ||text==='Les quantités nécessaires sont déjà dans Ma liste'
+    ||text.startsWith(dishPending.dish+' · ');
+  if(!success)return;
+  const token=dishPending;clearDishPending();recordDishConsumptions(token);
 }
 function styles(){
   if(document.getElementById('courses-purchase-intelligence-style'))return;
@@ -304,7 +421,7 @@ function styles(){
 function clearRecent(row,restoreSelection=false){
   const autoDeselected=row.dataset.recentPurchaseDefault==='1',overridden=row.dataset.recentPurchaseOverride==='1';
   row.classList.remove('is-recent-purchase');delete row.dataset.recentPurchase;row.querySelector('.dish-ingredient-recent')?.remove();
-  if(restoreSelection&&autoDeselected&&!overridden&&row.getAttribute('aria-pressed')==='false'){
+  if(restoreSelection&&autoDeselected&&!overridden&&row.getAttribute('aria-pressed')==='false'&&!row.disabled){
     delete row.dataset.recentPurchaseDefault;row.click();
   }
 }
@@ -313,8 +430,10 @@ function decorateDish(){
   const rows=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')];
   if(!isEnabled()){rows.forEach(row=>clearRecent(row,true));return}
   rows.forEach(row=>{
-    const name=String(row.dataset.ingredient||''),match=name&&recent(name,Date.now(),rowRequiredQty(row));
-    if(!match||row.disabled||row.hasAttribute('disabled')||row.dataset.recentPurchaseOverride==='1'){clearRecent(row);return}
+    const name=String(row.dataset.ingredient||'');
+    if(row.dataset.recentPurchaseOverride==='1'){clearRecent(row);return}
+    const match=name&&!row.disabled&&!row.hasAttribute('disabled')&&recent(name,Date.now(),rowRequiredQty(row));
+    if(!match){clearRecent(row,true);return}
     row.classList.add('is-recent-purchase');row.dataset.recentPurchase='1';
     const label=row.querySelector('.dish-ingredient-name');
     if(label&&!label.querySelector('.dish-ingredient-recent')){const note=document.createElement('small');note.className='dish-ingredient-recent';note.textContent=LABEL;label.appendChild(note)}
@@ -341,11 +460,15 @@ function bindDish(){
 }
 function bindPurchases(){
   document.addEventListener('click',event=>{
+    const dishAdd=event.target?.closest?.('#dishDialog .dish-sheet-add');if(dishAdd)watchDishConsumption(dishAdd);
     const buy=event.target?.closest?.('.purchase-check');if(buy){watchPurchase(buy);return}
     const undo=event.target?.closest?.('.undo-purchase');if(undo)cancelPurchase(undo);
   },true);
   const toast=document.getElementById('toast');
-  if(toast){toastObserver?.disconnect();toastObserver=new MutationObserver(consumeToast);toastObserver.observe(toast,{childList:true,characterData:true,subtree:true})}
+  if(toast){
+    toastObserver?.disconnect();toastObserver=new MutationObserver(consumeToast);
+    toastObserver.observe(toast,{attributes:true,attributeFilter:['class'],childList:true,characterData:true,subtree:true});
+  }
 }
 function bindHousehold(){
   document.addEventListener('click',event=>{
@@ -369,8 +492,12 @@ function init(){
     observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),10000);
   }
   window.COURSES_PURCHASE_INTELLIGENCE=Object.freeze({
-    retentionDays:HISTORY_DAYS,profileFor:name=>profile(name),isRecent:(name,qty=1)=>Boolean(recent(name,Date.now(),qty)),
-    explain:(name,qty=1)=>recent(name,Date.now(),qty)||profile(name),isEnabled,setEnabled
+    retentionDays:HISTORY_DAYS,
+    profileFor:name=>profile(name),
+    stockFor:(name,at=Date.now())=>stockEstimate(name,at),
+    isRecent:(name,qty=1)=>Boolean(recent(name,Date.now(),qty)),
+    explain:(name,qty=1)=>recent(name,Date.now(),qty)||stockEstimate(name)||profile(name),
+    isEnabled,setEnabled
   });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
