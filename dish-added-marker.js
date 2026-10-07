@@ -471,6 +471,7 @@ function confirmationLayer(dialog){
 function startConfirmationFeedback(dialog,button){
   confirmationLayer(dialog);
   dialog.classList.add('is-confirm-feedback');
+  button.classList.add('is-busy');
   button.disabled=true;
   const label=button.querySelector('span');
   if(label)label.textContent='Sélection validée';
@@ -482,8 +483,13 @@ function startConfirmationFeedback(dialog,button){
 function closeAfterConfirmation(dialog,button){
   dialog.classList.remove('is-confirm-feedback');
   dialog.querySelector('.dish-confirm-feedback-layer')?.remove();
-  if(dialog.open)dialog.close();else dialog.removeAttribute('open');
-  document.documentElement.classList.remove('dish-sheet-open');
+  const closeButton=dialog.querySelector('.dish-sheet-close');
+  if(closeButton)closeButton.click();
+  else{
+    if(dialog.open)dialog.close();else dialog.removeAttribute('open');
+    document.documentElement.classList.remove('dish-sheet-open');
+  }
+  button.classList.remove('is-busy');
   const label=button.querySelector('span');
   if(label)label.textContent='Ajouter à ma liste';
   const use=button.querySelector('svg use');
