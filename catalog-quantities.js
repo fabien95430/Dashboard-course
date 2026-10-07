@@ -238,6 +238,8 @@ let listObserver=null;
 let shoppingListObserver=null;
 let dialogObserver=null;
 const STORAGE_SERVINGS='courses-dish-servings-v1';
+const STORAGE_RECIPE_NEEDS='courses-dish-need-overrides-v1';
+let recipeNeedOverrides=readRecipeNeedOverrides();
 
 window.COURSES_PRODUCT_PACKS=PURCHASE_REFERENCES;
 
@@ -272,6 +274,9 @@ function variablePurchaseStepFor(name){
   const recipeUnit=RECIPE_UNITS[name]||'g';
   return recipeUnit===step.unit?step:null;
 }
+function recipeUnitFor(name){
+  return RECIPE_UNITS[name]||purchaseReferenceFor(name)?.unit||variablePurchaseStepFor(name)?.unit||'g';
+}
 function auditPurchaseModes(){
   const missing=[];
   PRODUCT_META.forEach((meta,name)=>{
@@ -280,12 +285,38 @@ function auditPurchaseModes(){
   });
   if(missing.length)console.warn('Catalogue : mode d’achat non défini',missing);
 }
-function needFor(name,dish=currentDish(),count=servings()){
+function readRecipeNeedOverrides(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(STORAGE_RECIPE_NEEDS)||'{}');
+    if(!raw||typeof raw!=='object'||Array.isArray(raw))return {};
+    const clean={};
+    Object.entries(raw).forEach(([dish,values])=>{
+      if(!values||typeof values!=='object'||Array.isArray(values))return;
+      const dishValues={};
+      Object.entries(values).forEach(([name,value])=>{
+        const amount=Number(value);
+        if(PRODUCT_META.has(name)&&Number.isFinite(amount)&&amount>0)dishValues[name]=amount;
+      });
+      if(Object.keys(dishValues).length)clean[String(dish)]=dishValues;
+    });
+    return clean;
+  }catch(_){return {}}
+}
+function persistRecipeNeedOverrides(){
+  try{localStorage.setItem(STORAGE_RECIPE_NEEDS,JSON.stringify(recipeNeedOverrides))}catch(_){}
+}
+function baseNeedFor(name,dish=currentDish(),count=servings()){
   const currentServings=Math.max(1,Math.min(12,Math.round(Number(count)||BASE_SERVINGS)));
   const dishNeed=Number(DISH_NEEDS_FOR_FOUR[dish]?.[name]);
   if(Number.isFinite(dishNeed)&&dishNeed>0)return dishNeed*currentServings/BASE_SERVINGS;
   const perPerson=Number(NEED_PER_PERSON[name]);
   return Number.isFinite(perPerson)&&perPerson>0?perPerson*currentServings:null;
+}
+function needFor(name,dish=currentDish(),count=servings()){
+  const currentServings=Math.max(1,Math.min(12,Math.round(Number(count)||BASE_SERVINGS)));
+  const custom=Number(recipeNeedOverrides[dish]?.[name]);
+  if(Number.isFinite(custom)&&custom>0)return custom*currentServings/BASE_SERVINGS;
+  return baseNeedFor(name,dish,currentServings);
 }
 function quantityFor(name,dish=currentDish(),count=servings()){
   const purchaseUnit=purchaseReferenceFor(name)||variablePurchaseStepFor(name);
@@ -293,12 +324,42 @@ function quantityFor(name,dish=currentDish(),count=servings()){
   if(!purchaseUnit||need===null)return 1;
   return Math.max(1,Math.ceil(need/purchaseUnit.amount));
 }
+function setRecipeNeeds(dish,values){
+  const dishName=String(dish||'').trim();
+  if(!dishName)return false;
+  const clean={};
+  Object.entries(values||{}).forEach(([name,value])=>{
+    if(!PRODUCT_META.has(name))return;
+    const amount=Number(value);
+    if(!Number.isFinite(amount)||amount<=0)return;
+    const rounded=Math.round(amount*100)/100;
+    const base=baseNeedFor(name,dishName,BASE_SERVINGS);
+    if(base!==null&&Math.abs(base-rounded)<0.001)return;
+    clean[name]=rounded;
+  });
+  if(Object.keys(clean).length)recipeNeedOverrides[dishName]=clean;
+  else delete recipeNeedOverrides[dishName];
+  persistRecipeNeedOverrides();
+  if(currentDish()===dishName)decorateDishRows();
+  return true;
+}
+function resetRecipeNeeds(dish){
+  const dishName=String(dish||'').trim();
+  if(!dishName)return false;
+  delete recipeNeedOverrides[dishName];
+  persistRecipeNeedOverrides();
+  if(currentDish()===dishName)decorateDishRows();
+  return true;
+}
+function hasRecipeNeeds(dish){
+  return Boolean(Object.keys(recipeNeedOverrides[String(dish||'')]||{}).length);
+}
 function formatNumber(value){
   return Number.isInteger(value)?String(value):String(Math.round(value*10)/10).replace('.',',');
 }
 function formatNeed(name,need){
   if(!(Number.isFinite(need)&&need>0))return '';
-  const unit=RECIPE_UNITS[name]||'g';
+  const unit=recipeUnitFor(name);
   if(unit==='piece'){
     const rounded=Math.max(1,Math.ceil(need));
     return rounded+' '+(rounded>1?'pièces':'pièce');
@@ -506,6 +567,11 @@ async function addSelectedQuantities(){
 window.COURSES_QUANTITIES=Object.freeze({
   getQuantity:(dish,name,count)=>quantityFor(name,dish,count),
   getNeed:(dish,name,count)=>needFor(name,dish,count),
+  getBaseNeed:(dish,name,count)=>baseNeedFor(name,dish,count),
+  getRecipeUnit:recipeUnitFor,
+  hasRecipeNeeds,
+  setRecipeNeeds,
+  resetRecipeNeeds,
   getPurchaseLabel:purchaseLabel,
   addSelected:addSelectedQuantities,
   bind

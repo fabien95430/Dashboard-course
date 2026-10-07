@@ -4,7 +4,8 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 const source=readFileSync(new URL('../catalog-quantities.js',import.meta.url),'utf8');
-const context={window:{},document:{readyState:'loading',addEventListener(){}},localStorage:{getItem(){return null}}};
+const storage=new Map();
+const context={window:{},document:{readyState:'loading',addEventListener(){}},localStorage:{getItem(key){return storage.get(key)??null},setItem(key,value){storage.set(key,String(value))}}};
 const catalog=readFileSync(new URL('../catalog.js',import.meta.url),'utf8');
 vm.runInNewContext(catalog.slice(0,catalog.indexOf('})();')+5),context);
 vm.runInNewContext(source,context);
@@ -34,6 +35,22 @@ test('les portions arrondissent les conditionnements à l’unité supérieure',
     assert.equal(api.getQuantity('Crème brûlée','Crème liquide',servings),quantity);
   }
   assert.equal(api.getQuantity('Crème brûlée','Vanille',8),2);
+});
+
+test('une recette personnalisée ajuste le besoin de base sans changer le moteur d’achat',()=>{
+  const api=context.window.COURSES_QUANTITIES;
+  assert.equal(api.getBaseNeed('Spaghetti carbonara','Spaghetti',4),400);
+  assert.equal(api.getRecipeUnit('Spaghetti'),'g');
+  assert.equal(api.getRecipeUnit('Œufs'),'piece');
+  api.setRecipeNeeds('Spaghetti carbonara',{Spaghetti:700,'Œufs':6});
+  assert.equal(api.hasRecipeNeeds('Spaghetti carbonara'),true);
+  assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',4),700);
+  assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',2),350);
+  assert.equal(api.getQuantity('Spaghetti carbonara','Spaghetti',4),2);
+  assert.equal(api.getNeed('Spaghetti carbonara','Œufs',4),6);
+  api.resetRecipeNeeds('Spaghetti carbonara');
+  assert.equal(api.hasRecipeNeeds('Spaghetti carbonara'),false);
+  assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',4),400);
 });
 
 test('les libellés audités décrivent le mode d’achat sans exposer les références techniques',()=>{

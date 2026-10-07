@@ -33,7 +33,7 @@
   const loadDishes=()=>{
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
     const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=313';
+    script.src='./dishes-ui.js?v=316';
     script.async=false;
     script.dataset.catalogDishes='script';
     script.addEventListener('load',loadLiquid,{once:true});
@@ -42,7 +42,7 @@
   const loadQuantities=()=>{
     if(window.COURSES_QUANTITIES){loadDishes();return}
     const quantities=document.createElement('script');
-    quantities.src='./catalog-quantities.js?v=310';
+    quantities.src='./catalog-quantities.js?v=316';
     quantities.async=false;
     quantities.dataset.catalogQuantities='script';
     quantities.addEventListener('load',loadDishes,{once:true});
@@ -60,7 +60,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=315';
+    images.src='./dish-local-images.js?v=316';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadRepurchaseSoon,{once:true});
