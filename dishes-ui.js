@@ -349,6 +349,7 @@ function buildRecipeCustomizationDialog(){
       .recipe-customization-quantity span{font-size:11px;font-weight:720;white-space:nowrap}
       .recipe-customization-auto{min-width:70px;color:#98a09b;font-size:12px;font-weight:700;text-align:right}
       .recipe-customization-dialog .dialog-actions{flex:0 0 auto;margin-top:12px}
+      .recipe-customization-dialog .dialog-actions button{flex:1 1 0;width:0;height:44px;margin:0;padding:0 12px;border-radius:13px;font-weight:750}
       .recipe-customization-dialog .dialog-actions button:disabled{opacity:.45}
       @media(max-width:390px){.recipe-customization-suggestions{max-height:32dvh}.recipe-customization-list{max-height:38dvh}.recipe-customization-item{padding:6px 8px}.recipe-customization-quantity{min-width:80px;padding:0 7px}.recipe-customization-quantity input{width:47px}}
     `;
