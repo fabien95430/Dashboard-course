@@ -1,0 +1,310 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+3 0 obj
+<< /Type /Pages /Count 8 /Kids [ 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R ] >>
+endobj
+4 0 obj
+<< /Length 649 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(Guide de fonctionnement - Courses) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(Version de référence : v299.) Tj
+1 0 0 1 48 724 Tm
+(Ce document explique le fonctionnement actuel de l’application Courses : Ma liste,) Tj
+1 0 0 1 48 709 Tm
+(Catalogue, Plats, quantités, historique intelligent, Home Assistant, sécurité,) Tj
+1 0 0 1 48 694 Tm
+(préférences, mode hors ligne et demandes d’intégration.) Tj
+1 0 0 1 48 664 Tm
+(Le dépôt GitHub fabien95430/Dashboard-course, branche main, reste la source de) Tj
+1 0 0 1 48 649 Tm
+(vérité technique.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 1/8) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 773 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(1. Architecture et navigation) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(Courses est une PWA mobile-first en HTML, CSS et JavaScript statiques, publiée avec) Tj
+1 0 0 1 48 739 Tm
+(GitHub Pages. Aucun framework ou backend supplémentaire n’est nécessaire au) Tj
+1 0 0 1 48 724 Tm
+(fonctionnement courant.) Tj
+1 0 0 1 48 694 Tm
+(Les vues principales sont Ma liste, Catalogue et Réglages. Le Catalogue peut) Tj
+1 0 0 1 48 679 Tm
+(s’ouvrir en Produits ou en Plats selon la préférence enregistrée.) Tj
+1 0 0 1 48 649 Tm
+(catalog.js reste la source du catalogue. Les safe areas iOS et le fonctionnement) Tj
+1 0 0 1 48 634 Tm
+(mobile restent des invariants du projet.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 2/8) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 1020 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(2. Ma liste, Catalogue et quantités) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(Ma liste est prioritairement alimentée par la liste todo Home Assistant) Tj
+1 0 0 1 48 739 Tm
+(sélectionnée. Les ajouts, suppressions et validations d’achat passent par le flux) Tj
+1 0 0 1 48 724 Tm
+(existant de synchronisation.) Tj
+1 0 0 1 48 694 Tm
+(Le Catalogue utilise les noms et catégories de catalog.js. Les quantités des plats) Tj
+1 0 0 1 48 679 Tm
+(s’adaptent au nombre de personnes. Pour certains produits au poids ou au volume,) Tj
+1 0 0 1 48 664 Tm
+(une occurrence synchronisée peut représenter un pas de 100 g ou 100 ml lorsque) Tj
+1 0 0 1 48 649 Tm
+(l’unité est compatible.) Tj
+1 0 0 1 48 619 Tm
+(Un produit déjà présent en quantité suffisante n’est pas ajouté en double ;) Tj
+1 0 0 1 48 604 Tm
+(lorsqu’il est seulement partiellement présent, l’application calcule le complément) Tj
+1 0 0 1 48 589 Tm
+(nécessaire.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 3/8) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 837 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(3. Plats et ajout d’ingrédients) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(Le mode Plats propose des recettes composées uniquement d’ingrédients compatibles) Tj
+1 0 0 1 48 739 Tm
+(avec le catalogue. Le nombre de personnes règle les besoins de la recette.) Tj
+1 0 0 1 48 709 Tm
+(Le moteur propriétaire des quantités contrôle les besoins, les conditionnements et) Tj
+1 0 0 1 48 694 Tm
+(les portions. L’ajout d’un plat utilise le service de liste partagé de) Tj
+1 0 0 1 48 679 Tm
+(l’application ; il n’a pas besoin de simuler des clics sur les cartes produits.) Tj
+1 0 0 1 48 649 Tm
+(Les marqueurs indiquent si les ingrédients d’un plat sont déjà présents,) Tj
+1 0 0 1 48 634 Tm
+(partiellement présents ou absents de Ma liste.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 4/8) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 1211 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(4. Historique intelligent et stock probabiliste) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(L’historique ne prétend pas maintenir un stock comptable exact. Il construit) Tj
+1 0 0 1 48 739 Tm
+(localement une estimation probabiliste destinée à éviter les doublons.) Tj
+1 0 0 1 48 709 Tm
+(Un achat n’est enregistré qu’après confirmation du flux d’achat. Le moteur tient) Tj
+1 0 0 1 48 694 Tm
+(compte du produit, de la quantité, du nombre de personnes, du temps écoulé, des) Tj
+1 0 0 1 48 679 Tm
+(habitudes d’achat et des corrections manuelles.) Tj
+1 0 0 1 48 649 Tm
+(Lorsqu’un plat est confirmé, seuls les ingrédients que le moteur avait considérés) Tj
+1 0 0 1 48 634 Tm
+(comme encore disponibles peuvent débiter cette estimation. Les débits restent liés) Tj
+1 0 0 1 48 619 Tm
+(au cycle d’achat courant.) Tj
+1 0 0 1 48 589 Tm
+(Pour les produits périssables, les plafonds de conservation du moteur restent des) Tj
+1 0 0 1 48 574 Tm
+(limites de recommandation : ils ne remplacent jamais une DLC, une DDM ou) Tj
+1 0 0 1 48 559 Tm
+(l’étiquette du produit. L’utilisateur peut toujours forcer un ingrédient.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 5/8) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 814 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(5. Home Assistant et sécurité) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(Home Assistant reste l’autorité de Ma liste lorsque la connexion est active. La) Tj
+1 0 0 1 48 739 Tm
+(synchronisation courante est événementielle via WebSocket ; l’application ne doit) Tj
+1 0 0 1 48 724 Tm
+(pas mettre en place de polling permanent.) Tj
+1 0 0 1 48 694 Tm
+(OAuth, WebSocket, coffre chiffré, verrouillage et biométrie sont conservés. La) Tj
+1 0 0 1 48 679 Tm
+(documentation n’accède à aucun jeton et n’ajoute aucune permission de sécurité.) Tj
+1 0 0 1 48 649 Tm
+(Les préférences locales et l’historique intelligent complètent l’expérience mais ne) Tj
+1 0 0 1 48 634 Tm
+(remplacent jamais la liste Home Assistant.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 6/8) Tj
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 895 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(6. Préférences, documentation et hors ligne) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(Les Préférences regroupent notamment le tri de Ma liste, la vue de démarrage, le) Tj
+1 0 0 1 48 739 Tm
+(mode d’ouverture du Catalogue, le nombre de personnes, les options d’affichage et) Tj
+1 0 0 1 48 724 Tm
+(l’Historique des achats.) Tj
+1 0 0 1 48 694 Tm
+(Le bouton Documentation ouvre ce PDF sans modifier les réglages. Le PDF est inclus) Tj
+1 0 0 1 48 679 Tm
+(dans le précache de la PWA afin de pouvoir être rouvert hors ligne après) Tj
+1 0 0 1 48 664 Tm
+(installation de la version correspondante.) Tj
+1 0 0 1 48 634 Tm
+(Le service worker renouvelle le cache applicatif lors des changements de version et) Tj
+1 0 0 1 48 619 Tm
+(conserve les ressources nécessaires à l’expérience hors ligne.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 7/8) Tj
+ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 1073 >>
+stream
+BT
+/F2 17 Tf
+1 0 0 1 48 790 Tm
+(7. Demandes, test et garde-fous) Tj
+/F1 10 Tf
+1 0 0 1 48 754 Tm
+(Les produits ou plats manquants peuvent être conservés localement puis préparés) Tj
+1 0 0 1 48 739 Tm
+(pour intégration selon les règles du dépôt. La PWA n’embarque pas de token GitHub) Tj
+1 0 0 1 48 724 Tm
+(ni de clé OpenAI pour modifier directement le dépôt.) Tj
+1 0 0 1 48 694 Tm
+(Le mode test permet de vérifier l’interface sans Home Assistant sans changer les) Tj
+1 0 0 1 48 679 Tm
+(invariants de sécurité ou la priorité de la liste réelle.) Tj
+1 0 0 1 48 649 Tm
+(Garde-fous : catalog.js reste la source du catalogue ; Home Assistant reste) Tj
+1 0 0 1 48 634 Tm
+(prioritaire ; synchronisation WebSocket sans polling permanent ; sécurité jamais) Tj
+1 0 0 1 48 619 Tm
+(réduite ; pas de framework, backend ou dépendance externe sans demande explicite.) Tj
+1 0 0 1 48 589 Tm
+(Pour le détail du moteur d’historique, voir docs/HISTORIQUE_ACHATS.md dans le) Tj
+1 0 0 1 48 574 Tm
+(dépôt.) Tj
+/F1 7.5 Tf
+1 0 0 1 48 28 Tm
+(Courses - Guide de fonctionnement - v299 - page 8/8) Tj
+ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Type /Catalog /Pages 3 0 R >>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000000015 00000 n 
+0000000112 00000 n 
+0000000214 00000 n 
+0000000320 00000 n 
+0000001020 00000 n 
+0000001156 00000 n 
+0000001980 00000 n 
+0000002116 00000 n 
+0000003188 00000 n 
+0000003324 00000 n 
+0000004213 00000 n 
+0000004351 00000 n 
+0000005615 00000 n 
+0000005753 00000 n 
+0000006619 00000 n 
+0000006757 00000 n 
+0000007704 00000 n 
+0000007842 00000 n 
+0000008968 00000 n 
+0000009106 00000 n 
+trailer
+<< /Size 21 /Root 20 0 R >>
+startxref
+9156
+%%EOF

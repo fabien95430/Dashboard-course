@@ -95,6 +95,7 @@ const STORAGE_CATALOG_MODE='courses-catalog-mode-v1';
 const SERVING_OPTIONS=Object.freeze([2,4,5]);
 const CATALOG_MODE_OPTIONS=Object.freeze(['products','dishes']);
 const DEFAULT_SERVINGS=4;
+const DOCUMENTATION_URL='./docs/guide-fonctionnement-courses.pdf?v=299';
 
 function readPreferredServings(){
   try{
@@ -181,6 +182,26 @@ function initPreferencesExtras(){
   const startView=document.getElementById('preferencesStartView');
   const saveButton=document.getElementById('savePreferences');
   if(!dialog||!startView||!saveButton)return;
+
+  let documentationButton=document.getElementById('preferencesDocumentation');
+  if(!documentationButton){
+    documentationButton=document.createElement('button');
+    documentationButton.id='preferencesDocumentation';
+    documentationButton.type='button';
+    documentationButton.className='secondary';
+    documentationButton.textContent='Documentation';
+    documentationButton.setAttribute('aria-label','Ouvrir la documentation PDF');
+    saveButton.before(documentationButton);
+    documentationButton.addEventListener('click',()=>{
+      const link=document.createElement('a');
+      link.href=DOCUMENTATION_URL;
+      link.target='_blank';
+      link.rel='noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+  }
 
   const startField=startView.closest('.field');
 
