@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v276';
+const APP_VERSION='v277';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -66,7 +66,44 @@ function syncPageVersions(){
   if(!document.getElementById('app-version-ui')){
     const style=document.createElement('style');
     style.id='app-version-ui';
-    style.textContent='.catalog-view .page-header h1::after{content:none!important}.dish-card img[src^="https://images.pexels.com/"],.dish-sheet-photo[src^="https://images.pexels.com/"]{visibility:hidden!important}';
+    style.textContent=`
+      .catalog-view .page-header h1::after{content:none!important}
+      .dish-card img[src^="https://images.pexels.com/"],.dish-sheet-photo[src^="https://images.pexels.com/"]{visibility:hidden!important}
+      .list-row-menu{
+        padding:0!important;
+        border:1px solid rgba(255,255,255,.22)!important;
+        border-radius:18px!important;
+        background:rgba(126,129,126,.92)!important;
+        color:#fff!important;
+        box-shadow:0 12px 28px rgba(32,38,34,.24),inset 0 1px 0 rgba(255,255,255,.14)!important;
+        -webkit-backdrop-filter:saturate(120%) blur(22px)!important;
+        backdrop-filter:saturate(120%) blur(22px)!important;
+        overflow:hidden!important;
+      }
+      .list-row-menu-delete{
+        height:48px!important;
+        border:0!important;
+        border-radius:0!important;
+        background:transparent!important;
+        color:#ff453a!important;
+        display:flex!important;
+        align-items:center!important;
+        gap:11px!important;
+        padding:0 16px!important;
+        text-align:left!important;
+        font-size:16px!important;
+        font-weight:500!important;
+        letter-spacing:-.01em!important;
+      }
+      .list-row-menu-delete::before{
+        content:'';
+        width:20px;
+        height:20px;
+        flex:0 0 20px;
+        background:center/20px 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff453a' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E");
+      }
+      .list-row-menu-delete:active{background:rgba(255,255,255,.10)!important}
+    `;
     document.head.appendChild(style);
   }
 }
