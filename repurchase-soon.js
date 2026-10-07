@@ -96,14 +96,17 @@ function ensureStyles(){
     .repurchase-dialog::backdrop{background:#f7f7f2}
     .repurchase-screen{
       width:100%;height:100%;box-sizing:border-box;display:flex;flex-direction:column;
-      padding:calc(env(safe-area-inset-top) + 10px) 18px max(calc(env(safe-area-inset-bottom) + 16px),24px)
+      padding:0 18px max(calc(env(safe-area-inset-bottom) + 16px),24px)
     }
-    .repurchase-head{position:relative;min-height:52px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+    .repurchase-head{
+      position:relative;min-height:calc(max(14px,env(safe-area-inset-top)) + 104px);box-sizing:border-box;
+      display:flex;align-items:flex-end;justify-content:center;flex:0 0 auto;padding:6px 0 14px
+    }
     .repurchase-back{
-      position:absolute;left:-5px;top:4px;width:44px;height:44px;border:0;border-radius:50%;display:grid;place-items:center;
-      background:transparent;color:#142019;-webkit-appearance:none;appearance:none
+      position:absolute;left:0;top:max(29px,calc(env(safe-area-inset-top) + 23px));width:42px;height:42px;padding:0 2px 4px 0;
+      border:0;border-radius:0;display:grid;place-items:center;background:transparent;color:#142019;box-shadow:none;
+      -webkit-backdrop-filter:none;backdrop-filter:none;-webkit-appearance:none;appearance:none;font-size:42px;line-height:1;font-family:inherit
     }
-    .repurchase-back svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
     .repurchase-head h2{margin:0;padding:0 50px;color:#0d3f2c;font-size:20px;line-height:1.1;font-weight:820;letter-spacing:-.035em;text-align:center}
     .repurchase-info{
       flex:0 0 auto;margin:5px 0 13px;padding:12px 14px;border:1px solid rgba(35,120,242,.07);border-radius:16px;
@@ -168,7 +171,7 @@ function ensureDialog(){
   dialog.id='repurchaseSoonDialog';
   dialog.className='repurchase-dialog';
   dialog.setAttribute('aria-labelledby','repurchaseSoonTitle');
-  dialog.innerHTML='<div class="repurchase-screen"><header class="repurchase-head"><button class="repurchase-back" type="button" aria-label="Retour au Catalogue"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"></path></svg></button><h2 id="repurchaseSoonTitle">À racheter bientôt</h2></header><div class="repurchase-info"><span class="repurchase-info-mark" aria-hidden="true">i</span><span>Suggestions basées sur vos habitudes d’achat. Rien n’est ajouté automatiquement.</span></div><div class="repurchase-list"></div></div>';
+  dialog.innerHTML='<div class="repurchase-screen"><header class="repurchase-head"><button class="repurchase-back" type="button" aria-label="Retour au Catalogue">‹</button><h2 id="repurchaseSoonTitle">À racheter bientôt</h2></header><div class="repurchase-info"><span class="repurchase-info-mark" aria-hidden="true">i</span><span>Suggestions basées sur vos habitudes d’achat. Rien n’est ajouté automatiquement.</span></div><div class="repurchase-list"></div></div>';
   document.body.appendChild(dialog);
   dialog.querySelector('.repurchase-back')?.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close()});
