@@ -8,6 +8,7 @@ const SVG_DESSERT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 31h2
 const SVG_MENU_OPENAI='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7c.55 4.55 2.75 6.75 7.3 7.3-4.55.55-6.75 2.75-7.3 7.3-.55-4.55-2.75-6.75-7.3-7.3 4.55-.55 6.75-2.75 7.3-7.3Z" fill="currentColor"/><circle cx="18.4" cy="17.9" r="1.55" fill="currentColor" opacity=".75"/></svg>';
 const SVG_MENU_CHATGPT='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M9 6h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_MENU_DELETE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6.5 7l.8 13h9.4l.8-13M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const SVG_MENU_MORE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.65" fill="currentColor"/><circle cx="12" cy="12" r="1.65" fill="currentColor"/><circle cx="19" cy="12" r="1.65" fill="currentColor"/></svg>';
 
 let openMenu=null;
 let holdTimer=0;
@@ -61,18 +62,16 @@ function positionMenu(menu,anchor){
   const rightBound=Math.min(window.innerWidth-margin,(dialogRect?.right||window.innerWidth)-margin);
   const topBound=Math.max(margin,(dialogRect?.top||0)+margin);
   const bottomBound=Math.min(window.innerHeight-margin,(dialogRect?.bottom||window.innerHeight)-margin);
-  const width=Math.min(248,Math.max(218,rightBound-leftBound));
+  const width=Math.min(224,Math.max(204,rightBound-leftBound));
   menu.style.width=width+'px';
-  const left=Math.max(leftBound,Math.min(rightBound-width,rect.right-width));
+  const left=Math.max(leftBound,Math.min(rightBound-width,rect.right-width+2));
   menu.style.left=left+'px';
-  const below=rect.bottom+10;
-  const above=rect.top-menu.offsetHeight-10;
+  const below=rect.bottom+6;
+  const above=rect.top-menu.offsetHeight-6;
   const placeAbove=below+menu.offsetHeight>bottomBound&&above>=topBound;
   menu.classList.toggle('is-above',placeAbove);
   const top=placeAbove?above:Math.min(bottomBound-menu.offsetHeight,below);
   menu.style.top=Math.max(topBound,top)+'px';
-  const pointer=Math.max(22,Math.min(width-22,rect.left+(rect.width/2)-left));
-  menu.style.setProperty('--menu-pointer-x',pointer+'px');
 }
 function startHold(button,row){
   if(button.disabled||button.classList.contains('is-disabled'))return;
@@ -163,7 +162,7 @@ function ensureMore(row){
   button.setAttribute('aria-label','Plus d’actions');
   button.setAttribute('aria-haspopup','menu');
   button.setAttribute('aria-expanded','false');
-  button.innerHTML='<span aria-hidden="true">•••</span>';
+  button.innerHTML=SVG_MENU_MORE;
   button.addEventListener('click',event=>{
     event.preventDefault();
     event.stopPropagation();
@@ -286,8 +285,9 @@ function installStyle(){
     #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:inline-flex!important;width:max-content!important}
     #missingProductsDialog .missing-product-remove{display:none!important}
     #missingProductsDialog .missing-product-row.missing-request-row>.missing-product-integrate,#missingProductsDialog .missing-product-row.missing-request-row .missing-dish-actions{display:none!important}
-    #missingProductsDialog .missing-row-more{width:36px;height:36px;min-width:36px;padding:0;border:1px solid rgba(47,68,54,.10);border-radius:12px;background:rgba(247,249,248,.84);color:#53615a;display:grid;place-items:center;font-size:12px;font-weight:900;letter-spacing:1.8px;box-shadow:0 2px 8px rgba(30,42,34,.06),inset 0 1px 0 rgba(255,255,255,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
-    #missingProductsDialog .missing-row-more:active{transform:scale(.96);background:rgba(239,243,240,.94)}
+    #missingProductsDialog .missing-row-more{width:32px;height:32px;min-width:32px;padding:0;border:0;border-radius:50%;background:rgba(118,118,128,.08);color:#59645f;display:grid;place-items:center;box-shadow:none;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+    #missingProductsDialog .missing-row-more svg{width:18px;height:18px;display:block}
+    #missingProductsDialog .missing-row-more:active{transform:scale(.94);background:rgba(118,118,128,.14)}
     #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:78px!important;min-height:36px!important;padding:0 10px!important;font-size:11px!important}
     #missingProductsDialog .missing-product-integrate.is-running-label,#missingProductsDialog .missing-dish-integrate.is-running-label{background:#eef3ef!important;color:#7b8d82!important;opacity:1!important}
     #missingProductsDialog .missing-dish-integrate.is-added-label{background:#edf0ee!important;color:#65736b!important;opacity:1!important}
@@ -295,26 +295,24 @@ function installStyle(){
     #missingProductsDialog .is-added-request .missing-request-thumb{filter:saturate(.45);opacity:.72}
     #missingProductsDialog .is-added-request .missing-row-more{color:#7f8983!important}
     #missingProductsDialog .missing-dish-magic{display:none!important}
-    .missing-row-menu{position:fixed;z-index:2147483647;padding:4px;border:1px solid rgba(255,255,255,.62);border-radius:16px;background:rgba(247,248,247,.88);box-shadow:0 12px 32px rgba(25,34,29,.18),inset 0 .5px 0 rgba(255,255,255,.86);-webkit-backdrop-filter:saturate(155%) blur(28px);backdrop-filter:saturate(155%) blur(28px);transform-origin:var(--menu-pointer-x,calc(100% - 22px)) top;animation:missingMenuIn .14s cubic-bezier(.2,.8,.2,1) both;overflow:visible}
-    .missing-row-menu::before{content:"";position:absolute;top:-6px;left:calc(var(--menu-pointer-x,calc(100% - 22px)) - 6px);width:12px;height:12px;border-left:1px solid rgba(255,255,255,.62);border-top:1px solid rgba(255,255,255,.62);border-radius:2px 0 0 0;background:rgba(247,248,247,.92);transform:rotate(45deg);pointer-events:none}
-    .missing-row-menu.is-above{transform-origin:var(--menu-pointer-x,calc(100% - 22px)) bottom;animation-name:missingMenuInAbove}
-    .missing-row-menu.is-above::before{top:auto;bottom:-6px;transform:rotate(225deg)}
-    .missing-row-menu-item{position:relative;z-index:1;width:100%;min-height:46px;padding:6px 11px;border:0;border-radius:12px;background:transparent;color:#172019;display:grid;grid-template-columns:24px 1fr;gap:9px;align-items:center;text-align:left;overflow:hidden;touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
-    .missing-row-menu-item+.missing-row-menu-item{border-top:1px solid rgba(60,60,67,.12);border-top-left-radius:0;border-top-right-radius:0}
-    .missing-row-menu-item:active{background:rgba(118,118,128,.10)}
-    .missing-row-menu-item strong{display:block;font-size:14px;font-weight:650;line-height:1.2;letter-spacing:-.01em}
+    .missing-row-menu{position:fixed;z-index:2147483647;padding:4px 0;border:.5px solid rgba(255,255,255,.58);border-radius:14px;background:rgba(242,242,247,.82);box-shadow:0 8px 22px rgba(0,0,0,.14),inset 0 .5px 0 rgba(255,255,255,.72);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);transform-origin:calc(100% - 16px) top;animation:missingMenuIn .12s cubic-bezier(.2,.8,.2,1) both;overflow:hidden}
+    .missing-row-menu.is-above{transform-origin:calc(100% - 16px) bottom;animation-name:missingMenuInAbove}
+    .missing-row-menu-item{position:relative;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:0;background:transparent;color:#1c1c1e;display:grid;grid-template-columns:20px 1fr;gap:9px;align-items:center;text-align:left;overflow:hidden;touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+    .missing-row-menu-item+.missing-row-menu-item{border-top:.5px solid rgba(60,60,67,.18)}
+    .missing-row-menu-item:active{background:rgba(118,118,128,.12)}
+    .missing-row-menu-item strong{display:block;font-size:13.5px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
     .missing-row-menu-item small{display:block;margin-top:3px;color:#8a938d;font-size:10.5px;font-weight:650;line-height:1.2}
-    .missing-menu-icon{position:relative;z-index:1;width:24px;height:24px;display:grid;place-items:center;color:#15935a}
-    .missing-menu-icon svg{width:21px;height:21px;display:block}
+    .missing-menu-icon{position:relative;z-index:1;width:20px;height:20px;display:grid;place-items:center;color:#15935a}
+    .missing-menu-icon svg{width:18.5px;height:18.5px;display:block}
     .missing-row-menu-item>span:last-child{position:relative;z-index:1}
     .missing-row-menu-item.is-danger,.missing-row-menu-item.is-danger .missing-menu-icon{color:#ff3b30}
-    .missing-row-menu-item.is-disabled,.missing-row-menu-item:disabled{opacity:.42;pointer-events:none}
+    .missing-row-menu-item.is-disabled,.missing-row-menu-item:disabled{opacity:.38;pointer-events:none}
     .missing-row-openai:before{content:"";position:absolute;inset:0;transform:scaleX(0);transform-origin:left center;background:rgba(35,144,90,.10);pointer-events:none}
     .missing-row-openai.is-holding:before{animation:missingOpenAiHold ${HOLD_MS}ms linear forwards}
     @keyframes missingOpenAiHold{to{transform:scaleX(1)}}
-    @keyframes missingMenuIn{from{opacity:0;transform:translateY(-4px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-    @keyframes missingMenuInAbove{from{opacity:0;transform:translateY(4px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-    @media(max-width:390px){#missingProductsDialog .missing-products-add #missingProductName{height:44px!important;font-size:14px!important}#missingProductsDialog .missing-products-add #addMissingProduct.primary{height:44px!important;min-width:84px!important;padding:0 12px!important;font-size:13px!important}#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr) 34px!important;gap:6px!important;padding:7px!important;min-height:62px!important}#missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px}#missingProductsDialog .missing-request-thumb svg{width:33px;height:33px}#missingProductsDialog .missing-row-more{width:34px;height:34px;min-width:34px;border-radius:11px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:70px!important;min-height:34px!important;padding-left:8px!important;padding-right:8px!important;font-size:10.5px!important}}
+    @keyframes missingMenuIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    @keyframes missingMenuInAbove{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    @media(max-width:390px){#missingProductsDialog .missing-products-add #missingProductName{height:44px!important;font-size:14px!important}#missingProductsDialog .missing-products-add #addMissingProduct.primary{height:44px!important;min-width:84px!important;padding:0 12px!important;font-size:13px!important}#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr) 32px!important;gap:6px!important;padding:7px!important;min-height:62px!important}#missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px}#missingProductsDialog .missing-request-thumb svg{width:33px;height:33px}#missingProductsDialog .missing-row-more{width:32px;height:32px;min-width:32px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:70px!important;min-height:34px!important;padding-left:8px!important;padding-right:8px!important;font-size:10.5px!important}}
     @media(prefers-reduced-motion:reduce){.missing-row-openai.is-holding:before{animation-duration:1ms}.missing-row-menu{animation:none}}
   `;
   document.head.appendChild(style);
