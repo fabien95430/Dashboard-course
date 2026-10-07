@@ -8,20 +8,14 @@ const here=dirname(fileURLToPath(import.meta.url));
 const root=resolve(here,'..');
 const read=name=>readFileSync(resolve(root,name),'utf8');
 
-test('les popups de préférences partagent une coque stable',()=>{
+test('les popups de préférences utilisent la même coque extérieure et un scroll interne',()=>{
   const source=read('settings-tab-badge.js');
-  const index=read('index.html');
-  for(const selector of ['#preferencesDialog','#missingProductsDialog','.recipe-customization-dialog']){
-    assert.ok(source.includes(selector),selector+' doit utiliser la coque partagée');
-  }
-  assert.match(source,/height:min\(590px,calc\(100svh/);
-  assert.match(source,/padding:20px!important/);
-  assert.match(source,/border-radius:26px!important/);
-  assert.match(source,/#missingProductsDialog\[open\],\s*\.recipe-customization-dialog\[open\]\{\s*display:flex!important;\s*flex-direction:column!important/);
-  assert.match(source,/#missingProductsDialog \.missing-products-list\{[\s\S]*?flex:1 1 auto!important;[\s\S]*?min-height:0!important;[\s\S]*?overflow:auto!important/);
-  assert.match(source,/backdrop-filter:blur\(8px\)!important/);
-  assert.match(index,/id="missingProductsDialog" class="dialog"/);
-  assert.doesNotMatch(index,/id="missingProductsDialog" class="dialog missing-products-dialog"/);
+  assert.match(source,/#preferencesDialog,\s*#missingProductsDialog,\s*\.recipe-customization-dialog\{[\s\S]*?width:min\(calc\(100% - 28px\),430px\)!important;[\s\S]*?height:min\(590px,calc\(100svh[\s\S]*?padding:20px!important;[\s\S]*?border-radius:26px!important;[\s\S]*?overflow:hidden!important/);
+  assert.match(source,/#preferencesDialog\[open\],\s*#missingProductsDialog\[open\],\s*\.recipe-customization-dialog\[open\]\{\s*display:flex!important;\s*flex-direction:column!important/);
+  assert.match(source,/function ensurePreferenceDialogScroll\(dialog\)[\s\S]*?content\.className='preference-dialog-scroll'/);
+  assert.match(source,/\.preference-dialog-scroll\{[\s\S]*?flex:1 1 auto;[\s\S]*?min-height:0;[\s\S]*?overflow:auto/);
+  assert.match(source,/#missingProductsDialog \.missing-products-list,\s*#missingProductsDialog \.missing-dishes-list\{[\s\S]*?flex:1 1 auto!important;[\s\S]*?min-height:0!important;[\s\S]*?max-height:none!important;[\s\S]*?overflow:auto!important/);
+  assert.match(source,/#preferencesDialog::backdrop,\s*#missingProductsDialog::backdrop,\s*\.recipe-customization-dialog::backdrop\{[\s\S]*?backdrop-filter:blur\(8px\)!important/);
 });
 
 test('le clavier ne déplace ni ne redimensionne les popups de préférences pendant la saisie',()=>{
@@ -33,7 +27,7 @@ test('le clavier ne déplace ni ne redimensionne les popups de préférences pen
   assert.match(source,/document\.addEventListener\('pointerdown',[\s\S]*?lockPreferenceDialog\(preferenceDialogFor\(event\.target\)\)/);
   assert.match(source,/document\.addEventListener\('focusin',[\s\S]*?lockPreferenceDialog\(preferenceDialogFor\(event\.target\)\)/);
   assert.match(source,/document\.addEventListener\('focusout',[\s\S]*?schedulePreferenceDialogUnlock\(preferenceDialogFor\(event\.target\)\)/);
-  assert.match(source,/\.is-preference-keyboard-locked\{[\s\S]*?position:fixed!important;[\s\S]*?top:var\(--preference-dialog-lock-top\)!important;[\s\S]*?height:var\(--preference-dialog-lock-height\)!important;[\s\S]*?margin:0!important/);
+  assert.match(source,/#preferencesDialog\.is-preference-keyboard-locked,[\s\S]*?position:fixed!important;[\s\S]*?top:var\(--preference-dialog-lock-top\)!important;[\s\S]*?height:var\(--preference-dialog-lock-height\)!important;[\s\S]*?margin:0!important/);
 });
 
 test('le choix d une catégorie produit ne déclenche pas un clic synthétique qui ferme le dialogue',()=>{
@@ -61,20 +55,19 @@ test('la personnalisation des recettes se réinitialise durablement et s enregis
   assert.doesNotMatch(save,/recipeCustomizationDialog\.close\(\)/);
 });
 
-test('les ressources modifiées sont versionnées pour le cache',()=>{
+test('la version visible passe à v331 et le nouveau service worker recharge les ressources modifiées',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=330/);
   assert.match(index,/catalog\.js\?v=330/);
   assert.match(index,/settings-tab-badge\.js\?v=327/);
-  assert.match(sw,/courses-app-v330-r1/);
-  assert.match(sw,/missing-products-dishes\.js\?v=4/);
-  assert.match(sw,/missing-products-fixes\.js\?v=16/);
-  assert.match(sw,/catalog\.js\?v=330/);
+  assert.match(sw,/courses-app-v331-r1/);
   assert.match(sw,/settings-tab-badge\.js\?v=327/);
-  assert.match(sw,/dishes-ui\.js\?v=326/);
   assert.match(sw,/dish-local-images\.js\?v=330/);
-  assert.match(localImages,/const APP_VERSION='v330'/);
+  assert.match(sw,/missing-products-fixes\.js\?v=16/);
+  assert.match(sw,/new Request\(event\.request,\{cache:'reload'\}\)/);
+  assert.match(localImages,/const APP_VERSION='v331'/);
+  assert.match(localImages,/if\(badge\.textContent!==APP_VERSION\)badge\.textContent=APP_VERSION/);
   assert.match(localImages,/missing-products-fixes\.js\?v=16/);
 });

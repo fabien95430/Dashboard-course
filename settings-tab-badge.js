@@ -386,20 +386,21 @@ function installPreferenceDialogAppearance(){
       padding:20px!important;
       border-radius:26px!important;
       box-sizing:border-box;
-    }
-    #preferencesDialog{
-      overflow:auto!important;
-      overscroll-behavior:contain;
-      -webkit-overflow-scrolling:touch;
-    }
-    #missingProductsDialog,
-    .recipe-customization-dialog{
       overflow:hidden!important;
+      overscroll-behavior:contain;
     }
+    #preferencesDialog[open],
     #missingProductsDialog[open],
     .recipe-customization-dialog[open]{
       display:flex!important;
       flex-direction:column!important;
+    }
+    .preference-dialog-scroll{
+      flex:1 1 auto;
+      min-height:0;
+      overflow:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
     }
     #missingProductsDialog .missing-products-header,
     #missingProductsDialog .missing-mode-switch,
@@ -408,7 +409,8 @@ function installPreferenceDialogAppearance(){
     #missingProductsDialog .missing-products-list-heading{
       flex:0 0 auto;
     }
-    #missingProductsDialog .missing-products-list{
+    #missingProductsDialog .missing-products-list,
+    #missingProductsDialog .missing-dishes-list{
       flex:1 1 auto!important;
       min-height:0!important;
       max-height:none!important;
@@ -444,6 +446,16 @@ function installPreferenceDialogAppearance(){
   document.head.appendChild(style);
 }
 
+function ensurePreferenceDialogScroll(dialog){
+  let content=dialog.querySelector(':scope>.preference-dialog-scroll');
+  if(content)return content;
+  content=document.createElement('div');
+  content.className='preference-dialog-scroll';
+  while(dialog.firstChild)content.appendChild(dialog.firstChild);
+  dialog.appendChild(content);
+  return content;
+}
+
 function initApplicationManagement(){
   installPreferenceDialogAppearance();
   bindPreferenceKeyboardStability();
@@ -452,6 +464,7 @@ function initApplicationManagement(){
   const selectionsButton=document.getElementById('settingsListBtn');
   const missingProductsButton=document.getElementById('settingsMissingProductsBtn');
   if(!dialog||!documentationButton||!selectionsButton||!missingProductsButton)return;
+  const content=ensurePreferenceDialogScroll(dialog);
 
   let managementButton=document.getElementById('settingsApplicationManagementBtn');
   if(!managementButton){
@@ -463,13 +476,13 @@ function initApplicationManagement(){
     missingProductsButton.after(managementButton);
   }
 
-  const selectionOptions=dialog.querySelector('.preference-options');
+  const selectionOptions=content.querySelector('.preference-options');
   let managementPanel=document.getElementById('preferencesApplicationManagement');
   if(!managementPanel){
     managementPanel=document.createElement('div');
     managementPanel.id='preferencesApplicationManagement';
     managementPanel.hidden=true;
-    (selectionOptions||dialog.querySelector('.dialog-actions'))?.before(managementPanel);
+    (selectionOptions||content.querySelector('.dialog-actions'))?.before(managementPanel);
   }
 
   let managementOptions=managementPanel.querySelector('.application-management-options');
@@ -485,11 +498,11 @@ function initApplicationManagement(){
   documentationButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-list"></use></svg></span><span class="security-setting-copy"><strong>Documentation</strong><small>Guide complet du fonctionnement de l’application</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
   managementPanel.appendChild(documentationButton);
 
-  const title=dialog.querySelector(':scope>h3');
-  const intro=dialog.querySelector(':scope>.dialog-intro');
+  const title=content.querySelector(':scope>h3');
+  const intro=content.querySelector(':scope>.dialog-intro');
   const originalTitle=title?.textContent||'Préférences';
   const originalIntro=intro?.textContent||'';
-  const selectionNodes=[...dialog.children].filter(node=>node!==title&&node!==intro&&node!==managementPanel);
+  const selectionNodes=[...content.children].filter(node=>node!==title&&node!==intro&&node!==managementPanel);
   const originalHidden=new Map(selectionNodes.map(node=>[node,node.hidden]));
 
   function showSelections(){
