@@ -101,6 +101,29 @@ function openRowMenu(row,anchor){
   const menu=document.createElement('div');
   menu.className='missing-row-menu';
   menu.setAttribute('role','menu');
+  const appendAction=(label,icon,target)=>{
+    const action=document.createElement('button');
+    action.type='button';
+    action.className='missing-row-menu-item';
+    action.setAttribute('role','menuitem');
+    action.innerHTML='<span class="missing-menu-icon" aria-hidden="true">'+icon+'</span><span><strong>'+label+'</strong></span>';
+    const disabled=!target||target.disabled;
+    action.disabled=disabled;
+    action.classList.toggle('is-disabled',disabled);
+    action.setAttribute('aria-disabled',String(disabled));
+    if(!disabled){
+      action.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        closeMenu();
+        target.click();
+      });
+    }
+    menu.appendChild(action);
+  };
+  const dish=row.hasAttribute('data-missing-dish-row');
+  if(dish)appendAction('Intégrer avec OpenAI','✦',row.querySelector('[data-openai-missing-dish]'));
+  appendAction('Intégrer avec ChatGPT','↗',row.querySelector('[data-integrate-missing-product],[data-integrate-missing-dish]'));
   const remove=document.createElement('button');
   remove.type='button';
   remove.className='missing-row-menu-item is-danger';
@@ -238,7 +261,7 @@ function installStyle(){
     #missingProductsDialog .missing-category-panel{margin-bottom:16px!important;padding:10px!important;border-radius:18px!important}
     #missingProductsDialog .missing-category-panel .missing-category-heading{margin-bottom:7px!important}
     #missingProductsDialog .missing-category-panel .missing-category-select{height:44px!important;border-radius:14px!important;font-size:13px!important}
-    #missingProductsDialog .missing-product-row.missing-request-row{position:relative!important;display:grid!important;grid-template-columns:48px minmax(0,1fr) auto 36px!important;gap:8px!important;min-height:68px!important;padding:8px!important;align-items:center!important;overflow:visible!important}
+    #missingProductsDialog .missing-product-row.missing-request-row{position:relative!important;display:grid!important;grid-template-columns:48px minmax(0,1fr) 36px!important;gap:8px!important;min-height:68px!important;padding:8px!important;align-items:center!important;overflow:visible!important}
     #missingProductsDialog .missing-product-row.missing-request-row .missing-product-mark{display:none!important}
     #missingProductsDialog .missing-request-thumb{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(54,75,60,.045)}
     #missingProductsDialog .missing-request-thumb svg{width:36px;height:36px;display:block}
@@ -246,13 +269,14 @@ function installStyle(){
     #missingProductsDialog .missing-request-thumb.is-dish{background:linear-gradient(145deg,#fff6df,#f8e9c1)}
     #missingProductsDialog .missing-request-thumb.is-dessert{background:linear-gradient(145deg,#fff0e7,#f8d9c9)}
     #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy{align-self:center!important;gap:4px!important;min-width:0!important}
-    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy strong{font-size:14.5px!important;line-height:1.22!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important}
+    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy strong{display:block!important;font-size:14.5px!important;line-height:1.22!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:break-word!important}
     #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){padding:4px 8px!important;font-size:9.5px!important;line-height:1.15!important}
     #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error){background:#edf7f0!important;color:#19804a!important}
     #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error){background:#fff4d9!important;color:#9b6811!important}
     #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error){background:#fff0e8!important;color:#ad5b39!important}
     #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:inline-flex!important;width:max-content!important}
     #missingProductsDialog .missing-product-remove{display:none!important}
+    #missingProductsDialog .missing-product-row.missing-request-row>.missing-product-integrate,#missingProductsDialog .missing-product-row.missing-request-row .missing-dish-actions{display:none!important}
     #missingProductsDialog .missing-row-more{width:36px;height:36px;min-width:36px;padding:0;border:1px solid #e5e9e5;border-radius:12px;background:#f8faf8;color:#4b5650;display:grid;place-items:center;font-size:13px;font-weight:900;letter-spacing:1px;box-shadow:none}
     #missingProductsDialog .missing-row-more:active{transform:scale(.96);background:#f1f5f2}
     #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:78px!important;min-height:36px!important;padding:0 10px!important;font-size:11px!important}
@@ -271,11 +295,11 @@ function installStyle(){
     .missing-menu-icon{position:relative;z-index:1;width:28px;height:28px;display:grid;place-items:center;color:#1b9557;font-size:18px}
     .missing-row-menu-item>span:last-child{position:relative;z-index:1}
     .missing-row-menu-item.is-danger,.missing-row-menu-item.is-danger .missing-menu-icon{color:#df4c47}
-    .missing-row-menu-item.is-disabled{opacity:.42}
+    .missing-row-menu-item.is-disabled,.missing-row-menu-item:disabled{opacity:.42;pointer-events:none}
     .missing-row-openai:before{content:"";position:absolute;inset:0;transform:scaleX(0);transform-origin:left center;background:rgba(35,144,90,.10);pointer-events:none}
     .missing-row-openai.is-holding:before{animation:missingOpenAiHold ${HOLD_MS}ms linear forwards}
     @keyframes missingOpenAiHold{to{transform:scaleX(1)}}
-    @media(max-width:390px){#missingProductsDialog .missing-products-add #missingProductName{height:44px!important;font-size:14px!important}#missingProductsDialog .missing-products-add #addMissingProduct.primary{height:44px!important;min-width:84px!important;padding:0 12px!important;font-size:13px!important}#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr) auto 34px!important;gap:6px!important;padding:7px!important;min-height:62px!important}#missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px}#missingProductsDialog .missing-request-thumb svg{width:33px;height:33px}#missingProductsDialog .missing-row-more{width:34px;height:34px;min-width:34px;border-radius:11px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:70px!important;min-height:34px!important;padding-left:8px!important;padding-right:8px!important;font-size:10.5px!important}}
+    @media(max-width:390px){#missingProductsDialog .missing-products-add #missingProductName{height:44px!important;font-size:14px!important}#missingProductsDialog .missing-products-add #addMissingProduct.primary{height:44px!important;min-width:84px!important;padding:0 12px!important;font-size:13px!important}#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr) 34px!important;gap:6px!important;padding:7px!important;min-height:62px!important}#missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px}#missingProductsDialog .missing-request-thumb svg{width:33px;height:33px}#missingProductsDialog .missing-row-more{width:34px;height:34px;min-width:34px;border-radius:11px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:70px!important;min-height:34px!important;padding-left:8px!important;padding-right:8px!important;font-size:10.5px!important}}
     @media(prefers-reduced-motion:reduce){.missing-row-openai.is-holding:before{animation-duration:1ms}}
   `;
   document.head.appendChild(style);
