@@ -92,6 +92,7 @@ const DISHES=Object.freeze([
   {name:'Crème brûlée',photoId:'',tags:['Végé','Dessert'],ingredients:['Crème liquide','Œufs','Sucre','Vanille']},
   {name:'Pannacotta',photoId:'',tags:['Dessert'],ingredients:['Crème liquide','Lait entier','Sucre','Vanille']},
   {name:'Riz au lait',photoId:'',tags:['Dessert'],ingredients:['Lait entier','Riz long','Sucre','Vanille']},
+  {name:'Rougail saucisse',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Tomates','Oignons jaunes','Ail','Piments','Riz long']},
 ]);
 
 const FILTERS=['Tous','Favoris','Dessert','Enfants','Pâtes','Poissons','Poulet','Rapides','Végé','Viandes'];
