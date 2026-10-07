@@ -88,13 +88,17 @@ Catalogue disponible:
 
 def image_prompt(name: str, category: str, subgroup: str) -> str:
     return (
-        f"Image produit pour une application de courses: {name}. Catégorie {category}, sous-groupe {subgroup}. "
-        "Représenter exactement un seul produit, isolé et immédiatement reconnaissable, sur fond totalement transparent. "
-        "Objet centré, proportions naturelles, marge transparente régulière, aucun bord important coupé, rendu propre et réaliste, "
-        "niveau de détail et ombre douce cohérents avec une collection homogène de vignettes de produits alimentaires et ménagers. "
-        "Aucun décor, table, rayon, main, personne, collage, grille ou deuxième produit. Aucun texte ajouté autour du produit. "
-        "Aucune marque ni logo inventé. Si le produit est emballé, utiliser un emballage simple et générique sans texte lisible fictif. "
-        "Le produit doit rester parfaitement lisible à petite taille dans une tuile mobile."
+        f"Vignette produit pour une application de courses: {name}. Catégorie {category}, sous-groupe {subgroup}. "
+        "Reprendre le langage visuel des produits déjà présents dans le catalogue: illustration 3D semi-réaliste de catalogue mobile, "
+        "objet détouré propre, volumes simples, textures nettes, lumière studio douce et ombre très légère. "
+        "Représenter un seul type de produit, isolé et immédiatement reconnaissable, sur fond totalement transparent. "
+        "Le produit principal doit occuper environ 65 à 75 % du carré, être centré, avec une marge transparente régulière et aucun bord important coupé. "
+        "Privilégier le produit lui-même plutôt que son emballage de vente. Si l'objet est reconnaissable sans emballage "
+        "(par exemple pile, thermomètre, éponge, rasoir, fruit ou légume), le montrer hors boîte, hors blister, hors sachet et sans étiquette. "
+        "N'utiliser un emballage générique que lorsqu'il est réellement indispensable pour identifier le produit; dans ce cas il doit rester simple, "
+        "sans marque, sans logo et sans texte lisible. Éviter les grands blocs rectangulaires ou les packagings qui dominent la vignette. "
+        "Aucun décor, table, rayon, main, personne, collage, grille ou deuxième type de produit. Aucun texte ajouté autour du produit. "
+        "Le produit doit rester parfaitement lisible à petite taille et visuellement cohérent avec les autres icônes du catalogue."
     )
 
 
