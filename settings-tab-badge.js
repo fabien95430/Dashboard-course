@@ -359,3 +359,69 @@ script.defer=true;
 script.dataset.dishAddedMarker='1';
 document.head.appendChild(script);
 })();
+
+(() => {
+'use strict';
+
+function initApplicationManagement(){
+  const dialog=document.getElementById('preferencesDialog');
+  const documentationButton=document.getElementById('preferencesDocumentation');
+  const selectionsButton=document.getElementById('settingsListBtn');
+  const missingProductsButton=document.getElementById('settingsMissingProductsBtn');
+  if(!dialog||!documentationButton||!selectionsButton||!missingProductsButton)return;
+
+  let managementButton=document.getElementById('settingsApplicationManagementBtn');
+  if(!managementButton){
+    managementButton=document.createElement('button');
+    managementButton.id='settingsApplicationManagementBtn';
+    managementButton.className='settings-row';
+    managementButton.type='button';
+    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation et informations</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+    missingProductsButton.after(managementButton);
+  }
+
+  let managementPanel=document.getElementById('preferencesApplicationManagement');
+  if(!managementPanel){
+    managementPanel=document.createElement('div');
+    managementPanel.id='preferencesApplicationManagement';
+    managementPanel.hidden=true;
+    dialog.querySelector('.dialog-actions')?.before(managementPanel);
+  }
+
+  documentationButton.className='security-action-row';
+  documentationButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-list"></use></svg></span><span class="security-setting-copy"><strong>Documentation</strong><small>Guide complet du fonctionnement de l’application</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+  managementPanel.appendChild(documentationButton);
+
+  const title=dialog.querySelector(':scope>h3');
+  const intro=dialog.querySelector(':scope>.dialog-intro');
+  const originalTitle=title?.textContent||'Préférences';
+  const originalIntro=intro?.textContent||'';
+  const selectionNodes=[...dialog.children].filter(node=>node!==title&&node!==intro&&node!==managementPanel);
+  const originalHidden=new Map(selectionNodes.map(node=>[node,node.hidden]));
+
+  function showSelections(){
+    selectionNodes.forEach(node=>{node.hidden=Boolean(originalHidden.get(node))});
+    managementPanel.hidden=true;
+    if(title)title.textContent=originalTitle;
+    if(intro)intro.textContent=originalIntro;
+  }
+
+  function showManagement(){
+    selectionNodes.forEach(node=>{node.hidden=true});
+    managementPanel.hidden=false;
+    if(title)title.textContent='Gestion de l’application';
+    if(intro)intro.textContent='Accédez à la documentation et aux informations de l’application.';
+    if(!dialog.open)dialog.showModal();
+  }
+
+  selectionsButton.addEventListener('click',showSelections,true);
+  managementButton.addEventListener('click',showManagement);
+  dialog.addEventListener('close',showSelections);
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initApplicationManagement,{once:true});
+}else{
+  initApplicationManagement();
+}
+})();
