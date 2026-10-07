@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v278';
+const APP_VERSION='v279';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -84,6 +84,9 @@ function syncPageVersions(){
       }
       .catalog-view .product:not(.is-selected) .badge::after{transform:translate(-50%,-50%) rotate(90deg)}
       #missingProductsDialog .missing-request-thumb.is-dessert svg path:nth-of-type(3){transform:translateX(-3px)}
+      html #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error){background:#f4f7f5!important;color:#66736c!important}
+      html #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error){background:#faf7ef!important;color:#7c705b!important}
+      html #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error){background:#faf3ef!important;color:#8a6b60!important}
       .list-row-menu{
         padding:0!important;
         border:1px solid rgba(255,255,255,.22)!important;
