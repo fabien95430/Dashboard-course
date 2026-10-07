@@ -5,6 +5,7 @@ const STORAGE_DISHES='courses-missing-dishes-v1';
 const STORAGE_PRODUCTS='courses-missing-products-v1';
 const STORAGE_RUNNING_DISHES='courses-missing-dishes-running-v1';
 const STORAGE_RUNNING_PRODUCTS='courses-missing-products-running-v1';
+const PRODUCT_PREFIX='__courses_product__:';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const HA_REQUEST_TIMEOUT_MS=12000;
 const OPENAI_COOLDOWN_MS=30000;
@@ -33,6 +34,7 @@ function readProducts(){
   const value=readJson(STORAGE_PRODUCTS,[]);
   return Array.isArray(value)?value:[];
 }
+function itemsForType(type){return type==='product'?readProducts():readDishes()}
 function runningKey(type){return type==='product'?STORAGE_RUNNING_PRODUCTS:STORAGE_RUNNING_DISHES}
 function readRunning(type){
   const value=readJson(runningKey(type),[]);
@@ -42,8 +44,7 @@ function saveRunning(type,running){
   try{localStorage.setItem(runningKey(type),JSON.stringify([...running]))}catch(_){}
 }
 function currentIds(type){
-  const items=type==='product'?readProducts():readDishes();
-  return new Set(items.map(item=>String(item?.id||'')).filter(Boolean));
+  return new Set(itemsForType(type).map(item=>String(item?.id||'')).filter(Boolean));
 }
 function pruneRunning(type){
   const current=currentIds(type);
@@ -65,6 +66,7 @@ function setRunning(type,id,active){
   else running.delete(value);
   saveRunning(type,running);
 }
+function cooldownKey(type,id){return type+':'+String(id||'')}
 function randomId(){
   if(globalThis.crypto?.getRandomValues){
     const bytes=crypto.getRandomValues(new Uint8Array(8));
@@ -238,11 +240,11 @@ async function requiredPushData(){
   }
   throw new Error('Souscription Web Push impossible. Réessaie après avoir rouvert l’application.');
 }
-async function integrateDishWithOpenAi(id){
-  const item=readDishes().find(entry=>String(entry?.id||'')===String(id||''));
+async function integrateWithOpenAi(type,id){
+  const item=itemsForType(type).find(entry=>String(entry?.id||'')===String(id||''));
   if(!item)return false;
   const serviceData={
-    dish_name:String(item.name||''),
+    dish_name:(type==='product'?PRODUCT_PREFIX:'')+String(item.name||''),
     dish_category:String(item.category||''),
     request_id:randomId()
   };
@@ -304,6 +306,35 @@ function decorateRunningRows(dialog,type,running){
     if(type==='dish')row.classList.toggle('is-added-request',added);
   });
 }
+function ensureOpenAiButton(row,type,id,running,added=false){
+  const attribute=type==='product'?'data-openai-missing-product':'data-openai-missing-dish';
+  let button=row.querySelector('['+attribute+']');
+  if(!button){
+    button=document.createElement('button');
+    button.type='button';
+    if(type==='dish'){
+      button.className='missing-dish-openai';
+      button.innerHTML='<span aria-hidden="true">✦</span>';
+      row.querySelector('.missing-dish-actions')?.appendChild(button);
+    }else{
+      button.className='missing-product-openai-trigger';
+      button.hidden=true;
+      row.appendChild(button);
+    }
+  }
+  const key=cooldownKey(type,id);
+  if(type==='product')button.dataset.openaiMissingProduct=id;
+  else button.dataset.openaiMissingDish=id;
+  button.dataset.openaiMissingType=type;
+  button.dataset.openaiMissingId=id;
+  const noun=type==='product'?'produit':'plat';
+  button.title=added?(type==='product'?'Produit déjà ajouté':'Plat déjà ajouté'):'Intégration OpenAI';
+  button.setAttribute('aria-label',added?(type==='product'?'Produit déjà ajouté':'Plat déjà ajouté'):running?'Intégration de ce '+noun+' en cours':'Intégrer ce '+noun+' avec OpenAI');
+  button.disabled=added||running||openAiCooldown.has(key);
+  button.classList.toggle('is-running',running);
+  button.setAttribute('aria-disabled',String(button.disabled));
+  return button;
+}
 function decorateOpenAiButtons(){
   const dialog=document.getElementById('missingProductsDialog');
   if(!dialog)return false;
@@ -311,26 +342,16 @@ function decorateOpenAiButtons(){
   const runningDishes=pruneRunning('dish');
   decorateRunningRows(dialog,'product',runningProducts);
   decorateRunningRows(dialog,'dish',runningDishes);
+  dialog.querySelectorAll('[data-missing-product-row]').forEach(row=>{
+    const id=String(row.dataset.missingProductRow||'');
+    if(id)ensureOpenAiButton(row,'product',id,runningProducts.has(id));
+  });
   dialog.querySelectorAll('[data-missing-dish-row]').forEach(row=>{
     const id=String(row.dataset.missingDishRow||'');
     const actions=row.querySelector('.missing-dish-actions');
     if(!id||!actions)return;
-    let button=actions.querySelector('[data-openai-missing-dish]');
-    if(!button){
-      button=document.createElement('button');
-      button.type='button';
-      button.className='missing-dish-openai';
-      button.innerHTML='<span aria-hidden="true">✦</span>';
-      actions.appendChild(button);
-    }
     const added=row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request');
-    const running=!added&&runningDishes.has(id);
-    button.dataset.openaiMissingDish=id;
-    button.title=added?'Plat déjà ajouté':'Intégration OpenAI';
-    button.setAttribute('aria-label',added?'Plat déjà ajouté':running?'Intégration de ce plat en cours':'Intégrer ce plat avec OpenAI');
-    button.disabled=added||running||openAiCooldown.has(id);
-    button.classList.toggle('is-running',running);
-    button.setAttribute('aria-disabled',String(button.disabled));
+    ensureOpenAiButton(row,'dish',id,!added&&runningDishes.has(id),added);
   });
   return true;
 }
@@ -340,31 +361,33 @@ function bindOpenAiUi(){
   installOpenAiStyle();
 
   document.addEventListener('click',event=>{
-    const button=event.target.closest?.('[data-openai-missing-dish]');
+    const button=event.target.closest?.('[data-openai-missing-product],[data-openai-missing-dish]');
     if(button){
       event.preventDefault();
       event.stopImmediatePropagation();
-      const id=String(button.dataset.openaiMissingDish||'');
-      if(!id||button.disabled||openAiCooldown.has(id))return;
-      setRunning('dish',id,true);
-      openAiCooldown.add(id);
+      const type=button.matches('[data-openai-missing-product]')?'product':'dish';
+      const id=String(type==='product'?button.dataset.openaiMissingProduct:button.dataset.openaiMissingDish||'');
+      const key=cooldownKey(type,id);
+      if(!id||button.disabled||openAiCooldown.has(key))return;
+      setRunning(type,id,true);
+      openAiCooldown.add(key);
       button.disabled=true;
       button.classList.add('is-running');
       button.setAttribute('aria-disabled','true');
       button.setAttribute('aria-busy','true');
       queueMicrotask(decorateOpenAiButtons);
       navigator.vibrate?.(12);
-      void integrateDishWithOpenAi(id).then(ok=>{
+      void integrateWithOpenAi(type,id).then(ok=>{
         if(!ok){
-          openAiCooldown.delete(id);
-          setRunning('dish',id,false);
+          openAiCooldown.delete(key);
+          setRunning(type,id,false);
         }
       }).finally(()=>{
         button.removeAttribute('aria-busy');
         decorateOpenAiButtons();
       });
       setTimeout(()=>{
-        openAiCooldown.delete(id);
+        openAiCooldown.delete(key);
         decorateOpenAiButtons();
       },OPENAI_COOLDOWN_MS);
       return;

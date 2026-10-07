@@ -1,4 +1,4 @@
-name: Intégrer un plat via OpenAI
+name: Intégrer un produit ou plat via OpenAI
 
 on:
   repository_dispatch:
@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: courses-dish-openai-integration
+  group: courses-openai-integration
   cancel-in-progress: false
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
       DISH_NAME: ${{ github.event.client_payload.name }}
       DISH_CATEGORY: ${{ github.event.client_payload.category }}
       REQUEST_ID: ${{ github.event.client_payload.request_id }}
-      TEMP_BRANCH: openai/dish-${{ github.run_id }}
+      TEMP_BRANCH: openai/item-${{ github.run_id }}
       PUSH_ENDPOINT: ${{ github.event.client_payload.push_endpoint }}
       PUSH_P256DH: ${{ github.event.client_payload.push_p256dh }}
       PUSH_AUTH: ${{ github.event.client_payload.push_auth }}
@@ -45,10 +45,32 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Générer et intégrer le plat
+      - name: Identifier la demande
+        id: request
+        shell: python
+        run: |
+          import os
+          raw=str(os.environ.get('DISH_NAME') or '').strip()
+          prefix='__courses_product__:'
+          item_type='product' if raw.startswith(prefix) else 'dish'
+          item_name=raw[len(prefix):].strip() if item_type=='product' else raw
+          if not item_name:
+              raise SystemExit('Nom de demande manquant')
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
+              out.write(f"type={item_type}\n")
+              out.write(f"name={item_name}\n")
+
+      - name: Générer et intégrer la demande
         id: integrate
         continue-on-error: true
-        run: python3 scripts/integrate_dish_openai.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.request.outputs.type }}" = "product" ]; then
+            python3 scripts/integrate_product_openai.py
+          else
+            python3 scripts/integrate_dish_openai.py
+          fi
 
       - name: Lire le résultat
         id: result
@@ -67,24 +89,6 @@ jobs:
                   value=data.get(key,'')
                   out.write(f"{key}={str(value).lower() if isinstance(value,bool) else value}\n")
 
-      - name: Harmoniser la version visible
-        if: steps.integrate.outcome == 'success' && steps.result.outputs.already_exists != 'true'
-        env:
-          VERSION: ${{ steps.result.outputs.version }}
-        shell: python
-        run: |
-          import os, re
-          from pathlib import Path
-          version=os.environ['VERSION'].strip()
-          if not version.isdigit():
-              raise SystemExit('Version générée invalide')
-          path=Path('catalog.js')
-          text=path.read_text(encoding='utf-8')
-          text,count=re.subn(r"el\.textContent='v\d+'", f"el.textContent='v{version}'", text, count=1)
-          if count != 1:
-              raise SystemExit('Version visible introuvable dans catalog.js')
-          path.write_text(text,encoding='utf-8')
-
       - name: Sauvegarder la génération sur une branche temporaire
         id: preserve
         if: steps.integrate.outcome == 'success' && steps.result.outputs.already_exists != 'true'
@@ -94,9 +98,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$TEMP_BRANCH"
-          git add catalog.js dishes-ui.js dish-local-images.js sw.js "www/Plats/${{ steps.result.outputs.filename }}"
+          if [ "${{ steps.request.outputs.type }}" = "product" ]; then
+            git add catalog.js dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
+            label="produit"
+          else
+            git add dishes-ui.js dish-local-images.js sw.js "www/Plats/${{ steps.result.outputs.filename }}"
+            label="plat"
+          fi
           git diff --cached --check
-          git commit -m "v${{ steps.result.outputs.version }}: ajoute le plat ${DISH_NAME} via OpenAI"
+          git commit -m "v${{ steps.result.outputs.version }}: ajoute le ${label} ${{ steps.request.outputs.name }} via OpenAI"
           git push -u origin HEAD:"$TEMP_BRANCH"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "Génération conservée sur $TEMP_BRANCH"
@@ -133,10 +143,15 @@ jobs:
           set -euo pipefail
           version="${{ steps.result.outputs.version }}"
           file="${{ steps.result.outputs.filename }}"
+          if [ "${{ steps.request.outputs.type }}" = "product" ]; then
+            asset="www/Items/${file}"
+          else
+            asset="www/Plats/${file}"
+          fi
           for attempt in $(seq 1 36); do
             version_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}dish-local-images.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
             if printf '%s' "$version_body" | grep -Fq "const APP_VERSION='v${version}'" \
-              && curl -fsSIL --max-time 12 "${COURSES_BASE_URL}www/Plats/${file}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
+              && curl -fsSIL --max-time 12 "${COURSES_BASE_URL}${asset}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
               echo "Déploiement v${version} confirmé."
               exit 0
             fi

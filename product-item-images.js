@@ -68,13 +68,37 @@ function restoreAtlas(card,sprite,image){
   sprite.classList.remove('is-single-product-image');
   image.src=source;
 }
+function decorateFallback(card,name,source){
+  const fallback=card.querySelector('.product-svg');
+  if(!fallback||fallback.dataset.singleProductPending===source)return;
+  fallback.dataset.singleProductPending=source;
+  const image=new Image();
+  image.alt='';
+  image.decoding='async';
+  image.dataset.singleProductSource=source;
+  image.addEventListener('load',()=>{
+    if(!fallback.isConnected)return;
+    const sprite=document.createElement('span');
+    sprite.className='premium-sprite is-single-product-image';
+    sprite.appendChild(image);
+    fallback.replaceWith(sprite);
+    card.classList.add('has-single-product-image');
+  },{once:true});
+  image.addEventListener('error',()=>{
+    delete fallback.dataset.singleProductPending;
+  },{once:true});
+  image.src=source;
+}
 function decorateCard(card){
   const name=String(card?.dataset?.name||'');
   if(!PRODUCT_NAMES.has(name))return;
+  const source=imageSource(name);
   const sprite=card.querySelector('.premium-sprite');
   const image=sprite?.querySelector(':scope > img');
-  if(!sprite||!image)return;
-  const source=imageSource(name);
+  if(!sprite||!image){
+    decorateFallback(card,name,source);
+    return;
+  }
   card.classList.add('has-single-product-image');
   if(image.dataset.singleProductSource===source)return;
   image.dataset.singleProductAtlasSource=image.getAttribute('src')||'';

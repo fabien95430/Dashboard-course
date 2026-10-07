@@ -47,7 +47,7 @@ function stopHold(){
   if(holdButton){holdButton.classList.remove('is-holding');holdButton=null;}
 }
 function triggerOpenAi(row){
-  const magic=row.querySelector('[data-openai-missing-dish]');
+  const magic=row.querySelector('[data-openai-missing-product],[data-openai-missing-dish]');
   if(!magic||magic.disabled)return false;
   navigator.vibrate?.([12,35,18]);
   magic.click();
@@ -129,8 +129,7 @@ function openRowMenu(row,anchor){
     }
     menu.appendChild(action);
   };
-  const dish=row.hasAttribute('data-missing-dish-row');
-  if(dish)appendAction('Intégrer avec OpenAI',SVG_MENU_OPENAI,row.querySelector('[data-openai-missing-dish]'));
+  appendAction('Intégrer avec OpenAI',SVG_MENU_OPENAI,row.querySelector('[data-openai-missing-product],[data-openai-missing-dish]'));
   appendAction('Intégrer avec ChatGPT',SVG_MENU_CHATGPT,row.querySelector('[data-integrate-missing-product],[data-integrate-missing-dish]'));
   const remove=document.createElement('button');
   remove.type='button';
