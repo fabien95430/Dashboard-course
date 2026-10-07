@@ -23,6 +23,10 @@ function ensureStyles(){
   const style=document.createElement('style');
   style.id='courses-product-item-images-style';
   style.textContent=`
+    .catalog-view .product .badge{
+      width:27px!important;
+      height:27px!important;
+    }
     .premium-sprite.is-single-product-image{
       -webkit-clip-path:none!important;
       clip-path:none!important;
