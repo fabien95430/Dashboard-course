@@ -3,7 +3,7 @@
 
 // Seuls les produits avec un conditionnement d'achat suffisamment stable
 // ont une référence fixe. Les autres gardent un libellé court indiquant
-// leur mode d'achat (poids, coupe ou pièce).
+// leur mode d'achat (poids, coupe, paquet, flacon, pièce, etc.).
 const PACKS=Object.freeze({
   'Spaghetti':{label:'500 g',amount:500,unit:'g'},
   'Penne':{label:'500 g',amount:500,unit:'g'},
@@ -19,7 +19,9 @@ const PACKS=Object.freeze({
   'Parmesan':{label:'100 g',amount:100,unit:'g'},
   'Crème fraîche':{label:'20 cl',amount:200,unit:'ml'},
   'Crème liquide':{label:'20 cl',amount:200,unit:'ml'},
+  'Crème épaisse':{label:'20 cl',amount:200,unit:'ml'},
   'Œufs':{label:'Boîte de 6',amount:6,unit:'piece'},
+  'Mascarpone':{label:'250 g',amount:250,unit:'g'},
   'Frites surgelées':{label:'1 kg',amount:1000,unit:'g'},
   'Mozzarella':{label:'125 g',amount:125,unit:'g'},
   'Fromage râpé':{label:'200 g',amount:200,unit:'g'},
@@ -44,6 +46,12 @@ const PACKS=Object.freeze({
   'Sucre':{label:'1 kg',amount:1000,unit:'g'},
   'Beurre':{label:'250 g',amount:250,unit:'g'},
   'Lait':{label:'1 L',amount:1000,unit:'ml'},
+  'Lait entier':{label:'1 L',amount:1000,unit:'ml'},
+  'Lait demi-écrémé':{label:'1 L',amount:1000,unit:'ml'},
+  'Lait écrémé':{label:'1 L',amount:1000,unit:'ml'},
+  'Lait sans lactose':{label:'1 L',amount:1000,unit:'ml'},
+  "Lait d'amande":{label:'1 L',amount:1000,unit:'ml'},
+  "Lait d'avoine":{label:'1 L',amount:1000,unit:'ml'},
   'Chapelure':{label:'250 g',amount:250,unit:'g'},
   'Croûtons':{label:'100 g',amount:100,unit:'g'},
   'Vanille':{label:'5 sachets',amount:5,unit:'piece'}
@@ -55,13 +63,63 @@ Object.entries(window.COURSES_CATALOG?.groups||{}).forEach(([category,subgroups]
     (Array.isArray(names)?names:[]).forEach(name=>PRODUCT_META.set(name,{category,sub}));
   });
 });
-const CUT_SUBS=new Set(['Charcuterie']);
-const WEIGHT_SUBS=new Set([
-  'Fromages','Viandes',
-  'Fruits classiques','Légumes du quotidien','Légumes variés',
-  'Pommes de terre & aromates'
-]);
-const WEIGHT_PRODUCTS=new Set(['Saumon','Cabillaud','Thon frais','Truite','Crevettes','Moules','Saumon fumé']);
+
+const SALE_MODE_BY_SUB=Object.freeze({
+  'Laits & crèmes':'Volume',
+  'Yaourts & desserts':'Pot',
+  'Fromages':'Poids',
+  'Charcuterie':'Coupe',
+  'Viandes':'Poids',
+  'Poissons & traiteur':'Poids',
+  'Surgelés':'Sachet',
+  'Boulangerie':'Pièce',
+  'Fruits classiques':'Poids',
+  'Fruits rouges & exotiques':'Poids',
+  'Légumes du quotidien':'Poids',
+  'Légumes variés':'Poids',
+  'Salades & herbes':'Pièce',
+  'Pommes de terre & aromates':'Poids',
+  'Pâtes, riz & céréales':'Poids',
+  'Conserves':'Boîte',
+  'Sauces & condiments':'Flacon',
+  'Petit-déjeuner':'Paquet',
+  'Biscuits & goûters':'Paquet',
+  'Pâtisserie & cuisine':'Poids',
+  'Apéritif':'Sachet',
+  'Monde & pratique':'Sachet',
+  'Eaux & jus':'Bouteille',
+  'Sodas & sirops':'Bouteille',
+  'Café & thé':'Boîte',
+  'Bières & vins':'Bouteille',
+  'Entretien':'Flacon',
+  'Lessive':'Flacon',
+  'Vaisselle':'Flacon',
+  'Papier & sacs':'Paquet',
+  'Hygiène':'Flacon',
+  'Salle de bain & soins':'Flacon',
+  'Bébé & animaux':'Paquet'
+});
+
+const SALE_MODE_BY_PRODUCT=Object.freeze({
+  'Surimi':'Paquet','Poisson pané':'Boîte','Quiche':'Pièce','Pizza fraîche':'Pièce','Pâtes fraîches':'Paquet',
+  'Pizza surgelée':'Pièce','Glace vanille':'Pot','Glace chocolat':'Pot','Sorbet':'Pot','Glaçons':'Sac',
+  'Ananas':'Pièce','Mangue':'Pièce','Avocat':'Pièce','Noix de coco':'Pièce','Grenade':'Pièce','Fruit de la passion':'Pièce','Melon':'Pièce',
+  'Concombres':'Pièce','Brocoli':'Pièce','Chou-fleur':'Pièce','Courge':'Pièce','Potiron':'Pièce','Butternut':'Pièce','Fenouil':'Pièce','Céleri':'Pièce','Artichauts':'Pièce',
+  'Persil':'Botte','Ciboulette':'Botte','Basilic':'Botte','Coriandre':'Botte','Menthe':'Botte','Thym frais':'Botte','Romarin frais':'Botte',
+  'Ail':'Pièce','Citron vert':'Pièce',
+  'Café soluble':'Pot','Thé noir':'Boîte','Thé vert':'Boîte','Confiture':'Pot','Pâte à tartiner':'Pot',
+  'Levure chimique':'Sachet','Levure boulangère':'Sachet','Pépites chocolat':'Sachet','Noix de coco râpée':'Sachet','Amandes en poudre':'Sachet',
+  'Olives':'Pot','Mini saucissons':'Paquet','Tapenade':'Pot','Houmous':'Pot',
+  'Harissa':'Tube','Guacamole':'Pot','Bouillon cubes':'Boîte','Soupes en brique':'Brique',
+  'Café décaféiné':'Paquet','Chicorée':'Paquet','Matcha':'Boîte','Chocolat chaud':'Boîte','Filtres à café':'Boîte',
+  'Éponges magiques':'Paquet','Lingettes ménage':'Paquet','Bicarbonate':'Paquet',
+  'Lessive capsules':'Boîte','Lessive poudre':'Paquet','Lingettes anti-décoloration':'Boîte','Filet de lavage':'Pièce','Pinces à linge':'Paquet','Sacs linge délicat':'Paquet',
+  'Tablettes lave-vaisselle':'Boîte','Sel lave-vaisselle':'Paquet','Éponges':'Paquet','Grattoirs':'Paquet','Brosses vaisselle':'Pièce','Gants ménage':'Paire','Torchons':'Paquet','Essuie-verres':'Paquet',
+  'Papier aluminium':'Rouleau','Film alimentaire':'Rouleau','Papier cuisson':'Rouleau',
+  'Dentifrice':'Tube','Brosses à dents':'Pièce','Cotons-tiges':'Boîte','Disques coton':'Paquet','Mouchoirs poche':'Paquet','Papier toilette humide':'Paquet',
+  'Crème hydratante':'Tube','Crème mains':'Tube','Baume lèvres':'Stick','Rasoirs':'Paquet','Coton':'Paquet','Protections hygiéniques':'Paquet','Pansements':'Boîte','Thermomètre piles':'Pièce','Pile AAA':'Paquet',
+  'Lait infantile':'Boîte','Petits pots':'Pot','Compotes bébé':'Pot','Croquettes chat':'Sac','Pâtée chat':'Boîte','Litière chat':'Sac','Croquettes chien':'Sac','Sacs déjections':'Paquet','Friandises animaux':'Paquet'
+});
 
 // Besoin culinaire, indépendant du conditionnement du produit.
 const NEED_PER_PERSON=Object.freeze({
@@ -144,11 +202,19 @@ function compactPackLabel(pack){
   return label;
 }
 function saleModeLabel(name){
+  const explicit=SALE_MODE_BY_PRODUCT[name];
+  if(explicit)return explicit;
   const meta=PRODUCT_META.get(name);
-  if(RECIPE_UNITS[name]==='piece'||meta?.sub==='Boulangerie'||meta?.sub==='Salades & herbes')return 'Pièce';
-  if(CUT_SUBS.has(meta?.sub))return 'Coupe';
-  if(WEIGHT_SUBS.has(meta?.sub)||WEIGHT_PRODUCTS.has(name))return 'Poids';
-  return 'Pièce';
+  return SALE_MODE_BY_SUB[meta?.sub]||'Unité';
+}
+function auditSaleModes(){
+  const missing=[];
+  PRODUCT_META.forEach((meta,name)=>{
+    if(packFor(name))return;
+    if(SALE_MODE_BY_PRODUCT[name]||SALE_MODE_BY_SUB[meta?.sub])return;
+    missing.push(name);
+  });
+  if(missing.length)console.warn('Catalogue : mode d’achat non défini',missing);
 }
 function needFor(name){
   const currentServings=servings();
@@ -401,6 +467,7 @@ function bind(){
   searchInput=document.getElementById('productSearch');
   catalogView=document.getElementById('catalogView');
   if(!dialog||!list||!products||!searchInput)return false;
+  auditSaleModes();
   ensureStyles();
   decorateProducts();
   decorateDishRows();
