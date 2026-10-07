@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220">
+  <defs>
+    <linearGradient id="bagFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfcf7"/>
+      <stop offset="1" stop-color="#f0f4e9"/>
+    </linearGradient>
+    <linearGradient id="breadFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f5dfad"/>
+      <stop offset="1" stop-color="#e6c57e"/>
+    </linearGradient>
+    <linearGradient id="leafFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c9ddb9"/>
+      <stop offset="1" stop-color="#8bb680"/>
+    </linearGradient>
+    <linearGradient id="appleFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d6e4bd"/>
+      <stop offset="1" stop-color="#aecb96"/>
+    </linearGradient>
+    <linearGradient id="bottleFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#edf3e9"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="140" cy="202" rx="82" ry="9" fill="#678b6b" opacity=".08"/>
+
+  <g fill="none" stroke="#5a8764" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M140 18v13M105 27l8 10M175 27l-8 10" opacity=".9"/>
+  </g>
+
+  <g transform="rotate(-13 82 94)">
+    <path d="M67 31c10-7 23-5 30 5 3 4 4 9 4 14l-3 91H61l-1-91c0-8 2-14 7-19z" fill="url(#breadFill)" stroke="#5a8764" stroke-width="2.3"/>
+    <path d="M73 57l10 13M72 83l11 14M71 111l9 12" fill="none" stroke="#6f946d" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <path d="M104 116c-10-17-8-34 1-45 9 4 14 14 14 27 1-17 8-29 18-33 9 10 8 26 0 39 8-11 17-16 26-13 2 13-7 25-22 34z" fill="url(#leafFill)" stroke="#5a8764" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M121 77c1 17 2 30 2 44M139 73c-6 16-9 31-10 47M153 97c-9 7-15 15-19 24" fill="none" stroke="#729b71" stroke-width="1.7" stroke-linecap="round" opacity=".9"/>
+
+  <g>
+    <path d="M172 55h21v11c0 4 2 7 6 11l3 4v58h-39V81l3-4c4-4 6-7 6-11z" fill="url(#bottleFill)" stroke="#537f5f" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M171 55h23" stroke="#38724f" stroke-width="6" stroke-linecap="round"/>
+    <path d="M168 91h29" stroke="#d9e8d7" stroke-width="8" opacity=".9"/>
+    <path d="M176 70h13" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+  </g>
+
+  <g>
+    <path d="M196 97c0-14 10-25 23-25 14 0 24 11 24 25 0 16-10 30-24 30-13 0-23-14-23-30z" fill="url(#appleFill)" stroke="#5a8764" stroke-width="2.2"/>
+    <path d="M219 72c1-8 5-13 10-16" fill="none" stroke="#4d7b57" stroke-width="2.1" stroke-linecap="round"/>
+    <path d="M226 60c8-6 16-5 21-2-5 7-12 10-21 8z" fill="#91bd84" stroke="#5a8764" stroke-width="1.8"/>
+  </g>
+
+  <path d="M52 106h176l-10 82c-1 8-7 12-15 12H77c-8 0-14-4-15-12z" fill="url(#bagFill)" stroke="#4b7959" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M84 108c2-29 22-48 48-48s46 19 48 48" fill="none" stroke="#4b7959" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M93 109c1-20 15-33 34-33s33 13 34 33" fill="none" stroke="#7ea27d" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>
+
+  <path d="M67 124c26 10 122 13 145 0" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity=".55"/>
+  <path d="M72 112l5 64c1 8 7 12 14 12" fill="none" stroke="#dfe9d8" stroke-width="5" stroke-linecap="round" opacity=".38"/>
+
+  <g transform="translate(105 137)" fill="none" stroke="#9fbe91" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 0h8l6 23h35l6-16H13"/>
+    <circle cx="20" cy="32" r="3.2" fill="#9fbe91" stroke="none"/>
+    <circle cx="45" cy="32" r="3.2" fill="#9fbe91" stroke="none"/>
+  </g>
+
+  <g stroke="#79a172" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M35 105c9-1 16 3 21 10-10 1-18-2-23-8z" fill="#a8cc9c"/>
+    <path d="M246 103c-9 0-16 5-20 12 10 0 17-4 22-10z" fill="#a8cc9c"/>
+    <path d="M43 157c8-1 14 3 18 9-9 1-15-2-19-7z" fill="#bad7ad" opacity=".9"/>
+    <path d="M237 150c-7 0-13 4-17 10 8 0 14-3 18-8z" fill="#bad7ad" opacity=".9"/>
+  </g>
+</svg>
