@@ -281,77 +281,6 @@ document.head.appendChild(script);
 
 (() => {
 'use strict';
-
-function initMissingProductsDialogFrame(){
-  const dialog=document.getElementById('missingProductsDialog');
-  if(!dialog)return;
-
-  const DIALOG_TOP='calc((100dvh - min(84dvh, 720px))/2 + 18px)';
-  let floorHeight=0;
-  let frame=0;
-
-  function applyPosition(){
-    dialog.style.top=DIALOG_TOP;
-    dialog.style.bottom='auto';
-    dialog.style.margin='0 auto';
-  }
-
-  function clearFrame(){
-    if(frame){
-      cancelAnimationFrame(frame);
-      frame=0;
-    }
-    floorHeight=0;
-    applyPosition();
-    dialog.style.removeProperty('min-height');
-  }
-
-  function pinFrame(){
-    frame=0;
-    if(!dialog.open)return;
-    applyPosition();
-    const rect=dialog.getBoundingClientRect();
-    floorHeight=Math.max(floorHeight,rect.height);
-    dialog.style.minHeight=Math.ceil(floorHeight)+'px';
-  }
-
-  function scheduleFrame(){
-    if(frame)cancelAnimationFrame(frame);
-    frame=requestAnimationFrame(pinFrame);
-  }
-
-  applyPosition();
-
-  new MutationObserver(()=>{
-    if(!dialog.open){
-      clearFrame();
-      return;
-    }
-    scheduleFrame();
-  }).observe(dialog,{
-    attributes:true,
-    attributeFilter:['open','hidden','class'],
-    childList:true,
-    subtree:true
-  });
-
-  dialog.addEventListener('close',clearFrame);
-  window.addEventListener('orientationchange',()=>{
-    if(!dialog.open)return;
-    clearFrame();
-    requestAnimationFrame(scheduleFrame);
-  },{passive:true});
-}
-
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',initMissingProductsDialogFrame,{once:true});
-}else{
-  initMissingProductsDialogFrame();
-}
-})();
-
-(() => {
-'use strict';
 if(document.querySelector('script[data-dish-added-marker]'))return;
 const script=document.createElement('script');
 script.src='./dish-added-marker.js?v=1';
@@ -363,7 +292,33 @@ document.head.appendChild(script);
 (() => {
 'use strict';
 
+function installPreferenceDialogAppearance(){
+  if(document.getElementById('preferences-dialog-appearance'))return;
+  const style=document.createElement('style');
+  style.id='preferences-dialog-appearance';
+  style.textContent=`
+    #preferencesDialog,
+    #missingProductsDialog,
+    .recipe-customization-dialog{
+      width:min(calc(100% - 28px),430px)!important;
+      max-height:calc(100dvh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom)))!important;
+      margin:auto!important;
+      box-sizing:border-box;
+    }
+    #preferencesDialog::backdrop,
+    #missingProductsDialog::backdrop,
+    .recipe-customization-dialog::backdrop{
+      background:rgba(28,38,31,.28)!important;
+      -webkit-backdrop-filter:blur(8px)!important;
+      backdrop-filter:blur(8px)!important;
+    }
+    #preferencesApplicationManagement .application-management-options:empty{display:none!important}
+  `;
+  document.head.appendChild(style);
+}
+
 function initApplicationManagement(){
+  installPreferenceDialogAppearance();
   const dialog=document.getElementById('preferencesDialog');
   const documentationButton=document.getElementById('preferencesDocumentation');
   const selectionsButton=document.getElementById('settingsListBtn');
@@ -376,17 +331,27 @@ function initApplicationManagement(){
     managementButton.id='settingsApplicationManagementBtn';
     managementButton.className='settings-row';
     managementButton.type='button';
-    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation et informations</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation, historique et informations</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
     missingProductsButton.after(managementButton);
   }
 
+  const selectionOptions=dialog.querySelector('.preference-options');
   let managementPanel=document.getElementById('preferencesApplicationManagement');
   if(!managementPanel){
     managementPanel=document.createElement('div');
     managementPanel.id='preferencesApplicationManagement';
     managementPanel.hidden=true;
-    dialog.querySelector('.dialog-actions')?.before(managementPanel);
+    (selectionOptions||dialog.querySelector('.dialog-actions'))?.before(managementPanel);
   }
+
+  let managementOptions=managementPanel.querySelector('.application-management-options');
+  if(!managementOptions){
+    managementOptions=document.createElement('div');
+    managementOptions.className='preference-options application-management-options';
+    managementPanel.appendChild(managementOptions);
+  }
+  const purchaseHistoryRow=dialog.querySelector('[data-purchase-history-toggle="1"]');
+  if(purchaseHistoryRow)managementOptions.appendChild(purchaseHistoryRow);
 
   documentationButton.className='security-action-row';
   documentationButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-list"></use></svg></span><span class="security-setting-copy"><strong>Documentation</strong><small>Guide complet du fonctionnement de l’application</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
@@ -410,7 +375,7 @@ function initApplicationManagement(){
     selectionNodes.forEach(node=>{node.hidden=true});
     managementPanel.hidden=false;
     if(title)title.textContent='Gestion de l’application';
-    if(intro)intro.textContent='Accédez à la documentation et aux informations de l’application.';
+    if(intro)intro.textContent='Accédez à la documentation, à l’historique des achats et aux informations de l’application.';
     if(!dialog.open)dialog.showModal();
   }
 
