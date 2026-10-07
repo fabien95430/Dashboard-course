@@ -536,7 +536,7 @@ function initMissingProductsAndDishes(){
       dishCategory=!category||categories.includes(category)?category:'';
     }else{
       const original=[...categoryGrid.querySelectorAll('[data-missing-category]')].find(button=>(button.dataset.missingCategory||'')===category);
-      original?.click();
+      original?.onclick?.();
     }
     renderCategorySelect();
     navigator.vibrate?.(4);

@@ -263,7 +263,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=3';
+script.src='./missing-products-dishes.js?v=4';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
@@ -301,9 +301,28 @@ function installPreferenceDialogAppearance(){
     #missingProductsDialog,
     .recipe-customization-dialog{
       width:min(calc(100% - 28px),430px)!important;
-      max-height:calc(100dvh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom)))!important;
+      height:min(590px,calc(100vh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
+      height:min(590px,calc(100svh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
+      max-height:min(590px,calc(100vh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
+      max-height:min(590px,calc(100svh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
+      inset:0!important;
       margin:auto!important;
+      padding:20px!important;
+      border-radius:26px!important;
       box-sizing:border-box;
+    }
+    #preferencesDialog,
+    #missingProductsDialog{
+      overflow:auto!important;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+    }
+    .recipe-customization-dialog{
+      overflow:hidden!important;
+    }
+    .recipe-customization-dialog[open]{
+      display:flex!important;
+      flex-direction:column!important;
     }
     #preferencesDialog::backdrop,
     #missingProductsDialog::backdrop,
