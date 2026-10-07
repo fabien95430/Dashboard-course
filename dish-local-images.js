@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v328';
+const APP_VERSION='v329';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -320,7 +320,7 @@ function installVisualWarmupStyle(){
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
-    script.src='./missing-products-fixes.js?v=15';
+    script.src='./missing-products-fixes.js?v=16';
     script.defer=true;
     script.dataset.missingProductsFixes='1';
     document.head.appendChild(script);

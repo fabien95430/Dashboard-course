@@ -75,7 +75,15 @@ function randomId(){
   return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 }
 function appNotify(title,detail=''){
-  const toast=document.getElementById('toast');
+  const dialog=document.getElementById('missingProductsDialog');
+  let toast=dialog?.open?dialog.querySelector('.courses-openai-feedback'):document.getElementById('toast');
+  if(dialog?.open&&!toast){
+    toast=document.createElement('div');
+    toast.className='courses-openai-feedback';
+    toast.setAttribute('role','status');
+    toast.setAttribute('aria-live','polite');
+    dialog.appendChild(toast);
+  }
   if(!toast)return;
   toast.textContent=detail?title+' — '+detail:title;
   toast.classList.add('is-visible');
@@ -94,6 +102,21 @@ function ensureNotificationPermission(){
     .catch(()=>Notification.permission)
     .finally(()=>{permissionPromise=null});
   return permissionPromise;
+}
+async function notifyIntegrationStarted(type,item,requestId){
+  if(Notification.permission!=='granted')return;
+  try{
+    const registration=await navigator.serviceWorker.ready;
+    const itemName=String(item?.name||'').trim()||(type==='product'?'Produit':'Plat');
+    await registration.showNotification('Demande envoyée',{
+      body:itemName+' est en cours de génération.',
+      tag:requestId?'courses-'+type+'-'+requestId+'-started':'courses-'+type+'-started',
+      icon:'./apple-touch-icon.png',
+      badge:'./apple-touch-icon.png',
+      data:{url:'./'},
+      renotify:true
+    });
+  }catch(_){}
 }
 
 function rejectHaPending(message='Connexion Home Assistant interrompue'){
@@ -257,6 +280,7 @@ async function integrateWithOpenAi(type,id){
   }
   try{
     await haCallService('rest_command','courses_integrate_dish_openai',{...serviceData,...push});
+    void notifyIntegrationStarted(type,item,serviceData.request_id);
     appNotify('Intégration OpenAI lancée',String(item.name||''));
     return true;
   }catch(error){
@@ -280,6 +304,8 @@ function installOpenAiStyle(){
     #missingProductsDialog .missing-product-integrate.is-running,#missingProductsDialog .missing-dish-integrate.is-running{background:#edf0ee!important;color:#7a837e!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-integrate.is-added{background:#edf0ee!important;color:#65736b!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-openai.is-running{background:#edf0ee!important;color:#8a928d!important;border-left-color:#dfe4e1!important;opacity:1!important}
+    #missingProductsDialog .courses-openai-feedback{position:absolute;z-index:80;left:14px;right:14px;bottom:14px;padding:10px 12px;border-radius:14px;background:rgba(24,36,29,.94);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:12px;line-height:1.35;font-weight:650;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+    #missingProductsDialog .courses-openai-feedback.is-visible{opacity:1;transform:translateY(0)}
     @media(max-width:390px){#missingProductsDialog .missing-dish-integrate{padding-left:11px!important;padding-right:10px!important}#missingProductsDialog .missing-dish-openai{width:36px!important;min-width:36px!important;min-height:40px!important;font-size:16px!important}}
   `;
   document.head.appendChild(style);
@@ -292,7 +318,19 @@ function decorateRunningRows(dialog,type,running){
     const id=String(row.dataset[rowData]||'');
     const added=type==='dish'&&(row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request'));
     const active=!added&&running.has(id);
-    row.querySelector('.missing-dish-progress')?.remove();
+    let progress=row.querySelector('.missing-dish-progress');
+    if(active){
+      const copy=row.querySelector('.missing-product-copy');
+      if(copy&&!progress){
+        progress=document.createElement('small');
+        progress.className='missing-dish-progress';
+        progress.textContent='En cours…';
+        progress.setAttribute('role','status');
+        copy.appendChild(progress);
+      }
+    }else if(progress){
+      progress.remove();
+    }
     const integrate=row.querySelector(integrateSelector);
     if(integrate){
       integrate.disabled=added||active;

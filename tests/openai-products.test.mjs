@@ -16,6 +16,15 @@ test('un produit manquant utilise le même déclencheur OpenAI et le même relai
   assert.match(popup,/\[data-openai-missing-product\],\[data-openai-missing-dish\]/);
 });
 
+test('le lancement OpenAI reste visible dans le popup et notifie Courses immédiatement',()=>{
+  const fixes=read('missing-products-fixes.js');
+  assert.match(fixes,/progress\.textContent='En cours…'/);
+  assert.match(fixes,/courses-openai-feedback/);
+  assert.match(fixes,/registration\.showNotification\('Demande envoyée'/);
+  assert.match(fixes,/est en cours de génération\./);
+  assert.match(fixes,/void notifyIntegrationStarted\(type,item,serviceData\.request_id\)/);
+});
+
 test('le workflow OpenAI route les produits vers une intégration WebP avec notification Web Push',()=>{
   const workflow=read('.github/workflows/integrate-dish-openai.yml');
   const script=read('scripts/integrate_product_openai.py');
