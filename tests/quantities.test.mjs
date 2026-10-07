@@ -33,4 +33,28 @@ test('les portions arrondissent les conditionnements à l’unité supérieure',
   for(const [servings,quantity] of [[2,2],[4,3],[5,4],[8,5]]){
     assert.equal(api.getQuantity('Crème brûlée','Crème liquide',servings),quantity);
   }
+  assert.equal(api.getQuantity('Crème brûlée','Vanille',8),2);
+});
+
+test('les libellés audités décrivent le vrai mode d’achat',()=>{
+  const api=context.window.COURSES_QUANTITIES;
+  const expected={
+    'Pâté':'Barquette',
+    'Rillettes':'Pot',
+    'Thon en boîte':'Boîte',
+    'Haricots rouges':'Boîte',
+    'Pois chiches':'Boîte',
+    'Tomates pelées':'Boîte',
+    'Maïs en boîte':'Boîte',
+    'Lentilles':'Boîte',
+    'Sucre roux':'Paquet',
+    'Sucre glace':'Paquet',
+    'Vanille':'Sachet',
+    'Pain de mie':'Paquet',
+    'Mâche':'Sachet',
+    'Roquette':'Sachet'
+  };
+  for(const [name,label] of Object.entries(expected)){
+    assert.equal(api.getPurchaseLabel(name),label,name);
+  }
 });
