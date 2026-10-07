@@ -27,8 +27,11 @@ function ensureStyles(){
       -webkit-clip-path:none!important;
       clip-path:none!important;
     }
-    .product.has-single-product-image .premium-sprite.is-single-product-image{
-      transform:translateY(5px)!important;
+    .catalog-view .product .media .premium-sprite{
+      transform:translateY(9px)!important;
+    }
+    .catalog-view .product.has-single-product-image .media .premium-sprite.is-single-product-image{
+      transform:translateY(14px)!important;
     }
     .premium-sprite.is-single-product-image>img{
       top:11%!important;
