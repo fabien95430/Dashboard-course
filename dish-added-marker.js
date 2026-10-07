@@ -139,7 +139,7 @@ function markerState(name){
   const entry=entries[name];
   if(!entry)return {state:'none',present:0,total:0};
   const total=entry.ingredients.length;
-  if(trustedListNames===null||!total)return {state:'complete',present:total,total};
+  if(trustedListNames===null||!total)return {state:'none',present:0,total};
   const present=entry.ingredients.reduce((count,item)=>count+(trustedListNames.has(normalize(item))?1:0),0);
   return {
     state:present===total?'complete':(present>0?'partial':'none'),
@@ -168,29 +168,32 @@ function syncCard(card){
 function syncCards(){
   document.querySelectorAll('#dishes .dish-card').forEach(syncCard);
 }
-function listIsUnfiltered(){
-  const search=document.getElementById('listSearch');
-  if(search&&String(search.value||'').trim())return false;
-  const selected=document.querySelector('#listFilterMenu [data-list-category][aria-checked="true"]');
-  return !selected||(selected.dataset.listCategory||'Toutes')==='Toutes';
-}
-function rowListQuantity(row){
-  const text=String(row?.querySelector?.('.list-qty')?.textContent||'');
-  const match=text.match(/(\d+)/);
-  return match?Math.max(1,Number(match[1])||1):1;
+function knownIngredientNames(){
+  const names=new Set();
+  Object.values(entries).forEach(entry=>{
+    (Array.isArray(entry?.ingredients)?entry.ingredients:[]).forEach(name=>{
+      const value=String(name||'').trim();
+      if(value)names.add(value);
+    });
+  });
+  document.querySelectorAll('#dishDialog .dish-ingredient[data-ingredient]').forEach(row=>{
+    const value=String(row.dataset.ingredient||'').trim();
+    if(value)names.add(value);
+  });
+  return names;
 }
 function readListState(){
-  if(!listIsUnfiltered())return null;
   const list=document.getElementById('listItems');
-  if(!list||list.querySelector('.empty .spinner'))return null;
+  const service=window.COURSES_LIST;
+  if(!list||list.querySelector('.empty .spinner')||typeof service?.getQuantity!=='function')return null;
   const names=new Set();
   const quantities=new Map();
-  [...list.querySelectorAll('.list-row[data-name]')].forEach(row=>{
-    const key=normalize(row.dataset.name||'');
+  knownIngredientNames().forEach(name=>{
+    const key=normalize(name);
     if(!key)return;
-    const quantity=rowListQuantity(row);
-    names.add(key);
-    quantities.set(key,(quantities.get(key)||0)+quantity);
+    const quantity=Math.max(0,Number(service.getQuantity(name))||0);
+    quantities.set(key,quantity);
+    if(quantity>0)names.add(key);
   });
   return {names,quantities};
 }
@@ -251,7 +254,12 @@ function syncDialogGuard(){
 }
 function reconcileList(){
   const state=readListState();
-  if(state===null)return;
+  if(state===null){
+    trustedListNames=null;
+    trustedListQuantities=null;
+    syncCards();
+    return;
+  }
   trustedListNames=state.names;
   trustedListQuantities=state.quantities;
   syncCards();
@@ -290,6 +298,32 @@ function trackPendingFromButton(button){
   clearTimeout(pendingTimer);
   pendingTimer=setTimeout(clearPending,90000);
 }
+function commitDishEntry(name,ingredients){
+  const dish=String(name||'').trim().slice(0,100);
+  const clean=[...new Set((Array.isArray(ingredients)?ingredients:[]).map(item=>String(item||'').trim()).filter(Boolean))].slice(0,20);
+  if(!dish||!clean.length)return false;
+  entries[dish]={ingredients:clean,at:Date.now()};
+  saveEntries();
+  trustedListNames=null;
+  trustedListQuantities=null;
+  syncCards();
+  if(pending?.name===dish)clearPending();
+  requestAnimationFrame(reconcileList);
+  return true;
+}
+function consumeDishAddSettled(event){
+  const detail=event?.detail||{};
+  const name=String(detail.name||'').trim();
+  if(!name)return;
+  if(!detail.result){
+    if(pending?.name===name)clearPending();
+    return;
+  }
+  const ingredients=Array.isArray(detail.ingredients)&&detail.ingredients.length
+    ?detail.ingredients
+    :(pending?.name===name?pending.ingredients:[]);
+  commitDishEntry(name,ingredients);
+}
 function consumeToast(){
   if(!pending||!observedToast?.classList.contains('is-visible'))return;
   const message=String(observedToast.textContent||'').trim();
@@ -300,12 +334,7 @@ function consumeToast(){
   }
   const success=message==='Les ingrédients sélectionnés sont déjà dans Ma liste'||message==='Les quantités nécessaires sont déjà dans Ma liste'||message.startsWith(pending.name+' · ');
   if(!success)return;
-  entries[pending.name]={ingredients:[...new Set(pending.ingredients)],at:Date.now()};
-  saveEntries();
-  trustedListNames=null;
-  trustedListQuantities=null;
-  syncCards();
-  clearPending();
+  commitDishEntry(pending.name,pending.ingredients);
 }
 function bindObservers(){
   ensureStyle();
@@ -342,6 +371,7 @@ function bindObservers(){
   }
 }
 
+document.addEventListener('courses:dish-add-settled',consumeDishAddSettled);
 document.addEventListener('click',event=>{
   const addButton=event.target.closest?.('#dishDialog .dish-sheet-add');
   if(addButton){
@@ -502,6 +532,10 @@ function confirmationResultMessage(name,result){
   return name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':'');
 }
 
+function publishDishAddResult(name,ingredients,result){
+  document.dispatchEvent(new CustomEvent('courses:dish-add-settled',{detail:{name,ingredients,result}}));
+}
+
 async function confirmWithFeedback(event){
   const button=event.currentTarget;
   const dialog=button.closest('#dishDialog');
@@ -509,6 +543,10 @@ async function confirmWithFeedback(event){
   const name=dialog.querySelector('.dish-sheet-head h2')?.textContent?.trim()||'';
   const addSelected=window.COURSES_QUANTITIES?.addSelected;
   if(!name||typeof addSelected!=='function')return;
+  const ingredients=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')]
+    .filter(row=>row.classList.contains('is-selected')||row.classList.contains('is-already-listed'))
+    .map(row=>String(row.dataset.ingredient||'').trim())
+    .filter(Boolean);
 
   event.preventDefault();
   event.stopImmediatePropagation();
@@ -517,6 +555,7 @@ async function confirmWithFeedback(event){
   try{
     settled=Promise.resolve(addSelected()).then(result=>({result}),error=>({error}));
   }catch(error){
+    publishDishAddResult(name,ingredients,null);
     showConfirmationToast('Ajout impossible');
     return;
   }
@@ -530,8 +569,13 @@ async function confirmWithFeedback(event){
   const outcome=await settled;
   confirmationBusy=false;
   document.documentElement.classList.remove('is-dish-background-sync');
-  if(outcome.error){showConfirmationToast('Ajout impossible');return}
+  if(outcome.error){
+    publishDishAddResult(name,ingredients,null);
+    showConfirmationToast('Ajout impossible');
+    return;
+  }
   const result=outcome.result||{added:0,failed:1,present:0};
+  publishDishAddResult(name,ingredients,result);
   navigator.vibrate?.(result.added?[10,28,10]:8);
   showConfirmationToast(confirmationResultMessage(name,result));
 }
