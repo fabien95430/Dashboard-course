@@ -487,20 +487,17 @@ async function confirmDishAdd(){
   if(!currentDish||busyDish||dishConfirmButton.disabled)return;
   cancelIngredientThumbs();
   const dish=currentDish;
+  const operation=window.COURSES_QUANTITIES.addSelected();
+  closeDishSheet();
   busyDish=dish.name;
-  dishConfirmButton.classList.add('is-busy');
-  dishConfirmButton.disabled=true;
-  dishConfirmButton.querySelector('span').textContent='Ajout en cours…';
   let result;
   try{
-    result=await window.COURSES_QUANTITIES.addSelected();
+    result=await operation;
   }catch(error){
     showToast('Ajout impossible');
     return;
   }finally{
     busyDish='';
-    dishConfirmButton.classList.remove('is-busy');
-    closeDishSheet();
   }
   navigator.vibrate?.(result.added?[12,35,12]:10);
   if(result.failed){showToast('Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
