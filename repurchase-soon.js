@@ -99,15 +99,20 @@ function ensureStyles(){
       padding:0 18px max(calc(env(safe-area-inset-bottom) + 16px),24px)
     }
     .repurchase-head{
-      position:relative;min-height:calc(max(14px,env(safe-area-inset-top)) + 104px);box-sizing:border-box;
-      display:flex;align-items:flex-end;justify-content:center;flex:0 0 auto;padding:6px 0 14px
+      display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;flex:0 0 auto;box-sizing:border-box;
+      padding:max(29px,calc(env(safe-area-inset-top) + 23px)) 0 12px
     }
+    .repurchase-head::after{content:'';width:42px;height:42px}
     .repurchase-back{
-      position:absolute;left:0;top:max(29px,calc(env(safe-area-inset-top) + 23px));width:42px;height:42px;padding:0 2px 4px 0;
-      border:0;border-radius:0;display:grid;place-items:center;background:transparent;color:#142019;box-shadow:none;
-      -webkit-backdrop-filter:none;backdrop-filter:none;-webkit-appearance:none;appearance:none;font-size:42px;line-height:1;font-family:inherit
+      width:42px;height:42px;margin:0;padding:0 2px 4px 0;border:0!important;border-radius:0!important;outline:0!important;
+      display:grid;place-items:center;background:transparent!important;color:#142019;box-shadow:none!important;
+      -webkit-backdrop-filter:none!important;backdrop-filter:none!important;-webkit-appearance:none!important;appearance:none!important;
+      -webkit-tap-highlight-color:transparent;font-size:42px;line-height:1;font-family:inherit
     }
-    .repurchase-head h2{margin:0;padding:0 50px;color:#0d3f2c;font-size:20px;line-height:1.1;font-weight:820;letter-spacing:-.035em;text-align:center}
+    .repurchase-back:hover,.repurchase-back:active,.repurchase-back:focus,.repurchase-back:focus-visible{
+      border:0!important;border-radius:0!important;outline:0!important;background:transparent!important;box-shadow:none!important
+    }
+    .repurchase-head h2{margin:0;padding:0;color:#0d3f2c;font-size:22px;line-height:1;font-weight:820;letter-spacing:-.035em;text-align:center}
     .repurchase-info{
       flex:0 0 auto;margin:5px 0 13px;padding:12px 14px;border:1px solid rgba(35,120,242,.07);border-radius:16px;
       display:flex;gap:10px;align-items:flex-start;background:#edf5ff;color:#315375;font-size:12.5px;line-height:1.35;font-weight:580
@@ -171,7 +176,7 @@ function ensureDialog(){
   dialog.id='repurchaseSoonDialog';
   dialog.className='repurchase-dialog';
   dialog.setAttribute('aria-labelledby','repurchaseSoonTitle');
-  dialog.innerHTML='<div class="repurchase-screen"><header class="repurchase-head"><button class="repurchase-back" type="button" aria-label="Retour au Catalogue">‹</button><h2 id="repurchaseSoonTitle">À racheter bientôt</h2></header><div class="repurchase-info"><span class="repurchase-info-mark" aria-hidden="true">i</span><span>Suggestions basées sur vos habitudes d’achat. Rien n’est ajouté automatiquement.</span></div><div class="repurchase-list"></div></div>';
+  dialog.innerHTML='<div class="repurchase-screen"><header class="repurchase-head"><button class="repurchase-back" type="button" aria-label="Retour au Catalogue">‹</button><h2 id="repurchaseSoonTitle">À prévoir</h2></header><div class="repurchase-info"><span class="repurchase-info-mark" aria-hidden="true">i</span><span>Suggestions basées sur vos habitudes d’achat. Rien n’est ajouté automatiquement.</span></div><div class="repurchase-list"></div></div>';
   document.body.appendChild(dialog);
   dialog.querySelector('.repurchase-back')?.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close()});
