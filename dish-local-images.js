@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v302';
+const APP_VERSION='v303';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -216,6 +216,13 @@ function syncPageVersions(){
         transform:scale(.978);
         filter:brightness(.98);
         box-shadow:0 6px 15px rgba(18,113,69,.14),inset 0 1px 0 rgba(255,255,255,.16);
+      }
+      @media(max-width:520px) and (max-height:900px){
+        #settingsView .settings-logout{
+          height:44px!important;
+          min-height:44px!important;
+          margin:-12px 0 2px!important;
+        }
       }
       @media(max-height:700px){
         #listItems .list-empty-state{min-height:300px!important;padding-top:8px!important;padding-bottom:20px!important}
