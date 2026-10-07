@@ -265,12 +265,15 @@ function initMissingProductsDialogFrame(){
   const dialog=document.getElementById('missingProductsDialog');
   if(!dialog)return;
 
-  const DIALOG_TOP_OFFSET=18;
-  const DIALOG_HEIGHT_RATIO=.84;
-  const DIALOG_MAX_HEIGHT=720;
+  const DIALOG_TOP='calc((100dvh - min(84dvh, 720px))/2 + 18px)';
   let floorHeight=0;
-  let pinnedTop=null;
   let frame=0;
+
+  function applyPosition(){
+    dialog.style.top=DIALOG_TOP;
+    dialog.style.bottom='auto';
+    dialog.style.margin='0 auto';
+  }
 
   function clearFrame(){
     if(frame){
@@ -278,26 +281,16 @@ function initMissingProductsDialogFrame(){
       frame=0;
     }
     floorHeight=0;
-    pinnedTop=null;
-    dialog.style.removeProperty('top');
-    dialog.style.removeProperty('bottom');
-    dialog.style.removeProperty('margin');
+    applyPosition();
     dialog.style.removeProperty('min-height');
   }
 
   function pinFrame(){
     frame=0;
     if(!dialog.open)return;
+    applyPosition();
     const rect=dialog.getBoundingClientRect();
-    if(pinnedTop===null){
-      const viewportHeight=window.innerHeight||document.documentElement.clientHeight||rect.height;
-      const referenceHeight=Math.min(viewportHeight*DIALOG_HEIGHT_RATIO,DIALOG_MAX_HEIGHT);
-      pinnedTop=Math.max(0,(viewportHeight-referenceHeight)/2+DIALOG_TOP_OFFSET);
-    }
     floorHeight=Math.max(floorHeight,rect.height);
-    dialog.style.top=Math.round(pinnedTop)+'px';
-    dialog.style.bottom='auto';
-    dialog.style.margin='0 auto';
     dialog.style.minHeight=Math.ceil(floorHeight)+'px';
   }
 
@@ -305,6 +298,8 @@ function initMissingProductsDialogFrame(){
     if(frame)cancelAnimationFrame(frame);
     frame=requestAnimationFrame(pinFrame);
   }
+
+  applyPosition();
 
   new MutationObserver(()=>{
     if(!dialog.open){
