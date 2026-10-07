@@ -1,310 +1,92 @@
 %PDF-1.4
-%âãÏÓ
+% Courses guide utilisateur
 1 0 obj
-<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+<< /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R] /Count 6 >>
 endobj
 3 0 obj
-<< /Type /Pages /Count 8 /Kids [ 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R ] >>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
 endobj
 4 0 obj
-<< /Length 649 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(Guide de fonctionnement - Courses) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(Version de référence : v299.) Tj
-1 0 0 1 48 724 Tm
-(Ce document explique le fonctionnement actuel de l’application Courses : Ma liste,) Tj
-1 0 0 1 48 709 Tm
-(Catalogue, Plats, quantités, historique intelligent, Home Assistant, sécurité,) Tj
-1 0 0 1 48 694 Tm
-(préférences, mode hors ligne et demandes d’intégration.) Tj
-1 0 0 1 48 664 Tm
-(Le dépôt GitHub fabien95430/Dashboard-course, branche main, reste la source de) Tj
-1 0 0 1 48 649 Tm
-(vérité technique.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 1/8) Tj
-ET
-endstream
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
 endobj
 5 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+<< /Length 1207 /Filter [/ASCII85Decode /FlateDecode] >>
+stream
+GhSup99'uN%,K5YFFoAunKS'c!P:SL-[gVumD,qbhY?qmUoL:l*k*p]N<W?]'q5op,:VcOCJT6?<db]Uh`j?dP`p&]?$#lA0n"A`(M`qT`Re:!$OX#F6q(&59eTSW<lM0U%Vm.=l&TmW/R:Od8oC,]QDLFLqnhUg/cEd<_O[*kA:Y$^^g/E'AA"#p/mZ2ee)e%[b0C/X2)PuIiM,Vj`/7P0X-:((onA8B--ER)o%Y4madaD(>>`e3Z9M"56STn"Kqr!)AB+5BV`-ZDelRXpVW:q>j9Uqs`5;CB3"/H&?j*9CL+*^@4?"j77:3p=Rc.Vr*f$^=+g;bNFMPWMb;#a^.,c)F,B2)rO^nD*+Y>^lag?@`/PXJg-S*b[/cGVa?AbO#&(2(M8W4pp2%o>pDeZ(S/EVm>BXYb#;5j]p3'Ukt#s<)#KuM29VB$7(!Ol>T%?EKMQ[HsF7_kb_+CrXEhV;UZS;&"CFNSA*\]b-\"q8:8'G*O#b<Y"jPZGF(/aOC6RiiQ@bXn8!DeV`j/efo!*)Gf6oc0%5e7k%7A(TFuDMWo5+TSB?Y,Z+(IlndU7^3oXL@TM@a7SgCnReru4m!H4--_`25X,7uDENKlZo0>!AMbMo5t1L[^&`5I"jo/5CVX,eM`Dd=:?DQ)b$;&qk3>4Gg<:O[cI/`Y+q+nB$LaB5'`Z3`@]n's[OQ2cGUmj#2Wg%`Zg[9E>+`:D"+G=sYdb;5"I>/n"'@J9!R!'Fn])AHhZ:Yi2oIb-ASjM:;=<t(PmLRMKsOd)42Mqf`Qbmo/(nh\r,tg77TltD*G'fVlrk0G%JJe!\u$X3`nk2\#QhZPO2aB9F67*.IQ9nTB,I]MdJAIdg('q<*J:[Nomb]qD;9=>$b(h%KB!FhQorCuq0J5a#gg5QP]H&(?5H`<A3L7=01UQXk$Lhpmn6HACqJi-976:Ja6uXPMBliZSV";N;i1mDaiTkn\""4UK"U\ih8]Y8kQa:*J=0?.'3M+7Nbc2Bmg+6+_;^>_\mg-+Ir,o[ci/K=ouZZ8caW-`g?4j=U*mqt#_Z]N*$`g+UOaoC-,,cpN[!J#V>*:mdjHDtOYAOij3;^[oMNJ+MpUW(a*LF.dfA(\g`on5pnH[trBQ5`f?ih/L[[2"K+FDV%g/i8Noj9)\icUOb?"CCq<W/]AoJ=jS`NuECSp`j]5@Q,a_sWDQ88_Nh/*#p%e5Zf~>
+endstream
 endobj
 6 0 obj
-<< /Length 773 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(1. Architecture et navigation) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(Courses est une PWA mobile-first en HTML, CSS et JavaScript statiques, publiée avec) Tj
-1 0 0 1 48 739 Tm
-(GitHub Pages. Aucun framework ou backend supplémentaire n’est nécessaire au) Tj
-1 0 0 1 48 724 Tm
-(fonctionnement courant.) Tj
-1 0 0 1 48 694 Tm
-(Les vues principales sont Ma liste, Catalogue et Réglages. Le Catalogue peut) Tj
-1 0 0 1 48 679 Tm
-(s’ouvrir en Produits ou en Plats selon la préférence enregistrée.) Tj
-1 0 0 1 48 649 Tm
-(catalog.js reste la source du catalogue. Les safe areas iOS et le fonctionnement) Tj
-1 0 0 1 48 634 Tm
-(mobile restent des invariants du projet.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 2/8) Tj
-ET
-endstream
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 540 960] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
 endobj
 7 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 6 0 R >>
+<< /Length 1510 /Filter [/ASCII85Decode /FlateDecode] >>
+stream
+GhT!]c#+L[%*.gc$9c4)U.@lXM?<M<DXX^b^h?mcbpA^hIfH3#?hSC'lmBeERcRA1p_-4F:/+rK;_-Om;Son-T43UB3/4:bI/>.9H&>NO'u(+gSiOF4bA6n;6D7-e?GD.-m&Lg;ZCt.8oCZno3@?jdjI(^r6r$(=q'%".q3UUIG<!@+p1uWt0cPrCg5/$BYEc$Pb(]LdUbG6^HI5ZJKiI]GCb=M<:U0]D,Tn&R@k*QUD)uS^E/V0?CaS)<eV"W7[-?Ed+a$[AJnM#TQoaL@Po5!>Hh"'k-?!e[lis$+c[,.ged<'cO>OKN3P6pN,P,Y$Q)nHTr&h^'5[25mU)@lIf7Ng/H"2";2W;;#;9>-&C.m'Hp-(U?YGE\aKk]Q7_O,%7P,9'>Z[3TC;q5@L7)cKaPi$r/99J`BM('.=JOP3S_=W=d=u)J6MES6)cr":$d_aUD*RtH/Kr7mR$`-[MIV[el[&Hqs4q_0iXbX+;H7)!h'4gd>dCa<G1%H2fFNj\!rp$H>K^g)Jb!5rE>#F/Xm5-+E9e"&P%a];oP+po7b-KdW!D3@SU;aA3%&7s>.nYN86/asgfr9:(%YjRq!A+\Y+E.,dB#'prU3cl:k"c#N761EPBb,aFC+cl*"2ICqp(4VQ^30KUb8pX`a2aVX!#sTZ?$+;=*roKq=@`)fTX?<NS2>N(0Mh3@mT6M`S0SITk%;u?S+A@g#9F7EH6.'*H8n5f6[U-i-J]5jkP-4a49UB]^O-4oBrQ_.XWG96m&id`!s9cE0LWU@3Z(cd*XjKXPr0Kt2R81Nka;620Vl,\N;NYm0eZr,49dpt&l,mbEAnlC-;h5$fj/n[-9*?oEXE4o/34K"`u3_8Xn)Rg'p<XmB:pdCr?"G;kW;2835OAab<R?C*YD67:.DQ5@O'p,McpWu4!NJ6*YE9"Qo,g,2SqjLFNiPQ\U"P\$]uhF,()U!P1kN/>)U%s"muUA`W_UcB#K7T.+3E8E0lV@a2`6S=k%4C--p(6Ij5%)qZD")dYn7J2&,uUZ)3M!cCZNt;gMMr'$OtSa\naj)Tka(>"g\u36[G&8UqqgGpKP#hK2s`)CPppEB\3NmgT!QRRZG=oltt]N7<8%9\TdLE9p=o+5-`fn[JaH'g:ZYdVTd16-RnU03_$>_!88ELK:$ep@kU(MkNUOl3H7-[1APgg-)C,m>R;k/gGEJl^1:aIX>2\>kG'bdfXq]IO(*K:n<\uDo_,pOr].6g7b>_a.[X-QWr6k1>I3_j;KMe'$mgHYq;b%CYVrZ@dD.\YH]@.i0Q[^'5;I6/ci8CdXI&5jMc5M/re@>&u2TNd-PIchShrWNlaZ9RP[OY>Z\1;28;5n-*JiV<HUt"[2ZATkSMWVKm2u\Udi6Xg/i%?hS/dQic]Ht4&**lA4lWWCNRX`Z]SXso2#/;Y,Kb/E+\Ko]Di(o:A)LNS7oSm/cV`a,'M=/fX)iS<6bD,&*T`PF+ZkI?VGci1]I$ReR#?KB#7dhj;)$Cr<kS^MRi~>
+endstream
 endobj
 8 0 obj
-<< /Length 1020 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(2. Ma liste, Catalogue et quantités) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(Ma liste est prioritairement alimentée par la liste todo Home Assistant) Tj
-1 0 0 1 48 739 Tm
-(sélectionnée. Les ajouts, suppressions et validations d’achat passent par le flux) Tj
-1 0 0 1 48 724 Tm
-(existant de synchronisation.) Tj
-1 0 0 1 48 694 Tm
-(Le Catalogue utilise les noms et catégories de catalog.js. Les quantités des plats) Tj
-1 0 0 1 48 679 Tm
-(s’adaptent au nombre de personnes. Pour certains produits au poids ou au volume,) Tj
-1 0 0 1 48 664 Tm
-(une occurrence synchronisée peut représenter un pas de 100 g ou 100 ml lorsque) Tj
-1 0 0 1 48 649 Tm
-(l’unité est compatible.) Tj
-1 0 0 1 48 619 Tm
-(Un produit déjà présent en quantité suffisante n’est pas ajouté en double ;) Tj
-1 0 0 1 48 604 Tm
-(lorsqu’il est seulement partiellement présent, l’application calcule le complément) Tj
-1 0 0 1 48 589 Tm
-(nécessaire.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 3/8) Tj
-ET
-endstream
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 540 960] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
 endobj
 9 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 8 0 R >>
+<< /Length 2300 /Filter [/ASCII85Decode /FlateDecode] >>
+stream
+GhSusgQ(Wt&q/YE_&#(-5QT;1UmZ+EhNRbf<g'4+H-&^.5AM#/2R@%o[p,W40ud0iCXiUB:JI>M;_+!^>hn5OJ+:grS@iY&h;>uYhnJm-Q\tN?"P4K-eE`V$i?k^&ftI@HK&]qK-&ct@,-Gj6\c5*\=a[fVS0RGVh/^f(,G0I-Dh#:mNO).?&2SHj[%CXPLWO=+;maZ1C=$!LZhP.j(PpG:[uuZ.kDR"[3nq9bG:Ipd)gaIH;Y+."U]MD<=VM,oGRAf$6EZMq'eU2l+JL-;iPYmDW/rYf\)Qqt'Z@Uk=-sn9Ze=I:Y0RnAor2cC;Qq"OEXjZ^gFSbM6UL,!q2FXi7Kb9MiHa8qVS\%dEa]m(*k0%e>*oA!$WH>pq7'TU9\s:'mRi@1<=9])("We9r;73hF*@S28`FDZ$.VI_%!qk!`\?q6685Qd=O#2=V%pa@N4ggP"k'bljqVPr86&`C]"]4(i$Cil5D@N(*q:?>G'BCQ.R)JuGX$qgKs0srn.e=!JNhf>\D=VCnO,Zkk`C4:s6i_TW<qEA;5$EN8Ag;FFlt6oe0(81"Flf6mH8.p7Ia=@<fC3jY==D"5kL)'Kp3n!MR7@IXlf>5?^*!fPib,OJ@&55q"26<,DaW0o?coNk,#W3Plf*7%`F-(UQtO0r]74OkDlV*"0S(%=5Gi?q#h8L:q"ff<T=*]NJ8s%)m4R_TX`q6^HR:NVWVsL]]'k%`@R?:U9jk:C<kh<EP[iIXp67@<j2`%NLgdG`jSA&#J)r@m-tP%*d'iR"Y]GILV2+4LsVa?B-0VCM^>nBQK3@"8Zp&GhDU\h$'Z8ofd_V#=V!("K'd@0Z\2*gU^Kilf4S1e5bDX[Xt*/\&>l7S?haLEN1RBK?Pl_fif\HEM(fBI7e:W>BI9e'8:[6u85Y2t8<-<^(baN[b[o5'g=\"^CfB2pc%[f9#tQ/4//+=9j`;pooG2,1&`\4ua^j^3;bsLE7UA$cPk2F^WdcW=9%-SAiVVVCB<+Ys>"u0/9ue%IE!s*Qf.g.AL1jVg$fGe=)LeteXfVP[5lld%8&,O18D4D(ZW</:EOhdqSJa,93&4o1B$?X^H@=X>Z].!5UD7Xq3Z8ph*4Xn8RFuA]a693%4mqu-]]EO3,UjWlK]-qWG:Y;o,8FrRe57]ZfUCfg#G8j:h9Y&3HoH"q7icP7RPgT*^>WP75[YULm5T(4<"HJe7+rWjDn&n&,qbsJ*[bqnLfeW,,1XAkQX3UCqNlUcGnd%5D:10nH3U!HT(ST.(;E^roGdJZDg:0uj1F3MUXA3DpX)%u9lAd*Gi/"q?B`(u9qUGc5(<$km($K>?S:lEmr2R5n"b^ohoB](6+jRh]sj,%?H+>>dLgWg"j'[?+ru[Q7QD^rm]dU:c`.W4Z6$ul#V2D./_eNeTBj4VIH;t'YYb\^r[@4/V=^pUCe`\XdLmt<'A#?jCEV/RHR"8NZE808,ol&t]%golh<&u?I3)C?<?\)RY-p3Z+/'$NoC8?%bY-TJl[n`\:m_F_'?cs!gK'OE"O\'6ceOMp.soQXFJW@rmee0;rG,C]r2nDnfk?eM--A;")&%36`GTlZ@4s8/Pg_CPX\/&hL7c\nq`kisr0k+l3[LClU(&-K^Ujj'"OkB%K\dP@<1t);A!Uu81/-QNBg=2Vo:,'@HVXAr]@9.GoQB=k<Zh!EQnZi*\N_(JI![72/Kt=nK#a6$0b#U7WrjnX6T*@^_Vg$!8GK8"29dn@9nTd]%,s"+\F]UCL,#ZM`g&NAr9pKb$J6RFj9-PMp`gsI0`I'j^q@-p'Q/?jE$j.X&Na$03t_p6l^hU9$?81S)^,`Cnd,Kt0GM!!T5AAX46"3F+!_ajmR4B^B2>V7&<4?d7#P4aU.(>i.%<\jhD4e`U&9*0^FtdS7pS-caT$.P`?IgH`=kXtRZ9eJg,[)l$CoG5"i!EN#hc0-.oK&)\"`0pmJCt\bF2Qc<$=*SX=fV_<*75me%B[K;;`JJet[\.&#?[rP/FT0?!aI1Wr3J?=<i/l^)I1[!0eBfM^:MB&MkcS_eGA"'8<fYh;NH8(/hu7`up^lJR2n-HeEsZg6Y^NcBDRDdH\^9U2dtf[0*IA0ukc9odHl=%SKZB8<MM6X>oKKWtXmq\TQWq?o.PM@Yr%'X6[R2f1d#eQD3j7idE$?7/0T]Y+[.XKrUQ<N?8B$0-l=Ze8"(0+euIHG]Eb&',(`T7eYF.e,@.cMs!(\;dOanZJqubrU@^\aBEfVJ*@Ou="L'+S6AN6dq1V6I7Xkm!ns';GJ@?E/@MioPoD1<-9g]Mf=u)BGg?~>
+endstream
 endobj
 10 0 obj
-<< /Length 837 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(3. Plats et ajout d’ingrédients) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(Le mode Plats propose des recettes composées uniquement d’ingrédients compatibles) Tj
-1 0 0 1 48 739 Tm
-(avec le catalogue. Le nombre de personnes règle les besoins de la recette.) Tj
-1 0 0 1 48 709 Tm
-(Le moteur propriétaire des quantités contrôle les besoins, les conditionnements et) Tj
-1 0 0 1 48 694 Tm
-(les portions. L’ajout d’un plat utilise le service de liste partagé de) Tj
-1 0 0 1 48 679 Tm
-(l’application ; il n’a pas besoin de simuler des clics sur les cartes produits.) Tj
-1 0 0 1 48 649 Tm
-(Les marqueurs indiquent si les ingrédients d’un plat sont déjà présents,) Tj
-1 0 0 1 48 634 Tm
-(partiellement présents ou absents de Ma liste.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 4/8) Tj
-ET
-endstream
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 540 960] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 10 0 R >>
+<< /Length 1832 /Filter [/ASCII85Decode /FlateDecode] >>
+stream
+GhT9%bDmkr%,LYZn-'O\`deall:9[sPQ$28-IF6TREbYYNXaLu5'h+u6p4I;EK(Dk#M\17.b4?ok,?Ujh7(-@]^mb\G?)<Qp6Y[Ii$Y-)ISW@V`b87GYO7_j\M>K*qS`W9UOm!s\k3R\f6?t)N&6a]B20n=:YH/4;uFnRIWb7_C6!$n-FHX^eP(@a\.kO/.HY87)(MtZB*k!.SMEjW2c_.pk02li/c66%ZF@n(gGk-(BQuX#OX,?!_K2!_frp:CHM(9;71%fkMLl4B#G%oQIZh.:-q-lhHi2JQj@<L@bj.=38+anZAULoBMDYTBq+2n*$b[/4Sor<+4b_d+adFhgPr8SDIo<Cokq`brH-+d<j*C0bq+Yss_rIaK0"U2q#t!n[&Tr]DYU.N="#WaQHjLHF^A,c:8XR/GbiYn[S;LjRWY[c*B_f^;kY0*HIpd;%U>mMZ.OfM4'N]o3OJ3\Ghom@!M7/T[!Z[VR.Q3XSB2TPu6<RT'DH<+:^_r4/&`4l!AjE[T]lMO-MEO6Q(lVI"NpMXcC$_ggK\O*e6oZQ8)D5K/6ctW.V\suOi]TEDi\+?u;dV+`V8m1J7GV&R]@JkkC9UI.H4AZ6?pGmrKGehIOF0@REb9qPfkY+1^^(YU$;,:^m,"9jb/Bu5Cjs%L8VW/9^#!!h;^sJr?hcQjXi^E$)Q?&X<`'Dra5cj$.b2hMaEIH!mN5.$.MK!oPr!fFE<E5i#*t`8/CR?anBmKA"V'o,1&3B;:do>#Vt>3RN'*d;`6:GsD^tE-nb'<MWsmnF)m\FTf*5T0.@+7?Ri(&Pot8>s#9/`U#%-aKMeokP#[^s=#CI,23kcNG;pSC30QRA6<i,)U*SRD3cCq>e.E4GgNr+6P,:q`l3MjHN;qg^#,drd,[Gn8p^i[Y$ZgZqmqgG!ep9D>4S?9+KZJGL-EA!]I0s9Pa)!."%0'3[C`pK.AL2a4NATLU6Qs2Vk:7gbu*P^OY,5?p?@e,t<?(g1*[C#RgMt2=RYlrR*ajVYFJim4^V88&1ce^EgYS'>3RN8@l85nKKUsqfOCR(-)d3Vu`P?L*`l$?7a<%R1+D%o-2?4]`dJ9R)3K&2dk"AZsQYml[:PL>hrOD@koOK%U>k)a<bGlne/*MV91)O[[X%8EmrLlE/rr1[)*(Ne&B>P\8N)Ir5Hj=J-g]L7b^S-R_UIBB,"`V+hTQ*cY`"Lk6KiS-!j!&-T?aGf\cOUf1!KOBdcl)Tn]3$kChA)qXa<(F'd,rleOmJEXPC2CRXW.:o;5"8E1:+9s9U(A&f.=6k;k7f*7K*Kokb9Er\UIAr9<JDpsA)iPK6`G7KKn.)?VeJSnm!2#)GX]I;M03tcP4lRNr;l,$!9e<8_m0d`>'T@A%6Q/#@9Q`@"K'SDFa+64ZB7VYG47Jhp^$K&g6IJdNbk-imNZ0lV%_6[NErg9+<jROSVU/6+C[`2+/7IG,.1Hb%*X?[2Vs6LP\Oi63'6JVRYW]ISqun:&Ynh1,&6q.ZVn^@S<S?A?jH$cEMjc2#/+t=dqSA[H"&]4-TrVfcoZ&g-/gJ.dk9djdr$pYEP3TR@]jlD06\D`lQ-$fZbjE3*LdJ$bo&[ZBMLgODUjP'6&+EO?A%%rOEtVDMb:=7'A3mG0;KQu#35sqg466WDc]rY*8SO\]<KDPPZb2gXE%,(R]=2>&Z8d.IL1,Xe?2qOl:t7tf3O^TWdA=F=(E9-'_>$,!i:&OZhpmQ!<e=)P^_3YfDV]A^K3F("^^haA&2"8(ttf&;(o%3ngUD'3+^_W+ha!#N7,<n1L,Oh)!tt=O9fMIQ/::Ph/0T6a'r+g;<S.LbL#o(l:jl8~>
+endstream
 endobj
 12 0 obj
-<< /Length 1211 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(4. Historique intelligent et stock probabiliste) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(L’historique ne prétend pas maintenir un stock comptable exact. Il construit) Tj
-1 0 0 1 48 739 Tm
-(localement une estimation probabiliste destinée à éviter les doublons.) Tj
-1 0 0 1 48 709 Tm
-(Un achat n’est enregistré qu’après confirmation du flux d’achat. Le moteur tient) Tj
-1 0 0 1 48 694 Tm
-(compte du produit, de la quantité, du nombre de personnes, du temps écoulé, des) Tj
-1 0 0 1 48 679 Tm
-(habitudes d’achat et des corrections manuelles.) Tj
-1 0 0 1 48 649 Tm
-(Lorsqu’un plat est confirmé, seuls les ingrédients que le moteur avait considérés) Tj
-1 0 0 1 48 634 Tm
-(comme encore disponibles peuvent débiter cette estimation. Les débits restent liés) Tj
-1 0 0 1 48 619 Tm
-(au cycle d’achat courant.) Tj
-1 0 0 1 48 589 Tm
-(Pour les produits périssables, les plafonds de conservation du moteur restent des) Tj
-1 0 0 1 48 574 Tm
-(limites de recommandation : ils ne remplacent jamais une DLC, une DDM ou) Tj
-1 0 0 1 48 559 Tm
-(l’étiquette du produit. L’utilisateur peut toujours forcer un ingrédient.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 5/8) Tj
-ET
-endstream
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 540 960] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 12 0 R >>
+<< /Length 2204 /Filter [/ASCII85Decode /FlateDecode] >>
+stream
+GhSur99/'k%,K5YI"I5>,UEIWJ=cUJTC`R2R05ff1Rl+-*_FJ>X+*"WS$K,Y8W%m@T+hc0g(FmtAGtVqr:p.^=MhohQ6p&9n^m@!9/qT&nNWq)hjeQ6f>m!>93UV3QcF#;>kG),&CrHcAc+`@?[g7ac7.*p'robC1XUmi7Zj,6\)m/;jnu(JZW`JoX[k:l:\6u$X`VW2?3NtQT`dAJPDh6TGnDItq3$Em/<iI5\Wi'K.T)A96A:,H9A[mc(3H$Kc!WMCQk>Z%<9:M2>S#hK0FToJ6i:):bmZ!QW`VuH@]353)J6tgK-<qult_c?c/>)hJ<cVJF^AY3%*UUMVg6Is?/Ll<GIa'W-)GQud+WSBhc-a=,Jn.pAUMK,,R6(`f]LfpEWtW#W$E*-U-^0H)+$EA/KQ)I'YDF+nkD*#nHt'YQB`@XJ?l^1('\5+a'L$VX=hn^$oRPd!^o_sRM:N,7<9^[IOk!JO5D\6]KC\;Zq04'`O^$=Pkg2d>1Ac;$M5.;KT+?F!^(s>FHEcRMT6m+VQXPCZ,[N2*,5i.hQYPE<(H`[aTbVHA6TnGI>u:r-5(6saHq)+:Wktocu1u9.\S0+K7M0:kVra`?kSYqMD7d[g0p>U9f*VgHIhZ.`!Lg9b6h\j98O>?H4qFECRVKfk*cj"BX.J*Pc8FYC&X$eUK*".("cFF@70HgBLqqG1]W/g#2qJ8!FXE%l=326^*-g2WK!(96&9,088e,Y*ZH$i9bmKPY5:C>#`!tcF>"P#BLW)L)&+)Mc,Y0@YPW+K2tV-,na>s<;:LPK]UaBmeC\,Y]e""QRpO/'[K`,nqI:PgOo?e?0uocF`AKW\\<\"8gp1BV*uhNX%C,@pD%msmnA1&7(9:@0fT;qJWlUNMh=i(N9-)*rpEGN">1nJIG4N=Yq1HYP5#Ym3YO/?n-uOu>#dDn7p%`#=HgQ^;H6+TES[XWn+bfBn#oV9u2UsYOCIQ>Jp+$[:0R)SZORjOi'#H]fQU2VcH^bq^fuDMuZtMb]85:''D"sqkW6e7%SmG$RC-XNaVOT'*A8_'Z\M5Nbor58E^0;Dj:-G-k%HP@(,[c?>e(L=54ei^1HG43a$E9mpWi8s<^XhLL7AF3(A1NLtr`fALf<eWWb,l,IF&>bNHBX&<6Eot?*Ji,p.$IZ45bMI7[g&Ig;@k>2'3[$$a0uZ.UeY!5KC5r!oR+D.CqqrYWsRJW4?Qn]-s'<r-;0^Oq#b79%qfU#R)D8TlLR^ITm\3qB,SuQKNWnZGZYTQpt0MSrq#c0`P"<^%elG<K;n859U_OFP9cSa*')d.U(s\d'g)ZAX(N$BG.KomYn\I&Dts,6Ys]AhcSWOu!DZrTHgQQ+f?C7gRVHHOVMK7gBPd(gCZ^n5irE/$5BqGXXK15=JQb""oB,=_VPWO!IS`Sq?Xk.OY0DDp*.:I_N,!X7Mn#lqN6&R:c&jW8Xk[U@B`Wh[oN_'J,;bEu;/6YDTT7m13B5Xc8fN:CUAs80L52B"W_9AUpGeDXN:1U=Y%qmQ`tAf$"2W'c0$TCJH[S#Y6M1f!`nITq@m3c`nLYYt"AP(J'6HBQ9R6-5F/;e2G(&Fu!*?P*DCq.#2iQe.=_P.?3U:E!7pD,-I>l^f4dFuq*g1r[Cob/glaG\eZ<,dU$l1bgRjZ-jfR1/I'"8SqD;>p]Y<HpPW"4^Ll3!ai+[1pp@Z0>MXh.RNmXl\9BA9l+gG+*FG)a9-!G)>R2]j#lQ0)@8gm=T)!\C_ub"g+,aq!e*<Q?nS_&3fa.Q`A74-loN27:le#4F>!C/)/%J6LmL@`M?ZDd#o6klsR\6%,`/jK#RLl@fY$Rb(L.b*68cUDHGB>#ubU#P5tH.UTIH/3e!2/$#GQLpj_,I76!HVO*"g=)#c,Z.;7>G$sf:Rn_dk[oXf:48/Snh?&$VlQ);"A*5URR>:P'mc\2gmqDE.F.4%)EPFunnL[k#8IS6\<^(rtBufS[VWYS<g.B<'@V4e[4Y9h2P'c7QK$h5i3cWp=j!CQI/"<*.OPd&e7gsS+3h<A[R:Wu\8CQq71+0i;foTb7FhGAH2V0k.<]3##)Z36l?,EsuPB(Pn9!6dMF'Z0/q['71*jgOE8LWCeeiDBuqkaL%-WZlcd1eCiA'OF7dl9dh:gKGK0o-jfpiHT8$SsY,fh;GH&]R>S3N%Zflg!_,ok(U3-W[nuZI9!?',e+T#J_&@a8~>
+endstream
 endobj
 14 0 obj
-<< /Length 814 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(5. Home Assistant et sécurité) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(Home Assistant reste l’autorité de Ma liste lorsque la connexion est active. La) Tj
-1 0 0 1 48 739 Tm
-(synchronisation courante est événementielle via WebSocket ; l’application ne doit) Tj
-1 0 0 1 48 724 Tm
-(pas mettre en place de polling permanent.) Tj
-1 0 0 1 48 694 Tm
-(OAuth, WebSocket, coffre chiffré, verrouillage et biométrie sont conservés. La) Tj
-1 0 0 1 48 679 Tm
-(documentation n’accède à aucun jeton et n’ajoute aucune permission de sécurité.) Tj
-1 0 0 1 48 649 Tm
-(Les préférences locales et l’historique intelligent complètent l’expérience mais ne) Tj
-1 0 0 1 48 634 Tm
-(remplacent jamais la liste Home Assistant.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 6/8) Tj
-ET
-endstream
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 540 960] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 14 0 R >>
+<< /Length 1856 /Filter [/ASCII85Decode /FlateDecode] >>
+stream
+GhSurgMS8a&:NH>i!VS2'a7-*,]?ISh@op?PteX.^?j&BISLX)(QU`6)9X(iVLc<!l@PY.<9L0J8_]KcpV/q<k?VQcWd+::0DFRlT6r9dSmk)\A@"Ha]3h_gPps9,0.o4i'c^_dX-(amIriA&MG*RjcBU33*71QNd7;#$@?aY^O_`seroTfe]&d(oOn(n3H&B84(AW\e.6N_)9.\\bj@S)G1WV+2qXGWikVGel7DE@d(_anB@Er[@aVA/;G%D]I(ujg\Hr>\3'K-d8/pJ]AR\`t10p^J#`*^YUWqMD]TArg<QE'$9Q11@:M_O!@b,"`q;7*E`@m6k/;DTuV6nr<$dlfHi("6Z!>K9+\UpMl[$>B+eZ3^^k5U6pV9IT8pHB>.].DW#niau4e1,]H&pR&:&'gbi]XGHG![K&I?r/SUXglG5NSPXEu`.__-qg@#X;"4Qq&u"<T@co$D"Q/PO,\P[l'Vlt?VSE9H]EC?J(0*5`2<3L,T2_Y"ls?Q6b>ZUeM7T;s0mYHA#J>!UDq$cUc$3t7H`fVbRFT)o6`$36UtBR1j0<+(m?m`V*&He2-=?YMd&8^Dq<+-7j@rk5Btu.(#gQC.;5riMmDS25_419,H)d_PcjM&O/rN<M-lLB+o<ZS#A30e@@$D*9;@Q(rUjffb]T^S-Ru8FmmpGhP]`etJ0;.ZU$f7'r\pVG%Xcr0,A<NCo'XQL"%Gg@d!LC7MmN,%CfUb^*b's5Yh-Zr;N8kB+Q(M+[Vilh-He7#"`(_N7g][VgQ`*41&6ta6ciWp^eKsc?X**ud)4@@`.peX6Lco([lr9\ip6KAc[@Z!rkX=VcDA,CGeTe`C>N/?`[Af_jMu0D@a`l;0.S:%6D^gta-,\"2B&O;D-cPkh7m.ou.[,R#h-"$D7YnUcNtuH<0UIQ9$-bcE(ie\?k@8V/i/Qq+mn@m+C58jEZ)@#&eC09eB+%q$47iMk17tVK>XeTk)F:MriPc9ne2<;n8.>:J0l=bbW/!_SHj#j2kE*g6Oi_W/-N(>^9-5*.oaTR<;m"Z6am"=LAj`FZ2Iu*B&kW7oD=o-pjKp*e5)N%Z.l&tL\Z50WGKE#FbA-IlhKpC/5uYfF2E]Q6ee9_D(Xt_-E+p2@Of8S[bpTq.n-5AoS2#*t1c:2PZR@=^k8Lrg`jtHS>F,%-FHW.]-e45PW^h1-L/*4`V`/_kWRgD!ZrjZ.PHpl\*ud969aR)9cF3Q]FAc8h8IqTF%s2i0.9P36DuQK/8oIhoEO5PmCRT0@s#*^,0P/2+Rc]Z)BEnfQ$k+QdC%[aXj[nW!bS8TY7B8'u9j@>UfDeMM.&<FG=B9=--01htf_LA0eNI9ajqor0Q&JUSB?W<mq@gppgLq<jga\1CLle*:2$1MN]p`di(p*_Bpj#Wrjd$Ac(%JmQK5-SB/R%W4\Dq!^qeh6FO$WlnIAq>9rkSD39)N5/jkP]>6bbU#48k&%"0H+GWpEob[*kUq>O%t%%XH;km?$rs`9Lj]C!TLDM02T1#OY'E'!+W%h-ZI_qQ.-n28&\;<^3cM<#gU`%&l\I_m.[+jj`a.ZsV.De&AP`:DD:N<aBYI9jP*o6C8$^URa3W_:X<rD-FMX8Za,;>/&^mLSAs*kU'r-7IN.udL4W6Le',Ul:hnsa`YgF6$,W&dW#t^\ZKeq7J2\u^:8jYZ0'1%B>_/:b-fJm.bo:"1I`H_Ja^&KZMJ`+^]qFR3(=ZhN]$>J;I,sLO1u`+]0+dLV\k'2GF$r;P#;'24EEuf:Yn.G;"cp\BplDlG8QJ&Ts?2N33HJQpo8O]aKXDn*d!Ck/obGlmcj8$d@[sY7R03&ls2o,RV^B&PqI(q+0T[.namp16qDh~>
+endstream
 endobj
 16 0 obj
-<< /Length 895 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(6. Préférences, documentation et hors ligne) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(Les Préférences regroupent notamment le tri de Ma liste, la vue de démarrage, le) Tj
-1 0 0 1 48 739 Tm
-(mode d’ouverture du Catalogue, le nombre de personnes, les options d’affichage et) Tj
-1 0 0 1 48 724 Tm
-(l’Historique des achats.) Tj
-1 0 0 1 48 694 Tm
-(Le bouton Documentation ouvre ce PDF sans modifier les réglages. Le PDF est inclus) Tj
-1 0 0 1 48 679 Tm
-(dans le précache de la PWA afin de pouvoir être rouvert hors ligne après) Tj
-1 0 0 1 48 664 Tm
-(installation de la version correspondante.) Tj
-1 0 0 1 48 634 Tm
-(Le service worker renouvelle le cache applicatif lors des changements de version et) Tj
-1 0 0 1 48 619 Tm
-(conserve les ressources nécessaires à l’expérience hors ligne.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 7/8) Tj
-ET
-endstream
-endobj
-17 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 16 0 R >>
-endobj
-18 0 obj
-<< /Length 1073 >>
-stream
-BT
-/F2 17 Tf
-1 0 0 1 48 790 Tm
-(7. Demandes, test et garde-fous) Tj
-/F1 10 Tf
-1 0 0 1 48 754 Tm
-(Les produits ou plats manquants peuvent être conservés localement puis préparés) Tj
-1 0 0 1 48 739 Tm
-(pour intégration selon les règles du dépôt. La PWA n’embarque pas de token GitHub) Tj
-1 0 0 1 48 724 Tm
-(ni de clé OpenAI pour modifier directement le dépôt.) Tj
-1 0 0 1 48 694 Tm
-(Le mode test permet de vérifier l’interface sans Home Assistant sans changer les) Tj
-1 0 0 1 48 679 Tm
-(invariants de sécurité ou la priorité de la liste réelle.) Tj
-1 0 0 1 48 649 Tm
-(Garde-fous : catalog.js reste la source du catalogue ; Home Assistant reste) Tj
-1 0 0 1 48 634 Tm
-(prioritaire ; synchronisation WebSocket sans polling permanent ; sécurité jamais) Tj
-1 0 0 1 48 619 Tm
-(réduite ; pas de framework, backend ou dépendance externe sans demande explicite.) Tj
-1 0 0 1 48 589 Tm
-(Pour le détail du moteur d’historique, voir docs/HISTORIQUE_ACHATS.md dans le) Tj
-1 0 0 1 48 574 Tm
-(dépôt.) Tj
-/F1 7.5 Tf
-1 0 0 1 48 28 Tm
-(Courses - Guide de fonctionnement - v299 - page 8/8) Tj
-ET
-endstream
-endobj
-19 0 obj
-<< /Type /Page /Parent 3 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 18 0 R >>
-endobj
-20 0 obj
-<< /Type /Catalog /Pages 3 0 R >>
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 540 960] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 15 0 R >>
 endobj
 xref
-0 21
+0 17
 0000000000 65535 f 
-0000000015 00000 n 
-0000000112 00000 n 
-0000000214 00000 n 
-0000000320 00000 n 
-0000001020 00000 n 
-0000001156 00000 n 
-0000001980 00000 n 
-0000002116 00000 n 
-0000003188 00000 n 
-0000003324 00000 n 
-0000004213 00000 n 
-0000004351 00000 n 
-0000005615 00000 n 
-0000005753 00000 n 
-0000006619 00000 n 
-0000006757 00000 n 
-0000007704 00000 n 
-0000007842 00000 n 
-0000008968 00000 n 
-0000009106 00000 n 
+0000000037 00000 n 
+0000000086 00000 n 
+0000000177 00000 n 
+0000000274 00000 n 
+0000000376 00000 n 
+0000001673 00000 n 
+0000001809 00000 n 
+0000003409 00000 n 
+0000003545 00000 n 
+0000005935 00000 n 
+0000006072 00000 n 
+0000007995 00000 n 
+0000008133 00000 n 
+0000010428 00000 n 
+0000010566 00000 n 
+0000012513 00000 n 
 trailer
-<< /Size 21 /Root 20 0 R >>
+<< /Size 17 /Root 1 0 R >>
 startxref
-9156
+12651
 %%EOF
