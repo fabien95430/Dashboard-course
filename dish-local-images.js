@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v297';
+const APP_VERSION='v298';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -481,7 +481,7 @@ function retryLocalImages(){
 
 function syncListEmptyState(root){
   if(!root)return;
-  const design='premium-v2';
+  const design='premium-v3';
   const empty=root.children.length===1&&root.firstElementChild?.classList.contains('empty')?root.firstElementChild:null;
   if(empty?.classList.contains('list-empty-state')&&empty.dataset.emptyDesign===design){
     root.classList.add('is-list-home-empty');
@@ -495,7 +495,7 @@ function syncListEmptyState(root){
   empty.dataset.emptyDesign=design;
   empty.innerHTML=`
     <div class="list-empty-visual" aria-hidden="true">
-      <img src="./empty-list-premium.svg?v=1" alt="" decoding="async" draggable="false">
+      <img src="./empty-list-premium-v3.webp?v=1" alt="" decoding="async" draggable="false">
     </div>
     <div class="list-empty-copy">
       <strong>Votre liste est prête</strong>
