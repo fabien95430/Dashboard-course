@@ -42,7 +42,7 @@
   const loadQuantities=()=>{
     if(window.COURSES_QUANTITIES){loadDishes();return}
     const quantities=document.createElement('script');
-    quantities.src='./catalog-quantities.js?v=302';
+    quantities.src='./catalog-quantities.js?v=310';
     quantities.async=false;
     quantities.dataset.catalogQuantities='script';
     quantities.addEventListener('load',loadDishes,{once:true});
@@ -51,7 +51,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadQuantities();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=302';
+    images.src='./dish-local-images.js?v=310';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadQuantities,{once:true});

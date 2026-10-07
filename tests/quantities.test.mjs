@@ -36,25 +36,48 @@ test('les portions arrondissent les conditionnements à l’unité supérieure',
   assert.equal(api.getQuantity('Crème brûlée','Vanille',8),2);
 });
 
-test('les libellés audités décrivent le vrai mode d’achat',()=>{
+test('les libellés audités décrivent le mode d’achat sans exposer les références techniques',()=>{
   const api=context.window.COURSES_QUANTITIES;
   const expected={
-    'Pâté':'Barquette',
-    'Rillettes':'Pot',
-    'Thon en boîte':'Boîte',
-    'Haricots rouges':'Boîte',
-    'Pois chiches':'Boîte',
-    'Tomates pelées':'Boîte',
-    'Maïs en boîte':'Boîte',
-    'Lentilles':'Boîte',
-    'Sucre roux':'Paquet',
-    'Sucre glace':'Paquet',
-    'Vanille':'Sachet',
-    'Pain de mie':'Paquet',
-    'Mâche':'Sachet',
-    'Roquette':'Sachet'
+    'Pâté':'Barquette','Rillettes':'Pot','Jambon blanc':'Barquette',
+    'Thon en boîte':'Boîte','Haricots rouges':'Boîte','Pois chiches':'Boîte','Tomates pelées':'Boîte','Maïs en boîte':'Boîte','Lentilles':'Boîte',
+    'Farine':'Paquet','Sucre':'Paquet','Sucre roux':'Paquet','Sucre glace':'Paquet','Maïzena':'Boîte','Vanille':'Sachet','Levure chimique':'Sachet','Pépites chocolat':'Sachet',
+    'Spaghetti':'Paquet','Riz basmati':'Paquet','Nouilles chinoises':'Paquet',
+    'Crème liquide':'Brique','Œufs':'Boîte','Mozzarella':'Sachet','Parmesan':'Poids','Fromage râpé':'Sachet','Poulet':'Poids','Saumon':'Poids',
+    'Pain de mie':'Paquet','Brioche':'Paquet','Wraps':'Paquet','Pains burger':'Paquet',
+    'Fraises':'Barquette','Concombres':'Pièce','Épinards':'Sachet','Poireaux':'Botte','Champignons':'Barquette','Asperges':'Botte','Mâche':'Sachet','Roquette':'Sachet','Persil':'Botte',
+    'Mayonnaise':'Pot','Moutarde':'Pot','Sauce tomate':'Pot','Pesto':'Pot','Huile d\'olive':'Bouteille','Miel':'Pot','Chocolat noir':'Tablette',
+    'Curry':'Flacon','Lait de coco':'Boîte','Harissa':'Tube','Soupes en brique':'Brique','Croûtons':'Sachet',
+    'Vinaigre ménager':'Bouteille','Lessive capsules':'Boîte','Papier aluminium':'Rouleau','Dentifrice':'Tube','Gants ménage':'Paire','Baume lèvres':'Stick','Croquettes chat':'Sac'
   };
-  for(const [name,label] of Object.entries(expected)){
-    assert.equal(api.getPurchaseLabel(name),label,name);
+  for(const [name,label] of Object.entries(expected))assert.equal(api.getPurchaseLabel(name),label,name);
+});
+
+test('chaque produit du catalogue a un conditionnement audité sans grammage arbitraire',()=>{
+  const api=context.window.COURSES_QUANTITIES;
+  const allowed=new Set(['Boîte','Pot','Barquette','Paquet','Sachet','Bouteille','Flacon','Pièce','Botte','Poids','Sac','Tube','Brique','Paire','Rouleau','Stick','Plaquette','Tablette']);
+  const names=[];
+  for(const subgroups of Object.values(context.window.COURSES_CATALOG.groups)){
+    for(const products of Object.values(subgroups))names.push(...products);
   }
+  for(const name of names){
+    const label=api.getPurchaseLabel(name);
+    assert.ok(allowed.has(label),`${name}: ${label}`);
+    assert.doesNotMatch(label,/\d/,`${name}: pas de quantité exacte affichée`);
+  }
+});
+
+test('les lentilles suivent désormais la référence technique d’une conserve',()=>{
+  const api=context.window.COURSES_QUANTITIES;
+  assert.equal(api.getPurchaseLabel('Lentilles'),'Boîte');
+  assert.equal(api.getNeed('Saucisse lentille','Lentilles',6),480);
+  assert.equal(api.getQuantity('Saucisse lentille','Lentilles',6),2);
+});
+
+test('les références techniques restent séparées des libellés visibles',()=>{
+  const refs=context.window.COURSES_PRODUCT_PACKS;
+  assert.deepEqual(JSON.parse(JSON.stringify(refs['Thon en boîte'])),{amount:140,unit:'g'});
+  assert.deepEqual(JSON.parse(JSON.stringify(refs['Crème liquide'])),{amount:200,unit:'ml'});
+  assert.deepEqual(JSON.parse(JSON.stringify(refs['Vanille'])),{amount:1,unit:'piece'});
+  assert.deepEqual(JSON.parse(JSON.stringify(refs['Lentilles'])),{amount:400,unit:'g'});
 });

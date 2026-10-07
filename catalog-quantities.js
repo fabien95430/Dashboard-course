@@ -1,60 +1,59 @@
 (() => {
 'use strict';
 
-// Seuls les produits avec un conditionnement d'achat suffisamment stable
-// ont une référence fixe. Les autres gardent un libellé court indiquant
-// leur mode d'achat (poids, coupe, paquet, flacon, pièce, etc.).
-const PACKS=Object.freeze({
-  'Spaghetti':{label:'500 g',amount:500,unit:'g'},
-  'Penne':{label:'500 g',amount:500,unit:'g'},
-  'Coquillettes':{label:'500 g',amount:500,unit:'g'},
-  'Tagliatelles':{label:'500 g',amount:500,unit:'g'},
-  'Lasagnes':{label:'500 g',amount:500,unit:'g'},
-  'Riz basmati':{label:'500 g',amount:500,unit:'g'},
-  'Riz long':{label:'500 g',amount:500,unit:'g'},
-  'Quinoa':{label:'500 g',amount:500,unit:'g'},
-  'Couscous':{label:'500 g',amount:500,unit:'g'},
-  'Nouilles chinoises':{label:'250 g',amount:250,unit:'g'},
-  'Lardons':{label:'Barquette',amount:200,unit:'g'},
-  'Parmesan':{label:'100 g',amount:100,unit:'g'},
-  'Crème fraîche':{label:'20 cl',amount:200,unit:'ml'},
-  'Crème liquide':{label:'20 cl',amount:200,unit:'ml'},
-  'Crème épaisse':{label:'20 cl',amount:200,unit:'ml'},
-  'Œufs':{label:'Boîte de 6',amount:6,unit:'piece'},
-  'Mascarpone':{label:'250 g',amount:250,unit:'g'},
-  'Frites surgelées':{label:'1 kg',amount:1000,unit:'g'},
-  'Mozzarella':{label:'125 g',amount:125,unit:'g'},
-  'Fromage râpé':{label:'200 g',amount:200,unit:'g'},
-  'Pains burger':{label:'4 pièces',amount:4,unit:'piece'},
-  'Pains hot-dog':{label:'4 pièces',amount:4,unit:'piece'},
-  'Wraps':{label:'6 pièces',amount:6,unit:'piece'},
-  'Galettes de blé':{label:'8 pièces',amount:8,unit:'piece'},
-  'Sauce tomate':{label:'400 g',amount:400,unit:'g'},
-  'Pesto':{label:'190 g',amount:190,unit:'g'},
-  'Sauce soja':{label:'15 cl',amount:150,unit:'ml'},
-  'Moutarde':{label:'370 g',amount:370,unit:'g'},
-  'Miel':{label:'375 g',amount:375,unit:'g'},
-  'Curry':{label:'40 g',amount:40,unit:'g'},
-  'Lait de coco':{label:'40 cl',amount:400,unit:'ml'},
-  'Haricots rouges':{label:'Boîte',amount:400,unit:'g'},
-  'Pois chiches':{label:'Boîte',amount:400,unit:'g'},
-  'Tomates pelées':{label:'Boîte',amount:400,unit:'g'},
-  'Maïs en boîte':{label:'Boîte',amount:300,unit:'g'},
-  'Thon en boîte':{label:'Boîte',amount:140,unit:'g'},
-  'Lentilles':{label:'Boîte',amount:500,unit:'g'},
-  'Farine':{label:'1 kg',amount:1000,unit:'g'},
-  'Sucre':{label:'1 kg',amount:1000,unit:'g'},
-  'Beurre':{label:'250 g',amount:250,unit:'g'},
-  'Lait':{label:'1 L',amount:1000,unit:'ml'},
-  'Lait entier':{label:'1 L',amount:1000,unit:'ml'},
-  'Lait demi-écrémé':{label:'1 L',amount:1000,unit:'ml'},
-  'Lait écrémé':{label:'1 L',amount:1000,unit:'ml'},
-  'Lait sans lactose':{label:'1 L',amount:1000,unit:'ml'},
-  "Lait d'amande":{label:'1 L',amount:1000,unit:'ml'},
-  "Lait d'avoine":{label:'1 L',amount:1000,unit:'ml'},
-  'Chapelure':{label:'250 g',amount:250,unit:'g'},
-  'Croûtons':{label:'100 g',amount:100,unit:'g'},
-  'Vanille':{label:'Sachet',amount:1,unit:'piece'}
+// Références techniques utilisées uniquement pour convertir un besoin de recette
+// en nombre d'unités à ajouter. Elles ne sont jamais affichées comme un format fixe.
+const PURCHASE_REFERENCES=Object.freeze({
+  'Spaghetti':{amount:500,unit:'g'},
+  'Penne':{amount:500,unit:'g'},
+  'Coquillettes':{amount:500,unit:'g'},
+  'Tagliatelles':{amount:500,unit:'g'},
+  'Lasagnes':{amount:500,unit:'g'},
+  'Riz basmati':{amount:500,unit:'g'},
+  'Riz long':{amount:500,unit:'g'},
+  'Quinoa':{amount:500,unit:'g'},
+  'Couscous':{amount:500,unit:'g'},
+  'Nouilles chinoises':{amount:250,unit:'g'},
+  'Lardons':{amount:200,unit:'g'},
+  'Parmesan':{amount:100,unit:'g'},
+  'Crème fraîche':{amount:200,unit:'ml'},
+  'Crème liquide':{amount:200,unit:'ml'},
+  'Crème épaisse':{amount:200,unit:'ml'},
+  'Œufs':{amount:6,unit:'piece'},
+  'Mascarpone':{amount:250,unit:'g'},
+  'Frites surgelées':{amount:1000,unit:'g'},
+  'Mozzarella':{amount:125,unit:'g'},
+  'Fromage râpé':{amount:200,unit:'g'},
+  'Pains burger':{amount:4,unit:'piece'},
+  'Pains hot-dog':{amount:4,unit:'piece'},
+  'Wraps':{amount:6,unit:'piece'},
+  'Galettes de blé':{amount:8,unit:'piece'},
+  'Sauce tomate':{amount:400,unit:'g'},
+  'Pesto':{amount:190,unit:'g'},
+  'Sauce soja':{amount:150,unit:'ml'},
+  'Moutarde':{amount:370,unit:'g'},
+  'Miel':{amount:375,unit:'g'},
+  'Curry':{amount:40,unit:'g'},
+  'Lait de coco':{amount:400,unit:'ml'},
+  'Haricots rouges':{amount:400,unit:'g'},
+  'Pois chiches':{amount:400,unit:'g'},
+  'Tomates pelées':{amount:400,unit:'g'},
+  'Maïs en boîte':{amount:300,unit:'g'},
+  'Thon en boîte':{amount:140,unit:'g'},
+  'Lentilles':{amount:400,unit:'g'},
+  'Farine':{amount:1000,unit:'g'},
+  'Sucre':{amount:1000,unit:'g'},
+  'Beurre':{amount:250,unit:'g'},
+  'Lait':{amount:1000,unit:'ml'},
+  'Lait entier':{amount:1000,unit:'ml'},
+  'Lait demi-écrémé':{amount:1000,unit:'ml'},
+  'Lait écrémé':{amount:1000,unit:'ml'},
+  'Lait sans lactose':{amount:1000,unit:'ml'},
+  "Lait d'amande":{amount:1000,unit:'ml'},
+  "Lait d'avoine":{amount:1000,unit:'ml'},
+  'Chapelure':{amount:250,unit:'g'},
+  'Croûtons':{amount:100,unit:'g'},
+  'Vanille':{amount:1,unit:'piece'}
 });
 
 const PRODUCT_META=new Map();
@@ -64,7 +63,75 @@ Object.entries(window.COURSES_CATALOG?.groups||{}).forEach(([category,subgroups]
   });
 });
 
-const SALE_MODE_BY_SUB=Object.freeze({
+// Libellés visibles : mode d'achat / type de conditionnement uniquement.
+const DISPLAY_MODE_BY_SUB=Object.freeze({
+  'Laits & crèmes':'Bouteille',
+  'Yaourts & desserts':'Pot',
+  'Fromages':'Poids',
+  'Charcuterie':'Barquette',
+  'Viandes':'Poids',
+  'Poissons & traiteur':'Poids',
+  'Surgelés':'Sachet',
+  'Boulangerie':'Pièce',
+  'Fruits classiques':'Poids',
+  'Fruits rouges & exotiques':'Poids',
+  'Légumes du quotidien':'Poids',
+  'Légumes variés':'Poids',
+  'Salades & herbes':'Pièce',
+  'Pommes de terre & aromates':'Poids',
+  'Pâtes, riz & céréales':'Paquet',
+  'Conserves':'Boîte',
+  'Sauces & condiments':'Flacon',
+  'Petit-déjeuner':'Paquet',
+  'Biscuits & goûters':'Paquet',
+  'Pâtisserie & cuisine':'Paquet',
+  'Apéritif':'Sachet',
+  'Monde & pratique':'Paquet',
+  'Eaux & jus':'Bouteille',
+  'Sodas & sirops':'Bouteille',
+  'Café & thé':'Boîte',
+  'Bières & vins':'Bouteille',
+  'Entretien':'Flacon',
+  'Lessive':'Flacon',
+  'Vaisselle':'Flacon',
+  'Papier & sacs':'Paquet',
+  'Hygiène':'Flacon',
+  'Salle de bain & soins':'Flacon',
+  'Bébé & animaux':'Paquet'
+});
+
+const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
+  'Crème fraîche':'Pot','Crème liquide':'Brique','Crème épaisse':'Pot','Œufs':'Boîte','Mascarpone':'Pot',
+  'Beurre':'Plaquette','Camembert':'Pièce','Chèvre':'Pièce','Mozzarella':'Sachet','Raclette':'Barquette','Reblochon':'Pièce','Fromage râpé':'Sachet',
+  'Saucisson':'Pièce','Chorizo':'Pièce','Pâté':'Barquette','Rillettes':'Pot',
+  'Surimi':'Paquet','Saumon fumé':'Paquet','Poisson pané':'Boîte','Quiche':'Pièce','Pizza fraîche':'Boîte','Pâtes fraîches':'Paquet',
+  'Steaks hachés surgelés':'Boîte','Pizza surgelée':'Boîte','Glace vanille':'Pot','Glace chocolat':'Pot','Sorbet':'Pot','Glaçons':'Sac',
+  'Pain de mie':'Paquet','Brioche':'Paquet','Croissants':'Paquet','Pains au chocolat':'Paquet','Wraps':'Paquet','Pains burger':'Paquet','Pains hot-dog':'Paquet','Galettes de blé':'Paquet',
+  'Citrons':'Pièce','Kiwis':'Pièce','Fraises':'Barquette','Framboises':'Barquette','Myrtilles':'Barquette','Mûres':'Barquette',
+  'Ananas':'Pièce','Mangue':'Pièce','Avocat':'Pièce','Noix de coco':'Pièce','Grenade':'Pièce','Fruit de la passion':'Pièce','Melon':'Pièce',
+  'Concombres':'Pièce','Brocoli':'Pièce','Chou-fleur':'Pièce','Épinards':'Sachet','Poireaux':'Botte',
+  'Champignons':'Barquette','Courge':'Pièce','Potiron':'Pièce','Butternut':'Pièce','Fenouil':'Pièce','Céleri':'Pièce','Artichauts':'Pièce','Asperges':'Botte','Maïs':'Pièce','Radis':'Botte',
+  'Mâche':'Sachet','Roquette':'Sachet','Endives':'Sachet',
+  'Persil':'Botte','Ciboulette':'Botte','Basilic':'Botte','Coriandre':'Botte','Menthe':'Botte','Thym frais':'Botte','Romarin frais':'Botte',
+  'Ail':'Pièce','Citron vert':'Pièce','Olives fraîches':'Barquette',
+  'Mayonnaise':'Pot','Moutarde':'Pot','Sauce tomate':'Pot','Pesto':'Pot','Vinaigre balsamique':'Bouteille','Vinaigre de vin':'Bouteille','Huile d\'olive':'Bouteille','Huile de tournesol':'Bouteille',
+  'Café soluble':'Pot','Thé noir':'Boîte','Thé vert':'Boîte','Chocolat en poudre':'Boîte','Céréales':'Boîte','Confiture':'Pot','Miel':'Pot','Pâte à tartiner':'Pot',
+  'Bonbons':'Sachet','Chocolat noir':'Tablette','Chocolat au lait':'Tablette',
+  'Levure chimique':'Sachet','Levure boulangère':'Sachet','Maïzena':'Boîte','Vanille':'Sachet','Pépites chocolat':'Sachet','Noix de coco râpée':'Sachet','Amandes en poudre':'Sachet',
+  'Olives':'Pot','Crackers':'Paquet','Mini saucissons':'Paquet','Tapenade':'Pot','Houmous':'Pot',
+  'Nouilles instantanées':'Paquet','Nouilles chinoises':'Paquet','Tortillas':'Paquet','Couscous':'Paquet','Curry':'Flacon','Lait de coco':'Boîte','Harissa':'Tube','Guacamole':'Pot','Purée en flocons':'Paquet','Bouillon cubes':'Boîte','Soupes en brique':'Brique','Croûtons':'Sachet',
+  'Café décaféiné':'Paquet','Chicorée':'Pot','Matcha':'Boîte','Chocolat chaud':'Boîte','Filtres à café':'Boîte',
+  'Éponges magiques':'Paquet','Lingettes ménage':'Paquet','Bicarbonate':'Paquet','Vinaigre ménager':'Bouteille',
+  'Lessive capsules':'Boîte','Lessive poudre':'Paquet','Lingettes anti-décoloration':'Boîte','Filet de lavage':'Pièce','Pinces à linge':'Paquet','Sacs linge délicat':'Paquet',
+  'Tablettes lave-vaisselle':'Boîte','Sel lave-vaisselle':'Paquet','Éponges':'Paquet','Grattoirs':'Paquet','Brosses vaisselle':'Pièce','Gants ménage':'Paire','Torchons':'Paquet','Essuie-verres':'Paquet',
+  'Papier aluminium':'Rouleau','Film alimentaire':'Rouleau','Papier cuisson':'Rouleau',
+  'Dentifrice':'Tube','Brosses à dents':'Pièce','Cotons-tiges':'Boîte','Disques coton':'Paquet','Mouchoirs poche':'Paquet','Papier toilette humide':'Paquet',
+  'Crème hydratante':'Tube','Crème mains':'Tube','Baume lèvres':'Stick','Rasoirs':'Paquet','Coton':'Paquet','Protections hygiéniques':'Paquet','Pansements':'Boîte','Thermomètre piles':'Pièce','Pile AAA':'Paquet',
+  'Lait infantile':'Boîte','Petits pots':'Pot','Compotes bébé':'Pot','Croquettes chat':'Sac','Pâtée chat':'Boîte','Litière chat':'Sac','Croquettes chien':'Sac','Sacs déjections':'Paquet','Friandises animaux':'Paquet'
+});
+
+// Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
+const TECHNICAL_MODE_BY_SUB=Object.freeze({
   'Laits & crèmes':'Volume',
   'Yaourts & desserts':'Pot',
   'Fromages':'Poids',
@@ -100,28 +167,11 @@ const SALE_MODE_BY_SUB=Object.freeze({
   'Bébé & animaux':'Paquet'
 });
 
-const SALE_MODE_BY_PRODUCT=Object.freeze({
-  'Saucisson':'Pièce','Chorizo':'Pièce','Pâté':'Barquette','Rillettes':'Pot',
+const TECHNICAL_MODE_BY_PRODUCT=Object.freeze({
   'Surimi':'Paquet','Poisson pané':'Boîte','Quiche':'Pièce','Pizza fraîche':'Pièce','Pâtes fraîches':'Paquet',
-  'Pain de mie':'Paquet','Croissants':'Paquet','Pains au chocolat':'Paquet',
-  'Pizza surgelée':'Pièce','Glace vanille':'Pot','Glace chocolat':'Pot','Sorbet':'Pot','Glaçons':'Sac',
   'Ananas':'Pièce','Mangue':'Pièce','Avocat':'Pièce','Noix de coco':'Pièce','Grenade':'Pièce','Fruit de la passion':'Pièce','Melon':'Pièce',
   'Concombres':'Pièce','Brocoli':'Pièce','Chou-fleur':'Pièce','Courge':'Pièce','Potiron':'Pièce','Butternut':'Pièce','Fenouil':'Pièce','Céleri':'Pièce','Artichauts':'Pièce',
-  'Mâche':'Sachet','Roquette':'Sachet','Endives':'Sachet',
-  'Persil':'Botte','Ciboulette':'Botte','Basilic':'Botte','Coriandre':'Botte','Menthe':'Botte','Thym frais':'Botte','Romarin frais':'Botte',
-  'Ail':'Pièce','Citron vert':'Pièce',
-  'Café soluble':'Pot','Thé noir':'Boîte','Thé vert':'Boîte','Confiture':'Pot','Pâte à tartiner':'Pot',
-  'Levure chimique':'Sachet','Levure boulangère':'Sachet','Pépites chocolat':'Sachet','Noix de coco râpée':'Sachet','Amandes en poudre':'Sachet',
-  'Olives':'Pot','Mini saucissons':'Paquet','Tapenade':'Pot','Houmous':'Pot',
-  'Harissa':'Tube','Guacamole':'Pot','Bouillon cubes':'Boîte','Soupes en brique':'Brique',
-  'Café décaféiné':'Paquet','Chicorée':'Paquet','Matcha':'Boîte','Chocolat chaud':'Boîte','Filtres à café':'Boîte',
-  'Éponges magiques':'Paquet','Lingettes ménage':'Paquet','Bicarbonate':'Paquet',
-  'Lessive capsules':'Boîte','Lessive poudre':'Paquet','Lingettes anti-décoloration':'Boîte','Filet de lavage':'Pièce','Pinces à linge':'Paquet','Sacs linge délicat':'Paquet',
-  'Tablettes lave-vaisselle':'Boîte','Sel lave-vaisselle':'Paquet','Éponges':'Paquet','Grattoirs':'Paquet','Brosses vaisselle':'Pièce','Gants ménage':'Paire','Torchons':'Paquet','Essuie-verres':'Paquet',
-  'Papier aluminium':'Rouleau','Film alimentaire':'Rouleau','Papier cuisson':'Rouleau',
-  'Dentifrice':'Tube','Brosses à dents':'Pièce','Cotons-tiges':'Boîte','Disques coton':'Paquet','Mouchoirs poche':'Paquet','Papier toilette humide':'Paquet',
-  'Crème hydratante':'Tube','Crème mains':'Tube','Baume lèvres':'Stick','Rasoirs':'Paquet','Coton':'Paquet','Protections hygiéniques':'Paquet','Pansements':'Boîte','Thermomètre piles':'Pièce','Pile AAA':'Paquet',
-  'Lait infantile':'Boîte','Petits pots':'Pot','Compotes bébé':'Pot','Croquettes chat':'Sac','Pâtée chat':'Boîte','Litière chat':'Sac','Croquettes chien':'Sac','Sacs déjections':'Paquet','Friandises animaux':'Paquet'
+  'Ail':'Pièce','Citron vert':'Pièce'
 });
 
 // Une occurrence synchronisée avec Home Assistant représente 100 g (ou 100 ml)
@@ -189,7 +239,7 @@ let shoppingListObserver=null;
 let dialogObserver=null;
 const STORAGE_SERVINGS='courses-dish-servings-v1';
 
-window.COURSES_PRODUCT_PACKS=PACKS;
+window.COURSES_PRODUCT_PACKS=PURCHASE_REFERENCES;
 
 function servings(){
   const input=dialog?.querySelector('.dish-servings-value');
@@ -199,42 +249,33 @@ function servings(){
 function currentDish(){
   return dialog?.querySelector('.dish-sheet-head h2')?.textContent?.trim()||'';
 }
-function packFor(name){
-  const pack=PACKS[name];
-  return pack&&Number(pack.amount)>0?pack:null;
-}
-function compactPackLabel(pack){
-  const label=String(pack?.label||'').trim();
-  let match=label.match(/^Boîte de (\d+)$/i);
-  if(match)return 'Boîte ×'+match[1];
-  match=label.match(/^(\d+)\s*pièces?$/i);
-  if(match)return '×'+match[1];
-  match=label.match(/^(\d+)\s*sachets?$/i);
-  if(match)return 'Sachet ×'+match[1];
-  return label;
-}
-function saleModeLabel(name){
-  const explicit=SALE_MODE_BY_PRODUCT[name];
-  if(explicit)return explicit;
-  const meta=PRODUCT_META.get(name);
-  return SALE_MODE_BY_SUB[meta?.sub]||'Unité';
+function purchaseReferenceFor(name){
+  const reference=PURCHASE_REFERENCES[name];
+  return reference&&Number(reference.amount)>0?reference:null;
 }
 function purchaseLabel(name){
-  const pack=packFor(name);
-  return pack?compactPackLabel(pack):saleModeLabel(name);
+  const explicit=DISPLAY_MODE_BY_PRODUCT[name];
+  if(explicit)return explicit;
+  const meta=PRODUCT_META.get(name);
+  return DISPLAY_MODE_BY_SUB[meta?.sub]||'Unité';
+}
+function technicalMode(name){
+  const explicit=TECHNICAL_MODE_BY_PRODUCT[name];
+  if(explicit)return explicit;
+  const meta=PRODUCT_META.get(name);
+  return TECHNICAL_MODE_BY_SUB[meta?.sub]||'Unité';
 }
 function variablePurchaseStepFor(name){
-  if(packFor(name))return null;
-  const step=VARIABLE_PURCHASE_STEPS[saleModeLabel(name)];
+  if(purchaseReferenceFor(name))return null;
+  const step=VARIABLE_PURCHASE_STEPS[technicalMode(name)];
   if(!step)return null;
   const recipeUnit=RECIPE_UNITS[name]||'g';
   return recipeUnit===step.unit?step:null;
 }
-function auditSaleModes(){
+function auditPurchaseModes(){
   const missing=[];
   PRODUCT_META.forEach((meta,name)=>{
-    if(packFor(name))return;
-    if(SALE_MODE_BY_PRODUCT[name]||SALE_MODE_BY_SUB[meta?.sub])return;
+    if(DISPLAY_MODE_BY_PRODUCT[name]||DISPLAY_MODE_BY_SUB[meta?.sub])return;
     missing.push(name);
   });
   if(missing.length)console.warn('Catalogue : mode d’achat non défini',missing);
@@ -247,7 +288,7 @@ function needFor(name,dish=currentDish(),count=servings()){
   return Number.isFinite(perPerson)&&perPerson>0?perPerson*currentServings:null;
 }
 function quantityFor(name,dish=currentDish(),count=servings()){
-  const purchaseUnit=packFor(name)||variablePurchaseStepFor(name);
+  const purchaseUnit=purchaseReferenceFor(name)||variablePurchaseStepFor(name);
   const need=needFor(name,dish,count);
   if(!purchaseUnit||need===null)return 1;
   return Math.max(1,Math.ceil(need/purchaseUnit.amount));
@@ -322,7 +363,6 @@ function decorateProducts(){
   if(!products)return;
   products.querySelectorAll('.product[data-name]').forEach(card=>{
     const name=String(card.dataset.name||'');
-    const pack=packFor(name);
     const variableStep=variablePurchaseStepFor(name);
     const quantity=Math.max(0,Number(card.dataset.quantity)||0);
     const meta=PRODUCT_META.get(name);
@@ -344,9 +384,7 @@ function decorateProducts(){
     const measured=variableStep&&quantity>0?measuredQuantity(name,quantity):'';
     const referenceText=measured||purchaseLabel(name);
     if(reference.textContent!==referenceText)reference.textContent=referenceText;
-    reference.title=pack
-      ?'Conditionnement de référence : '+pack.label
-      :(measured?'Quantité dans Ma liste : '+measured:'Mode d’achat : '+saleModeLabel(name));
+    reference.title=measured?'Quantité dans Ma liste : '+measured:'Mode d’achat : '+purchaseLabel(name);
   });
 }
 function decorateShoppingList(){
@@ -379,7 +417,7 @@ function decorateDishRows(){
   if(!dialog?.open||!list)return;
   list.querySelectorAll('.dish-ingredient[data-ingredient]').forEach(row=>{
     const name=String(row.dataset.ingredient||'');
-    const pack=packFor(name);
+    const purchaseReference=purchaseReferenceFor(name);
     const variableStep=variablePurchaseStepFor(name);
     const need=needFor(name);
     const quantity=quantityFor(name);
@@ -387,7 +425,7 @@ function decorateDishRows(){
     const label=row.querySelector('.dish-ingredient-name');
     if(label){
       let reference=label.querySelector('.dish-ingredient-pack');
-      const text=pack?pack.label:(need!==null?'Besoin : '+formatNeed(name,need):'');
+      const text=purchaseReference?purchaseLabel(name):(need!==null?'Besoin : '+formatNeed(name,need):'');
       if(text){
         if(!reference){
           reference=document.createElement('small');
@@ -401,9 +439,9 @@ function decorateDishRows(){
     }
     const badge=row.querySelector('.dish-ingredient-check');
     if(badge){
-      if(pack){
+      if(purchaseReference){
         badge.textContent='×'+quantity;
-        badge.setAttribute('aria-label',quantity+' conditionnement'+(quantity>1?'s':'')+' de '+pack.label+' à acheter');
+        badge.setAttribute('aria-label',quantity+' '+purchaseLabel(name)+(quantity>1?'s':'')+' à acheter');
       }else if(variableStep&&need!==null){
         const purchaseAmount=measuredQuantity(name,quantity);
         badge.textContent='×'+quantity;
@@ -478,7 +516,7 @@ function bind(){
   products=document.getElementById('products');
   shoppingList=document.getElementById('listItems');
   if(!dialog||!list||!products||!shoppingList)return false;
-  auditSaleModes();
+  auditPurchaseModes();
   ensureStyles();
   buildServingsControl();
   decorateProducts();
