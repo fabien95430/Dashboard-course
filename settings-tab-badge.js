@@ -266,6 +266,8 @@ function initMissingProductsDialogFrame(){
   if(!dialog)return;
 
   const DIALOG_TOP_OFFSET=18;
+  const DIALOG_HEIGHT_RATIO=.84;
+  const DIALOG_MAX_HEIGHT=720;
   let floorHeight=0;
   let pinnedTop=null;
   let frame=0;
@@ -287,7 +289,11 @@ function initMissingProductsDialogFrame(){
     frame=0;
     if(!dialog.open)return;
     const rect=dialog.getBoundingClientRect();
-    if(pinnedTop===null)pinnedTop=rect.top+DIALOG_TOP_OFFSET;
+    if(pinnedTop===null){
+      const viewportHeight=window.innerHeight||document.documentElement.clientHeight||rect.height;
+      const referenceHeight=Math.min(viewportHeight*DIALOG_HEIGHT_RATIO,DIALOG_MAX_HEIGHT);
+      pinnedTop=Math.max(0,(viewportHeight-referenceHeight)/2+DIALOG_TOP_OFFSET);
+    }
     floorHeight=Math.max(floorHeight,rect.height);
     dialog.style.top=Math.round(pinnedTop)+'px';
     dialog.style.bottom='auto';
