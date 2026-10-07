@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v277';
+const APP_VERSION='v278';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -69,6 +69,21 @@ function syncPageVersions(){
     style.textContent=`
       .catalog-view .page-header h1::after{content:none!important}
       .dish-card img[src^="https://images.pexels.com/"],.dish-sheet-photo[src^="https://images.pexels.com/"]{visibility:hidden!important}
+      .catalog-view .product:not(.is-selected) .badge{font-size:0!important}
+      .catalog-view .product:not(.is-selected) .badge::before,.catalog-view .product:not(.is-selected) .badge::after{
+        content:'';
+        position:absolute;
+        left:50%;
+        top:50%;
+        width:11px;
+        height:1.6px;
+        border-radius:999px;
+        background:currentColor;
+        transform:translate(-50%,-50%);
+        pointer-events:none;
+      }
+      .catalog-view .product:not(.is-selected) .badge::after{transform:translate(-50%,-50%) rotate(90deg)}
+      #missingProductsDialog .missing-request-thumb.is-dessert svg path:nth-of-type(3){transform:translateX(-3px)}
       .list-row-menu{
         padding:0!important;
         border:1px solid rgba(255,255,255,.22)!important;
