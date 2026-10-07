@@ -1,5 +1,15 @@
 # Règles agent
 
+## Module propriétaire et factorisation
+
+Pour modifier un comportement existant, modifier le module qui en est propriétaire. Ne pas ajouter un script correctif, une interception de clic, un MutationObserver ou une surcharge CSS uniquement pour contourner ce module.
+
+Une extraction en module partagé est appropriée si elle remplace réellement les implémentations concurrentes. Garder une seule source de vérité pour le comportement extrait et supprimer les anciennes voies dans la même demande.
+
+Avant d'unifier une logique métier, fixer ses résultats attendus dans des tests exécutables. Vérifier aussi le comportement affiché lorsqu'il dépend d'événements UI (input, change, blur, clic). Les tests Node se lancent avec `node --test tests/*.test.mjs`.
+
+Ne pas remplacer globalement les méthodes natives du navigateur pour récupérer un état interne. La suppression du pont existant sur `WebSocket.prototype.send` est une priorité haute : exposer un client Home Assistant partagé en préservant la fermeture au verrouillage et la confidentialité des jetons.
+
 ## Commits
 
 Pour chaque demande validée, faire un seul commit atomique contenant tous les fichiers nécessaires.

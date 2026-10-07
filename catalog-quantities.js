@@ -179,14 +179,12 @@ let dialog=null;
 let list=null;
 let products=null;
 let shoppingList=null;
-let searchInput=null;
-let catalogView=null;
 let pending=false;
 let productObserver=null;
 let listObserver=null;
 let shoppingListObserver=null;
 let dialogObserver=null;
-let toastTimer=0;
+const STORAGE_SERVINGS='courses-dish-servings-v1';
 
 window.COURSES_PRODUCT_PACKS=PACKS;
 
@@ -234,16 +232,16 @@ function auditSaleModes(){
   });
   if(missing.length)console.warn('Catalogue : mode d’achat non défini',missing);
 }
-function needFor(name){
-  const currentServings=servings();
-  const dishNeed=Number(DISH_NEEDS_FOR_FOUR[currentDish()]?.[name]);
+function needFor(name,dish=currentDish(),count=servings()){
+  const currentServings=Math.max(1,Math.min(12,Math.round(Number(count)||BASE_SERVINGS)));
+  const dishNeed=Number(DISH_NEEDS_FOR_FOUR[dish]?.[name]);
   if(Number.isFinite(dishNeed)&&dishNeed>0)return dishNeed*currentServings/BASE_SERVINGS;
   const perPerson=Number(NEED_PER_PERSON[name]);
   return Number.isFinite(perPerson)&&perPerson>0?perPerson*currentServings:null;
 }
-function quantityFor(name){
+function quantityFor(name,dish=currentDish(),count=servings()){
   const purchaseUnit=packFor(name)||variablePurchaseStepFor(name);
-  const need=needFor(name);
+  const need=needFor(name,dish,count);
   if(!purchaseUnit||need===null)return 1;
   return Math.max(1,Math.ceil(need/purchaseUnit.amount));
 }
@@ -413,124 +411,68 @@ function decorateDishRows(){
 function scheduleDishRefresh(){
   queueMicrotask(()=>requestAnimationFrame(decorateDishRows));
 }
-function nextPaint(){
-  return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+function setServings(value){
+  const input=dialog?.querySelector('.dish-servings-value');
+  if(!input)return;
+  const next=Math.max(1,Math.min(12,Math.round(Number(value)||BASE_SERVINGS)));
+  input.value=String(next);
+  try{localStorage.setItem(STORAGE_SERVINGS,String(next))}catch(_){}
+  decorateDishRows();
 }
-function setProductQuery(value){
-  if(!searchInput)return;
-  searchInput.value=value;
-  searchInput.dispatchEvent(new Event('input',{bubbles:true}));
-}
-function currentCard(name){
-  return [...(products?.querySelectorAll('.product')||[])].find(card=>String(card.dataset.name||'')===name)||null;
-}
-function waitForQuantity(name,before,timeout=14000){
-  return new Promise(resolve=>{
-    const started=Date.now();
-    let observer=null;
-    let timer=0;
-    let done=false;
-    const finish=value=>{
-      if(done)return;
-      done=true;
-      observer?.disconnect();
-      clearTimeout(timer);
-      resolve(value);
-    };
-    const check=()=>{
-      const quantity=Math.max(0,Number(currentCard(name)?.dataset.quantity)||0);
-      if(quantity>before){finish(quantity);return true}
-      if(Date.now()-started>=timeout){finish(quantity);return true}
-      return false;
-    };
-    if(check())return;
-    observer=new MutationObserver(check);
-    if(products)observer.observe(products,{subtree:true,childList:true,attributes:true,attributeFilter:['data-quantity']});
-    timer=setTimeout(()=>finish(Math.max(0,Number(currentCard(name)?.dataset.quantity)||0)),timeout);
+function buildServingsControl(){
+  const head=dialog?.querySelector('.dish-sheet-head');
+  if(!head||head.querySelector('.dish-servings'))return;
+  const block=document.createElement('div');
+  block.className='dish-servings';
+  block.innerHTML='<strong>Nombre de personnes</strong><div class="dish-servings-control"><button type="button" class="dish-servings-step" data-step="-1" aria-label="Retirer une personne">−</button><input class="dish-servings-value" type="number" inputmode="numeric" min="1" max="12" step="1" aria-label="Nombre de personnes"><button type="button" class="dish-servings-step" data-step="1" aria-label="Ajouter une personne">+</button></div>';
+  head.appendChild(block);
+  const input=block.querySelector('input');
+  let saved=BASE_SERVINGS;
+  try{saved=localStorage.getItem(STORAGE_SERVINGS)||BASE_SERVINGS}catch(_){}
+  setServings(saved);
+  block.querySelectorAll('.dish-servings-step').forEach(button=>button.addEventListener('click',()=>{
+    setServings(servings()+Number(button.dataset.step||0));
+    navigator.vibrate?.(4);
+  }));
+  input.addEventListener('input',()=>{
+    const value=Number(input.value);
+    if(Number.isFinite(value)&&value>=1&&value<=12)setServings(value);
   });
+  input.addEventListener('change',()=>setServings(input.value));
+  input.addEventListener('blur',()=>setServings(input.value));
 }
-async function ensureIngredient(name,target){
-  setProductQuery(name);
-  await nextPaint();
-  let card=currentCard(name);
-  if(!card)return {added:0,failed:1,present:0};
-  let quantity=Math.max(0,Number(card.dataset.quantity)||0);
-  if(quantity>=target)return {added:0,failed:0,present:1};
-  let added=0;
-  while(quantity<target){
-    card=currentCard(name);
-    const button=card?.querySelector('.badge');
-    if(!button)return {added,failed:1,present:0};
-    const before=quantity;
-    button.click();
-    const next=await waitForQuantity(name,before);
-    if(next<=before)return {added,failed:1,present:0};
-    added+=next-before;
-    quantity=next;
-  }
-  return {added,failed:0,present:0};
-}
-function showToast(message){
-  const toast=document.getElementById('toast');
-  if(!toast)return;
-  clearTimeout(toastTimer);
-  toast.textContent=message;
-  toast.classList.add('is-visible');
-  toastTimer=setTimeout(()=>toast.classList.remove('is-visible'),2200);
-}
-async function addSelectedQuantities(button){
-  if(pending||button.disabled||!dialog||!list)return;
-  const rows=[...list.querySelectorAll('.dish-ingredient[aria-pressed="true"]:not([disabled])')];
-  if(!rows.length)return;
+async function addSelectedQuantities(){
+  if(pending)throw new Error('Ajout déjà en cours');
+  if(!dialog||!list)throw new Error('Fiche du plat indisponible');
+  const tasks=[...list.querySelectorAll('.dish-ingredient[aria-pressed="true"]:not([disabled])')]
+    .map(row=>({name:String(row.dataset.ingredient||''),target:quantityFor(String(row.dataset.ingredient||''))}));
+  const result={added:0,failed:0,present:0};
   pending=true;
-  const title=currentDish();
-  const userQuery=String(searchInput?.value||'');
-  button.classList.add('is-busy');
-  button.disabled=true;
-  const buttonLabel=button.querySelector('span');
-  if(buttonLabel)buttonLabel.textContent='Ajout en cours…';
-  const tasks=rows.map(row=>{
-    const name=String(row.dataset.ingredient||'');
-    return {name,target:quantityFor(name)};
-  });
-  catalogView?.classList.add('dish-driving');
-  let added=0,failed=0,present=0;
   try{
     for(const task of tasks){
-      const result=await ensureIngredient(task.name,task.target);
-      added+=result.added;
-      failed+=result.failed;
-      present+=result.present;
+      const item=await window.COURSES_LIST.ensureQuantity(task.name,task.target);
+      result.added+=item.added;
+      result.failed+=item.failed;
+      result.present+=item.present;
     }
-  }finally{
-    setProductQuery(userQuery);
-    await nextPaint();
-    catalogView?.classList.remove('dish-driving');
-    pending=false;
-    button.classList.remove('is-busy');
-  }
-  dialog.querySelector('.dish-sheet-close')?.click();
-  navigator.vibrate?.(added?[12,35,12]:10);
-  if(failed){
-    showToast('Ajout partiel · '+added+' unité'+(added>1?'s':'')+' ajoutée'+(added>1?'s':'')+' · '+failed+' erreur'+(failed>1?'s':''));
-    return;
-  }
-  if(!added){
-    showToast('Les quantités nécessaires sont déjà dans Ma liste');
-    return;
-  }
-  showToast(title+' · '+added+' unité'+(added>1?'s':'')+' ajoutée'+(added>1?'s':'')+(present?' · '+present+' déjà dans Ma liste':''));
+    return result;
+  }finally{pending=false}
 }
+window.COURSES_QUANTITIES=Object.freeze({
+  getQuantity:(dish,name,count)=>quantityFor(name,dish,count),
+  getNeed:(dish,name,count)=>needFor(name,dish,count),
+  addSelected:addSelectedQuantities,
+  bind
+});
 function bind(){
   dialog=document.getElementById('dishDialog');
   list=dialog?.querySelector('.dish-sheet-list');
   products=document.getElementById('products');
   shoppingList=document.getElementById('listItems');
-  searchInput=document.getElementById('productSearch');
-  catalogView=document.getElementById('catalogView');
-  if(!dialog||!list||!products||!shoppingList||!searchInput)return false;
+  if(!dialog||!list||!products||!shoppingList)return false;
   auditSaleModes();
   ensureStyles();
+  buildServingsControl();
   decorateProducts();
   decorateShoppingList();
   decorateDishRows();
@@ -551,28 +493,6 @@ function bind(){
   dialogObserver=new MutationObserver(scheduleDishRefresh);
   dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open']});
 
-  dialog.addEventListener('input',event=>{
-    if(event.target?.classList?.contains('dish-servings-value'))scheduleDishRefresh();
-  },true);
-  dialog.addEventListener('click',event=>{
-    if(event.target?.closest?.('.dish-servings-step'))scheduleDishRefresh();
-    const button=event.target?.closest?.('.dish-sheet-add');
-    if(!button||button.disabled||pending)return;
-    decorateDishRows();
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    void addSelectedQuantities(button);
-  },true);
   return true;
 }
-function init(){
-  if(bind())return;
-  const observer=new MutationObserver(()=>{
-    if(bind())observer.disconnect();
-  });
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(()=>observer.disconnect(),10000);
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
-else init();
 })();

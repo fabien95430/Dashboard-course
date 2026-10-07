@@ -9,7 +9,6 @@
 
 (() => {
   'use strict';
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v270';});
 
   const style=document.createElement('link');
   style.rel='stylesheet';
@@ -26,7 +25,7 @@
   const loadLiquid=()=>{
     if(document.querySelector('script[data-catalog-liquid]'))return;
     const liquid=document.createElement('script');
-    liquid.src='./catalog-liquid.js?v=2';
+    liquid.src='./catalog-liquid.js?v=297';
     liquid.async=false;
     liquid.dataset.catalogLiquid='script';
     document.body.appendChild(liquid);
@@ -34,19 +33,28 @@
   const loadDishes=()=>{
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
     const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=2';
+    script.src='./dishes-ui.js?v=297';
     script.async=false;
     script.dataset.catalogDishes='script';
     script.addEventListener('load',loadLiquid,{once:true});
     document.body.appendChild(script);
   };
+  const loadQuantities=()=>{
+    if(window.COURSES_QUANTITIES){loadDishes();return}
+    const quantities=document.createElement('script');
+    quantities.src='./catalog-quantities.js?v=297';
+    quantities.async=false;
+    quantities.dataset.catalogQuantities='script';
+    quantities.addEventListener('load',loadDishes,{once:true});
+    document.body.appendChild(quantities);
+  };
   const load=()=>{
-    if(document.querySelector('script[data-dish-local-images]')){loadDishes();return}
+    if(document.querySelector('script[data-dish-local-images]')){loadQuantities();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=1';
+    images.src='./dish-local-images.js?v=297';
     images.async=false;
     images.dataset.dishLocalImages='script';
-    images.addEventListener('load',loadDishes,{once:true});
+    images.addEventListener('load',loadQuantities,{once:true});
     document.body.appendChild(images);
   };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});

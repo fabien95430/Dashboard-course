@@ -1828,6 +1828,38 @@ async function refreshItems(){
     status('is-error','Courses indisponible',state.error);
   }
 }
+function productQuantity(name){
+  return activeGroups().find(group=>norm(group.summary)===norm(name))?.count||0;
+}
+async function ensureProductQuantity(name,target){
+  const product=BY_NAME.get(norm(name));
+  const goal=Number(target);
+  const failed=(added=0)=>({added,failed:1,present:0});
+  if(!product||!Number.isSafeInteger(goal)||goal<1||goal>100)return failed();
+  const item=product.name,key=norm(item),entity=state.entity,demo=state.demo;
+  if(state.locked||state.productBusy.has(key))return failed();
+  let quantity=productQuantity(item),added=0;
+  if(quantity>=goal)return {added:0,failed:0,present:1};
+  state.productBusy.add(key);
+  try{
+    while(quantity<goal){
+      if(state.locked||state.demo!==demo||state.entity!==entity)return failed(added);
+      if(!await addItem(item))return failed(added);
+      added+=1;
+      const next=productQuantity(item);
+      // Stop after an unconfirmed refresh rather than retrying an accepted write.
+      if(next<=quantity)return failed(added);
+      quantity=next;
+    }
+    return {added,failed:0,present:0};
+  }catch(error){
+    return failed(added);
+  }finally{
+    state.productBusy.delete(key);
+    renderSelectionAndList();
+  }
+}
+window.COURSES_LIST=Object.freeze({getQuantity:productQuantity,ensureQuantity:ensureProductQuantity});
 async function incrementProduct(name){
   const item=String(name||'').trim();
   if(!item)return;
@@ -1867,12 +1899,12 @@ async function addItem(name){
     const items=loadJson(DEMO_KEY,[])||[];
     items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
     saveJson(DEMO_KEY,items);state.items=items;recordUsage(item);
-    navigator.vibrate?.(10);toast(item+' ajouté');renderSelectionAndList();return;
+    navigator.vibrate?.(10);toast(item+' ajouté');renderSelectionAndList();return true;
   }
   if(!state.entity)return;
   try{
     await todoService('add_item',{item});
-    recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();
+    recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();return true;
   }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
 }
 async function completeTodoItem(uid){

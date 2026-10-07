@@ -47,6 +47,16 @@ Dans **Ma liste**, un glissement horizontal vers la gauche révèle **✓ Achet�
 
 ## Test sans Home Assistant
 
+Les tests de calcul des quantités et de disponibilité du précache s'exécutent avec Node.js 22 ou plus récent, sans installation de dépendances :
+
+```sh
+node --test tests/*.test.mjs
+```
+
+`catalog-quantities.js` possède le calcul des besoins, des conditionnements et le contrôle des portions. `dishes-ui.js` possède la confirmation d'ajout et appelle ce module. Les ajouts passent par `COURSES_LIST.ensureQuantity` dans `app.js`, sans simuler de clic sur une carte produit. Les achats à quantité variable conservent le modèle introduit en v295 : une occurrence synchronisée représente 100 g (ou 100 ml), et le besoin culinaire est affiché séparément.
+
+Le contrôle navigateur facultatif `node tests/browser-quantities.cjs` nécessite Playwright et Chromium (ou `BROWSER_CHANNEL=msedge` pour Edge installé). Il vérifie les badges après perte du focus, les ajouts en mode démo, les doubles clics et un échec partiel simulé. Il remplace les images manquantes par des placeholders et ne valide ni le rendu PWA iPhone ni une connexion Home Assistant réelle.
+
 Le bouton **Tester sans Home Assistant** permet de vérifier immédiatement la recherche, les catégories et la liste. Les données de ce mode restent uniquement dans le stockage local du navigateur.
 
 ## Liste Home Assistant partagée

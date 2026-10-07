@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v296';
+const APP_VERSION='v297';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -249,14 +249,6 @@ function installMissingProductsFixes(){
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);
   }
-}
-function installCatalogQuantities(){
-  if(document.querySelector('script[data-catalog-quantities]'))return;
-  const script=document.createElement('script');
-  script.src='./catalog-quantities.js?v=4';
-  script.defer=true;
-  script.dataset.catalogQuantities='1';
-  document.head.appendChild(script);
 }
 function installProductItemImages(){
   if(document.querySelector('script[data-product-item-images]'))return;
@@ -564,7 +556,6 @@ function bind(){
 syncPageVersions();
 installVisualWarmupStyle();
 installMissingProductsFixes();
-installCatalogQuantities();
 installProductItemImages();
 installPurchaseIntelligence();
 bindSecurityKeyboardViewport();

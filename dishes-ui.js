@@ -271,6 +271,7 @@ function buildDishDialog(){
   dishConfirmButton.addEventListener('click',confirmDishAdd);
   dishDialog.addEventListener('click',event=>{if(event.target===dishDialog)closeDishSheet()});
   dishDialog.addEventListener('cancel',event=>{event.preventDefault();closeDishSheet()});
+  window.COURSES_QUANTITIES.bind();
 }
 function validateDishes(){
   const missing=[];
@@ -483,23 +484,28 @@ function renderDishSheetIngredients(){
   dishConfirmButton.querySelector('span').textContent=count?'Ajouter à ma liste':'Sélectionnez un ingrédient';
 }
 async function confirmDishAdd(){
-  if(!currentDish||busyDish||!selectedIngredients.size)return;
+  if(!currentDish||busyDish||dishConfirmButton.disabled)return;
   cancelIngredientThumbs();
   const dish=currentDish;
-  const ingredients=dish.ingredients.filter(name=>selectedIngredients.has(name));
+  busyDish=dish.name;
   dishConfirmButton.classList.add('is-busy');
   dishConfirmButton.disabled=true;
   dishConfirmButton.querySelector('span').textContent='Ajout en cours…';
-  const result=await addDish(dish,ingredients);
-  dishConfirmButton.classList.remove('is-busy');
-  if(dishDialog.open)dishDialog.close();else dishDialog.removeAttribute('open');
-  document.documentElement.classList.remove('dish-sheet-open');
-  currentDish=null;
-  selectedIngredients.clear();
+  let result;
+  try{
+    result=await window.COURSES_QUANTITIES.addSelected();
+  }catch(error){
+    showToast('Ajout impossible');
+    return;
+  }finally{
+    busyDish='';
+    dishConfirmButton.classList.remove('is-busy');
+    closeDishSheet();
+  }
   navigator.vibrate?.(result.added?[12,35,12]:10);
-  if(result.failed){showToast('Ajout partiel · '+result.added+' ajouté'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
-  if(!result.added){showToast('Les ingrédients sélectionnés sont déjà dans Ma liste');return}
-  showToast(dish.name+' · '+result.added+' ingrédient'+(result.added>1?'s':'')+' ajouté'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà présent'+(result.present>1?'s':''):' '));
+  if(result.failed){showToast('Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
+  if(!result.added){showToast('Les quantités nécessaires sont déjà dans Ma liste');return}
+  showToast(dish.name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':''));
 }
 function setHiddenCatalogQuery(value){
   drivingCatalog=true;
@@ -508,55 +514,8 @@ function setHiddenCatalogQuery(value){
   drivingCatalog=false;
 }
 function nextPaint(){return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))}
-function waitForAdded(card,before,timeout=14000){
-  const start=Date.now();
-  return new Promise(resolve=>{
-    const check=()=>{
-      if(!card.isConnected||Number(card.dataset.quantity||0)>before)return resolve(true);
-      if(Date.now()-start>=timeout)return resolve(false);
-      setTimeout(check,90);
-    };
-    check();
-  });
-}
-async function addIngredient(name){
-  setHiddenCatalogQuery(name);
-  await nextPaint();
-  const cards=[...productsGrid.querySelectorAll('.product')];
-  const card=cards.find(item=>item.dataset.name===name);
-  if(!card)return 'present';
-  const before=Number(card.dataset.quantity||0);
-  if(before>0)return 'present';
-  const addButton=card.querySelector('.badge');
-  if(!addButton)return 'failed';
-  addButton.click();
-  return await waitForAdded(card,before)?'added':'failed';
-}
-async function addDish(dish,ingredients){
-  if(busyDish)return {added:0,present:0,failed:0};
-  busyDish=dish.name;
-  const userQuery=searchInput.value;
-  catalogView.classList.add('dish-driving');
-  let added=0,present=0,failed=0;
-  try{
-    for(const ingredient of ingredients){
-      const result=await addIngredient(ingredient);
-      if(result==='added')added+=1;
-      else if(result==='present')present+=1;
-      else failed+=1;
-    }
-  }finally{
-    setHiddenCatalogQuery(userQuery);
-    await nextPaint();
-    catalogView.classList.remove('dish-driving');
-    busyDish='';
-    renderDishes();
-  }
-  return {added,present,failed};
-}
 
 function init(){
-  document.querySelectorAll('.page-version').forEach(el=>{el.textContent='v192'});
   buildUi();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
