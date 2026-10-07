@@ -29,13 +29,33 @@ test('le choix d une catégorie produit ne déclenche pas un clic synthétique q
   assert.doesNotMatch(source,/original\?\.click\(\);/);
 });
 
+test('la personnalisation des recettes se réinitialise durablement et s enregistre sans fermer le popup',()=>{
+  const source=read('dishes-ui.js');
+  const resetStart=source.indexOf('function resetRecipeCustomizationDraft()');
+  const resetEnd=source.indexOf('function recipeCustomizationMatchesBase()',resetStart);
+  const saveStart=source.indexOf('function saveRecipeCustomization()');
+  const saveEnd=source.indexOf('function validateDishes()',saveStart);
+  assert.ok(resetStart>=0&&resetEnd>resetStart,'fonction de réinitialisation introuvable');
+  assert.ok(saveStart>=0&&saveEnd>saveStart,'fonction d enregistrement introuvable');
+  const reset=source.slice(resetStart,resetEnd);
+  const save=source.slice(saveStart,saveEnd);
+  assert.match(reset,/delete recipeCustomizations\[dish\.name\]/);
+  assert.match(reset,/persistRecipeCustomizations\(\)/);
+  assert.match(reset,/resetRecipeNeeds\?\.\(dish\.name\)/);
+  assert.match(reset,/showToast\('Recette '\+dish\.name\+' réinitialisée'\)/);
+  assert.match(save,/setRecipeNeeds\?\.\(dish\.name,recipeCustomizationNeeds\)/);
+  assert.match(save,/loadRecipeCustomizationDish\(dish\.name\)/);
+  assert.doesNotMatch(save,/recipeCustomizationDialog\.close\(\)/);
+});
+
 test('les ressources modifiées sont versionnées pour le cache',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
   assert.match(index,/catalog\.js\?v=325/);
   assert.match(index,/settings-tab-badge\.js\?v=322/);
-  assert.match(sw,/courses-app-v325-r1/);
+  assert.match(sw,/courses-app-v326-r1/);
   assert.match(sw,/missing-products-dishes\.js\?v=4/);
-  assert.match(sw,/dishes-ui\.js\?v=324/);
-  assert.match(sw,/dish-local-images\.js\?v=325/);
+  assert.match(sw,/catalog\.js\?v=326/);
+  assert.match(sw,/dishes-ui\.js\?v=326/);
+  assert.match(sw,/dish-local-images\.js\?v=326/);
 });

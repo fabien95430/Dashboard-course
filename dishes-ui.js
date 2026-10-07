@@ -432,6 +432,9 @@ function renderRecipeCustomizationDishOptions(){
 function resetRecipeCustomizationDraft(){
   const dish=recipeCustomizationDish;
   if(!dish)return;
+  delete recipeCustomizations[dish.name];
+  persistRecipeCustomizations();
+  recipeQuantities()?.resetRecipeNeeds?.(dish.name);
   recipeCustomizationSelection=new Set(dish.ingredients);
   recipeCustomizationNeeds={};
   dish.ingredients.forEach(name=>{
@@ -439,6 +442,7 @@ function resetRecipeCustomizationDraft(){
     if(Number.isFinite(amount)&&amount>0)recipeCustomizationNeeds[name]=amount;
   });
   renderRecipeCustomizationIngredients();
+  showToast('Recette '+dish.name+' réinitialisée');
 }
 function recipeCustomizationMatchesBase(){
   const dish=recipeCustomizationDish;
@@ -524,7 +528,8 @@ function saveRecipeCustomization(){
   persistRecipeCustomizations();
   recipeQuantities()?.setRecipeNeeds?.(dish.name,recipeCustomizationNeeds);
   hideRecipeCustomizationSuggestions();
-  recipeCustomizationDialog.close();
+  loadRecipeCustomizationDish(dish.name);
+  recipeCustomizationSearch.value=dish.name;
   showToast('Recette '+dish.name+' personnalisée');
 }
 function validateDishes(){
