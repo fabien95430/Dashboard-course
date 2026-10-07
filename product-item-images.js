@@ -1,9 +1,11 @@
 (() => {
 'use strict';
 
-const CATEGORY='Fruits & Légumes';
-const groups=window.COURSES_CATALOG?.groups?.[CATEGORY]||{};
-const PRODUCT_NAMES=new Set(Object.values(groups).flatMap(names=>Array.isArray(names)?names:[]));
+const CATEGORIES=['Fruits & Légumes','Frais'];
+const PRODUCT_NAMES=new Set(CATEGORIES.flatMap(category=>{
+  const groups=window.COURSES_CATALOG?.groups?.[category]||{};
+  return Object.values(groups).flatMap(names=>Array.isArray(names)?names:[]);
+}));
 let products=null;
 let observer=null;
 
@@ -59,6 +61,13 @@ function ensureStyles(){
   `;
   document.head.appendChild(style);
 }
+function restoreAtlas(card,sprite,image){
+  const source=image.dataset.singleProductAtlasSource||'';
+  if(!source)return;
+  card.classList.remove('has-single-product-image');
+  sprite.classList.remove('is-single-product-image');
+  image.src=source;
+}
 function decorateCard(card){
   const name=String(card?.dataset?.name||'');
   if(!PRODUCT_NAMES.has(name))return;
@@ -68,10 +77,12 @@ function decorateCard(card){
   const source=imageSource(name);
   card.classList.add('has-single-product-image');
   if(image.dataset.singleProductSource===source)return;
+  image.dataset.singleProductAtlasSource=image.getAttribute('src')||'';
   image.dataset.singleProductSource=source;
   sprite.classList.add('is-single-product-image');
   sprite.classList.remove('is-fallback');
   image.addEventListener('load',()=>sprite.classList.remove('is-fallback'),{once:true});
+  image.addEventListener('error',()=>restoreAtlas(card,sprite,image),{once:true});
   image.src=source;
 }
 function decorateProducts(){
