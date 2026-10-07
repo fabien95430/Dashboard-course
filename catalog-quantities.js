@@ -121,6 +121,15 @@ const SALE_MODE_BY_PRODUCT=Object.freeze({
   'Lait infantile':'Boîte','Petits pots':'Pot','Compotes bébé':'Pot','Croquettes chat':'Sac','Pâtée chat':'Boîte','Litière chat':'Sac','Croquettes chien':'Sac','Sacs déjections':'Paquet','Friandises animaux':'Paquet'
 });
 
+// Une occurrence synchronisée avec Home Assistant représente 100 g (ou 100 ml)
+// pour les produits vendus à quantité variable. Cela conserve le modèle actuel
+// de quantité par doublons tout en permettant aux plats de transporter leur besoin réel.
+const VARIABLE_PURCHASE_STEPS=Object.freeze({
+  'Poids':{amount:100,unit:'g'},
+  'Coupe':{amount:100,unit:'g'},
+  'Volume':{amount:100,unit:'ml'}
+});
+
 // Besoin culinaire, indépendant du conditionnement du produit.
 const NEED_PER_PERSON=Object.freeze({
   'Spaghetti':100,'Penne':100,'Coquillettes':100,'Tagliatelles':100,'Lasagnes':100,
@@ -169,11 +178,13 @@ const BASE_SERVINGS=4;
 let dialog=null;
 let list=null;
 let products=null;
+let shoppingList=null;
 let searchInput=null;
 let catalogView=null;
 let pending=false;
 let productObserver=null;
 let listObserver=null;
+let shoppingListObserver=null;
 let dialogObserver=null;
 let toastTimer=0;
 
@@ -207,6 +218,13 @@ function saleModeLabel(name){
   const meta=PRODUCT_META.get(name);
   return SALE_MODE_BY_SUB[meta?.sub]||'Unité';
 }
+function variablePurchaseStepFor(name){
+  if(packFor(name))return null;
+  const step=VARIABLE_PURCHASE_STEPS[saleModeLabel(name)];
+  if(!step)return null;
+  const recipeUnit=RECIPE_UNITS[name]||'g';
+  return recipeUnit===step.unit?step:null;
+}
 function auditSaleModes(){
   const missing=[];
   PRODUCT_META.forEach((meta,name)=>{
@@ -224,10 +242,10 @@ function needFor(name){
   return Number.isFinite(perPerson)&&perPerson>0?perPerson*currentServings:null;
 }
 function quantityFor(name){
-  const pack=packFor(name);
+  const purchaseUnit=packFor(name)||variablePurchaseStepFor(name);
   const need=needFor(name);
-  if(!pack||need===null)return 1;
-  return Math.max(1,Math.ceil(need/pack.amount));
+  if(!purchaseUnit||need===null)return 1;
+  return Math.max(1,Math.ceil(need/purchaseUnit.amount));
 }
 function formatNumber(value){
   return Number.isInteger(value)?String(value):String(Math.round(value*10)/10).replace('.',',');
@@ -246,6 +264,11 @@ function formatNeed(name,need){
   }
   if(need>=1000)return formatNumber(need/1000)+' kg';
   return formatNumber(need)+' g';
+}
+function measuredQuantity(name,count){
+  const step=variablePurchaseStepFor(name);
+  const value=Math.max(0,Number(count)||0);
+  return step&&value>0?formatNeed(name,value*step.amount):'';
 }
 function ensureStyles(){
   if(document.getElementById('courses-product-quantities-style'))return;
@@ -285,6 +308,8 @@ function ensureStyles(){
     #dishDialog .dish-ingredient-name{display:flex!important;flex-direction:column!important;gap:2px!important}
     #dishDialog .dish-ingredient-pack{display:block!important;color:#718078!important;font-size:10.5px!important;line-height:1.05!important;font-weight:720!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
     #dishDialog .dish-ingredient-check{font-size:12px!important;letter-spacing:-.2px!important}
+    #listItems .list-qty.is-measured-count{display:none!important}
+    #listItems .list-measured-quantity{display:block!important;color:#718078!important;font-size:11px!important;line-height:1.15!important;font-weight:720!important;white-space:nowrap!important}
   `;
   document.head.appendChild(style);
 }
@@ -293,6 +318,8 @@ function decorateProducts(){
   products.querySelectorAll('.product[data-name]').forEach(card=>{
     const name=String(card.dataset.name||'');
     const pack=packFor(name);
+    const variableStep=variablePurchaseStepFor(name);
+    const quantity=Math.max(0,Number(card.dataset.quantity)||0);
     const meta=PRODUCT_META.get(name);
     const detail=card.querySelector('.pcat');
     const subcategory=String(meta?.sub||meta?.category||'');
@@ -309,9 +336,38 @@ function decorateProducts(){
       reference.className='product-pack-badge';
       card.appendChild(reference);
     }
-    const referenceText=pack?compactPackLabel(pack):saleModeLabel(name);
+    const measured=variableStep&&quantity>0?measuredQuantity(name,quantity):'';
+    const referenceText=pack?compactPackLabel(pack):(measured||saleModeLabel(name));
     if(reference.textContent!==referenceText)reference.textContent=referenceText;
-    reference.title=pack?'Conditionnement de référence : '+pack.label:'Mode d’achat : '+referenceText;
+    reference.title=pack
+      ?'Conditionnement de référence : '+pack.label
+      :(measured?'Quantité dans Ma liste : '+measured:'Mode d’achat : '+saleModeLabel(name));
+  });
+}
+function decorateShoppingList(){
+  if(!shoppingList)return;
+  shoppingList.querySelectorAll('.list-row[data-name]').forEach(row=>{
+    const name=String(row.dataset.name||'');
+    const step=variablePurchaseStepFor(name);
+    const countBadge=row.querySelector('.list-qty');
+    let measured=row.querySelector('.list-measured-quantity');
+    if(!step){
+      countBadge?.classList.remove('is-measured-count');
+      measured?.remove();
+      return;
+    }
+    const match=String(countBadge?.textContent||'').match(/(\d+)/);
+    const count=match?Math.max(1,Number(match[1])||1):1;
+    const text=measuredQuantity(name,count);
+    const copy=row.querySelector('.list-copy');
+    if(!copy||!text)return;
+    if(!measured){
+      measured=document.createElement('small');
+      measured.className='list-measured-quantity';
+      copy.appendChild(measured);
+    }
+    if(measured.textContent!==text)measured.textContent=text;
+    countBadge?.classList.add('is-measured-count');
   });
 }
 function decorateDishRows(){
@@ -319,6 +375,7 @@ function decorateDishRows(){
   list.querySelectorAll('.dish-ingredient[data-ingredient]').forEach(row=>{
     const name=String(row.dataset.ingredient||'');
     const pack=packFor(name);
+    const variableStep=variablePurchaseStepFor(name);
     const need=needFor(name);
     const quantity=quantityFor(name);
     row.dataset.recipeQuantity=String(quantity);
@@ -342,6 +399,10 @@ function decorateDishRows(){
       if(pack){
         badge.textContent='×'+quantity;
         badge.setAttribute('aria-label',quantity+' conditionnement'+(quantity>1?'s':'')+' de '+pack.label+' à acheter');
+      }else if(variableStep&&need!==null){
+        const purchaseAmount=measuredQuantity(name,quantity);
+        badge.textContent='×'+quantity;
+        badge.setAttribute('aria-label',purchaseAmount+' à acheter pour un besoin de '+formatNeed(name,need));
       }else{
         badge.textContent='1';
         badge.setAttribute('aria-label','1 article à ajouter');
@@ -464,21 +525,27 @@ function bind(){
   dialog=document.getElementById('dishDialog');
   list=dialog?.querySelector('.dish-sheet-list');
   products=document.getElementById('products');
+  shoppingList=document.getElementById('listItems');
   searchInput=document.getElementById('productSearch');
   catalogView=document.getElementById('catalogView');
-  if(!dialog||!list||!products||!searchInput)return false;
+  if(!dialog||!list||!products||!shoppingList||!searchInput)return false;
   auditSaleModes();
   ensureStyles();
   decorateProducts();
+  decorateShoppingList();
   decorateDishRows();
 
   productObserver?.disconnect();
   productObserver=new MutationObserver(()=>requestAnimationFrame(decorateProducts));
-  productObserver.observe(products,{childList:true,subtree:true});
+  productObserver.observe(products,{childList:true,subtree:true,attributes:true,attributeFilter:['data-quantity']});
 
   listObserver?.disconnect();
   listObserver=new MutationObserver(scheduleDishRefresh);
   listObserver.observe(list,{childList:true});
+
+  shoppingListObserver?.disconnect();
+  shoppingListObserver=new MutationObserver(()=>requestAnimationFrame(decorateShoppingList));
+  shoppingListObserver.observe(shoppingList,{childList:true,subtree:true});
 
   dialogObserver?.disconnect();
   dialogObserver=new MutationObserver(scheduleDishRefresh);
