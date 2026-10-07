@@ -48,13 +48,22 @@
     quantities.addEventListener('load',loadDishes,{once:true});
     document.body.appendChild(quantities);
   };
+  const loadRepurchaseSoon=()=>{
+    if(document.querySelector('script[data-repurchase-soon]')){loadQuantities();return}
+    const script=document.createElement('script');
+    script.src='./repurchase-soon.js?v=1';
+    script.async=false;
+    script.dataset.repurchaseSoon='script';
+    script.addEventListener('load',loadQuantities,{once:true});
+    document.body.appendChild(script);
+  };
   const load=()=>{
-    if(document.querySelector('script[data-dish-local-images]')){loadQuantities();return}
+    if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=310';
+    images.src='./dish-local-images.js?v=311';
     images.async=false;
     images.dataset.dishLocalImages='script';
-    images.addEventListener('load',loadQuantities,{once:true});
+    images.addEventListener('load',loadRepurchaseSoon,{once:true});
     document.body.appendChild(images);
   };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});
