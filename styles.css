@@ -4161,3 +4161,37 @@ body{
 
 /* Ma liste — empêche la sélection de texte pendant le maintien tactile */
 .list-row,.list-row *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
+
+
+/* v323 — Ma liste : quantité près du produit, Annuler remplace les actions */
+.list-row{
+  grid-template-columns:46px 68px minmax(0,max-content) auto minmax(0,1fr) 58px;
+}
+.list-copy{max-width:100%;justify-self:start}
+.list-qty{
+  grid-column:4;
+  justify-self:start;
+  margin-left:0;
+}
+.undo-purchase{
+  grid-column:6;
+  grid-row:1;
+  justify-self:end;
+  margin-right:8px;
+  white-space:nowrap;
+}
+.row-grip{
+  grid-column:6;
+  grid-row:1;
+}
+.list-row.is-purchased .row-grip.list-row-more{display:none!important}
+@media(max-width:520px){
+  .list-row{
+    grid-template-columns:36px 50px minmax(0,max-content) auto minmax(0,1fr) 58px!important;
+  }
+  .list-qty{margin-left:0!important}
+  .undo-purchase{
+    grid-column:6!important;
+    margin-right:8px!important;
+  }
+}

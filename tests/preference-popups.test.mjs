@@ -29,9 +29,9 @@ test('le choix d une catégorie produit ne déclenche pas un clic synthétique q
 test('les ressources modifiées sont versionnées pour le cache',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
-  assert.match(index,/catalog\.js\?v=322/);
+  assert.match(index,/catalog\.js\?v=323/);
   assert.match(index,/settings-tab-badge\.js\?v=322/);
-  assert.match(sw,/courses-app-v322-r1/);
+  assert.match(sw,/courses-app-v323-r1/);
   assert.match(sw,/missing-products-dishes\.js\?v=4/);
-  assert.match(sw,/dish-local-images\.js\?v=322/);
+  assert.match(sw,/dish-local-images\.js\?v=323/);
 });
