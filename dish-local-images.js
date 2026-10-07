@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v288';
+const APP_VERSION='v289';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -120,6 +120,89 @@ function syncPageVersions(){
         background:center/20px 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff453a' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E");
       }
       .list-row-menu-delete:active{background:rgba(255,255,255,.10)!important}
+      #listItems.is-list-home-empty{
+        position:relative;
+        overflow:hidden;
+        border-color:transparent!important;
+        box-shadow:none!important;
+        background:radial-gradient(circle at 50% 45%,rgba(92,154,95,.12) 0,rgba(92,154,95,.055) 28%,rgba(92,154,95,0) 63%)!important;
+      }
+      #listItems.is-list-home-empty::before{
+        content:'';
+        position:absolute;
+        inset:12% 8% 14%;
+        border-radius:50%;
+        background:radial-gradient(circle,rgba(255,255,255,.56),rgba(255,255,255,0) 68%);
+        pointer-events:none;
+      }
+      #listItems .list-empty-state{
+        position:relative;
+        z-index:1;
+        width:100%;
+        height:100%!important;
+        min-height:360px!important;
+        padding:22px 20px max(34px,env(safe-area-inset-bottom))!important;
+        display:flex!important;
+        flex-direction:column;
+        align-items:center!important;
+        justify-content:center!important;
+        gap:0!important;
+        color:#0d5138!important;
+        text-align:center;
+      }
+      .list-empty-visual{
+        width:min(52vw,210px);
+        aspect-ratio:11/8;
+        display:grid;
+        place-items:center;
+        margin:0 auto 20px;
+        filter:drop-shadow(0 12px 24px rgba(52,94,63,.08));
+      }
+      .list-empty-visual svg{display:block;width:100%;height:auto;overflow:visible}
+      .list-empty-copy{display:flex;flex-direction:column;align-items:center;gap:6px}
+      .list-empty-copy strong{
+        color:#0a4b35;
+        font-size:clamp(20px,5.4vw,25px);
+        line-height:1.08;
+        font-weight:800;
+        letter-spacing:-.035em;
+      }
+      .list-empty-copy span{
+        max-width:290px;
+        color:#7d8490;
+        font-size:clamp(12px,3.4vw,15px);
+        line-height:1.35;
+        font-weight:500;
+      }
+      .list-empty-action{
+        margin-top:22px;
+        min-width:min(76vw,270px);
+        height:48px;
+        padding:0 22px;
+        border:0;
+        border-radius:999px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+        background:linear-gradient(135deg,#16794d,#218b55);
+        color:#fff!important;
+        box-shadow:0 12px 24px rgba(22,121,77,.18),inset 0 1px 0 rgba(255,255,255,.18);
+        font-size:14px;
+        font-weight:760;
+        letter-spacing:-.01em;
+        cursor:pointer;
+        -webkit-appearance:none;
+        appearance:none;
+        transition:transform .12s ease,filter .12s ease;
+      }
+      .list-empty-action svg{width:16px;height:16px;flex:0 0 16px}
+      .list-empty-action:active{transform:scale(.975);filter:brightness(.97)}
+      @media(max-height:700px){
+        #listItems .list-empty-state{min-height:300px!important;padding-top:14px!important;padding-bottom:22px!important}
+        .list-empty-visual{width:min(43vw,170px);margin-bottom:14px}
+        .list-empty-action{margin-top:16px;height:44px}
+      }
     `;
     document.head.appendChild(style);
   }
@@ -385,8 +468,59 @@ function retryLocalImages(){
   localizeDialog(dialog);
 }
 
+function syncListEmptyState(root){
+  if(!root)return;
+  const empty=root.children.length===1&&root.firstElementChild?.classList.contains('empty')?root.firstElementChild:null;
+  if(empty?.classList.contains('list-empty-state')){
+    root.classList.add('is-list-home-empty');
+    return;
+  }
+  const shouldEnhance=Boolean(empty&&empty.children.length===0&&empty.textContent.trim()==='La liste est vide.');
+  root.classList.toggle('is-list-home-empty',shouldEnhance);
+  if(!shouldEnhance)return;
+  empty.classList.add('list-empty-state');
+  empty.innerHTML=`
+    <div class="list-empty-visual" aria-hidden="true">
+      <svg viewBox="0 0 220 160" role="presentation">
+        <ellipse cx="110" cy="145" rx="72" ry="9" fill="rgba(83,132,83,.08)"/>
+        <path d="M68 74c4-25 20-38 42-38s38 13 42 38" fill="none" stroke="#4f8157" stroke-width="4" stroke-linecap="round"/>
+        <g transform="rotate(-12 70 70)">
+          <rect x="55" y="34" width="29" height="82" rx="14" fill="#ead7a8" stroke="#5d8a5d" stroke-width="3"/>
+          <path d="M66 54l7 10M63 75l8 11M61 95l7 10" stroke="#5d8a5d" stroke-width="2.4" stroke-linecap="round"/>
+        </g>
+        <path d="M98 79c-11-17-4-35 5-39 11 5 12 18 9 30 5-13 14-21 22-18 5 12-2 25-17 34" fill="#b8cfad" stroke="#5d8a5d" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M137 49h17v10l6 9v43h-29V68l6-9z" fill="#f9faf4" stroke="#4f8157" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M137 49h17" stroke="#2f6f45" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="159" cy="84" r="18" fill="#c4d8ae" stroke="#5d8a5d" stroke-width="3"/>
+        <path d="M157 65c5-7 10-7 14-6-3 6-8 9-14 9" fill="#84b37d" stroke="#5d8a5d" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M49 79h122l-9 60H58z" fill="#f7f8f1" fill-opacity=".92" stroke="#4f8157" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M70 79c1-14 10-23 21-23s20 9 21 23" fill="none" stroke="#4f8157" stroke-width="3" stroke-linecap="round"/>
+        <g transform="translate(88 101)" fill="none" stroke="#91ba83" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M0 0h7l5 20h31l5-14H13"/>
+          <circle cx="18" cy="28" r="2.5" fill="#91ba83" stroke="none"/>
+          <circle cx="40" cy="28" r="2.5" fill="#91ba83" stroke="none"/>
+        </g>
+        <path d="M39 70c6 0 11 3 15 8-7 1-13-1-17-5M178 64c-7 1-12 5-15 11 8 0 13-3 17-8" fill="#a9cda0" stroke="#76a66f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M109 18v12M84 25l8 10M134 25l-7 10" stroke="#4f8157" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="list-empty-copy">
+      <strong>Votre liste est prête</strong>
+      <span>Ajoutez vos produits depuis le catalogue</span>
+    </div>
+    <button class="list-empty-action" type="button">
+      <span>Ouvrir le catalogue</span>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  `;
+  empty.querySelector('.list-empty-action')?.addEventListener('click',()=>{
+    document.querySelector('.tab[data-view="catalog"]')?.click();
+  });
+}
+
 let gridObserver=null;
 let dialogObserver=null;
+let listEmptyObserver=null;
 let versionFrame=0;
 const bootstrapObserver=new MutationObserver(()=>bind());
 const versionObserver=new MutationObserver(()=>{
@@ -405,6 +539,12 @@ const dishWarmupObserver=new MutationObserver(mutations=>{
 
 function bind(){
   syncPageVersions();
+  const listItems=document.getElementById('listItems');
+  if(listItems&&!listEmptyObserver){
+    syncListEmptyState(listItems);
+    listEmptyObserver=new MutationObserver(()=>syncListEmptyState(listItems));
+    listEmptyObserver.observe(listItems,{childList:true,subtree:true,characterData:true});
+  }
   const grid=document.getElementById('dishes');
   if(grid&&!gridObserver){
     localizeCards(grid);
@@ -417,7 +557,7 @@ function bind(){
     dialogObserver=new MutationObserver(()=>localizeDialog(dialog));
     dialogObserver.observe(dialog,{attributes:true,subtree:true,attributeFilter:['open','src']});
   }
-  if(gridObserver&&dialogObserver)bootstrapObserver.disconnect();
+  if(gridObserver&&dialogObserver&&listEmptyObserver)bootstrapObserver.disconnect();
 }
 
 syncPageVersions();
