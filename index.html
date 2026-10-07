@@ -44,7 +44,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v297</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v313</span></p>
         </div>
         <div class="page-header-actions">
           <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
@@ -110,7 +110,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v297</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v313</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -130,7 +130,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v297</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v313</span></p>
         </div>
       </header>
 
@@ -154,11 +154,7 @@
               <span class="settings-copy"><strong>Mot de passe et verrouillage</strong><small>Coffre local chiffré</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
-            <button id="settingsLockBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-power"></use></svg></span>
-              <span class="settings-copy"><strong>Verrouiller maintenant</strong><small>Fermer la session sur cet appareil</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
+            <button id="settingsLockBtn" type="button" hidden aria-hidden="true" tabindex="-1"></button>
           </div>
         </section>
 
@@ -168,6 +164,11 @@
             <button id="settingsListBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
               <span class="settings-copy"><strong>Sélections personnalisées</strong><small>Tri, ouverture et catalogue</small></span>
+              <svg class="chevron"><use href="#i-chevron"></use></svg>
+            </button>
+            <button id="settingsRecipeCustomizationBtn" class="settings-row" type="button">
+              <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
+              <span class="settings-copy"><strong>Personnalisation des recettes</strong><small>Affiner les ingrédients sélectionnés par défaut</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
             <button id="settingsMissingProductsBtn" class="settings-row missing-products-settings-row" type="button">
@@ -415,7 +416,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=297"></script>
+  <script src="./catalog.js?v=313"></script>
   <script src="./app.js?v=297"></script>
   <script src="./settings-tab-badge.js?v=297"></script>
 </body>
