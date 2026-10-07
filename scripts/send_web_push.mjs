@@ -14,12 +14,12 @@ const requestId=String(process.env.REQUEST_ID||'').trim();
 const baseUrl=String(process.env.COURSES_BASE_URL||'https://fabien95430.github.io/Dashboard-course/').trim();
 
 if(!endpoint||!p256dh||!auth){
-  console.log('Aucune souscription push fournie; notification ignorée.');
-  process.exit(0);
+  console.error('Souscription push absente ou incomplète; notification non envoyée.');
+  process.exit(1);
 }
 if(!publicKey||!privateKey){
-  console.log('Clés VAPID incomplètes; notification ignorée.');
-  process.exit(0);
+  console.error('Clés VAPID incomplètes; notification non envoyée.');
+  process.exit(1);
 }
 
 const target=new URL(baseUrl);
@@ -58,8 +58,8 @@ try{
 }catch(error){
   const code=Number(error?.statusCode||0);
   if(code===404||code===410){
-    console.log('Souscription push expirée; notification ignorée.');
-    process.exit(0);
+    console.error('Souscription push expirée; notification non envoyée.');
+    process.exit(1);
   }
   console.error('Échec notification push:',error?.message||error);
   process.exit(1);
