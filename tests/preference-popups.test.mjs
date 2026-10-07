@@ -17,10 +17,23 @@ test('les popups de préférences partagent une coque stable',()=>{
   assert.match(source,/height:min\(590px,calc\(100svh/);
   assert.match(source,/padding:20px!important/);
   assert.match(source,/border-radius:26px!important/);
-  assert.match(source,/recipe-customization-dialog\[open\]\{\s*display:flex!important;\s*flex-direction:column!important/);
+  assert.match(source,/#missingProductsDialog\[open\],\s*\.recipe-customization-dialog\[open\]\{\s*display:flex!important;\s*flex-direction:column!important/);
+  assert.match(source,/#missingProductsDialog \.missing-products-list\{[\s\S]*?flex:1 1 auto!important;[\s\S]*?min-height:0!important;[\s\S]*?overflow:auto!important/);
   assert.match(source,/backdrop-filter:blur\(8px\)!important/);
   assert.match(index,/id="missingProductsDialog" class="dialog"/);
   assert.doesNotMatch(index,/id="missingProductsDialog" class="dialog missing-products-dialog"/);
+});
+
+test('le clavier ne déplace ni ne redimensionne les popups de préférences pendant la saisie',()=>{
+  const source=read('settings-tab-badge.js');
+  const selector=source.match(/const PREFERENCE_DIALOG_SELECTOR='([^']+)'/)?.[1];
+  assert.equal(selector,'#preferencesDialog,#missingProductsDialog,.recipe-customization-dialog');
+  assert.doesNotMatch(selector,/#settingsDialog|#connectionDialog/);
+  assert.match(source,/const rect=dialog\.getBoundingClientRect\(\)/);
+  assert.match(source,/document\.addEventListener\('pointerdown',[\s\S]*?lockPreferenceDialog\(preferenceDialogFor\(event\.target\)\)/);
+  assert.match(source,/document\.addEventListener\('focusin',[\s\S]*?lockPreferenceDialog\(preferenceDialogFor\(event\.target\)\)/);
+  assert.match(source,/document\.addEventListener\('focusout',[\s\S]*?schedulePreferenceDialogUnlock\(preferenceDialogFor\(event\.target\)\)/);
+  assert.match(source,/\.is-preference-keyboard-locked\{[\s\S]*?position:fixed!important;[\s\S]*?top:var\(--preference-dialog-lock-top\)!important;[\s\S]*?height:var\(--preference-dialog-lock-height\)!important;[\s\S]*?margin:0!important/);
 });
 
 test('le choix d une catégorie produit ne déclenche pas un clic synthétique qui ferme le dialogue',()=>{
@@ -51,11 +64,12 @@ test('la personnalisation des recettes se réinitialise durablement et s enregis
 test('les ressources modifiées sont versionnées pour le cache',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
-  assert.match(index,/catalog\.js\?v=325/);
-  assert.match(index,/settings-tab-badge\.js\?v=322/);
-  assert.match(sw,/courses-app-v326-r1/);
+  assert.match(index,/catalog\.js\?v=327/);
+  assert.match(index,/settings-tab-badge\.js\?v=327/);
+  assert.match(sw,/courses-app-v327-r1/);
   assert.match(sw,/missing-products-dishes\.js\?v=4/);
-  assert.match(sw,/catalog\.js\?v=326/);
+  assert.match(sw,/catalog\.js\?v=327/);
+  assert.match(sw,/settings-tab-badge\.js\?v=327/);
   assert.match(sw,/dishes-ui\.js\?v=326/);
-  assert.match(sw,/dish-local-images\.js\?v=326/);
+  assert.match(sw,/dish-local-images\.js\?v=327/);
 });

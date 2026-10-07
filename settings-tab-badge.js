@@ -292,6 +292,82 @@ document.head.appendChild(script);
 (() => {
 'use strict';
 
+const PREFERENCE_DIALOG_SELECTOR='#preferencesDialog,#missingProductsDialog,.recipe-customization-dialog';
+const PREFERENCE_KEYBOARD_INPUT_TYPES=new Set(['text','search','number','email','url','tel','password']);
+const preferenceKeyboardLocks=new WeakSet();
+const preferenceKeyboardUnlockTimers=new WeakMap();
+
+function preferenceDialogFor(target){
+  return target?.closest?.(PREFERENCE_DIALOG_SELECTOR)||null;
+}
+function isPreferenceKeyboardField(target){
+  if(!target?.matches)return false;
+  if(target.matches('textarea,[contenteditable="true"]'))return true;
+  if(!target.matches('input'))return false;
+  return PREFERENCE_KEYBOARD_INPUT_TYPES.has(String(target.type||'text').toLowerCase());
+}
+function clearPreferenceKeyboardUnlock(dialog){
+  const timer=preferenceKeyboardUnlockTimers.get(dialog);
+  if(timer){
+    clearTimeout(timer);
+    preferenceKeyboardUnlockTimers.delete(dialog);
+  }
+}
+function lockPreferenceDialog(dialog){
+  if(!dialog?.open)return;
+  clearPreferenceKeyboardUnlock(dialog);
+  if(preferenceKeyboardLocks.has(dialog))return;
+  const rect=dialog.getBoundingClientRect();
+  if(rect.width<=0||rect.height<=0)return;
+  dialog.style.setProperty('--preference-dialog-lock-top',rect.top+'px');
+  dialog.style.setProperty('--preference-dialog-lock-left',rect.left+'px');
+  dialog.style.setProperty('--preference-dialog-lock-width',rect.width+'px');
+  dialog.style.setProperty('--preference-dialog-lock-height',rect.height+'px');
+  dialog.classList.add('is-preference-keyboard-locked');
+  preferenceKeyboardLocks.add(dialog);
+}
+function unlockPreferenceDialog(dialog){
+  if(!dialog)return;
+  clearPreferenceKeyboardUnlock(dialog);
+  dialog.classList.remove('is-preference-keyboard-locked');
+  dialog.style.removeProperty('--preference-dialog-lock-top');
+  dialog.style.removeProperty('--preference-dialog-lock-left');
+  dialog.style.removeProperty('--preference-dialog-lock-width');
+  dialog.style.removeProperty('--preference-dialog-lock-height');
+  preferenceKeyboardLocks.delete(dialog);
+}
+function schedulePreferenceDialogUnlock(dialog){
+  if(!dialog||!preferenceKeyboardLocks.has(dialog))return;
+  clearPreferenceKeyboardUnlock(dialog);
+  const timer=setTimeout(()=>{
+    preferenceKeyboardUnlockTimers.delete(dialog);
+    const active=document.activeElement;
+    if(dialog.open&&dialog.contains(active)&&isPreferenceKeyboardField(active))return;
+    unlockPreferenceDialog(dialog);
+  },450);
+  preferenceKeyboardUnlockTimers.set(dialog,timer);
+}
+function bindPreferenceKeyboardStability(){
+  if(document.documentElement.dataset.preferenceKeyboardStability==='1')return;
+  document.documentElement.dataset.preferenceKeyboardStability='1';
+  document.addEventListener('pointerdown',event=>{
+    if(!isPreferenceKeyboardField(event.target))return;
+    lockPreferenceDialog(preferenceDialogFor(event.target));
+  },true);
+  document.addEventListener('focusin',event=>{
+    if(!isPreferenceKeyboardField(event.target))return;
+    lockPreferenceDialog(preferenceDialogFor(event.target));
+  },true);
+  document.addEventListener('focusout',event=>{
+    if(!isPreferenceKeyboardField(event.target))return;
+    schedulePreferenceDialogUnlock(preferenceDialogFor(event.target));
+  },true);
+  document.addEventListener('close',event=>{
+    const dialog=event.target?.matches?.(PREFERENCE_DIALOG_SELECTOR)?event.target:null;
+    if(dialog)unlockPreferenceDialog(dialog);
+  },true);
+}
+
 function installPreferenceDialogAppearance(){
   if(document.getElementById('preferences-dialog-appearance'))return;
   const style=document.createElement('style');
@@ -311,18 +387,50 @@ function installPreferenceDialogAppearance(){
       border-radius:26px!important;
       box-sizing:border-box;
     }
-    #preferencesDialog,
-    #missingProductsDialog{
+    #preferencesDialog{
       overflow:auto!important;
       overscroll-behavior:contain;
       -webkit-overflow-scrolling:touch;
     }
+    #missingProductsDialog,
     .recipe-customization-dialog{
       overflow:hidden!important;
     }
+    #missingProductsDialog[open],
     .recipe-customization-dialog[open]{
       display:flex!important;
       flex-direction:column!important;
+    }
+    #missingProductsDialog .missing-products-header,
+    #missingProductsDialog .missing-mode-switch,
+    #missingProductsDialog .missing-products-add,
+    #missingProductsDialog .missing-category-panel,
+    #missingProductsDialog .missing-products-list-heading{
+      flex:0 0 auto;
+    }
+    #missingProductsDialog .missing-products-list{
+      flex:1 1 auto!important;
+      min-height:0!important;
+      max-height:none!important;
+      overflow:auto!important;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+    }
+    #preferencesDialog.is-preference-keyboard-locked,
+    #missingProductsDialog.is-preference-keyboard-locked,
+    .recipe-customization-dialog.is-preference-keyboard-locked{
+      position:fixed!important;
+      inset:auto!important;
+      top:var(--preference-dialog-lock-top)!important;
+      left:var(--preference-dialog-lock-left)!important;
+      right:auto!important;
+      bottom:auto!important;
+      width:var(--preference-dialog-lock-width)!important;
+      max-width:none!important;
+      height:var(--preference-dialog-lock-height)!important;
+      max-height:var(--preference-dialog-lock-height)!important;
+      margin:0!important;
+      transform:none!important;
     }
     #preferencesDialog::backdrop,
     #missingProductsDialog::backdrop,
@@ -338,6 +446,7 @@ function installPreferenceDialogAppearance(){
 
 function initApplicationManagement(){
   installPreferenceDialogAppearance();
+  bindPreferenceKeyboardStability();
   const dialog=document.getElementById('preferencesDialog');
   const documentationButton=document.getElementById('preferencesDocumentation');
   const selectionsButton=document.getElementById('settingsListBtn');
