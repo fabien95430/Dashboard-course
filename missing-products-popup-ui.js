@@ -4,7 +4,7 @@
 const HOLD_MS=800;
 const SVG_PRODUCT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 20h17v31H12z" fill="#f7f2e8" stroke="#758575" stroke-width="2"/><path d="M15 16h11l3 4H12z" fill="#e8eee6" stroke="#758575" stroke-width="2"/><path d="M38 14h9v7h-9z" fill="#d7dfd4"/><path d="M35 20h15l2 6v25H33V26z" fill="#859583"/><path d="M38 28h9" stroke="#f4f1e9" stroke-width="2.5" stroke-linecap="round"/></svg>';
 const SVG_DISH='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M11 45h42" stroke="#ad791d" stroke-width="3.5" stroke-linecap="round"/><path d="M16 42c0-13 7-22 16-22s16 9 16 22z" fill="#d6a33d"/><circle cx="32" cy="17" r="3.5" fill="#ad791d"/><path d="M15 42h34" stroke="#9f6c16" stroke-width="3" stroke-linecap="round"/></svg>';
-const SVG_DESSERT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 29h24l-3 22H23z" fill="#c9714f"/><path d="M19 29h26" stroke="#9f5237" stroke-width="3" stroke-linecap="round"/><path d="M23 27c0-4 3-7 7-7 1-5 8-6 11-2 5 0 8 4 7 9z" fill="#dd9777"/><circle cx="34" cy="14" r="3" fill="#a9513c"/></svg>';
+const SVG_DESSERT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 31h22l-2.5 20h-17z" fill="#c9714f"/><path d="M18.5 30h27" stroke="#9f5237" stroke-width="3" stroke-linecap="round"/><path d="M20 29c1-6.2 5.8-10 12-10s11 3.8 12 10z" fill="#dd9777"/><circle cx="32" cy="15" r="3" fill="#a9513c"/></svg>';
 
 let openMenu=null;
 let holdTimer=0;
