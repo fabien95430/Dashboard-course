@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v304';
+const APP_VERSION='v305';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -161,7 +161,7 @@ function syncPageVersions(){
         display:grid;
         place-items:center;
         margin:0 auto 17px;
-        filter:drop-shadow(0 13px 22px rgba(47,94,57,.10));
+        filter:drop-shadow(0 8px 16px rgba(47,94,57,.055));
       }
       .list-empty-visual img{
         display:block;
@@ -567,7 +567,7 @@ function retryLocalImages(){
 
 function syncListEmptyState(root){
   if(!root)return;
-  const design='premium-v3';
+  const design='premium-v4';
   const empty=root.children.length===1&&root.firstElementChild?.classList.contains('empty')?root.firstElementChild:null;
   if(empty?.classList.contains('list-empty-state')&&empty.dataset.emptyDesign===design){
     root.classList.add('is-list-home-empty');
@@ -581,7 +581,7 @@ function syncListEmptyState(root){
   empty.dataset.emptyDesign=design;
   empty.innerHTML=`
     <div class="list-empty-visual" aria-hidden="true">
-      <img src="./empty-list-premium-v3.webp?v=1" alt="" decoding="async" draggable="false">
+      <img src="./www/empty-list-premium-v4.webp?v=305" alt="" loading="lazy" decoding="async" fetchpriority="low" draggable="false">
     </div>
     <div class="list-empty-copy">
       <strong>Votre liste est prête</strong>
