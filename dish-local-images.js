@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v316';
+const APP_VERSION='v317';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -144,7 +144,7 @@ function syncPageVersions(){
         position:relative;
         z-index:1;
         width:100%;
-        height:100%!important;
+       height:100%!important;
         min-height:360px!important;
         padding:10px 22px max(30px,env(safe-area-inset-bottom))!important;
         display:flex!important;
@@ -163,8 +163,7 @@ function syncPageVersions(){
         margin:0 auto 17px;
         filter:drop-shadow(0 8px 16px rgba(47,94,57,.055));
       }
-      .list-empty-visual img{
-        display:block;
+      .list-empty-visual img{        display:block;
         width:100%;
         height:100%;
         object-fit:contain;
@@ -206,11 +205,9 @@ function syncPageVersions(){
         line-height:1;
         font-weight:760;
         letter-spacing:-.012em;
-        cursor:pointer;
-        -webkit-appearance:none;
+        cursor:pointer;        -webkit-appearance:none;
         appearance:none;
-        transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;
-      }
+        transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;      }
       .list-empty-action svg{width:15px;height:15px;flex:0 0 15px}
       .list-empty-action:active{
         transform:scale(.978);
@@ -276,8 +273,8 @@ function syncPageVersions(){
       html #dishDialog.is-confirm-feedback .dish-confirm-feedback-layer{animation:dishConfirmPremium .56s cubic-bezier(.16,.88,.24,1) both!important}
       html #dishDialog.is-confirm-feedback .dish-confirm-feedback-mark::before{animation:dishConfirmHalo .58s ease-out both}
       html #dishDialog.is-confirm-feedback .dish-sheet-list,
-      html #dishDialog.is-confirm-feedback .dish-sheet-head,
-      html #dishDialog.is-confirm-feedback .dish-sheet-note{
+      html #dishDialog.is-confirm-fedback .dish-sheet-head,
+      html #dishDialog.is-confirm-fedback .dish-sheet-note{
         opacity:.15!important;
         filter:blur(1.15px) saturate(.86)!important;
         transition:opacity .18s ease,filter .18s ease!important;

@@ -403,7 +403,7 @@ else bindObservers();
 (() => {
 'use strict';
 
-const FEEDBACK_MS=1700;
+const FEEDBACK_MS=1400;
 let confirmationBusy=false;
 let confirmationToastTimer=0;
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
