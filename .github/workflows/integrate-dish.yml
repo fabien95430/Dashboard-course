@@ -163,7 +163,10 @@ jobs:
               if item_type=='product':
                   if not product_exists():
                       return None
-                  return version,''
+                  image=Path('www/Items')/(slugify(item_name)+'.webp')
+                  if not image.is_file():
+                      return None
+                  return version,image.name
 
               if normalize(item_name) not in read_dish_names():
                   return None
@@ -217,7 +220,8 @@ jobs:
             if [ -n "$deployed" ] && [ "$deployed" -ge "$expected" ]; then
               if [ "$type" = "product" ]; then
                 catalog_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}catalog.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
-                if printf '%s' "$catalog_body" | grep -Fq -- "$item"; then
+                if printf '%s' "$catalog_body" | grep -Fq -- "$item" \
+                  && curl -fsSIL --max-time 12 "${COURSES_BASE_URL}www/Items/${file}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
                   echo "Déploiement du produit confirmé en v${deployed}."
                   exit 0
                 fi

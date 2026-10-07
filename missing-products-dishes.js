@@ -160,10 +160,12 @@ function buildProductPrompt(item){
     '- Préserver mobile-first et les safe areas iOS.',
     '- Ne pas ajouter de framework, backend ou dépendance externe.',
     '- Pour le produit, choisir le sous-groupe cohérent dans catalog.js après lecture du catalogue actuel.',
-    '- Lire et respecter docs/ATLAS_PRODUITS.md, PRODUCT_SHEETS, POSITIONS et le renderer sprite actuel.',
-    '- Ajouter/mettre à jour le visuel du produit dans l’atlas concerné en conservant strictement l’ordre des cellules et le rendu existant. Ne pas dégrader les autres produits.',
+    '- Lire et respecter docs/IMAGES_ITEMS.md et product-item-images.js avant de créer le visuel.',
+    '- Générer exactement une image WebP pour ce produit, dans le même style que les items existants de sa catégorie : un seul produit, fond transparent, centré, proportions naturelles, sans décor, sans personne, sans marque ou logo inventé.',
+    '- Stocker le visuel dans www/Items/ avec le nom de fichier attendu par le slugify() actuel de product-item-images.js.',
+    '- Ne pas modifier ni supprimer l’atlas de la catégorie : il reste uniquement comme fallback si l’image unitaire manque ou échoue.',
     '- Versionner le visuel/cache selon les conventions actuelles pour que l’image arrive réellement dans l’application.',
-    '- Vérifier les impacts sur Ma liste, Catalogue, Home Assistant, sécurité, mode test et mobile.',
+    '- Vérifier les impacts sur Ma liste, Catalogue, mode hors ligne, Home Assistant, sécurité, mode test et mobile.',
     '',
     'À la fin, vérifie le résultat puis commit directement sur main avec un message conforme aux versions actuelles.'
   ].join('\n');
