@@ -369,3 +369,182 @@ bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindObservers,{once:true});
 else bindObservers();
 })();
+
+(() => {
+'use strict';
+
+const FEEDBACK_MS=620;
+let confirmationBusy=false;
+let confirmationToastTimer=0;
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+function ensureConfirmationStyle(){
+  if(document.getElementById('dish-confirmation-feedback-style'))return;
+  const style=document.createElement('style');
+  style.id='dish-confirmation-feedback-style';
+  style.textContent=`
+    #dishDialog .dish-confirm-feedback-layer{
+      position:fixed;
+      z-index:30;
+      left:50%;
+      top:50%;
+      width:min(76vw,280px);
+      padding:18px 20px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      border:1px solid rgba(255,255,255,.68);
+      border-radius:24px;
+      background:rgba(248,250,246,.94);
+      box-shadow:0 18px 46px rgba(35,55,43,.18);
+      -webkit-backdrop-filter:blur(18px) saturate(125%);
+      backdrop-filter:blur(18px) saturate(125%);
+      opacity:0;
+      transform:translate(-50%,-46%) scale(.84);
+      pointer-events:none;
+    }
+    #dishDialog .dish-confirm-feedback-mark{
+      width:54px;
+      height:54px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:#168647;
+      color:#fff;
+      box-shadow:0 9px 22px rgba(22,134,71,.22);
+      font-size:29px;
+      line-height:1;
+      font-weight:900;
+    }
+    #dishDialog .dish-confirm-feedback-layer strong{color:#173126;font-size:18px;line-height:1.1;font-weight:850}
+    #dishDialog .dish-confirm-feedback-layer small{color:#718078;font-size:12px;line-height:1.2;font-weight:650}
+    #dishDialog.is-confirm-feedback .dish-confirm-feedback-layer{animation:dishConfirmFeedback .48s cubic-bezier(.18,.82,.2,1) both}
+    #dishDialog.is-confirm-feedback .dish-sheet-list,
+    #dishDialog.is-confirm-feedback .dish-sheet-head,
+    #dishDialog.is-confirm-feedback .dish-sheet-note{opacity:.22!important;transition:opacity .16s ease!important;pointer-events:none!important}
+    #dishDialog.is-confirm-feedback .dish-sheet-close,
+    #dishDialog.is-confirm-feedback .dish-sheet-favorite{opacity:.3!important;pointer-events:none!important}
+    #dishDialog.is-confirm-feedback .dish-ingredient.is-already-listed .dish-ingredient-name::after,
+    #dishDialog.is-confirm-feedback .dish-ingredient.is-partially-listed .dish-ingredient-name::after{display:none!important;content:none!important}
+    #dishDialog.is-confirm-feedback .dish-sheet-add{
+      transform:scale(.985)!important;
+      background:linear-gradient(160deg,#2fd875,#159c51)!important;
+      color:#fff!important;
+      box-shadow:0 8px 22px rgba(22,134,71,.19)!important;
+      transition:transform .16s ease,background .16s ease,box-shadow .16s ease!important;
+    }
+    #dishDialog.is-confirm-feedback .dish-sheet-add svg{transform:scale(1.08);transition:transform .18s ease}
+    html.is-dish-background-sync #dishes .dish-card{pointer-events:none}
+    @keyframes dishConfirmFeedback{
+      0%{opacity:0;transform:translate(-50%,-42%) scale(.78)}
+      58%{opacity:1;transform:translate(-50%,-51%) scale(1.035)}
+      100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    }
+    @media(prefers-reduced-motion:reduce){
+      #dishDialog.is-confirm-feedback .dish-confirm-feedback-layer{animation:none;opacity:1;transform:translate(-50%,-50%)}
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function showConfirmationToast(message){
+  const toast=document.getElementById('toast');
+  if(!toast)return;
+  clearTimeout(confirmationToastTimer);
+  toast.textContent=message;
+  toast.classList.add('is-visible');
+  confirmationToastTimer=setTimeout(()=>toast.classList.remove('is-visible'),2200);
+}
+
+function confirmationLayer(dialog){
+  let layer=dialog.querySelector('.dish-confirm-feedback-layer');
+  if(layer)return layer;
+  layer=document.createElement('div');
+  layer.className='dish-confirm-feedback-layer';
+  layer.setAttribute('aria-hidden','true');
+  layer.innerHTML='<span class="dish-confirm-feedback-mark">✓</span><strong>Sélection validée</strong><small>Ajout à Ma liste en cours</small>';
+  dialog.appendChild(layer);
+  return layer;
+}
+
+function startConfirmationFeedback(dialog,button){
+  confirmationLayer(dialog);
+  dialog.classList.add('is-confirm-feedback');
+  button.disabled=true;
+  const label=button.querySelector('span');
+  if(label)label.textContent='Sélection validée';
+  const use=button.querySelector('svg use');
+  if(use)use.setAttribute('href','#i-check');
+  navigator.vibrate?.([8,24,8]);
+}
+
+function closeAfterConfirmation(dialog,button){
+  dialog.classList.remove('is-confirm-feedback');
+  dialog.querySelector('.dish-confirm-feedback-layer')?.remove();
+  if(dialog.open)dialog.close();else dialog.removeAttribute('open');
+  document.documentElement.classList.remove('dish-sheet-open');
+  const label=button.querySelector('span');
+  if(label)label.textContent='Ajouter à ma liste';
+  const use=button.querySelector('svg use');
+  if(use)use.setAttribute('href','#i-cart');
+}
+
+function confirmationResultMessage(name,result){
+  if(result.failed)return 'Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':'');
+  if(!result.added)return 'Les quantités nécessaires sont déjà dans Ma liste';
+  return name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':'');
+}
+
+async function confirmWithFeedback(event){
+  const button=event.currentTarget;
+  const dialog=button.closest('#dishDialog');
+  if(!dialog||button.disabled||confirmationBusy)return;
+  const name=dialog.querySelector('.dish-sheet-head h2')?.textContent?.trim()||'';
+  const addSelected=window.COURSES_QUANTITIES?.addSelected;
+  if(!name||typeof addSelected!=='function')return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  let settled;
+  try{
+    settled=Promise.resolve(addSelected()).then(result=>({result}),error=>({error}));
+  }catch(error){
+    showConfirmationToast('Ajout impossible');
+    return;
+  }
+
+  confirmationBusy=true;
+  document.documentElement.classList.add('is-dish-background-sync');
+  startConfirmationFeedback(dialog,button);
+  await wait(FEEDBACK_MS);
+  closeAfterConfirmation(dialog,button);
+
+  const outcome=await settled;
+  confirmationBusy=false;
+  document.documentElement.classList.remove('is-dish-background-sync');
+  if(outcome.error){showConfirmationToast('Ajout impossible');return}
+  const result=outcome.result||{added:0,failed:1,present:0};
+  navigator.vibrate?.(result.added?[10,28,10]:8);
+  showConfirmationToast(confirmationResultMessage(name,result));
+}
+
+function bindConfirmationFeedback(){
+  ensureConfirmationStyle();
+  const button=document.querySelector('#dishDialog .dish-sheet-add');
+  if(!button||button.dataset.confirmFeedbackBound==='1')return false;
+  button.dataset.confirmFeedbackBound='1';
+  button.addEventListener('click',confirmWithFeedback,true);
+  return true;
+}
+
+const confirmationObserver=new MutationObserver(()=>{if(bindConfirmationFeedback())confirmationObserver.disconnect()});
+if(!bindConfirmationFeedback())confirmationObserver.observe(document.documentElement,{childList:true,subtree:true});
+document.addEventListener('keydown',event=>{
+  if(!confirmationBusy||!['Enter',' '].includes(event.key))return;
+  if(!event.target?.closest?.('#dishes .dish-card'))return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+},true);
+})();
