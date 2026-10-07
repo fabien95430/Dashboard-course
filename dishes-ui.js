@@ -91,7 +91,7 @@ const DISHES=Object.freeze([
   {name:'Saucisse lentille',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Lentilles','Carottes','Oignons jaunes']},
   {name:'Crème brûlée',photoId:'',tags:['Végé','Dessert'],ingredients:['Crème liquide','Œufs','Sucre','Vanille']},
   {name:'Pannacotta',photoId:'',tags:['Dessert'],ingredients:['Crème liquide','Lait entier','Sucre','Vanille']},
-  {name:'Riz au lait',photoId:'',tags:['Dessert','Enfants'],ingredients:['Lait entier','Riz long','Sucre','Vanille']},
+  {name:'Riz au lait',photoId:'',tags:['Dessert'],ingredients:['Lait entier','Riz long','Sucre','Vanille']},
 ]);
 
 const FILTERS=['Tous','Favoris','Dessert','Enfants','Pâtes','Poissons','Poulet','Rapides','Végé','Viandes'];
