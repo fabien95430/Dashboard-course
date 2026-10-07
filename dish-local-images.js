@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v303';
+const APP_VERSION='v304';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -217,6 +217,81 @@ function syncPageVersions(){
         filter:brightness(.98);
         box-shadow:0 6px 15px rgba(18,113,69,.14),inset 0 1px 0 rgba(255,255,255,.16);
       }
+      html #dishDialog .dish-confirm-feedback-layer{
+        width:min(calc(100vw - 58px),286px)!important;
+        padding:26px 24px 23px!important;
+        gap:9px!important;
+        border:1px solid rgba(255,255,255,.88)!important;
+        border-radius:30px!important;
+        background:linear-gradient(158deg,rgba(255,255,255,.985) 0%,rgba(244,249,246,.965) 58%,rgba(238,247,241,.95) 100%)!important;
+        box-shadow:0 30px 80px rgba(18,48,31,.22),0 9px 24px rgba(33,82,54,.12),inset 0 1px 0 rgba(255,255,255,.95),0 0 0 200vmax rgba(17,42,29,.095)!important;
+        -webkit-backdrop-filter:blur(30px) saturate(145%)!important;
+        backdrop-filter:blur(30px) saturate(145%)!important;
+        overflow:visible!important;
+      }
+      html #dishDialog .dish-confirm-feedback-layer::before{
+        content:'';
+        position:absolute;
+        inset:1px;
+        border-radius:29px;
+        background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,0) 42%);
+        pointer-events:none;
+      }
+      html #dishDialog .dish-confirm-feedback-mark{
+        position:relative!important;
+        width:64px!important;
+        height:64px!important;
+        margin-bottom:3px!important;
+        background:linear-gradient(145deg,#28aa68 0%,#117c4b 72%,#0b6f42 100%)!important;
+        box-shadow:0 13px 30px rgba(17,124,75,.28),inset 0 1px 0 rgba(255,255,255,.32),0 0 0 7px rgba(31,151,89,.075)!important;
+        font-size:31px!important;
+        font-weight:850!important;
+      }
+      html #dishDialog .dish-confirm-feedback-mark::before{
+        content:'';
+        position:absolute;
+        inset:-11px;
+        border:1px solid rgba(27,139,82,.16);
+        border-radius:50%;
+        opacity:0;
+      }
+      html #dishDialog .dish-confirm-feedback-layer strong{
+        position:relative;
+        color:#112c20!important;
+        font-size:20px!important;
+        line-height:1.08!important;
+        font-weight:850!important;
+        letter-spacing:-.035em!important;
+      }
+      html #dishDialog .dish-confirm-feedback-layer small{
+        position:relative;
+        max-width:220px;
+        color:#74837a!important;
+        font-size:12.5px!important;
+        line-height:1.35!important;
+        font-weight:620!important;
+        letter-spacing:-.01em!important;
+        text-align:center!important;
+      }
+      html #dishDialog.is-confirm-feedback .dish-confirm-feedback-layer{animation:dishConfirmPremium .56s cubic-bezier(.16,.88,.24,1) both!important}
+      html #dishDialog.is-confirm-feedback .dish-confirm-feedback-mark::before{animation:dishConfirmHalo .58s ease-out both}
+      html #dishDialog.is-confirm-feedback .dish-sheet-list,
+      html #dishDialog.is-confirm-feedback .dish-sheet-head,
+      html #dishDialog.is-confirm-feedback .dish-sheet-note{
+        opacity:.15!important;
+        filter:blur(1.15px) saturate(.86)!important;
+        transition:opacity .18s ease,filter .18s ease!important;
+      }
+      @keyframes dishConfirmPremium{
+        0%{opacity:0;transform:translate(-50%,-43%) scale(.88)}
+        58%{opacity:1;transform:translate(-50%,-51%) scale(1.018)}
+        100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+      }
+      @keyframes dishConfirmHalo{
+        0%{opacity:0;transform:scale(.74)}
+        48%{opacity:1}
+        100%{opacity:.08;transform:scale(1.24)}
+      }
       @media(max-width:520px) and (max-height:900px){
         #settingsView .settings-logout{
           height:44px!important;
@@ -228,6 +303,10 @@ function syncPageVersions(){
         #listItems .list-empty-state{min-height:300px!important;padding-top:8px!important;padding-bottom:20px!important}
         .list-empty-visual{width:min(42vw,165px);margin-bottom:12px}
         .list-empty-action{margin-top:15px;height:42px;min-width:min(60vw,220px)}
+      }
+      @media(prefers-reduced-motion:reduce){
+        html #dishDialog.is-confirm-feedback .dish-confirm-feedback-layer{animation:none!important;opacity:1!important;transform:translate(-50%,-50%)!important}
+        html #dishDialog.is-confirm-feedback .dish-confirm-feedback-mark::before{animation:none!important;opacity:.12!important}
       }
     `;
     document.head.appendChild(style);
