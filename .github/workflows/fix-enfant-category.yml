@@ -1,0 +1,99 @@
+name: Correctif ponctuel catégorie Enfant
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-enfant-category.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Appliquer le correctif minimal
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" repo
+          cd repo
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_one(path, old, new):
+              file = Path(path)
+              text = file.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: motif attendu une fois, trouvé {count}: {old!r}')
+              file.write_text(text.replace(old, new, 1))
+
+          replace_one(
+              'app.js',
+              "  'Maison': { label:'Maison' },\n  'Favoris': { label:'Favoris' }",
+              "  'Maison': { label:'Maison' },\n  'Enfant': { label:'Enfant' },\n  'Favoris': { label:'Favoris' }"
+          )
+          replace_one(
+              'app.js',
+              "const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Favoris'];",
+              "const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Enfant','Favoris'];"
+          )
+          replace_one(
+              'app.js',
+              "const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Fruits & Légumes','Épicerie','Frais','Boissons','Maison']);",
+              "const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Enfant']);"
+          )
+          replace_one(
+              'app.js',
+              "if(!['Toutes','Frais','Fruits & Légumes','Épicerie','Boissons','Maison'].includes(next))return;",
+              "if(!['Toutes','Frais','Fruits & Légumes','Épicerie','Boissons','Maison','Enfant'].includes(next))return;"
+          )
+
+          replace_one(
+              'index.html',
+              "          <button class=\"list-filter-option\" type=\"button\" data-list-category=\"Maison\" role=\"radio\">\n            <span>Maison</span><i aria-hidden=\"true\"></i>\n          </button>",
+              "          <button class=\"list-filter-option\" type=\"button\" data-list-category=\"Maison\" role=\"radio\">\n            <span>Maison</span><i aria-hidden=\"true\"></i>\n          </button>\n          <button class=\"list-filter-option\" type=\"button\" data-list-category=\"Enfant\" role=\"radio\">\n            <span>Enfant</span><i aria-hidden=\"true\"></i>\n          </button>"
+          )
+          replace_one(
+              'index.html',
+              "        <button class=\"missing-category-choice\" type=\"button\" data-missing-category=\"Maison\" aria-pressed=\"false\"><span>Maison</span></button>",
+              "        <button class=\"missing-category-choice\" type=\"button\" data-missing-category=\"Maison\" aria-pressed=\"false\"><span>Maison</span></button>\n        <button class=\"missing-category-choice\" type=\"button\" data-missing-category=\"Enfant\" aria-pressed=\"false\"><span>Enfant</span></button>"
+          )
+          replace_one('index.html', '<script src="./catalog.js?v=349"></script>', '<script src="./catalog.js?v=351"></script>')
+          replace_one('index.html', '<script src="./app.js?v=350"></script>', '<script src="./app.js?v=351"></script>')
+
+          sw = Path('sw.js')
+          text = sw.read_text()
+          if "const CACHE='courses-app-v350-r1';" not in text:
+              raise SystemExit('sw.js: cache v350-r1 introuvable')
+          text = text.replace("const CACHE='courses-app-v350-r1';", "const CACHE='courses-app-v350-r2';", 1)
+          pattern = r"(const SHELL=\[[^\n]*)(\];)"
+          text, count = re.subn(pattern, r"\1,'./catalog.js?v=351','./app.js?v=351'\2", text, count=1)
+          if count != 1:
+              raise SystemExit('sw.js: tableau SHELL introuvable')
+          sw.write_text(text)
+
+          catalog = Path('catalog.js').read_text()
+          images = Path('product-item-images.js').read_text()
+          checks = [
+              ('catalog Enfant', '"Enfant":{"Enfant":["Couches","Lingettes bébé","Lait infantile","Petits pots","Compotes bébé","Sacs à couches"]}' in catalog),
+              ('images Enfant', "'Maison','Enfant'" in images),
+              ('ordre Enfant', "'Maison','Enfant','Favoris'" in Path('app.js').read_text()),
+              ('filtre Enfant', 'data-list-category="Enfant"' in Path('index.html').read_text()),
+          ]
+          missing = [name for name, ok in checks if not ok]
+          if missing:
+              raise SystemExit('Vérifications échouées: ' + ', '.join(missing))
+          PY
+
+          node --check app.js
+          rm -f .github/workflows/fix-enfant-category.yml
+          git config user.name "OpenAI Agent"
+          git config user.email "openai-agent@users.noreply.github.com"
+          git add app.js index.html sw.js .github/workflows/fix-enfant-category.yml
+          git commit -m "fix: affiche la catégorie Enfant"
+          git push origin HEAD:main
