@@ -16,3 +16,8 @@ test('la suppression a son propre effet visuel sans état acheté',()=>{
   assert.match(styles,/\.list-row\.is-deleting \.purchase-check::before\{/);
   assert.match(styles,/\.list-row\.is-deleting \.list-row-more\{/);
 });
+
+
+test('le toast global reste sur une seule ligne sur mobile',()=>{
+  assert.match(styles,/\.toast\{[^}]*width:max-content;[^}]*max-width:calc\(100vw - 24px\);[^}]*white-space:nowrap;[^}]*overflow:hidden;[^}]*text-overflow:ellipsis;/s);
+});
