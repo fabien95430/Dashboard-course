@@ -45,7 +45,12 @@ jobs:
           one("removeGroup(button.dataset.name||'',row);","removeGroup(button.dataset.name||'',row,'purchase');",'rond')
           one("remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};","remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row,'delete')};",'menu')
           one("async function removeGroup(name,row=null){","async function removeGroup(name,row=null,intent='purchase'){",'removeGroup base signature')
-          one("  const key=norm(item);\n  if(state.productBusy.has(key))return;\n  const group=activeGroups().find(entry=>norm(entry.summary)===key);","  const key=norm(item);\n  const isPurchase=intent!=='delete';\n  if(state.productBusy.has(key))return;\n  const group=activeGroups().find(entry=>norm(entry.summary)===key);",'base intent')
+          old="  const key=norm(item);\n  if(state.productBusy.has(key))return;\n  const group=activeGroups().find(entry=>norm(entry.summary)===key);"
+          new="  const key=norm(item);\n  const isPurchase=intent!=='delete';\n  if(state.productBusy.has(key))return;\n  const group=activeGroups().find(entry=>norm(entry.summary)===key);"
+          base_scope=s.index("async function removeGroup(name,row=null,intent='purchase'){")
+          anchor=s.find(old,base_scope)
+          if anchor<0: raise SystemExit('base intent anchor')
+          s=s[:anchor]+new+s[anchor+len(old):]
 
           base_pat=re.compile(r"(async function removeGroup\(name,row=null,intent='purchase'\)\{.*?state\.productBusy\.add\(key\);\n  let undoToken=null;\n)  if\(row\)\{(.*?)\n  \}\n\n  state\.pendingRemoval\.add\(key\);",re.S)
           m=base_pat.search(s)
