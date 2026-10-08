@@ -273,7 +273,7 @@ document.head.appendChild(script);
 'use strict';
 if(document.querySelector('script[data-missing-products-modern]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-modern.js?v=5';
+script.src='./missing-products-modern.js?v=6';
 script.defer=true;
 script.dataset.missingProductsModern='1';
 document.head.appendChild(script);

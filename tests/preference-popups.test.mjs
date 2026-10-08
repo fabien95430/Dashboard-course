@@ -18,6 +18,16 @@ test('les popups de préférences utilisent la même coque extérieure et un scr
   assert.match(source,/#preferencesDialog::backdrop,\s*#missingProductsDialog::backdrop,\s*\.recipe-customization-dialog::backdrop\{[\s\S]*?backdrop-filter:blur\(8px\)!important/);
 });
 
+test('le design moderne des produits manquants ne redéfinit plus la coque extérieure',()=>{
+  const source=read('missing-products-modern.js');
+  assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bwidth:/);
+  assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bheight:/);
+  assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bmax-height:/);
+  assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bpadding(?:-left|-right)?:/);
+  assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bborder-radius:/);
+  assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\boverflow(?:-y)?:/);
+});
+
 test('le clavier ne déplace ni ne redimensionne les popups de préférences pendant la saisie',()=>{
   const source=read('settings-tab-badge.js');
   const selector=source.match(/const PREFERENCE_DIALOG_SELECTOR='([^']+)'/)?.[1];
@@ -55,21 +65,25 @@ test('la personnalisation des recettes se réinitialise durablement et s enregis
   assert.doesNotMatch(save,/recipeCustomizationDialog\.close\(\)/);
 });
 
-test('la version visible passe à v336 et les ressources Ma liste sont rechargées',()=>{
+test('la version visible passe à v337 et la coque corrigée est rechargée',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
+  const settings=read('settings-tab-badge.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=336/);
-  assert.match(index,/catalog\.js\?v=336/);
+  assert.match(index,/catalog\.js\?v=337/);
   assert.match(index,/app\.js\?v=336/);
-  assert.match(index,/settings-tab-badge\.js\?v=335/);
-  assert.equal((index.match(/page-version\">v336/g)||[]).length,3);
-  assert.match(catalog,/dish-local-images\.js\?v=336/);
-  assert.match(sw,/courses-app-v336-r1/);
+  assert.match(index,/settings-tab-badge\.js\?v=337/);
+  assert.equal((index.match(/page-version\">v337/g)||[]).length,3);
+  assert.match(catalog,/dish-local-images\.js\?v=337/);
+  assert.match(settings,/missing-products-modern\.js\?v=6/);
+  assert.match(sw,/courses-app-v337-r1/);
   assert.match(sw,/styles\.css\?v=336/);
-  assert.match(sw,/catalog\.js\?v=336/);
+  assert.match(sw,/catalog\.js\?v=337/);
   assert.match(sw,/app\.js\?v=336/);
-  assert.match(sw,/dish-local-images\.js\?v=336/);
-  assert.match(localImages,/const APP_VERSION='v336'/);
+  assert.match(sw,/settings-tab-badge\.js\?v=337/);
+  assert.match(sw,/dish-local-images\.js\?v=337/);
+  assert.match(sw,/missing-products-modern\.js\?v=6/);
+  assert.match(localImages,/const APP_VERSION='v337'/);
 });
