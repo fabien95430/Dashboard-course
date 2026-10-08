@@ -1,4 +1,4 @@
-const CACHE='courses-app-v354-r1';
+const CACHE='courses-app-v354-r2';
 const VISUAL_CACHE='courses-visuals-v1';
 const PRODUCT_VISUALS=[
   './bring-photo-v5-frais.webp.png?v=15',
@@ -15,6 +15,11 @@ function isPersistentVisual(url){
     ||url.pathname.includes('/www/Items/')
     ||url.pathname.endsWith('/www/empty-list-premium-v4.webp')
     ||/\/bring-photo-v5-(?:frais|fruits-legumes|epicerie|boissons|maison)\.webp\.png$/.test(url.pathname);
+}
+
+function isLaunchVisual(url){
+  return url.pathname.endsWith('/welcome-cart-transparent-v46.png')
+    ||url.pathname.endsWith('/welcome-background-v40.webp');
 }
 
 async function migrateExistingVisuals(){
@@ -79,6 +84,17 @@ self.addEventListener('activate',event=>event.waitUntil(
 self.addEventListener('fetch',event=>{
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin||event.request.method!=='GET')return;
+
+  if(isLaunchVisual(url)){
+    event.respondWith(caches.match(event.request).then(hit=>{
+      if(hit)return hit;
+      return fetch(new Request(event.request,{cache:'reload'})).then(response=>{
+        if(response.ok)caches.open(CACHE).then(cache=>cache.put(event.request,response.clone()));
+        return response;
+      });
+    }));
+    return;
+  }
 
   if(isPersistentVisual(url)){
     const cachePromise=caches.open(VISUAL_CACHE);
