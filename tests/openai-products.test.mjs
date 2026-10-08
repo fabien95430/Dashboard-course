@@ -37,6 +37,17 @@ test('le workflow OpenAI route les produits vers une intégration WebP avec noti
   assert.match(script,/ROOT \/ "catalog\.js"/);
 });
 
+test('le classement OpenAI reçoit tout le catalogue et peut créer une sous-catégorie',()=>{
+  const script=read('scripts/integrate_product_openai.py');
+  assert.doesNotMatch(script,/list\(names\)\[:8\]/);
+  assert.match(script,/category:\{subgroup:list\(names\) for subgroup,names in subgroups\.items\(\)\}/);
+  assert.match(script,/"category", "subgroup" et "create_subgroup"/);
+  assert.match(script,/if not isinstance\(create_value,bool\)/);
+  assert.match(script,/if create_subgroup:/);
+  assert.match(script,/groups\[category\]\[subgroup\]=\[\]/);
+  assert.match(script,/created_subgroup/);
+});
+
 test('une nouvelle tuile produit hors atlas peut être remplacée par son image unitaire',()=>{
   const images=read('product-item-images.js');
   assert.match(images,/card\.querySelector\('\.product-svg'\)/);

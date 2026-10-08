@@ -46,27 +46,63 @@ def find_product(groups: dict[str, dict[str, list[str]]], name: str):
     return None
 
 
-def infer_location(name: str, selected_category: str, groups: dict, api_key: str) -> tuple[str,str]:
+def validate_location_result(result: dict, source: dict, name: str) -> tuple[str,str,bool]:
+    category=str(result.get("category") or "").strip()
+    subgroup=re.sub(r"\s+"," ",str(result.get("subgroup") or "")).strip()
+    create_value=result.get("create_subgroup")
+    if not isinstance(create_value,bool):
+        raise RuntimeError("Le classement produit doit préciser create_subgroup avec un booléen")
+    if category not in source:
+        raise RuntimeError("Catégorie produit générée invalide")
+    if not subgroup:
+        raise RuntimeError("Sous-catégorie produit vide")
+
+    for existing in source[category]:
+        if base.normalize(existing)==base.normalize(subgroup):
+            return category,str(existing),False
+
+    if not create_value:
+        raise RuntimeError("Sous-catégorie produit générée inexistante")
+    if len(subgroup)>40 or len(subgroup.split())>5:
+        raise RuntimeError("Nouvelle sous-catégorie produit invalide")
+    if any(ord(character)<32 for character in subgroup):
+        raise RuntimeError("Nouvelle sous-catégorie produit invalide")
+    if base.normalize(subgroup)==base.normalize(name):
+        raise RuntimeError("La nouvelle sous-catégorie doit être générique et réutilisable")
+    return category,subgroup,True
+
+
+def infer_location(name: str, selected_category: str, groups: dict, api_key: str) -> tuple[str,str,bool]:
     if selected_category and selected_category not in groups:
         base.fail("Catégorie produit invalide")
-    candidates={}
     source={selected_category:groups[selected_category]} if selected_category else groups
-    for category,subgroups in source.items():
-        candidates[category]={subgroup:list(names)[:8] for subgroup,names in subgroups.items()}
+    candidates={
+        category:{subgroup:list(names) for subgroup,names in subgroups.items()}
+        for category,subgroups in source.items()
+    }
     model=os.getenv("COURSES_TEXT_MODEL","gpt-6-luna")
     category_rule=(
         f"La catégorie imposée est {selected_category!r}; retourne exactement cette catégorie."
         if selected_category else
-        "Choisis la catégorie la plus cohérente parmi celles fournies."
+        "Choisis la catégorie principale la plus cohérente parmi celles fournies."
     )
     prompt=f"""
 Tu classes un nouveau produit dans le catalogue d'une application de courses française.
 Produit demandé: {name}
 {category_rule}
 
-Réponds UNIQUEMENT par un objet JSON avec exactement deux clés: "category" et "subgroup".
-Les deux valeurs doivent être recopiées EXACTEMENT depuis les clés du catalogue ci-dessous.
-Choisis le sous-groupe où ce produit serait le plus naturel. Les produits existants fournis sont seulement des exemples de contexte.
+Réponds UNIQUEMENT par un objet JSON avec exactement trois clés:
+"category", "subgroup" et "create_subgroup".
+"create_subgroup" doit être un booléen JSON.
+
+Règles de classement:
+- Analyse toutes les sous-catégories et tous les produits existants fournis ci-dessous.
+- Privilégie toujours une sous-catégorie existante lorsque le produit y est naturellement à sa place.
+- Si tu choisis une sous-catégorie existante, recopie son nom EXACTEMENT et mets "create_subgroup": false.
+- Uniquement si aucune sous-catégorie existante n'est réellement cohérente, mets "create_subgroup": true et propose dans "subgroup" un nom français court, générique et réutilisable pour plusieurs produits.
+- Une nouvelle sous-catégorie ne doit jamais être simplement le nom du produit demandé.
+- La catégorie principale doit toujours être recopiée EXACTEMENT depuis le catalogue fourni; n'invente jamais de nouvelle catégorie principale.
+
 Catalogue disponible:
 {json.dumps(candidates,ensure_ascii=False)}
 """.strip()
@@ -77,13 +113,9 @@ Catalogue disponible:
     )
     try:
         result=base.parse_json_object(base.response_text(payload))
+        return validate_location_result(result,source,name)
     except Exception as error:
         raise RuntimeError(f"Classement produit invalide: {error}") from error
-    category=str(result.get("category") or "")
-    subgroup=str(result.get("subgroup") or "")
-    if category not in source or subgroup not in source[category]:
-        raise RuntimeError("Catégorie ou sous-groupe produit généré invalide")
-    return category,subgroup
 
 
 def image_prompt(name: str, category: str, subgroup: str) -> str:
@@ -138,7 +170,7 @@ def current_version() -> int:
     return int(match.group(1))
 
 
-def integrate_files(name: str, category: str, subgroup: str, image: bytes, catalog_text: str, groups_match: re.Match[str], groups: dict, already_in_catalog: bool) -> tuple[int,str]:
+def integrate_files(name: str, category: str, subgroup: str, image: bytes, catalog_text: str, groups_match: re.Match[str], groups: dict, already_in_catalog: bool, create_subgroup: bool=False) -> tuple[int,str]:
     local_path=ROOT / "dish-local-images.js"
     sw_path=ROOT / "sw.js"
     local_text=local_path.read_text(encoding="utf-8")
@@ -146,6 +178,12 @@ def integrate_files(name: str, category: str, subgroup: str, image: bytes, catal
     new_version=current_version()+1
 
     if not already_in_catalog:
+        if create_subgroup:
+            if subgroup in groups[category]:
+                base.fail("La sous-catégorie produit existe déjà")
+            groups[category][subgroup]=[]
+        elif subgroup not in groups[category]:
+            base.fail("Sous-catégorie produit introuvable")
         groups[category][subgroup].append(name)
         encoded_groups=json.dumps(groups,ensure_ascii=False,separators=(",",":"))
         catalog_text=catalog_text[:groups_match.start(1)]+encoded_groups+catalog_text[groups_match.end(1):]
@@ -180,6 +218,7 @@ def main() -> None:
 
     catalog_text,groups_match,groups=load_groups()
     existing=find_product(groups,name)
+    create_subgroup=False
     if existing:
         existing_name,category,subgroup=existing
         filename=base.slugify(existing_name)+".webp"
@@ -195,16 +234,19 @@ def main() -> None:
     else:
         if not api_key:
             base.fail("Secret GitHub OPENAI_API_KEY manquant")
-        category,subgroup=infer_location(name,selected_category,groups,api_key)
+        category,subgroup,create_subgroup=infer_location(name,selected_category,groups,api_key)
         already_in_catalog=False
 
     if not api_key:
         base.fail("Secret GitHub OPENAI_API_KEY manquant")
     image=generate_image(name,category,subgroup,api_key)
-    version,filename=integrate_files(name,category,subgroup,image,catalog_text,groups_match,groups,already_in_catalog)
+    version,filename=integrate_files(
+        name,category,subgroup,image,catalog_text,groups_match,groups,already_in_catalog,create_subgroup
+    )
     RESULT_PATH.write_text(json.dumps({
         "ok":True,"already_exists":False,"name":name,"version":version,
         "filename":filename,"category":category,"subgroup":subgroup,
+        "created_subgroup":create_subgroup,
     },ensure_ascii=False,indent=2),encoding="utf-8")
 
 
