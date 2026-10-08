@@ -343,12 +343,29 @@ function installStyle(){
   `;
   document.head.appendChild(style);
 }
+function bindOpenFallback(dialog){
+  const opener=document.getElementById('settingsMissingProductsBtn');
+  if(!opener||opener.dataset.missingPopupOpenFallback==='1')return;
+  opener.dataset.missingPopupOpenFallback='1';
+  opener.addEventListener('click',()=>{
+    if(dialog.open)return;
+    dialog.removeAttribute('autofocus');
+    try{
+      dialog.showModal();
+      requestAnimationFrame(()=>{
+        try{dialog.focus({preventScroll:true})}catch(_){dialog.focus()}
+      });
+    }catch(_){}
+  });
+}
 function bind(){
   const dialog=document.getElementById('missingProductsDialog');
   if(!dialog)return false;
+  dialog.removeAttribute('autofocus');
   if(dialog.dataset.missingPopupUiBound==='1'){queueDecorate();return true;}
   dialog.dataset.missingPopupUiBound='1';
   ensureCloseButton(dialog);
+  bindOpenFallback(dialog);
   bindModeSwitch(dialog);
   new MutationObserver(mutations=>{
     queueDecorate();
