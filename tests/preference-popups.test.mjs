@@ -128,28 +128,28 @@ test('les validations restent dans leur popup tant que celui-ci reste ouvert',()
   assert.match(styles,/\.dialog-feedback,\.courses-openai-feedback\{/);
 });
 
-test('la version visible passe à v344 et les ressources de feedback sont rechargées',()=>{
+test('la version visible passe à v345 et les ressources du catalogue sont rechargées',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
   const settings=read('settings-tab-badge.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=344/);
-  assert.match(index,/catalog\.js\?v=344/);
-  assert.match(index,/app\.js\?v=344/);
+  assert.match(index,/catalog\.js\?v=345/);
+  assert.match(index,/app\.js\?v=345/);
   assert.match(index,/settings-tab-badge\.js\?v=344/);
-  assert.equal((index.match(/page-version\">v344/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v345/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=344/);
-  assert.match(catalog,/dish-local-images\.js\?v=344/);
+  assert.match(catalog,/dish-local-images\.js\?v=345/);
   assert.match(settings,/missing-products-dishes\.js\?v=6/);
   assert.match(settings,/missing-products-modern\.js\?v=6/);
-  assert.match(sw,/courses-app-v344-r1/);
+  assert.match(sw,/courses-app-v345-r1/);
   assert.match(sw,/styles\.css\?v=344/);
-  assert.match(sw,/catalog\.js\?v=344/);
-  assert.match(sw,/app\.js\?v=344/);
+  assert.match(sw,/catalog\.js\?v=345/);
+  assert.match(sw,/app\.js\?v=345/);
   assert.match(sw,/settings-tab-badge\.js\?v=344/);
   assert.match(sw,/missing-products-dishes\.js\?v=6/);
   assert.match(sw,/dishes-ui\.js\?v=344/);
-  assert.match(sw,/dish-local-images\.js\?v=344/);
-  assert.match(localImages,/const APP_VERSION='v344'/);
+  assert.match(sw,/dish-local-images\.js\?v=345/);
+  assert.match(localImages,/const APP_VERSION='v345'/);
 });

@@ -72,6 +72,43 @@ test('un produit inconnu, une quantité invalide ou une session verrouillée ne 
 });
 
 
+test('le catalogue cumule immédiatement les appuis rapides sur plus et moins',async()=>{
+  const queueStart=source.indexOf('const catalogQuantityQueue=new Map();');
+  const queueEnd=source.indexOf('function syncProductSelection()',queueStart);
+  assert.ok(queueStart>=0&&queueEnd>queueStart,'file de quantité catalogue introuvable');
+  let quantity=0,firstAdd=true,release;
+  const gate=new Promise(resolve=>{release=resolve});
+  const shown=[];
+  const context={
+    Map,Math,Number,String,Promise,
+    state:{locked:false},
+    norm:value=>String(value).toLowerCase(),
+    productQuantity:()=>quantity,
+    setProductQuantity:(_name,value)=>shown.push(value),
+    incrementProduct:async()=>{if(firstAdd){firstAdd=false;await gate}quantity+=1},
+    decrementProduct:async()=>{quantity-=1}
+  };
+  vm.runInNewContext(source.slice(queueStart,queueEnd)+';globalThis.catalogQueueApi={queueCatalogQuantityChange,catalogQuantityForDisplay};',context);
+  const api=context.catalogQueueApi;
+  const adding=api.queueCatalogQuantityChange('Crème liquide',1);
+  api.queueCatalogQuantityChange('Crème liquide',1);
+  api.queueCatalogQuantityChange('Crème liquide',1);
+  assert.equal(shown.at(-1),3);
+  assert.equal(api.catalogQuantityForDisplay('Crème liquide',0),3);
+  release();
+  await adding;
+  assert.equal(quantity,3);
+  assert.equal(shown.at(-1),3);
+  const removing=api.queueCatalogQuantityChange('Crème liquide',-1);
+  api.queueCatalogQuantityChange('Crème liquide',-1);
+  api.queueCatalogQuantityChange('Crème liquide',-1);
+  assert.equal(shown.at(-1),0);
+  await removing;
+  assert.equal(quantity,0);
+  assert.equal(shown.at(-1),0);
+});
+
+
 test('le menu trois points adopte un glass iOS plus compact et fondu sans changer les actions',()=>{
   const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');
   const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);

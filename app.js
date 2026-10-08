@@ -732,8 +732,8 @@ function productCard(product){
     '<button type="button" class="badge"></button>'+
     '<button type="button" class="media">'+sprite(product)+'</button>'+
     '<span class="product-copy"><span class="pname">'+esc(productDisplayName(product.name))+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>';
-  const add=card.querySelector('.badge');if(add)add.onclick=()=>incrementProduct(product.name);
-  const remove=card.querySelector('.media');if(remove)remove.onclick=()=>decrementProduct(product.name);
+  const add=card.querySelector('.badge');if(add)add.onclick=()=>queueCatalogQuantityChange(product.name,1);
+  const remove=card.querySelector('.media');if(remove)remove.onclick=()=>queueCatalogQuantityChange(product.name,-1);
   productCardCache.set(key,card);
   return card;
 }
@@ -752,7 +752,7 @@ function renderProducts(){
   const fragment=document.createDocumentFragment();
   products.forEach(product=>{
     const card=productCard(product);
-    updateProductCardQuantity(card,product.name,quantities.get(norm(product.name))||0);
+    updateProductCardQuantity(card,product.name,catalogQuantityForDisplay(product.name,quantities.get(norm(product.name))||0));
     fragment.appendChild(card);
   });
   el.replaceChildren(fragment);
@@ -763,11 +763,51 @@ function setProductQuantity(name,quantity){
   if(!card)return;
   updateProductCardQuantity(card,name,quantity);
 }
+const catalogQuantityQueue=new Map();
+function catalogQuantityForDisplay(name,confirmed=productQuantity(name)){
+  const task=catalogQuantityQueue.get(norm(name));
+  return task?task.target:confirmed;
+}
+function queueCatalogQuantityChange(name,delta){
+  const item=String(name||'').trim(),step=Math.sign(Number(delta)||0);
+  if(!item||!step||state.locked)return Promise.resolve();
+  const key=norm(item),existing=catalogQuantityQueue.get(key);
+  const current=existing?existing.target:productQuantity(item);
+  const target=Math.max(0,Math.min(100,current+step));
+  if(target===current)return existing?.promise||Promise.resolve();
+  const task=existing||{name:item,target:current,processing:false,promise:null};
+  task.target=target;
+  catalogQuantityQueue.set(key,task);
+  setProductQuantity(item,target);
+  if(!task.processing)task.promise=flushCatalogQuantityQueue(key,task);
+  return task.promise;
+}
+async function flushCatalogQuantityQueue(key,task){
+  task.processing=true;
+  try{
+    while(catalogQuantityQueue.get(key)===task&&!state.locked){
+      const confirmed=productQuantity(task.name),target=task.target;
+      if(confirmed===target)break;
+      if(confirmed<target)await incrementProduct(task.name);
+      else await decrementProduct(task.name);
+      const next=productQuantity(task.name);
+      setProductQuantity(task.name,task.target);
+      if(next===confirmed)break;
+    }
+  }finally{
+    task.processing=false;
+    if(catalogQuantityQueue.get(key)===task){
+      catalogQuantityQueue.delete(key);
+      setProductQuantity(task.name,productQuantity(task.name));
+    }
+  }
+}
 function syncProductSelection(){
   if(state.preferences.hideAdded){renderProducts();return}
   const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
   document.querySelectorAll('#products .product').forEach(card=>{
-    setProductQuantity(card.dataset.name||'',quantities.get(norm(card.dataset.name))||0);
+    const name=card.dataset.name||'';
+    setProductQuantity(name,catalogQuantityForDisplay(name,quantities.get(norm(name))||0));
   });
 }
 function renderSelectionAndList(){
