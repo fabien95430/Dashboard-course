@@ -18,7 +18,7 @@ jobs:
           ref: agent-openai-cancel-status-v353
           fetch-depth: 10
 
-      - name: Patch, test and publish v353
+      - name: Valider et conserver les fichiers applicatifs v353
         shell: bash
         env:
           EXPECTED_MAIN: 4a199bfd5d921ad5c43669542f8c8a6d892a4fe0
@@ -35,6 +35,11 @@ jobs:
           new="text=replace_once(text,r'assert.equal((index.match(/page-version\\\">v352/g)||[]).length,3);',r'assert.equal((index.match(/page-version\\\">v353/g)||[]).length,3);','badge version test')"
           if old not in text:
               raise SystemExit('badge patch source missing')
-          path.write_text(text.replace(old,new,1))
+          text=text.replace(old,new,1)
+          old_tail='''git config user.name "OpenAI Agent"\ngit config user.email "openai-agent@users.noreply.github.com"\ngit add .github/workflows/integrate-dish-openai.yml catalog.js dish-local-images.js index.html missing-products-fixes.js sw.js tests/openai-cancellation.test.mjs tests/preference-popups.test.mjs\ngit commit -m "v353: gère l’annulation des intégrations OpenAI"\ngit push origin HEAD:main'''
+          new_tail='''git checkout -- .github/workflows/integrate-dish-openai.yml\ngit config user.name "OpenAI Agent"\ngit config user.email "openai-agent@users.noreply.github.com"\ngit add catalog.js dish-local-images.js index.html missing-products-fixes.js sw.js tests/openai-cancellation.test.mjs tests/preference-popups.test.mjs\ngit commit -m "v353: fichiers applicatifs validés"\ngit push --force origin HEAD:agent-openai-cancel-validated-v353'''
+          if old_tail not in text:
+              raise SystemExit('publish tail missing')
+          path.write_text(text.replace(old_tail,new_tail,1))
           PY
           bash /tmp/agent-v353.sh
