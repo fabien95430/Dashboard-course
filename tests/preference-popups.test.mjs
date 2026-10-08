@@ -72,7 +72,7 @@ test('la personnalisation des recettes se réinitialise durablement et s enregis
   assert.doesNotMatch(save,/recipeCustomizationDialog\.close\(\)/);
 });
 
-test('la recherche des recettes personnalisées reste fermée à l ouverture',()=>{
+test('la recherche des recettes personnalisées reste fermée et vide à l ouverture',()=>{
   const source=read('dishes-ui.js');
   const start=source.indexOf('function openRecipeCustomization()');
   const end=source.indexOf('function saveRecipeCustomization()',start);
@@ -81,6 +81,7 @@ test('la recherche des recettes personnalisées reste fermée à l ouverture',()
   const show=open.indexOf("recipeCustomizationDialog.showModal()");
   const focus=open.indexOf("recipeCustomizationDialog.focus({preventScroll:true})");
   const hide=open.lastIndexOf('hideRecipeCustomizationSuggestions()');
+  assert.match(open,/recipeCustomizationSearch\.value='';/);
   assert.ok(show>=0,'showModal introuvable');
   assert.ok(focus>show,'le dialogue doit reprendre le focus après showModal');
   assert.ok(hide>focus,'les suggestions doivent être refermées après la gestion du focus');
@@ -96,29 +97,29 @@ test('un ingrédient du catalogue peut être ajouté à une recette personnalis�
   assert.match(source,/dishSheetList\.innerHTML=recipeIngredientsForDish\(currentDish\)\.map\(name=>/);
 });
 
-test('la version visible passe à v342 et les ressources du menu Ma liste sont rechargées',()=>{
+test('la version visible passe à v343 et les ressources de personnalisation sont rechargées',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
   const settings=read('settings-tab-badge.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=342/);
-  assert.match(index,/catalog\.js\?v=342/);
+  assert.match(index,/catalog\.js\?v=343/);
   assert.match(index,/app\.js\?v=342/);
   assert.match(index,/settings-tab-badge\.js\?v=341/);
-  assert.equal((index.match(/page-version\">v342/g)||[]).length,3);
-  assert.match(catalog,/dishes-ui\.js\?v=340/);
-  assert.match(catalog,/dish-local-images\.js\?v=342/);
+  assert.equal((index.match(/page-version\">v343/g)||[]).length,3);
+  assert.match(catalog,/dishes-ui\.js\?v=343/);
+  assert.match(catalog,/dish-local-images\.js\?v=343/);
   assert.match(settings,/missing-products-dishes\.js\?v=5/);
   assert.match(settings,/missing-products-modern\.js\?v=6/);
-  assert.match(sw,/courses-app-v342-r1/);
+  assert.match(sw,/courses-app-v343-r1/);
   assert.match(sw,/styles\.css\?v=342/);
-  assert.match(sw,/catalog\.js\?v=342/);
+  assert.match(sw,/catalog\.js\?v=343/);
   assert.match(sw,/app\.js\?v=342/);
   assert.match(sw,/settings-tab-badge\.js\?v=341/);
   assert.match(sw,/missing-products-dishes\.js\?v=5/);
-  assert.match(sw,/dishes-ui\.js\?v=340/);
-  assert.match(sw,/dish-local-images\.js\?v=342/);
+  assert.match(sw,/dishes-ui\.js\?v=343/);
+  assert.match(sw,/dish-local-images\.js\?v=343/);
   assert.match(sw,/missing-products-modern\.js\?v=6/);
-  assert.match(localImages,/const APP_VERSION='v342'/);
+  assert.match(localImages,/const APP_VERSION='v343'/);
 });

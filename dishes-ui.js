@@ -605,7 +605,7 @@ function openRecipeCustomization(){
   if(!recipeCustomizationDialog)return;
   const current=recipeCustomizationDish?.name||DISHES[0]?.name||'';
   loadRecipeCustomizationDish(current);
-  recipeCustomizationSearch.value=current;
+  recipeCustomizationSearch.value='';
   if(typeof recipeCustomizationDialog.showModal==='function')recipeCustomizationDialog.showModal();
   else recipeCustomizationDialog.setAttribute('open','');
   recipeCustomizationDialog.focus({preventScroll:true});
