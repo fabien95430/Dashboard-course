@@ -954,20 +954,60 @@ function closeListRowMenu(){
   listRowMenu.menu.remove();
   listRowMenu=null;
 }
+async function changeListRowMenuQuantity(name,delta){
+  const item=String(name||'').trim();
+  if(!item||!listRowMenu)return;
+  const key=norm(item);
+  listRowMenu.menu.classList.add('is-busy');
+  listRowMenu.menu.querySelectorAll('button').forEach(button=>button.disabled=true);
+  try{
+    if(delta>0)await incrementProduct(item);
+    else await decrementProduct(item);
+  }finally{
+    const nextRow=[...document.querySelectorAll('#listItems .list-row')].find(entry=>norm(entry.dataset.name)===key);
+    const nextAnchor=nextRow?.querySelector('.list-row-more');
+    if(nextRow&&nextAnchor&&productQuantity(item)>0)openListRowMenu(nextRow,nextAnchor);
+    else closeListRowMenu();
+  }
+}
 function openListRowMenu(row,anchor){
   closeListRowMenu();
   const name=row.dataset.name||'';
-  if(!activeGroups().some(entry=>norm(entry.summary)===norm(name)))return;
+  const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));
+  if(!group)return;
   const menu=document.createElement('div');
   menu.className='list-row-menu';
   menu.setAttribute('role','menu');
+  menu.setAttribute('aria-label','Actions pour '+name);
+  const quantity=document.createElement('div');
+  quantity.className='list-row-menu-quantity';
+  quantity.setAttribute('aria-label','Quantité de '+name);
+  const decrement=document.createElement('button');
+  decrement.type='button';
+  decrement.className='list-row-menu-decrement';
+  decrement.setAttribute('role','menuitem');
+  decrement.setAttribute('aria-label','Retirer une unité de '+name);
+  decrement.textContent='−';
+  const value=document.createElement('strong');
+  value.className='list-row-menu-value';
+  value.textContent=String(group.count);
+  value.setAttribute('aria-live','polite');
+  const increment=document.createElement('button');
+  increment.type='button';
+  increment.className='list-row-menu-increment';
+  increment.setAttribute('role','menuitem');
+  increment.setAttribute('aria-label','Ajouter une unité de '+name);
+  increment.textContent='+';
+  decrement.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,-1)};
+  increment.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,1)};
+  quantity.append(decrement,value,increment);
   const remove=document.createElement('button');
   remove.type='button';
   remove.className='list-row-menu-delete';
   remove.setAttribute('role','menuitem');
   remove.textContent='Supprimer';
   remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
-  menu.append(remove);
+  menu.append(quantity,remove);
   document.body.appendChild(menu);
   const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
   menu.style.width=width+'px';

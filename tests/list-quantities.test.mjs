@@ -5,6 +5,7 @@ import vm from 'node:vm';
 
 // Run the real list service with deterministic storage/network adapters.
 const source=readFileSync(new URL('../app.js',import.meta.url),'utf8');
+const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
 const start=source.indexOf('function productQuantity(name){');
 const end=source.indexOf('async function incrementProduct(name){',start);
 assert.ok(start>=0&&end>start,'service de quantité introuvable');
@@ -68,4 +69,25 @@ test('un produit inconnu, une quantité invalide ou une session verrouillée ne 
   s.state.locked=true;
   assert.equal((await s.api.ensureQuantity('Crème liquide',3)).failed,1);
   assert.equal(s.writes(),0);
+});
+
+
+test('le menu trois points expose la quantité et la suppression comme la maquette validée',()=>{
+  const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');
+  const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);
+  const menuEnd=source.indexOf('function bindListReorder(root){',menuStart);
+  assert.ok(helperStart>=0&&menuStart>helperStart&&menuEnd>menuStart,'menu d actions introuvable');
+  const helper=source.slice(helperStart,menuStart),menu=source.slice(menuStart,menuEnd);
+  assert.match(helper,/await incrementProduct\(item\)/);
+  assert.match(helper,/await decrementProduct\(item\)/);
+  assert.match(menu,/list-row-menu-quantity/);
+  assert.match(menu,/list-row-menu-decrement/);
+  assert.match(menu,/list-row-menu-value/);
+  assert.match(menu,/list-row-menu-increment/);
+  assert.match(menu,/changeListRowMenuQuantity\(name,-1\)/);
+  assert.match(menu,/changeListRowMenuQuantity\(name,1\)/);
+  assert.match(menu,/list-row-menu-delete/);
+  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-bottom:1px solid rgba\(23,49,38,\.08\)/s);
+  assert.match(styles,/\.list-row-menu-quantity button\{[^}]*border-radius:999px[^}]*background:#eaf4ef/s);
+  assert.match(styles,/\.list-row-menu-delete\{[^}]*background:#fdeff0[^}]*color:#df3f49/s);
 });
