@@ -103,7 +103,7 @@ def image_prompt(name: str, category: str, subgroup: str) -> str:
 
 
 def generate_image(name: str, category: str, subgroup: str, api_key: str) -> bytes:
-    model=os.getenv("COURSES_IMAGE_MODEL","gpt-image-2")
+    model=os.getenv("COURSES_IMAGE_MODEL","gpt-image-2.5-flare")
     payload=base.api_json(
         "https://api.openai.com/v1/images/generations",
         {
