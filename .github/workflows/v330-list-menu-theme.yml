@@ -37,137 +37,102 @@ jobs:
 
           app_path = Path('app.js')
           app = app_path.read_text(encoding='utf-8')
-          old_menu = """let listRowMenu=null;
-function closeListRowMenu(){
-  if(!listRowMenu)return;
-  listRowMenu.anchor?.setAttribute('aria-expanded','false');
-  listRowMenu.menu.remove();
-  listRowMenu=null;
-}
-function openListRowMenu(row,anchor){
-  closeListRowMenu();
-  const name=row.dataset.name||'';
-  if(!activeGroups().some(entry=>norm(entry.summary)===norm(name)))return;
-  const menu=document.createElement('div');
-  menu.className='list-row-menu';
-  menu.setAttribute('role','menu');
-  const remove=document.createElement('button');
-  remove.type='button';
-  remove.className='list-row-menu-delete';
-  remove.setAttribute('role','menuitem');
-  remove.textContent='Supprimer';
-  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
-  menu.append(remove);
-  document.body.appendChild(menu);
-  const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
-  menu.style.width=width+'px';
-  const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
-  const below=rect.bottom+7,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-7);
-  menu.style.left=left+'px';menu.style.top=top+'px';
-  anchor.setAttribute('aria-expanded','true');
-  listRowMenu={menu,anchor};
-}
-"""
-          new_menu = """let listRowMenu=null;
-function closeListRowMenu(){
-  if(!listRowMenu)return;
-  listRowMenu.anchor?.setAttribute('aria-expanded','false');
-  listRowMenu.menu.remove();
-  listRowMenu=null;
-}
-async function changeListRowMenuQuantity(name,delta){
-  const item=String(name||'').trim();
-  if(!item||!listRowMenu)return;
-  const key=norm(item);
-  listRowMenu.menu.classList.add('is-busy');
-  listRowMenu.menu.querySelectorAll('button').forEach(button=>button.disabled=true);
-  try{
-    if(delta>0)await incrementProduct(item);
-    else await decrementProduct(item);
-  }finally{
-    const nextRow=[...document.querySelectorAll('#listItems .list-row')].find(entry=>norm(entry.dataset.name)===key);
-    const nextAnchor=nextRow?.querySelector('.list-row-more');
-    if(nextRow&&nextAnchor&&productQuantity(item)>0)openListRowMenu(nextRow,nextAnchor);
-    else closeListRowMenu();
-  }
-}
-function openListRowMenu(row,anchor){
-  closeListRowMenu();
-  const name=row.dataset.name||'';
-  const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));
-  if(!group)return;
-  const menu=document.createElement('div');
-  menu.className='list-row-menu';
-  menu.setAttribute('role','menu');
-  menu.setAttribute('aria-label','Actions pour '+name);
-  const quantity=document.createElement('div');
-  quantity.className='list-row-menu-quantity';
-  quantity.setAttribute('aria-label','Quantité de '+name);
-  const decrement=document.createElement('button');
-  decrement.type='button';
-  decrement.className='list-row-menu-decrement';
-  decrement.setAttribute('role','menuitem');
-  decrement.setAttribute('aria-label','Retirer une unité de '+name);
-  decrement.textContent='−';
-  const value=document.createElement('strong');
-  value.className='list-row-menu-value';
-  value.textContent=String(group.count);
-  value.setAttribute('aria-live','polite');
-  const increment=document.createElement('button');
-  increment.type='button';
-  increment.className='list-row-menu-increment';
-  increment.setAttribute('role','menuitem');
-  increment.setAttribute('aria-label','Ajouter une unité de '+name);
-  increment.textContent='+';
-  decrement.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,-1)};
-  increment.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,1)};
-  quantity.append(decrement,value,increment);
-  const remove=document.createElement('button');
-  remove.type='button';
-  remove.className='list-row-menu-delete';
-  remove.setAttribute('role','menuitem');
-  remove.textContent='Supprimer';
-  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
-  menu.append(quantity,remove);
-  document.body.appendChild(menu);
-  const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
-  menu.style.width=width+'px';
-  const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
-  const below=rect.bottom+7,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-7);
-  menu.style.left=left+'px';menu.style.top=top+'px';
-  anchor.setAttribute('aria-expanded','true');
-  listRowMenu={menu,anchor};
-}
-"""
-          if app.count(old_menu) != 1:
+          menu_pattern = re.compile(r"let listRowMenu=null;\nfunction closeListRowMenu\(\)\{.*?\nfunction bindListReorder\(root\)\{", re.S)
+          new_menu = (
+              "let listRowMenu=null;\n"
+              "function closeListRowMenu(){\n"
+              "  if(!listRowMenu)return;\n"
+              "  listRowMenu.anchor?.setAttribute('aria-expanded','false');\n"
+              "  listRowMenu.menu.remove();\n"
+              "  listRowMenu=null;\n"
+              "}\n"
+              "async function changeListRowMenuQuantity(name,delta){\n"
+              "  const item=String(name||'').trim();\n"
+              "  if(!item||!listRowMenu)return;\n"
+              "  const key=norm(item);\n"
+              "  listRowMenu.menu.classList.add('is-busy');\n"
+              "  listRowMenu.menu.querySelectorAll('button').forEach(button=>button.disabled=true);\n"
+              "  try{\n"
+              "    if(delta>0)await incrementProduct(item);\n"
+              "    else await decrementProduct(item);\n"
+              "  }finally{\n"
+              "    const nextRow=[...document.querySelectorAll('#listItems .list-row')].find(entry=>norm(entry.dataset.name)===key);\n"
+              "    const nextAnchor=nextRow?.querySelector('.list-row-more');\n"
+              "    if(nextRow&&nextAnchor&&productQuantity(item)>0)openListRowMenu(nextRow,nextAnchor);\n"
+              "    else closeListRowMenu();\n"
+              "  }\n"
+              "}\n"
+              "function openListRowMenu(row,anchor){\n"
+              "  closeListRowMenu();\n"
+              "  const name=row.dataset.name||'';\n"
+              "  const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));\n"
+              "  if(!group)return;\n"
+              "  const menu=document.createElement('div');\n"
+              "  menu.className='list-row-menu';\n"
+              "  menu.setAttribute('role','menu');\n"
+              "  menu.setAttribute('aria-label','Actions pour '+name);\n"
+              "  const quantity=document.createElement('div');\n"
+              "  quantity.className='list-row-menu-quantity';\n"
+              "  quantity.setAttribute('aria-label','Quantité de '+name);\n"
+              "  const decrement=document.createElement('button');\n"
+              "  decrement.type='button';\n"
+              "  decrement.className='list-row-menu-decrement';\n"
+              "  decrement.setAttribute('role','menuitem');\n"
+              "  decrement.setAttribute('aria-label','Retirer une unité de '+name);\n"
+              "  decrement.textContent='−';\n"
+              "  const value=document.createElement('strong');\n"
+              "  value.className='list-row-menu-value';\n"
+              "  value.textContent=String(group.count);\n"
+              "  value.setAttribute('aria-live','polite');\n"
+              "  const increment=document.createElement('button');\n"
+              "  increment.type='button';\n"
+              "  increment.className='list-row-menu-increment';\n"
+              "  increment.setAttribute('role','menuitem');\n"
+              "  increment.setAttribute('aria-label','Ajouter une unité de '+name);\n"
+              "  increment.textContent='+';\n"
+              "  decrement.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,-1)};\n"
+              "  increment.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,1)};\n"
+              "  quantity.append(decrement,value,increment);\n"
+              "  const remove=document.createElement('button');\n"
+              "  remove.type='button';\n"
+              "  remove.className='list-row-menu-delete';\n"
+              "  remove.setAttribute('role','menuitem');\n"
+              "  remove.textContent='Supprimer';\n"
+              "  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};\n"
+              "  menu.append(quantity,remove);\n"
+              "  document.body.appendChild(menu);\n"
+              "  const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);\n"
+              "  menu.style.width=width+'px';\n"
+              "  const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));\n"
+              "  const below=rect.bottom+7,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-7);\n"
+              "  menu.style.left=left+'px';menu.style.top=top+'px';\n"
+              "  anchor.setAttribute('aria-expanded','true');\n"
+              "  listRowMenu={menu,anchor};\n"
+              "}\n"
+              "function bindListReorder(root){"
+          )
+          app, changed = menu_pattern.subn(lambda _: new_menu, app, count=1)
+          if changed != 1:
               raise SystemExit('Bloc menu attendu introuvable ou ambigu dans app.js')
-          app = app.replace(old_menu, new_menu, 1)
           app_path.write_text(app, encoding='utf-8')
 
           styles_path = Path('styles.css')
           styles = styles_path.read_text(encoding='utf-8')
-          old_styles = """.list-row-menu{position:fixed;z-index:2200;padding:6px;border:1px solid rgba(23,49,38,.08);border-radius:20px;background:rgba(255,255,255,.96);color:#173126;box-shadow:0 14px 34px rgba(35,56,44,.14);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);overflow:hidden}
-.list-row-menu-quantity{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 10px;font-size:14px;font-weight:760}
-.list-row-menu-quantity>div{display:flex;align-items:center;gap:8px}
-.list-row-menu-quantity button{width:38px;height:38px;border:0;border-radius:999px;background:#eaf4ef;color:#176f40;font-size:24px;font-weight:700;box-shadow:none}
-.list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:16px;color:#173126}
-.list-row-menu-delete{width:100%;height:46px;border:0;background:#fdeff0;color:#df3f49;text-align:left;padding:0 14px;border-radius:14px;font-size:15px;font-weight:780;display:flex;align-items:center;gap:10px}
-.list-row-menu-delete::before{content:'';width:20px;height:20px;flex:0 0 20px;background:center/20px 20px no-repeat url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E\")}
-.list-row-menu-delete:active{background:#f9e4e6}
-"""
-          new_styles = """.list-row-menu{position:fixed;z-index:2200;padding:8px;border:1px solid rgba(23,49,38,.08);border-radius:20px;background:rgba(255,255,255,.96);color:#173126;box-shadow:0 14px 34px rgba(35,56,44,.14);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);overflow:hidden}
-.list-row-menu-quantity{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 8px 12px;margin-bottom:6px;border-bottom:1px solid rgba(23,49,38,.08);font-size:14px;font-weight:760}
-.list-row-menu-quantity button{width:38px;height:38px;border:0;border-radius:999px;background:#eaf4ef;color:#176f40;font-size:24px;font-weight:700;line-height:1;box-shadow:none;transition:transform .12s ease,background .12s ease}
-.list-row-menu-quantity button:active{background:#dceee5;transform:scale(.96)}
-.list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:18px;line-height:1;color:#173126;font-variant-numeric:tabular-nums}
-.list-row-menu-quantity button:disabled,.list-row-menu-delete:disabled{opacity:.45}
-.list-row-menu-delete{width:100%;height:48px;border:0;background:#fdeff0;color:#df3f49;text-align:left;padding:0 14px;border-radius:14px;font-size:15px;font-weight:780;display:flex;align-items:center;gap:10px}
-.list-row-menu-delete::before{content:'';width:20px;height:20px;flex:0 0 20px;background:center/20px 20px no-repeat url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E\")}
-.list-row-menu-delete:active{background:#f9e4e6}
-"""
-          if styles.count(old_styles) != 1:
+          styles_pattern = re.compile(r"\.list-row-menu\{position:fixed;.*?\.list-row-menu-delete:active\{background:#f9e4e6\}\n", re.S)
+          new_styles = (
+              ".list-row-menu{position:fixed;z-index:2200;padding:8px;border:1px solid rgba(23,49,38,.08);border-radius:20px;background:rgba(255,255,255,.96);color:#173126;box-shadow:0 14px 34px rgba(35,56,44,.14);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);overflow:hidden}\n"
+              ".list-row-menu-quantity{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 8px 12px;margin-bottom:6px;border-bottom:1px solid rgba(23,49,38,.08);font-size:14px;font-weight:760}\n"
+              ".list-row-menu-quantity button{width:38px;height:38px;border:0;border-radius:999px;background:#eaf4ef;color:#176f40;font-size:24px;font-weight:700;line-height:1;box-shadow:none;transition:transform .12s ease,background .12s ease}\n"
+              ".list-row-menu-quantity button:active{background:#dceee5;transform:scale(.96)}\n"
+              ".list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:18px;line-height:1;color:#173126;font-variant-numeric:tabular-nums}\n"
+              ".list-row-menu-quantity button:disabled,.list-row-menu-delete:disabled{opacity:.45}\n"
+              ".list-row-menu-delete{width:100%;height:48px;border:0;background:#fdeff0;color:#df3f49;text-align:left;padding:0 14px;border-radius:14px;font-size:15px;font-weight:780;display:flex;align-items:center;gap:10px}\n"
+              ".list-row-menu-delete::before{content:'';width:20px;height:20px;flex:0 0 20px;background:center/20px 20px no-repeat url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E\")}\n"
+              ".list-row-menu-delete:active{background:#f9e4e6}\n"
+          )
+          styles, changed = styles_pattern.subn(lambda _: new_styles, styles, count=1)
+          if changed != 1:
               raise SystemExit('Bloc CSS du menu attendu introuvable ou ambigu')
-          styles = styles.replace(old_styles, new_styles, 1)
           styles_path.write_text(styles, encoding='utf-8')
 
           local_path = Path('dish-local-images.js')
@@ -203,12 +168,7 @@ function openListRowMenu(row,anchor){
           if not shell:
               raise SystemExit('SHELL introuvable dans sw.js')
           shell_body = shell.group(1)
-          for entry in (
-              f"'./styles.css?v={next_version}'",
-              f"'./catalog.js?v={next_version}'",
-              f"'./app.js?v={next_version}'",
-              f"'./dish-local-images.js?v={next_version}'",
-          ):
+          for entry in (f"'./styles.css?v={next_version}'", f"'./catalog.js?v={next_version}'", f"'./app.js?v={next_version}'", f"'./dish-local-images.js?v={next_version}'"):
               if entry not in shell_body:
                   shell_body += ',' + entry
           sw = sw[:shell.start(1)] + shell_body + sw[shell.end(1):]
@@ -222,58 +182,57 @@ function openListRowMenu(row,anchor){
               if source_line not in quantities_test:
                   raise SystemExit('Source app.js introuvable dans list-quantities.test.mjs')
               quantities_test = quantities_test.replace(source_line, source_line + styles_line, 1)
-          menu_test = """
-
-test('le menu trois points expose la quantité et la suppression comme la maquette validée',()=>{
-  const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');
-  const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);
-  const menuEnd=source.indexOf('function bindListReorder(root){',menuStart);
-  assert.ok(helperStart>=0&&menuStart>helperStart&&menuEnd>menuStart,'menu d actions introuvable');
-  const helper=source.slice(helperStart,menuStart),menu=source.slice(menuStart,menuEnd);
-  assert.match(helper,/await incrementProduct\(item\)/);
-  assert.match(helper,/await decrementProduct\(item\)/);
-  assert.match(menu,/list-row-menu-quantity/);
-  assert.match(menu,/list-row-menu-decrement/);
-  assert.match(menu,/list-row-menu-value/);
-  assert.match(menu,/list-row-menu-increment/);
-  assert.match(menu,/changeListRowMenuQuantity\(name,-1\)/);
-  assert.match(menu,/changeListRowMenuQuantity\(name,1\)/);
-  assert.match(menu,/list-row-menu-delete/);
-  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-bottom:1px solid rgba\(23,49,38,\.08\)/s);
-  assert.match(styles,/\.list-row-menu-quantity button\{[^}]*border-radius:999px[^}]*background:#eaf4ef/s);
-  assert.match(styles,/\.list-row-menu-delete\{[^}]*background:#fdeff0[^}]*color:#df3f49/s);
-});
-"""
           if "le menu trois points expose la quantité" not in quantities_test:
-              quantities_test += menu_test
+              quantities_test += (
+                  "\n\ntest('le menu trois points expose la quantité et la suppression comme la maquette validée',()=>{\n"
+                  "  const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');\n"
+                  "  const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);\n"
+                  "  const menuEnd=source.indexOf('function bindListReorder(root){',menuStart);\n"
+                  "  assert.ok(helperStart>=0&&menuStart>helperStart&&menuEnd>menuStart,'menu d actions introuvable');\n"
+                  "  const helper=source.slice(helperStart,menuStart),menu=source.slice(menuStart,menuEnd);\n"
+                  "  assert.match(helper,/await incrementProduct\\(item\\)/);\n"
+                  "  assert.match(helper,/await decrementProduct\\(item\\)/);\n"
+                  "  assert.match(menu,/list-row-menu-quantity/);\n"
+                  "  assert.match(menu,/list-row-menu-decrement/);\n"
+                  "  assert.match(menu,/list-row-menu-value/);\n"
+                  "  assert.match(menu,/list-row-menu-increment/);\n"
+                  "  assert.match(menu,/changeListRowMenuQuantity\\(name,-1\\)/);\n"
+                  "  assert.match(menu,/changeListRowMenuQuantity\\(name,1\\)/);\n"
+                  "  assert.match(menu,/list-row-menu-delete/);\n"
+                  "  assert.match(styles,/\\.list-row-menu-quantity\\{[^}]*border-bottom:1px solid rgba\\(23,49,38,\\.08\\)/s);\n"
+                  "  assert.match(styles,/\\.list-row-menu-quantity button\\{[^}]*border-radius:999px[^}]*background:#eaf4ef/s);\n"
+                  "  assert.match(styles,/\\.list-row-menu-delete\\{[^}]*background:#fdeff0[^}]*color:#df3f49/s);\n"
+                  "});\n"
+              )
           quantities_test_path.write_text(quantities_test, encoding='utf-8')
 
           preference_path = Path('tests/preference-popups.test.mjs')
           preference = preference_path.read_text(encoding='utf-8')
           version_test = re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$", re.S)
-          replacement = f"""test('la version visible passe à {version} et le service worker recharge les ressources modifiées',()=>{{
-  const index=read('index.html');
-  const sw=read('sw.js');
-  const localImages=read('dish-local-images.js');
-  assert.match(index,/styles\\.css\\?v={next_version}/);
-  assert.match(index,/catalog\\.js\\?v={next_version}/);
-  assert.match(index,/app\\.js\\?v={next_version}/);
-  assert.match(index,/settings-tab-badge\\.js\\?v=327/);
-  assert.equal((index.match(/page-version\\">{version}/g)||[]).length,3);
-  assert.match(sw,/courses-app-v{next_version}-r1/);
-  assert.match(sw,/styles\\.css\\?v={next_version}/);
-  assert.match(sw,/catalog\\.js\\?v={next_version}/);
-  assert.match(sw,/app\\.js\\?v={next_version}/);
-  assert.match(sw,/dish-local-images\\.js\\?v={next_version}/);
-  assert.match(sw,/settings-tab-badge\\.js\\?v=327/);
-  assert.match(sw,/missing-products-fixes\\.js\\?v=16/);
-  assert.match(sw,/new Request\\(event\\.request,\\{{cache:'reload'\\}}\\)/);
-  assert.match(localImages,/const APP_VERSION='{version}'/);
-  assert.match(localImages,/if\\(badge\\.textContent!==APP_VERSION\\)badge\\.textContent=APP_VERSION/);
-  assert.match(localImages,/missing-products-fixes\\.js\\?v=16/);
-}});
-"""
-          preference, changed = version_test.subn(replacement, preference, count=1)
+          replacement = (
+              f"test('la version visible passe à {version} et le service worker recharge les ressources modifiées',()=>{{\n"
+              "  const index=read('index.html');\n"
+              "  const sw=read('sw.js');\n"
+              "  const localImages=read('dish-local-images.js');\n"
+              f"  assert.match(index,/styles\\.css\\?v={next_version}/);\n"
+              f"  assert.match(index,/catalog\\.js\\?v={next_version}/);\n"
+              f"  assert.match(index,/app\\.js\\?v={next_version}/);\n"
+              "  assert.match(index,/settings-tab-badge\\.js\\?v=327/);\n"
+              f"  assert.equal((index.match(/page-version\\\">{version}/g)||[]).length,3);\n"
+              f"  assert.match(sw,/courses-app-v{next_version}-r1/);\n"
+              f"  assert.match(sw,/styles\\.css\\?v={next_version}/);\n"
+              f"  assert.match(sw,/catalog\\.js\\?v={next_version}/);\n"
+              f"  assert.match(sw,/app\\.js\\?v={next_version}/);\n"
+              f"  assert.match(sw,/dish-local-images\\.js\\?v={next_version}/);\n"
+              "  assert.match(sw,/settings-tab-badge\\.js\\?v=327/);\n"
+              "  assert.match(sw,/missing-products-fixes\\.js\\?v=16/);\n"
+              "  assert.match(sw,/new Request\\(event\\.request,\\{cache:'reload'\\}\\)/);\n"
+              f"  assert.match(localImages,/const APP_VERSION='{version}'/);\n"
+              "  assert.match(localImages,/if\\(badge\\.textContent!==APP_VERSION\\)badge\\.textContent=APP_VERSION/);\n"
+              "  assert.match(localImages,/missing-products-fixes\\.js\\?v=16/);\n"
+              "});\n"
+          )
+          preference, changed = version_test.subn(lambda _: replacement, preference, count=1)
           if changed != 1:
               raise SystemExit('Test de version introuvable dans preference-popups.test.mjs')
           preference_path.write_text(preference, encoding='utf-8')
