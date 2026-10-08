@@ -4196,3 +4196,13 @@ body{
     margin-right:8px!important;
   }
 }
+
+
+/* v336 — Ma liste : suppression distincte d'un achat */
+.list-row.is-deleting{background:linear-gradient(90deg,#fff0f1 0%,#fff8f7 100%)!important;box-shadow:0 8px 22px rgba(203,66,75,.10)!important}
+.list-row.is-deleting .purchase-check{background:transparent!important;box-shadow:none!important}
+.list-row.is-deleting .purchase-check::before{border-color:#e06a70!important;background:rgba(224,106,112,.08)!important;box-shadow:none!important}
+.list-row.is-deleting .list-name{color:#a73b42!important;text-decoration:none!important;opacity:.88}
+.list-row.is-deleting .list-qty{background:#ffe7e9!important;color:#be3f48!important}
+.list-row.is-deleting .undo-purchase{display:none!important}
+.list-row.is-deleting .list-row-more{font-size:0!important;color:transparent!important;opacity:1!important;background:center/20px 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E")!important}

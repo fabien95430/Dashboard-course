@@ -794,7 +794,7 @@ function renderList(){
   el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
     event.stopPropagation();
     const row=button.closest('.list-row');
-    removeGroup(button.dataset.name||'',row);
+    removeGroup(button.dataset.name||'',row,'purchase');
   });
   el.querySelectorAll('.undo-purchase').forEach(button=>button.onclick=event=>{
     event.stopPropagation();
@@ -1006,7 +1006,7 @@ function openListRowMenu(row,anchor){
   remove.className='list-row-menu-delete';
   remove.setAttribute('role','menuitem');
   remove.textContent='Supprimer';
-  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
+  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row,'delete')};
   menu.append(quantity,remove);
   document.body.appendChild(menu);
   const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
@@ -1990,17 +1990,18 @@ async function removeOneItem(name,groupHint=null){
   }
 }
 
-async function removeGroup(name,row=null){
+async function removeGroup(name,row=null,intent='purchase'){
   const item=String(name||'').trim();
   if(!item)return;
   const key=norm(item);
+  const isPurchase=intent!=='delete';
   if(state.productBusy.has(key))return;
   const group=activeGroups().find(entry=>norm(entry.summary)===key);
   if(!group)return;
 
   state.productBusy.add(key);
   let undoToken=null;
-  if(row){
+  if(row&&isPurchase){
     undoToken={cancelled:false};
     state.purchaseUndo.set(key,undoToken);
     row.classList.add('is-purchased','is-busy');
@@ -2013,26 +2014,35 @@ async function removeGroup(name,row=null){
     await new Promise(resolve=>setTimeout(resolve,PURCHASE_EXIT_MS));
     if(undoToken.cancelled)return;
     state.purchaseUndo.delete(key);
+  }else if(row){
+    row.classList.add('is-deleting','is-busy');
+    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
+    const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
+    navigator.vibrate?.(7);
+    await new Promise(resolve=>setTimeout(resolve,180));
+    row.classList.add('is-removing');
+    await new Promise(resolve=>setTimeout(resolve,180));
   }
 
   state.pendingRemoval.add(key);
   const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
   state.items=state.items.filter(keepOtherItems);
   removeRenderedListRow(row);
+  const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';
 
   try{
     if(state.demo){
       const items=(loadJson(DEMO_KEY,[])||[]).filter(keepOtherItems);
       saveJson(DEMO_KEY,items);
       state.items=items;
-      toast(item+' acheté');
+      toast(successMessage);
       return;
     }
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
     const uids=group.uids.filter(Boolean);
     if(!uids.length)throw new Error('Identifiant de l’article indisponible');
     await Promise.all(uids.map(completeTodoItem));
-    toast(item+' acheté');
+    toast(successMessage);
   }catch(error){
     toast('Suppression impossible');
     status('is-error','Erreur',error.message||'Suppression impossible');
@@ -2489,18 +2499,19 @@ refreshItems=async function(){
   }
 };
 const onlineRemoveGroup=removeGroup;
-removeGroup=async function(name,row=null){
+removeGroup=async function(name,row=null,intent='purchase'){
   const item=String(name||'').trim();
   if(!item)return;
-  if(state.demo)return onlineRemoveGroup(name,row);
+  if(state.demo)return onlineRemoveGroup(name,row,intent);
   const key=norm(item);
+  const isPurchase=intent!=='delete';
   if(state.productBusy.has(key))return;
   const group=activeGroups().find(entry=>norm(entry.summary)===key);
   if(!group)return;
 
   state.productBusy.add(key);
   let undoToken=null;
-  if(row){
+  if(row&&isPurchase){
     undoToken={cancelled:false};
     state.purchaseUndo.set(key,undoToken);
     row.classList.add('is-purchased','is-busy');
@@ -2513,6 +2524,14 @@ removeGroup=async function(name,row=null){
     await new Promise(resolve=>setTimeout(resolve,PURCHASE_EXIT_MS));
     if(undoToken.cancelled)return;
     state.purchaseUndo.delete(key);
+  }else if(row){
+    row.classList.add('is-deleting','is-busy');
+    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
+    const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
+    navigator.vibrate?.(7);
+    await new Promise(resolve=>setTimeout(resolve,180));
+    row.classList.add('is-removing');
+    await new Promise(resolve=>setTimeout(resolve,180));
   }
 
   state.pendingRemoval.add(key);
@@ -2521,6 +2540,7 @@ removeGroup=async function(name,row=null){
   state.items=state.items.filter(keepOtherItems);
   removeRenderedListRow(row);
   let queuedOffline=false;
+  const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';
 
   try{
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
@@ -2529,17 +2549,17 @@ removeGroup=async function(name,row=null){
     if(!socketReady()){
       await queueOfflineCompletion(item,uids);
       queuedOffline=true;
-      toast(item+' acheté');
+      toast(successMessage);
       return;
     }
     try{
       await Promise.all(uids.map(completeTodoItem));
-      toast(item+' acheté');
+      toast(successMessage);
     }catch(error){
       if(!isTransientHaError(error))throw error;
       await queueOfflineCompletion(item,uids);
       queuedOffline=true;
-      toast(item+' acheté');
+      toast(successMessage);
     }
   }catch(error){
     if(!queuedOffline&&!socketReady()){

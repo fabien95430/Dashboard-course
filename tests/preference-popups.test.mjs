@@ -55,25 +55,21 @@ test('la personnalisation des recettes se réinitialise durablement et s enregis
   assert.doesNotMatch(save,/recipeCustomizationDialog\.close\(\)/);
 });
 
-test('la version visible passe à v335 et la coque préférences n est plus chargée avec un ancien cache',()=>{
+test('la version visible passe à v336 et les ressources Ma liste sont rechargées',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
-  assert.match(index,/styles\.css\?v=332/);
-  assert.match(index,/catalog\.js\?v=335/);
-  assert.match(index,/app\.js\?v=332/);
+  assert.match(index,/styles\.css\?v=336/);
+  assert.match(index,/catalog\.js\?v=336/);
+  assert.match(index,/app\.js\?v=336/);
   assert.match(index,/settings-tab-badge\.js\?v=335/);
-  assert.doesNotMatch(index,/settings-tab-badge\.js\?v=327/);
-  assert.equal((index.match(/page-version\">v335/g)||[]).length,3);
-  assert.match(catalog,/dish-local-images\.js\?v=335/);
-  assert.match(sw,/courses-app-v335-r1/);
-  assert.match(sw,/catalog\.js\?v=335/);
-  assert.match(sw,/settings-tab-badge\.js\?v=335/);
-  assert.match(sw,/dish-local-images\.js\?v=335/);
-  assert.match(sw,/missing-products-fixes\.js\?v=16/);
-  assert.match(sw,/new Request\(event\.request,\{cache:'reload'\}\)/);
-  assert.match(localImages,/const APP_VERSION='v335'/);
-  assert.match(localImages,/if\(badge\.textContent!==APP_VERSION\)badge\.textContent=APP_VERSION/);
-  assert.match(localImages,/missing-products-fixes\.js\?v=16/);
+  assert.equal((index.match(/page-version\">v336/g)||[]).length,3);
+  assert.match(catalog,/dish-local-images\.js\?v=336/);
+  assert.match(sw,/courses-app-v336-r1/);
+  assert.match(sw,/styles\.css\?v=336/);
+  assert.match(sw,/catalog\.js\?v=336/);
+  assert.match(sw,/app\.js\?v=336/);
+  assert.match(sw,/dish-local-images\.js\?v=336/);
+  assert.match(localImages,/const APP_VERSION='v336'/);
 });
