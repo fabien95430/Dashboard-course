@@ -98,9 +98,11 @@ function syncCombinedCount(){
   if(source.hidden!==(total===0))source.hidden=total===0;
 }
 function appNotify(title,detail=''){
-  const toast=document.getElementById('toast');
+  const dialog=document.getElementById('missingProductsDialog');
+  const toast=dialog?.open?document.getElementById('missingProductsFeedback'):document.getElementById('toast');
   if(!toast)return;
   toast.textContent=detail?title+' — '+detail:title;
+  toast.classList.remove('is-error');
   toast.classList.add('is-visible');
   clearTimeout(toast._t);
   toast._t=setTimeout(()=>toast.classList.remove('is-visible'),3000);

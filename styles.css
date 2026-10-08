@@ -4221,3 +4221,15 @@ body{
 .list-row.is-deleting .list-qty{background:#ffe7e9!important;color:#be3f48!important}
 .list-row.is-deleting .undo-purchase{display:none!important}
 .list-row.is-deleting .list-row-more{font-size:0!important;color:transparent!important;opacity:1!important;background:center/20px 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E")!important}
+
+
+/* ===== UI v344 — feedback dans les dialogues ===== */
+.dialog-feedback,.courses-openai-feedback{
+  min-height:18px;margin:8px 0 0;padding:8px 10px;border-radius:12px;box-sizing:border-box;
+  background:#edf8f0;color:#157545;font-size:12px;line-height:1.35;font-weight:720;text-align:center;
+  opacity:0;transform:translateY(3px);transition:opacity .16s ease,transform .16s ease;pointer-events:none
+}
+.dialog-feedback:empty,.courses-openai-feedback:empty{display:none}
+.dialog-feedback.is-visible,.courses-openai-feedback.is-visible{display:block;opacity:1;transform:none}
+.dialog-feedback.is-error,.courses-openai-feedback.is-error{background:#fff0ef;color:#b43a32}
+@media(prefers-reduced-motion:reduce){.dialog-feedback,.courses-openai-feedback{transition:none}}

@@ -14,7 +14,7 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=342">
+  <link rel="stylesheet" href="./styles.css?v=344">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -44,7 +44,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v343</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v344</span></p>
         </div>
         <div class="page-header-actions">
           <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
@@ -110,7 +110,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v343</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v344</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -130,7 +130,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v343</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v344</span></p>
         </div>
       </header>
 
@@ -276,6 +276,7 @@
       <span>Adresse Home Assistant</span>
       <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
     </label>
+    <p id="connectionDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
     <div class="dialog-actions">
       <button id="saveConnectionSettings" class="primary" type="button">Enregistrer</button>
     </div>
@@ -344,6 +345,7 @@
       <input id="missingProductName" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" placeholder="Nom du produit" aria-label="Nom du produit">
       <button id="addMissingProduct" class="primary" type="button">Ajouter</button>
     </div>
+    <p id="missingProductsFeedback" class="dialog-feedback courses-openai-feedback" role="status" aria-live="polite"></p>
 
     <section class="missing-category-panel" aria-labelledby="missingCategoryTitle">
       <div class="missing-category-heading">
@@ -370,6 +372,7 @@
   <dialog id="settingsDialog" class="dialog security-settings-dialog" tabindex="-1">
     <h3>Mot de passe et verrouillage</h3>
     <p class="dialog-intro">Protection locale de l’accès à vos courses sur cet appareil.</p>
+    <p id="settingsDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
 
     <div class="security-settings-summary">
       <div class="security-setting-info">
@@ -416,8 +419,8 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=343"></script>
-  <script src="./app.js?v=342"></script>
-  <script src="./settings-tab-badge.js?v=341"></script>
+  <script src="./catalog.js?v=344"></script>
+  <script src="./app.js?v=344"></script>
+  <script src="./settings-tab-badge.js?v=344"></script>
 </body>
 </html>

@@ -197,7 +197,9 @@ const $ = selector => document.querySelector(selector);
 const UI = Object.freeze({
   securityPassword: document.getElementById('securityPassword'),
   settingsDialog: document.getElementById('settingsDialog'),
+  settingsDialogFeedback: document.getElementById('settingsDialogFeedback'),
   connectionDialog: document.getElementById('connectionDialog'),
+  connectionDialogFeedback: document.getElementById('connectionDialogFeedback'),
   preferencesDialog: document.getElementById('preferencesDialog'),
   setup: document.getElementById('setup'),
   securityOverlay: document.getElementById('securityOverlay'),
@@ -222,6 +224,7 @@ const UI = Object.freeze({
   preferencesHideAdded: document.getElementById('preferencesHideAdded'),
   preferencesSmartFavorites: document.getElementById('preferencesSmartFavorites'),
   missingProductsDialog: document.getElementById('missingProductsDialog'),
+  missingProductsFeedback: document.getElementById('missingProductsFeedback'),
   missingProductName: document.getElementById('missingProductName'),
   missingCategoryGrid: document.getElementById('missingCategoryGrid'),
   missingProductsList: document.getElementById('missingProductsList'),
@@ -668,6 +671,20 @@ function status(kind,title,detail=''){
   renderSettingsPage();
 }
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
+function clearDialogFeedback(target){
+  if(!target)return;
+  clearTimeout(target._t);
+  target.textContent='';
+  target.classList.remove('is-visible','is-error');
+}
+function setDialogFeedback(target,message,kind='success'){
+  if(!target)return;
+  clearTimeout(target._t);
+  target.textContent=String(message||'');
+  target.classList.toggle('is-error',kind==='error');
+  target.classList.add('is-visible');
+  target._t=setTimeout(()=>clearDialogFeedback(target),3000);
+}
 requestAnimationFrame(()=>setTimeout(()=>document.body.classList.remove('is-launching'),180));
 function refreshVisualLock(){
   const blocked=UI.setup.classList.contains('is-visible')||UI.securityOverlay.classList.contains('is-visible');
@@ -2120,6 +2137,7 @@ function openConnectionSettings(){
     select.value=state.entity||'';
   }
   renderSettingsPage();
+  clearDialogFeedback(UI.connectionDialogFeedback);
   const dialog=UI.connectionDialog;
   select?.blur();
   urlInput?.blur();
@@ -2129,7 +2147,8 @@ async function saveConnectionSettings(){
   const nextUrl=normalizeHaUrl(UI.connectionHaUrl.value);
   const chosenEntity=UI.connectionEntitySelect.value;
   const nextEntity=chosenEntity||state.entity;
-  if(!nextUrl)return;
+  if(!nextUrl){setDialogFeedback(UI.connectionDialogFeedback,'Entre une adresse HTTPS Home Assistant valide.','error');return}
+  clearDialogFeedback(UI.connectionDialogFeedback);
   const changedUrl=nextUrl!==state.haUrl;
   const changedEntity=!!chosenEntity&&chosenEntity!==state.entity;
   if(chosenEntity){
@@ -2183,6 +2202,7 @@ function renderMissingProducts(){
 function openMissingProducts(){
   state.missingProductCategory='';
   UI.missingProductName.value='';
+  clearDialogFeedback(UI.missingProductsFeedback);
   renderMissingProducts();
   showNeutralDialog(UI.missingProductsDialog);
 }
@@ -2197,11 +2217,11 @@ function addMissingProduct(){
   const name=String(UI.missingProductName.value||'').trim().replace(/\s+/g,' ').slice(0,80);
   if(!name){
     UI.missingProductName.focus();
-    toast('Indique le nom du produit');
+    setDialogFeedback(UI.missingProductsFeedback,'Indique le nom du produit','error');
     return;
   }
   if(state.missingProducts.some(item=>norm(item.name)===norm(name))){
-    toast('Ce produit est déjà noté');
+    setDialogFeedback(UI.missingProductsFeedback,'Ce produit est déjà noté','error');
     return;
   }
   state.missingProducts.push({id:secureRandomToken(8),name,category:state.missingProductCategory});
@@ -2211,7 +2231,7 @@ function addMissingProduct(){
   renderMissingProducts();
   renderSettingsPage();
   navigator.vibrate?.(8);
-  toast('Produit ajouté');
+  setDialogFeedback(UI.missingProductsFeedback,'Produit ajouté');
 }
 function removeMissingProduct(id){
   const next=state.missingProducts.filter(item=>item.id!==id);
@@ -2252,6 +2272,7 @@ function savePreferencesSettings(){
 function openSettings(){
   if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
   clearPasswordChangeForm();
+  clearDialogFeedback(UI.settingsDialogFeedback);
   if(UI.autoLockSelect)UI.autoLockSelect.value=String(state.autoLockMinutes);
   showNeutralDialog(UI.settingsDialog);
 }
@@ -2261,7 +2282,7 @@ function setAutoLockMinutes(value){
   state.autoLockMinutes=next;
   localStorage.setItem(STORAGE.autoLockMinutes,String(next));
   armIdleLock();
-  toast('Verrouillage après '+next+' min');
+  setDialogFeedback(UI.settingsDialogFeedback,'Verrouillage après '+next+' min');
 }
 async function changeLocalPassword(){
   const current=UI.currentLocalPassword.value;
@@ -2269,6 +2290,7 @@ async function changeLocalPassword(){
   const confirm=UI.confirmNewLocalPassword.value;
   const error=UI.changePasswordError;
   const button=UI.savePasswordChange;
+  clearDialogFeedback(UI.settingsDialogFeedback);
   error.textContent='';
   if(!current){error.textContent='Entre le mot de passe actuel.';return}
   if(next.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
@@ -2280,7 +2302,7 @@ async function changeLocalPassword(){
     clearUnlockGuard();
     clearPasswordChangeForm();
     armIdleLock();
-    toast('Mot de passe modifié');
+    setDialogFeedback(UI.settingsDialogFeedback,'Mot de passe modifié');
   }catch(_){
     error.textContent='Mot de passe actuel incorrect ou coffre illisible.';
   }finally{
@@ -2764,6 +2786,7 @@ function bindUiEvents(){
     const opening=panel.hidden;
     if(!opening){clearPasswordChangeForm();return}
     panel.hidden=false;
+    clearDialogFeedback(UI.settingsDialogFeedback);
     UI.changePasswordError.textContent='';
   };
   UI.savePasswordChange.onclick=changeLocalPassword;

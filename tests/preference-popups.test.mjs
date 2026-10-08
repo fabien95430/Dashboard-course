@@ -66,7 +66,7 @@ test('la personnalisation des recettes se réinitialise durablement et s enregis
   assert.match(reset,/delete recipeCustomizations\[dish\.name\]/);
   assert.match(reset,/persistRecipeCustomizations\(\)/);
   assert.match(reset,/resetRecipeNeeds\?\.\(dish\.name\)/);
-  assert.match(reset,/showToast\('Recette '\+dish\.name\+' réinitialisée'\)/);
+  assert.match(reset,/showRecipeCustomizationFeedback\('Recette '\+dish\.name\+' réinitialisée'\)/);
   assert.match(save,/setRecipeNeeds\?\.\(dish\.name,recipeCustomizationNeeds\)/);
   assert.match(save,/loadRecipeCustomizationDish\(dish\.name\)/);
   assert.doesNotMatch(save,/recipeCustomizationDialog\.close\(\)/);
@@ -97,29 +97,59 @@ test('un ingrédient du catalogue peut être ajouté à une recette personnalis�
   assert.match(source,/dishSheetList\.innerHTML=recipeIngredientsForDish\(currentDish\)\.map\(name=>/);
 });
 
-test('la version visible passe à v343 et les ressources de personnalisation sont rechargées',()=>{
+
+test('les validations restent dans leur popup tant que celui-ci reste ouvert',()=>{
+  const app=read('app.js');
+  const dishes=read('dishes-ui.js');
+  const missing=read('missing-products-dishes.js');
+  const styles=read('styles.css');
+  assert.match(app,/connectionDialogFeedback: document\.getElementById\('connectionDialogFeedback'\)/);
+  assert.match(app,/missingProductsFeedback: document\.getElementById\('missingProductsFeedback'\)/);
+  assert.match(app,/settingsDialogFeedback: document\.getElementById\('settingsDialogFeedback'\)/);
+  assert.match(app,/if\(!nextUrl\)\{setDialogFeedback\(UI\.connectionDialogFeedback,'Entre une adresse HTTPS Home Assistant valide\.','error'\);return\}/);
+  const addStart=app.indexOf('function addMissingProduct()');
+  const addEnd=app.indexOf('function removeMissingProduct',addStart);
+  const add=app.slice(addStart,addEnd);
+  assert.match(add,/setDialogFeedback\(UI\.missingProductsFeedback,'Indique le nom du produit','error'\)/);
+  assert.match(add,/setDialogFeedback\(UI\.missingProductsFeedback,'Ce produit est déjà noté','error'\)/);
+  assert.match(add,/setDialogFeedback\(UI\.missingProductsFeedback,'Produit ajouté'\)/);
+  assert.doesNotMatch(add,/\btoast\(/);
+  assert.match(app,/setDialogFeedback\(UI\.settingsDialogFeedback,'Verrouillage après '\+next\+' min'\)/);
+  assert.match(app,/setDialogFeedback\(UI\.settingsDialogFeedback,'Mot de passe modifié'\)/);
+  const resetStart=dishes.indexOf('function resetRecipeCustomizationDraft()');
+  const resetEnd=dishes.indexOf('function recipeCustomizationMatchesBase()',resetStart);
+  const saveStart=dishes.indexOf('function saveRecipeCustomization()');
+  const saveEnd=dishes.indexOf('function validateDishes()',saveStart);
+  assert.match(dishes.slice(resetStart,resetEnd),/showRecipeCustomizationFeedback\(/);
+  assert.doesNotMatch(dishes.slice(resetStart,resetEnd),/showToast\(/);
+  assert.match(dishes.slice(saveStart,saveEnd),/showRecipeCustomizationFeedback\(/);
+  assert.doesNotMatch(dishes.slice(saveStart,saveEnd),/showToast\(/);
+  assert.match(missing,/const toast=dialog\?\.open\?document\.getElementById\('missingProductsFeedback'\):document\.getElementById\('toast'\)/);
+  assert.match(styles,/\.dialog-feedback,\.courses-openai-feedback\{/);
+});
+
+test('la version visible passe à v344 et les ressources de feedback sont rechargées',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
   const settings=read('settings-tab-badge.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
-  assert.match(index,/styles\.css\?v=342/);
-  assert.match(index,/catalog\.js\?v=343/);
-  assert.match(index,/app\.js\?v=342/);
-  assert.match(index,/settings-tab-badge\.js\?v=341/);
-  assert.equal((index.match(/page-version\">v343/g)||[]).length,3);
-  assert.match(catalog,/dishes-ui\.js\?v=343/);
-  assert.match(catalog,/dish-local-images\.js\?v=343/);
-  assert.match(settings,/missing-products-dishes\.js\?v=5/);
+  assert.match(index,/styles\.css\?v=344/);
+  assert.match(index,/catalog\.js\?v=344/);
+  assert.match(index,/app\.js\?v=344/);
+  assert.match(index,/settings-tab-badge\.js\?v=344/);
+  assert.equal((index.match(/page-version\">v344/g)||[]).length,3);
+  assert.match(catalog,/dishes-ui\.js\?v=344/);
+  assert.match(catalog,/dish-local-images\.js\?v=344/);
+  assert.match(settings,/missing-products-dishes\.js\?v=6/);
   assert.match(settings,/missing-products-modern\.js\?v=6/);
-  assert.match(sw,/courses-app-v343-r1/);
-  assert.match(sw,/styles\.css\?v=342/);
-  assert.match(sw,/catalog\.js\?v=343/);
-  assert.match(sw,/app\.js\?v=342/);
-  assert.match(sw,/settings-tab-badge\.js\?v=341/);
-  assert.match(sw,/missing-products-dishes\.js\?v=5/);
-  assert.match(sw,/dishes-ui\.js\?v=343/);
-  assert.match(sw,/dish-local-images\.js\?v=343/);
-  assert.match(sw,/missing-products-modern\.js\?v=6/);
-  assert.match(localImages,/const APP_VERSION='v343'/);
+  assert.match(sw,/courses-app-v344-r1/);
+  assert.match(sw,/styles\.css\?v=344/);
+  assert.match(sw,/catalog\.js\?v=344/);
+  assert.match(sw,/app\.js\?v=344/);
+  assert.match(sw,/settings-tab-badge\.js\?v=344/);
+  assert.match(sw,/missing-products-dishes\.js\?v=6/);
+  assert.match(sw,/dishes-ui\.js\?v=344/);
+  assert.match(sw,/dish-local-images\.js\?v=344/);
+  assert.match(localImages,/const APP_VERSION='v344'/);
 });
