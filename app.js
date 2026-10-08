@@ -2819,7 +2819,9 @@ function bindUiEvents(){
   UI.missingCategoryGrid.querySelectorAll('[data-missing-category]').forEach(button=>button.onclick=()=>setMissingProductCategory(button.dataset.missingCategory||''));
   UI.missingProductsList.onclick=event=>{
     const button=event.target.closest('[data-remove-missing]');
-    if(button)removeMissingProduct(button.dataset.removeMissing||'');
+    if(!button)return;
+    event.stopPropagation();
+    removeMissingProduct(button.dataset.removeMissing||'');
   };
   $('#changePasswordBtn').onclick=()=>{
     const panel=UI.changePasswordPanel;
