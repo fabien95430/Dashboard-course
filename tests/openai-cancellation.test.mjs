@@ -9,6 +9,7 @@ test('une annulation OpenAI passe la demande à Annulé et autorise une relance'
   const fixes=read('missing-products-fixes.js');
   const workflow=read('.github/workflows/integrate-dish-openai.yml');
   assert.match(workflow,/run-name: OpenAI · \$\{\{ github\.event\.client_payload\.request_id \}\}/);
+  assert.match(workflow,/concurrency:\s*group: courses-openai-integration\s*cancel-in-progress: false\s*queue: max/s);
   assert.match(fixes,/const STORAGE_OPENAI_REQUESTS='courses-openai-request-status-v1'/);
   assert.match(fixes,/status:'running'/);
   assert.match(fixes,/display_title\|\|'\'\)\.includes\(entry\.state\.requestId\)/);

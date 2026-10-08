@@ -11,6 +11,7 @@ permissions:
 concurrency:
   group: courses-openai-integration
   cancel-in-progress: false
+  queue: max
 
 jobs:
   integrate:
