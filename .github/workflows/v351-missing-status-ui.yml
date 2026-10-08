@@ -1,0 +1,292 @@
+name: Polish missing request status
+
+on:
+  push:
+    branches: [agent-final-v318]
+    paths:
+      - .github/workflows/v351-missing-status-ui.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Verify expected main
+        run: test "$(git rev-parse HEAD)" = "9f339c23f1210a8c0943b86d3d7c17aa08444978"
+
+      - name: Apply compact request statuses
+        shell: python
+        run: |
+          from pathlib import Path
+          import re, textwrap
+
+          VERSION=351
+          version=f'v{VERSION}'
+
+          def replace_once(text,old,new,label):
+              if text.count(old)!=1:
+                  raise SystemExit(f'{label}: attendu 1, trouvé {text.count(old)}')
+              return text.replace(old,new,1)
+
+          # Bottom feedback: keep the useful information and fit it on one line.
+          path=Path('missing-products-dishes.js')
+          source=path.read_text(encoding='utf-8')
+          source=replace_once(
+              source,
+              "function notifyRequest(name){\n  appNotify('Demande d’ajout en cours',name+' sera ajouté prochainement.');\n}",
+              "function notifyRequest(name){\n  appNotify('Ajout en cours',name);\n}",
+              'notifyRequest'
+          )
+          path.write_text(source,encoding='utf-8')
+
+          # OpenAI request status owns running/error state and its visual semantics.
+          path=Path('missing-products-fixes.js')
+          source=path.read_text(encoding='utf-8')
+          source=replace_once(
+              source,
+              "const openAiCooldown=new Set();",
+              "const openAiCooldown=new Set();\nconst openAiErrors=new Set();",
+              'openAiErrors'
+          )
+          old_css="    #missingProductsDialog .missing-dish-progress{display:inline-flex!important;width:max-content!important;margin-top:1px!important;padding:4px 8px!important;border-radius:999px!important;background:#eef1ef!important;color:#6f7973!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}\n"
+          new_css="    #missingProductsDialog .missing-dish-progress{display:inline-flex!important;align-items:center!important;width:max-content!important;margin:0!important;padding:3px 7px!important;border-radius:999px!important;background:rgba(255,149,0,.11)!important;color:#b96500!important;font-size:9.5px!important;line-height:1!important;font-weight:780!important;white-space:nowrap!important}\n    #missingProductsDialog .missing-dish-progress.is-error{background:rgba(255,59,48,.10)!important;color:#d93025!important}\n"
+          source=replace_once(source,old_css,new_css,'progress style')
+          old_feedback="    #missingProductsDialog .courses-openai-feedback{position:absolute;z-index:80;left:14px;right:14px;bottom:14px;padding:10px 12px;border-radius:14px;background:rgba(24,36,29,.94);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:12px;line-height:1.35;font-weight:650;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}\n"
+          new_feedback="    #missingProductsDialog .courses-openai-feedback{position:absolute;z-index:80;left:14px;right:14px;bottom:14px;padding:9px 11px;border-radius:14px;background:rgba(24,36,29,.94);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:11.5px;line-height:1.2;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}\n"
+          source=replace_once(source,old_feedback,new_feedback,'feedback style')
+          old_block="""    const added=type==='dish'&&(row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request'));
+    const active=!added&&running.has(id);
+    let progress=row.querySelector('.missing-dish-progress');
+    if(active){
+      const copy=row.querySelector('.missing-product-copy');
+      if(copy&&!progress){
+        progress=document.createElement('small');
+        progress.className='missing-dish-progress';
+        progress.textContent='En cours…';
+        progress.setAttribute('role','status');
+        copy.appendChild(progress);
+      }
+    }else if(progress){
+      progress.remove();
+    }
+"""
+          new_block="""    const added=type==='dish'&&(row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request'));
+    const active=!added&&running.has(id);
+    const failed=!added&&!active&&openAiErrors.has(cooldownKey(type,id));
+    const copy=row.querySelector('.missing-product-copy');
+    let progress=copy?.querySelector('.missing-dish-progress');
+    if((active||failed)&&copy){
+      if(!progress){
+        progress=document.createElement('small');
+        progress.className='missing-dish-progress';
+        progress.setAttribute('role','status');
+        copy.appendChild(progress);
+      }
+      progress.textContent=failed?'Erreur':'En cours';
+      progress.classList.toggle('is-error',failed);
+      progress.setAttribute('aria-label',failed?'Erreur lors de l’intégration':'Intégration en cours');
+    }else if(progress){
+      progress.remove();
+    }
+"""
+          source=replace_once(source,old_block,new_block,'running status block')
+          source=replace_once(
+              source,
+              "    row.classList.toggle('is-running-request',active);\n    if(type==='dish')row.classList.toggle('is-added-request',added);",
+              "    row.classList.toggle('is-running-request',active);\n    row.classList.toggle('is-error-request',failed);\n    if(type==='dish')row.classList.toggle('is-added-request',added);",
+              'row status classes'
+          )
+          source=replace_once(
+              source,
+              "      const key=cooldownKey(type,id);\n      if(!id||button.disabled||openAiCooldown.has(key))return;\n      setRunning(type,id,true);",
+              "      const key=cooldownKey(type,id);\n      if(!id||button.disabled||openAiCooldown.has(key))return;\n      openAiErrors.delete(key);\n      setRunning(type,id,true);",
+              'clear error on retry'
+          )
+          source=replace_once(
+              source,
+              "      void integrateWithOpenAi(type,id).then(ok=>{\n        if(!ok){\n          openAiCooldown.delete(key);\n          setRunning(type,id,false);\n        }\n      }).finally(()=>{",
+              "      void integrateWithOpenAi(type,id).then(ok=>{\n        if(!ok){\n          openAiErrors.add(key);\n          openAiCooldown.delete(key);\n          setRunning(type,id,false);\n        }else{\n          openAiErrors.delete(key);\n        }\n      }).finally(()=>{",
+              'remember integration error'
+          )
+          source=replace_once(
+              source,
+              "    if(!id)return;\n    setRunning(type,id,true);\n    queueMicrotask(decorateOpenAiButtons);",
+              "    if(!id)return;\n    openAiErrors.delete(cooldownKey(type,id));\n    setRunning(type,id,true);\n    queueMicrotask(decorateOpenAiButtons);",
+              'clear manual retry error'
+          )
+          path.write_text(source,encoding='utf-8')
+
+          # Keep category + status together on the same compact metadata line.
+          path=Path('missing-products-popup-ui.js')
+          source=path.read_text(encoding='utf-8')
+          source=replace_once(
+              source,
+              "    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy{align-self:center!important;gap:4px!important;min-width:0!important}\n",
+              "    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy{display:flex!important;flex-flow:row wrap!important;align-items:center!important;align-self:center!important;column-gap:5px!important;row-gap:3px!important;min-width:0!important}\n",
+              'copy layout'
+          )
+          source=replace_once(
+              source,
+              "    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy strong{display:block!important;font-size:14.5px!important;line-height:1.22!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:break-word!important}\n",
+              "    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy strong{display:block!important;flex:0 0 100%!important;min-width:0!important;font-size:14.5px!important;line-height:1.22!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:break-word!important}\n",
+              'title layout'
+          )
+          source=replace_once(
+              source,
+              "    #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:inline-flex!important;width:max-content!important}\n",
+              "    #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:inline-flex!important;align-items:center!important;width:max-content!important;max-width:100%!important;margin:0!important;padding:3px 7px!important;font-size:9.5px!important;line-height:1!important;white-space:nowrap!important}\n",
+              'progress inline layout'
+          )
+          path.write_text(source,encoding='utf-8')
+
+          # Cache-bust the active owners.
+          path=Path('settings-tab-badge.js')
+          source=path.read_text(encoding='utf-8')
+          source,n=re.subn(r"missing-products-dishes\.js\?v=\d+","missing-products-dishes.js?v=7",source,count=1)
+          if n!=1: raise SystemExit('settings missing-products-dishes cache')
+          path.write_text(source,encoding='utf-8')
+
+          path=Path('dish-local-images.js')
+          source=path.read_text(encoding='utf-8')
+          source,n=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='{version}'",source,count=1)
+          if n!=1: raise SystemExit('APP_VERSION')
+          source,n=re.subn(r"missing-products-fixes\.js\?v=\d+","missing-products-fixes.js?v=17",source,count=1)
+          if n!=1: raise SystemExit('fixes cache')
+          source,n=re.subn(r"missing-products-popup-ui\.js\?v=\d+","missing-products-popup-ui.js?v=16",source,count=1)
+          if n!=1: raise SystemExit('popup ui cache')
+          path.write_text(source,encoding='utf-8')
+
+          path=Path('catalog.js')
+          source=path.read_text(encoding='utf-8')
+          source,n=re.subn(r"dish-local-images\.js\?v=\d+",f"dish-local-images.js?v={VERSION}",source,count=1)
+          if n!=1: raise SystemExit('catalog dish-local cache')
+          path.write_text(source,encoding='utf-8')
+
+          path=Path('index.html')
+          source=path.read_text(encoding='utf-8')
+          source,n=re.subn(r'(<span class="page-version">)v\d+',rf'\1{version}',source)
+          if n!=3: raise SystemExit(f'page versions: {n}')
+          source,n=re.subn(r'settings-tab-badge\.js\?v=\d+',f'settings-tab-badge.js?v={VERSION}',source,count=1)
+          if n!=1: raise SystemExit('settings cache')
+          source,n=re.subn(r'catalog\.js\?v=\d+',f'catalog.js?v={VERSION}',source,count=1)
+          if n!=1: raise SystemExit('catalog cache')
+          source,n=re.subn(r'app\.js\?v=\d+',f'app.js?v={VERSION}',source,count=1)
+          if n!=1: raise SystemExit('app cache')
+          path.write_text(source,encoding='utf-8')
+
+          path=Path('sw.js')
+          source=path.read_text(encoding='utf-8')
+          source,n=re.subn(r"const CACHE='courses-app-v\d+-r\d+';",f"const CACHE='courses-app-v{VERSION}-r1';",source,count=1)
+          if n!=1: raise SystemExit('service worker cache')
+          shell=re.search(r'const SHELL=\[(.*?)\];',source,re.S)
+          if not shell: raise SystemExit('SHELL introuvable')
+          body=shell.group(1)
+          for entry in (
+              f"'./catalog.js?v={VERSION}'",
+              f"'./app.js?v={VERSION}'",
+              f"'./settings-tab-badge.js?v={VERSION}'",
+              "'./missing-products-dishes.js?v=7'",
+              "'./missing-products-fixes.js?v=17'",
+              "'./missing-products-popup-ui.js?v=16'",
+              f"'./dish-local-images.js?v={VERSION}'"
+          ):
+              if entry not in body: body+=','+entry
+          source=source[:shell.start(1)]+body+source[shell.end(1):]
+          path.write_text(source,encoding='utf-8')
+
+          # Regression tests: compact one-line status, orange success path, red error path.
+          path=Path('tests/preference-popups.test.mjs')
+          source=path.read_text(encoding='utf-8')
+          marker="\ntest('la version visible passe à v"
+          pos=source.rfind(marker)
+          if pos<0: raise SystemExit('version test marker')
+          extra=r'''
+
+test('les demandes manquantes gardent un statut compact sur une ligne avec erreur distincte',()=>{
+  const missing=read('missing-products-dishes.js');
+  const fixes=read('missing-products-fixes.js');
+  const popup=read('missing-products-popup-ui.js');
+  assert.match(missing,/function notifyRequest\(name\)\{\s*appNotify\('Ajout en cours',name\);\s*\}/);
+  assert.match(fixes,/const openAiErrors=new Set\(\);/);
+  assert.match(fixes,/progress\.textContent=failed\?'Erreur':'En cours';/);
+  assert.match(fixes,/progress\.classList\.toggle\('is-error',failed\);/);
+  assert.match(fixes,/\.missing-dish-progress\.is-error\{[^}]*color:#d93025!important/);
+  assert.match(fixes,/\.courses-openai-feedback\{[^}]*white-space:nowrap;[^}]*text-overflow:ellipsis/);
+  assert.match(popup,/\.missing-product-row\.missing-request-row \.missing-product-copy\{[^}]*display:flex!important;[^}]*flex-flow:row wrap!important/);
+  assert.match(popup,/\.missing-product-copy \.missing-dish-progress[^}]*white-space:nowrap!important/);
+});
+'''
+          source=source[:pos]+textwrap.dedent(extra).rstrip()+source[pos:]
+          pattern=re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$",re.S)
+          replacement=f'''test('la version visible passe à {version} et les statuts des demandes sont rechargés',()=>{{
+  const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
+  assert.match(index,/styles\\.css\\?v=348/);
+  assert.match(index,/catalog\\.js\\?v={VERSION}/);
+  assert.match(index,/app\\.js\\?v={VERSION}/);
+  assert.match(index,/settings-tab-badge\\.js\\?v={VERSION}/);
+  assert.equal((index.match(/page-version\\">{version}/g)||[]).length,3);
+  assert.match(catalog,/dishes-ui\\.js\\?v=344/);
+  assert.match(catalog,/dish-local-images\\.js\\?v={VERSION}/);
+  assert.match(settings,/missing-products-dishes\\.js\\?v=7/);
+  assert.match(sw,/courses-app-v{VERSION}-r1/);
+  assert.match(sw,/styles\\.css\\?v=348/);
+  assert.match(sw,/catalog\\.js\\?v={VERSION}/);
+  assert.match(sw,/app\\.js\\?v={VERSION}/);
+  assert.match(sw,/settings-tab-badge\\.js\\?v={VERSION}/);
+  assert.match(sw,/missing-products-dishes\\.js\\?v=7/);
+  assert.match(sw,/missing-products-fixes\\.js\\?v=17/);
+  assert.match(sw,/missing-products-popup-ui\\.js\\?v=16/);
+  assert.match(sw,/dish-local-images\\.js\\?v={VERSION}/);
+  assert.match(localImages,/const APP_VERSION='{version}'/);
+  assert.match(localImages,/missing-products-fixes\\.js\\?v=17/);
+  assert.match(localImages,/missing-products-popup-ui\\.js\\?v=16/);
+}});\n'''
+          source,n=pattern.subn(lambda _:replacement,source,count=1)
+          if n!=1: raise SystemExit('version test replacement')
+          path.write_text(source,encoding='utf-8')
+
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          node --test tests/*.test.mjs
+          git diff --check
+
+      - name: Validate final change
+        shell: python
+        run: |
+          from pathlib import Path
+          checks={
+            'missing-products-dishes.js':["appNotify('Ajout en cours',name)"],
+            'missing-products-fixes.js':["const openAiErrors=new Set();","failed?'Erreur':'En cours'","missing-dish-progress.is-error"],
+            'missing-products-popup-ui.js':['flex-flow:row wrap!important','white-space:nowrap!important'],
+            'dish-local-images.js':["const APP_VERSION='v351'","missing-products-fixes.js?v=17","missing-products-popup-ui.js?v=16"],
+            'settings-tab-badge.js':['missing-products-dishes.js?v=7'],
+            'index.html':['page-version\">v351','settings-tab-badge.js?v=351'],
+            'sw.js':['courses-app-v351-r1','missing-products-dishes.js?v=7','missing-products-fixes.js?v=17','missing-products-popup-ui.js?v=16']
+          }
+          for file,needles in checks.items():
+              text=Path(file).read_text(encoding='utf-8')
+              for needle in needles:
+                  if needle not in text: raise SystemExit(f'{file}: manque {needle}')
+
+      - name: Ensure main did not move
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "9f339c23f1210a8c0943b86d3d7c17aa08444978"
+
+      - name: Commit and push main
+        run: |
+          set -euo pipefail
+          git config user.name "OpenAI Agent"
+          git config user.email "openai-agent@users.noreply.github.com"
+          git add missing-products-dishes.js missing-products-fixes.js missing-products-popup-ui.js settings-tab-badge.js dish-local-images.js catalog.js index.html sw.js tests/preference-popups.test.mjs
+          git commit -m "v351: affine les statuts des demandes manquantes"
+          git push origin HEAD:main
