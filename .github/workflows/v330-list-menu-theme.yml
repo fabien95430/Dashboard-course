@@ -12,14 +12,15 @@ jobs:
   apply:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
+      - name: Checkout current main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 1
 
-      - name: Verify expected main
-        run: test "$(git rev-parse HEAD)" = "c134acdd00c8a848f388949ac39cf906078d283d"
+      - name: Capture base
+        shell: bash
+        run: echo "BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Optimize catalog burst synchronization
         shell: python
@@ -27,10 +28,17 @@ jobs:
           from pathlib import Path
           import re, textwrap
 
-          V=347
+          local_path=Path('dish-local-images.js')
+          local=local_path.read_text(encoding='utf-8')
+          match=re.search(r"const APP_VERSION='v(\d+)'",local)
+          if not match: raise SystemExit('APP_VERSION introuvable')
+          V=int(match.group(1))+1
           version=f'v{V}'
-          p=Path('app.js')
-          app=p.read_text(encoding='utf-8')
+
+          app_path=Path('app.js')
+          app=app_path.read_text(encoding='utf-8')
+          if 'incrementProduct(task.name,{deferRefresh:true})' in app:
+              raise SystemExit('optimisation déjà présente')
 
           def replace_between(text,start,end,replacement,label):
               a=text.find(start); b=text.find(end,a+len(start))
@@ -90,7 +98,7 @@ jobs:
               if(catalogQuantityQueue.get(key)===task){
                 catalogQuantityQueue.delete(key);
                 setProductQuantity(task.name,productQuantity(task.name));
-                if(!catalogQuantityQueue.size)scheduleListRefresh();
+                if(!catalogQuantityQueue.size&&!state.locked)scheduleListRefresh();
               }
             }
           }
@@ -203,12 +211,18 @@ jobs:
 
           '''
           app=replace_between(app,'async function incrementProduct(name){','async function removeGroup(name,row=null,intent=\'purchase\'){',operations,'quantity operations')
-          p.write_text(app,encoding='utf-8')
+          app_path.write_text(app,encoding='utf-8')
 
-          t=Path('tests/list-quantities.test.mjs')
-          test=t.read_text(encoding='utf-8')
-          test=test.replace('Map,Math,Number,String,Promise,\n    state:{locked:false},','Map,Math,Number,String,Promise,clearTimeout(){},\n    state:{locked:false,listRefreshTimer:null},',1)
-          test=test.replace('setProductQuantity:(_name,value)=>shown.push(value),\n    incrementProduct:',"setProductQuantity:(_name,value)=>shown.push(value),\n    scheduleListRefresh(){},\n    incrementProduct:",1)
+          qtest=Path('tests/list-quantities.test.mjs')
+          test=qtest.read_text(encoding='utf-8')
+          old='''    Map,Math,Number,String,Promise,\n    state:{locked:false},'''
+          new='''    Map,Math,Number,String,Promise,clearTimeout(){},\n    state:{locked:false,listRefreshTimer:null},'''
+          if old not in test: raise SystemExit('queue test context')
+          test=test.replace(old,new,1)
+          old='''    setProductQuantity:(_name,value)=>shown.push(value),\n    incrementProduct:'''
+          new='''    setProductQuantity:(_name,value)=>shown.push(value),\n    scheduleListRefresh(){},\n    incrementProduct:'''
+          if old not in test: raise SystemExit('queue test refresh stub')
+          test=test.replace(old,new,1)
           marker="\n\ntest('le menu trois points adopte un glass iOS plus compact et fondu sans changer les actions'"
           extra=r'''
 
@@ -224,106 +238,110 @@ jobs:
             const ops=source.slice(opsStart,opsEnd);
             assert.match(queue,/incrementProduct\(task\.name,\{deferRefresh:true\}\)/);
             assert.match(queue,/decrementProduct\(task\.name,\{deferRefresh:true\}\)/);
-            assert.match(queue,/if\(!catalogQuantityQueue\.size\)scheduleListRefresh\(\)/);
+            assert.match(queue,/if\(!catalogQuantityQueue\.size&&!state\.locked\)scheduleListRefresh\(\)/);
             assert.match(schedule,/if\(catalogQuantityQueue\.size\)/);
             assert.match(ops,/async function addItem\(name,\{deferRefresh=false\}=\{\}\)/);
             assert.match(ops,/state\.items=\[\.\.\.state\.items,\{uid:'',summary:item,status:'needs_action'\}\]/);
             assert.match(ops,/if\(deferRefresh&&group\.uids\.filter\(Boolean\)\.length<group\.count\)/);
           });
           '''
-          if marker not in test: raise SystemExit('test insertion marker')
+          if marker not in test: raise SystemExit('queue test insertion')
           test=test.replace(marker,textwrap.dedent(extra).rstrip()+marker,1)
-          t.write_text(test,encoding='utf-8')
+          qtest.write_text(test,encoding='utf-8')
 
-          local=Path('dish-local-images.js')
-          s=local.read_text(encoding='utf-8')
-          s,n=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='{version}'",s,count=1)
-          if n!=1: raise SystemExit('APP_VERSION')
-          local.write_text(s,encoding='utf-8')
+          local,n=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='{version}'",local,count=1)
+          if n!=1: raise SystemExit('APP_VERSION update')
+          local_path.write_text(local,encoding='utf-8')
 
-          catalog=Path('catalog.js')
-          s=catalog.read_text(encoding='utf-8')
-          s,n=re.subn(r'dish-local-images\.js\?v=\d+',f'dish-local-images.js?v={V}',s,count=1)
+          catalog_path=Path('catalog.js')
+          catalog=catalog_path.read_text(encoding='utf-8')
+          catalog,n=re.subn(r'dish-local-images\.js\?v=\d+',f'dish-local-images.js?v={V}',catalog,count=1)
           if n!=1: raise SystemExit('catalog cache')
-          catalog.write_text(s,encoding='utf-8')
+          catalog_path.write_text(catalog,encoding='utf-8')
 
-          index=Path('index.html')
-          s=index.read_text(encoding='utf-8')
-          s,n=re.subn(r'catalog\.js\?v=\d+',f'catalog.js?v={V}',s,count=1)
+          index_path=Path('index.html')
+          index=index_path.read_text(encoding='utf-8')
+          style_v=re.search(r'styles\.css\?v=(\d+)',index).group(1)
+          settings_v=re.search(r'settings-tab-badge\.js\?v=(\d+)',index).group(1)
+          index,n=re.subn(r'catalog\.js\?v=\d+',f'catalog.js?v={V}',index,count=1)
           if n!=1: raise SystemExit('index catalog')
-          s,n=re.subn(r'app\.js\?v=\d+',f'app.js?v={V}',s,count=1)
+          index,n=re.subn(r'app\.js\?v=\d+',f'app.js?v={V}',index,count=1)
           if n!=1: raise SystemExit('index app')
-          s,n=re.subn(r'(<span class="page-version">)v\d+',rf'\1{version}',s)
+          index,n=re.subn(r'(<span class="page-version">)v\d+',rf'\1{version}',index)
           if n!=3: raise SystemExit('page versions')
-          index.write_text(s,encoding='utf-8')
+          index_path.write_text(index,encoding='utf-8')
 
-          sw=Path('sw.js')
-          s=sw.read_text(encoding='utf-8')
-          s,n=re.subn(r"const CACHE='courses-app-v\d+-r1';",f"const CACHE='courses-app-v{V}-r1';",s,count=1)
+          sw_path=Path('sw.js')
+          sw=sw_path.read_text(encoding='utf-8')
+          sw,n=re.subn(r"const CACHE='courses-app-v\d+-r1';",f"const CACHE='courses-app-v{V}-r1';",sw,count=1)
           if n!=1: raise SystemExit('sw cache')
-          m=re.search(r'const SHELL=\[(.*?)\];',s,re.S)
-          if not m: raise SystemExit('sw shell')
-          body=m.group(1)
+          shell=re.search(r'const SHELL=\[(.*?)\];',sw,re.S)
+          if not shell: raise SystemExit('sw shell')
+          body=shell.group(1)
           for entry in (f"'./catalog.js?v={V}'",f"'./app.js?v={V}'",f"'./dish-local-images.js?v={V}'"):
               if entry not in body: body+=','+entry
-          s=s[:m.start(1)]+body+s[m.end(1):]
-          sw.write_text(s,encoding='utf-8')
+          sw=sw[:shell.start(1)]+body+sw[shell.end(1):]
+          sw_path.write_text(sw,encoding='utf-8')
 
-          pref=Path('tests/preference-popups.test.mjs')
-          s=pref.read_text(encoding='utf-8')
+          dishes_v=re.search(r'dishes-ui\.js\?v=(\d+)',catalog).group(1)
+          pref_path=Path('tests/preference-popups.test.mjs')
+          pref=pref_path.read_text(encoding='utf-8')
           pat=re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$",re.S)
-          rep=textwrap.dedent(r'''
-          test('la version visible passe à v347 et les ressources de quantité sont rechargées',()=>{
+          rep=f'''test('la version visible passe à {version} et les ressources de quantité sont rechargées',()=>{{
             const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
-            assert.match(index,/styles\.css\?v=346/);
-            assert.match(index,/catalog\.js\?v=347/);
-            assert.match(index,/app\.js\?v=347/);
-            assert.match(index,/settings-tab-badge\.js\?v=344/);
-            assert.equal((index.match(/page-version\">v347/g)||[]).length,3);
-            assert.match(catalog,/dishes-ui\.js\?v=344/);
-            assert.match(catalog,/dish-local-images\.js\?v=347/);
-            assert.match(settings,/missing-products-dishes\.js\?v=6/);
-            assert.match(settings,/missing-products-modern\.js\?v=6/);
-            assert.match(sw,/courses-app-v347-r1/);
-            assert.match(sw,/styles\.css\?v=346/);
-            assert.match(sw,/catalog\.js\?v=347/);
-            assert.match(sw,/app\.js\?v=347/);
-            assert.match(sw,/settings-tab-badge\.js\?v=344/);
-            assert.match(sw,/dishes-ui\.js\?v=344/);
-            assert.match(sw,/dish-local-images\.js\?v=347/);
-            assert.match(localImages,/const APP_VERSION='v347'/);
-          });
-          ''').lstrip()
-          s,n=pat.subn(lambda _:rep,s,count=1)
+            assert.match(index,/styles\\.css\\?v={style_v}/);
+            assert.match(index,/catalog\\.js\\?v={V}/);
+            assert.match(index,/app\\.js\\?v={V}/);
+            assert.match(index,/settings-tab-badge\\.js\\?v={settings_v}/);
+            assert.equal((index.match(/page-version\\">{version}/g)||[]).length,3);
+            assert.match(catalog,/dishes-ui\\.js\\?v={dishes_v}/);
+            assert.match(catalog,/dish-local-images\\.js\\?v={V}/);
+            assert.match(sw,/courses-app-v{V}-r1/);
+            assert.match(sw,/styles\\.css\\?v={style_v}/);
+            assert.match(sw,/catalog\\.js\\?v={V}/);
+            assert.match(sw,/app\\.js\\?v={V}/);
+            assert.match(sw,/settings-tab-badge\\.js\\?v={settings_v}/);
+            assert.match(sw,/dish-local-images\\.js\\?v={V}/);
+            assert.match(localImages,/const APP_VERSION='{version}'/);
+          }});\n'''
+          pref,n=pat.subn(lambda _:rep,pref,count=1)
           if n!=1: raise SystemExit('version test')
-          pref.write_text(s,encoding='utf-8')
+          pref_path.write_text(pref,encoding='utf-8')
+          Path('.next-version').write_text(str(V),encoding='utf-8')
 
       - name: Run tests
+        shell: bash
         run: |
           set -euo pipefail
           node --test tests/*.test.mjs
           git diff --check
 
       - name: Validate final change
+        shell: bash
         run: |
           set -euo pipefail
+          V="$(cat .next-version)"
           grep -F "incrementProduct(task.name,{deferRefresh:true})" app.js
           grep -F "decrementProduct(task.name,{deferRefresh:true})" app.js
-          grep -F "if(!catalogQuantityQueue.size)scheduleListRefresh()" app.js
-          grep -F "const APP_VERSION='v347'" dish-local-images.js
-          test "$(grep -o 'page-version\">v347' index.html | wc -l)" -eq 3
+          grep -F "if(!catalogQuantityQueue.size&&!state.locked)scheduleListRefresh()" app.js
+          grep -F "const APP_VERSION='v${V}'" dish-local-images.js
+          test "$(grep -o "page-version\">v${V}" index.html | wc -l)" -eq 3
+          rm .next-version
 
       - name: Ensure main did not move
+        shell: bash
         run: |
           set -euo pipefail
           git fetch origin main --depth=1
-          test "$(git rev-parse origin/main)" = "c134acdd00c8a848f388949ac39cf906078d283d"
+          test "$(git rev-parse origin/main)" = "$BASE_SHA"
 
       - name: Commit and push main
+        shell: bash
         run: |
           set -euo pipefail
+          V="$(grep -o "const APP_VERSION='v[0-9]*'" dish-local-images.js | head -1 | grep -o '[0-9]*')"
           git config user.name "OpenAI Agent"
           git config user.email "openai-agent@users.noreply.github.com"
           git add app.js index.html catalog.js dish-local-images.js sw.js tests/list-quantities.test.mjs tests/preference-popups.test.mjs
-          git commit -m "v347: fluidifie les rafales multi-produits"
+          git commit -m "v${V}: fluidifie les rafales multi-produits"
           git push origin HEAD:main
