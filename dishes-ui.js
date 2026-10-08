@@ -516,9 +516,10 @@ function openRecipeCustomization(){
   const current=recipeCustomizationDish?.name||DISHES[0]?.name||'';
   loadRecipeCustomizationDish(current);
   recipeCustomizationSearch.value=current;
-  hideRecipeCustomizationSuggestions();
   if(typeof recipeCustomizationDialog.showModal==='function')recipeCustomizationDialog.showModal();
   else recipeCustomizationDialog.setAttribute('open','');
+  recipeCustomizationDialog.focus({preventScroll:true});
+  hideRecipeCustomizationSuggestions();
 }
 function saveRecipeCustomization(){
   const dish=recipeCustomizationDish;
