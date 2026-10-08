@@ -5,10 +5,13 @@ const STORAGE_DISHES='courses-missing-dishes-v1';
 const STORAGE_PRODUCTS='courses-missing-products-v1';
 const STORAGE_RUNNING_DISHES='courses-missing-dishes-running-v1';
 const STORAGE_RUNNING_PRODUCTS='courses-missing-products-running-v1';
+const STORAGE_OPENAI_REQUESTS='courses-openai-request-status-v1';
 const PRODUCT_PREFIX='__courses_product__:';
+const OPENAI_RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/actions/workflows/integrate-dish-openai.yml/runs?event=repository_dispatch&per_page=100';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const HA_REQUEST_TIMEOUT_MS=12000;
 const OPENAI_COOLDOWN_MS=30000;
+const OPENAI_RECONCILE_MIN_MS=15000;
 
 let haSocket=null;
 let haSeq=980000000;
@@ -16,6 +19,8 @@ const haPending=new Map();
 let pushDataPromise=null;
 let pushDataCache=null;
 let permissionPromise=null;
+let openAiReconcilePromise=null;
+let lastOpenAiReconcileAt=0;
 const openAiCooldown=new Set();
 const openAiErrors=new Set();
 
@@ -66,6 +71,44 @@ function setRunning(type,id,active){
   if(active)running.add(value);
   else running.delete(value);
   saveRunning(type,running);
+}
+function openAiRequestKey(type,id){return type+':'+String(id||'')}
+function readOpenAiRequests(){
+  const value=readJson(STORAGE_OPENAI_REQUESTS,{});
+  return value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+}
+function saveOpenAiRequests(requests){
+  try{localStorage.setItem(STORAGE_OPENAI_REQUESTS,JSON.stringify(requests))}catch(_){}
+}
+function openAiRequestState(type,id){
+  const value=readOpenAiRequests()[openAiRequestKey(type,id)];
+  return value&&typeof value==='object'?value:null;
+}
+function setOpenAiRequestState(type,id,state){
+  const key=openAiRequestKey(type,id);
+  if(!String(id||''))return;
+  const requests=readOpenAiRequests();
+  if(state)requests[key]=state;
+  else delete requests[key];
+  saveOpenAiRequests(requests);
+}
+function pruneOpenAiRequests(){
+  const current={
+    product:currentIds('product'),
+    dish:currentIds('dish')
+  };
+  const requests=readOpenAiRequests();
+  let changed=false;
+  Object.keys(requests).forEach(key=>{
+    const separator=key.indexOf(':');
+    const type=separator>0?key.slice(0,separator):'';
+    const id=separator>0?key.slice(separator+1):'';
+    if((type==='product'||type==='dish')&&current[type].has(id))return;
+    delete requests[key];
+    changed=true;
+  });
+  if(changed)saveOpenAiRequests(requests);
+  return requests;
 }
 function cooldownKey(type,id){return type+':'+String(id||'')}
 function randomId(){
@@ -118,6 +161,77 @@ async function notifyIntegrationStarted(type,item,requestId){
       renotify:true
     });
   }catch(_){}
+}
+
+function trackedRunningOpenAiRequests(){
+  const requests=pruneOpenAiRequests();
+  return Object.entries(requests).flatMap(([key,state])=>{
+    if(state?.status!=='running'||!state.requestId)return [];
+    const separator=key.indexOf(':');
+    if(separator<=0)return [];
+    const type=key.slice(0,separator);
+    const id=key.slice(separator+1);
+    if(type!=='product'&&type!=='dish')return [];
+    return [{key,type,id,state}];
+  });
+}
+function markOpenAiCancelled(entry){
+  const current=openAiRequestState(entry.type,entry.id);
+  if(!current||current.status==='cancelled')return null;
+  const item=itemsForType(entry.type).find(value=>String(value?.id||'')===entry.id);
+  const name=String(item?.name||current.name||'').trim()||(entry.type==='product'?'Produit':'Plat');
+  setRunning(entry.type,entry.id,false);
+  openAiCooldown.delete(cooldownKey(entry.type,entry.id));
+  openAiErrors.delete(cooldownKey(entry.type,entry.id));
+  setOpenAiRequestState(entry.type,entry.id,{...current,status:'cancelled',name,cancelledAt:Date.now()});
+  return name;
+}
+function notifyOpenAiCancelled(names){
+  const unique=[...new Set(names.filter(Boolean))];
+  if(!unique.length)return;
+  if(unique.length===1){
+    appNotify('Intégration OpenAI annulée',unique[0]+' peut être relancé.');
+    return;
+  }
+  appNotify('Intégrations OpenAI annulées',unique.length+' demandes peuvent être relancées.');
+}
+async function reconcileOpenAiRequests(){
+  const tracked=trackedRunningOpenAiRequests();
+  if(!tracked.length)return false;
+  const now=Date.now();
+  if(openAiReconcilePromise)return openAiReconcilePromise;
+  if(now-lastOpenAiReconcileAt<OPENAI_RECONCILE_MIN_MS)return false;
+  lastOpenAiReconcileAt=now;
+  openAiReconcilePromise=(async()=>{
+    try{
+      const response=await fetch(OPENAI_RUNS_URL,{
+        headers:{Accept:'application/vnd.github+json'},
+        cache:'no-store'
+      });
+      if(!response.ok)return false;
+      const data=await response.json();
+      const runs=Array.isArray(data?.workflow_runs)?data.workflow_runs:[];
+      const cancelled=[];
+      tracked.forEach(entry=>{
+        const run=runs.find(candidate=>String(candidate?.display_title||'').includes(entry.state.requestId));
+        if(run?.status!=='completed'||run?.conclusion!=='cancelled')return;
+        const name=markOpenAiCancelled(entry);
+        if(name)cancelled.push(name);
+      });
+      if(!cancelled.length)return false;
+      decorateOpenAiButtons();
+      notifyOpenAiCancelled(cancelled);
+      return true;
+    }catch(_){
+      return false;
+    }finally{
+      openAiReconcilePromise=null;
+    }
+  })();
+  return openAiReconcilePromise;
+}
+function requestOpenAiReconciliation(){
+  void reconcileOpenAiRequests();
 }
 
 function rejectHaPending(message='Connexion Home Assistant interrompue'){
@@ -264,13 +378,13 @@ async function requiredPushData(){
   }
   throw new Error('Souscription Web Push impossible. Réessaie après avoir rouvert l’application.');
 }
-async function integrateWithOpenAi(type,id){
+async function integrateWithOpenAi(type,id,requestId){
   const item=itemsForType(type).find(entry=>String(entry?.id||'')===String(id||''));
   if(!item)return false;
   const serviceData={
     dish_name:(type==='product'?PRODUCT_PREFIX:'')+String(item.name||''),
     dish_category:String(item.category||''),
-    request_id:randomId()
+    request_id:String(requestId||randomId())
   };
   let push;
   try{
@@ -303,6 +417,7 @@ function installOpenAiStyle(){
     #missingProductsDialog .missing-dish-openai:focus-visible{outline:2px solid rgba(11,112,64,.25)!important;outline-offset:2px!important}
     #missingProductsDialog .missing-dish-progress{display:inline-flex!important;align-items:center!important;width:max-content!important;margin:0!important;padding:3px 7px!important;border-radius:999px!important;background:rgba(255,149,0,.11)!important;color:#b96500!important;font-size:9.5px!important;line-height:1!important;font-weight:780!important;white-space:nowrap!important}
     #missingProductsDialog .missing-dish-progress.is-error{background:rgba(255,59,48,.10)!important;color:#d93025!important}
+    #missingProductsDialog .missing-dish-progress.is-cancelled{background:rgba(142,142,147,.12)!important;color:#6e6e73!important}
     #missingProductsDialog .missing-product-integrate.is-running,#missingProductsDialog .missing-dish-integrate.is-running{background:#edf0ee!important;color:#7a837e!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-integrate.is-added{background:#edf0ee!important;color:#65736b!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-openai.is-running{background:#edf0ee!important;color:#8a928d!important;border-left-color:#dfe4e1!important;opacity:1!important}
@@ -319,11 +434,13 @@ function decorateRunningRows(dialog,type,running){
   dialog.querySelectorAll(rowSelector).forEach(row=>{
     const id=String(row.dataset[rowData]||'');
     const added=type==='dish'&&(row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request'));
-    const active=!added&&running.has(id);
-    const failed=!added&&!active&&openAiErrors.has(cooldownKey(type,id));
+    const request=openAiRequestState(type,id);
+    const cancelled=!added&&request?.status==='cancelled';
+    const active=!added&&!cancelled&&running.has(id);
+    const failed=!added&&!active&&!cancelled&&openAiErrors.has(cooldownKey(type,id));
     const copy=row.querySelector('.missing-product-copy');
     let progress=copy?.querySelector('.missing-dish-progress');
-    if((active||failed)&&copy){
+    if((active||failed||cancelled)&&copy){
       if(!progress){
         progress=document.createElement('small');
         progress.className='missing-dish-progress';
@@ -331,8 +448,11 @@ function decorateRunningRows(dialog,type,running){
         copy.appendChild(progress);
       }
       progress.textContent=failed?'Erreur':'En cours';
+      if(cancelled)progress.textContent='Annulé';
       progress.classList.toggle('is-error',failed);
-      progress.setAttribute('aria-label',failed?'Erreur lors de l’intégration':'Intégration en cours');
+      progress.classList.toggle('is-cancelled',cancelled);
+      progress.classList.toggle('missing-dish-error',failed||cancelled);
+      progress.setAttribute('aria-label',cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours');
     }else if(progress){
       progress.remove();
     }
@@ -347,10 +467,11 @@ function decorateRunningRows(dialog,type,running){
     }
     row.classList.toggle('is-running-request',active);
     row.classList.toggle('is-error-request',failed);
+    row.classList.toggle('is-cancelled-request',cancelled);
     if(type==='dish')row.classList.toggle('is-added-request',added);
   });
 }
-function ensureOpenAiButton(row,type,id,running,added=false){
+function ensureOpenAiButton(row,type,id,running,added=false,cancelled=false){
   const attribute=type==='product'?'data-openai-missing-product':'data-openai-missing-dish';
   let button=row.querySelector('['+attribute+']');
   if(!button){
@@ -372,8 +493,8 @@ function ensureOpenAiButton(row,type,id,running,added=false){
   button.dataset.openaiMissingType=type;
   button.dataset.openaiMissingId=id;
   const noun=type==='product'?'produit':'plat';
-  button.title=added?(type==='product'?'Produit déjà ajouté':'Plat déjà ajouté'):'Intégration OpenAI';
-  button.setAttribute('aria-label',added?(type==='product'?'Produit déjà ajouté':'Plat déjà ajouté'):running?'Intégration de ce '+noun+' en cours':'Intégrer ce '+noun+' avec OpenAI');
+  button.title=added?(type==='product'?'Produit déjà ajouté':'Plat déjà ajouté'):cancelled?'Relancer avec OpenAI':'Intégration OpenAI';
+  button.setAttribute('aria-label',added?(type==='product'?'Produit déjà ajouté':'Plat déjà ajouté'):running?'Intégration de ce '+noun+' en cours':cancelled?'Relancer ce '+noun+' avec OpenAI':'Intégrer ce '+noun+' avec OpenAI');
   button.disabled=added||running||openAiCooldown.has(key);
   button.classList.toggle('is-running',running);
   button.setAttribute('aria-disabled',String(button.disabled));
@@ -388,14 +509,18 @@ function decorateOpenAiButtons(){
   decorateRunningRows(dialog,'dish',runningDishes);
   dialog.querySelectorAll('[data-missing-product-row]').forEach(row=>{
     const id=String(row.dataset.missingProductRow||'');
-    if(id)ensureOpenAiButton(row,'product',id,runningProducts.has(id));
+    if(id){
+      const cancelled=openAiRequestState('product',id)?.status==='cancelled';
+      ensureOpenAiButton(row,'product',id,runningProducts.has(id)&&!cancelled,false,cancelled);
+    }
   });
   dialog.querySelectorAll('[data-missing-dish-row]').forEach(row=>{
     const id=String(row.dataset.missingDishRow||'');
     const actions=row.querySelector('.missing-dish-actions');
     if(!id||!actions)return;
     const added=row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request');
-    ensureOpenAiButton(row,'dish',id,!added&&runningDishes.has(id),added);
+    const cancelled=!added&&openAiRequestState('dish',id)?.status==='cancelled';
+    ensureOpenAiButton(row,'dish',id,!added&&!cancelled&&runningDishes.has(id),added,cancelled);
   });
   return true;
 }
@@ -414,6 +539,15 @@ function bindOpenAiUi(){
       const key=cooldownKey(type,id);
       if(!id||button.disabled||openAiCooldown.has(key))return;
       openAiErrors.delete(key);
+      const item=itemsForType(type).find(entry=>String(entry?.id||'')===id);
+      if(!item)return;
+      const requestId=randomId();
+      setOpenAiRequestState(type,id,{
+        requestId,
+        status:'running',
+        name:String(item.name||''),
+        startedAt:Date.now()
+      });
       setRunning(type,id,true);
       openAiCooldown.add(key);
       button.disabled=true;
@@ -422,11 +556,12 @@ function bindOpenAiUi(){
       button.setAttribute('aria-busy','true');
       queueMicrotask(decorateOpenAiButtons);
       navigator.vibrate?.(12);
-      void integrateWithOpenAi(type,id).then(ok=>{
+      void integrateWithOpenAi(type,id,requestId).then(ok=>{
         if(!ok){
           openAiErrors.add(key);
           openAiCooldown.delete(key);
           setRunning(type,id,false);
+          setOpenAiRequestState(type,id,null);
         }else{
           openAiErrors.delete(key);
         }
@@ -448,6 +583,7 @@ function bindOpenAiUi(){
       :String(integrate.dataset.integrateMissingDish||'');
     if(!id)return;
     openAiErrors.delete(cooldownKey(type,id));
+    setOpenAiRequestState(type,id,null);
     setRunning(type,id,true);
     queueMicrotask(decorateOpenAiButtons);
   },true);
@@ -456,6 +592,7 @@ function bindOpenAiUi(){
     const dialog=document.getElementById('missingProductsDialog');
     if(!dialog)return false;
     decorateOpenAiButtons();
+    requestOpenAiReconciliation();
     let decorateQueued=false;
     new MutationObserver(()=>{
       if(decorateQueued)return;
@@ -468,9 +605,15 @@ function bindOpenAiUi(){
     dialog.addEventListener('close',()=>{
       pruneRunning('product');
       pruneRunning('dish');
+      pruneOpenAiRequests();
     });
     return true;
   };
+  document.getElementById('settingsMissingProductsBtn')?.addEventListener('click',requestOpenAiReconciliation);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')requestOpenAiReconciliation();
+  });
+  window.addEventListener('focus',requestOpenAiReconciliation,{passive:true});
   if(bindDialog())return;
   const observer=new MutationObserver(()=>{
     if(bindDialog())observer.disconnect();

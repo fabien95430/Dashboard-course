@@ -1,4 +1,5 @@
 name: Intégrer un produit ou plat via OpenAI
+run-name: OpenAI · ${{ github.event.client_payload.request_id }}
 
 on:
   repository_dispatch:

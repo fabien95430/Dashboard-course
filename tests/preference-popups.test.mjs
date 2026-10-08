@@ -165,22 +165,27 @@ test('les demandes manquantes affichent catégorie et statut compact sur la mêm
   assert.ok(popup.includes('small:not(.missing-dish-error):not(.missing-dish-progress)'));
 });
 
-test('la version visible passe à v352 et les statuts des demandes sont rechargés',()=>{
+test('la version visible passe à v353 et le suivi des annulations OpenAI est rechargé',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=352/);
+  assert.match(index,/catalog\.js\?v=353/);
   assert.match(index,/app\.js\?v=352/);
   assert.match(index,/settings-tab-badge\.js\?v=352/);
-  assert.equal((index.match(/page-version\">v352/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v353/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=344/);
-  assert.match(catalog,/dish-local-images\.js\?v=352/);
+  assert.match(catalog,/dish-local-images\.js\?v=353/);
   assert.match(settings,/missing-products-dishes\.js\?v=8/);
-  assert.match(sw,/courses-app-v352-r1/);
+  assert.match(sw,/courses-app-v353-r1/);
   assert.match(sw,/styles\.css\?v=348/);
   assert.match(sw,/catalog\.js\?v=352/);
   assert.match(sw,/app\.js\?v=352/);
   assert.match(sw,/settings-tab-badge\.js\?v=352/);
   assert.match(sw,/missing-products-dishes\.js\?v=8/);
   assert.match(sw,/dish-local-images\.js\?v=351/);
-  assert.match(localImages,/const APP_VERSION='v352'/);
+  assert.match(sw,/missing-products-fixes\.js\?v=18/);
+  assert.match(sw,/missing-products-popup-ui\.js\?v=16/);
+  assert.match(sw,/dish-local-images\.js\?v=353/);
+  assert.match(localImages,/const APP_VERSION='v353'/);
+  assert.match(localImages,/missing-products-fixes\.js\?v=18/);
+  assert.match(localImages,/missing-products-popup-ui\.js\?v=16/);
 });
