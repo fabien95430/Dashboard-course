@@ -975,10 +975,36 @@ function openListRowMenu(row,anchor){
   const name=row.dataset.name||'';
   const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));
   if(!group)return;
+  const product=catalogProductFor(name);
+  const detail=[product?.category,product?.sub].filter((value,index,array)=>value&&array.indexOf(value)===index).join(' · ')||'Article';
   const menu=document.createElement('div');
   menu.className='list-row-menu';
   menu.setAttribute('role','menu');
   menu.setAttribute('aria-label','Actions pour '+name);
+
+  const header=document.createElement('div');
+  header.className='list-row-menu-head';
+  const visual=document.createElement('span');
+  visual.className='list-row-menu-product-icon';
+  visual.innerHTML=product?sprite(product,true):'<span class="unknown">•</span>';
+  const copy=document.createElement('span');
+  copy.className='list-row-menu-copy';
+  const title=document.createElement('strong');
+  title.textContent=name;
+  const subtitle=document.createElement('small');
+  subtitle.textContent=detail;
+  copy.append(title,subtitle);
+  const close=document.createElement('button');
+  close.type='button';
+  close.className='list-row-menu-close';
+  close.setAttribute('aria-label','Fermer le menu');
+  close.textContent='×';
+  close.onclick=event=>{event.stopPropagation();closeListRowMenu()};
+  header.append(visual,copy,close);
+
+  const quantityLabel=document.createElement('span');
+  quantityLabel.className='list-row-menu-quantity-label';
+  quantityLabel.textContent='Quantité';
   const quantity=document.createElement('div');
   quantity.className='list-row-menu-quantity';
   quantity.setAttribute('aria-label','Quantité de '+name);
@@ -1001,18 +1027,21 @@ function openListRowMenu(row,anchor){
   decrement.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,-1)};
   increment.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,1)};
   quantity.append(decrement,value,increment);
+
   const remove=document.createElement('button');
   remove.type='button';
   remove.className='list-row-menu-delete';
   remove.setAttribute('role','menuitem');
-  remove.textContent='Supprimer';
+  remove.textContent='Supprimer de Ma liste';
   remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row,'delete')};
-  menu.append(quantity,remove);
+  menu.append(header,quantityLabel,quantity,remove);
   document.body.appendChild(menu);
-  const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
+
+  const margin=14,rect=anchor.getBoundingClientRect(),width=Math.min(286,window.innerWidth-margin*2);
   menu.style.width=width+'px';
-  const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
-  const below=rect.bottom+7,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-7);
+  const left=Math.max(margin,Math.min(window.innerWidth-width-margin,rect.right-width));
+  const below=rect.bottom+8,above=rect.top-menu.offsetHeight-8;
+  const top=below+menu.offsetHeight<=window.innerHeight-margin?below:Math.max(margin,above);
   menu.style.left=left+'px';menu.style.top=top+'px';
   anchor.setAttribute('aria-expanded','true');
   listRowMenu={menu,anchor};

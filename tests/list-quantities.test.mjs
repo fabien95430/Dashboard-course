@@ -72,7 +72,7 @@ test('un produit inconnu, une quantité invalide ou une session verrouillée ne 
 });
 
 
-test('le menu trois points expose la quantité et la suppression comme la maquette validée',()=>{
+test('le menu trois points adopte le glass classique iOS tout en conservant quantité et suppression',()=>{
   const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');
   const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);
   const menuEnd=source.indexOf('function bindListReorder(root){',menuStart);
@@ -80,14 +80,21 @@ test('le menu trois points expose la quantité et la suppression comme la maquet
   const helper=source.slice(helperStart,menuStart),menu=source.slice(menuStart,menuEnd);
   assert.match(helper,/await incrementProduct\(item\)/);
   assert.match(helper,/await decrementProduct\(item\)/);
-  assert.match(menu,/list-row-menu-quantity/);
+  assert.match(menu,/const product=catalogProductFor\(name\)/);
+  assert.match(menu,/list-row-menu-head/);
+  assert.match(menu,/list-row-menu-product-icon/);
+  assert.match(menu,/list-row-menu-close/);
+  assert.match(menu,/quantityLabel\.textContent='Quantité'/);
   assert.match(menu,/list-row-menu-decrement/);
   assert.match(menu,/list-row-menu-value/);
   assert.match(menu,/list-row-menu-increment/);
   assert.match(menu,/changeListRowMenuQuantity\(name,-1\)/);
   assert.match(menu,/changeListRowMenuQuantity\(name,1\)/);
-  assert.match(menu,/list-row-menu-delete/);
-  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-bottom:1px solid rgba\(23,49,38,\.08\)/s);
-  assert.match(styles,/\.list-row-menu-quantity button\{[^}]*border-radius:999px[^}]*background:#eaf4ef/s);
-  assert.match(styles,/\.list-row-menu-delete\{[^}]*background:#fdeff0[^}]*color:#df3f49/s);
+  assert.match(menu,/remove\.textContent='Supprimer de Ma liste'/);
+  assert.match(menu,/removeGroup\(name,row,'delete'\)/);
+  assert.match(menu,/Math\.min\(286,window\.innerWidth-margin\*2\)/);
+  assert.match(styles,/\.list-row-menu\{[^}]*border-radius:26px[^}]*backdrop-filter:blur\(30px\) saturate\(145%\)/s);
+  assert.match(styles,/\.list-row-menu-head\{[^}]*grid-template-columns:46px minmax\(0,1fr\) 34px/s);
+  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-radius:999px[^}]*backdrop-filter:blur\(16px\) saturate\(125%\)/s);
+  assert.match(styles,/\.list-row-menu-delete\{[^}]*height:52px[^}]*border-radius:17px/s);
 });

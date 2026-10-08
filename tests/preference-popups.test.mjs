@@ -79,27 +79,27 @@ test('la recherche des recettes personnalisées reste fermée à l ouverture',()
   assert.ok(hide>focus,'les suggestions doivent être refermées après la gestion du focus');
 });
 
-test('la version visible passe à v338 et les ressources du popup recettes sont rechargées',()=>{
+test('la version visible passe à v339 et les ressources du menu Ma liste sont rechargées',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
   const settings=read('settings-tab-badge.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
-  assert.match(index,/styles\.css\?v=336/);
-  assert.match(index,/catalog\.js\?v=338/);
-  assert.match(index,/app\.js\?v=336/);
+  assert.match(index,/styles\.css\?v=339/);
+  assert.match(index,/catalog\.js\?v=339/);
+  assert.match(index,/app\.js\?v=339/);
   assert.match(index,/settings-tab-badge\.js\?v=337/);
-  assert.equal((index.match(/page-version\">v338/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v339/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=338/);
-  assert.match(catalog,/dish-local-images\.js\?v=338/);
+  assert.match(catalog,/dish-local-images\.js\?v=339/);
   assert.match(settings,/missing-products-modern\.js\?v=6/);
-  assert.match(sw,/courses-app-v338-r1/);
-  assert.match(sw,/styles\.css\?v=336/);
-  assert.match(sw,/catalog\.js\?v=338/);
-  assert.match(sw,/app\.js\?v=336/);
+  assert.match(sw,/courses-app-v339-r1/);
+  assert.match(sw,/styles\.css\?v=339/);
+  assert.match(sw,/catalog\.js\?v=339/);
+  assert.match(sw,/app\.js\?v=339/);
   assert.match(sw,/settings-tab-badge\.js\?v=337/);
   assert.match(sw,/dishes-ui\.js\?v=338/);
-  assert.match(sw,/dish-local-images\.js\?v=338/);
+  assert.match(sw,/dish-local-images\.js\?v=339/);
   assert.match(sw,/missing-products-modern\.js\?v=6/);
-  assert.match(localImages,/const APP_VERSION='v338'/);
+  assert.match(localImages,/const APP_VERSION='v339'/);
 });
