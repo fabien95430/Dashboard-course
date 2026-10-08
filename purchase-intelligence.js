@@ -40,7 +40,7 @@ const SUB=Object.freeze({
   'Café & thé':{days:35,factor:.85},'Bières & vins':{days:30,factor:.82},
   'Entretien':{days:60,factor:.88},'Lessive':{days:45,factor:.88},'Vaisselle':{days:45,factor:.88},
   'Papier & sacs':{days:35,factor:.86},'Hygiène':{days:35,factor:.86},
-  'Salle de bain & soins':{days:60,factor:.88},'Bébé & animaux':{days:21,factor:.82}
+  'Salle de bain & soins':{days:60,factor:.88},'Enfant':{days:21,factor:.82}
 });
 const PRODUCT=Object.freeze({
   'Lait':{days:6,shelf:7},'Lait entier':{days:6,shelf:7},'Lait demi-écrémé':{days:6,shelf:7},

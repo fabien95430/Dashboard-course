@@ -97,7 +97,7 @@ const DISPLAY_MODE_BY_SUB=Object.freeze({
   'Papier & sacs':'Paquet',
   'Hygiène':'Flacon',
   'Salle de bain & soins':'Flacon',
-  'Bébé & animaux':'Paquet'
+  'Enfant':'Paquet'
 });
 
 const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
@@ -164,7 +164,7 @@ const TECHNICAL_MODE_BY_SUB=Object.freeze({
   'Papier & sacs':'Paquet',
   'Hygiène':'Flacon',
   'Salle de bain & soins':'Flacon',
-  'Bébé & animaux':'Paquet'
+  'Enfant':'Paquet'
 });
 
 const TECHNICAL_MODE_BY_PRODUCT=Object.freeze({
