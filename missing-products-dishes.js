@@ -108,7 +108,7 @@ function appNotify(title,detail=''){
   toast._t=setTimeout(()=>toast.classList.remove('is-visible'),3000);
 }
 function notifyRequest(name){
-  appNotify('Demande d’ajout en cours',name+' sera ajouté prochainement.');
+  appNotify('Ajout en cours',name);
 }
 async function notifyProductQueued(id){
   if(!('Notification' in window)||!('serviceWorker' in navigator))return false;

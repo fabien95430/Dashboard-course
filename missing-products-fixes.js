@@ -17,6 +17,7 @@ let pushDataPromise=null;
 let pushDataCache=null;
 let permissionPromise=null;
 const openAiCooldown=new Set();
+const openAiErrors=new Set();
 
 function readJson(key,fallback){
   try{
@@ -300,11 +301,12 @@ function installOpenAiStyle(){
     #missingProductsDialog .missing-dish-openai:active{transform:scale(.96)}
     #missingProductsDialog .missing-dish-openai:disabled{opacity:.45!important;transform:none!important}
     #missingProductsDialog .missing-dish-openai:focus-visible{outline:2px solid rgba(11,112,64,.25)!important;outline-offset:2px!important}
-    #missingProductsDialog .missing-dish-progress{display:inline-flex!important;width:max-content!important;margin-top:1px!important;padding:4px 8px!important;border-radius:999px!important;background:#eef1ef!important;color:#6f7973!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important}
+    #missingProductsDialog .missing-dish-progress{display:inline-flex!important;align-items:center!important;width:max-content!important;margin:0!important;padding:3px 7px!important;border-radius:999px!important;background:rgba(255,149,0,.11)!important;color:#b96500!important;font-size:9.5px!important;line-height:1!important;font-weight:780!important;white-space:nowrap!important}
+    #missingProductsDialog .missing-dish-progress.is-error{background:rgba(255,59,48,.10)!important;color:#d93025!important}
     #missingProductsDialog .missing-product-integrate.is-running,#missingProductsDialog .missing-dish-integrate.is-running{background:#edf0ee!important;color:#7a837e!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-integrate.is-added{background:#edf0ee!important;color:#65736b!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-openai.is-running{background:#edf0ee!important;color:#8a928d!important;border-left-color:#dfe4e1!important;opacity:1!important}
-    #missingProductsDialog .courses-openai-feedback{position:absolute;z-index:80;left:14px;right:14px;bottom:14px;padding:10px 12px;border-radius:14px;background:rgba(24,36,29,.94);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:12px;line-height:1.35;font-weight:650;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+    #missingProductsDialog .courses-openai-feedback{position:absolute;z-index:80;left:14px;right:14px;bottom:14px;padding:9px 11px;border-radius:14px;background:rgba(24,36,29,.94);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:11.5px;line-height:1.2;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
     #missingProductsDialog .courses-openai-feedback.is-visible{opacity:1;transform:translateY(0)}
     @media(max-width:390px){#missingProductsDialog .missing-dish-integrate{padding-left:11px!important;padding-right:10px!important}#missingProductsDialog .missing-dish-openai{width:36px!important;min-width:36px!important;min-height:40px!important;font-size:16px!important}}
   `;
@@ -318,16 +320,19 @@ function decorateRunningRows(dialog,type,running){
     const id=String(row.dataset[rowData]||'');
     const added=type==='dish'&&(row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request'));
     const active=!added&&running.has(id);
-    let progress=row.querySelector('.missing-dish-progress');
-    if(active){
-      const copy=row.querySelector('.missing-product-copy');
-      if(copy&&!progress){
+    const failed=!added&&!active&&openAiErrors.has(cooldownKey(type,id));
+    const copy=row.querySelector('.missing-product-copy');
+    let progress=copy?.querySelector('.missing-dish-progress');
+    if((active||failed)&&copy){
+      if(!progress){
         progress=document.createElement('small');
         progress.className='missing-dish-progress';
-        progress.textContent='En cours…';
         progress.setAttribute('role','status');
         copy.appendChild(progress);
       }
+      progress.textContent=failed?'Erreur':'En cours';
+      progress.classList.toggle('is-error',failed);
+      progress.setAttribute('aria-label',failed?'Erreur lors de l’intégration':'Intégration en cours');
     }else if(progress){
       progress.remove();
     }
@@ -341,6 +346,7 @@ function decorateRunningRows(dialog,type,running){
       if(integrate.textContent!==label)integrate.textContent=label;
     }
     row.classList.toggle('is-running-request',active);
+    row.classList.toggle('is-error-request',failed);
     if(type==='dish')row.classList.toggle('is-added-request',added);
   });
 }
@@ -407,6 +413,7 @@ function bindOpenAiUi(){
       const id=String(type==='product'?button.dataset.openaiMissingProduct:button.dataset.openaiMissingDish||'');
       const key=cooldownKey(type,id);
       if(!id||button.disabled||openAiCooldown.has(key))return;
+      openAiErrors.delete(key);
       setRunning(type,id,true);
       openAiCooldown.add(key);
       button.disabled=true;
@@ -417,8 +424,11 @@ function bindOpenAiUi(){
       navigator.vibrate?.(12);
       void integrateWithOpenAi(type,id).then(ok=>{
         if(!ok){
+          openAiErrors.add(key);
           openAiCooldown.delete(key);
           setRunning(type,id,false);
+        }else{
+          openAiErrors.delete(key);
         }
       }).finally(()=>{
         button.removeAttribute('aria-busy');
@@ -437,6 +447,7 @@ function bindOpenAiUi(){
       ?String(integrate.dataset.integrateMissingProduct||'')
       :String(integrate.dataset.integrateMissingDish||'');
     if(!id)return;
+    openAiErrors.delete(cooldownKey(type,id));
     setRunning(type,id,true);
     queueMicrotask(decorateOpenAiButtons);
   },true);

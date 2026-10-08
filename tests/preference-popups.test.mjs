@@ -153,22 +153,34 @@ test('les validations restent dans leur popup tant que celui-ci reste ouvert',()
   assert.match(styles,/\.dialog-feedback,\.courses-openai-feedback\{[\s\S]*?white-space:nowrap;[\s\S]*?overflow:hidden;[\s\S]*?text-overflow:ellipsis;[\s\S]*?max-width:100%/);
 });
 
-test('la version visible passe à v351 et les suppressions du popup sont rechargées',()=>{
+test('les demandes manquantes affichent catégorie et statut compact sur la même ligne',()=>{
+  const missing=read('missing-products-dishes.js');
+  const fixes=read('missing-products-fixes.js');
+  const popup=read('missing-products-popup-ui.js');
+  assert.ok(missing.includes("appNotify('Ajout en cours',name);"));
+  assert.ok(fixes.includes("progress.textContent=failed?'Erreur':'En cours';"));
+  assert.ok(fixes.includes('background:rgba(255,149,0,.11)!important;color:#b96500!important'));
+  assert.ok(fixes.includes('.missing-dish-progress.is-error{background:rgba(255,59,48,.10)!important;color:#d93025!important}'));
+  assert.ok(popup.includes('display:flex!important;flex-flow:row wrap!important;align-items:center!important'));
+  assert.ok(popup.includes('small:not(.missing-dish-error):not(.missing-dish-progress)'));
+});
+
+test('la version visible passe à v352 et les statuts des demandes sont rechargés',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=349/);
-  assert.match(index,/app\.js\?v=350/);
-  assert.match(index,/settings-tab-badge\.js\?v=351/);
-  assert.equal((index.match(/page-version\">v351/g)||[]).length,3);
+  assert.match(index,/catalog\.js\?v=352/);
+  assert.match(index,/app\.js\?v=352/);
+  assert.match(index,/settings-tab-badge\.js\?v=352/);
+  assert.equal((index.match(/page-version\">v352/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=344/);
-  assert.match(catalog,/dish-local-images\.js\?v=349/);
-  assert.match(settings,/missing-products-dishes\.js\?v=7/);
-  assert.match(sw,/courses-app-v351-r1/);
+  assert.match(catalog,/dish-local-images\.js\?v=352/);
+  assert.match(settings,/missing-products-dishes\.js\?v=8/);
+  assert.match(sw,/courses-app-v352-r1/);
   assert.match(sw,/styles\.css\?v=348/);
-  assert.match(sw,/catalog\.js\?v=349/);
-  assert.match(sw,/app\.js\?v=350/);
-  assert.match(sw,/settings-tab-badge\.js\?v=351/);
-  assert.match(sw,/missing-products-dishes\.js\?v=7/);
+  assert.match(sw,/catalog\.js\?v=352/);
+  assert.match(sw,/app\.js\?v=352/);
+  assert.match(sw,/settings-tab-badge\.js\?v=352/);
+  assert.match(sw,/missing-products-dishes\.js\?v=8/);
   assert.match(sw,/dish-local-images\.js\?v=351/);
-  assert.match(localImages,/const APP_VERSION='v351'/);
+  assert.match(localImages,/const APP_VERSION='v352'/);
 });

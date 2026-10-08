@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v351';
+const APP_VERSION='v352';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -83,9 +83,9 @@ function syncPageVersions(){
         pointer-events:none;
       }
       .catalog-view .product:not(.is-selected) .badge::after{transform:translate(-50%,-50%) rotate(90deg)}
-      html #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error){background:#f4f7f5!important;color:#66736c!important}
-      html #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error){background:#faf7ef!important;color:#7c705b!important}
-      html #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error){background:#faf3ef!important;color:#8a6b60!important}
+      html #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){background:#f4f7f5!important;color:#66736c!important}
+      html #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){background:#faf7ef!important;color:#7c705b!important}
+      html #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){background:#faf3ef!important;color:#8a6b60!important}
       #listItems.is-list-home-empty{
         position:relative;
         overflow:hidden;
@@ -286,14 +286,14 @@ function installVisualWarmupStyle(){
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
-    script.src='./missing-products-fixes.js?v=16';
+    script.src='./missing-products-fixes.js?v=17';
     script.defer=true;
     script.dataset.missingProductsFixes='1';
     document.head.appendChild(script);
   }
   if(!document.querySelector('script[data-missing-products-popup-ui]')){
     const script=document.createElement('script');
-    script.src='./missing-products-popup-ui.js?v=15';
+    script.src='./missing-products-popup-ui.js?v=16';
     script.defer=true;
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);
