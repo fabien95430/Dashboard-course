@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const source=readFileSync(new URL('../app.js',import.meta.url),'utf8');
 const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
 const start=source.indexOf('function productQuantity(name){');
-const end=source.indexOf('async function incrementProduct(name){',start);
+const end=source.indexOf('async function incrementProduct(name',start);
 assert.ok(start>=0&&end>start,'service de quantité introuvable');
 function service({initial=0,onAdd}={}){
   const item={name:'Crème liquide'};
@@ -80,11 +80,12 @@ test('le catalogue cumule immédiatement les appuis rapides sur plus et moins',a
   const gate=new Promise(resolve=>{release=resolve});
   const shown=[];
   const context={
-    Map,Math,Number,String,Promise,
-    state:{locked:false},
+    Map,Math,Number,String,Promise,clearTimeout(){},
+    state:{locked:false,listRefreshTimer:null},
     norm:value=>String(value).toLowerCase(),
     productQuantity:()=>quantity,
     setProductQuantity:(_name,value)=>shown.push(value),
+    scheduleListRefresh(){},
     incrementProduct:async()=>{if(firstAdd){firstAdd=false;await gate}quantity+=1},
     decrementProduct:async()=>{quantity-=1}
   };
@@ -108,6 +109,25 @@ test('le catalogue cumule immédiatement les appuis rapides sur plus et moins',a
   assert.equal(shown.at(-1),0);
 });
 
+
+test('les rafales multi-produits diffèrent les refresh intermédiaires et gardent une seule réconciliation finale',()=>{
+  const queueStart=source.indexOf('const catalogQuantityQueue=new Map();');
+  const queueEnd=source.indexOf('function syncProductSelection()',queueStart);
+  const queue=source.slice(queueStart,queueEnd);
+  const scheduleStart=source.indexOf('function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){');
+  const scheduleEnd=source.indexOf('function connectWs(token){',scheduleStart);
+  const schedule=source.slice(scheduleStart,scheduleEnd);
+  const opsStart=source.indexOf('async function incrementProduct(name');
+  const opsEnd=source.indexOf("async function removeGroup(name,row=null,intent='purchase')",opsStart);
+  const ops=source.slice(opsStart,opsEnd);
+  assert.match(queue,/incrementProduct\(task\.name,\{deferRefresh:true\}\)/);
+  assert.match(queue,/decrementProduct\(task\.name,\{deferRefresh:true\}\)/);
+  assert.match(queue,/if\(!catalogQuantityQueue\.size&&!state\.locked\)scheduleListRefresh\(\)/);
+  assert.match(schedule,/if\(catalogQuantityQueue\.size\)/);
+  assert.match(ops,/async function addItem\(name,\{deferRefresh=false\}=\{\}\)/);
+  assert.match(ops,/state\.items=\[\.\.\.state\.items,\{uid:'',summary:item,status:'needs_action'\}\]/);
+  assert.match(ops,/if\(deferRefresh&&group\.uids\.filter\(Boolean\)\.length<group\.count\)/);
+});
 
 test('le menu trois points adopte un glass iOS plus compact et fondu sans changer les actions',()=>{
   const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');

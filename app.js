@@ -775,6 +775,8 @@ function queueCatalogQuantityChange(name,delta){
   const current=existing?existing.target:productQuantity(item);
   const target=Math.max(0,Math.min(100,current+step));
   if(target===current)return existing?.promise||Promise.resolve();
+  clearTimeout(state.listRefreshTimer);
+  state.listRefreshTimer=null;
   const task=existing||{name:item,target:current,processing:false,promise:null};
   task.target=target;
   catalogQuantityQueue.set(key,task);
@@ -788,8 +790,8 @@ async function flushCatalogQuantityQueue(key,task){
     while(catalogQuantityQueue.get(key)===task&&!state.locked){
       const confirmed=productQuantity(task.name),target=task.target;
       if(confirmed===target)break;
-      if(confirmed<target)await incrementProduct(task.name);
-      else await decrementProduct(task.name);
+      if(confirmed<target)await incrementProduct(task.name,{deferRefresh:true});
+      else await decrementProduct(task.name,{deferRefresh:true});
       const next=productQuantity(task.name);
       setProductQuantity(task.name,task.target);
       if(next===confirmed)break;
@@ -799,6 +801,7 @@ async function flushCatalogQuantityQueue(key,task){
     if(catalogQuantityQueue.get(key)===task){
       catalogQuantityQueue.delete(key);
       setProductQuantity(task.name,productQuantity(task.name));
+      if(!catalogQuantityQueue.size&&!state.locked)scheduleListRefresh();
     }
   }
 }
@@ -1885,9 +1888,15 @@ function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){
     state.listReorderRefreshPending=true;
     return;
   }
+  if(catalogQuantityQueue.size){
+    clearTimeout(state.listRefreshTimer);
+    state.listRefreshTimer=null;
+    return;
+  }
   clearTimeout(state.listRefreshTimer);
   state.listRefreshTimer=setTimeout(()=>{
     state.listRefreshTimer=null;
+    if(catalogQuantityQueue.size)return;
     refreshItems();
   },delay);
 }
@@ -1986,7 +1995,7 @@ async function ensureProductQuantity(name,target){
   }
 }
 window.COURSES_LIST=Object.freeze({getQuantity:productQuantity,ensureQuantity:ensureProductQuantity});
-async function incrementProduct(name){
+async function incrementProduct(name,{deferRefresh=false}={}){
   const item=String(name||'').trim();
   if(!item)return;
   const key=norm(item);
@@ -1995,13 +2004,14 @@ async function incrementProduct(name){
   state.productBusy.add(key);
   setProductQuantity(item,current+1);
   try{
-    await addItem(item);
+    await addItem(item,{deferRefresh});
   }finally{
     state.productBusy.delete(key);
-    renderSelectionAndList();
+    if(deferRefresh)syncProductSelection();
+    else renderSelectionAndList();
   }
 }
-async function decrementProduct(name){
+async function decrementProduct(name,{deferRefresh=false}={}){
   const item=String(name||'').trim();
   if(!item)return;
   const key=norm(item);
@@ -2011,14 +2021,15 @@ async function decrementProduct(name){
   state.productBusy.add(key);
   setProductQuantity(item,group.count-1);
   try{
-    await removeOneItem(item,group);
+    await removeOneItem(item,group,{deferRefresh});
   }finally{
     state.productBusy.delete(key);
-    renderSelectionAndList();
+    if(deferRefresh)syncProductSelection();
+    else renderSelectionAndList();
   }
 }
 
-async function addItem(name){
+async function addItem(name,{deferRefresh=false}={}){
   const item=String(name||'').trim();
   if(!item)return;
   if(state.demo){
@@ -2030,7 +2041,12 @@ async function addItem(name){
   if(!state.entity)return;
   try{
     await todoService('add_item',{item});
-    recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();return true;
+    recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');
+    if(deferRefresh){
+      state.items=[...state.items,{uid:'',summary:item,status:'needs_action'}];
+      return true;
+    }
+    await refreshItems();return true;
   }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
 }
 async function completeTodoItem(uid){
@@ -2038,13 +2054,12 @@ async function completeTodoItem(uid){
   if(!uidValue)throw new Error('Identifiant de l’article indisponible');
   return todoService('update_item',{item:uidValue,status:'completed'});
 }
-async function removeOneItem(name,groupHint=null){
+async function removeOneItem(name,groupHint=null,{deferRefresh=false}={}){
   const item=String(name||'').trim();
   if(!item)return;
   const key=norm(item);
-  const group=groupHint||activeGroups().find(entry=>norm(entry.summary)===key);
+  let group=groupHint||activeGroups().find(entry=>norm(entry.summary)===key);
   if(!group||group.count<1)return;
-
   try{
     if(state.demo){
       const items=loadJson(DEMO_KEY,[])||[];
@@ -2056,20 +2071,28 @@ async function removeOneItem(name,groupHint=null){
       }
       if(removeIndex<0)return;
       items.splice(removeIndex,1);
-      saveJson(DEMO_KEY,items);
-      state.items=items;
-      navigator.vibrate?.(8);
-      toast(item+' -1');
-      renderSelectionAndList();
-      return;
+      saveJson(DEMO_KEY,items);state.items=items;
+      navigator.vibrate?.(8);toast(item+' -1');renderSelectionAndList();return true;
     }
-
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
+    if(deferRefresh&&group.uids.filter(Boolean).length<group.count){
+      await refreshItems();
+      group=activeGroups().find(entry=>norm(entry.summary)===key);
+      if(!group||group.count<1)return;
+    }
     const uid=group.uids.filter(Boolean).at(-1);
     await completeTodoItem(uid);
-    navigator.vibrate?.(8);
-    toast(item+' -1');
-    await refreshItems();
+    navigator.vibrate?.(8);toast(item+' -1');
+    if(deferRefresh){
+      let removed=false;
+      state.items=state.items.filter(entry=>{
+        if(removed||!isPendingItem(entry)||norm(itemSummary(entry))!==key)return true;
+        if(itemUid(entry)!==uid)return true;
+        removed=true;return false;
+      });
+      return true;
+    }
+    await refreshItems();return true;
   }catch(error){
     toast('Retrait impossible');
     status('is-error','Erreur',error.message||'Retrait impossible');
