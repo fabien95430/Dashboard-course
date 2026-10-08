@@ -14,10 +14,11 @@ const CATEGORY_META = {
   'Frais': { label:'Produits frais' },
   'Boissons': { label:'Boissons' },
   'Maison': { label:'Maison' },
+  'Enfant': { label:'Enfant' },
   'Favoris': { label:'Favoris' }
 };
-const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Favoris'];
-const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Fruits & Légumes','Épicerie','Frais','Boissons','Maison']);
+const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Enfant','Favoris'];
+const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Enfant']);
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
   "Lait sans lactose":"Lait s. lact.",
@@ -2816,7 +2817,7 @@ function bindUiEvents(){
   });
   UI.listFilterMenu.querySelectorAll('[data-list-category]').forEach(button=>button.onclick=()=>{
     const next=button.dataset.listCategory||'Toutes';
-    if(!['Toutes','Frais','Fruits & Légumes','Épicerie','Boissons','Maison'].includes(next))return;
+    if(!['Toutes','Frais','Fruits & Légumes','Épicerie','Boissons','Maison','Enfant'].includes(next))return;
     state.listCategoryFilter=next;
     renderList();
     renderListFilterMenuState();
