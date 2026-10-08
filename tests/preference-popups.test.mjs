@@ -46,6 +46,13 @@ test('le choix d une catégorie produit ne déclenche pas un clic synthétique q
   assert.doesNotMatch(source,/original\?\.click\(\);/);
 });
 
+test('un nouveau produit à générer déclenche la notification système dédiée',()=>{
+  const source=read('missing-products-dishes.js');
+  assert.match(source,/registration\.showNotification\('Produit à générer',\{/);
+  assert.match(source,/body:'Un produit a été ajouté à la liste'/);
+  assert.match(source,/if\(!knownProductIds\.has\(item\.id\)\)\{[\s\S]*?notifyRequest\(item\.name\);[\s\S]*?void notifyProductQueued\(item\.id\);/);
+});
+
 test('la personnalisation des recettes se réinitialise durablement et s enregistre sans fermer le popup',()=>{
   const source=read('dishes-ui.js');
   const resetStart=source.indexOf('function resetRecipeCustomizationDraft()');
@@ -89,27 +96,29 @@ test('un ingrédient du catalogue peut être ajouté à une recette personnalis�
   assert.match(source,/dishSheetList\.innerHTML=recipeIngredientsForDish\(currentDish\)\.map\(name=>/);
 });
 
-test('la version visible passe à v340 et les ressources de personnalisation sont rechargées',()=>{
+test('la version visible passe à v341 et les ressources de notification sont rechargées',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
   const settings=read('settings-tab-badge.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=339/);
-  assert.match(index,/catalog\.js\?v=340/);
+  assert.match(index,/catalog\.js\?v=341/);
   assert.match(index,/app\.js\?v=339/);
-  assert.match(index,/settings-tab-badge\.js\?v=337/);
-  assert.equal((index.match(/page-version\">v340/g)||[]).length,3);
+  assert.match(index,/settings-tab-badge\.js\?v=341/);
+  assert.equal((index.match(/page-version\">v341/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=340/);
-  assert.match(catalog,/dish-local-images\.js\?v=340/);
+  assert.match(catalog,/dish-local-images\.js\?v=341/);
+  assert.match(settings,/missing-products-dishes\.js\?v=5/);
   assert.match(settings,/missing-products-modern\.js\?v=6/);
-  assert.match(sw,/courses-app-v340-r1/);
+  assert.match(sw,/courses-app-v341-r1/);
   assert.match(sw,/styles\.css\?v=339/);
-  assert.match(sw,/catalog\.js\?v=340/);
+  assert.match(sw,/catalog\.js\?v=341/);
   assert.match(sw,/app\.js\?v=339/);
-  assert.match(sw,/settings-tab-badge\.js\?v=337/);
+  assert.match(sw,/settings-tab-badge\.js\?v=341/);
+  assert.match(sw,/missing-products-dishes\.js\?v=5/);
   assert.match(sw,/dishes-ui\.js\?v=340/);
-  assert.match(sw,/dish-local-images\.js\?v=340/);
+  assert.match(sw,/dish-local-images\.js\?v=341/);
   assert.match(sw,/missing-products-modern\.js\?v=6/);
-  assert.match(localImages,/const APP_VERSION='v340'/);
+  assert.match(localImages,/const APP_VERSION='v341'/);
 });

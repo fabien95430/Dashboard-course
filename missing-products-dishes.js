@@ -108,6 +108,28 @@ function appNotify(title,detail=''){
 function notifyRequest(name){
   appNotify('Demande d’ajout en cours',name+' sera ajouté prochainement.');
 }
+async function notifyProductQueued(id){
+  if(!('Notification' in window)||!('serviceWorker' in navigator))return false;
+  let permission=Notification.permission;
+  if(permission==='default'){
+    try{permission=await Notification.requestPermission()}catch(_){return false}
+  }
+  if(permission!=='granted')return false;
+  try{
+    const registration=await navigator.serviceWorker.ready;
+    await registration.showNotification('Produit à générer',{
+      body:'Un produit a été ajouté à la liste',
+      tag:'courses-product-to-generate-'+String(id||'request'),
+      icon:'./apple-touch-icon.png',
+      badge:'./apple-touch-icon.png',
+      data:{url:'./'},
+      renotify:true
+    });
+    return true;
+  }catch(_){
+    return false;
+  }
+}
 function notifyAdded(type,name){
   const title=type==='dish'?'Plat ajouté':'Produit ajouté';
   appNotify(title,name+' est maintenant disponible dans le catalogue.');
@@ -504,7 +526,10 @@ function initMissingProductsAndDishes(){
     const products=readProducts();
     const nextIds=new Set(products.map(item=>item.id));
     products.forEach(item=>{
-      if(!knownProductIds.has(item.id))notifyRequest(item.name);
+      if(!knownProductIds.has(item.id)){
+        notifyRequest(item.name);
+        void notifyProductQueued(item.id);
+      }
     });
     knownProductIds=nextIds;
     if(mode==='products')listCount.textContent=String(products.length);
