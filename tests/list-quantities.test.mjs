@@ -72,7 +72,7 @@ test('un produit inconnu, une quantité invalide ou une session verrouillée ne 
 });
 
 
-test('le menu trois points adopte le glass classique iOS tout en conservant quantité et suppression',()=>{
+test('le menu trois points adopte un glass iOS plus compact et fondu sans changer les actions',()=>{
   const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');
   const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);
   const menuEnd=source.indexOf('function bindListReorder(root){',menuStart);
@@ -80,21 +80,16 @@ test('le menu trois points adopte le glass classique iOS tout en conservant quan
   const helper=source.slice(helperStart,menuStart),menu=source.slice(menuStart,menuEnd);
   assert.match(helper,/await incrementProduct\(item\)/);
   assert.match(helper,/await decrementProduct\(item\)/);
-  assert.match(menu,/const product=catalogProductFor\(name\)/);
-  assert.match(menu,/list-row-menu-head/);
   assert.match(menu,/list-row-menu-product-icon/);
-  assert.match(menu,/list-row-menu-close/);
   assert.match(menu,/quantityLabel\.textContent='Quantité'/);
-  assert.match(menu,/list-row-menu-decrement/);
-  assert.match(menu,/list-row-menu-value/);
-  assert.match(menu,/list-row-menu-increment/);
   assert.match(menu,/changeListRowMenuQuantity\(name,-1\)/);
   assert.match(menu,/changeListRowMenuQuantity\(name,1\)/);
   assert.match(menu,/remove\.textContent='Supprimer de Ma liste'/);
   assert.match(menu,/removeGroup\(name,row,'delete'\)/);
-  assert.match(menu,/Math\.min\(286,window\.innerWidth-margin\*2\)/);
-  assert.match(styles,/\.list-row-menu\{[^}]*border-radius:26px[^}]*backdrop-filter:blur\(30px\) saturate\(145%\)/s);
-  assert.match(styles,/\.list-row-menu-head\{[^}]*grid-template-columns:46px minmax\(0,1fr\) 34px/s);
-  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-radius:999px[^}]*backdrop-filter:blur\(16px\) saturate\(125%\)/s);
-  assert.match(styles,/\.list-row-menu-delete\{[^}]*height:52px[^}]*border-radius:17px/s);
+  assert.match(menu,/Math\.min\(252,window\.innerWidth-margin\*2\)/);
+  assert.match(styles,/\.list-row-menu\{[^}]*padding:11px[^}]*border-radius:23px[^}]*backdrop-filter:blur\(34px\) saturate\(150%\)/s);
+  assert.match(styles,/\.list-row-menu-product-icon\{[^}]*border:0[^}]*background:transparent[^}]*box-shadow:none/s);
+  assert.match(styles,/\.list-row-menu-head\{[^}]*grid-template-columns:40px minmax\(0,1fr\) 30px/s);
+  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-radius:999px[^}]*backdrop-filter:blur\(18px\) saturate\(135%\)/s);
+  assert.match(styles,/\.list-row-menu-delete\{[^}]*height:46px[^}]*border-radius:15px/s);
 });

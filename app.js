@@ -1037,10 +1037,10 @@ function openListRowMenu(row,anchor){
   menu.append(header,quantityLabel,quantity,remove);
   document.body.appendChild(menu);
 
-  const margin=14,rect=anchor.getBoundingClientRect(),width=Math.min(286,window.innerWidth-margin*2);
+  const margin=14,rect=anchor.getBoundingClientRect(),width=Math.min(252,window.innerWidth-margin*2);
   menu.style.width=width+'px';
   const left=Math.max(margin,Math.min(window.innerWidth-width-margin,rect.right-width));
-  const below=rect.bottom+8,above=rect.top-menu.offsetHeight-8;
+  const below=rect.bottom+6,above=rect.top-menu.offsetHeight-6;
   const top=below+menu.offsetHeight<=window.innerHeight-margin?below:Math.max(margin,above);
   menu.style.left=left+'px';menu.style.top=top+'px';
   anchor.setAttribute('aria-expanded','true');

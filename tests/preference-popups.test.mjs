@@ -96,29 +96,29 @@ test('un ingrédient du catalogue peut être ajouté à une recette personnalis�
   assert.match(source,/dishSheetList\.innerHTML=recipeIngredientsForDish\(currentDish\)\.map\(name=>/);
 });
 
-test('la version visible passe à v341 et les ressources de notification sont rechargées',()=>{
+test('la version visible passe à v342 et les ressources du menu Ma liste sont rechargées',()=>{
   const index=read('index.html');
   const catalog=read('catalog.js');
   const settings=read('settings-tab-badge.js');
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
-  assert.match(index,/styles\.css\?v=339/);
-  assert.match(index,/catalog\.js\?v=341/);
-  assert.match(index,/app\.js\?v=339/);
+  assert.match(index,/styles\.css\?v=342/);
+  assert.match(index,/catalog\.js\?v=342/);
+  assert.match(index,/app\.js\?v=342/);
   assert.match(index,/settings-tab-badge\.js\?v=341/);
-  assert.equal((index.match(/page-version\">v341/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v342/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=340/);
-  assert.match(catalog,/dish-local-images\.js\?v=341/);
+  assert.match(catalog,/dish-local-images\.js\?v=342/);
   assert.match(settings,/missing-products-dishes\.js\?v=5/);
   assert.match(settings,/missing-products-modern\.js\?v=6/);
-  assert.match(sw,/courses-app-v341-r1/);
-  assert.match(sw,/styles\.css\?v=339/);
-  assert.match(sw,/catalog\.js\?v=341/);
-  assert.match(sw,/app\.js\?v=339/);
+  assert.match(sw,/courses-app-v342-r1/);
+  assert.match(sw,/styles\.css\?v=342/);
+  assert.match(sw,/catalog\.js\?v=342/);
+  assert.match(sw,/app\.js\?v=342/);
   assert.match(sw,/settings-tab-badge\.js\?v=341/);
   assert.match(sw,/missing-products-dishes\.js\?v=5/);
   assert.match(sw,/dishes-ui\.js\?v=340/);
-  assert.match(sw,/dish-local-images\.js\?v=341/);
+  assert.match(sw,/dish-local-images\.js\?v=342/);
   assert.match(sw,/missing-products-modern\.js\?v=6/);
-  assert.match(localImages,/const APP_VERSION='v341'/);
+  assert.match(localImages,/const APP_VERSION='v342'/);
 });
