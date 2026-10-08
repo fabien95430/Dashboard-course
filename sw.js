@@ -17,11 +17,6 @@ function isPersistentVisual(url){
     ||/\/bring-photo-v5-(?:frais|fruits-legumes|epicerie|boissons|maison)\.webp\.png$/.test(url.pathname);
 }
 
-function isLaunchVisual(url){
-  return url.pathname.endsWith('/welcome-cart-transparent-v46.png')
-    ||url.pathname.endsWith('/welcome-background-v40.webp');
-}
-
 async function migrateExistingVisuals(){
   const target=await caches.open(VISUAL_CACHE);
   const cacheNames=await caches.keys();
@@ -84,17 +79,6 @@ self.addEventListener('activate',event=>event.waitUntil(
 self.addEventListener('fetch',event=>{
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin||event.request.method!=='GET')return;
-
-  if(isLaunchVisual(url)){
-    event.respondWith(caches.match(event.request).then(hit=>{
-      if(hit)return hit;
-      return fetch(new Request(event.request,{cache:'reload'})).then(response=>{
-        if(response.ok)caches.open(CACHE).then(cache=>cache.put(event.request,response.clone()));
-        return response;
-      });
-    }));
-    return;
-  }
 
   if(isPersistentVisual(url)){
     const cachePromise=caches.open(VISUAL_CACHE);
