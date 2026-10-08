@@ -1,0 +1,148 @@
+name: Retry catalog burst optimization
+
+on:
+  push:
+    branches: [agent-final-v318]
+    paths: [.github/workflows/retry-catalog-burst.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Capture base and helper workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          git fetch origin agent-final-v318 --depth=1
+          git show origin/agent-final-v318:.github/workflows/v330-list-menu-theme.yml > /tmp/catalog-burst-source.yml
+
+      - name: Apply optimization on current main
+        shell: python
+        run: |
+          from pathlib import Path
+          import re, textwrap
+
+          base_index=Path('index.html').read_text(encoding='utf-8')
+          base_local=Path('dish-local-images.js').read_text(encoding='utf-8')
+          app_v=int(re.search(r"const APP_VERSION='v(\d+)'",base_local).group(1))
+          visible=[int(v) for v in re.findall(r'page-version">v(\d+)',base_index)]
+          desired=max([app_v,*visible])+1
+
+          workflow=Path('/tmp/catalog-burst-source.yml').read_text(encoding='utf-8')
+          match=re.search(r"      - name: Optimize catalog burst synchronization\n        shell: python\n        run: \|\n(?P<script>.*?)(?=\n      - name: Run tests)",workflow,re.S)
+          if not match: raise SystemExit('script source introuvable')
+          script=textwrap.dedent(match.group('script'))
+          exec(compile(script,'catalog-burst-source','exec'),{})
+
+          test_path=Path('tests/list-quantities.test.mjs')
+          test=test_path.read_text(encoding='utf-8')
+          old="const end=source.indexOf('async function incrementProduct(name){',start);"
+          if old not in test: raise SystemExit('marqueur du service de quantité introuvable')
+          test=test.replace(old,"const end=source.indexOf('async function incrementProduct(name',start);",1)
+          test_path.write_text(test,encoding='utf-8')
+
+          version=f'v{desired}'
+          local=Path('dish-local-images.js').read_text(encoding='utf-8')
+          local,n=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='{version}'",local,count=1)
+          if n!=1: raise SystemExit('APP_VERSION')
+          Path('dish-local-images.js').write_text(local,encoding='utf-8')
+
+          catalog=Path('catalog.js').read_text(encoding='utf-8')
+          catalog,n=re.subn(r'dish-local-images\.js\?v=\d+',f'dish-local-images.js?v={desired}',catalog,count=1)
+          if n!=1: raise SystemExit('catalog cache')
+          Path('catalog.js').write_text(catalog,encoding='utf-8')
+
+          index=Path('index.html').read_text(encoding='utf-8')
+          style_v=re.search(r'styles\.css\?v=(\d+)',index).group(1)
+          settings_v=re.search(r'settings-tab-badge\.js\?v=(\d+)',index).group(1)
+          index,n=re.subn(r'catalog\.js\?v=\d+',f'catalog.js?v={desired}',index,count=1)
+          if n!=1: raise SystemExit('index catalog')
+          index,n=re.subn(r'app\.js\?v=\d+',f'app.js?v={desired}',index,count=1)
+          if n!=1: raise SystemExit('index app')
+          index,n=re.subn(r'(<span class="page-version">)v\d+',rf'\1{version}',index)
+          if n!=3: raise SystemExit('page versions')
+          Path('index.html').write_text(index,encoding='utf-8')
+
+          sw=Path('sw.js').read_text(encoding='utf-8')
+          sw,n=re.subn(r"const CACHE='courses-app-v\d+-r1';",f"const CACHE='courses-app-v{desired}-r1';",sw,count=1)
+          if n!=1: raise SystemExit('sw cache')
+          shell=re.search(r'const SHELL=\[(.*?)\];',sw,re.S)
+          if not shell: raise SystemExit('sw shell')
+          body=shell.group(1)
+          for entry in (f"'./catalog.js?v={desired}'",f"'./app.js?v={desired}'",f"'./dish-local-images.js?v={desired}'"):
+              if entry not in body: body+=','+entry
+          sw=sw[:shell.start(1)]+body+sw[shell.end(1):]
+          Path('sw.js').write_text(sw,encoding='utf-8')
+
+          dishes_v=re.search(r'dishes-ui\.js\?v=(\d+)',catalog).group(1)
+          pref_path=Path('tests/preference-popups.test.mjs')
+          pref=pref_path.read_text(encoding='utf-8')
+          pat=re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$",re.S)
+          rep=f'''test('la version visible passe à {version} et les ressources de quantité sont rechargées',()=>{{
+            const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
+            assert.match(index,/styles\\.css\\?v={style_v}/);
+            assert.match(index,/catalog\\.js\\?v={desired}/);
+            assert.match(index,/app\\.js\\?v={desired}/);
+            assert.match(index,/settings-tab-badge\\.js\\?v={settings_v}/);
+            assert.equal((index.match(/page-version\\">{version}/g)||[]).length,3);
+            assert.match(catalog,/dishes-ui\\.js\\?v={dishes_v}/);
+            assert.match(catalog,/dish-local-images\\.js\\?v={desired}/);
+            assert.match(sw,/courses-app-v{desired}-r1/);
+            assert.match(sw,/styles\\.css\\?v={style_v}/);
+            assert.match(sw,/catalog\\.js\\?v={desired}/);
+            assert.match(sw,/app\\.js\\?v={desired}/);
+            assert.match(sw,/settings-tab-badge\\.js\\?v={settings_v}/);
+            assert.match(sw,/dish-local-images\\.js\\?v={desired}/);
+            assert.match(localImages,/const APP_VERSION='{version}'/);
+          }});\n'''
+          pref,n=pat.subn(lambda _:rep,pref,count=1)
+          if n!=1: raise SystemExit('version test')
+          pref_path.write_text(pref,encoding='utf-8')
+          Path('.next-version').write_text(str(desired),encoding='utf-8')
+
+      - name: Run tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/*.test.mjs
+          git diff --check
+
+      - name: Validate final change
+        shell: bash
+        run: |
+          set -euo pipefail
+          V="$(cat .next-version)"
+          grep -F "incrementProduct(task.name,{deferRefresh:true})" app.js
+          grep -F "decrementProduct(task.name,{deferRefresh:true})" app.js
+          grep -F "if(!catalogQuantityQueue.size&&!state.locked)scheduleListRefresh()" app.js
+          grep -F "const APP_VERSION='v${V}'" dish-local-images.js
+          test "$(grep -o "page-version\">v${V}" index.html | wc -l)" -eq 3
+          rm .next-version
+
+      - name: Ensure main did not move
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          test "$(git rev-parse origin/main)" = "$BASE_SHA"
+
+      - name: Commit and push main
+        shell: bash
+        run: |
+          set -euo pipefail
+          V="$(grep -o "const APP_VERSION='v[0-9]*'" dish-local-images.js | head -1 | grep -o '[0-9]*')"
+          git config user.name "OpenAI Agent"
+          git config user.email "openai-agent@users.noreply.github.com"
+          git add app.js index.html catalog.js dish-local-images.js sw.js tests/list-quantities.test.mjs tests/preference-popups.test.mjs
+          git commit -m "v${V}: fluidifie les rafales multi-produits"
+          git push origin HEAD:main
