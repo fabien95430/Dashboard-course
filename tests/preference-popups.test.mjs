@@ -58,6 +58,18 @@ test('supprimer un produit manquant garde le popup ouvert',()=>{
   assert.ok(handler.indexOf('event.stopPropagation()')<handler.indexOf('removeMissingProduct('));
 });
 
+test('supprimer un plat manquant garde le popup ouvert',()=>{
+  const source=read('missing-products-dishes.js');
+  const start=source.indexOf("dishesList.addEventListener('click',event=>{");
+  const end=source.indexOf('new MutationObserver(',start);
+  assert.ok(start>=0&&end>start,'gestionnaire de suppression des plats introuvable');
+  const handler=source.slice(start,end);
+  assert.match(handler,/const remove=event\.target\.closest\('\[data-remove-missing-dish\]'\);/);
+  assert.match(handler,/if\(!remove\)return;/);
+  assert.match(handler,/event\.stopPropagation\(\);/);
+  assert.ok(handler.indexOf('event.stopPropagation()')<handler.indexOf('removeDish('));
+});
+
 test('un nouveau produit à générer déclenche la notification système dédiée',()=>{
   const source=read('missing-products-dishes.js');
   assert.match(source,/registration\.showNotification\('Produit à générer',\{/);
@@ -141,20 +153,22 @@ test('les validations restent dans leur popup tant que celui-ci reste ouvert',()
   assert.match(styles,/\.dialog-feedback,\.courses-openai-feedback\{[\s\S]*?white-space:nowrap;[\s\S]*?overflow:hidden;[\s\S]*?text-overflow:ellipsis;[\s\S]*?max-width:100%/);
 });
 
-test('la version visible passe à v350 et le correctif produit manquant est rechargé',()=>{
+test('la version visible passe à v351 et les suppressions du popup sont rechargées',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
   assert.match(index,/catalog\.js\?v=349/);
   assert.match(index,/app\.js\?v=350/);
-  assert.match(index,/settings-tab-badge\.js\?v=344/);
-  assert.equal((index.match(/page-version\">v350/g)||[]).length,3);
+  assert.match(index,/settings-tab-badge\.js\?v=351/);
+  assert.equal((index.match(/page-version\">v351/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=344/);
   assert.match(catalog,/dish-local-images\.js\?v=349/);
-  assert.match(sw,/courses-app-v350-r1/);
+  assert.match(settings,/missing-products-dishes\.js\?v=7/);
+  assert.match(sw,/courses-app-v351-r1/);
   assert.match(sw,/styles\.css\?v=348/);
   assert.match(sw,/catalog\.js\?v=349/);
   assert.match(sw,/app\.js\?v=350/);
-  assert.match(sw,/settings-tab-badge\.js\?v=344/);
-  assert.match(sw,/dish-local-images\.js\?v=350/);
-  assert.match(localImages,/const APP_VERSION='v350'/);
+  assert.match(sw,/settings-tab-badge\.js\?v=351/);
+  assert.match(sw,/missing-products-dishes\.js\?v=7/);
+  assert.match(sw,/dish-local-images\.js\?v=351/);
+  assert.match(localImages,/const APP_VERSION='v351'/);
 });

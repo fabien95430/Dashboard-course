@@ -596,7 +596,9 @@ function initMissingProductsAndDishes(){
       return;
     }
     const remove=event.target.closest('[data-remove-missing-dish]');
-    if(remove)removeDish(remove.dataset.removeMissingDish||'');
+    if(!remove)return;
+    event.stopPropagation();
+    removeDish(remove.dataset.removeMissingDish||'');
   });
 
   new MutationObserver(()=>{
