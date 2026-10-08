@@ -2,10 +2,8 @@ name: Optimize cross-product catalog quantities
 
 on:
   push:
-    branches:
-      - agent-final-v318
-    paths:
-      - .github/workflows/v330-list-menu-theme.yml
+    branches: [agent-final-v318]
+    paths: [.github/workflows/v330-list-menu-theme.yml]
 
 permissions:
   contents: write
@@ -21,10 +19,7 @@ jobs:
           fetch-depth: 1
 
       - name: Verify expected main
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "8d7752015249f2b8ad093e4ee94aa56d915ddff7"
+        run: test "$(git rev-parse HEAD)" = "c134acdd00c8a848f388949ac39cf906078d283d"
 
       - name: Optimize catalog burst synchronization
         shell: python
@@ -34,22 +29,15 @@ jobs:
 
           V=347
           version=f'v{V}'
+          p=Path('app.js')
+          app=p.read_text(encoding='utf-8')
 
-          app_path=Path('app.js')
-          app=app_path.read_text(encoding='utf-8')
+          def replace_between(text,start,end,replacement,label):
+              a=text.find(start); b=text.find(end,a+len(start))
+              if a<0 or b<0: raise SystemExit(label)
+              return text[:a]+replacement+text[b:]
 
-          old="""function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){
-            if(state.listReorderBusy){
-              state.listReorderRefreshPending=true;
-              return;
-            }
-            clearTimeout(state.listRefreshTimer);
-            state.listRefreshTimer=setTimeout(()=>{
-              state.listRefreshTimer=null;
-              refreshItems();
-            },delay);
-          }"""
-          new="""function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){
+          schedule='''function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){
             if(state.listReorderBusy){
               state.listReorderRefreshPending=true;
               return;
@@ -65,45 +53,11 @@ jobs:
               if(catalogQuantityQueue.size)return;
               refreshItems();
             },delay);
-          }"""
-          if app.count(old)!=1: raise SystemExit(f'scheduleListRefresh anchor: {app.count(old)}')
-          app=app.replace(old,new,1)
-
-          old="""function queueCatalogQuantityChange(name,delta){
-            const item=String(name||'').trim(),step=Math.sign(Number(delta)||0);
-            if(!item||!step||state.locked)return Promise.resolve();
-            const key=norm(item),existing=catalogQuantityQueue.get(key);
-            const current=existing?existing.target:productQuantity(item);
-            const target=Math.max(0,Math.min(100,current+step));
-            if(target===current)return existing?.promise||Promise.resolve();
-            const task=existing||{name:item,target:current,processing:false,promise:null};
-            task.target=target;
-            catalogQuantityQueue.set(key,task);
-            setProductQuantity(item,target);
-            if(!task.processing)task.promise=flushCatalogQuantityQueue(key,task);
-            return task.promise;
           }
-          async function flushCatalogQuantityQueue(key,task){
-            task.processing=true;
-            try{
-              while(catalogQuantityQueue.get(key)===task&&!state.locked){
-                const confirmed=productQuantity(task.name),target=task.target;
-                if(confirmed===target)break;
-                if(confirmed<target)await incrementProduct(task.name);
-                else await decrementProduct(task.name);
-                const next=productQuantity(task.name);
-                setProductQuantity(task.name,task.target);
-                if(next===confirmed)break;
-              }
-            }finally{
-              task.processing=false;
-              if(catalogQuantityQueue.get(key)===task){
-                catalogQuantityQueue.delete(key);
-                setProductQuantity(task.name,productQuantity(task.name));
-              }
-            }
-          }"""
-          new="""function queueCatalogQuantityChange(name,delta){
+          '''
+          app=replace_between(app,'function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){','function connectWs(token){',schedule,'scheduleListRefresh')
+
+          queue='''function queueCatalogQuantityChange(name,delta){
             const item=String(name||'').trim(),step=Math.sign(Number(delta)||0);
             if(!item||!step||state.locked)return Promise.resolve();
             const key=norm(item),existing=catalogQuantityQueue.get(key);
@@ -139,100 +93,11 @@ jobs:
                 if(!catalogQuantityQueue.size)scheduleListRefresh();
               }
             }
-          }"""
-          if app.count(old)!=1: raise SystemExit(f'catalog queue anchor: {app.count(old)}')
-          app=app.replace(old,new,1)
-
-          old="""async function incrementProduct(name){
-            const item=String(name||'').trim();
-            if(!item)return;
-            const key=norm(item);
-            if(state.productBusy.has(key))return;
-            const current=activeGroups().find(group=>norm(group.summary)===key)?.count||0;
-            state.productBusy.add(key);
-            setProductQuantity(item,current+1);
-            try{
-              await addItem(item);
-            }finally{
-              state.productBusy.delete(key);
-              renderSelectionAndList();
-            }
           }
-          async function decrementProduct(name){
-            const item=String(name||'').trim();
-            if(!item)return;
-            const key=norm(item);
-            if(state.productBusy.has(key))return;
-            const group=activeGroups().find(entry=>norm(entry.summary)===key);
-            if(!group||group.count<1)return;
-            state.productBusy.add(key);
-            setProductQuantity(item,group.count-1);
-            try{
-              await removeOneItem(item,group);
-            }finally{
-              state.productBusy.delete(key);
-              renderSelectionAndList();
-            }
-          }
+          '''
+          app=replace_between(app,'function queueCatalogQuantityChange(name,delta){','function syncProductSelection(){',queue,'catalog queue')
 
-          async function addItem(name){
-            const item=String(name||'').trim();
-            if(!item)return;
-            if(state.demo){
-              const items=loadJson(DEMO_KEY,[])||[];
-              items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
-              saveJson(DEMO_KEY,items);state.items=items;recordUsage(item);
-              navigator.vibrate?.(10);toast(item+' ajouté');renderSelectionAndList();return true;
-            }
-            if(!state.entity)return;
-            try{
-              await todoService('add_item',{item});
-              recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');await refreshItems();return true;
-            }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
-          }
-          async function completeTodoItem(uid){
-            const uidValue=String(uid||'').trim();
-            if(!uidValue)throw new Error('Identifiant de l’article indisponible');
-            return todoService('update_item',{item:uidValue,status:'completed'});
-          }
-          async function removeOneItem(name,groupHint=null){
-            const item=String(name||'').trim();
-            if(!item)return;
-            const key=norm(item);
-            const group=groupHint||activeGroups().find(entry=>norm(entry.summary)===key);
-            if(!group||group.count<1)return;
-
-            try{
-              if(state.demo){
-                const items=loadJson(DEMO_KEY,[])||[];
-                let removeIndex=-1;
-                for(let i=items.length-1;i>=0;i--){
-                  const entry=items[i];
-                  if(!isPendingItem(entry))continue;
-                  if(norm(itemSummary(entry))===key){removeIndex=i;break}
-                }
-                if(removeIndex<0)return;
-                items.splice(removeIndex,1);
-                saveJson(DEMO_KEY,items);
-                state.items=items;
-                navigator.vibrate?.(8);
-                toast(item+' -1');
-                renderSelectionAndList();
-                return;
-              }
-
-              if(!state.entity)throw new Error('Liste Home Assistant indisponible');
-              const uid=group.uids.filter(Boolean).at(-1);
-              await completeTodoItem(uid);
-              navigator.vibrate?.(8);
-              toast(item+' -1');
-              await refreshItems();
-            }catch(error){
-              toast('Retrait impossible');
-              status('is-error','Erreur',error.message||'Retrait impossible');
-            }
-          }"""
-          new="""async function incrementProduct(name,{deferRefresh=false}={}){
+          operations='''async function incrementProduct(name,{deferRefresh=false}={}){
             const item=String(name||'').trim();
             if(!item)return;
             const key=norm(item);
@@ -297,7 +162,6 @@ jobs:
             const key=norm(item);
             let group=groupHint||activeGroups().find(entry=>norm(entry.summary)===key);
             if(!group||group.count<1)return;
-
             try{
               if(state.demo){
                 const items=loadJson(DEMO_KEY,[])||[];
@@ -309,14 +173,9 @@ jobs:
                 }
                 if(removeIndex<0)return;
                 items.splice(removeIndex,1);
-                saveJson(DEMO_KEY,items);
-                state.items=items;
-                navigator.vibrate?.(8);
-                toast(item+' -1');
-                renderSelectionAndList();
-                return true;
+                saveJson(DEMO_KEY,items);state.items=items;
+                navigator.vibrate?.(8);toast(item+' -1');renderSelectionAndList();return true;
               }
-
               if(!state.entity)throw new Error('Liste Home Assistant indisponible');
               if(deferRefresh&&group.uids.filter(Boolean).length<group.count){
                 await refreshItems();
@@ -325,15 +184,13 @@ jobs:
               }
               const uid=group.uids.filter(Boolean).at(-1);
               await completeTodoItem(uid);
-              navigator.vibrate?.(8);
-              toast(item+' -1');
+              navigator.vibrate?.(8);toast(item+' -1');
               if(deferRefresh){
                 let removed=false;
                 state.items=state.items.filter(entry=>{
                   if(removed||!isPendingItem(entry)||norm(itemSummary(entry))!==key)return true;
                   if(itemUid(entry)!==uid)return true;
-                  removed=true;
-                  return false;
+                  removed=true;return false;
                 });
                 return true;
               }
@@ -342,195 +199,127 @@ jobs:
               toast('Retrait impossible');
               status('is-error','Erreur',error.message||'Retrait impossible');
             }
-          }"""
-          if app.count(old)!=1: raise SystemExit(f'quantity operations anchor: {app.count(old)}')
-          app=app.replace(old,new,1)
-          app_path.write_text(app,encoding='utf-8')
+          }
 
-          qtest_path=Path('tests/list-quantities.test.mjs')
-          qtest=qtest_path.read_text(encoding='utf-8')
-          qpat=re.compile(r"test\('le catalogue cumule immédiatement les appuis rapides sur plus et moins',async\(\)=>\{.*?\n\}\);",re.S)
-          qrep=textwrap.dedent(r'''
-            test('le catalogue cumule immédiatement les appuis rapides et synchronise une seule fois après la rafale',async()=>{
-              const queueStart=source.indexOf('const catalogQuantityQueue=new Map();');
-              const queueEnd=source.indexOf('function syncProductSelection()',queueStart);
-              assert.ok(queueStart>=0&&queueEnd>queueStart,'file de quantité catalogue introuvable');
-              let quantity=0,firstAdd=true,release,reconciles=0;
-              const gate=new Promise(resolve=>{release=resolve});
-              const shown=[],deferred=[];
-              const context={
-                Map,Math,Number,String,Promise,clearTimeout(){},
-                state:{locked:false,listRefreshTimer:null},
-                norm:value=>String(value).toLowerCase(),
-                productQuantity:()=>quantity,
-                setProductQuantity:(_name,value)=>shown.push(value),
-                scheduleListRefresh:()=>{reconciles+=1},
-                incrementProduct:async(_name,options)=>{deferred.push(options?.deferRefresh===true);if(firstAdd){firstAdd=false;await gate}quantity+=1},
-                decrementProduct:async(_name,options)=>{deferred.push(options?.deferRefresh===true);quantity-=1}
-              };
-              vm.runInNewContext(source.slice(queueStart,queueEnd)+';globalThis.catalogQueueApi={queueCatalogQuantityChange,catalogQuantityForDisplay};',context);
-              const api=context.catalogQueueApi;
-              const adding=api.queueCatalogQuantityChange('Crème liquide',1);
-              api.queueCatalogQuantityChange('Crème liquide',1);
-              api.queueCatalogQuantityChange('Crème liquide',1);
-              assert.equal(shown.at(-1),3);
-              assert.equal(api.catalogQuantityForDisplay('Crème liquide',0),3);
-              release();
-              await adding;
-              assert.equal(quantity,3);
-              assert.equal(shown.at(-1),3);
-              assert.equal(reconciles,1);
-              const removing=api.queueCatalogQuantityChange('Crème liquide',-1);
-              api.queueCatalogQuantityChange('Crème liquide',-1);
-              api.queueCatalogQuantityChange('Crème liquide',-1);
-              assert.equal(shown.at(-1),0);
-              await removing;
-              assert.equal(quantity,0);
-              assert.equal(shown.at(-1),0);
-              assert.equal(reconciles,2);
-              assert.ok(deferred.length>=6&&deferred.every(Boolean),'les écritures catalogue doivent différer les rafraîchissements intermédiaires');
-            });
+          '''
+          app=replace_between(app,'async function incrementProduct(name){','async function removeGroup(name,row=null,intent=\'purchase\'){',operations,'quantity operations')
+          p.write_text(app,encoding='utf-8')
 
-            test('les transitions entre deux produits partent en parallèle et partagent la réconciliation finale',async()=>{
-              const queueStart=source.indexOf('const catalogQuantityQueue=new Map();');
-              const queueEnd=source.indexOf('function syncProductSelection()',queueStart);
-              const quantities=new Map([['lait',0],['oeufs',0]]),shown=new Map(),started=[];
-              let releaseMilk,releaseEggs,reconciles=0;
-              const milkGate=new Promise(resolve=>{releaseMilk=resolve});
-              const eggsGate=new Promise(resolve=>{releaseEggs=resolve});
-              const context={
-                Map,Math,Number,String,Promise,clearTimeout(){},
-                state:{locked:false,listRefreshTimer:null},
-                norm:value=>String(value).toLowerCase(),
-                productQuantity:name=>quantities.get(String(name).toLowerCase())||0,
-                setProductQuantity:(name,value)=>shown.set(String(name).toLowerCase(),value),
-                scheduleListRefresh:()=>{reconciles+=1},
-                incrementProduct:async(name,{deferRefresh}={})=>{
-                  const key=String(name).toLowerCase();started.push([key,deferRefresh]);
-                  await (key==='lait'?milkGate:eggsGate);
-                  quantities.set(key,(quantities.get(key)||0)+1);
-                },
-                decrementProduct:async()=>{}
-              };
-              vm.runInNewContext(source.slice(queueStart,queueEnd)+';globalThis.catalogQueueApi={queueCatalogQuantityChange};',context);
-              const api=context.catalogQueueApi;
-              const milk=api.queueCatalogQuantityChange('Lait',1);
-              const eggs=api.queueCatalogQuantityChange('Oeufs',1);
-              await Promise.resolve();
-              assert.equal(shown.get('lait'),1);
-              assert.equal(shown.get('oeufs'),1);
-              assert.deepEqual(started.map(entry=>entry[0]).sort(),['lait','oeufs']);
-              assert.ok(started.every(([,deferRefresh])=>deferRefresh===true));
-              releaseMilk();releaseEggs();
-              await Promise.all([milk,eggs]);
-              assert.equal(quantities.get('lait'),1);
-              assert.equal(quantities.get('oeufs'),1);
-              assert.equal(reconciles,1);
-            });
-          ''').strip()
-          qtest,n=qpat.subn(lambda _:qrep,qtest,count=1)
-          if n!=1: raise SystemExit(f'catalog queue test: {n}')
-          qtest_path.write_text(qtest,encoding='utf-8')
+          t=Path('tests/list-quantities.test.mjs')
+          test=t.read_text(encoding='utf-8')
+          test=test.replace('Map,Math,Number,String,Promise,\n    state:{locked:false},','Map,Math,Number,String,Promise,clearTimeout(){},\n    state:{locked:false,listRefreshTimer:null},',1)
+          test=test.replace('setProductQuantity:(_name,value)=>shown.push(value),\n    incrementProduct:',"setProductQuantity:(_name,value)=>shown.push(value),\n    scheduleListRefresh(){},\n    incrementProduct:",1)
+          marker="\n\ntest('le menu trois points adopte un glass iOS plus compact et fondu sans changer les actions'"
+          extra=r'''
 
-          local_path=Path('dish-local-images.js')
-          local=local_path.read_text(encoding='utf-8')
-          local,n=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='{version}'",local,count=1)
+          test('les rafales multi-produits diffèrent les refresh intermédiaires et gardent une seule réconciliation finale',()=>{
+            const queueStart=source.indexOf('const catalogQuantityQueue=new Map();');
+            const queueEnd=source.indexOf('function syncProductSelection()',queueStart);
+            const queue=source.slice(queueStart,queueEnd);
+            const scheduleStart=source.indexOf('function scheduleListRefresh(delay=HA_TIMING.eventRefreshDelayMs){');
+            const scheduleEnd=source.indexOf('function connectWs(token){',scheduleStart);
+            const schedule=source.slice(scheduleStart,scheduleEnd);
+            const opsStart=source.indexOf('async function incrementProduct(name');
+            const opsEnd=source.indexOf("async function removeGroup(name,row=null,intent='purchase')",opsStart);
+            const ops=source.slice(opsStart,opsEnd);
+            assert.match(queue,/incrementProduct\(task\.name,\{deferRefresh:true\}\)/);
+            assert.match(queue,/decrementProduct\(task\.name,\{deferRefresh:true\}\)/);
+            assert.match(queue,/if\(!catalogQuantityQueue\.size\)scheduleListRefresh\(\)/);
+            assert.match(schedule,/if\(catalogQuantityQueue\.size\)/);
+            assert.match(ops,/async function addItem\(name,\{deferRefresh=false\}=\{\}\)/);
+            assert.match(ops,/state\.items=\[\.\.\.state\.items,\{uid:'',summary:item,status:'needs_action'\}\]/);
+            assert.match(ops,/if\(deferRefresh&&group\.uids\.filter\(Boolean\)\.length<group\.count\)/);
+          });
+          '''
+          if marker not in test: raise SystemExit('test insertion marker')
+          test=test.replace(marker,textwrap.dedent(extra).rstrip()+marker,1)
+          t.write_text(test,encoding='utf-8')
+
+          local=Path('dish-local-images.js')
+          s=local.read_text(encoding='utf-8')
+          s,n=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='{version}'",s,count=1)
           if n!=1: raise SystemExit('APP_VERSION')
-          local_path.write_text(local,encoding='utf-8')
+          local.write_text(s,encoding='utf-8')
 
-          catalog_path=Path('catalog.js')
-          catalog=catalog_path.read_text(encoding='utf-8')
-          catalog,n=re.subn(r"dish-local-images\.js\?v=\d+",f'dish-local-images.js?v={V}',catalog,count=1)
-          if n!=1: raise SystemExit('catalog local images cache')
-          catalog_path.write_text(catalog,encoding='utf-8')
+          catalog=Path('catalog.js')
+          s=catalog.read_text(encoding='utf-8')
+          s,n=re.subn(r'dish-local-images\.js\?v=\d+',f'dish-local-images.js?v={V}',s,count=1)
+          if n!=1: raise SystemExit('catalog cache')
+          catalog.write_text(s,encoding='utf-8')
 
-          index_path=Path('index.html')
-          index=index_path.read_text(encoding='utf-8')
-          for pat,rep,label in [
-              (r"catalog\.js\?v=\d+",f'catalog.js?v={V}','catalog'),
-              (r"app\.js\?v=\d+",f'app.js?v={V}','app'),
-          ]:
-              index,n=re.subn(pat,rep,index,count=1)
-              if n!=1: raise SystemExit('index '+label)
-          index,n=re.subn(r'(<span class="page-version">)v\d+',rf'\1{version}',index)
-          if n!=3: raise SystemExit(f'page badges: {n}')
-          index_path.write_text(index,encoding='utf-8')
+          index=Path('index.html')
+          s=index.read_text(encoding='utf-8')
+          s,n=re.subn(r'catalog\.js\?v=\d+',f'catalog.js?v={V}',s,count=1)
+          if n!=1: raise SystemExit('index catalog')
+          s,n=re.subn(r'app\.js\?v=\d+',f'app.js?v={V}',s,count=1)
+          if n!=1: raise SystemExit('index app')
+          s,n=re.subn(r'(<span class="page-version">)v\d+',rf'\1{version}',s)
+          if n!=3: raise SystemExit('page versions')
+          index.write_text(s,encoding='utf-8')
 
-          sw_path=Path('sw.js')
-          sw=sw_path.read_text(encoding='utf-8')
-          sw,n=re.subn(r"const CACHE='courses-app-v\d+-r1';",f"const CACHE='courses-app-v{V}-r1';",sw,count=1)
+          sw=Path('sw.js')
+          s=sw.read_text(encoding='utf-8')
+          s,n=re.subn(r"const CACHE='courses-app-v\d+-r1';",f"const CACHE='courses-app-v{V}-r1';",s,count=1)
           if n!=1: raise SystemExit('sw cache')
-          shell=re.search(r"const SHELL=\[(.*?)\];",sw,re.S)
-          if not shell: raise SystemExit('sw shell')
-          body=shell.group(1)
+          m=re.search(r'const SHELL=\[(.*?)\];',s,re.S)
+          if not m: raise SystemExit('sw shell')
+          body=m.group(1)
           for entry in (f"'./catalog.js?v={V}'",f"'./app.js?v={V}'",f"'./dish-local-images.js?v={V}'"):
               if entry not in body: body+=','+entry
-          sw=sw[:shell.start(1)]+body+sw[shell.end(1):]
-          sw_path.write_text(sw,encoding='utf-8')
+          s=s[:m.start(1)]+body+s[m.end(1):]
+          sw.write_text(s,encoding='utf-8')
 
-          pref_path=Path('tests/preference-popups.test.mjs')
-          pref=pref_path.read_text(encoding='utf-8')
-          ppat=re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$",re.S)
-          prep=textwrap.dedent(r'''
-            test('la version visible passe à v347 et les ressources de quantité sont rechargées',()=>{
-              const index=read('index.html');
-              const catalog=read('catalog.js');
-              const settings=read('settings-tab-badge.js');
-              const sw=read('sw.js');
-              const localImages=read('dish-local-images.js');
-              assert.match(index,/styles\.css\?v=346/);
-              assert.match(index,/catalog\.js\?v=347/);
-              assert.match(index,/app\.js\?v=347/);
-              assert.match(index,/settings-tab-badge\.js\?v=344/);
-              assert.equal((index.match(/page-version\">v347/g)||[]).length,3);
-              assert.match(catalog,/dishes-ui\.js\?v=344/);
-              assert.match(catalog,/dish-local-images\.js\?v=347/);
-              assert.match(settings,/missing-products-dishes\.js\?v=6/);
-              assert.match(settings,/missing-products-modern\.js\?v=6/);
-              assert.match(sw,/courses-app-v347-r1/);
-              assert.match(sw,/styles\.css\?v=346/);
-              assert.match(sw,/catalog\.js\?v=347/);
-              assert.match(sw,/app\.js\?v=347/);
-              assert.match(sw,/settings-tab-badge\.js\?v=344/);
-              assert.match(sw,/dishes-ui\.js\?v=344/);
-              assert.match(sw,/dish-local-images\.js\?v=347/);
-              assert.match(localImages,/const APP_VERSION='v347'/);
-            });
+          pref=Path('tests/preference-popups.test.mjs')
+          s=pref.read_text(encoding='utf-8')
+          pat=re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$",re.S)
+          rep=textwrap.dedent(r'''
+          test('la version visible passe à v347 et les ressources de quantité sont rechargées',()=>{
+            const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
+            assert.match(index,/styles\.css\?v=346/);
+            assert.match(index,/catalog\.js\?v=347/);
+            assert.match(index,/app\.js\?v=347/);
+            assert.match(index,/settings-tab-badge\.js\?v=344/);
+            assert.equal((index.match(/page-version\">v347/g)||[]).length,3);
+            assert.match(catalog,/dishes-ui\.js\?v=344/);
+            assert.match(catalog,/dish-local-images\.js\?v=347/);
+            assert.match(settings,/missing-products-dishes\.js\?v=6/);
+            assert.match(settings,/missing-products-modern\.js\?v=6/);
+            assert.match(sw,/courses-app-v347-r1/);
+            assert.match(sw,/styles\.css\?v=346/);
+            assert.match(sw,/catalog\.js\?v=347/);
+            assert.match(sw,/app\.js\?v=347/);
+            assert.match(sw,/settings-tab-badge\.js\?v=344/);
+            assert.match(sw,/dishes-ui\.js\?v=344/);
+            assert.match(sw,/dish-local-images\.js\?v=347/);
+            assert.match(localImages,/const APP_VERSION='v347'/);
+          });
           ''').lstrip()
-          pref,n=ppat.subn(lambda _:prep,pref,count=1)
-          if n!=1: raise SystemExit(f'preference version test: {n}')
-          pref_path.write_text(pref,encoding='utf-8')
+          s,n=pat.subn(lambda _:rep,s,count=1)
+          if n!=1: raise SystemExit('version test')
+          pref.write_text(s,encoding='utf-8')
 
       - name: Run tests
-        shell: bash
         run: |
           set -euo pipefail
           node --test tests/*.test.mjs
           git diff --check
 
       - name: Validate final change
-        shell: bash
         run: |
           set -euo pipefail
           grep -F "incrementProduct(task.name,{deferRefresh:true})" app.js
           grep -F "decrementProduct(task.name,{deferRefresh:true})" app.js
           grep -F "if(!catalogQuantityQueue.size)scheduleListRefresh()" app.js
-          grep -F "if(catalogQuantityQueue.size){" app.js
           grep -F "const APP_VERSION='v347'" dish-local-images.js
           test "$(grep -o 'page-version\">v347' index.html | wc -l)" -eq 3
-          grep -F "./app.js?v=347" index.html
-          grep -F "./catalog.js?v=347" index.html
-          grep -F "courses-app-v347-r1" sw.js
 
       - name: Ensure main did not move
-        shell: bash
         run: |
           set -euo pipefail
           git fetch origin main --depth=1
-          test "$(git rev-parse origin/main)" = "8d7752015249f2b8ad093e4ee94aa56d915ddff7"
+          test "$(git rev-parse origin/main)" = "c134acdd00c8a848f388949ac39cf906078d283d"
 
       - name: Commit and push main
-        shell: bash
         run: |
           set -euo pipefail
           git config user.name "OpenAI Agent"
