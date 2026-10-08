@@ -1,9 +1,11 @@
-name: Apply Ma liste action menu theme
+name: Apply Ma liste quantity action menu
 
 on:
   push:
     branches:
       - agent-final-v318
+    paths:
+      - .github/workflows/v330-list-menu-theme.yml
 
 permissions:
   contents: write
@@ -18,52 +20,162 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      - name: Apply minimal menu theme change
+      - name: Verify expected main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "181141712039348d8fb95d26d2281206ef4b5b0f"
+
+      - name: Apply validated quantity menu
         shell: python
         run: |
           from pathlib import Path
           import re
 
-          version_file = Path('dish-local-images.js')
-          local_images = version_file.read_text(encoding='utf-8')
-          match = re.search(r"const APP_VERSION='v(\d+)'", local_images)
-          if not match:
-              raise SystemExit('APP_VERSION introuvable')
-          current = int(match.group(1))
-          next_version = current + 1
+          next_version = 332
           version = f'v{next_version}'
 
-          dark_menu = re.compile(r"\n      \.list-row-menu\{\n        padding:0!important;.*?\n      \.list-row-menu-delete:active\{background:rgba\(255,255,255,\.10\)!important\}\n", re.S)
-          local_images, removed = dark_menu.subn('\n', local_images, count=1)
-          if removed != 1:
-              raise SystemExit('Bloc sombre du menu introuvable ou ambigu')
-          local_images = re.sub(r"const APP_VERSION='v\d+'", f"const APP_VERSION='{version}'", local_images, count=1)
-          version_file.write_text(local_images, encoding='utf-8')
+          app_path = Path('app.js')
+          app = app_path.read_text(encoding='utf-8')
+          old_menu = """let listRowMenu=null;
+function closeListRowMenu(){
+  if(!listRowMenu)return;
+  listRowMenu.anchor?.setAttribute('aria-expanded','false');
+  listRowMenu.menu.remove();
+  listRowMenu=null;
+}
+function openListRowMenu(row,anchor){
+  closeListRowMenu();
+  const name=row.dataset.name||'';
+  if(!activeGroups().some(entry=>norm(entry.summary)===norm(name)))return;
+  const menu=document.createElement('div');
+  menu.className='list-row-menu';
+  menu.setAttribute('role','menu');
+  const remove=document.createElement('button');
+  remove.type='button';
+  remove.className='list-row-menu-delete';
+  remove.setAttribute('role','menuitem');
+  remove.textContent='Supprimer';
+  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
+  menu.append(remove);
+  document.body.appendChild(menu);
+  const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
+  menu.style.width=width+'px';
+  const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
+  const below=rect.bottom+7,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-7);
+  menu.style.left=left+'px';menu.style.top=top+'px';
+  anchor.setAttribute('aria-expanded','true');
+  listRowMenu={menu,anchor};
+}
+"""
+          new_menu = """let listRowMenu=null;
+function closeListRowMenu(){
+  if(!listRowMenu)return;
+  listRowMenu.anchor?.setAttribute('aria-expanded','false');
+  listRowMenu.menu.remove();
+  listRowMenu=null;
+}
+async function changeListRowMenuQuantity(name,delta){
+  const item=String(name||'').trim();
+  if(!item||!listRowMenu)return;
+  const key=norm(item);
+  listRowMenu.menu.classList.add('is-busy');
+  listRowMenu.menu.querySelectorAll('button').forEach(button=>button.disabled=true);
+  try{
+    if(delta>0)await incrementProduct(item);
+    else await decrementProduct(item);
+  }finally{
+    const nextRow=[...document.querySelectorAll('#listItems .list-row')].find(entry=>norm(entry.dataset.name)===key);
+    const nextAnchor=nextRow?.querySelector('.list-row-more');
+    if(nextRow&&nextAnchor&&productQuantity(item)>0)openListRowMenu(nextRow,nextAnchor);
+    else closeListRowMenu();
+  }
+}
+function openListRowMenu(row,anchor){
+  closeListRowMenu();
+  const name=row.dataset.name||'';
+  const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));
+  if(!group)return;
+  const menu=document.createElement('div');
+  menu.className='list-row-menu';
+  menu.setAttribute('role','menu');
+  menu.setAttribute('aria-label','Actions pour '+name);
+  const quantity=document.createElement('div');
+  quantity.className='list-row-menu-quantity';
+  quantity.setAttribute('aria-label','Quantité de '+name);
+  const decrement=document.createElement('button');
+  decrement.type='button';
+  decrement.className='list-row-menu-decrement';
+  decrement.setAttribute('role','menuitem');
+  decrement.setAttribute('aria-label','Retirer une unité de '+name);
+  decrement.textContent='−';
+  const value=document.createElement('strong');
+  value.className='list-row-menu-value';
+  value.textContent=String(group.count);
+  value.setAttribute('aria-live','polite');
+  const increment=document.createElement('button');
+  increment.type='button';
+  increment.className='list-row-menu-increment';
+  increment.setAttribute('role','menuitem');
+  increment.setAttribute('aria-label','Ajouter une unité de '+name);
+  increment.textContent='+';
+  decrement.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,-1)};
+  increment.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,1)};
+  quantity.append(decrement,value,increment);
+  const remove=document.createElement('button');
+  remove.type='button';
+  remove.className='list-row-menu-delete';
+  remove.setAttribute('role','menuitem');
+  remove.textContent='Supprimer';
+  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};
+  menu.append(quantity,remove);
+  document.body.appendChild(menu);
+  const rect=anchor.getBoundingClientRect(),width=Math.min(184,window.innerWidth-28);
+  menu.style.width=width+'px';
+  const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
+  const below=rect.bottom+7,top=below+menu.offsetHeight<=window.innerHeight-14?below:Math.max(14,rect.top-menu.offsetHeight-7);
+  menu.style.left=left+'px';menu.style.top=top+'px';
+  anchor.setAttribute('aria-expanded','true');
+  listRowMenu={menu,anchor};
+}
+"""
+          if app.count(old_menu) != 1:
+              raise SystemExit('Bloc menu attendu introuvable ou ambigu dans app.js')
+          app = app.replace(old_menu, new_menu, 1)
+          app_path.write_text(app, encoding='utf-8')
 
           styles_path = Path('styles.css')
           styles = styles_path.read_text(encoding='utf-8')
-          old_rules = {
-              '.list-row-menu{position:fixed;z-index:2200;padding:8px;border:1px solid #e4e8e4;border-radius:18px;background:#fff;color:#172019;box-shadow:0 18px 45px rgba(36,50,41,.22)}': '.list-row-menu{position:fixed;z-index:2200;padding:6px;border:1px solid rgba(23,49,38,.08);border-radius:20px;background:rgba(255,255,255,.96);color:#173126;box-shadow:0 14px 34px rgba(35,56,44,.14);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);overflow:hidden}',
-              '.list-row-menu-quantity{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:7px 8px 10px;font-size:14px;font-weight:760}': '.list-row-menu-quantity{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 10px;font-size:14px;font-weight:760}',
-              '.list-row-menu-quantity button{width:34px;height:34px;border:0;border-radius:12px;background:#eef4ef;color:#176f40;font-size:22px;font-weight:700}': '.list-row-menu-quantity button{width:38px;height:38px;border:0;border-radius:999px;background:#eaf4ef;color:#176f40;font-size:24px;font-weight:700;box-shadow:none}',
-              '.list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:15px}': '.list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:16px;color:#173126}',
-          }
-          for old, new in old_rules.items():
-              if old not in styles:
-                  raise SystemExit('Règle CSS attendue introuvable: ' + old[:80])
-              styles = styles.replace(old, new, 1)
-
-          old_delete = '.list-row-menu-delete{width:100%;height:42px;border:0;border-top:1px solid #edf0ed;background:transparent;color:#c13f48;text-align:left;padding:8px;font-size:14px;font-weight:780}'
-          new_delete = """.list-row-menu-delete{width:100%;height:46px;border:0;background:#fdeff0;color:#df3f49;text-align:left;padding:0 14px;border-radius:14px;font-size:15px;font-weight:780;display:flex;align-items:center;gap:10px}\n.list-row-menu-delete::before{content:'';width:20px;height:20px;flex:0 0 20px;background:center/20px 20px no-repeat url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E\")}\n.list-row-menu-delete:active{background:#f9e4e6}"""
-          if old_delete not in styles:
-              raise SystemExit('Règle Supprimer attendue introuvable')
-          styles = styles.replace(old_delete, new_delete, 1)
-
-          compact_override = '.list-row-menu{padding:5px!important;border-radius:14px!important;background:rgba(255,255,255,.98)!important;box-shadow:0 12px 30px rgba(36,50,41,.18)!important}\n.list-row-menu-delete{height:40px!important;border-top:0!important;border-radius:10px!important;padding:0 12px!important}\n'
-          if compact_override not in styles:
-              raise SystemExit('Ancienne surcharge compacte introuvable')
-          styles = styles.replace(compact_override, '', 1)
+          old_styles = """.list-row-menu{position:fixed;z-index:2200;padding:6px;border:1px solid rgba(23,49,38,.08);border-radius:20px;background:rgba(255,255,255,.96);color:#173126;box-shadow:0 14px 34px rgba(35,56,44,.14);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);overflow:hidden}
+.list-row-menu-quantity{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 10px;font-size:14px;font-weight:760}
+.list-row-menu-quantity>div{display:flex;align-items:center;gap:8px}
+.list-row-menu-quantity button{width:38px;height:38px;border:0;border-radius:999px;background:#eaf4ef;color:#176f40;font-size:24px;font-weight:700;box-shadow:none}
+.list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:16px;color:#173126}
+.list-row-menu-delete{width:100%;height:46px;border:0;background:#fdeff0;color:#df3f49;text-align:left;padding:0 14px;border-radius:14px;font-size:15px;font-weight:780;display:flex;align-items:center;gap:10px}
+.list-row-menu-delete::before{content:'';width:20px;height:20px;flex:0 0 20px;background:center/20px 20px no-repeat url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E\")}
+.list-row-menu-delete:active{background:#f9e4e6}
+"""
+          new_styles = """.list-row-menu{position:fixed;z-index:2200;padding:8px;border:1px solid rgba(23,49,38,.08);border-radius:20px;background:rgba(255,255,255,.96);color:#173126;box-shadow:0 14px 34px rgba(35,56,44,.14);-webkit-backdrop-filter:blur(18px) saturate(1.1);backdrop-filter:blur(18px) saturate(1.1);overflow:hidden}
+.list-row-menu-quantity{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 8px 12px;margin-bottom:6px;border-bottom:1px solid rgba(23,49,38,.08);font-size:14px;font-weight:760}
+.list-row-menu-quantity button{width:38px;height:38px;border:0;border-radius:999px;background:#eaf4ef;color:#176f40;font-size:24px;font-weight:700;line-height:1;box-shadow:none;transition:transform .12s ease,background .12s ease}
+.list-row-menu-quantity button:active{background:#dceee5;transform:scale(.96)}
+.list-row-menu-quantity strong{min-width:24px;text-align:center;font-size:18px;line-height:1;color:#173126;font-variant-numeric:tabular-nums}
+.list-row-menu-quantity button:disabled,.list-row-menu-delete:disabled{opacity:.45}
+.list-row-menu-delete{width:100%;height:48px;border:0;background:#fdeff0;color:#df3f49;text-align:left;padding:0 14px;border-radius:14px;font-size:15px;font-weight:780;display:flex;align-items:center;gap:10px}
+.list-row-menu-delete::before{content:'';width:20px;height:20px;flex:0 0 20px;background:center/20px 20px no-repeat url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E\")}
+.list-row-menu-delete:active{background:#f9e4e6}
+"""
+          if styles.count(old_styles) != 1:
+              raise SystemExit('Bloc CSS du menu attendu introuvable ou ambigu')
+          styles = styles.replace(old_styles, new_styles, 1)
           styles_path.write_text(styles, encoding='utf-8')
+
+          local_path = Path('dish-local-images.js')
+          local = local_path.read_text(encoding='utf-8')
+          local, count = re.subn(r"const APP_VERSION='v\d+'", f"const APP_VERSION='{version}'", local, count=1)
+          if count != 1:
+              raise SystemExit('APP_VERSION introuvable')
+          local_path.write_text(local, encoding='utf-8')
 
           catalog_path = Path('catalog.js')
           catalog = catalog_path.read_text(encoding='utf-8')
@@ -76,9 +188,10 @@ jobs:
           index = index_path.read_text(encoding='utf-8')
           index, styles_count = re.subn(r"styles\.css\?v=\d+", f'styles.css?v={next_version}', index, count=1)
           index, catalog_count = re.subn(r"catalog\.js\?v=\d+", f'catalog.js?v={next_version}', index, count=1)
+          index, app_count = re.subn(r"app\.js\?v=\d+", f'app.js?v={next_version}', index, count=1)
           index, badge_count = re.subn(r'(<span class="page-version">)v\d+', rf'\1{version}', index)
-          if styles_count != 1 or catalog_count != 1 or badge_count != 3:
-              raise SystemExit(f'Versionnement index inattendu: styles={styles_count}, catalog={catalog_count}, badges={badge_count}')
+          if styles_count != 1 or catalog_count != 1 or app_count != 1 or badge_count != 3:
+              raise SystemExit(f'Versionnement index inattendu: styles={styles_count}, catalog={catalog_count}, app={app_count}, badges={badge_count}')
           index_path.write_text(index, encoding='utf-8')
 
           sw_path = Path('sw.js')
@@ -90,60 +203,109 @@ jobs:
           if not shell:
               raise SystemExit('SHELL introuvable dans sw.js')
           shell_body = shell.group(1)
-          for entry in (f"'./styles.css?v={next_version}'", f"'./catalog.js?v={next_version}'", f"'./dish-local-images.js?v={next_version}'"):
+          for entry in (
+              f"'./styles.css?v={next_version}'",
+              f"'./catalog.js?v={next_version}'",
+              f"'./app.js?v={next_version}'",
+              f"'./dish-local-images.js?v={next_version}'",
+          ):
               if entry not in shell_body:
                   shell_body += ',' + entry
           sw = sw[:shell.start(1)] + shell_body + sw[shell.end(1):]
           sw_path.write_text(sw, encoding='utf-8')
 
-          tests_path = Path('tests/preference-popups.test.mjs')
-          tests = tests_path.read_text(encoding='utf-8')
-          lines = []
-          for line in tests.splitlines(True):
-              if 'assert.match(index,/catalog\\.js\\?v=' in line:
-                  line = re.sub(r'v=\d+', f'v={next_version}', line)
-              elif 'assert.match(sw,/courses-app-v' in line:
-                  line = re.sub(r'v\d+-r1', f'v{next_version}-r1', line)
-              elif 'assert.match(sw,/catalog\\.js\\?v=' in line:
-                  line = re.sub(r'v=\d+', f'v={next_version}', line)
-              elif 'assert.match(sw,/dish-local-images\\.js\\?v=' in line:
-                  line = re.sub(r'v=\d+', f'v={next_version}', line)
-              elif "assert.match(localImages,/const APP_VERSION='v" in line:
-                  line = re.sub(r'v\d+', version, line)
-              lines.append(line)
-          tests = ''.join(lines)
-          catalog_assert = f"  assert.match(index,/catalog\\.js\\?v={next_version}/);\n"
-          styles_assert = f"  assert.match(index,/styles\\.css\\?v={next_version}/);\n"
-          if styles_assert not in tests:
-              if catalog_assert not in tests:
-                  raise SystemExit('Assertion catalog index introuvable')
-              tests = tests.replace(catalog_assert, styles_assert + catalog_assert, 1)
-          tests_path.write_text(tests, encoding='utf-8')
+          quantities_test_path = Path('tests/list-quantities.test.mjs')
+          quantities_test = quantities_test_path.read_text(encoding='utf-8')
+          source_line = "const source=readFileSync(new URL('../app.js',import.meta.url),'utf8');\n"
+          styles_line = "const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');\n"
+          if styles_line not in quantities_test:
+              if source_line not in quantities_test:
+                  raise SystemExit('Source app.js introuvable dans list-quantities.test.mjs')
+              quantities_test = quantities_test.replace(source_line, source_line + styles_line, 1)
+          menu_test = """
+
+test('le menu trois points expose la quantité et la suppression comme la maquette validée',()=>{
+  const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');
+  const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);
+  const menuEnd=source.indexOf('function bindListReorder(root){',menuStart);
+  assert.ok(helperStart>=0&&menuStart>helperStart&&menuEnd>menuStart,'menu d actions introuvable');
+  const helper=source.slice(helperStart,menuStart),menu=source.slice(menuStart,menuEnd);
+  assert.match(helper,/await incrementProduct\(item\)/);
+  assert.match(helper,/await decrementProduct\(item\)/);
+  assert.match(menu,/list-row-menu-quantity/);
+  assert.match(menu,/list-row-menu-decrement/);
+  assert.match(menu,/list-row-menu-value/);
+  assert.match(menu,/list-row-menu-increment/);
+  assert.match(menu,/changeListRowMenuQuantity\(name,-1\)/);
+  assert.match(menu,/changeListRowMenuQuantity\(name,1\)/);
+  assert.match(menu,/list-row-menu-delete/);
+  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-bottom:1px solid rgba\(23,49,38,\.08\)/s);
+  assert.match(styles,/\.list-row-menu-quantity button\{[^}]*border-radius:999px[^}]*background:#eaf4ef/s);
+  assert.match(styles,/\.list-row-menu-delete\{[^}]*background:#fdeff0[^}]*color:#df3f49/s);
+});
+"""
+          if "le menu trois points expose la quantité" not in quantities_test:
+              quantities_test += menu_test
+          quantities_test_path.write_text(quantities_test, encoding='utf-8')
+
+          preference_path = Path('tests/preference-popups.test.mjs')
+          preference = preference_path.read_text(encoding='utf-8')
+          version_test = re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$", re.S)
+          replacement = f"""test('la version visible passe à {version} et le service worker recharge les ressources modifiées',()=>{{
+  const index=read('index.html');
+  const sw=read('sw.js');
+  const localImages=read('dish-local-images.js');
+  assert.match(index,/styles\\.css\\?v={next_version}/);
+  assert.match(index,/catalog\\.js\\?v={next_version}/);
+  assert.match(index,/app\\.js\\?v={next_version}/);
+  assert.match(index,/settings-tab-badge\\.js\\?v=327/);
+  assert.equal((index.match(/page-version\\">{version}/g)||[]).length,3);
+  assert.match(sw,/courses-app-v{next_version}-r1/);
+  assert.match(sw,/styles\\.css\\?v={next_version}/);
+  assert.match(sw,/catalog\\.js\\?v={next_version}/);
+  assert.match(sw,/app\\.js\\?v={next_version}/);
+  assert.match(sw,/dish-local-images\\.js\\?v={next_version}/);
+  assert.match(sw,/settings-tab-badge\\.js\\?v=327/);
+  assert.match(sw,/missing-products-fixes\\.js\\?v=16/);
+  assert.match(sw,/new Request\\(event\\.request,\\{{cache:'reload'\\}}\\)/);
+  assert.match(localImages,/const APP_VERSION='{version}'/);
+  assert.match(localImages,/if\\(badge\\.textContent!==APP_VERSION\\)badge\\.textContent=APP_VERSION/);
+  assert.match(localImages,/missing-products-fixes\\.js\\?v=16/);
+}});
+"""
+          preference, changed = version_test.subn(replacement, preference, count=1)
+          if changed != 1:
+              raise SystemExit('Test de version introuvable dans preference-popups.test.mjs')
+          preference_path.write_text(preference, encoding='utf-8')
 
           Path('.next-version').write_text(version, encoding='utf-8')
 
       - name: Run tests
         run: node --test tests/*.test.mjs
 
-      - name: Validate change scope
+      - name: Validate final change
         shell: bash
         run: |
           set -euo pipefail
           V="$(cat .next-version)"
           N="${V#v}"
-          grep -q "background:rgba(255,255,255,.96)" styles.css
+          grep -q "list-row-menu-quantity" app.js
+          grep -q "list-row-menu-decrement" app.js
+          grep -q "list-row-menu-increment" app.js
+          grep -q "changeListRowMenuQuantity(name,-1)" app.js
+          grep -q "changeListRowMenuQuantity(name,1)" app.js
           grep -q "background:#fdeff0" styles.css
-          grep -q "border-radius:999px;background:#eaf4ef" styles.css
-          grep -q "stroke='%23df3f49'" styles.css
-          ! grep -q "background:rgba(126,129,126,.92)!important" dish-local-images.js
+          grep -q "border-bottom:1px solid rgba(23,49,38,.08)" styles.css
           grep -q "const APP_VERSION='${V}'" dish-local-images.js
           grep -q "styles.css?v=${N}" index.html
           grep -q "catalog.js?v=${N}" index.html
+          grep -q "app.js?v=${N}" index.html
           test "$(grep -o "page-version\">${V}" index.html | wc -l | tr -d ' ')" = "3"
           grep -q "courses-app-${V}-r1" sw.js
+          grep -q "app.js?v=${N}" sw.js
           grep -q "dish-local-images.js?v=${N}" catalog.js
           git diff --check
-          git diff -- styles.css dish-local-images.js catalog.js index.html sw.js tests/preference-popups.test.mjs
+          git diff -- app.js styles.css dish-local-images.js catalog.js index.html sw.js tests/list-quantities.test.mjs tests/preference-popups.test.mjs
 
       - name: Ensure main did not move
         shell: bash
@@ -160,6 +322,6 @@ jobs:
           rm .next-version
           git config user.name 'Fabien'
           git config user.email 'canape-silence-8o@icloud.com'
-          git add styles.css dish-local-images.js catalog.js index.html sw.js tests/preference-popups.test.mjs
-          git commit -m "${V}: harmonise le menu d’actions de Ma liste"
+          git add app.js styles.css dish-local-images.js catalog.js index.html sw.js tests/list-quantities.test.mjs tests/preference-popups.test.mjs
+          git commit -m "${V}: complète le menu d’actions de Ma liste"
           git push origin HEAD:main
