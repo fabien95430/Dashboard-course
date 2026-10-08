@@ -32,379 +32,104 @@ jobs:
           from pathlib import Path
           import re
 
-          next_version = 336
-          version = f'v{next_version}'
+          V=336
+          p=Path('app.js')
+          s=p.read_text(encoding='utf-8')
 
-          app_path = Path('app.js')
-          app = app_path.read_text(encoding='utf-8')
+          def one(old,new,label):
+              global s
+              n=s.count(old)
+              if n!=1: raise SystemExit(f'{label}: {n}')
+              s=s.replace(old,new,1)
 
-          app, count = re.subn(
-              r"removeGroup\(button\.dataset\.name\|\|'',row\);",
-              "removeGroup(button.dataset.name||'',row,'purchase');",
-              app,
-              count=1,
-          )
-          if count != 1:
-              raise SystemExit('Appui rond introuvable ou ambigu')
+          one("removeGroup(button.dataset.name||'',row);","removeGroup(button.dataset.name||'',row,'purchase');",'rond')
+          one("remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row)};","remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row,'delete')};",'menu')
+          one("async function removeGroup(name,row=null){","async function removeGroup(name,row=null,intent='purchase'){",'removeGroup base signature')
+          one("  const key=norm(item);\n  if(state.productBusy.has(key))return;\n  const group=activeGroups().find(entry=>norm(entry.summary)===key);","  const key=norm(item);\n  const isPurchase=intent!=='delete';\n  if(state.productBusy.has(key))return;\n  const group=activeGroups().find(entry=>norm(entry.summary)===key);",'base intent')
 
-          app, count = re.subn(
-              r"remove\.onclick=event=>\{event\.stopPropagation\(\);closeListRowMenu\(\);removeGroup\(name,row\)\};",
-              "remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row,'delete')};",
-              app,
-              count=1,
-          )
-          if count != 1:
-              raise SystemExit('Suppression menu introuvable ou ambigu')
+          base_pat=re.compile(r"(async function removeGroup\(name,row=null,intent='purchase'\)\{.*?state\.productBusy\.add\(key\);\n  let undoToken=null;\n)  if\(row\)\{(.*?)\n  \}\n\n  state\.pendingRemoval\.add\(key\);",re.S)
+          m=base_pat.search(s)
+          if not m: raise SystemExit('base visual block')
+          purchase_body=m.group(2)
+          delete_body="    row.classList.add('is-deleting','is-busy');\n    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;\n    const more=row.querySelector('.list-row-more');if(more)more.disabled=true;\n    navigator.vibrate?.(7);\n    await new Promise(resolve=>setTimeout(resolve,180));\n    row.classList.add('is-removing');\n    await new Promise(resolve=>setTimeout(resolve,180));"
+          replacement=m.group(1)+"  if(row&&isPurchase){"+purchase_body+"\n  }else if(row){\n"+delete_body+"\n  }\n\n  state.pendingRemoval.add(key);"
+          s=s[:m.start()]+replacement+s[m.end():]
 
-          base_pattern = re.compile(
-              r"async function removeGroup\(name,row=null\)\{.*?\n\}\nfunction showNeutralDialog\(dialog\)\{",
-              re.S,
-          )
-          base_replacement = r'''async function removeGroup(name,row=null,intent='purchase'){
-  const item=String(name||'').trim();
-  if(!item)return;
-  const key=norm(item);
-  const isPurchase=intent!=='delete';
-  if(state.productBusy.has(key))return;
-  const group=activeGroups().find(entry=>norm(entry.summary)===key);
-  if(!group)return;
+          one("  state.items=state.items.filter(keepOtherItems);\n  removeRenderedListRow(row);\n\n  try{","  state.items=state.items.filter(keepOtherItems);\n  removeRenderedListRow(row);\n  const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';\n\n  try{",'base success')
+          base_start=s.index("async function removeGroup(name,row=null,intent='purchase'){")
+          base_end=s.index("function showNeutralDialog(dialog){",base_start)
+          base=s[base_start:base_end]
+          if base.count("toast(item+' acheté')")!=2: raise SystemExit('base toasts')
+          base=base.replace("toast(item+' acheté')","toast(successMessage)")
+          s=s[:base_start]+base+s[base_end:]
 
-  state.productBusy.add(key);
-  let undoToken=null;
-  if(row&&isPurchase){
-    undoToken={cancelled:false};
-    state.purchaseUndo.set(key,undoToken);
-    row.classList.add('is-purchased','is-busy');
-    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
-    const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=false;
-    navigator.vibrate?.(8);
-    await new Promise(resolve=>setTimeout(resolve,PURCHASE_HOLD_MS));
-    if(undoToken.cancelled)return;
-    row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,PURCHASE_EXIT_MS));
-    if(undoToken.cancelled)return;
-    state.purchaseUndo.delete(key);
-  }else if(row){
-    row.classList.add('is-deleting','is-busy');
-    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
-    const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
-    navigator.vibrate?.(7);
-    await new Promise(resolve=>setTimeout(resolve,180));
-    row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,180));
-  }
+          one("removeGroup=async function(name,row=null){","removeGroup=async function(name,row=null,intent='purchase'){",'wrapper signature')
+          one("  if(state.demo)return onlineRemoveGroup(name,row);","  if(state.demo)return onlineRemoveGroup(name,row,intent);",'wrapper demo')
+          wrapper_start=s.index("removeGroup=async function(name,row=null,intent='purchase'){",s.index("const onlineRemoveGroup=removeGroup;"))
+          wrapper_end=s.index("const onlineWipeMemoryCredentials=wipeMemoryCredentials;",wrapper_start)
+          w=s[wrapper_start:wrapper_end]
+          old="  const key=norm(item);\n  if(state.productBusy.has(key))return;"
+          if w.count(old)!=1: raise SystemExit('wrapper intent anchor')
+          w=w.replace(old,"  const key=norm(item);\n  const isPurchase=intent!=='delete';\n  if(state.productBusy.has(key))return;",1)
+          pat=re.compile(r"(state\.productBusy\.add\(key\);\n  let undoToken=null;\n)  if\(row\)\{(.*?)\n  \}\n\n  state\.pendingRemoval\.add\(key\);",re.S)
+          m=pat.search(w)
+          if not m: raise SystemExit('wrapper visual block')
+          w=w[:m.start()]+m.group(1)+"  if(row&&isPurchase){"+m.group(2)+"\n  }else if(row){\n"+delete_body+"\n  }\n\n  state.pendingRemoval.add(key);"+w[m.end():]
+          old="  removeRenderedListRow(row);\n  let queuedOffline=false;"
+          if w.count(old)!=1: raise SystemExit('wrapper success anchor')
+          w=w.replace(old,"  removeRenderedListRow(row);\n  let queuedOffline=false;\n  const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';",1)
+          if w.count("toast(item+' acheté')")!=3: raise SystemExit('wrapper toasts')
+          w=w.replace("toast(item+' acheté')","toast(successMessage)")
+          s=s[:wrapper_start]+w+s[wrapper_end:]
+          p.write_text(s,encoding='utf-8')
 
-  state.pendingRemoval.add(key);
-  const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
-  state.items=state.items.filter(keepOtherItems);
-  removeRenderedListRow(row);
-  const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';
+          p=Path('styles.css')
+          css=p.read_text(encoding='utf-8')
+          if '.list-row.is-deleting{' in css: raise SystemExit('delete css already present')
+          css += "\n\n/* v336 — Ma liste : suppression distincte d'un achat */\n.list-row.is-deleting{background:linear-gradient(90deg,#fff0f1 0%,#fff8f7 100%)!important;box-shadow:0 8px 22px rgba(203,66,75,.10)!important}\n.list-row.is-deleting .purchase-check{background:transparent!important;box-shadow:none!important}\n.list-row.is-deleting .purchase-check::before{border-color:#e06a70!important;background:rgba(224,106,112,.08)!important;box-shadow:none!important}\n.list-row.is-deleting .list-name{color:#a73b42!important;text-decoration:none!important;opacity:.88}\n.list-row.is-deleting .list-qty{background:#ffe7e9!important;color:#be3f48!important}\n.list-row.is-deleting .undo-purchase{display:none!important}\n.list-row.is-deleting .list-row-more{font-size:0!important;color:transparent!important;opacity:1!important;background:center/20px 20px no-repeat url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E\")!important}\n"
+          p.write_text(css,encoding='utf-8')
 
-  try{
-    if(state.demo){
-      const items=(loadJson(DEMO_KEY,[])||[]).filter(keepOtherItems);
-      saveJson(DEMO_KEY,items);
-      state.items=items;
-      toast(successMessage);
-      return;
-    }
-    if(!state.entity)throw new Error('Liste Home Assistant indisponible');
-    const uids=group.uids.filter(Boolean);
-    if(!uids.length)throw new Error('Identifiant de l’article indisponible');
-    await Promise.all(uids.map(completeTodoItem));
-    toast(successMessage);
-  }catch(error){
-    toast('Suppression impossible');
-    status('is-error','Erreur',error.message||'Suppression impossible');
-  }finally{
-    state.purchaseUndo.delete(key);
-    state.pendingRemoval.delete(key);
-    state.productBusy.delete(key);
-    if(!state.demo)await refreshItems();
-    else syncProductSelection();
-  }
-}
-function showNeutralDialog(dialog){'''
-          app, count = base_pattern.subn(lambda _: base_replacement, app, count=1)
-          if count != 1:
-              raise SystemExit('removeGroup principal introuvable ou ambigu')
+          p=Path('dish-local-images.js')
+          x=p.read_text(encoding='utf-8')
+          if "const APP_VERSION='v335'" not in x: raise SystemExit('APP_VERSION source')
+          p.write_text(x.replace("const APP_VERSION='v335'","const APP_VERSION='v336'",1),encoding='utf-8')
 
-          app, count = re.subn(
-              r"function showOfflineStatus\(\)\{\n  const pending=state\.offlinePending\.length;\n  const title=socketReady\(\)&&pending\?'Synchronisation en attente':'Hors ligne';\n  const detail=pending\n    \?pending\+' achat'\+\(pending>1\?'s':''\)\+' à synchroniser'\n    :\(state\.offlineLoaded\?'Dernière liste enregistrée':'Aucune liste enregistrée'\);\n  status\('is-waiting',title,detail\);\n\}",
-              """function showOfflineStatus(){
-  const pending=state.offlinePending.length;
-  const deletions=state.offlinePending.filter(action=>action.intent==='delete').length;
-  const purchases=pending-deletions;
-  const title=socketReady()&&pending?'Synchronisation en attente':'Hors ligne';
-  const pendingLabel=deletions===pending
-    ?pending+' suppression'+(pending>1?'s':'')+' à synchroniser'
-    :(purchases===pending?pending+' achat'+(pending>1?'s':'')+' à synchroniser':pending+' action'+(pending>1?'s':'')+' à synchroniser');
-  const detail=pending?pendingLabel:(state.offlineLoaded?'Dernière liste enregistrée':'Aucune liste enregistrée');
-  status('is-waiting',title,detail);
-}""",
-              app,
-              count=1,
-          )
-          if count != 1:
-              raise SystemExit('showOfflineStatus introuvable ou ambigu')
+          p=Path('catalog.js')
+          x=p.read_text(encoding='utf-8')
+          x,n=re.subn(r"dish-local-images\.js\?v=\d+","dish-local-images.js?v=336",x,count=1)
+          if n!=1: raise SystemExit('catalog cache')
+          p.write_text(x,encoding='utf-8')
 
-          app, count = re.subn(
-              r"name:String\(action\.name\|\|''\)\.trim\(\)\.slice\(0,80\),\n      createdAt:Number\(action\.createdAt\)\|\|Date\.now\(\)",
-              "name:String(action.name||'').trim().slice(0,80),\n      intent:action?.intent==='delete'?'delete':'purchase',\n      createdAt:Number(action.createdAt)||Date.now()",
-              app,
-              count=1,
-          )
-          if count != 1:
-              raise SystemExit('sanitizeOfflinePending introuvable')
+          p=Path('index.html')
+          x=p.read_text(encoding='utf-8')
+          for pat,rep,label in [(r"styles\.css\?v=\d+","styles.css?v=336",'styles'),(r"catalog\.js\?v=\d+","catalog.js?v=336",'catalog'),(r"app\.js\?v=\d+","app.js?v=336",'app')]:
+              x,n=re.subn(pat,rep,x,count=1)
+              if n!=1: raise SystemExit('index '+label)
+          x,n=re.subn(r'(<span class="page-version">)v\d+',r'\1v336',x)
+          if n!=3: raise SystemExit(f'badges {n}')
+          p.write_text(x,encoding='utf-8')
 
-          app, count = re.subn(
-              r"async function queueOfflineCompletion\(name,uids\)\{",
-              "async function queueOfflineCompletion(name,uids,intent='purchase') {",
-              app,
-              count=1,
-          )
-          if count != 1:
-              raise SystemExit('queueOfflineCompletion introuvable')
+          p=Path('sw.js')
+          x=p.read_text(encoding='utf-8')
+          x,n=re.subn(r"const CACHE='courses-app-v\d+-r1';","const CACHE='courses-app-v336-r1';",x,count=1)
+          if n!=1: raise SystemExit('sw cache')
+          m=re.search(r"const SHELL=\[(.*?)\];",x,re.S)
+          if not m: raise SystemExit('sw shell')
+          body=m.group(1)
+          for e in ("'./styles.css?v=336'","'./catalog.js?v=336'","'./app.js?v=336'","'./dish-local-images.js?v=336'"):
+              if e not in body: body+=','+e
+          x=x[:m.start(1)]+body+x[m.end(1):]
+          p.write_text(x,encoding='utf-8')
 
-          app, count = re.subn(
-              r"name:String\(name\|\|''\)\.trim\(\)\.slice\(0,80\),\n    createdAt:Date\.now\(\)",
-              "name:String(name||'').trim().slice(0,80),\n    intent:intent==='delete'?'delete':'purchase',\n    createdAt:Date.now()",
-              app,
-              count=1,
-          )
-          if count != 1:
-              raise SystemExit('Action offline introuvable')
+          p=Path('tests/preference-popups.test.mjs')
+          x=p.read_text(encoding='utf-8')
+          pat=re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$",re.S)
+          rep="test('la version visible passe à v336 et les ressources Ma liste sont rechargées',()=>{\n  const index=read('index.html');\n  const catalog=read('catalog.js');\n  const sw=read('sw.js');\n  const localImages=read('dish-local-images.js');\n  assert.match(index,/styles\\.css\\?v=336/);\n  assert.match(index,/catalog\\.js\\?v=336/);\n  assert.match(index,/app\\.js\\?v=336/);\n  assert.match(index,/settings-tab-badge\\.js\\?v=335/);\n  assert.equal((index.match(/page-version\\\">v336/g)||[]).length,3);\n  assert.match(catalog,/dish-local-images\\.js\\?v=336/);\n  assert.match(sw,/courses-app-v336-r1/);\n  assert.match(sw,/styles\\.css\\?v=336/);\n  assert.match(sw,/catalog\\.js\\?v=336/);\n  assert.match(sw,/app\\.js\\?v=336/);\n  assert.match(sw,/dish-local-images\\.js\\?v=336/);\n  assert.match(localImages,/const APP_VERSION='v336'/);\n});"
+          x,n=pat.subn(lambda _:rep,x,count=1)
+          if n!=1: raise SystemExit('version test')
+          p.write_text(x,encoding='utf-8')
 
-          wrapper_pattern = re.compile(
-              r"const onlineRemoveGroup=removeGroup;\nremoveGroup=async function\(name,row=null\)\{.*?\n\};\nconst onlineWipeMemoryCredentials=wipeMemoryCredentials;",
-              re.S,
-          )
-          wrapper_replacement = r'''const onlineRemoveGroup=removeGroup;
-removeGroup=async function(name,row=null,intent='purchase'){
-  const item=String(name||'').trim();
-  if(!item)return;
-  if(state.demo)return onlineRemoveGroup(name,row,intent);
-  const key=norm(item);
-  const isPurchase=intent!=='delete';
-  if(state.productBusy.has(key))return;
-  const group=activeGroups().find(entry=>norm(entry.summary)===key);
-  if(!group)return;
-
-  state.productBusy.add(key);
-  let undoToken=null;
-  if(row&&isPurchase){
-    undoToken={cancelled:false};
-    state.purchaseUndo.set(key,undoToken);
-    row.classList.add('is-purchased','is-busy');
-    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
-    const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=false;
-    navigator.vibrate?.(8);
-    await new Promise(resolve=>setTimeout(resolve,PURCHASE_HOLD_MS));
-    if(undoToken.cancelled)return;
-    row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,PURCHASE_EXIT_MS));
-    if(undoToken.cancelled)return;
-    state.purchaseUndo.delete(key);
-  }else if(row){
-    row.classList.add('is-deleting','is-busy');
-    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
-    const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
-    navigator.vibrate?.(7);
-    await new Promise(resolve=>setTimeout(resolve,180));
-    row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,180));
-  }
-
-  state.pendingRemoval.add(key);
-  const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
-  const previousItems=state.items;
-  state.items=state.items.filter(keepOtherItems);
-  removeRenderedListRow(row);
-  let queuedOffline=false;
-  const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';
-
-  try{
-    if(!state.entity)throw new Error('Liste Home Assistant indisponible');
-    const uids=group.uids.filter(Boolean);
-    if(!uids.length)throw new Error('Identifiant de l’article indisponible');
-    if(!socketReady()){
-      await queueOfflineCompletion(item,uids,intent);
-      queuedOffline=true;
-      toast(successMessage);
-      return;
-    }
-    try{
-      await Promise.all(uids.map(completeTodoItem));
-      toast(successMessage);
-    }catch(error){
-      if(!isTransientHaError(error))throw error;
-      await queueOfflineCompletion(item,uids,intent);
-      queuedOffline=true;
-      toast(successMessage);
-    }
-  }catch(error){
-    if(!queuedOffline&&!socketReady()){
-      state.items=previousItems;
-      renderSelectionAndList();
-    }
-    toast('Suppression impossible');
-    status('is-error','Erreur',error.message||'Suppression impossible');
-  }finally{
-    state.purchaseUndo.delete(key);
-    state.pendingRemoval.delete(key);
-    state.productBusy.delete(key);
-    if(queuedOffline){
-      syncProductSelection();
-      showOfflineStatus();
-    }else if(socketReady()){
-      await refreshItems();
-    }else if(state.offlineLoaded){
-      showOfflineStatus();
-    }
-  }
-};
-const onlineWipeMemoryCredentials=wipeMemoryCredentials;'''
-          app, count = wrapper_pattern.subn(lambda _: wrapper_replacement, app, count=1)
-          if count != 1:
-              raise SystemExit('removeGroup offline introuvable ou ambigu')
-
-          app_path.write_text(app, encoding='utf-8')
-
-          styles_path = Path('styles.css')
-          styles = styles_path.read_text(encoding='utf-8')
-          if '.list-row.is-deleting{' in styles:
-              raise SystemExit('Styles suppression déjà présents')
-          styles += r'''
-
-/* v336 — Ma liste : suppression distincte d'un achat */
-.list-row.is-deleting{
-  background:linear-gradient(90deg,#fff0f1 0%,#fff8f7 100%)!important;
-  box-shadow:0 8px 22px rgba(203,66,75,.10)!important;
-}
-.list-row.is-deleting .purchase-check{
-  background:transparent!important;
-  box-shadow:none!important;
-}
-.list-row.is-deleting .purchase-check::before{
-  border-color:#e06a70!important;
-  background:rgba(224,106,112,.08)!important;
-  box-shadow:none!important;
-}
-.list-row.is-deleting .list-name{
-  color:#a73b42!important;
-  text-decoration:none!important;
-  opacity:.88;
-}
-.list-row.is-deleting .list-qty{
-  background:#ffe7e9!important;
-  color:#be3f48!important;
-}
-.list-row.is-deleting .undo-purchase{display:none!important}
-.list-row.is-deleting .list-row-more{
-  font-size:0!important;
-  color:transparent!important;
-  opacity:1!important;
-  background:center/20px 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23df3f49' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9 7V4h6v3'/%3E%3Cpath d='m6.5 7 .8 13h9.4l.8-13'/%3E%3Cpath d='M10 11v5M14 11v5'/%3E%3C/svg%3E")!important;
-}
-'''
-          styles_path.write_text(styles, encoding='utf-8')
-
-          local_path = Path('dish-local-images.js')
-          local = local_path.read_text(encoding='utf-8')
-          match = re.search(r"const APP_VERSION='v(\d+)'", local)
-          if not match or int(match.group(1)) != 335:
-              raise SystemExit('Version source inattendue')
-          local = re.sub(r"const APP_VERSION='v\d+'", f"const APP_VERSION='{version}'", local, count=1)
-          local_path.write_text(local, encoding='utf-8')
-
-          catalog_path = Path('catalog.js')
-          catalog = catalog_path.read_text(encoding='utf-8')
-          catalog, count = re.subn(r"dish-local-images\.js\?v=\d+", f'dish-local-images.js?v={next_version}', catalog, count=1)
-          if count != 1:
-              raise SystemExit('Version dish-local-images introuvable dans catalog.js')
-          catalog_path.write_text(catalog, encoding='utf-8')
-
-          index_path = Path('index.html')
-          index = index_path.read_text(encoding='utf-8')
-          index, styles_count = re.subn(r"styles\.css\?v=\d+", f'styles.css?v={next_version}', index, count=1)
-          index, catalog_count = re.subn(r"catalog\.js\?v=\d+", f'catalog.js?v={next_version}', index, count=1)
-          index, app_count = re.subn(r"app\.js\?v=\d+", f'app.js?v={next_version}', index, count=1)
-          index, badge_count = re.subn(r'(<span class="page-version">)v\d+', rf'\1{version}', index)
-          if styles_count != 1 or catalog_count != 1 or app_count != 1 or badge_count != 3:
-              raise SystemExit(f'Versionnement index inattendu: styles={styles_count}, catalog={catalog_count}, app={app_count}, badges={badge_count}')
-          index_path.write_text(index, encoding='utf-8')
-
-          sw_path = Path('sw.js')
-          sw = sw_path.read_text(encoding='utf-8')
-          sw, cache_count = re.subn(r"const CACHE='courses-app-v\d+-r1';", f"const CACHE='courses-app-v{next_version}-r1';", sw, count=1)
-          if cache_count != 1:
-              raise SystemExit('CACHE introuvable dans sw.js')
-          shell = re.search(r"const SHELL=\[(.*?)\];", sw, re.S)
-          if not shell:
-              raise SystemExit('SHELL introuvable dans sw.js')
-          shell_body = shell.group(1)
-          for entry in (f"'./styles.css?v={next_version}'", f"'./catalog.js?v={next_version}'", f"'./app.js?v={next_version}'", f"'./dish-local-images.js?v={next_version}'"):
-              if entry not in shell_body:
-                  shell_body += ',' + entry
-          sw = sw[:shell.start(1)] + shell_body + sw[shell.end(1):]
-          sw_path.write_text(sw, encoding='utf-8')
-
-          pref_path = Path('tests/preference-popups.test.mjs')
-          pref = pref_path.read_text(encoding='utf-8')
-          version_test = re.compile(r"test\('la version visible passe à v\d+.*?\n\}\);\s*$", re.S)
-          replacement = f'''test('la version visible passe à {version} et les ressources Ma liste sont rechargées',()=>{{
-  const index=read('index.html');
-  const catalog=read('catalog.js');
-  const sw=read('sw.js');
-  const localImages=read('dish-local-images.js');
-  assert.match(index,/styles\\.css\\?v={next_version}/);
-  assert.match(index,/catalog\\.js\\?v={next_version}/);
-  assert.match(index,/app\\.js\\?v={next_version}/);
-  assert.match(index,/settings-tab-badge\\.js\\?v=335/);
-  assert.equal((index.match(/page-version\\\">{version}/g)||[]).length,3);
-  assert.match(catalog,/dish-local-images\\.js\\?v={next_version}/);
-  assert.match(sw,/courses-app-v{next_version}-r1/);
-  assert.match(sw,/styles\\.css\\?v={next_version}/);
-  assert.match(sw,/catalog\\.js\\?v={next_version}/);
-  assert.match(sw,/app\\.js\\?v={next_version}/);
-  assert.match(sw,/dish-local-images\\.js\\?v={next_version}/);
-  assert.match(localImages,/const APP_VERSION='{version}'/);
-}});'''
-          pref, count = version_test.subn(lambda _: replacement, pref, count=1)
-          if count != 1:
-              raise SystemExit('Test version introuvable')
-          pref_path.write_text(pref, encoding='utf-8')
-
-          Path('tests/list-removal-intent.test.mjs').write_text(r'''import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import test from 'node:test';
-
-const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
-const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
-
-test('achat et suppression utilisent des intentions distinctes',()=>{
-  assert.match(app,/removeGroup\(button\.dataset\.name\|\|'',row,'purchase'\)/);
-  assert.match(app,/removeGroup\(name,row,'delete'\)/);
-  assert.match(app,/async function removeGroup\(name,row=null,intent='purchase'\)/);
-  assert.match(app,/removeGroup=async function\(name,row=null,intent='purchase'\)/);
-  assert.match(app,/const isPurchase=intent!=='delete'/);
-  assert.match(app,/successMessage=isPurchase\?item\+' acheté':item\+' supprimé de Ma liste'/);
-});
-
-test('la suppression a son propre effet visuel sans état acheté',()=>{
-  assert.match(app,/row\.classList\.add\('is-deleting','is-busy'\)/);
-  assert.match(styles,/\.list-row\.is-deleting\{/);
-  assert.match(styles,/\.list-row\.is-deleting \.purchase-check::before\{/);
-  assert.match(styles,/\.list-row\.is-deleting \.list-row-more\{/);
-});
-
-test('le mode hors ligne conserve aussi la nature suppression ou achat',()=>{
-  assert.match(app,/async function queueOfflineCompletion\(name,uids,intent='purchase'\)/);
-  assert.match(app,/intent:intent==='delete'\?'delete':'purchase'/);
-  assert.match(app,/action\.intent==='delete'/);
-  assert.match(app,/suppression'\+\(pending>1\?'s':''\)\+' à synchroniser'/);
-});
-''', encoding='utf-8')
+          Path('tests/list-removal-intent.test.mjs').write_text("import assert from 'node:assert/strict';\nimport {readFileSync} from 'node:fs';\nimport test from 'node:test';\nconst app=readFileSync(new URL('../app.js',import.meta.url),'utf8');\nconst styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');\ntest('achat et suppression utilisent des intentions distinctes',()=>{\n  assert.match(app,/removeGroup\\(button\\.dataset\\.name\\|\\|'',row,'purchase'\\)/);\n  assert.match(app,/removeGroup\\(name,row,'delete'\\)/);\n  assert.match(app,/async function removeGroup\\(name,row=null,intent='purchase'\\)/);\n  assert.match(app,/removeGroup=async function\\(name,row=null,intent='purchase'\\)/);\n  assert.match(app,/successMessage=isPurchase\\?item\\+' acheté':item\\+' supprimé de Ma liste'/);\n});\ntest('la suppression a son propre effet visuel sans état acheté',()=>{\n  assert.match(app,/row\\.classList\\.add\\('is-deleting','is-busy'\\)/);\n  assert.match(styles,/\\.list-row\\.is-deleting\\{/);\n  assert.match(styles,/\\.list-row\\.is-deleting \\.purchase-check::before\\{/);\n  assert.match(styles,/\\.list-row\\.is-deleting \\.list-row-more\\{/);\n});\n",encoding='utf-8')
 
       - name: Run tests
         run: node --test tests/*.test.mjs
@@ -419,8 +144,7 @@ test('le mode hors ligne conserve aussi la nature suppression ou achat',()=>{
           grep -q "supprimé de Ma liste" app.js
           grep -q "\.list-row.is-deleting" styles.css
           grep -q "const APP_VERSION='v336'" dish-local-images.js
-          grep -q 'page-version">v336' index.html
-          test "$(grep -o 'page-version">v336' index.html | wc -l | tr -d ' ')" = "3"
+          test "$(grep -o 'page-version\">v336' index.html | wc -l | tr -d ' ')" = "3"
           grep -q "courses-app-v336-r1" sw.js
           git diff --check
 
