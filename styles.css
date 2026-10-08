@@ -4226,7 +4226,7 @@ body{
 /* ===== UI v344 — feedback dans les dialogues ===== */
 .dialog-feedback,.courses-openai-feedback{
   min-height:18px;margin:8px 0 0;padding:8px 10px;border-radius:12px;box-sizing:border-box;
-  background:#edf8f0;color:#157545;font-size:12px;line-height:1.35;font-weight:720;text-align:center;
+  background:#edf8f0;color:#157545;font-size:12px;line-height:1.35;font-weight:720;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
   opacity:0;transform:translateY(3px);transition:opacity .16s ease,transform .16s ease;pointer-events:none
 }
 .dialog-feedback:empty,.courses-openai-feedback:empty{display:none}
