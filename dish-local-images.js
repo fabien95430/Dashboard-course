@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v354';
+const APP_VERSION='v355';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -293,7 +293,7 @@ function installMissingProductsFixes(){
   }
   if(!document.querySelector('script[data-missing-products-popup-ui]')){
     const script=document.createElement('script');
-    script.src='./missing-products-popup-ui.js?v=16';
+    script.src='./missing-products-popup-ui.js?v=17';
     script.defer=true;
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);

@@ -165,17 +165,28 @@ test('les demandes manquantes affichent catégorie et statut compact sur la mêm
   assert.ok(popup.includes('small:not(.missing-dish-error):not(.missing-dish-progress)'));
 });
 
-test('la version visible passe à v354 et la file OpenAI renforcée est rechargée',()=>{
+test('le popup produits et plats manquants prend le focus sans ouvrir le clavier et peut toujours se fermer',()=>{
+  const index=read('index.html');
+  const popup=read('missing-products-popup-ui.js');
+  assert.match(index,/<dialog id="missingProductsDialog" class="dialog" tabindex="-1" autofocus>/);
+  assert.match(popup,/function ensureCloseButton\(dialog\)/);
+  assert.match(popup,/button\.className='missing-products-close'/);
+  assert.match(popup,/button\.setAttribute\('aria-label','Fermer'\)/);
+  assert.match(popup,/button\.addEventListener\('click',[\s\S]*?closePopup\(dialog\)/);
+  assert.match(popup,/dialog\.addEventListener\('cancel',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?closePopup\(dialog\)/);
+});
+
+test('la version visible passe à v355 et le popup des demandes est rechargé',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=354/);
+  assert.match(index,/catalog\.js\?v=355/);
   assert.match(index,/app\.js\?v=352/);
   assert.match(index,/settings-tab-badge\.js\?v=352/);
-  assert.equal((index.match(/page-version\">v354/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v355/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=344/);
-  assert.match(catalog,/dish-local-images\.js\?v=354/);
+  assert.match(catalog,/dish-local-images\.js\?v=355/);
   assert.match(settings,/missing-products-dishes\.js\?v=8/);
-  assert.match(sw,/courses-app-v354-r1/);
+  assert.match(sw,/courses-app-v355-r1/);
   assert.match(sw,/styles\.css\?v=348/);
   assert.match(sw,/catalog\.js\?v=352/);
   assert.match(sw,/app\.js\?v=352/);
@@ -187,7 +198,10 @@ test('la version visible passe à v354 et la file OpenAI renforcée est recharg�
   assert.match(sw,/dish-local-images\.js\?v=353/);
   assert.match(sw,/catalog\.js\?v=354/);
   assert.match(sw,/dish-local-images\.js\?v=354/);
-  assert.match(localImages,/const APP_VERSION='v354'/);
+  assert.match(sw,/catalog\.js\?v=355/);
+  assert.match(sw,/missing-products-popup-ui\.js\?v=17/);
+  assert.match(sw,/dish-local-images\.js\?v=355/);
+  assert.match(localImages,/const APP_VERSION='v355'/);
   assert.match(localImages,/missing-products-fixes\.js\?v=18/);
-  assert.match(localImages,/missing-products-popup-ui\.js\?v=16/);
+  assert.match(localImages,/missing-products-popup-ui\.js\?v=17/);
 });
