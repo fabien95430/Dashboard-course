@@ -555,7 +555,7 @@ function syncListEmptyState(root){
   empty.dataset.emptyDesign=design;
   empty.innerHTML=`
     <div class="list-empty-visual" aria-hidden="true">
-      <img src="./www/empty-list-premium-v4.webp?v=305" alt="" loading="lazy" decoding="async" fetchpriority="low" draggable="false">
+      <img src="./www/empty-list-premium-v4.webp?v=305" alt="" loading="eager" decoding="sync" fetchpriority="high" draggable="false">
     </div>
     <div class="list-empty-copy">
       <strong>Votre liste est prête</strong>
