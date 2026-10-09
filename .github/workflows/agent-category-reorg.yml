@@ -1,0 +1,341 @@
+name: Agent category reorg v372
+
+on:
+  push:
+    branches:
+      - agent/category-reorg-v372
+
+permissions:
+  contents: write
+
+jobs:
+  reorg:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/category-reorg-v372
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Réorganiser le catalogue
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import html
+          import json
+          import re
+          import unicodedata
+
+          VERSION=372
+          ROOT=Path('.')
+
+          def norm(value):
+              value=str(value or '').lower().replace('œ','oe')
+              value=''.join(c for c in unicodedata.normalize('NFD',value) if unicodedata.category(c)!='Mn')
+              value=re.sub(r'[^a-z0-9]+',' ',value).strip()
+              return value
+
+          def sorted_names(values):
+              out=[]
+              seen=set()
+              for value in values:
+                  key=norm(value)
+                  if key in seen:
+                      continue
+                  seen.add(key)
+                  out.append(value)
+              return sorted(out,key=norm)
+
+          catalog_path=ROOT/'catalog.js'
+          catalog=catalog_path.read_text(encoding='utf-8')
+          groups_match=re.search(r'groups:\s*(\{.*?\}),\s*\n\s*meta:',catalog,flags=re.S)
+          if not groups_match:
+              raise SystemExit('groups introuvable dans catalog.js')
+          old_groups=json.loads(groups_match.group(1))
+          if 'atlasGroups:' in catalog:
+              raise SystemExit('atlasGroups existe déjà')
+
+          def group(category,subgroup):
+              return list(old_groups[category][subgroup])
+          def without(values,*removed):
+              removed_keys={norm(value) for value in removed}
+              return [value for value in values if norm(value) not in removed_keys]
+          def only(values,*selected):
+              wanted={norm(value) for value in selected}
+              return [value for value in values if norm(value) in wanted]
+
+          fish_traiteur=group('Frais','Poissons & traiteur')
+          frozen=group('Frais','Surgelés')
+          preserves=group('Épicerie','Conserves')
+          world=group('Épicerie','Monde & pratique')
+
+          new_groups={
+              'Fruits & Légumes':{
+                  key:sorted_names(values) for key,values in old_groups['Fruits & Légumes'].items()
+              },
+              'Viandes & poissons':{
+                  'Charcuterie':sorted_names(group('Frais','Charcuterie')),
+                  'Viandes':sorted_names(group('Frais','Viandes')),
+                  'Poissons & traiteur':sorted_names(without(fish_traiteur,'Quiche','Pizza fraîche','Pâtes fraîches')),
+                  'Conserves':sorted_names(only(preserves,'Thon en boîte','Sardines','Maquereaux')),
+                  'Surgelés':sorted_names(only(frozen,'Poisson surgelé','Steaks hachés surgelés')),
+              },
+              'Frais':{
+                  'Laits & crèmes':sorted_names(group('Frais','Laits & crèmes')),
+                  'Yaourts & desserts':sorted_names(group('Frais','Yaourts & desserts')),
+                  'Fromages':sorted_names(group('Frais','Fromages')),
+                  'Traiteur frais':sorted_names(only(fish_traiteur,'Quiche','Pizza fraîche','Pâtes fraîches')),
+              },
+              'Boulangerie':{
+                  'Boulangerie':sorted_names(group('Frais','Boulangerie')),
+                  'Pâtes à tarte':sorted_names(group('Frais','Pâtes à tarte')),
+              },
+              'Petit-déjeuner':{
+                  'Petit-déjeuner':sorted_names(group('Épicerie','Petit-déjeuner')),
+                  'Café & thé':sorted_names(group('Boissons','Café & thé')),
+              },
+              'Cuisine':{
+                  'Pâtes, riz & céréales':sorted_names(group('Épicerie','Pâtes, riz & céréales')),
+                  'Conserves':sorted_names(without(preserves,'Thon en boîte','Sardines','Maquereaux')),
+                  'Sauces & condiments':sorted_names(group('Épicerie','Sauces & condiments')),
+                  'Pâtisserie & cuisine':sorted_names(group('Épicerie','Pâtisserie & cuisine')),
+                  'Monde & pratique':sorted_names(without(world,'Tortillas')),
+                  'Surgelés':sorted_names(only(frozen,'Frites surgelées','Légumes surgelés','Haricots verts surgelés','Petits pois surgelés','Poêlée de légumes','Pizza surgelée')),
+              },
+              'Boissons':{
+                  'Eaux & jus':sorted_names(group('Boissons','Eaux & jus')),
+                  'Sodas & sirops':sorted_names(group('Boissons','Sodas & sirops')),
+                  'Bières & vins':sorted_names(group('Boissons','Bières & vins')),
+                  'Surgelés':sorted_names(only(frozen,'Glaçons')),
+              },
+              'Apéritif & snacks':{
+                  'Apéritif':sorted_names(group('Épicerie','Apéritif')),
+                  'Biscuits & goûters':sorted_names(group('Épicerie','Biscuits & goûters')),
+                  'Surgelés':sorted_names(only(frozen,'Glace vanille','Glace chocolat','Sorbet')),
+              },
+              'Maison':{
+                  'Entretien':sorted_names(group('Maison','Entretien')),
+                  'Lessive':sorted_names(group('Maison','Lessive')),
+                  'Vaisselle':sorted_names(group('Maison','Vaisselle')),
+                  'Papier & sacs':sorted_names(group('Maison','Papier & sacs')),
+                  'Équipement':sorted_names(group('Maison','Équipement')),
+              },
+              'Hygiène & soins':{
+                  'Hygiène':sorted_names(group('Maison','Hygiène')),
+                  'Salle de bain & soins':sorted_names(group('Maison','Salle de bain & soins')),
+              },
+              'Enfant':{
+                  key:sorted_names(values) for key,values in old_groups['Enfant'].items()
+              },
+          }
+
+          old_names={norm(name):name for subs in old_groups.values() for names in subs.values() for name in names}
+          logical=[]
+          for subs in new_groups.values():
+              for names in subs.values():
+                  logical.extend(names)
+          logical_keys=[norm(name) for name in logical]
+          if len(logical_keys)!=len(set(logical_keys)):
+              duplicates=sorted({key for key in logical_keys if logical_keys.count(key)>1})
+              raise SystemExit(f'doublons dans le nouveau catalogue: {duplicates}')
+          if set(logical_keys)!=set(old_names):
+              missing=sorted(set(old_names)-set(logical_keys))
+              extra=sorted(set(logical_keys)-set(old_names))
+              raise SystemExit(f'écart produits; manquants={missing}; extras={extra}')
+
+          encoded_new=json.dumps(new_groups,ensure_ascii=False,separators=(',',':'))
+          encoded_atlas=json.dumps(old_groups,ensure_ascii=False,separators=(',',':'))
+          catalog=catalog[:groups_match.start(1)]+encoded_new+catalog[groups_match.end(1):]
+          meta_anchor=re.search(r'(\n\s*meta:\s*\{.*?\},\s*\n)(\s*favorites:)',catalog,flags=re.S)
+          if not meta_anchor:
+              raise SystemExit('meta/favorites introuvables')
+          catalog=catalog[:meta_anchor.end(1)]+f'    atlasGroups: {encoded_atlas},\n'+catalog[meta_anchor.start(2):]
+          catalog=re.sub(r'(dish-local-images\.js\?v=)\d+',rf'\g<1>{VERSION}',catalog,count=1)
+          catalog_path.write_text(catalog,encoding='utf-8')
+
+          app_path=ROOT/'app.js'
+          app=app_path.read_text(encoding='utf-8')
+          app=app.replace('const GROUPS = CATALOG.groups;\nconst META = CATALOG.meta;', 'const GROUPS = CATALOG.groups;\nconst ATLAS_GROUPS = CATALOG.atlasGroups || GROUPS;\nconst META = CATALOG.meta;',1)
+          category_block="""const CATEGORY_META = {
+            'Toutes': { label:'Tous' },
+            'Apéritif & snacks': { label:'Apéritif & snacks' },
+            'Boissons': { label:'Boissons' },
+            'Boulangerie': { label:'Boulangerie' },
+            'Cuisine': { label:'Cuisine' },
+            'Enfant': { label:'Enfant' },
+            'Frais': { label:'Frais' },
+            'Fruits & Légumes': { label:'Fruits & légumes' },
+            'Hygiène & soins': { label:'Hygiène & soins' },
+            'Maison': { label:'Maison' },
+            'Petit-déjeuner': { label:'Petit-déjeuner' },
+            'Viandes & poissons': { label:'Viandes & poissons' },
+            'Favoris': { label:'Favoris' }
+          };
+          const CATALOG_CATEGORY_ORDER=['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'];
+          const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons']);"""
+          app,count=re.subn(r"const CATEGORY_META = \{.*?const MISSING_PRODUCT_CATEGORIES=Object\.freeze\(\[.*?\]\);",category_block,app,count=1,flags=re.S)
+          if count!=1:
+              raise SystemExit('bloc catégories app.js introuvable')
+          old_positions="Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));"
+          new_positions="Object.entries(ATLAS_GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));"
+          if old_positions not in app:
+              raise SystemExit('construction POSITIONS introuvable')
+          app=app.replace(old_positions,new_positions,1)
+          app=app.replace("return category==='Frais'?'Produits frais':(CATEGORY_META[category]?.label||category);","return CATEGORY_META[category]?.label||category;",1)
+          app_path.write_text(app,encoding='utf-8')
+
+          items_path=ROOT/'product-item-images.js'
+          items=items_path.read_text(encoding='utf-8')
+          items,count=re.subn(
+              r"const CATEGORIES=\[.*?\];\nconst PRODUCT_NAMES=new Set\(CATEGORIES\.flatMap\(category=>\{\n  const groups=window\.COURSES_CATALOG\?\.groups\?\.\[category\]\|\|\{\};\n  return Object\.values\(groups\)\.flatMap\(names=>Array\.isArray\(names\)\?names:\[\]\);\n\}\)\);",
+              "const PRODUCT_NAMES=new Set(Object.values(window.COURSES_CATALOG?.groups||{}).flatMap(groups=>\n  Object.values(groups||{}).flatMap(names=>Array.isArray(names)?names:[])\n));",
+              items,count=1,flags=re.S
+          )
+          if count!=1:
+              raise SystemExit('liste catégories product-item-images.js introuvable')
+          items_path.write_text(items,encoding='utf-8')
+
+          quantities_path=ROOT/'catalog-quantities.js'
+          quantities=quantities_path.read_text(encoding='utf-8')
+          quantities=quantities.replace("  'Poissons & traiteur':'Poids',\n  'Surgelés':'Sachet',","  'Poissons & traiteur':'Poids',\n  'Traiteur frais':'Pièce',\n  'Surgelés':'Sachet',",1)
+          quantities=quantities.replace("  'Poissons & traiteur':'Poids',\n  'Surgelés':'Sachet',","  'Poissons & traiteur':'Poids',\n  'Traiteur frais':'Pièce',\n  'Surgelés':'Sachet',",1)
+          if quantities.count("'Traiteur frais':'Pièce'")!=2:
+              raise SystemExit('modes Traiteur frais non ajoutés')
+          quantities_path.write_text(quantities,encoding='utf-8')
+
+          intelligence_path=ROOT/'purchase-intelligence.js'
+          intelligence=intelligence_path.read_text(encoding='utf-8')
+          new_category="""const CATEGORY=Object.freeze({
+            'Viandes & poissons':{days:3,factor:.5,shelf:5},
+            'Frais':{days:7,factor:.6,shelf:12},
+            'Fruits & Légumes':{days:7,factor:.62,shelf:14},
+            'Boulangerie':{days:4,factor:.55,shelf:7},
+            'Petit-déjeuner':{days:30,factor:.82},
+            'Cuisine':{days:30,factor:.8},
+            'Boissons':{days:14,factor:.8},
+            'Apéritif & snacks':{days:18,factor:.72},
+            'Maison':{days:45,factor:.86},
+            'Hygiène & soins':{days:45,factor:.86},
+            'Enfant':{days:14,factor:.78}
+          });"""
+          intelligence,count=re.subn(r'const CATEGORY=Object\.freeze\(\{.*?\n\}\);',new_category,intelligence,count=1,flags=re.S)
+          if count!=1:
+              raise SystemExit('CATEGORY purchase-intelligence introuvable')
+          intelligence=intelligence.replace("  'Viandes':{days:2,factor:.5,shelf:3},'Poissons & traiteur':{days:2,factor:.5,shelf:3},","  'Viandes':{days:2,factor:.5,shelf:3},'Poissons & traiteur':{days:2,factor:.5,shelf:3},'Traiteur frais':{days:4,factor:.55,shelf:7},",1)
+          intelligence_path.write_text(intelligence,encoding='utf-8')
+
+          index_path=ROOT/'index.html'
+          index=index_path.read_text(encoding='utf-8')
+          labels=['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons']
+          buttons=['        <div class="list-filter-section list-filter-categories" role="radiogroup" aria-label="Filtrer par catégorie">','          <strong class="list-filter-title">Filtrer par catégorie</strong>']
+          for label in labels:
+              escaped=html.escape(label,quote=True)
+              buttons.extend([
+                  f'          <button class="list-filter-option" type="button" data-list-category="{escaped}" role="radio">',
+                  f'            <span>{escaped}</span><i aria-hidden="true"></i>',
+                  '          </button>'
+              ])
+          buttons.append('        </div>')
+          replacement='\n'.join(buttons)
+          index,count=re.subn(r'        <div class="list-filter-section list-filter-categories" role="radiogroup" aria-label="Filtrer par catégorie">.*?        </div>',replacement,index,count=1,flags=re.S)
+          if count!=1:
+              raise SystemExit('filtres catégories index introuvables')
+          index,count=re.subn(r'(<span class="page-version">)v\d+(</span>)',rf'\g<1>v{VERSION}\g<2>',index)
+          if count!=3:
+              raise SystemExit(f'{count} badges version trouvés au lieu de 3')
+          index=re.sub(r'(catalog\.js\?v=)\d+',rf'\g<1>{VERSION}',index,count=1)
+          index=re.sub(r'(app\.js\?v=)\d+',rf'\g<1>{VERSION}',index,count=1)
+          index_path.write_text(index,encoding='utf-8')
+
+          local_path=ROOT/'dish-local-images.js'
+          local=local_path.read_text(encoding='utf-8')
+          local,count=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='v{VERSION}'",local,count=1)
+          if count!=1:
+              raise SystemExit('APP_VERSION introuvable')
+          local=re.sub(r'(product-item-images\.js\?v=)\d+',rf'\g<1>{VERSION}',local,count=1)
+          local=re.sub(r'(purchase-intelligence\.js\?v=)\d+',rf'\g<1>{VERSION}',local,count=1)
+          local_path.write_text(local,encoding='utf-8')
+
+          sw_path=ROOT/'sw.js'
+          sw=sw_path.read_text(encoding='utf-8')
+          sw,count=re.subn(r"const CACHE='courses-app-v\d+-r\d+'",f"const CACHE='courses-app-v{VERSION}-r1'",sw,count=1)
+          if count!=1:
+              raise SystemExit('CACHE sw introuvable')
+          shell_match=re.search(r'(const SHELL=\[)(.*?)(\];)',sw,flags=re.S)
+          if not shell_match:
+              raise SystemExit('SHELL sw introuvable')
+          body=shell_match.group(2)
+          for asset in [f'./catalog.js?v={VERSION}',f'./app.js?v={VERSION}',f'./dish-local-images.js?v={VERSION}',f'./product-item-images.js?v={VERSION}',f'./purchase-intelligence.js?v={VERSION}',f'./catalog-quantities.js?v={VERSION}']:
+              quoted=json.dumps(asset,ensure_ascii=False)
+              if quoted not in body and ("'"+asset+"'") not in body:
+                  body=body.rstrip()+(',' if body.rstrip() else '')+quoted
+          sw=sw[:shell_match.start()]+shell_match.group(1)+body+shell_match.group(3)+sw[shell_match.end():]
+          sw_path.write_text(sw,encoding='utf-8')
+
+          tests_path=ROOT/'tests/catalog-ordering.test.mjs'
+          tests=tests_path.read_text(encoding='utf-8')
+          tests=tests.replace("const CATALOG_CATEGORY_ORDER=\\['Toutes','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Maison','Favoris'\\]","const CATALOG_CATEGORY_ORDER=\\['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'\\]",1)
+          tests=tests.replace("const MISSING_PRODUCT_CATEGORIES=Object\\.freeze\\(\\['','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Maison'\\]\\)","const MISSING_PRODUCT_CATEGORIES=Object\\.freeze\\(\\['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons'\\]\\)",1)
+          extra=r'''
+
+test('les catégories logiques sont découplées des anciennes positions d atlas',()=>{
+  const source=read('catalog.js');
+  const groupsMatch=source.match(/groups:\s*(\{.*?\}),\s*\n\s*meta:/s);
+  const atlasMatch=source.match(/atlasGroups:\s*(\{.*?\}),\s*\n\s*favorites:/s);
+  assert.ok(groupsMatch,'groups introuvable');
+  assert.ok(atlasMatch,'atlasGroups introuvable');
+  const groups=JSON.parse(groupsMatch[1]);
+  const atlas=JSON.parse(atlasMatch[1]);
+  assert.deepEqual(Object.keys(groups),['Fruits & Légumes','Viandes & poissons','Frais','Boulangerie','Petit-déjeuner','Cuisine','Boissons','Apéritif & snacks','Maison','Hygiène & soins','Enfant']);
+  const logical=new Map();
+  for(const [category,subs] of Object.entries(groups))for(const names of Object.values(subs))for(const name of names){
+    const key=norm(name);
+    assert.ok(!logical.has(key),`produit dupliqué: ${name}`);
+    logical.set(key,category);
+  }
+  for(const subs of Object.values(atlas))for(const names of Object.values(subs))for(const name of names){
+    assert.ok(logical.has(norm(name)),`produit atlas absent du catalogue logique: ${name}`);
+  }
+  assert.equal(logical.get(norm('Confiture fruits rouges')),'Petit-déjeuner');
+  assert.equal(logical.get(norm('Poulet')),'Viandes & poissons');
+  assert.equal(logical.get(norm('Shampoing')),'Hygiène & soins');
+  const app=read('app.js');
+  assert.match(app,/const ATLAS_GROUPS = CATALOG\.atlasGroups \|\| GROUPS;/);
+  assert.match(app,/Object\.entries\(ATLAS_GROUPS\).*?POSITIONS\.set/s);
+  const itemImages=read('product-item-images.js');
+  assert.doesNotMatch(itemImages,/const CATEGORIES=/);
+  assert.match(itemImages,/Object\.values\(window\.COURSES_CATALOG\?\.groups\|\|\{\}\)/);
+});
+'''
+          if 'catégories logiques sont découplées' not in tests:
+              tests+=extra
+          tests_path.write_text(tests,encoding='utf-8')
+
+          docs_path=ROOT/'docs/IMAGES_ITEMS.md'
+          if docs_path.exists():
+              docs=docs_path.read_text(encoding='utf-8')
+              docs=docs.replace('Les catégories Fruits & Légumes, Frais, Épicerie, Boissons et Maison utilisent les images unitaires.','Toutes les catégories logiques du catalogue utilisent les images unitaires. Les anciens atlas conservent leurs coordonnées via `atlasGroups`, séparément des catégories affichées.')
+              docs_path.write_text(docs,encoding='utf-8')
+          PY
+
+      - name: Vérifier les tests
+        run: node --test tests/*.test.mjs
+
+      - name: Publier le résultat sur la branche de travail
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/agent-category-reorg.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "v372: réorganise les catégories du catalogue"
+          git push origin HEAD:agent/category-reorg-v372
