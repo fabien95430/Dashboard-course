@@ -1,5 +1,5 @@
-name: Intégrer un produit ou plat via OpenAI
-run-name: OpenAI · ${{ github.event.client_payload.request_id }}
+name: Intégrer ou administrer le catalogue
+run-name: Courses · ${{ github.event.client_payload.request_id }}
 
 on:
   repository_dispatch:
@@ -21,7 +21,7 @@ jobs:
       DISH_NAME: ${{ github.event.client_payload.name }}
       DISH_CATEGORY: ${{ github.event.client_payload.category }}
       REQUEST_ID: ${{ github.event.client_payload.request_id }}
-      TEMP_BRANCH: openai/item-${{ github.run_id }}
+      TEMP_BRANCH: automation/item-${{ github.run_id }}
       PUSH_ENDPOINT: ${{ github.event.client_payload.push_endpoint }}
       PUSH_P256DH: ${{ github.event.client_payload.push_p256dh }}
       PUSH_AUTH: ${{ github.event.client_payload.push_auth }}
@@ -53,22 +53,32 @@ jobs:
         run: |
           import os
           raw=str(os.environ.get('DISH_NAME') or '').strip()
-          prefix='__courses_product__:'
-          item_type='product' if raw.startswith(prefix) else 'dish'
-          item_name=raw[len(prefix):].strip() if item_type=='product' else raw
+          product_prefix='__courses_product__:'
+          delete_prefix='__courses_delete_product__:'
+          if raw.startswith(delete_prefix):
+              item_type='delete_product'
+              item_name=raw[len(delete_prefix):].strip()
+          elif raw.startswith(product_prefix):
+              item_type='product'
+              item_name=raw[len(product_prefix):].strip()
+          else:
+              item_type='dish'
+              item_name=raw
           if not item_name:
               raise SystemExit('Nom de demande manquant')
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
               out.write(f"type={item_type}\n")
               out.write(f"name={item_name}\n")
 
-      - name: Générer et intégrer la demande
+      - name: Traiter la demande
         id: integrate
         continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
-          if [ "${{ steps.request.outputs.type }}" = "product" ]; then
+          if [ "${{ steps.request.outputs.type }}" = "delete_product" ]; then
+            python3 scripts/manage_product_catalog.py
+          elif [ "${{ steps.request.outputs.type }}" = "product" ]; then
             python3 scripts/integrate_product_openai.py
             python3 scripts/validate_generated_asset.py product
           else
@@ -89,7 +99,7 @@ jobs:
               try: data=json.loads(path.read_text(encoding='utf-8'))
               except Exception: pass
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
-              for key in ('ok','already_exists','version','filename','name','error'):
+              for key in ('ok','deleted','already_exists','version','filename','name','error'):
                   value=data.get(key,'')
                   if isinstance(value,bool):
                       value=str(value).lower()
@@ -99,7 +109,7 @@ jobs:
                       value=value[:1000]
                   out.write(f"{key}={value}\n")
 
-      - name: Sauvegarder la génération sur une branche temporaire
+      - name: Sauvegarder la modification sur une branche temporaire
         id: preserve
         if: steps.integrate.outcome == 'success' && steps.result.outputs.already_exists != 'true'
         shell: bash
@@ -108,18 +118,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$TEMP_BRANCH"
-          if [ "${{ steps.request.outputs.type }}" = "product" ]; then
+          if [ "${{ steps.request.outputs.type }}" = "delete_product" ]; then
+            git add -A catalog.js index.html dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
+            message="v${{ steps.result.outputs.version }}: supprime le produit ${{ steps.request.outputs.name }} du catalogue"
+          elif [ "${{ steps.request.outputs.type }}" = "product" ]; then
             git add catalog.js app.js catalog-quantities.js index.html product-item-images.js dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
-            label="produit"
+            message="v${{ steps.result.outputs.version }}: ajoute le produit ${{ steps.request.outputs.name }} via OpenAI"
           else
             git add dishes-ui.js dish-local-images.js sw.js "www/Plats/${{ steps.result.outputs.filename }}"
-            label="plat"
+            message="v${{ steps.result.outputs.version }}: ajoute le plat ${{ steps.request.outputs.name }} via OpenAI"
           fi
           git diff --cached --check
-          git commit -m "v${{ steps.result.outputs.version }}: ajoute le ${label} ${{ steps.request.outputs.name }} via OpenAI"
+          git commit -m "$message"
           git push -u origin HEAD:"$TEMP_BRANCH"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "Génération conservée sur $TEMP_BRANCH"
+          echo "Modification conservée sur $TEMP_BRANCH"
 
       - name: Rebaser et publier sur main
         id: commit
@@ -131,7 +144,7 @@ jobs:
             git fetch --depth=20 origin main
             if ! git rebase origin/main; then
               git rebase --abort || true
-              echo "Conflit avec main : la génération reste conservée sur $TEMP_BRANCH." >&2
+              echo "Conflit avec main : la modification reste conservée sur $TEMP_BRANCH." >&2
               exit 1
             fi
             git push --force-with-lease origin HEAD:"$TEMP_BRANCH"
@@ -141,7 +154,7 @@ jobs:
             fi
             echo "main a encore changé, nouvelle tentative ($attempt/3)."
           done
-          echo "main a trop changé pendant la publication ; la génération reste conservée sur $TEMP_BRANCH." >&2
+          echo "main a trop changé pendant la publication ; la modification reste conservée sur $TEMP_BRANCH." >&2
           exit 1
 
       - name: Confirmer le déploiement GitHub Pages
@@ -153,20 +166,33 @@ jobs:
           set -euo pipefail
           version="${{ steps.result.outputs.version }}"
           file="${{ steps.result.outputs.filename }}"
-          if [ "${{ steps.request.outputs.type }}" = "product" ]; then
+          if [ "${{ steps.request.outputs.type }}" = "delete_product" ]; then
             asset="www/Items/${file}"
+            for attempt in $(seq 1 36); do
+              version_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}dish-local-images.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
+              if printf '%s' "$version_body" | grep -Fq "const APP_VERSION='v${version}'" \
+                && ! curl -fsSIL --max-time 12 "${COURSES_BASE_URL}${asset}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
+                echo "Suppression v${version} confirmée."
+                exit 0
+              fi
+              sleep 10
+            done
           else
-            asset="www/Plats/${file}"
-          fi
-          for attempt in $(seq 1 36); do
-            version_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}dish-local-images.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
-            if printf '%s' "$version_body" | grep -Fq "const APP_VERSION='v${version}'" \
-              && curl -fsSIL --max-time 12 "${COURSES_BASE_URL}${asset}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
-              echo "Déploiement v${version} confirmé."
-              exit 0
+            if [ "${{ steps.request.outputs.type }}" = "product" ]; then
+              asset="www/Items/${file}"
+            else
+              asset="www/Plats/${file}"
             fi
-            sleep 10
-          done
+            for attempt in $(seq 1 36); do
+              version_body="$(curl -fsSL --max-time 12 "${COURSES_BASE_URL}dish-local-images.js?courses_deploy=${GITHUB_RUN_ID}-${attempt}" || true)"
+              if printf '%s' "$version_body" | grep -Fq "const APP_VERSION='v${version}'" \
+                && curl -fsSIL --max-time 12 "${COURSES_BASE_URL}${asset}?courses_deploy=${GITHUB_RUN_ID}-${attempt}" >/dev/null; then
+                echo "Déploiement v${version} confirmé."
+                exit 0
+              fi
+              sleep 10
+            done
+          fi
           echo "Le déploiement GitHub Pages n'a pas été confirmé." >&2
           exit 1
 
@@ -177,23 +203,23 @@ jobs:
         run: git push origin --delete "$TEMP_BRANCH"
 
       - name: Installer l'émetteur Web Push
-        if: always()
+        if: always() && env.PUSH_ENDPOINT != ''
         run: npm install --no-save --no-package-lock web-push@3.6.7
 
       - name: Notification Courses — succès
-        if: steps.integrate.outcome == 'success' && steps.deploy.outcome == 'success'
+        if: steps.integrate.outcome == 'success' && steps.deploy.outcome == 'success' && env.PUSH_ENDPOINT != ''
         env:
           PUSH_STATUS: added
         run: node scripts/send_web_push.mjs
 
       - name: Notification Courses — erreur
-        if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success')
+        if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success') && env.PUSH_ENDPOINT != ''
         env:
           PUSH_STATUS: error
           PUSH_ERROR: ${{ steps.result.outputs.error }}
           PUSH_STAGE: ${{ steps.integrate.outcome != 'success' && 'integration' || 'deployment' }}
         run: node scripts/send_web_push.mjs
 
-      - name: Signaler un échec d'intégration
+      - name: Signaler un échec
         if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success')
         run: exit 1
