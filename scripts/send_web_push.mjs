@@ -8,8 +8,13 @@ const privateKey=String(process.env.COURSES_VAPID_PRIVATE_KEY||'').trim();
 const status=String(process.env.PUSH_STATUS||'error');
 const rawName=String(process.env.DISH_NAME||'').trim();
 const productPrefix='__courses_product__:';
-const itemType=rawName.startsWith(productPrefix)?'product':'dish';
-const itemName=(itemType==='product'?rawName.slice(productPrefix.length):rawName).trim()||(itemType==='product'?'Produit':'Plat');
+const deleteProductPrefix='__courses_delete_product__:';
+const deleteProduct=rawName.startsWith(deleteProductPrefix);
+const itemType=deleteProduct?'product':rawName.startsWith(productPrefix)?'product':'dish';
+const itemName=(deleteProduct
+  ?rawName.slice(deleteProductPrefix.length)
+  :itemType==='product'?rawName.slice(productPrefix.length):rawName
+).trim()||(itemType==='product'?'Produit':'Plat');
 const requestId=String(process.env.REQUEST_ID||'').trim();
 const stage=String(process.env.PUSH_STAGE||'').trim();
 const rawError=String(process.env.PUSH_ERROR||'').trim();
@@ -31,15 +36,18 @@ if(!publicKey||!privateKey){
 }
 
 const success=status==='added';
+const publicStatus=success?(deleteProduct?'deleted':'added'):'error';
 const itemLabel=itemType==='product'?'produit':'plat';
 const fallbackError=stage==='deployment'
   ?'La publication ou le déploiement GitHub Pages n’a pas pu être confirmé.'
-  :`L’intégration du ${itemLabel} n’a pas pu être terminée.`;
+  :deleteProduct
+    ?`La suppression du produit n’a pas pu être terminée.`
+    :`L’intégration du ${itemLabel} n’a pas pu être terminée.`;
 const failureReason=errorDetail||fallbackError;
 
 const target=new URL(baseUrl);
 target.searchParams.set(itemType==='product'?'courses_product':'courses_dish',itemName);
-target.searchParams.set('courses_status',success?'added':'error');
+target.searchParams.set('courses_status',publicStatus);
 if(requestId)target.searchParams.set('courses_request',requestId);
 if(!success){
   target.searchParams.set('courses_error',failureReason.slice(0,500));
@@ -47,14 +55,19 @@ if(!success){
 }
 
 const payload={
-  title:success?'Ajout terminé':'Courses',
+  title:success?(deleteProduct?'Suppression terminée':'Ajout terminé'):'Courses',
   body:success
-    ?`${itemName} est maintenant disponible dans le catalogue.`
-    :`⚠️ L’intégration du ${itemLabel} « ${itemName} » a échoué.`,
-  tag:requestId?`courses-${itemType}-${requestId}`:`courses-${itemType}-integration`,
-  status:success?'added':'error',
+    ?deleteProduct
+      ?`${itemName} a été supprimé définitivement du catalogue.`
+      :`${itemName} est maintenant disponible dans le catalogue.`
+    :deleteProduct
+      ?`⚠️ La suppression du produit « ${itemName} » a échoué.`
+      :`⚠️ L’intégration du ${itemLabel} « ${itemName} » a échoué.`,
+  tag:requestId?`courses-${deleteProduct?'product-delete':itemType}-${requestId}`:`courses-${deleteProduct?'product-delete':itemType}-integration`,
+  status:publicStatus,
   itemType,
   itemName,
+  operation:deleteProduct?'delete':'integrate',
   requestId,
   stage:success?'':stage,
   error:success?'':failureReason,
