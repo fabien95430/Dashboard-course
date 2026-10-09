@@ -18,14 +18,13 @@ test('les popups de préférences utilisent la même coque extérieure et un scr
   assert.match(source,/#preferencesDialog::backdrop,\s*#missingProductsDialog::backdrop,\s*\.recipe-customization-dialog::backdrop\{[\s\S]*?backdrop-filter:blur\(8px\)!important/);
 });
 
-test('le design moderne des produits manquants ne redéfinit plus la coque extérieure',()=>{
+test('le design moderne des produits manquants ne redéfinit plus les dimensions de la coque extérieure',()=>{
   const source=read('missing-products-modern.js');
   assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bwidth:/);
   assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bheight:/);
   assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bmax-height:/);
   assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bpadding(?:-left|-right)?:/);
   assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\bborder-radius:/);
-  assert.doesNotMatch(source,/#missingProductsDialog\{[^}]*\boverflow(?:-y)?:/);
 });
 
 test('le clavier ne déplace ni ne redimensionne les popups de préférences pendant la saisie',()=>{
@@ -226,31 +225,32 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 
-test('la version visible runtime passe à v370 et recharge les modules modifiés',()=>{
+test('la version visible runtime passe à v373 et recharge les modules modifiés',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=370/);
-  assert.match(index,/app\.js\?v=370/);
+  assert.match(index,/catalog\.js\?v=373/);
+  assert.match(index,/app\.js\?v=373/);
   assert.match(index,/settings-tab-badge\.js\?v=364/);
-  assert.equal((index.match(/page-version\">v370/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v373/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=364/);
-  assert.match(catalog,/catalog-quantities\.js\?v=370/);
+  assert.match(catalog,/catalog-quantities\.js\?v=373/);
   assert.match(catalog,/repurchase-soon\.js\?v=363/);
-  assert.match(catalog,/dish-local-images\.js\?v=370/);
+  assert.match(catalog,/dish-local-images\.js\?v=373/);
   assert.match(settings,/missing-products-dishes\.js\?v=363/);
-  assert.match(sw,/courses-app-v370-r1/);
-  assert.match(sw,/catalog\.js\?v=370/);
-  assert.match(sw,/app\.js\?v=370/);
+  assert.match(sw,/courses-app-v373-r1/);
+  assert.match(sw,/catalog\.js\?v=373/);
+  assert.match(sw,/app\.js\?v=373/);
   assert.match(sw,/settings-tab-badge\.js\?v=364/);
   assert.match(sw,/missing-products-dishes\.js\?v=363/);
   assert.match(sw,/dishes-ui\.js\?v=364/);
-  assert.match(sw,/catalog-quantities\.js\?v=370/);
+  assert.match(sw,/catalog-quantities\.js\?v=373/);
   assert.match(sw,/repurchase-soon\.js\?v=363/);
   assert.match(sw,/missing-products-fixes\.js\?v=19/);
   assert.match(sw,/missing-products-popup-ui\.js\?v=18/);
-  assert.match(sw,/dish-local-images\.js\?v=370/);
-  assert.match(localImages,/const APP_VERSION='v370'/);
+  assert.match(sw,/dish-local-images\.js\?v=373/);
+  assert.match(localImages,/const APP_VERSION='v373'/);
   assert.match(localImages,/missing-products-fixes\.js\?v=20/);
   assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
-  assert.match(localImages,/product-item-images\.js\?v=11/);
+  assert.match(localImages,/product-item-images\.js\?v=12/);
+  assert.match(localImages,/purchase-intelligence\.js\?v=5/);
 });

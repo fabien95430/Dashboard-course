@@ -9,16 +9,21 @@ const META = CATALOG.meta;
 const FAVORITES = CATALOG.favorites;
 const CATEGORY_META = {
   'Toutes': { label:'Tous' },
-  'Fruits & Légumes': { label:'Fruits & légumes' },
-  'Épicerie': { label:'Épicerie' },
-  'Frais': { label:'Produits frais' },
+  'Apéritif & snacks': { label:'Apéritif & snacks' },
   'Boissons': { label:'Boissons' },
-  'Maison': { label:'Maison' },
+  'Boulangerie': { label:'Boulangerie' },
+  'Cuisine': { label:'Cuisine' },
   'Enfant': { label:'Enfant' },
+  'Frais': { label:'Frais' },
+  'Fruits & Légumes': { label:'Fruits & légumes' },
+  'Hygiène & soins': { label:'Hygiène & soins' },
+  'Maison': { label:'Maison' },
+  'Petit-déjeuner': { label:'Petit-déjeuner' },
+  'Viandes & poissons': { label:'Viandes & poissons' },
   'Favoris': { label:'Favoris' }
 };
-const CATALOG_CATEGORY_ORDER=['Toutes','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Maison','Favoris'];
-const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Maison']);
+const CATALOG_CATEGORY_ORDER=['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'];
+const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons']);
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
   "Lait sans lactose":"Lait s. lact.",
@@ -2251,7 +2256,7 @@ async function saveConnectionSettings(){
 }
 
 function missingCategoryLabel(category){
-  return category==='Frais'?'Produits frais':(CATEGORY_META[category]?.label||category);
+  return CATEGORY_META[category]?.label||category;
 }
 function renderMissingCategorySelection(){
   if(!UI.missingCategoryGrid)return;

@@ -18,16 +18,22 @@ const LABEL='Acheté récemment';
 // Fenêtres de disponibilité probables. Elles évitent les doublons mais ne remplacent jamais une DLC.
 // Les plafonds `shelf` restent absolus, même lorsque l'historique apprend une durée plus longue.
 const CATEGORY=Object.freeze({
-  'Frais':{days:5,factor:.55,shelf:7},
-  'Fruits & Légumes':{days:7,factor:.62,shelf:14},
-  'Épicerie':{days:30,factor:.8},
+  'Apéritif & snacks':{days:18,factor:.72},
   'Boissons':{days:14,factor:.8},
-  'Maison':{days:45,factor:.86}
+  'Boulangerie':{days:4,factor:.55,shelf:7},
+  'Cuisine':{days:30,factor:.8},
+  'Enfant':{days:14,factor:.78},
+  'Frais':{days:7,factor:.6,shelf:12},
+  'Fruits & Légumes':{days:7,factor:.62,shelf:14},
+  'Hygiène & soins':{days:45,factor:.86},
+  'Maison':{days:45,factor:.86},
+  'Petit-déjeuner':{days:30,factor:.82},
+  'Viandes & poissons':{days:3,factor:.5,shelf:5}
 });
 const SUB=Object.freeze({
   'Laits & crèmes':{days:7,factor:.6,shelf:10},'Yaourts & desserts':{days:8,factor:.6,shelf:12},
   'Fromages':{days:14,factor:.7,shelf:21},'Charcuterie':{days:5,factor:.55,shelf:7},
-  'Viandes':{days:2,factor:.5,shelf:3},'Poissons & traiteur':{days:2,factor:.5,shelf:3},
+  'Viandes':{days:2,factor:.5,shelf:3},'Poissons & traiteur':{days:2,factor:.5,shelf:3},'Poissons en conserve':{days:4,factor:.25},'Traiteur frais':{days:4,factor:.55,shelf:7},
   'Surgelés':{days:35,factor:.82},'Boulangerie':{days:4,factor:.55,shelf:7},
   'Fruits classiques':{days:8,factor:.65,shelf:18},'Fruits rouges & exotiques':{days:5,factor:.6,shelf:10},
   'Légumes du quotidien':{days:7,factor:.65,shelf:14},'Légumes variés':{days:9,factor:.65,shelf:18},
