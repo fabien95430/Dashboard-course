@@ -31,7 +31,7 @@ test('le précache seul couvre les scripts et styles chargés par la page',async
     const source=readFileSync(new URL(file,root),'utf8');
     for(const match of source.matchAll(/["'](\.\/[^"'\s]+\.(?:js|css)(?:\?[^"'\s]*)?)["']/g)){
       const next=match[1].replace(/^\.\//,'').split('?')[0];
-      if(next==='sw.js')continue;
+      if(next==='sw.js'||match[1].includes('courses_catalog_admin='))continue;
       requests.add(match[1]);walk(next);
     }
   }

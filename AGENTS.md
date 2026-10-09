@@ -59,10 +59,8 @@ Respecter le nom de fichier attendu par `dish-local-images.js`, l’emplacement 
 
 Ajouter le plat dans `dishes-ui.js` avec sa catégorie et uniquement des ingrédients compatibles avec le catalogue courant. Incrémenter ensuite la version globale et le cache conformément aux règles existantes, puis déplacer la demande vers `done` dans le même commit.
 
-## Atlas de visuels produits
+## Visuels des produits
 
-Avant toute modification d'un atlas produit, lire `docs/ATLAS_PRODUITS.md`.
+Un produit utilise une image WebP unitaire dans `www/Items/`. Lire `docs/IMAGES_ITEMS.md` avant toute création ou modification d’un visuel produit.
 
-La méthode de référence est celle utilisée pour reconstruire l'atlas **Maison v5** : isoler réellement chaque produit, conserver ses pixels source, le recentrer dans une cellule transparente plus grande avec des gouttières régulières, puis supprimer les compensations de recadrage propres à la catégorie lorsque le nouvel atlas les rend inutiles.
-
-Ne pas revenir à des recadrages CSS/JS globaux ou à des exceptions produit par produit tant qu'une reconstruction propre de l'atlas permet de corriger le problème.
+Ne jamais réintroduire d’atlas, de planche ou de sprite produit. `product-item-images.js` peut harmoniser le cadrage des WebP unitaires, et le SVG premium local reste le seul fallback si une image manque ou échoue.

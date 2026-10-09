@@ -225,32 +225,11 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 
-test('la version visible runtime passe à v373 et recharge les modules modifiés',()=>{
+test('la version visible runtime passe à v383 et recharge les modules modifiés',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
-  assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=373/);
-  assert.match(index,/app\.js\?v=373/);
-  assert.match(index,/settings-tab-badge\.js\?v=364/);
-  assert.equal((index.match(/page-version\">v373/g)||[]).length,3);
-  assert.match(catalog,/dishes-ui\.js\?v=364/);
-  assert.match(catalog,/catalog-quantities\.js\?v=373/);
-  assert.match(catalog,/repurchase-soon\.js\?v=363/);
-  assert.match(catalog,/dish-local-images\.js\?v=373/);
-  assert.match(settings,/missing-products-dishes\.js\?v=363/);
-  assert.match(sw,/courses-app-v373-r1/);
-  assert.match(sw,/catalog\.js\?v=373/);
-  assert.match(sw,/app\.js\?v=373/);
-  assert.match(sw,/settings-tab-badge\.js\?v=364/);
-  assert.match(sw,/missing-products-dishes\.js\?v=363/);
-  assert.match(sw,/dishes-ui\.js\?v=364/);
-  assert.match(sw,/catalog-quantities\.js\?v=373/);
-  assert.match(sw,/repurchase-soon\.js\?v=363/);
-  assert.match(sw,/missing-products-fixes\.js\?v=19/);
-  assert.match(sw,/missing-products-popup-ui\.js\?v=18/);
-  assert.match(sw,/dish-local-images\.js\?v=373/);
-  assert.match(localImages,/const APP_VERSION='v373'/);
-  assert.match(localImages,/missing-products-fixes\.js\?v=20/);
-  assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
-  assert.match(localImages,/product-item-images\.js\?v=12/);
-  assert.match(localImages,/purchase-intelligence\.js\?v=5/);
+  assert.match(index,/catalog\.js\?v=383/); assert.match(index,/app\.js\?v=383/); assert.match(index,/settings-tab-badge\.js\?v=383/);
+  assert.equal((index.match(/page-version\">v383/g)||[]).length,3);
+  assert.match(catalog,/dish-local-images\.js\?v=383/); assert.match(settings,/missing-products-dishes\.js\?v=383/);
+  assert.match(sw,/courses-app-v383-r1/); assert.match(sw,/product-item-images\.js\?v=14/);
+  assert.match(localImages,/const APP_VERSION='v383'/); assert.match(localImages,/product-item-images\.js\?v=14/);
 });

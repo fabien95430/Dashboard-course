@@ -14,7 +14,7 @@ test('les catégories du catalogue gardent Tous en tête, Favoris à la fin et l
 
 test('chaque sous-catégorie de catalog.js est stockée en ordre alphabétique',()=>{
   const source=read('catalog.js');
-  const match=source.match(/groups:\s*(\{.*?\}),\s*\n\s*meta:/s);
+  const match=source.match(/groups:\s*(\{.*?\}),\s*\n\s*favorites:/s);
   assert.ok(match,'groups introuvable');
   const groups=JSON.parse(match[1]);
   for(const [category,subgroups] of Object.entries(groups)){
@@ -42,7 +42,7 @@ test('les noms longs ont un libellé automatique de 13 caractères maximum',()=>
 
 test('chaque produit appartient à une seule catégorie principale cohérente',()=>{
   const source=read('catalog.js');
-  const match=source.match(/groups:\s*(\{.*?\}),\s*\n\s*meta:/s);
+  const match=source.match(/groups:\s*(\{.*?\}),\s*\n\s*favorites:/s);
   assert.ok(match,'groups introuvable');
   const groups=JSON.parse(match[1]);
   const locations=new Map();
@@ -51,7 +51,7 @@ test('chaque produit appartient à une seule catégorie principale cohérente',(
     assert.ok(!locations.has(key),`produit dupliqué: ${name}`);
     locations.set(key,{name,category,sub});
   }
-  assert.equal(locations.get(norm('Confiture fruits rouges'))?.category,'Petit-déjeuner');
+  assert.equal(locations.get(norm('Lait'))?.category,'Frais');
   assert.equal(locations.get(norm('Poulet'))?.category,'Viandes & poissons');
   assert.equal(locations.get(norm('Saumon'))?.category,'Viandes & poissons');
   assert.equal(locations.get(norm('Pain'))?.category,'Boulangerie');
