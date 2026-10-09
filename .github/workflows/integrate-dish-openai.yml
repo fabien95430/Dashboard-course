@@ -119,7 +119,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$TEMP_BRANCH"
           if [ "${{ steps.request.outputs.type }}" = "delete_product" ]; then
-            git add -A catalog.js index.html dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
+            git add catalog.js index.html dish-local-images.js sw.js
+            image="www/Items/${{ steps.result.outputs.filename }}"
+            if git ls-files --error-unmatch "$image" >/dev/null 2>&1; then
+              git add -A "$image"
+            fi
             message="v${{ steps.result.outputs.version }}: supprime le produit ${{ steps.request.outputs.name }} du catalogue"
           elif [ "${{ steps.request.outputs.type }}" = "product" ]; then
             git add catalog.js app.js catalog-quantities.js index.html product-item-images.js dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
