@@ -53,12 +53,26 @@ function installMissingProductsCompactLayout(){
 
 installMissingProductsCompactLayout();
 
+function loadErrorFeedbackBridge(){
+  if(document.querySelector('script[data-courses-error-feedback]'))return;
+  const script=document.createElement('script');
+  script.src='./error-feedback-bridge.js?v=1';
+  script.defer=true;
+  script.dataset.coursesErrorFeedback='1';
+  document.head.appendChild(script);
+}
 function loadErrorCenter(){
-  if(document.querySelector('script[data-courses-error-center]'))return;
+  const existing=document.querySelector('script[data-courses-error-center]');
+  if(existing){
+    if(window.CoursesErrors)loadErrorFeedbackBridge();
+    else existing.addEventListener('load',loadErrorFeedbackBridge,{once:true});
+    return;
+  }
   const script=document.createElement('script');
   script.src='./error-center.js?v=1';
   script.defer=true;
   script.dataset.coursesErrorCenter='1';
+  script.addEventListener('load',loadErrorFeedbackBridge,{once:true});
   document.head.appendChild(script);
 }
 
