@@ -1,5 +1,6 @@
-const CACHE='courses-app-v374-r1';
+const CACHE='courses-app-v374-r2';
 const VISUAL_CACHE='courses-visuals-v1';
+const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const PRODUCT_VISUALS=[
   './bring-photo-v5-frais.webp.png?v=15',
   './bring-photo-v5-fruits-legumes.webp.png?v=15',
@@ -10,7 +11,7 @@ const PRODUCT_VISUALS=[
   './welcome-background-v40.webp',
   './www/empty-list-premium-v4.webp?v=305'
 ];
-const SHELL=['./welcome-cart-transparent-v46.png','./welcome-background-v40.webp','./startup/app.js?v=2','./','./index.html','./styles.css?v=169','./styles.css?v=170','./catalog.js?v=297','./catalog.js?v=313','./catalog.js?v=315','./catalog.js?v=316','./catalog.js?v=318','./catalog.js?v=321','./catalog.js?v=322','./app.js?v=297','./settings-tab-badge.js?v=297','./settings-tab-badge.js?v=299','./settings-tab-badge.js?v=300','./settings-tab-badge.js?v=322','./missing-products-dishes.js?v=1','./missing-products-dishes.js?v=2','./missing-products-dishes.js?v=3','./missing-products-dishes.js?v=4','./missing-products-modern.js?v=5','./missing-products-fixes.js?v=13','./missing-products-fixes.js?v=14','./missing-products-fixes.js?v=15','./missing-products-fixes.js?v=16','./missing-products-fixes-core.js?v=6','./missing-products-popup-ui.js?v=9','./missing-products-popup-ui.js?v=11','./missing-products-popup-ui.js?v=12','./missing-products-popup-ui.js?v=13','./missing-products-popup-ui.js?v=14','./missing-products-popup-ui.js?v=15','./dishes.css?v=3','./dishes-ui.js?v=297','./dishes-ui.js?v=301','./dishes-ui.js?v=313','./dishes-ui.js?v=316','./dishes-ui.js?v=321','./dish-local-images.js?v=297','./dish-local-images.js?v=298','./dish-local-images.js?v=299','./dish-local-images.js?v=300','./dish-local-images.js?v=301','./dish-local-images.js?v=302','./dish-local-images.js?v=303','./dish-local-images.js?v=304','./dish-local-images.js?v=305','./dish-local-images.js?v=306','./dish-local-images.js?v=307','./dish-local-images.js?v=308','./dish-local-images.js?v=309','./dish-local-images.js?v=310','./dish-local-images.js?v=311','./dish-local-images.js?v=312','./dish-local-images.js?v=313','./dish-local-images.js?v=314','./dish-local-images.js?v=315','./dish-local-images.js?v=316','./dish-local-images.js?v=317','./dish-local-images.js?v=318','./dish-local-images.js?v=319','./dish-local-images.js?v=320','./dish-local-images.js?v=321','./dish-local-images.js?v=322','./dish-added-marker.js?v=1','./catalog-liquid.css?v=3','./catalog-liquid.js?v=297','./catalog-quantities.js?v=297','./catalog-quantities.js?v=302','./catalog-quantities.js?v=310','./catalog-quantities.js?v=316','./product-item-images.js?v=9','./product-item-images.js?v=10','./purchase-intelligence.js?v=4','./repurchase-soon.js?v=1','./repurchase-soon.js?v=2','./repurchase-soon.js?v=3','./dish-detail.css?v=5','./docs/guide-fonctionnement-courses.pdf?v=299','./manifest.webmanifest?v=43','./icon-premium-v40.svg','./icon.svg','./styles.css?v=323','./catalog.js?v=323','./dish-local-images.js?v=323','./dishes-ui.js?v=324','./dish-local-images.js?v=324','./catalog.js?v=325','./dish-local-images.js?v=325','./catalog.js?v=326','./dishes-ui.js?v=326','./dish-local-images.js?v=326','./catalog.js?v=327','./settings-tab-badge.js?v=327','./dish-local-images.js?v=327','./dish-local-images.js?v=329','./styles.css?v=330','./catalog.js?v=330','./dish-local-images.js?v=330','./styles.css?v=332','./catalog.js?v=332','./app.js?v=332','./dish-local-images.js?v=332','./catalog.js?v=335','./settings-tab-badge.js?v=335','./dish-local-images.js?v=335','./styles.css?v=336','./catalog.js?v=336','./app.js?v=336','./dish-local-images.js?v=336','./catalog.js?v=337','./settings-tab-badge.js?v=337','./dish-local-images.js?v=337','./missing-products-modern.js?v=6','./catalog.js?v=338','./dishes-ui.js?v=338','./dish-local-images.js?v=338','./styles.css?v=339','./catalog.js?v=339','./app.js?v=339','./dish-local-images.js?v=339','./catalog.js?v=340','./dishes-ui.js?v=340','./dish-local-images.js?v=340','./catalog.js?v=341','./settings-tab-badge.js?v=341','./missing-products-dishes.js?v=5','./dish-local-images.js?v=341','./styles.css?v=342','./catalog.js?v=342','./app.js?v=342','./dish-local-images.js?v=342','./catalog.js?v=343','./dishes-ui.js?v=343','./dish-local-images.js?v=343','./styles.css?v=344','./catalog.js?v=344','./app.js?v=344','./settings-tab-badge.js?v=344','./missing-products-dishes.js?v=6','./dishes-ui.js?v=344','./dish-local-images.js?v=344','./catalog.js?v=345','./app.js?v=345','./dish-local-images.js?v=345','./styles.css?v=346','./styles.css?v=348','./catalog.js?v=348','./app.js?v=348','./dish-local-images.js?v=348','./catalog.js?v=349','./app.js?v=349','./dish-local-images.js?v=349','./app.js?v=350','./dish-local-images.js?v=350','./catalog.js?v=351','./app.js?v=351','./settings-tab-badge.js?v=351','./missing-products-dishes.js?v=7','./dish-local-images.js?v=351','./catalog.js?v=352','./app.js?v=352','./settings-tab-badge.js?v=352','./missing-products-dishes.js?v=8','./missing-products-fixes.js?v=17','./missing-products-popup-ui.js?v=16','./dish-local-images.js?v=352','./catalog.js?v=353','./missing-products-fixes.js?v=18','./dish-local-images.js?v=353','./catalog.js?v=354','./dish-local-images.js?v=354','./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./app.js?v=356','./settings-tab-badge.js?v=356','./catalog.js?v=357','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=357','./catalog.js?v=363','./settings-tab-badge.js?v=363','./missing-products-dishes.js?v=363','./dishes-ui.js?v=363','./repurchase-soon.js?v=363','./dish-local-images.js?v=363','./catalog.js?v=364','./settings-tab-badge.js?v=370','./dishes-ui.js?v=364','./catalog-quantities.js?v=364','./dish-local-images.js?v=364','./dish-local-images.js?v=370','./product-item-images.js?v=11','./catalog-quantities.js?v=370','./app.js?v=370','./catalog.js?v=370','./missing-products-fixes.js?v=20','./settings-tab-badge.js?v=364',"./catalog.js?v=372","./catalog-quantities.js?v=372","./dish-local-images.js?v=372","./catalog.js?v=373","./app.js?v=373","./catalog-quantities.js?v=373","./dish-local-images.js?v=373","./product-item-images.js?v=12","./purchase-intelligence.js?v=5","./catalog.js?v=374","./catalog-quantities.js?v=374","./dish-local-images.js?v=374"];
+const SHELL=['./welcome-cart-transparent-v46.png','./welcome-background-v40.webp','./startup/app.js?v=2','./error-center.js?v=1','./','./index.html','./styles.css?v=169','./styles.css?v=170','./catalog.js?v=297','./catalog.js?v=313','./catalog.js?v=315','./catalog.js?v=316','./catalog.js?v=318','./catalog.js?v=321','./catalog.js?v=322','./app.js?v=297','./settings-tab-badge.js?v=297','./settings-tab-badge.js?v=299','./settings-tab-badge.js?v=300','./settings-tab-badge.js?v=322','./missing-products-dishes.js?v=1','./missing-products-dishes.js?v=2','./missing-products-dishes.js?v=3','./missing-products-dishes.js?v=4','./missing-products-modern.js?v=5','./missing-products-fixes.js?v=13','./missing-products-fixes.js?v=14','./missing-products-fixes.js?v=15','./missing-products-fixes.js?v=16','./missing-products-fixes-core.js?v=6','./missing-products-popup-ui.js?v=9','./missing-products-popup-ui.js?v=11','./missing-products-popup-ui.js?v=12','./missing-products-popup-ui.js?v=13','./missing-products-popup-ui.js?v=14','./missing-products-popup-ui.js?v=15','./dishes.css?v=3','./dishes-ui.js?v=297','./dishes-ui.js?v=301','./dishes-ui.js?v=313','./dishes-ui.js?v=316','./dishes-ui.js?v=321','./dish-local-images.js?v=297','./dish-local-images.js?v=298','./dish-local-images.js?v=299','./dish-local-images.js?v=300','./dish-local-images.js?v=301','./dish-local-images.js?v=302','./dish-local-images.js?v=303','./dish-local-images.js?v=304','./dish-local-images.js?v=305','./dish-local-images.js?v=306','./dish-local-images.js?v=307','./dish-local-images.js?v=308','./dish-local-images.js?v=309','./dish-local-images.js?v=310','./dish-local-images.js?v=311','./dish-local-images.js?v=312','./dish-local-images.js?v=313','./dish-local-images.js?v=314','./dish-local-images.js?v=315','./dish-local-images.js?v=316','./dish-local-images.js?v=317','./dish-local-images.js?v=318','./dish-local-images.js?v=319','./dish-local-images.js?v=320','./dish-local-images.js?v=321','./dish-local-images.js?v=322','./dish-added-marker.js?v=1','./catalog-liquid.css?v=3','./catalog-liquid.js?v=297','./catalog-quantities.js?v=297','./catalog-quantities.js?v=302','./catalog-quantities.js?v=310','./catalog-quantities.js?v=316','./product-item-images.js?v=9','./product-item-images.js?v=10','./purchase-intelligence.js?v=4','./repurchase-soon.js?v=1','./repurchase-soon.js?v=2','./repurchase-soon.js?v=3','./dish-detail.css?v=5','./docs/guide-fonctionnement-courses.pdf?v=299','./manifest.webmanifest?v=43','./icon-premium-v40.svg','./icon.svg','./styles.css?v=323','./catalog.js?v=323','./dish-local-images.js?v=323','./dishes-ui.js?v=324','./dish-local-images.js?v=324','./catalog.js?v=325','./dish-local-images.js?v=325','./catalog.js?v=326','./dishes-ui.js?v=326','./dish-local-images.js?v=326','./catalog.js?v=327','./settings-tab-badge.js?v=327','./dish-local-images.js?v=327','./dish-local-images.js?v=329','./styles.css?v=330','./catalog.js?v=330','./dish-local-images.js?v=330','./styles.css?v=332','./catalog.js?v=332','./app.js?v=332','./dish-local-images.js?v=332','./catalog.js?v=335','./settings-tab-badge.js?v=335','./dish-local-images.js?v=335','./styles.css?v=336','./catalog.js?v=336','./app.js?v=336','./dish-local-images.js?v=336','./catalog.js?v=337','./settings-tab-badge.js?v=337','./dish-local-images.js?v=337','./missing-products-modern.js?v=6','./catalog.js?v=338','./dishes-ui.js?v=338','./dish-local-images.js?v=338','./styles.css?v=339','./catalog.js?v=339','./app.js?v=339','./dish-local-images.js?v=339','./catalog.js?v=340','./dishes-ui.js?v=340','./dish-local-images.js?v=340','./catalog.js?v=341','./settings-tab-badge.js?v=341','./missing-products-dishes.js?v=5','./dish-local-images.js?v=341','./styles.css?v=342','./catalog.js?v=342','./app.js?v=342','./dish-local-images.js?v=342','./catalog.js?v=343','./dishes-ui.js?v=343','./dish-local-images.js?v=343','./styles.css?v=344','./catalog.js?v=344','./app.js?v=344','./settings-tab-badge.js?v=344','./missing-products-dishes.js?v=6','./dishes-ui.js?v=344','./dish-local-images.js?v=344','./catalog.js?v=345','./app.js?v=345','./dish-local-images.js?v=345','./styles.css?v=346','./styles.css?v=348','./catalog.js?v=348','./app.js?v=348','./dish-local-images.js?v=348','./catalog.js?v=349','./app.js?v=349','./dish-local-images.js?v=349','./app.js?v=350','./dish-local-images.js?v=350','./catalog.js?v=351','./app.js?v=351','./settings-tab-badge.js?v=351','./missing-products-dishes.js?v=7','./dish-local-images.js?v=351','./catalog.js?v=352','./app.js?v=352','./settings-tab-badge.js?v=352','./missing-products-dishes.js?v=8','./missing-products-fixes.js?v=17','./missing-products-popup-ui.js?v=16','./dish-local-images.js?v=352','./catalog.js?v=353','./missing-products-fixes.js?v=18','./dish-local-images.js?v=353','./catalog.js?v=354','./dish-local-images.js?v=354','./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./app.js?v=356','./settings-tab-badge.js?v=356','./catalog.js?v=357','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=357','./catalog.js?v=363','./settings-tab-badge.js?v=363','./missing-products-dishes.js?v=363','./dishes-ui.js?v=363','./repurchase-soon.js?v=363','./dish-local-images.js?v=363','./catalog.js?v=364','./settings-tab-badge.js?v=370','./dishes-ui.js?v=364','./catalog-quantities.js?v=364','./dish-local-images.js?v=364','./dish-local-images.js?v=370','./product-item-images.js?v=11','./catalog-quantities.js?v=370','./app.js?v=370','./catalog.js?v=370','./missing-products-fixes.js?v=20','./settings-tab-badge.js?v=364',"./catalog.js?v=372","./catalog-quantities.js?v=372","./dish-local-images.js?v=372","./catalog.js?v=373","./app.js?v=373","./catalog-quantities.js?v=373","./dish-local-images.js?v=373","./product-item-images.js?v=12","./purchase-intelligence.js?v=5","./catalog.js?v=374","./catalog-quantities.js?v=374","./dish-local-images.js?v=374"];
 const refreshedVisuals=new Set();
 
 function isPersistentVisual(url){
@@ -26,7 +27,8 @@ function isStartupShellAsset(url){
   return url.pathname.endsWith('/styles.css')
     ||url.pathname.endsWith('/catalog.js')
     ||url.pathname.endsWith('/app.js')
-    ||url.pathname.endsWith('/settings-tab-badge.js');
+    ||url.pathname.endsWith('/settings-tab-badge.js')
+    ||url.pathname.endsWith('/error-center.js');
 }
 
 async function migrateExistingVisuals(){
@@ -82,6 +84,22 @@ function refreshShell(cache,request){
   });
 }
 
+async function storeErrorSignal(payload){
+  const status=String(payload?.status||'').toLowerCase();
+  if(status!=='error'&&status!=='added')return;
+  const id=String(payload?.requestId||payload?.request_id||payload?.tag||Date.now()).replace(/[^a-z0-9_-]+/gi,'-').slice(0,120)||String(Date.now());
+  const url=new URL('./__courses_error_event__/'+id+'-'+Date.now(),self.location.href);
+  const cache=await caches.open(ERROR_INBOX_CACHE);
+  await cache.put(new Request(url.href),new Response(JSON.stringify({...payload,receivedAt:Date.now()}),{headers:{'Content-Type':'application/json'}}));
+}
+
+async function notifyErrorSignalClients(payload){
+  const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  await Promise.all(clients.map(client=>{
+    try{client.postMessage({type:'courses-error-signal',payload});return Promise.resolve()}catch(_){return Promise.resolve()}
+  }));
+}
+
 self.addEventListener('install',event=>event.waitUntil(
   Promise.all([
     caches.open(CACHE).then(cache=>cache.addAll(SHELL)),
@@ -91,7 +109,7 @@ self.addEventListener('install',event=>event.waitUntil(
 
 self.addEventListener('activate',event=>event.waitUntil(
   caches.keys()
-    .then(keys=>Promise.all(keys.filter(key=>key!==CACHE&&key!==VISUAL_CACHE).map(key=>caches.delete(key))))
+    .then(keys=>Promise.all(keys.filter(key=>key!==CACHE&&key!==VISUAL_CACHE&&key!==ERROR_INBOX_CACHE).map(key=>caches.delete(key))))
     .then(()=>self.clients.claim())
 ));
 
@@ -167,14 +185,18 @@ self.addEventListener('push',event=>{
   const body=String(payload.body||'Le catalogue a été mis à jour.');
   const tag=String(payload.tag||'courses-catalog-update');
   const url=String(payload.url||'./');
-  event.waitUntil(self.registration.showNotification(title,{
-    body,
-    tag,
-    icon:'./apple-touch-icon.png',
-    badge:'./apple-touch-icon.png',
-    data:{url},
-    renotify:true
-  }));
+  event.waitUntil(Promise.all([
+    storeErrorSignal(payload).catch(()=>{}),
+    notifyErrorSignalClients(payload).catch(()=>{}),
+    self.registration.showNotification(title,{
+      body,
+      tag,
+      icon:'./apple-touch-icon.png',
+      badge:'./apple-touch-icon.png',
+      data:{url},
+      renotify:true
+    })
+  ]));
 });
 
 self.addEventListener('notificationclick',event=>{
