@@ -12,8 +12,6 @@ let haSeq=997000000;
 const haPending=new Map();
 let currentQuery='';
 let currentConfirm='';
-let confirmStep=0;
-let confirmText='';
 let uiBound=false;
 
 const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -165,8 +163,7 @@ function installStyle(){
     .courses-product-admin-delete{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(218,48,42,.12);border-radius:12px;background:rgba(255,59,48,.065);color:#d93025}.courses-product-admin-delete svg{width:15px;height:15px}.courses-product-admin-delete:disabled{opacity:.42}
     .courses-product-admin-pending{font-size:9.5px;font-weight:780;color:#b36a00;background:rgba(255,149,0,.10);padding:5px 8px;border-radius:9px}
     .courses-product-admin-confirm{grid-column:1/-1;margin-top:2px;padding:11px;border-radius:13px;background:rgba(255,59,48,.055);border:1px solid rgba(218,48,42,.10)}
-    .courses-product-admin-confirm strong{display:block;color:#b82924;font-size:11.5px}.courses-product-admin-confirm p{margin:4px 0 9px;color:#6f615e;font-size:9.8px;line-height:1.4}.courses-product-admin-confirm-actions{display:flex;gap:7px;justify-content:flex-end;align-items:center}.courses-product-admin-confirm-actions button{min-height:32px;padding:0 11px;border-radius:10px;font-size:10px;font-weight:790}.courses-product-admin-cancel{border:1px solid rgba(55,75,63,.10);background:#fff;color:#68736c}.courses-product-admin-continue,.courses-product-admin-confirm-delete{border:0;background:#d93025;color:#fff}.courses-product-admin-confirm-delete:disabled{opacity:.38}
-    .courses-product-admin-confirm-input{width:100%;height:38px;margin:2px 0 9px;padding:0 10px;border:1px solid rgba(218,48,42,.18)!important;border-radius:11px!important;background:#fff!important;font-size:11px!important;box-sizing:border-box}
+    .courses-product-admin-confirm strong{display:block;color:#b82924;font-size:11.5px}.courses-product-admin-confirm p{margin:4px 0 9px;color:#6f615e;font-size:9.8px;line-height:1.4}.courses-product-admin-confirm-actions{display:flex;gap:7px;justify-content:flex-end;align-items:center}.courses-product-admin-confirm-actions button{min-height:32px;padding:0 11px;border-radius:10px;font-size:10px;font-weight:790}.courses-product-admin-cancel{border:1px solid rgba(55,75,63,.10);background:#fff;color:#68736c}.courses-product-admin-confirm-delete{border:0;background:#d93025;color:#fff}
     .courses-product-admin-empty{padding:28px 14px;text-align:center;color:#78827c;font-size:11px;border:1px dashed rgba(43,72,54,.14);border-radius:16px}.courses-product-admin-feedback{min-height:16px;color:#657269;font-size:10px;text-align:center}.courses-product-admin-feedback.is-error{color:#d93025}.courses-product-admin-feedback.is-ok{color:#0b7040}
   `;
   document.head.appendChild(style);
@@ -191,14 +188,7 @@ function visibleProducts(){
 }
 function confirmMarkup(item){
   if(currentConfirm!==item.name)return '';
-  if(confirmStep===1){
-    return '<div class="courses-product-admin-confirm"><strong>Supprimer « '+esc(item.name)+' » ?</strong><p>Le produit sera retiré du catalogue et son image supprimée du dépôt GitHub. La liste Home Assistant n’est pas modifiée.</p><div class="courses-product-admin-confirm-actions"><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-continue" type="button" data-continue-delete="'+esc(item.name)+'">Continuer</button></div></div>';
-  }
-  if(confirmStep===2){
-    const valid=norm(confirmText)===norm(item.name);
-    return '<div class="courses-product-admin-confirm"><strong>Confirmation définitive</strong><p>Saisissez exactement <b>'+esc(item.name)+'</b> pour autoriser la suppression sur GitHub.</p><input class="courses-product-admin-confirm-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" value="'+esc(confirmText)+'" placeholder="'+esc(item.name)+'" data-delete-confirm-input="'+esc(item.name)+'"><div class="courses-product-admin-confirm-actions"><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-confirm-delete" type="button" data-confirm-delete="'+esc(item.name)+'" '+(valid?'':'disabled')+'>Supprimer définitivement</button></div></div>';
-  }
-  return '';
+  return '<div class="courses-product-admin-confirm"><strong>Supprimer définitivement « '+esc(item.name)+' » ?</strong><p>Le produit sera retiré du catalogue et son image supprimée du dépôt GitHub. La liste Home Assistant n’est pas modifiée.</p><div class="courses-product-admin-confirm-actions"><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-confirm-delete" type="button" data-confirm-delete="'+esc(item.name)+'">Supprimer définitivement</button></div></div>';
 }
 function render(){
   const panel=document.getElementById('preferencesProductCatalogPanel');if(!panel)return;
@@ -224,17 +214,16 @@ async function beginDeletion(name,button){
       feedback('Suppression bloquée : utilisé par '+usages.slice(0,5).join(', ')+(usages.length>5?'…':''),'error');
       button.disabled=false;return;
     }
-    currentConfirm=name;confirmStep=1;confirmText='';render();
+    currentConfirm=name;render();
   }catch(error){
     button.disabled=false;feedback(String(error?.message||'Vérification impossible.'),'error');
   }
 }
 async function confirmDeletion(name,button){
-  if(norm(confirmText)!==norm(name))return;
   button.disabled=true;feedback('Envoi de la suppression à GitHub…');
   try{
     await requestDeletion(name);
-    currentConfirm='';confirmStep=0;confirmText='';render();
+    currentConfirm='';render();
     feedback('Suppression demandée. GitHub applique la modification en arrière-plan.','ok');
   }catch(error){
     button.disabled=false;feedback(String(error?.message||'Suppression impossible.'),'error');
@@ -271,7 +260,7 @@ function showCatalog(){
   const {dialog,content,panel,title,intro}=panelElements();if(!dialog||!content||!panel)return;
   [...content.children].forEach(node=>{if(node===title||node===intro||node===panel)return;node.hidden=true});
   panel.hidden=false;if(title)title.textContent='Catalogue produit';if(intro)intro.textContent='Gérez les produits présents dans le catalogue de l’application.';
-  currentQuery='';currentConfirm='';confirmStep=0;confirmText='';render();if(!dialog.open)dialog.showModal();
+  currentQuery='';currentConfirm='';render();if(!dialog.open)dialog.showModal();
   void reconcilePending();
 }
 function bindUi(){
@@ -293,22 +282,16 @@ function bindUi(){
   button.addEventListener('click',showCatalog);
   panel.addEventListener('input',event=>{
     if(event.target.matches('[data-product-admin-search]')){
-      currentQuery=event.target.value;currentConfirm='';confirmStep=0;confirmText='';render();panel.querySelector('[data-product-admin-search]')?.focus();return;
-    }
-    if(event.target.matches('[data-delete-confirm-input]')){
-      confirmText=event.target.value;
-      const finalButton=panel.querySelector('[data-confirm-delete]');
-      if(finalButton)finalButton.disabled=norm(confirmText)!==norm(event.target.dataset.deleteConfirmInput||'');
+      currentQuery=event.target.value;currentConfirm='';render();panel.querySelector('[data-product-admin-search]')?.focus();
     }
   });
   panel.addEventListener('click',event=>{
     if(event.target.closest('.courses-product-admin-back')){showManagement();return}
     const del=event.target.closest('[data-delete-product]');if(del){void beginDeletion(del.dataset.deleteProduct||'',del);return}
-    if(event.target.closest('.courses-product-admin-cancel')){currentConfirm='';confirmStep=0;confirmText='';render();return}
-    const next=event.target.closest('[data-continue-delete]');if(next){currentConfirm=next.dataset.continueDelete||'';confirmStep=2;confirmText='';render();panel.querySelector('[data-delete-confirm-input]')?.focus();return}
+    if(event.target.closest('.courses-product-admin-cancel')){currentConfirm='';render();return}
     const finalButton=event.target.closest('[data-confirm-delete]');if(finalButton){void confirmDeletion(finalButton.dataset.confirmDelete||'',finalButton)}
   });
-  dialog.addEventListener('close',()=>{panel.hidden=true;currentConfirm='';confirmStep=0;confirmText=''});
+  dialog.addEventListener('close',()=>{panel.hidden=true;currentConfirm=''});
   return true;
 }
 function bindWhenReady(){
