@@ -78,7 +78,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Pépites chocolat":"Pépites choc.",
   "Noix de coco râpée":"Noix coco",
   "Amandes en poudre":"Amandes poud.",
-  "Chips barbecue":"Chips BBQ",
+
   "Mini saucissons":"Mini sauciss.",
   "Nouilles instantanées":"Nouilles inst",
   "Nouilles chinoises":"Nouilles chin",
