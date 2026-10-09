@@ -165,10 +165,14 @@ test('les demandes manquantes affichent catégorie et statut compact sur la mêm
   assert.ok(popup.includes('small:not(.missing-dish-error):not(.missing-dish-progress)'));
 });
 
-test('le popup produits et plats manquants prend le focus sans ouvrir le clavier et peut toujours se fermer',()=>{
+test('le popup produits et plats manquants conserve l ouverture native et peut toujours se fermer',()=>{
   const index=read('index.html');
+  const app=read('app.js');
   const popup=read('missing-products-popup-ui.js');
-  assert.match(index,/<dialog id="missingProductsDialog" class="dialog" tabindex="-1" autofocus>/);
+  assert.match(index,/<dialog id="missingProductsDialog" class="dialog" tabindex="-1">/);
+  assert.doesNotMatch(index,/<dialog id="missingProductsDialog"[^>]*\bautofocus\b/);
+  assert.match(app,/function openMissingProducts\(\)[\s\S]*?showNeutralDialog\(UI\.missingProductsDialog\)/);
+  assert.doesNotMatch(popup,/function bindOpenFallback\(dialog\)/);
   assert.match(popup,/function ensureCloseButton\(dialog\)/);
   assert.match(popup,/button\.className='missing-products-close'/);
   assert.match(popup,/button\.setAttribute\('aria-label','Fermer'\)/);
@@ -176,13 +180,13 @@ test('le popup produits et plats manquants prend le focus sans ouvrir le clavier
   assert.match(popup,/dialog\.addEventListener\('cancel',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?closePopup\(dialog\)/);
 });
 
-test('la version visible passe à v355 et le popup des demandes est rechargé',()=>{
+test('la version visible passe à v356 et les scripts principaux sont rechargés',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=355/);
-  assert.match(index,/app\.js\?v=352/);
-  assert.match(index,/settings-tab-badge\.js\?v=352/);
-  assert.equal((index.match(/page-version\">v355/g)||[]).length,3);
+  assert.match(index,/catalog\.js\?v=356/);
+  assert.match(index,/app\.js\?v=356/);
+  assert.match(index,/settings-tab-badge\.js\?v=356/);
+  assert.equal((index.match(/page-version\">v356/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=344/);
   assert.match(catalog,/dish-local-images\.js\?v=355/);
   assert.match(settings,/missing-products-dishes\.js\?v=8/);
