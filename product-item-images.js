@@ -49,11 +49,11 @@ function ensureStyles(){
       max-height:none!important;
       object-fit:contain!important;
       object-position:center!important;
-      transform:translateY(4px) scale(var(--single-product-scale,1))!important;
+      transform:translate(var(--single-product-shift-x,0%),calc(4px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
       transform-origin:center!important;
     }
     .premium-sprite.is-single-product-image.is-compact>img{
-      transform:translateY(1px) scale(var(--single-product-scale,1))!important;
+      transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
     }
     @media(max-width:520px){
       .catalog-view .product .media{
@@ -66,7 +66,12 @@ function ensureStyles(){
 function applyVisualScale(image,source){
   if(!image||!source)return;
   const cached=visualScaleCache.get(source);
-  if(cached){image.style.setProperty('--single-product-scale',String(cached));return}
+  if(cached){
+    image.style.setProperty('--single-product-scale',String(cached.scale));
+    image.style.setProperty('--single-product-shift-x',cached.shiftX+'%');
+    image.style.setProperty('--single-product-shift-y',cached.shiftY+'%');
+    return;
+  }
   try{
     const size=96,canvas=document.createElement('canvas');
     canvas.width=size;canvas.height=size;
@@ -82,10 +87,20 @@ function applyVisualScale(image,source){
     }
     if(maxX<minX||maxY<minY)return;
     const occupancy=Math.max((maxX-minX+1)/size,(maxY-minY+1)/size);
-    const scale=Math.max(.94,Math.min(1.30,.90/Math.max(.01,occupancy)));
-    const rounded=Math.round(scale*1000)/1000;
-    visualScaleCache.set(source,rounded);
-    image.style.setProperty('--single-product-scale',String(rounded));
+    const scale=Math.max(.94,Math.min(1.45,.90/Math.max(.01,occupancy)));
+    const centerX=(minX+maxX+1)/(2*size);
+    const centerY=(minY+maxY+1)/(2*size);
+    const shiftX=Math.max(-18,Math.min(18,(.5-centerX)*100*scale));
+    const shiftY=Math.max(-18,Math.min(18,(.5-centerY)*100*scale));
+    const metrics={
+      scale:Math.round(scale*1000)/1000,
+      shiftX:Math.round(shiftX*10)/10,
+      shiftY:Math.round(shiftY*10)/10,
+    };
+    visualScaleCache.set(source,metrics);
+    image.style.setProperty('--single-product-scale',String(metrics.scale));
+    image.style.setProperty('--single-product-shift-x',metrics.shiftX+'%');
+    image.style.setProperty('--single-product-shift-y',metrics.shiftY+'%');
   }catch(_){}
 }
 function onSingleProductImageLoaded(image,source){
