@@ -92,7 +92,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Sirop de menthe":"Sirop menthe",
   "Sirop de pêche":"Sirop pêche",
   "Boisson énergétique":"Boisson énerg",
-  "Café décaféiné":"Café déca.",
+
   "Thé fruits rouges":"Thé fruits r.",
   "Infusion verveine":"Infusion verv",
   "Infusion camomille":"Infusion camo",
