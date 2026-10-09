@@ -87,9 +87,15 @@ jobs:
               try: data=json.loads(path.read_text(encoding='utf-8'))
               except Exception: pass
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
-              for key in ('ok','already_exists','version','filename','name'):
+              for key in ('ok','already_exists','version','filename','name','error'):
                   value=data.get(key,'')
-                  out.write(f"{key}={str(value).lower() if isinstance(value,bool) else value}\n")
+                  if isinstance(value,bool):
+                      value=str(value).lower()
+                  else:
+                      value=' '.join(str(value).split())
+                  if key=='error':
+                      value=value[:1000]
+                  out.write(f"{key}={value}\n")
 
       - name: Sauvegarder la génération sur une branche temporaire
         id: preserve
@@ -182,6 +188,8 @@ jobs:
         if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success')
         env:
           PUSH_STATUS: error
+          PUSH_ERROR: ${{ steps.result.outputs.error }}
+          PUSH_STAGE: ${{ steps.integrate.outcome != 'success' && 'integration' || 'deployment' }}
         run: node scripts/send_web_push.mjs
 
       - name: Signaler un échec d'intégration
