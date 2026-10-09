@@ -2881,7 +2881,7 @@ function bindUiEvents(){
   UI.savePasswordChange.onclick=changeLocalPassword;
   UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
   $('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp(STATUS_TEXT.manualLockReason)};
-  UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';renderProducts()};
+  UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';clearTimeout(UI.productSearch._searchTimer);UI.productSearch._searchTimer=setTimeout(renderProducts,80)};
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!UI.listFilterMenu.hidden)setListFilterMenuOpen(false)});
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{
