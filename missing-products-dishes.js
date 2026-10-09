@@ -4,9 +4,50 @@
 const STORAGE_DISHES='courses-missing-dishes-v1';
 const STORAGE_ADDED_DISHES='courses-missing-dishes-added-v1';
 const STORAGE_PRODUCTS='courses-missing-products-v1';
+const STORAGE_PRODUCT_IMAGE_HINTS='courses-missing-product-image-hints-v1';
+const PRODUCT_IMAGE_HINT_MAX=140;
 const CHATGPT_URL='https://chatgpt.com/';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+function sanitizeProductImageHint(value){
+  return String(value||'').trim().replace(/\s+/g,' ').slice(0,PRODUCT_IMAGE_HINT_MAX);
+}
+function readProductImageHints(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STORAGE_PRODUCT_IMAGE_HINTS)||'{}');
+    return saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:{};
+  }catch(_){
+    return {};
+  }
+}
+function saveProductImageHints(hints){
+  try{localStorage.setItem(STORAGE_PRODUCT_IMAGE_HINTS,JSON.stringify(hints))}catch(_){}
+}
+function productImageHint(name){
+  const key=normalize(name);
+  return key?sanitizeProductImageHint(readProductImageHints()[key]):'';
+}
+function setProductImageHint(name,value){
+  const key=normalize(name);
+  if(!key)return;
+  const hints=readProductImageHints();
+  const hint=sanitizeProductImageHint(value);
+  if(hint)hints[key]=hint;
+  else delete hints[key];
+  saveProductImageHints(hints);
+}
+function pruneProductImageHints(products){
+  const keep=new Set((products||[]).map(item=>normalize(item?.name)).filter(Boolean));
+  const hints=readProductImageHints();
+  let changed=false;
+  Object.keys(hints).forEach(key=>{
+    if(keep.has(key))return;
+    delete hints[key];
+    changed=true;
+  });
+  if(changed)saveProductImageHints(hints);
+}
 
 function catalogDishCategories(){
   const categories=[...document.querySelectorAll('.dish-filter[data-value]')]
@@ -69,7 +110,8 @@ function sanitizeProduct(item,index=0){
   return {
     id:String(item?.id||('product-'+index+'-'+normalize(name))),
     name,
-    category:String(item?.category||'').trim().slice(0,80)
+    category:String(item?.category||'').trim().slice(0,80),
+    imageHint:productImageHint(name)
   };
 }
 function readProducts(){
@@ -165,6 +207,7 @@ function launchChatGpt(prompt){
 }
 function buildProductPrompt(item){
   const category=item.category||'non précisée';
+  const imageHint=sanitizeProductImageHint(item.imageHint);
   return [
     'Tu travailles sur le projet Application Course.',
     '',
@@ -173,6 +216,10 @@ function buildProductPrompt(item){
     '',
     'Demande : intégrer le produit « '+item.name+' » dans le catalogue.',
     'Catégorie proposée par l’utilisateur : '+category+'.',
+    ...(imageHint?[
+      'Précision visuelle fournie par l’utilisateur (uniquement pour l’image) : « '+imageHint+' ».',
+      'Cette précision décrit l’apparence, la forme, le contenant ou l’emballage à représenter et ne doit jamais modifier le nom du produit.'
+    ]:[]),
     '',
     'Exécute directement cette demande : le feu vert est donné.',
     '',
@@ -274,6 +321,17 @@ function initMissingProductsAndDishes(){
     #missingProductsDialog .missing-mode-button{position:relative;z-index:1;border:0;background:transparent;color:#758078;font-size:13px;font-weight:780;border-radius:18px;padding:0 12px;transition:color .2s ease,transform .2s cubic-bezier(.3,1.4,.5,1)}
     #missingProductsDialog .missing-mode-button.is-active{color:#0b6f3e}
     #missingProductsDialog .missing-mode-switch.is-swapping .missing-mode-button.is-active{transform:scale(1.035)}
+    #missingProductsDialog .missing-image-hint-field{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;margin:-2px 0 12px;padding:10px 11px;border:1px solid rgba(35,144,90,.13);border-radius:17px;background:linear-gradient(145deg,rgba(246,251,248,.98),rgba(239,247,242,.88));box-shadow:inset 0 1px 0 rgba(255,255,255,.96)}
+    #missingProductsDialog .missing-image-hint-field[hidden]{display:none!important}
+    #missingProductsDialog .missing-image-hint-mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(35,144,90,.10);color:#17844d;font-size:16px;font-weight:850}
+    #missingProductsDialog .missing-image-hint-content{min-width:0;display:grid;gap:5px}
+    #missingProductsDialog .missing-image-hint-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 1px}
+    #missingProductsDialog .missing-image-hint-head strong{color:#183126;font-size:12.5px;font-weight:820;letter-spacing:-.01em}
+    #missingProductsDialog .missing-image-hint-head small{color:#8a948e;font-size:10px;font-weight:700}
+    #missingProductsDialog #missingProductImageHint{width:100%;min-width:0;height:38px;border:1px solid rgba(207,219,211,.9);border-radius:12px;background:rgba(255,255,255,.96);color:#1a2821;padding:0 11px;font-size:12.5px;font-weight:620;outline:none;-webkit-appearance:none;appearance:none}
+    #missingProductsDialog #missingProductImageHint::placeholder{color:#a2aaa5;font-weight:560}
+    #missingProductsDialog #missingProductImageHint:focus{border-color:rgba(35,144,90,.34);box-shadow:0 0 0 3px rgba(35,144,90,.07)}
+    #missingProductsDialog .missing-image-hint-help{padding:0 1px;color:#829087;font-size:9.8px;line-height:1.2;font-weight:620}
     #missingProductsDialog .missing-category-grid{display:none!important}
     #missingProductsDialog .missing-category-heading{margin-bottom:8px!important}
     #missingProductsDialog .missing-category-select{width:100%;height:46px;border:1px solid #e3e8e2;border-radius:14px;background:#fff;color:#27342d;padding:0 13px;font-size:13px;font-weight:720;outline:none}
@@ -286,7 +344,7 @@ function initMissingProductsAndDishes(){
     #missingProductsDialog .missing-dish-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto}
     #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{border:0;border-radius:999px;min-height:40px;padding:0 14px;background:#e5f4e9;color:#0b7040;font-size:12px;font-weight:850;white-space:nowrap}
     #missingProductsDialog .missing-product-remove:disabled{opacity:.3}
-    @media(max-width:390px){#missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:32px minmax(0,1fr) auto 40px!important;gap:6px!important}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{padding:0 11px!important;font-size:11px!important}}
+    @media(max-width:390px){#missingProductsDialog .missing-image-hint-field{grid-template-columns:30px minmax(0,1fr);gap:8px;padding:9px 10px;border-radius:15px}#missingProductsDialog .missing-image-hint-mark{width:30px;height:30px;border-radius:10px;font-size:14px}#missingProductsDialog #missingProductImageHint{height:36px;font-size:12px}#missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:32px minmax(0,1fr) auto 40px!important;gap:6px!important}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{padding:0 11px!important;font-size:11px!important}}
     @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-lens,#missingProductsDialog .missing-mode-button{transition:none!important}}
   `;
   document.head.appendChild(style);
@@ -297,6 +355,12 @@ function initMissingProductsAndDishes(){
   modeSwitch.setAttribute('aria-label','Type d’élément manquant');
   modeSwitch.innerHTML='<span class="missing-mode-lens" aria-hidden="true"></span><button class="missing-mode-button is-active" type="button" data-missing-mode="products" role="tab" aria-selected="true">Produits</button><button class="missing-mode-button" type="button" data-missing-mode="dishes" role="tab" aria-selected="false">Plats</button>';
   addRow.before(modeSwitch);
+
+  const imageHintField=document.createElement('label');
+  imageHintField.className='missing-image-hint-field';
+  imageHintField.innerHTML='<span class="missing-image-hint-mark" aria-hidden="true">✦</span><span class="missing-image-hint-content"><span class="missing-image-hint-head"><strong>Précision image</strong><small>Optionnel</small></span><input id="missingProductImageHint" type="text" maxlength="'+PRODUCT_IMAGE_HINT_MAX+'" autocomplete="off" autocapitalize="sentences" placeholder="Ex. tube d’épice chili en poudre" aria-label="Précision pour l’image du produit"><small class="missing-image-hint-help">Utilisée uniquement pour l’image · le nom reste inchangé</small></span>';
+  addRow.after(imageHintField);
+  const imageHintInput=imageHintField.querySelector('#missingProductImageHint');
 
   const categorySelect=document.createElement('select');
   categorySelect.className='missing-category-select';
@@ -364,6 +428,7 @@ function initMissingProductsAndDishes(){
     });
     input.placeholder=dishesMode?'Nom du plat':'Nom du produit';
     input.setAttribute('aria-label',dishesMode?'Nom du plat':'Nom du produit');
+    imageHintField.hidden=dishesMode;
     listHeading.textContent=dishesMode?'Plats manquants':'Produits manquants';
     productList.hidden=dishesMode;
     dishesList.hidden=!dishesMode;
@@ -381,7 +446,10 @@ function initMissingProductsAndDishes(){
     if(mode===next){renderMode();return}
     mode=next;
     lastMode=next;
-    if(clearInput)input.value='';
+    if(clearInput){
+      input.value='';
+      imageHintInput.value='';
+    }
     if(animate&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
       modeSwitch.classList.add('is-swapping');
       clearTimeout(swapTimer);
@@ -389,6 +457,15 @@ function initMissingProductsAndDishes(){
       navigator.vibrate?.(4);
     }
     renderMode();
+  }
+  function saveProductImageHintDraft(){
+    if(mode!=='products')return;
+    const name=String(input.value||'').trim().replace(/\s+/g,' ').slice(0,80);
+    if(!name)return;
+    setProductImageHint(name,imageHintInput.value);
+    queueMicrotask(()=>{
+      if(!String(input.value||'').trim())imageHintInput.value='';
+    });
   }
   function addDish(){
     const name=String(input.value||'').trim().replace(/\s+/g,' ').slice(0,80);
@@ -526,6 +603,7 @@ function initMissingProductsAndDishes(){
   }
   function syncNewProductRequests(){
     const products=readProducts();
+    pruneProductImageHints(products);
     const nextIds=new Set(products.map(item=>item.id));
     products.forEach(item=>{
       if(!knownProductIds.has(item.id)){
@@ -570,13 +648,20 @@ function initMissingProductsAndDishes(){
   });
 
   addButton.addEventListener('click',event=>{
-    if(mode!=='dishes')return;
+    if(mode==='products'){
+      saveProductImageHintDraft();
+      return;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
     addDish();
   },true);
   input.addEventListener('keydown',event=>{
-    if(mode!=='dishes'||event.key!=='Enter')return;
+    if(event.key!=='Enter')return;
+    if(mode==='products'){
+      saveProductImageHintDraft();
+      return;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
     addDish();
@@ -631,6 +716,7 @@ function initMissingProductsAndDishes(){
   visualWarmupObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 
   settingsButton.addEventListener('click',()=>{
+    imageHintInput.value='';
     setMode(lastMode,{animate:false,clearInput:false});
     requestAnimationFrame(()=>{
       renderCategorySelect();
@@ -640,6 +726,7 @@ function initMissingProductsAndDishes(){
   });
   dialog.addEventListener('close',()=>{
     lastMode=mode;
+    imageHintInput.value='';
   });
 
   renderMode();

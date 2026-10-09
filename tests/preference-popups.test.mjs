@@ -77,6 +77,24 @@ test('un nouveau produit à générer déclenche la notification système dédi�
   assert.match(source,/if\(!knownProductIds\.has\(item\.id\)\)\{[\s\S]*?notifyRequest\(item\.name\);[\s\S]*?void notifyProductQueued\(item\.id\);/);
 });
 
+test('la précision image reste séparée du nom et atteint les deux intégrations produit',()=>{
+  const missing=read('missing-products-dishes.js');
+  const fixes=read('missing-products-fixes.js');
+  const generator=read('scripts/integrate_product_openai.py');
+  assert.match(missing,/STORAGE_PRODUCT_IMAGE_HINTS='courses-missing-product-image-hints-v1'/);
+  assert.match(missing,/id="missingProductImageHint"/);
+  assert.match(missing,/Utilisée uniquement pour l’image · le nom reste inchangé/);
+  assert.match(missing,/imageHint:productImageHint\(name\)/);
+  assert.match(missing,/function saveProductImageHintDraft\(\)/);
+  assert.match(missing,/Précision visuelle fournie par l’utilisateur \(uniquement pour l’image\)/);
+  assert.match(fixes,/PRODUCT_IMAGE_HINT_MARKER='\|\|__courses_image_hint__:'/);
+  assert.match(fixes,/dish_category:type==='product'\?productOpenAiCategory\(item\):String\(item\.category\|\|''\)/);
+  assert.match(generator,/IMAGE_HINT_MARKER = "\|\|__courses_image_hint__:"/);
+  assert.match(generator,/def parse_product_category\(value: str\) -> tuple\[str,str\]:/);
+  assert.match(generator,/Précision visuelle prioritaire fournie par l’utilisateur/);
+  assert.match(generator,/image=generate_image\(name,category,subgroup,image_hint,api_key\)/);
+});
+
 test('la personnalisation des recettes se réinitialise durablement et s enregistre sans fermer le popup',()=>{
   const source=read('dishes-ui.js');
   const resetStart=source.indexOf('function resetRecipeCustomizationDraft()');
@@ -208,7 +226,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 
-test('la version visible passe à v363 et recharge les textes raccourcis',()=>{
+test('la version visible runtime passe à v364 et recharge la génération avec précision image',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
   assert.match(index,/catalog\.js\?v=363/);
@@ -229,7 +247,7 @@ test('la version visible passe à v363 et recharge les textes raccourcis',()=>{
   assert.match(sw,/missing-products-fixes\.js\?v=19/);
   assert.match(sw,/missing-products-popup-ui\.js\?v=18/);
   assert.match(sw,/dish-local-images\.js\?v=363/);
-  assert.match(localImages,/const APP_VERSION='v363'/);
-  assert.match(localImages,/missing-products-fixes\.js\?v=19/);
+  assert.match(localImages,/const APP_VERSION='v364'/);
+  assert.match(localImages,/missing-products-fixes\.js\?v=20/);
   assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
 });

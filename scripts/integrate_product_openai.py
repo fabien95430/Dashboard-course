@@ -8,12 +8,15 @@ import json
 import os
 import re
 import sys
+from urllib.parse import unquote
 
 import integrate_dish as base
 
 ROOT = base.ROOT
 RESULT_PATH = base.RESULT_PATH
 PRODUCT_PREFIX = "__courses_product__:"
+IMAGE_HINT_MARKER = "||__courses_image_hint__:"
+IMAGE_HINT_MAX = 140
 
 
 def require_push() -> None:
@@ -44,6 +47,20 @@ def find_product(groups: dict[str, dict[str, list[str]]], name: str):
                 if base.normalize(existing)==wanted:
                     return str(existing),category,subgroup
     return None
+
+
+def parse_product_category(value: str) -> tuple[str,str]:
+    raw=str(value or "").strip()
+    if IMAGE_HINT_MARKER not in raw:
+        return raw,""
+    category,encoded_hint=raw.split(IMAGE_HINT_MARKER,1)
+    try:
+        hint=unquote(encoded_hint)
+    except Exception:
+        hint=encoded_hint
+    hint=re.sub(r"\s+"," ",hint).strip()
+    hint="".join(character for character in hint if ord(character)>=32)[:IMAGE_HINT_MAX]
+    return category.strip(),hint
 
 
 def validate_location_result(result: dict, source: dict, name: str) -> tuple[str,str,bool]:
@@ -118,29 +135,35 @@ Catalogue disponible:
         raise RuntimeError(f"Classement produit invalide: {error}") from error
 
 
-def image_prompt(name: str, category: str, subgroup: str) -> str:
+def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") -> str:
+    hint=(
+        f"Précision visuelle prioritaire fournie par l’utilisateur: {image_hint}. "
+        "Respecter précisément cette forme, ce contenant ou cet emballage; cette précision sert uniquement au visuel et ne modifie jamais le nom du produit. "
+        if image_hint else ""
+    )
     return (
         f"Vignette produit pour une application de courses: {name}. Catégorie {category}, sous-groupe {subgroup}. "
+        +hint+
         "Reprendre le langage visuel des produits déjà présents dans le catalogue: illustration 3D semi-réaliste de catalogue mobile, "
         "objet détouré propre, volumes simples, textures nettes, lumière studio douce et ombre très légère. "
         "Représenter un seul type de produit, isolé et immédiatement reconnaissable, sur fond totalement transparent. "
         "Le produit principal doit occuper environ 65 à 75 % du carré, être centré, avec une marge transparente régulière et aucun bord important coupé. "
-        "Privilégier le produit lui-même plutôt que son emballage de vente. Si l'objet est reconnaissable sans emballage "
+        "En l’absence de précision visuelle utilisateur, privilégier le produit lui-même plutôt que son emballage de vente. Si l'objet est reconnaissable sans emballage "
         "(par exemple pile, thermomètre, éponge, rasoir, fruit ou légume), le montrer hors boîte, hors blister, hors sachet et sans étiquette. "
-        "N'utiliser un emballage générique que lorsqu'il est réellement indispensable pour identifier le produit; dans ce cas il doit rester simple, "
+        "N'utiliser un emballage générique que lorsqu'il est réellement indispensable pour identifier le produit, ou lorsqu’une précision visuelle utilisateur le demande; dans ce cas il doit rester simple, "
         "sans marque, sans logo et sans texte lisible. Éviter les grands blocs rectangulaires ou les packagings qui dominent la vignette. "
         "Aucun décor, table, rayon, main, personne, collage, grille ou deuxième type de produit. Aucun texte ajouté autour du produit. "
         "Le produit doit rester parfaitement lisible à petite taille et visuellement cohérent avec les autres icônes du catalogue."
     )
 
 
-def generate_image(name: str, category: str, subgroup: str, api_key: str) -> bytes:
+def generate_image(name: str, category: str, subgroup: str, image_hint: str, api_key: str) -> bytes:
     model=os.getenv("COURSES_IMAGE_MODEL","gpt-image-2.5-flare")
     payload=base.api_json(
         "https://api.openai.com/v1/images/generations",
         {
             "model":model,
-            "prompt":image_prompt(name,category,subgroup),
+            "prompt":image_prompt(name,category,subgroup,image_hint),
             "size":"1024x1024",
             "quality":"high",
             "output_format":"webp",
@@ -207,7 +230,7 @@ def integrate_files(name: str, category: str, subgroup: str, image: bytes, catal
 
 def main() -> None:
     raw_name=re.sub(r"\s+"," ",str(os.getenv("DISH_NAME") or "")).strip()
-    selected_category=str(os.getenv("DISH_CATEGORY") or "").strip()
+    selected_category,image_hint=parse_product_category(str(os.getenv("DISH_CATEGORY") or ""))
     api_key=str(os.getenv("OPENAI_API_KEY") or "").strip()
     if not raw_name.startswith(PRODUCT_PREFIX):
         base.fail("Préfixe produit manquant")
@@ -239,7 +262,7 @@ def main() -> None:
 
     if not api_key:
         base.fail("Secret GitHub OPENAI_API_KEY manquant")
-    image=generate_image(name,category,subgroup,api_key)
+    image=generate_image(name,category,subgroup,image_hint,api_key)
     version,filename=integrate_files(
         name,category,subgroup,image,catalog_text,groups_match,groups,already_in_catalog,create_subgroup
     )
