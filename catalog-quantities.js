@@ -135,7 +135,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   'Lait infantile':'Boîte','Petits pots':'Pot','Compotes bébé':'Pot','Croquettes chat':'Sac','Pâtée chat':'Boîte','Litière chat':'Sac','Croquettes chien':'Sac','Sacs déjections':'Paquet','Friandises animaux':'Paquet',
   "Piles AA":"Paquet",
   "Cornichon":"Pot",
-  "Confiture fraise":"Pot"
+  "Confiture fraise":"Pot",
+  "Confiture mirabelles":"Pot"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
