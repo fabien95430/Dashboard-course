@@ -158,7 +158,7 @@ test('les demandes manquantes affichent catégorie et statut compact sur la mêm
   const fixes=read('missing-products-fixes.js');
   const popup=read('missing-products-popup-ui.js');
   assert.ok(missing.includes("appNotify('Ajout en cours',name);"));
-  assert.ok(fixes.includes("progress.textContent=failed?'Erreur':'En cours';"));
+  assert.ok(fixes.includes("const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';"));
   assert.ok(fixes.includes('background:rgba(255,149,0,.11)!important;color:#b96500!important'));
   assert.ok(fixes.includes('.missing-dish-progress.is-error{background:rgba(255,59,48,.10)!important;color:#d93025!important}'));
   assert.ok(popup.includes('display:flex!important;flex-flow:row wrap!important;align-items:center!important'));
@@ -180,32 +180,35 @@ test('le popup produits et plats manquants conserve l ouverture native et peut t
   assert.match(popup,/dialog\.addEventListener\('cancel',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?closePopup\(dialog\)/);
 });
 
-test('la version visible passe à v356 et les scripts principaux sont rechargés',()=>{
+test('les décorations du popup sont idempotentes et ne nourrissent plus leurs MutationObserver',()=>{
+  const fixes=read('missing-products-fixes.js');
+  const popup=read('missing-products-popup-ui.js');
+  assert.match(fixes,/const progressLabel=cancelled\?'Annulé':failed\?'Erreur':'En cours';/);
+  assert.match(fixes,/if\(progress\.textContent!==progressLabel\)progress\.textContent=progressLabel;/);
+  assert.match(popup,/if\(thumb\.dataset\.requestThumbType!==type\)\{[\s\S]*?thumb\.innerHTML=thumbSvg\(type\)/);
+  assert.match(popup,/if\(integrate\.textContent!=='Ajouté ✓'\)integrate\.textContent='Ajouté ✓';/);
+  assert.match(popup,/if\(integrate\.textContent!==label\)integrate\.textContent=label;/);
+  assert.doesNotMatch(popup,/row\.classList\.remove\('is-request-product','is-request-dish','is-request-dessert'\)/);
+});
+
+test('la version visible passe à v357 et recharge les modules corrigés du popup',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=356/);
+  assert.match(index,/catalog\.js\?v=357/);
   assert.match(index,/app\.js\?v=356/);
   assert.match(index,/settings-tab-badge\.js\?v=356/);
-  assert.equal((index.match(/page-version\">v356/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v357/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=344/);
-  assert.match(catalog,/dish-local-images\.js\?v=355/);
+  assert.match(catalog,/dish-local-images\.js\?v=357/);
   assert.match(settings,/missing-products-dishes\.js\?v=8/);
-  assert.match(sw,/courses-app-v355-r1/);
-  assert.match(sw,/styles\.css\?v=348/);
-  assert.match(sw,/catalog\.js\?v=352/);
-  assert.match(sw,/app\.js\?v=352/);
-  assert.match(sw,/settings-tab-badge\.js\?v=352/);
-  assert.match(sw,/missing-products-dishes\.js\?v=8/);
-  assert.match(sw,/dish-local-images\.js\?v=351/);
-  assert.match(sw,/missing-products-fixes\.js\?v=18/);
-  assert.match(sw,/missing-products-popup-ui\.js\?v=16/);
-  assert.match(sw,/dish-local-images\.js\?v=353/);
-  assert.match(sw,/catalog\.js\?v=354/);
-  assert.match(sw,/dish-local-images\.js\?v=354/);
-  assert.match(sw,/catalog\.js\?v=355/);
-  assert.match(sw,/missing-products-popup-ui\.js\?v=17/);
-  assert.match(sw,/dish-local-images\.js\?v=355/);
-  assert.match(localImages,/const APP_VERSION='v355'/);
-  assert.match(localImages,/missing-products-fixes\.js\?v=18/);
-  assert.match(localImages,/missing-products-popup-ui\.js\?v=17/);
+  assert.match(sw,/courses-app-v357-r1/);
+  assert.match(sw,/catalog\.js\?v=357/);
+  assert.match(sw,/app\.js\?v=356/);
+  assert.match(sw,/settings-tab-badge\.js\?v=356/);
+  assert.match(sw,/missing-products-fixes\.js\?v=19/);
+  assert.match(sw,/missing-products-popup-ui\.js\?v=18/);
+  assert.match(sw,/dish-local-images\.js\?v=357/);
+  assert.match(localImages,/const APP_VERSION='v357'/);
+  assert.match(localImages,/missing-products-fixes\.js\?v=19/);
+  assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
 });

@@ -204,16 +204,20 @@ function ensureThumb(row,type){
     if(copy)row.insertBefore(thumb,copy);
     else row.prepend(thumb);
   }
-  thumb.className='missing-request-thumb is-'+type;
-  thumb.innerHTML=thumbSvg(type);
+  const className='missing-request-thumb is-'+type;
+  if(thumb.className!==className)thumb.className=className;
+  if(thumb.dataset.requestThumbType!==type){
+    thumb.dataset.requestThumbType=type;
+    thumb.innerHTML=thumbSvg(type);
+  }
 }
 function syncRunning(row){
   const integrate=row.querySelector('[data-integrate-missing-product],[data-integrate-missing-dish]');
   if(!integrate)return;
   const added=row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request');
   if(added){
-    integrate.disabled=true;
-    integrate.textContent='Ajouté ✓';
+    if(!integrate.disabled)integrate.disabled=true;
+    if(integrate.textContent!=='Ajouté ✓')integrate.textContent='Ajouté ✓';
     integrate.classList.remove('is-running-label');
     integrate.classList.add('is-added-label');
     row.classList.remove('is-running-request');
@@ -221,7 +225,8 @@ function syncRunning(row){
   }
   integrate.classList.remove('is-added-label');
   const running=integrate.classList.contains('is-running')||integrate.disabled;
-  integrate.textContent=running?'En cours…':'Intégrer';
+  const label=running?'En cours…':'Intégrer';
+  if(integrate.textContent!==label)integrate.textContent=label;
   integrate.classList.toggle('is-running-label',running);
   row.classList.toggle('is-running-request',running);
 }
@@ -259,8 +264,12 @@ function resetModeLens(dialog){
 function decorateRow(row){
   if(!(row instanceof HTMLElement))return;
   const type=rowType(row);
-  row.classList.remove('is-request-product','is-request-dish','is-request-dessert');
-  row.classList.add('missing-request-row','is-request-'+type);
+  if(!row.classList.contains('missing-request-row'))row.classList.add('missing-request-row');
+  ['product','dish','dessert'].forEach(kind=>{
+    const className='is-request-'+kind;
+    const active=kind===type;
+    if(row.classList.contains(className)!==active)row.classList.toggle(className,active);
+  });
   ensureThumb(row,type);
   ensureMore(row);
   syncRunning(row);

@@ -447,12 +447,13 @@ function decorateRunningRows(dialog,type,running){
         progress.setAttribute('role','status');
         copy.appendChild(progress);
       }
-      progress.textContent=failed?'Erreur':'En cours';
-      if(cancelled)progress.textContent='Annulé';
+      const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';
+      if(progress.textContent!==progressLabel)progress.textContent=progressLabel;
       progress.classList.toggle('is-error',failed);
       progress.classList.toggle('is-cancelled',cancelled);
       progress.classList.toggle('missing-dish-error',failed||cancelled);
-      progress.setAttribute('aria-label',cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours');
+      const progressAriaLabel=cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours';
+      if(progress.getAttribute('aria-label')!==progressAriaLabel)progress.setAttribute('aria-label',progressAriaLabel);
     }else if(progress){
       progress.remove();
     }

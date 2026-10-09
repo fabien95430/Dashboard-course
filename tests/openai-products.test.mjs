@@ -18,7 +18,8 @@ test('un produit manquant utilise le même déclencheur OpenAI et le même relai
 
 test('le lancement OpenAI reste visible dans le popup et notifie Courses immédiatement',()=>{
   const fixes=read('missing-products-fixes.js');
-  assert.ok(fixes.includes("progress.textContent=failed?'Erreur':'En cours';"));
+  assert.ok(fixes.includes("const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';"));
+  assert.ok(fixes.includes('if(progress.textContent!==progressLabel)progress.textContent=progressLabel;'));
   assert.ok(fixes.includes('const openAiErrors=new Set();'));
   assert.ok(fixes.includes('.missing-dish-progress.is-error'));
   assert.match(fixes,/courses-openai-feedback/);

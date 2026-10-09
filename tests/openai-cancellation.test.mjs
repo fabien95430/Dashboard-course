@@ -16,7 +16,8 @@ test('une annulation OpenAI passe la demande à Annulé et autorise une relance'
   assert.match(fixes,/run\?\.status!=='completed'\|\|run\?\.conclusion!=='cancelled'/);
   assert.match(fixes,/setRunning\(entry\.type,entry\.id,false\)/);
   assert.match(fixes,/status:'cancelled'/);
-  assert.match(fixes,/if\(cancelled\)progress\.textContent='Annulé'/);
+  assert.match(fixes,/const progressLabel=cancelled\?'Annulé':failed\?'Erreur':'En cours';/);
+  assert.match(fixes,/if\(progress\.textContent!==progressLabel\)progress\.textContent=progressLabel;/);
   assert.match(fixes,/cancelled\?'Relancer ce '\+noun\+' avec OpenAI'/);
   assert.match(fixes,/appNotify\('Intégration OpenAI annulée',unique\[0\]\+' peut être relancé\.'\)/);
 });
