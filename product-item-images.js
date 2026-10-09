@@ -192,3 +192,13 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
 else init();
 })();
+
+(() => {
+'use strict';
+if(document.querySelector('script[data-catalog-product-admin]'))return;
+const script=document.createElement('script');
+script.src='./catalog-product-admin.js?v=1';
+script.defer=true;
+script.dataset.catalogProductAdmin='1';
+document.head.appendChild(script);
+})();
