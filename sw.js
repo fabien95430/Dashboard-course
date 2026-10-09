@@ -1,317 +1,224 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f7f2">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Liste de courses synchronisée avec Home Assistant">
-  <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
-  <link rel="manifest" href="./manifest.webmanifest?v=43">
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
-  <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
-  <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
-  <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=348">
-</head>
-<body>
-  <svg class="svg-sprite" aria-hidden="true">
-    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l1.4 9.1a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L19.5 7H6.1"/><circle cx="9" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/></symbol>
-    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></symbol>
-    <symbol id="i-gear" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.2 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.4v-4h.1A1.7 1.7 0 0 0 4.2 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.6 4.2a1.7 1.7 0 0 0 1-.6A1.7 1.7 0 0 0 10 2.5v-.1h4v.1A1.7 1.7 0 0 0 15 4.2a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 8.6a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.7 1Z"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 4.2 4.2"/></symbol>
-    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.4"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"/><path d="M12 14v2.5"/></symbol>
-    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3.5 10 8.5-7 8.5 7"/><path d="M5.5 9.5V21h13V9.5"/><path d="M9.5 21v-6h5v6"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v5.5c0 5.1-3.4 8.1-8 9.5-4.6-1.4-8-4.4-8-9.5V6l8-3Z"/><path d="m8.7 12.1 2.1 2.1 4.5-4.6"/></symbol>
-    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
-    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.1 8.2A7 7 0 0 1 18.8 7L20 12M4 12l1.2 5A7 7 0 0 0 18 15.8"/></symbol>
-    <symbol id="i-refresh" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.4A8 8 0 0 0 6.25 5.25L4 7.5"/><path d="M4 4v3.5h3.5"/><path d="M4 16.6a8 8 0 0 0 13.75 2.15L20 16.5"/><path d="M20 20v-3.5h-3.5"/></symbol>
-    <symbol id="i-filter" viewBox="0 0 24 24" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
-    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M7.2 5.5a8 8 0 1 0 9.6 0"/></symbol>
-    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
-    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M14 8l4 4-4 4M18 12H8"/></symbol>
-    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="m6.5 7 .8 13h9.4l.8-13"/><path d="M10 11v5M14 11v5"/></symbol>\
-    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13h6l-1 9 9-12h-6.2l.7-8Z"/></symbol>
-  </svg>
+const CACHE='courses-app-v375-r1';
+const VISUAL_CACHE='courses-visuals-v1';
+const ERROR_INBOX_CACHE='courses-error-inbox-v1';
+const PRODUCT_VISUALS=[
+  './bring-photo-v5-frais.webp.png?v=15',
+  './bring-photo-v5-fruits-legumes.webp.png?v=15',
+  './bring-photo-v5-epicerie.webp.png?v=15',
+  './bring-photo-v5-boissons.webp.png?v=15',
+  './bring-photo-v5-maison.webp.png?v=15',
+  './welcome-cart-transparent-v46.png',
+  './welcome-background-v40.webp',
+  './www/empty-list-premium-v4.webp?v=305'
+];
+const SHELL=['./welcome-cart-transparent-v46.png','./welcome-background-v40.webp','./startup/app.js?v=2','./error-center.js?v=1','./error-feedback-bridge.js?v=1','./','./index.html','./styles.css?v=169','./styles.css?v=170','./catalog.js?v=297','./catalog.js?v=313','./catalog.js?v=315','./catalog.js?v=316','./catalog.js?v=318','./catalog.js?v=321','./catalog.js?v=322','./app.js?v=297','./settings-tab-badge.js?v=297','./settings-tab-badge.js?v=299','./settings-tab-badge.js?v=300','./settings-tab-badge.js?v=322','./missing-products-dishes.js?v=1','./missing-products-dishes.js?v=2','./missing-products-dishes.js?v=3','./missing-products-dishes.js?v=4','./missing-products-modern.js?v=5','./missing-products-fixes.js?v=13','./missing-products-fixes.js?v=14','./missing-products-fixes.js?v=15','./missing-products-fixes.js?v=16','./missing-products-fixes-core.js?v=6','./missing-products-popup-ui.js?v=9','./missing-products-popup-ui.js?v=11','./missing-products-popup-ui.js?v=12','./missing-products-popup-ui.js?v=13','./missing-products-popup-ui.js?v=14','./missing-products-popup-ui.js?v=15','./dishes.css?v=3','./dishes-ui.js?v=297','./dishes-ui.js?v=301','./dishes-ui.js?v=313','./dishes-ui.js?v=316','./dishes-ui.js?v=321','./dish-local-images.js?v=297','./dish-local-images.js?v=298','./dish-local-images.js?v=299','./dish-local-images.js?v=300','./dish-local-images.js?v=301','./dish-local-images.js?v=302','./dish-local-images.js?v=303','./dish-local-images.js?v=304','./dish-local-images.js?v=305','./dish-local-images.js?v=306','./dish-local-images.js?v=307','./dish-local-images.js?v=308','./dish-local-images.js?v=309','./dish-local-images.js?v=310','./dish-local-images.js?v=311','./dish-local-images.js?v=312','./dish-local-images.js?v=313','./dish-local-images.js?v=314','./dish-local-images.js?v=315','./dish-local-images.js?v=316','./dish-local-images.js?v=317','./dish-local-images.js?v=318','./dish-local-images.js?v=319','./dish-local-images.js?v=320','./dish-local-images.js?v=321','./dish-local-images.js?v=322','./dish-added-marker.js?v=1','./catalog-liquid.css?v=3','./catalog-liquid.js?v=297','./catalog-quantities.js?v=297','./catalog-quantities.js?v=302','./catalog-quantities.js?v=310','./catalog-quantities.js?v=316','./product-item-images.js?v=9','./product-item-images.js?v=10','./purchase-intelligence.js?v=4','./repurchase-soon.js?v=1','./repurchase-soon.js?v=2','./repurchase-soon.js?v=3','./dish-detail.css?v=5','./docs/guide-fonctionnement-courses.pdf?v=299','./manifest.webmanifest?v=43','./icon-premium-v40.svg','./icon.svg','./styles.css?v=323','./catalog.js?v=323','./dish-local-images.js?v=323','./dishes-ui.js?v=324','./dish-local-images.js?v=324','./catalog.js?v=325','./dish-local-images.js?v=325','./catalog.js?v=326','./dishes-ui.js?v=326','./dish-local-images.js?v=326','./catalog.js?v=327','./settings-tab-badge.js?v=327','./dish-local-images.js?v=327','./dish-local-images.js?v=329','./styles.css?v=330','./catalog.js?v=330','./dish-local-images.js?v=330','./styles.css?v=332','./catalog.js?v=332','./app.js?v=332','./dish-local-images.js?v=332','./catalog.js?v=335','./settings-tab-badge.js?v=335','./dish-local-images.js?v=335','./styles.css?v=336','./catalog.js?v=336','./app.js?v=336','./dish-local-images.js?v=336','./catalog.js?v=337','./settings-tab-badge.js?v=337','./dish-local-images.js?v=337','./missing-products-modern.js?v=6','./catalog.js?v=338','./dishes-ui.js?v=338','./dish-local-images.js?v=338','./styles.css?v=339','./catalog.js?v=339','./app.js?v=339','./dish-local-images.js?v=339','./catalog.js?v=340','./dishes-ui.js?v=340','./dish-local-images.js?v=340','./catalog.js?v=341','./settings-tab-badge.js?v=341','./missing-products-dishes.js?v=5','./dish-local-images.js?v=341','./styles.css?v=342','./catalog.js?v=342','./app.js?v=342','./dish-local-images.js?v=342','./catalog.js?v=343','./dishes-ui.js?v=343','./dish-local-images.js?v=343','./styles.css?v=344','./catalog.js?v=344','./app.js?v=344','./settings-tab-badge.js?v=344','./missing-products-dishes.js?v=6','./dishes-ui.js?v=344','./dish-local-images.js?v=344','./catalog.js?v=345','./app.js?v=345','./dish-local-images.js?v=345','./styles.css?v=346','./styles.css?v=348','./catalog.js?v=348','./app.js?v=348','./dish-local-images.js?v=348','./catalog.js?v=349','./app.js?v=349','./dish-local-images.js?v=349','./app.js?v=350','./dish-local-images.js?v=350','./catalog.js?v=351','./app.js?v=351','./settings-tab-badge.js?v=351','./missing-products-dishes.js?v=7','./dish-local-images.js?v=351','./catalog.js?v=352','./app.js?v=352','./settings-tab-badge.js?v=352','./missing-products-dishes.js?v=8','./missing-products-fixes.js?v=17','./missing-products-popup-ui.js?v=16','./dish-local-images.js?v=352','./catalog.js?v=353','./missing-products-fixes.js?v=18','./dish-local-images.js?v=353','./catalog.js?v=354','./dish-local-images.js?v=354','./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./app.js?v=356','./settings-tab-badge.js?v=356','./catalog.js?v=357','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=357','./catalog.js?v=363','./settings-tab-badge.js?v=363','./missing-products-dishes.js?v=363','./dishes-ui.js?v=363','./repurchase-soon.js?v=363','./dish-local-images.js?v=363','./catalog.js?v=364','./settings-tab-badge.js?v=370','./dishes-ui.js?v=364','./catalog-quantities.js?v=364','./dish-local-images.js?v=364','./dish-local-images.js?v=370','./product-item-images.js?v=11','./catalog-quantities.js?v=370','./app.js?v=370','./catalog.js?v=370','./missing-products-fixes.js?v=20','./settings-tab-badge.js?v=364',"./catalog.js?v=372","./catalog-quantities.js?v=372","./dish-local-images.js?v=372","./catalog.js?v=373","./app.js?v=373","./catalog-quantities.js?v=373","./dish-local-images.js?v=373","./product-item-images.js?v=12","./purchase-intelligence.js?v=5","./catalog.js?v=374","./catalog-quantities.js?v=374","./dish-local-images.js?v=374","./catalog.js?v=375","./dish-local-images.js?v=375","./product-item-images.js?v=13"];
+const refreshedVisuals=new Set();
 
-  <main id="app" class="app is-locked">
-    <div id="status" class="status is-waiting" aria-live="polite"><span></span><div><strong>Connexion…</strong><small>Home Assistant</small></div></div>
+function isPersistentVisual(url){
+  return url.pathname.includes('/www/Plats/')
+    ||url.pathname.includes('/www/Items/')
+    ||url.pathname.endsWith('/www/empty-list-premium-v4.webp')
+    ||url.pathname.endsWith('/welcome-cart-transparent-v46.png')
+    ||url.pathname.endsWith('/welcome-background-v40.webp')
+    ||/\/bring-photo-v5-(?:frais|fruits-legumes|epicerie|boissons|maison)\.webp\.png$/.test(url.pathname);
+}
 
-    <section id="listView" class="view list-view is-active">
-      <header class="page-header">
-        <div>
-          <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v376</span></p>
-        </div>
-        <div class="page-header-actions">
-          <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
-            <svg><use href="#i-refresh"></use></svg>
-          </button>
-          <button id="listFilterBtn" class="icon-btn list-filter-btn" type="button" aria-label="Trier ou filtrer la liste" aria-expanded="false" aria-controls="listFilterMenu">
-            <svg><use href="#i-filter"></use></svg>
-          </button>
-        </div>
-      </header>
+function isStartupShellAsset(url){
+  return url.pathname.endsWith('/styles.css')
+    ||url.pathname.endsWith('/catalog.js')
+    ||url.pathname.endsWith('/app.js')
+    ||url.pathname.endsWith('/settings-tab-badge.js')
+    ||url.pathname.endsWith('/error-center.js')
+    ||url.pathname.endsWith('/error-feedback-bridge.js');
+}
 
-      <div id="listFilterBackdrop" class="list-filter-backdrop" hidden></div>
-      <div id="listFilterMenu" class="list-filter-menu" role="dialog" aria-modal="true" aria-label="Trier et filtrer Ma liste" hidden>
-        <div class="list-filter-handle" aria-hidden="true"></div>
-        <div class="list-filter-sheet-head">
-          <strong>Trier la liste</strong>
-        </div>
-        <div class="list-filter-section list-filter-sort-options" role="radiogroup" aria-label="Trier la liste">
-          <button class="list-filter-option" type="button" data-list-sort="added" role="radio">
-            <svg class="list-filter-choice-icon"><use href="#i-list"></use></svg>
-            <span>Ordre d’ajout</span><i aria-hidden="true"></i>
-          </button>
-          <button class="list-filter-option" type="button" data-list-sort="alpha" role="radio">
-            <span>A - Z</span><i aria-hidden="true"></i>
-          </button>
-          <button class="list-filter-option" type="button" data-list-sort="category" role="radio">
-            <svg class="list-filter-choice-icon"><use href="#i-grid"></use></svg>
-            <span>Par catégorie</span><i aria-hidden="true"></i>
-          </button>
-        </div>
-        <div class="list-filter-section list-filter-categories" role="radiogroup" aria-label="Filtrer par catégorie">
-          <strong class="list-filter-title">Filtrer par catégorie</strong>
-          <button class="list-filter-option" type="button" data-list-category="Toutes" role="radio"><span>Toutes</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Apéritif &amp; snacks" role="radio"><span>Apéritif &amp; snacks</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Boissons" role="radio"><span>Boissons</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Boulangerie" role="radio"><span>Boulangerie</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Cuisine" role="radio"><span>Cuisine</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Enfant" role="radio"><span>Enfant</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Frais" role="radio"><span>Frais</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Fruits &amp; Légumes" role="radio"><span>Fruits &amp; Légumes</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Hygiène &amp; soins" role="radio"><span>Hygiène &amp; soins</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Maison" role="radio"><span>Maison</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Petit-déjeuner" role="radio"><span>Petit-déjeuner</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Viandes &amp; poissons" role="radio"><span>Viandes &amp; poissons</span><i aria-hidden="true"></i></button>
-        </div>
-      </div>
+async function migrateExistingVisuals(){
+  const target=await caches.open(VISUAL_CACHE);
+  const cacheNames=await caches.keys();
+  for(const cacheName of cacheNames){
+    if(cacheName===VISUAL_CACHE)continue;
+    const source=await caches.open(cacheName);
+    const requests=await source.keys();
+    await Promise.all(requests.filter(request=>isPersistentVisual(new URL(request.url))).map(async request=>{
+      if(await target.match(request))return;
+      const response=await source.match(request);
+      if(response)await target.put(request,response.clone());
+    }));
+  }
+}
 
-      <label class="searchbox page-search">
-        <svg><use href="#i-search"></use></svg>
-        <input id="listSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher un produit…">
-        <small id="listCount">0 article</small>
-      </label>
-      <div id="listItems" class="list-items"></div>
-    </section>
+async function seedProductVisuals(){
+  const cache=await caches.open(VISUAL_CACHE);
+  await Promise.all(PRODUCT_VISUALS.map(async src=>{
+    if(await cache.match(src))return;
+    const existing=await caches.match(src);
+    if(existing){
+      await cache.put(src,existing.clone());
+      return;
+    }
+    try{
+      const response=await fetch(new Request(src,{cache:'reload'}));
+      if(response.ok)await cache.put(src,response.clone());
+    }catch(_){}
+  }));
+}
 
-    <section id="catalogView" class="view catalog-view">
-      <header class="page-header">
-        <div>
-          <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v376</span></p>
-        </div>
-        <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
-          <svg><use href="#i-refresh"></use></svg>
-        </button>
-      </header>
+function refreshVisual(cache,request){
+  const key=request.url;
+  if(refreshedVisuals.has(key))return Promise.resolve();
+  refreshedVisuals.add(key);
+  return fetch(new Request(request,{cache:'reload'})).then(response=>{
+    if(!response.ok){
+      refreshedVisuals.delete(key);
+      return;
+    }
+    return cache.put(request,response.clone());
+  }).catch(()=>{
+    refreshedVisuals.delete(key);
+  });
+}
 
-      <label class="searchbox page-search">
-        <svg><use href="#i-search"></use></svg>
-        <input id="productSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher un produit…">
-        <small id="productCount"></small>
-      </label>
-      <div id="categories" class="categories" aria-label="Catégories"></div>
-      <div id="products" class="products"></div>
-    </section>
+function refreshShell(cache,request){
+  return fetch(new Request(request,{cache:'reload'})).then(async response=>{
+    if(response.ok)await cache.put(request,response.clone());
+    return response;
+  });
+}
 
-    <section id="settingsView" class="view settings-view">
-      <header class="page-header settings-header">
-        <div>
-          <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v376</span></p>
-        </div>
-      </header>
+async function storeErrorSignal(payload){
+  const status=String(payload?.status||'').toLowerCase();
+  if(status!=='error'&&status!=='added')return;
+  const id=String(payload?.requestId||payload?.request_id||payload?.tag||Date.now()).replace(/[^a-z0-9_-]+/gi,'-').slice(0,120)||String(Date.now());
+  const url=new URL('./__courses_error_event__/'+id+'-'+Date.now(),self.location.href);
+  const cache=await caches.open(ERROR_INBOX_CACHE);
+  await cache.put(new Request(url.href),new Response(JSON.stringify({...payload,receivedAt:Date.now()}),{headers:{'Content-Type':'application/json'}}));
+}
 
-      <div class="settings-scroll">
-        <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-home"></use></svg></span>Compte</h2>
-          <div class="settings-card">
-            <button id="settingsConnectionBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-home"></use></svg></span>
-              <span class="settings-copy"><strong>Connexion Home Assistant</strong><small id="settingsConnectionSummary">Connexion…</small></span>
-              <span class="settings-row-end"><span id="settingsConnectionDot" class="sync-dot" aria-hidden="true"></span><svg class="chevron"><use href="#i-chevron"></use></svg></span>
-            </button>
-          </div>
-        </section>
+async function deliverErrorSignal(payload){
+  const status=String(payload?.status||'').toLowerCase();
+  if(status!=='error'&&status!=='added')return;
+  const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  const visible=clients.filter(client=>client.visibilityState==='visible');
+  if(!visible.length){
+    await storeErrorSignal(payload);
+    return;
+  }
+  let delivered=false;
+  for(const client of visible){
+    try{client.postMessage({type:'courses-error-signal',payload});delivered=true}catch(_){}
+  }
+  if(!delivered)await storeErrorSignal(payload);
+}
 
-        <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-shield"></use></svg></span>Sécurité</h2>
-          <div class="settings-card">
-            <button id="settingsSecurityBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-lock"></use></svg></span>
-              <span class="settings-copy"><strong>Mot de passe et verrouillage</strong><small>Coffre local chiffré</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-            <button id="settingsLockBtn" type="button" hidden aria-hidden="true" tabindex="-1"></button>
-          </div>
-        </section>
+self.addEventListener('install',event=>event.waitUntil(
+  Promise.all([
+    caches.open(CACHE).then(cache=>cache.addAll(SHELL)),
+    migrateExistingVisuals().then(seedProductVisuals)
+  ]).then(()=>self.skipWaiting())
+));
 
-        <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-gear"></use></svg></span>Préférences</h2>
-          <div class="settings-card">
-            <button id="settingsListBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
-              <span class="settings-copy"><strong>Sélections personnalisées</strong><small>Tri, ouverture et catalogue</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-            <button id="settingsRecipeCustomizationBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
-              <span class="settings-copy"><strong>Personnalisation des recettes</strong><small>Affiner les ingrédients sélectionnés par défaut</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-            <button id="settingsMissingProductsBtn" class="settings-row missing-products-settings-row" type="button">
-              <span class="settings-icon settings-icon-missing" style="position:relative;overflow:visible">
-                <svg><use href="#i-cart"></use></svg>
-                <span id="settingsMissingProductsCount" class="settings-count" hidden style="position:absolute;top:-6px;right:-7px;min-width:20px;height:20px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#ff3b30;color:#fff;font-size:10px;line-height:16px;font-weight:800;display:grid;place-items:center;box-shadow:0 2px 7px rgba(207,33,26,.22);z-index:2;pointer-events:none">0</span>
-              </span>
-              <span class="settings-copy"><strong>Produits manquants</strong><small>Noter les produits absents du catalogue</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
-          </div>
-        </section>
+self.addEventListener('activate',event=>event.waitUntil(
+  caches.keys()
+    .then(keys=>Promise.all(keys.filter(key=>key!==CACHE&&key!==VISUAL_CACHE&&key!==ERROR_INBOX_CACHE).map(key=>caches.delete(key))))
+    .then(()=>self.clients.claim())
+));
 
-        <button id="settingsLogoutBtn" class="settings-logout" type="button">
-          <svg><use href="#i-exit"></use></svg>
-          <span>Se déconnecter</span>
-        </button>
-      </div>
-    </section>
+self.addEventListener('fetch',event=>{
+  const url=new URL(event.request.url);
+  if(url.origin!==self.location.origin||event.request.method!=='GET')return;
 
-    <nav class="tabs" aria-label="Navigation">
-      <button class="tab is-active" data-view="list" type="button">
-        <svg><use href="#i-cart"></use></svg><span>Ma liste</span>
-      </button>
-      <button class="tab" data-view="catalog" type="button">
-        <svg><use href="#i-grid"></use></svg><span>Catalogue</span>
-      </button>
-      <button class="tab" data-view="settings" type="button">
-        <svg><use href="#i-gear"></use></svg><span>Réglages</span>
-      </button>
-    </nav>
-  </main>
+  if(event.request.mode==='navigate'){
+    const cachePromise=caches.open(CACHE);
+    const networkPromise=cachePromise.then(cache=>refreshShell(cache,event.request));
+    event.waitUntil(networkPromise.catch(()=>{}));
+    event.respondWith(cachePromise.then(async cache=>{
+      const hit=await cache.match(event.request)||await cache.match('./index.html');
+      if(hit)return hit;
+      try{return await networkPromise}catch(_){return Response.error()}
+    }));
+    return;
+  }
 
-  <section id="setup" class="overlay" aria-modal="true">
-    <div class="modal setup-modal">
-      <div class="welcome-logo"><svg><use href="#i-cart"></use></svg></div>
-      <h2>Mes courses</h2>
-      <p>Connecte Home Assistant pour retrouver ta liste sur cet appareil.</p>
-      <label class="field">
-        <span>Adresse Home Assistant / Nabu Casa</span>
-        <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
-      </label>
-      <p class="hint">Connexion OAuth sécurisée. L’autorisation reste chiffrée sur cet appareil.</p>
-      <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
-      <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
-      <div id="setupError" class="setup-error" role="alert"></div>
-    </div>
-  </section>
+  if(isPersistentVisual(url)){
+    const cachePromise=caches.open(VISUAL_CACHE);
+    const hitPromise=cachePromise.then(cache=>cache.match(event.request));
+    event.waitUntil(
+      hitPromise.then(hit=>{
+        if(!hit)return;
+        return cachePromise.then(cache=>refreshVisual(cache,event.request));
+      }).catch(()=>{})
+    );
+    event.respondWith(
+      Promise.all([cachePromise,hitPromise]).then(async([cache,hit])=>{
+        if(hit)return hit;
+        try{
+          const response=await fetch(new Request(event.request,{cache:'reload'}));
+          if(response.ok)await cache.put(event.request,response.clone());
+          return response;
+        }catch(_){
+          return Response.error();
+        }
+      })
+    );
+    return;
+  }
 
-  <section id="securityOverlay" class="overlay security-overlay is-visible" aria-modal="true" aria-labelledby="securityTitle">
-    <button id="securitySettingsBtn" class="security-settings-pill" type="button" aria-label="Réglages">
-      <svg><use href="#i-gear"></use></svg><span>Réglages</span>
-    </button>
+  if(isStartupShellAsset(url)){
+    const cachePromise=caches.open(CACHE);
+    const hitPromise=cachePromise.then(cache=>cache.match(event.request));
+    const networkPromise=cachePromise.then(cache=>refreshShell(cache,event.request));
+    event.waitUntil(networkPromise.catch(()=>{}));
+    event.respondWith(hitPromise.then(async hit=>{
+      if(hit)return hit;
+      try{return await networkPromise}catch(_){return Response.error()}
+    }));
+    return;
+  }
 
-    <div class="security-shell">
-      <div class="security-hero">
-        <div class="welcome-cart-art" aria-hidden="true">
-          <img src="./welcome-cart-transparent-v46.png" alt="" width="380" height="345" loading="eager" decoding="sync" fetchpriority="high">
-        </div>
-        <h2 id="securityTitle">Mes courses</h2>
-        <p class="security-tagline">Simple, rapide, toujours à jour <span aria-hidden="true">♥</span></p>
-      </div>
+  const networkRequest=new Request(event.request,{cache:'reload'});
+  event.respondWith(fetch(networkRequest).then(response=>{
+    const copy=response.clone();
+    caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+    return response;
+  }).catch(()=>caches.match(event.request).then(hit=>{
+    if(hit)return hit;
+    return Response.error();
+  })));
+});
 
-      <div class="modal security-modal">
-        <div id="securityIcon" class="security-lock-icon"><svg><use href="#i-lock"></use></svg></div>
-        <h3>Accéder à mes courses</h3>
-        <p class="security-card-copy">Déverrouillage sécurisé avec votre compte Home Assistant</p>
-        <p id="securityText" class="security-dynamic" aria-live="polite"></p>
+self.addEventListener('push',event=>{
+  let payload={};
+  try{payload=event.data?.json?.()||{}}catch(_){
+    try{payload={body:event.data?.text?.()||''}}catch(__){payload={}}
+  }
+  const title=String(payload.title||'Courses');
+  const body=String(payload.body||'Le catalogue a été mis à jour.');
+  const tag=String(payload.tag||'courses-catalog-update');
+  const url=String(payload.url||'./');
+  event.waitUntil(Promise.all([
+    deliverErrorSignal(payload).catch(()=>{}),
+    self.registration.showNotification(title,{
+      body,
+      tag,
+      icon:'./apple-touch-icon.png',
+      badge:'./apple-touch-icon.png',
+      data:{url},
+      renotify:true
+    })
+  ]));
+});
 
-        <div id="passwordPanel" class="password-panel">
-          <label class="field">
-            <span>Mot de passe local</span>
-            <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
-          </label>
-          <label id="securityConfirmWrap" class="field" hidden>
-            <span>Confirmer le mot de passe</span>
-            <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
-          </label>
-          <p id="securityHint" class="hint">Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local.</p>
-          <button id="securitySubmit" class="primary" type="button">Connexion</button>
-          <button id="resetSecurityBtn" class="secondary reset-link" type="button">Réinitialiser la connexion de cet appareil</button>
-        </div>
-        <div id="securityError" class="setup-error" role="alert"></div>
-      </div>
-
-      <div class="security-note" aria-hidden="true">Tout pour<br>des courses plus simples<br>au quotidien !<span></span></div>
-
-      <div class="security-benefits" aria-hidden="true">
-        <span><i><svg><use href="#i-sync"></use></svg></i><small>Synchronisé<br>avec Home Assistant</small></span>
-        <span><i><svg><use href="#i-lock"></use></svg></i><small>Vos données<br>restent privées</small></span>
-        <span><i class="benefit-bolt"><svg><use href="#i-bolt"></use></svg></i><small>Rapide<br>et intuitif</small></span>
-      </div>
-    </div>
-  </section>
-
-  <dialog id="connectionDialog" class="dialog connection-dialog" tabindex="-1">
-    <h3>Connexion Home Assistant</h3>
-    <label class="field">
-      <span>Liste Home Assistant</span>
-      <select id="connectionEntitySelect">
-        <option value="" selected>Choisir une liste</option>
-      </select>
-    </label>
-    <label class="field">
-      <span>Adresse Home Assistant</span>
-      <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
-    </label>
-    <p id="connectionDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
-    <div class="dialog-actions">
-      <button id="saveConnectionSettings" class="primary" type="button">Enregistrer</button>
-    </div>
-  </dialog>
-
-  <dialog id="preferencesDialog" class="dialog preferences-dialog" tabindex="-1">
-    <h3>Préférences</h3>
-    <p class="dialog-intro">Personnalisez l’affichage et le comportement de l’application.</p>
-    <label class="field"><span>Tri de Ma liste</span><select id="preferencesListSort"><option value="added">Ordre d’ajout</option><option value="category">Par catégorie</option><option value="alpha">A → Z</option></select></label>
-    <label class="field"><span>Ouverture de l’application</span><select id="preferencesStartView"><option value="list">Ma liste</option><option value="catalog">Catalogue</option></select></label>
-    <div class="preference-options" aria-label="Options du catalogue">
-      <label class="preference-toggle"><span class="preference-toggle-copy"><strong>Masquer les produits déjà ajoutés</strong><small>Allège le catalogue pendant les courses.</small></span><span class="preference-switch"><input id="preferencesHideAdded" type="checkbox" aria-label="Masquer les produits déjà ajoutés"><span aria-hidden="true"></span></span></label>
-      <label class="preference-toggle"><span class="preference-toggle-copy"><strong>Favoris intelligents</strong><small>Priorise les produits que vous ajoutez le plus souvent.</small></span><span class="preference-switch"><input id="preferencesSmartFavorites" type="checkbox" aria-label="Favoris intelligents"><span aria-hidden="true"></span></span></label>
-    </div>
-    <div class="dialog-actions"><button id="savePreferences" class="primary" type="button">Enregistrer</button></div>
-  </dialog>
-
-  <dialog id="missingProductsDialog" class="dialog" tabindex="-1">
-    <div class="missing-products-header"><div><h3>Produits manquants</h3><p class="dialog-intro">Ajoutez les produits ou plats absents du catalogue.</p></div></div>
-    <div class="missing-products-add"><input id="missingProductName" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" placeholder="Nom du produit" aria-label="Nom du produit"><button id="addMissingProduct" class="primary" type="button">Ajouter</button></div>
-    <p id="missingProductsFeedback" class="dialog-feedback courses-openai-feedback" role="status" aria-live="polite"></p>
-    <section class="missing-category-panel" aria-labelledby="missingCategoryTitle"><div class="missing-category-heading"><strong id="missingCategoryTitle">Choisir une catégorie</strong><small>Optionnel</small></div><div id="missingCategoryGrid" class="missing-category-grid">
-      <button class="missing-category-choice is-active" type="button" data-missing-category="" aria-pressed="true"><span>Aucune</span></button>
-      <button class="missing-category-choice" type="button" data-missing-category="Apéritif &amp; snacks" aria-pressed="false"><span>Apéritif &amp; snacks</span></button><button class="missing-category-choice" type="button" data-missing-category="Boissons" aria-pressed="false"><span>Boissons</span></button><button class="missing-category-choice" type="button" data-missing-category="Boulangerie" aria-pressed="false"><span>Boulangerie</span></button><button class="missing-category-choice" type="button" data-missing-category="Cuisine" aria-pressed="false"><span>Cuisine</span></button><button class="missing-category-choice" type="button" data-missing-category="Enfant" aria-pressed="false"><span>Enfant</span></button><button class="missing-category-choice" type="button" data-missing-category="Frais" aria-pressed="false"><span>Frais</span></button><button class="missing-category-choice" type="button" data-missing-category="Fruits &amp; Légumes" aria-pressed="false"><span>Fruits &amp; Légumes</span></button><button class="missing-category-choice" type="button" data-missing-category="Hygiène &amp; soins" aria-pressed="false"><span>Hygiène &amp; soins</span></button><button class="missing-category-choice" type="button" data-missing-category="Maison" aria-pressed="false"><span>Maison</span></button><button class="missing-category-choice" type="button" data-missing-category="Petit-déjeuner" aria-pressed="false"><span>Petit-déjeuner</span></button><button class="missing-category-choice" type="button" data-missing-category="Viandes &amp; poissons" aria-pressed="false"><span>Viandes &amp; poissons</span></button>
-    </div></section>
-    <div class="missing-products-list-heading"><strong>Liste des produits</strong><span id="missingProductsListCount">0</span></div><div id="missingProductsList" class="missing-products-list"></div>
-  </dialog>
-
-  <dialog id="settingsDialog" class="dialog security-settings-dialog" tabindex="-1">
-    <h3>Mot de passe et verrouillage</h3><p class="dialog-intro">Protection locale de l’accès à vos courses sur cet appareil.</p><p id="settingsDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
-    <div class="security-settings-summary"><div class="security-setting-info"><span class="security-setting-icon"><svg><use href="#i-shield"></use></svg></span><span class="security-setting-copy"><strong>Coffre local chiffré</strong><small>Actif sur cet appareil</small></span><span class="security-setting-state">Actif</span></div><label class="security-setting-info security-setting-lock"><span class="security-setting-icon"><svg><use href="#i-lock"></use></svg></span><span class="security-setting-copy"><strong>Verrouillage automatique</strong><small>Même délai en activité et en arrière-plan</small></span><select id="autoLockSelect" class="security-lock-select" aria-label="Délai de verrouillage automatique"><option value="5">5 min</option><option value="10">10 min</option><option value="20">20 min</option><option value="30">30 min</option></select></label></div>
-    <button id="changePasswordBtn" class="security-action-row" type="button"><span class="security-setting-icon"><svg><use href="#i-lock"></use></svg></span><span class="security-setting-copy"><strong>Changer le mot de passe local</strong><small>Vérifie l’ancien mot de passe puis rechiffre le coffre</small></span><svg class="chevron"><use href="#i-chevron"></use></svg></button>
-    <div id="changePasswordPanel" class="change-password-panel" hidden><label class="field"><span>Mot de passe actuel</span><input id="currentLocalPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false"></label><label class="field"><span>Nouveau mot de passe</span><input id="newLocalPassword" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false"></label><label class="field"><span>Confirmer le nouveau mot de passe</span><input id="confirmNewLocalPassword" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false"></label><div id="changePasswordError" class="setup-error" role="alert"></div><button id="savePasswordChange" class="primary security-password-save" type="button">Changer le mot de passe</button></div>
-    <button id="lockNowBtn" class="secondary security-lock-now" type="button">Verrouiller maintenant</button>
-  </dialog>
-
-  <div id="toast" class="toast" role="status"></div>
-  <script src="./startup/app.js?v=2"></script>
-  <script src="./catalog.js?v=376"></script>
-  <script src="./app.js?v=376"></script>
-  <script src="./settings-tab-badge.js?v=364"></script>
-</body>
-</html>
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const target=new URL(String(event.notification.data?.url||'./'),self.location.href).href;
+  event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(async clients=>{
+    for(const client of clients){
+      try{
+        if(new URL(client.url).origin!==self.location.origin)continue;
+        if('navigate' in client)await client.navigate(target);
+        if('focus' in client)return client.focus();
+      }catch(_){}
+    }
+    return self.clients.openWindow?self.clients.openWindow(target):undefined;
+  }));
+});
