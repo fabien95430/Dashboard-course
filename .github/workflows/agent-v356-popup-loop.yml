@@ -43,6 +43,7 @@ jobs:
                   raise SystemExit(f'{path}: regex did not match exactly once: {pattern}')
               p.write_text(updated,encoding='utf-8')
 
+          # The OpenAI status decorator must settle after its first real DOM change.
           sub_once(
               'missing-products-fixes.js',
               r"progress\.textContent=failed\?'Erreur':'En cours';\s*if\(cancelled\)progress\.textContent='Annulé';",
@@ -54,6 +55,7 @@ jobs:
               "const progressAriaLabel=cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours';\n      if(progress.getAttribute('aria-label')!==progressAriaLabel)progress.setAttribute('aria-label',progressAriaLabel);"
           )
 
+          # The popup decorator must not feed its own MutationObserver.
           sub_once(
               'missing-products-popup-ui.js',
               r"thumb\.className='missing-request-thumb is-'\+type;\s*thumb\.innerHTML=thumbSvg\(type\);",
@@ -75,6 +77,7 @@ jobs:
               "if(!row.classList.contains('missing-request-row'))row.classList.add('missing-request-row');\n  ['product','dish','dessert'].forEach(kind=>{\n    const className='is-request-'+kind;\n    const active=kind===type;\n    if(row.classList.contains(className)!==active)row.classList.toggle(className,active);\n  });"
           )
 
+          # Global visible version and cache-busting for the repaired popup modules.
           replace_exact('index.html','page-version">v356','page-version">v357',3)
           replace_exact('index.html','./catalog.js?v=356','./catalog.js?v=357')
           replace_exact('catalog.js',"images.src='./dish-local-images.js?v=355';","images.src='./dish-local-images.js?v=357';")
@@ -86,6 +89,18 @@ jobs:
               'sw.js',
               "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355'];",
               "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./app.js?v=356','./settings-tab-badge.js?v=356','./catalog.js?v=357','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=357'];"
+          )
+
+          # Update every executable assertion that describes the old unconditional write.
+          replace_exact(
+              'tests/openai-cancellation.test.mjs',
+              "  assert.match(fixes,/if\\(cancelled\\)progress\\.textContent='Annulé'/);",
+              "  assert.match(fixes,/const progressLabel=cancelled\\?'Annulé':failed\\?'Erreur':'En cours';/);\n  assert.match(fixes,/if\\(progress\\.textContent!==progressLabel\\)progress\\.textContent=progressLabel;/);"
+          )
+          replace_exact(
+              'tests/openai-products.test.mjs',
+              "  assert.ok(fixes.includes(\"progress.textContent=failed?'Erreur':'En cours';\"));",
+              "  assert.ok(fixes.includes(\"const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';\"));\n  assert.ok(fixes.includes('if(progress.textContent!==progressLabel)progress.textContent=progressLabel;'));"
           )
 
           tests=Path('tests/preference-popups.test.mjs')
@@ -153,6 +168,6 @@ jobs:
         run: |
           git config user.name "Fabien"
           git config user.email "canape-silence-8o@icloud.com"
-          git add missing-products-fixes.js missing-products-popup-ui.js index.html catalog.js dish-local-images.js sw.js tests/preference-popups.test.mjs
+          git add missing-products-fixes.js missing-products-popup-ui.js index.html catalog.js dish-local-images.js sw.js tests/preference-popups.test.mjs tests/openai-cancellation.test.mjs tests/openai-products.test.mjs
           git commit -m "v357: supprime la boucle du popup des demandes"
           git push origin HEAD:main
