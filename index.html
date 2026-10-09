@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" class="startup-assets-pending">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
@@ -14,8 +14,28 @@
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
+  <link rel="preload" as="script" href="./startup/app.js?v=1" fetchpriority="high">
   <title>Mes courses</title>
   <link rel="stylesheet" href="./styles.css?v=348">
+  <style id="startup-visual-sync">
+    html.startup-assets-pending,
+    html.startup-assets-pending:has(#setup.is-visible),
+    html.startup-assets-pending:has(#securityOverlay.is-visible),
+    html.startup-assets-pending body,
+    html.startup-assets-pending body:has(#setup.is-visible),
+    html.startup-assets-pending body:has(#securityOverlay.is-visible){
+      background-color:#f5f2ea!important;
+      background-image:none!important;
+    }
+    html.startup-assets-pending #setup.overlay.is-visible,
+    html.startup-assets-pending #securityOverlay.overlay.is-visible{
+      background:#f5f2ea!important;
+      background-image:none!important;
+    }
+    html.startup-assets-pending .overlay.is-visible>*{
+      visibility:hidden!important;
+    }
+  </style>
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -422,6 +442,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
+  <script src="./startup/app.js?v=1"></script>
   <script src="./catalog.js?v=363"></script>
   <script src="./app.js?v=356"></script>
   <script src="./settings-tab-badge.js?v=363"></script>
