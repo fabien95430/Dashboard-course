@@ -22,6 +22,37 @@ preloadVisual('./welcome-cart-transparent-v46.png');
 preloadVisual('./www/empty-list-premium-v4.webp?v=305');
 window.COURSES_STARTUP_VISUALS=retained;
 
+function installMissingProductsCompactLayout(){
+  if(document.getElementById('courses-missing-products-compact-layout'))return;
+  const style=document.createElement('style');
+  style.id='courses-missing-products-compact-layout';
+  style.textContent=`
+    html body #missingProductsDialog .missing-products-close{
+      display:none!important;
+    }
+    html body #missingProductsDialog .missing-products-header{
+      padding-right:0!important;
+    }
+    html body #missingProductsDialog .missing-products-header>div{
+      width:100%!important;
+      min-width:0!important;
+    }
+    html body #missingProductsDialog .missing-products-header h3{
+      white-space:nowrap!important;
+      font-size:clamp(19px,5.6vw,22px)!important;
+    }
+    html body #missingProductsDialog .missing-category-panel{
+      margin-bottom:4px!important;
+    }
+    html body #missingProductsDialog .missing-products-list-heading{
+      margin-top:0!important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+installMissingProductsCompactLayout();
+
 const listRoot=document.getElementById('listItems');
 if(!listRoot)return;
 
