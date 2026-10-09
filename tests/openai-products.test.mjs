@@ -62,8 +62,19 @@ test('une nouvelle tuile produit hors atlas peut être remplacée par son image 
   const images=read('product-item-images.js');
   assert.match(images,/card\.querySelector\('\.product-svg'\)/);
   assert.match(images,/fallback\.replaceWith\(sprite\)/);
-  assert.match(images,/sprite\.className='premium-sprite is-single-product-image'/);
+  assert.match(images,/const compact=fallback\.classList\.contains\('is-compact'\)/);
+  assert.match(images,/sprite\.className='premium-sprite is-single-product-image'\+\(compact\?' is-compact':''\)/);
   assert.match(images,/getImageData\(0,0,size,size\)/);
   assert.match(images,/--single-product-scale/);
   assert.match(images,/\.90\/Math\.max\(\.01,occupancy\)/);
+});
+
+test('Ma liste reprend la même image unitaire que le Catalogue avec l atlas en secours',()=>{
+  const images=read('product-item-images.js');
+  assert.match(images,/listItems=document\.getElementById\('listItems'\)/);
+  assert.match(images,/listItems\?\.querySelectorAll\('\.list-row\[data-name\]'\)\.forEach\(decorateCard\)/);
+  assert.match(images,/observer\.observe\(products,\{childList:true,subtree:true\}\)/);
+  assert.match(images,/observer\.observe\(listItems,\{childList:true,subtree:true\}\)/);
+  assert.match(images,/image\.dataset\.singleProductAtlasSource=image\.getAttribute\('src'\)\|\|''/);
+  assert.match(images,/image\.addEventListener\('error',\(\)=>restoreAtlas\(card,sprite,image\),\{once:true\}\)/);
 });

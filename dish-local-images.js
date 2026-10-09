@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v374';
+const APP_VERSION='v375';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -302,7 +302,7 @@ function installMissingProductsFixes(){
 function installProductItemImages(){
   if(document.querySelector('script[data-product-item-images]'))return;
   const script=document.createElement('script');
-  script.src='./product-item-images.js?v=12';
+  script.src='./product-item-images.js?v=13';
   script.defer=true;
   script.dataset.productItemImages='1';
   document.head.appendChild(script);

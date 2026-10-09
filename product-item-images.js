@@ -5,6 +5,7 @@ const PRODUCT_NAMES=new Set(Object.values(window.COURSES_CATALOG?.groups||{}).fl
   Object.values(groups||{}).flatMap(names=>Array.isArray(names)?names:[])
 ));
 let products=null;
+let listItems=null;
 let observer=null;
 const visualScaleCache=new Map();
 
@@ -116,6 +117,7 @@ function decorateFallback(card,name,source){
   const fallback=card.querySelector('.product-svg');
   if(!fallback||fallback.dataset.singleProductPending===source)return;
   fallback.dataset.singleProductPending=source;
+  const compact=fallback.classList.contains('is-compact');
   const image=new Image();
   image.alt='';
   image.decoding='async';
@@ -123,7 +125,7 @@ function decorateFallback(card,name,source){
   image.addEventListener('load',()=>{
     if(!fallback.isConnected)return;
     const sprite=document.createElement('span');
-    sprite.className='premium-sprite is-single-product-image';
+    sprite.className='premium-sprite is-single-product-image'+(compact?' is-compact':'');
     sprite.appendChild(image);
     fallback.replaceWith(sprite);
     card.classList.add('has-single-product-image');
@@ -157,17 +159,26 @@ function decorateCard(card){
 function decorateProducts(){
   products?.querySelectorAll('.product[data-name]').forEach(decorateCard);
 }
+function decorateList(){
+  listItems?.querySelectorAll('.list-row[data-name]').forEach(decorateCard);
+}
+function decorateAll(){
+  decorateProducts();
+  decorateList();
+}
 function bind(){
   products=document.getElementById('products');
-  if(!products)return false;
+  listItems=document.getElementById('listItems');
+  if(!products||!listItems)return false;
   ensureStyles();
-  decorateProducts();
+  decorateAll();
   observer?.disconnect();
   observer=new MutationObserver(mutations=>{
     if(!mutations.some(mutation=>mutation.addedNodes.length))return;
-    requestAnimationFrame(decorateProducts);
+    requestAnimationFrame(decorateAll);
   });
   observer.observe(products,{childList:true,subtree:true});
+  observer.observe(listItems,{childList:true,subtree:true});
   return true;
 }
 function init(){
