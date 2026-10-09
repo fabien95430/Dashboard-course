@@ -53,6 +53,17 @@ function installMissingProductsCompactLayout(){
 
 installMissingProductsCompactLayout();
 
+function loadErrorCenter(){
+  if(document.querySelector('script[data-courses-error-center]'))return;
+  const script=document.createElement('script');
+  script.src='./error-center.js?v=1';
+  script.defer=true;
+  script.dataset.coursesErrorCenter='1';
+  document.head.appendChild(script);
+}
+
+loadErrorCenter();
+
 const listRoot=document.getElementById('listItems');
 if(!listRoot)return;
 
