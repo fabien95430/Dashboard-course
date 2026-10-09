@@ -1,0 +1,10 @@
+name: Agent category reorg v373
+
+on:
+  push:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo category-reorg-ready
