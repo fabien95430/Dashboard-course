@@ -120,7 +120,7 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   'Persil':'Botte','Ciboulette':'Botte','Basilic':'Botte','Coriandre':'Botte','Menthe':'Botte','Thym frais':'Botte','Romarin frais':'Botte',
   'Ail':'Pièce','Piments':'Pièce','Citron vert':'Pièce','Olives fraîches':'Barquette',
   'Mayonnaise':'Pot','Moutarde':'Pot','Sauce tomate':'Pot','Pesto':'Pot','Sauce César':'Flacon','Vinaigre balsamique':'Bouteille','Vinaigre de vin':'Bouteille','Vinaigre de cidre':'Bouteille','Huile d\'olive':'Bouteille','Huile de tournesol':'Bouteille',
-  'Café soluble':'Pot','Thé noir':'Boîte','Thé vert':'Boîte','Chocolat en poudre':'Boîte','Céréales':'Boîte','Confiture':'Pot','Confiture fruits rouges':'Pot','Miel':'Pot','Pâte à tartiner':'Pot',
+  'Café soluble':'Pot','Thé noir':'Boîte','Thé vert':'Boîte','Chocolat en poudre':'Boîte','Céréales':'Boîte','Confiture fruits rouges':'Pot','Miel':'Pot','Pâte à tartiner':'Pot',
   'Bonbons':'Sachet','Chocolat noir':'Tablette','Chocolat au lait':'Tablette',
   'Levure chimique':'Sachet','Levure boulangère':'Sachet','Maïzena':'Boîte','Vanille':'Sachet','Pépites chocolat':'Sachet','Noix de coco râpée':'Sachet','Amandes en poudre':'Sachet','Gélatine':'Paquet',
   'Olives':'Pot','Crackers':'Paquet','Mini saucissons':'Paquet','Tapenade':'Pot','Houmous':'Pot',

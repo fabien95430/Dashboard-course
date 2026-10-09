@@ -81,7 +81,7 @@ const PRODUCT=Object.freeze({
   'Huile d\'olive':{days:120,factor:.88},'Huile de tournesol':{days:120,factor:.88},'Cornichons':{days:75,factor:.85},
   'Café moulu':{days:21},'Café en grains':{days:30},'Café soluble':{days:60},'Thé noir':{days:75},'Thé vert':{days:75},
   'Farine':{days:90},'Sucre':{days:120},'Sucre roux':{days:120},'Sucre glace':{days:120},'Maïzena':{days:120},
-  'Miel':{days:120},'Confiture':{days:60},'Pâte à tartiner':{days:60},'Curry':{days:120},'Bouillon cubes':{days:120},
+  'Miel':{days:120},'Pâte à tartiner':{days:60},'Curry':{days:120},'Bouillon cubes':{days:120},
   'Papier toilette':{days:28},'Essuie-tout':{days:28},'Sacs poubelle 30L':{days:45},'Sacs poubelle 50L':{days:45},
   'Lessive liquide':{days:45},'Lessive capsules':{days:45},'Lessive poudre':{days:60},'Adoucissant':{days:50},
   'Liquide vaisselle':{days:45},'Tablettes lave-vaisselle':{days:45},'Shampoing':{days:45},'Après-shampoing':{days:55},
