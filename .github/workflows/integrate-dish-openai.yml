@@ -70,8 +70,10 @@ jobs:
           set -euo pipefail
           if [ "${{ steps.request.outputs.type }}" = "product" ]; then
             python3 scripts/integrate_product_openai.py
+            python3 scripts/validate_generated_asset.py product
           else
             python3 scripts/integrate_dish_openai.py
+            python3 scripts/validate_generated_asset.py dish
           fi
 
       - name: Lire le résultat
