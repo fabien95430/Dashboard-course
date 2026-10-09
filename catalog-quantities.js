@@ -136,7 +136,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Piles AA":"Paquet",
   "Cornichon":"Pot",
   "Confiture fraise":"Pot",
-  "Confiture mirabelles":"Pot"
+  "Confiture mirabelles":"Pot",
+  "Chips":"Paquet"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
