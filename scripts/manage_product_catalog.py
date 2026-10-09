@@ -101,6 +101,9 @@ def remove_object_entry(text: str, constant: str, name: str, value_pattern: str)
         updated, count = re.subn(entry, '', body, count=1, flags=re.S)
     if count == 0:
         return text
+    # An entry removal can leave indentation on an otherwise empty line.
+    # Keep git diff --check strict without reformatting unrelated code.
+    updated = re.sub(r'(?m)^[ \t]+$', '', updated)
     return text[:wrapper.start(2)] + updated + text[wrapper.end(2):]
 
 
