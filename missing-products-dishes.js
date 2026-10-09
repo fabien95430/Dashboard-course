@@ -549,25 +549,12 @@ function initMissingProductsAndDishes(){
       row?.scrollIntoView?.({block:'nearest',behavior:'auto'});
     }));
   }
-  function productImageReady(item){
-    const card=[...document.querySelectorAll('#products .product[data-name]')].find(entry=>normalize(entry.dataset.name)===normalize(item.name));
-    if(!card)return false;
-    const sprite=card.querySelector('.premium-sprite');
-    const image=sprite?.querySelector('img');
-    if(!sprite||!image||sprite.classList.contains('is-fallback'))return false;
-    if(image.complete&&image.naturalWidth>0)return true;
-    if(!image.dataset.missingProductLoadWatch){
-      image.dataset.missingProductLoadWatch='1';
-      image.addEventListener('load',()=>reconcileProducts(),{once:true});
-    }
-    return false;
-  }
   function reconcileProducts(){
     const catalog=catalogProductLookup();
     if(!catalog.size)return;
     const products=readProducts();
     products.forEach(item=>{
-      if(!catalog.has(normalize(item.name))||!productImageReady(item)||completedThisSession.has('product:'+item.id))return;
+      if(!catalog.has(normalize(item.name))||completedThisSession.has('product:'+item.id))return;
       const row=[...productList.querySelectorAll('[data-missing-product-row]')].find(entry=>entry.dataset.missingProductRow===item.id);
       const remove=row?.querySelector('[data-remove-missing]');
       if(!remove)return;
