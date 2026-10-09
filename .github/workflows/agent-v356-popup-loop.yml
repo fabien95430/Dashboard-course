@@ -1,4 +1,4 @@
-name: Fix missing popup observer loop v356
+name: Fix missing popup observer loop v357
 
 on:
   push:
@@ -19,24 +19,24 @@ jobs:
 
       - name: Verify expected main
         run: |
-          test "$(git rev-parse HEAD)" = "f8a80a7a68a7b888c081d5a6ea094be2e45bdd31"
+          test "$(git rev-parse HEAD)" = "f44d6eadfcaf6a97e5740fac213c87767559e30e"
 
-      - name: Apply v356 fix
+      - name: Apply v357 fix
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
 
           def replace_exact(path, old, new, count=1):
               p=Path(path)
               text=p.read_text(encoding='utf-8')
               actual=text.count(old)
               if actual!=count:
-                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old[:80]!r}')
+                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old[:90]!r}')
               p.write_text(text.replace(old,new,count),encoding='utf-8')
 
-          # missing-products-fixes.js: never rewrite the status text when it is already correct.
+          # Status decoration: changing an already-correct text node used to retrigger
+          # the childList observer indefinitely.
           replace_exact('missing-products-fixes.js',
           """      progress.textContent=failed?'Erreur':'En cours';
           if(cancelled)progress.textContent='Annulé';
@@ -54,7 +54,8 @@ jobs:
           if(progress.getAttribute('aria-label')!==progressAriaLabel)progress.setAttribute('aria-label',progressAriaLabel);
           """)
 
-          # missing-products-popup-ui.js: make decoration idempotent so its observer cannot feed itself.
+          # Popup decoration: every write is now idempotent, so the observer settles
+          # after the first real DOM change instead of observing its own redraw forever.
           replace_exact('missing-products-popup-ui.js',
           """  thumb.className='missing-request-thumb is-'+type;
           thumb.innerHTML=thumbSvg(type);
@@ -110,66 +111,31 @@ jobs:
           });
           """)
 
-          replace_exact('missing-products-popup-ui.js',
-          """function bindOpenFallback(dialog){
-            const opener=document.getElementById('settingsMissingProductsBtn');
-            if(!opener||opener.dataset.missingPopupOpenFallback==='1')return;
-            opener.dataset.missingPopupOpenFallback='1';
-            opener.addEventListener('click',()=>{
-              if(dialog.open)return;
-              dialog.removeAttribute('autofocus');
-              try{
-                dialog.showModal();
-                requestAnimationFrame(()=>{
-                  try{dialog.focus({preventScroll:true})}catch(_){dialog.focus()}
-                });
-              }catch(_){}
-            });
-          }
-          """,
-          """)
-          replace_exact('missing-products-popup-ui.js',"  dialog.removeAttribute('autofocus');\n","")
-          replace_exact('missing-products-popup-ui.js',"  bindOpenFallback(dialog);\n","")
-
-          # Roll back the unnecessary autofocus workaround; app.js remains the single opening path.
-          replace_exact('index.html',
-                        '<dialog id="missingProductsDialog" class="dialog" tabindex="-1" autofocus>',
-                        '<dialog id="missingProductsDialog" class="dialog" tabindex="-1">')
-          replace_exact('index.html','page-version">v355','page-version">v356',3)
-          replace_exact('index.html','./catalog.js?v=355','./catalog.js?v=356')
-
-          replace_exact('catalog.js',"images.src='./dish-local-images.js?v=355';","images.src='./dish-local-images.js?v=356';")
-
-          replace_exact('dish-local-images.js',"const APP_VERSION='v355';","const APP_VERSION='v356';")
+          # Global visible version and cache busting for the two repaired owner modules.
+          replace_exact('index.html','page-version">v356','page-version">v357',3)
+          replace_exact('index.html','./catalog.js?v=356','./catalog.js?v=357')
+          replace_exact('catalog.js',"images.src='./dish-local-images.js?v=355';","images.src='./dish-local-images.js?v=357';")
+          replace_exact('dish-local-images.js',"const APP_VERSION='v355';","const APP_VERSION='v357';")
           replace_exact('dish-local-images.js',"script.src='./missing-products-fixes.js?v=18';","script.src='./missing-products-fixes.js?v=19';")
           replace_exact('dish-local-images.js',"script.src='./missing-products-popup-ui.js?v=17';","script.src='./missing-products-popup-ui.js?v=18';")
 
-          replace_exact('sw.js',"const CACHE='courses-app-v355-r1';","const CACHE='courses-app-v356-r1';")
+          replace_exact('sw.js',"const CACHE='courses-app-v355-r1';","const CACHE='courses-app-v357-r1';")
           replace_exact('sw.js',
                         "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355'];",
-                        "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=356'];")
+                        "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./app.js?v=356','./settings-tab-badge.js?v=356','./catalog.js?v=357','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=357'];")
 
-          # Replace the two v355 popup/version tests with regression coverage for the observer loop.
           tests=Path('tests/preference-popups.test.mjs')
           source=tests.read_text(encoding='utf-8')
-          marker="test('le popup produits et plats manquants prend le focus sans ouvrir le clavier et peut toujours se fermer',()=>{"
+          source=source.replace(
+              "assert.ok(fixes.includes(\"progress.textContent=failed?'Erreur':'En cours';\"));",
+              "assert.ok(fixes.includes(\"const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';\"));",
+              1
+          )
+          marker="test('la version visible passe à v356 et les scripts principaux sont rechargés',()=>{"
           start=source.find(marker)
           if start<0:
-              raise SystemExit('popup regression test marker not found')
-          source=source[:start]+r"""test('le popup produits et plats manquants reste ouvrable et fermable sans voie concurrente',()=>{
-            const index=read('index.html');
-            const popup=read('missing-products-popup-ui.js');
-            assert.doesNotMatch(index,/<dialog id="missingProductsDialog"[^>]*autofocus/);
-            assert.match(popup,/function ensureCloseButton\(dialog\)/);
-            assert.match(popup,/button\.className='missing-products-close'/);
-            assert.match(popup,/button\.setAttribute\('aria-label','Fermer'\)/);
-            assert.match(popup,/button\.addEventListener\('click',[\s\S]*?closePopup\(dialog\)/);
-            assert.match(popup,/dialog\.addEventListener\('cancel',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?closePopup\(dialog\)/);
-            assert.doesNotMatch(popup,/function bindOpenFallback\(/);
-            assert.doesNotMatch(popup,/missingPopupOpenFallback/);
-          });
-
-          test('les décorations du popup sont idempotentes et ne nourrissent plus leurs MutationObserver',()=>{
+              raise SystemExit('v356 version test marker not found')
+          regression=r"""test('les décorations du popup sont idempotentes et ne nourrissent plus leurs MutationObserver',()=>{
             const fixes=read('missing-products-fixes.js');
             const popup=read('missing-products-popup-ui.js');
             assert.match(fixes,/const progressLabel=cancelled\?'Annulé':failed\?'Erreur':'En cours';/);
@@ -180,29 +146,29 @@ jobs:
             assert.doesNotMatch(popup,/row\.classList\.remove\('is-request-product','is-request-dish','is-request-dessert'\)/);
           });
 
-          test('la version visible passe à v356 et recharge les deux modules du popup',()=>{
+          test('la version visible passe à v357 et recharge les modules corrigés du popup',()=>{
             const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
             assert.match(index,/styles\.css\?v=348/);
-            assert.match(index,/catalog\.js\?v=356/);
-            assert.match(index,/app\.js\?v=352/);
-            assert.match(index,/settings-tab-badge\.js\?v=352/);
-            assert.equal((index.match(/page-version\">v356/g)||[]).length,3);
+            assert.match(index,/catalog\.js\?v=357/);
+            assert.match(index,/app\.js\?v=356/);
+            assert.match(index,/settings-tab-badge\.js\?v=356/);
+            assert.equal((index.match(/page-version\">v357/g)||[]).length,3);
             assert.match(catalog,/dishes-ui\.js\?v=344/);
-            assert.match(catalog,/dish-local-images\.js\?v=356/);
+            assert.match(catalog,/dish-local-images\.js\?v=357/);
             assert.match(settings,/missing-products-dishes\.js\?v=8/);
-            assert.match(sw,/courses-app-v356-r1/);
-            assert.match(sw,/styles\.css\?v=348/);
-            assert.match(sw,/app\.js\?v=352/);
-            assert.match(sw,/settings-tab-badge\.js\?v=352/);
-            assert.match(sw,/catalog\.js\?v=356/);
+            assert.match(sw,/courses-app-v357-r1/);
+            assert.match(sw,/catalog\.js\?v=357/);
+            assert.match(sw,/app\.js\?v=356/);
+            assert.match(sw,/settings-tab-badge\.js\?v=356/);
             assert.match(sw,/missing-products-fixes\.js\?v=19/);
             assert.match(sw,/missing-products-popup-ui\.js\?v=18/);
-            assert.match(sw,/dish-local-images\.js\?v=356/);
-            assert.match(localImages,/const APP_VERSION='v356'/);
+            assert.match(sw,/dish-local-images\.js\?v=357/);
+            assert.match(localImages,/const APP_VERSION='v357'/);
             assert.match(localImages,/missing-products-fixes\.js\?v=19/);
             assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
           });
           """
+          source=source[:start]+regression
           tests.write_text(source,encoding='utf-8')
           PY
 
@@ -211,18 +177,19 @@ jobs:
           node --test tests/*.test.mjs
           git diff --check
           git diff --exit-code -- AGENTS.md
-          grep -q "page-version\">v356" index.html
-          ! grep -q "function bindOpenFallback" missing-products-popup-ui.js
+          test "$(grep -o 'page-version\">v357' index.html | wc -l)" -eq 3
+          ! grep -q "progress.textContent=failed?'Erreur':'En cours'" missing-products-fixes.js
+          ! grep -q "row.classList.remove('is-request-product','is-request-dish','is-request-dessert')" missing-products-popup-ui.js
 
       - name: Ensure main did not move
         run: |
           git fetch origin main --depth=1
-          test "$(git rev-parse origin/main)" = "f8a80a7a68a7b888c081d5a6ea094be2e45bdd31"
+          test "$(git rev-parse origin/main)" = "f44d6eadfcaf6a97e5740fac213c87767559e30e"
 
       - name: Commit and push main
         run: |
           git config user.name "Fabien"
           git config user.email "canape-silence-8o@icloud.com"
           git add missing-products-fixes.js missing-products-popup-ui.js index.html catalog.js dish-local-images.js sw.js tests/preference-popups.test.mjs
-          git commit -m "v356: supprime la boucle du popup des demandes"
+          git commit -m "v357: supprime la boucle du popup des demandes"
           git push origin HEAD:main
