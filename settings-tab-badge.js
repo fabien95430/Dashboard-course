@@ -531,3 +531,40 @@ if(document.readyState==='loading'){
   initApplicationManagement();
 }
 })();
+
+(() => {
+'use strict';
+
+function initAdministratorSettings(){
+  const preferencesSection=document.getElementById('settingsMissingProductsBtn')?.closest('.settings-section');
+  const managementButton=document.getElementById('settingsApplicationManagementBtn');
+  const managementPanel=document.getElementById('preferencesApplicationManagement');
+  if(!preferencesSection||!managementButton||!managementPanel)return;
+
+  let adminSection=document.getElementById('settingsAdministratorSection');
+  if(!adminSection){
+    adminSection=document.createElement('section');
+    adminSection.id='settingsAdministratorSection';
+    adminSection.className='settings-section';
+    adminSection.innerHTML='<h2><span class="section-icon"><svg><use href="#i-gear"></use></svg></span>Administrateur</h2><div class="settings-card"></div>';
+    preferencesSection.after(adminSection);
+  }
+  adminSection.querySelector('.settings-card')?.appendChild(managementButton);
+
+  let errorMessagesButton=document.getElementById('preferencesErrorMessages');
+  if(!errorMessagesButton){
+    errorMessagesButton=document.createElement('button');
+    errorMessagesButton.id='preferencesErrorMessages';
+    errorMessagesButton.type='button';
+    errorMessagesButton.className='security-action-row';
+    errorMessagesButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-list"></use></svg></span><span class="security-setting-copy"><strong>Messages d’erreur</strong><small>Consulter les erreurs détectées par l’application</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+    managementPanel.appendChild(errorMessagesButton);
+  }
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initAdministratorSettings,{once:true});
+}else{
+  initAdministratorSettings();
+}
+})();
