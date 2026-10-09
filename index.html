@@ -45,7 +45,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v357</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v363</span></p>
         </div>
         <div class="page-header-actions">
           <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
@@ -114,7 +114,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v357</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v363</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -134,7 +134,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v357</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v363</span></p>
         </div>
       </header>
 
@@ -215,7 +215,7 @@
         <span>Adresse Home Assistant / Nabu Casa</span>
         <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
       </label>
-      <p class="hint">La connexion est sécurisée par OAuth. Ton autorisation locale sera ensuite chiffrée sur cet appareil.</p>
+      <p class="hint">Connexion OAuth sécurisée. L’autorisation reste chiffrée sur cet appareil.</p>
       <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
       <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
       <div id="setupError" class="setup-error" role="alert"></div>
@@ -251,7 +251,7 @@
             <span>Confirmer le mot de passe</span>
             <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
           </label>
-          <p id="securityHint" class="hint">Le mot de passe n’est jamais enregistré. Il sert uniquement à déchiffrer ton autorisation Home Assistant sur cet appareil.</p>
+          <p id="securityHint" class="hint">Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local.</p>
           <button id="securitySubmit" class="primary" type="button">Connexion</button>
           <button id="resetSecurityBtn" class="secondary reset-link" type="button">Réinitialiser la connexion de cet appareil</button>
         </div>
@@ -339,7 +339,7 @@
     <div class="missing-products-header">
       <div>
         <h3>Produits manquants</h3>
-        <p class="dialog-intro">Ajoutez ici les produits absents du catalogue. Cette liste reste sur cet appareil.</p>
+        <p class="dialog-intro">Ajoutez les produits ou plats absents du catalogue.</p>
       </div>
     </div>
 
@@ -422,8 +422,8 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=357"></script>
+  <script src="./catalog.js?v=363"></script>
   <script src="./app.js?v=356"></script>
-  <script src="./settings-tab-badge.js?v=356"></script>
+  <script src="./settings-tab-badge.js?v=363"></script>
 </body>
 </html>

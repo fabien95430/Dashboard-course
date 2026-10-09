@@ -176,7 +176,7 @@ function ensureDialog(){
   dialog.id='repurchaseSoonDialog';
   dialog.className='repurchase-dialog';
   dialog.setAttribute('aria-labelledby','repurchaseSoonTitle');
-  dialog.innerHTML='<div class="repurchase-screen"><header class="repurchase-head"><button class="repurchase-back" type="button" aria-label="Retour au Catalogue">‹</button><h2 id="repurchaseSoonTitle">À prévoir</h2></header><div class="repurchase-info"><span class="repurchase-info-mark" aria-hidden="true">i</span><span>Suggestions basées sur vos habitudes d’achat. Rien n’est ajouté automatiquement.</span></div><div class="repurchase-list"></div></div>';
+  dialog.innerHTML='<div class="repurchase-screen"><header class="repurchase-head"><button class="repurchase-back" type="button" aria-label="Retour au Catalogue">‹</button><h2 id="repurchaseSoonTitle">À prévoir</h2></header><div class="repurchase-info"><span class="repurchase-info-mark" aria-hidden="true">i</span><span>Suggestions selon vos habitudes. Aucun ajout automatique.</span></div><div class="repurchase-list"></div></div>';
   document.body.appendChild(dialog);
   dialog.querySelector('.repurchase-back')?.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close()});
@@ -186,9 +186,9 @@ function ensureDialog(){
 function emptyMarkup(){
   const enabled=intelligence()?.isEnabled?.()!==false;
   if(!enabled){
-    return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez « Historique des achats » dans vos préférences pour obtenir des suggestions.</span></div>';
+    return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez l’historique des achats dans Préférences.</span></div>';
   }
-  return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent après au moins deux achats d’un même produit et uniquement quand son prochain rachat approche.</span></div>';
+  return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent quand un prochain achat approche.</span></div>';
 }
 
 function renderDialog(items=suggestions()){

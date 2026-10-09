@@ -313,7 +313,7 @@ function buildDishDialog(){
     '</div>'+ 
     '<div class="dish-sheet-list" aria-label="Ingrédients à ajouter"></div>'+ 
     '<div class="dish-sheet-footer">'+
-      '<div class="dish-sheet-note"><span aria-hidden="true">ⓘ</span><div><strong>Sel, huile, poivre non inclus</strong><small>Ces ingrédients de base sont à ajouter manuellement si nécessaire.</small></div></div>'+ 
+      '<div class="dish-sheet-note"><span aria-hidden="true">ⓘ</span><div><strong>Sel, huile, poivre non inclus</strong><small>À ajouter manuellement si besoin.</small></div></div>'+ 
       '<button type="button" class="dish-sheet-add"><svg><use href="#i-cart"></use></svg><span>Ajouter à ma liste</span></button>'+ 
     '</div>';
   document.body.appendChild(dishDialog);
@@ -394,7 +394,7 @@ function buildRecipeCustomizationDialog(){
   recipeCustomizationDialog.tabIndex=-1;
   recipeCustomizationDialog.innerHTML=
     '<h3>Personnalisation des recettes</h3>'+ 
-    '<p class="dialog-intro">Affinez les aliments et les quantités prédéfinies pour 4 personnes. Les quantités seront ensuite adaptées automatiquement au nombre de personnes.</p>'+ 
+    '<p class="dialog-intro">Modifiez ingrédients et quantités pour 4 personnes. Les portions s’adaptent automatiquement.</p>'+ 
     '<div class="recipe-customization-search-wrap"><label class="recipe-customization-search"><svg aria-hidden="true"><use href="#i-search"></use></svg><input type="search" autocomplete="off" placeholder="Rechercher un plat…" aria-label="Rechercher un plat" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="recipeCustomizationSuggestions"></label><div id="recipeCustomizationSuggestions" class="recipe-customization-suggestions" role="listbox" hidden></div></div>'+ 
     '<p class="recipe-customization-status" aria-live="polite"></p>'+ 
     '<div class="recipe-customization-list" aria-label="Aliments et quantités de la recette"></div>'+ 

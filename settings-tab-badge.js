@@ -263,7 +263,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=8';
+script.src='./missing-products-dishes.js?v=363';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
@@ -516,7 +516,7 @@ function initApplicationManagement(){
     selectionNodes.forEach(node=>{node.hidden=true});
     managementPanel.hidden=false;
     if(title)title.textContent='Gestion de l’application';
-    if(intro)intro.textContent='Accédez à la documentation, à l’historique des achats et aux informations de l’application.';
+    if(intro)intro.textContent='Documentation, historique et informations de l’application.';
     if(!dialog.open)dialog.showModal();
   }
 

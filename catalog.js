@@ -33,7 +33,7 @@
   const loadDishes=()=>{
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
     const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=344';
+    script.src='./dishes-ui.js?v=363';
     script.async=false;
     script.dataset.catalogDishes='script';
     script.addEventListener('load',loadLiquid,{once:true});
@@ -51,7 +51,7 @@
   const loadRepurchaseSoon=()=>{
     if(document.querySelector('script[data-repurchase-soon]')){loadQuantities();return}
     const script=document.createElement('script');
-    script.src='./repurchase-soon.js?v=3';
+    script.src='./repurchase-soon.js?v=363';
     script.async=false;
     script.dataset.repurchaseSoon='script';
     script.addEventListener('load',loadQuantities,{once:true});
@@ -60,7 +60,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=357';
+    images.src='./dish-local-images.js?v=363';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadRepurchaseSoon,{once:true});

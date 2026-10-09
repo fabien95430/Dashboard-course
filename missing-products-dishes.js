@@ -262,7 +262,7 @@ function initMissingProductsAndDishes(){
   const dialogTitle=dialog.querySelector('.missing-products-header h3');
   const dialogIntro=dialog.querySelector('.missing-products-header .dialog-intro');
   if(dialogTitle)dialogTitle.textContent='Produits & plats manquants';
-  if(dialogIntro)dialogIntro.textContent='Ajoutez ici les produits ou plats absents du catalogue. Les demandes restent ici jusqu’à leur ajout.';
+  if(dialogIntro)dialogIntro.textContent='Ajoutez les produits ou plats absents du catalogue.';
 
   const style=document.createElement('style');
   style.id='missing-products-dishes-ui';
