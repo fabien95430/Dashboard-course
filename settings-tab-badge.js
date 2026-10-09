@@ -94,7 +94,7 @@ const STORAGE_PREFERRED_CATALOG_MODE='courses-catalog-preferred-mode-v1';
 const STORAGE_CATALOG_MODE='courses-catalog-mode-v1';
 const SERVING_OPTIONS=Object.freeze([2,4,5]);
 const CATALOG_MODE_OPTIONS=Object.freeze(['products','dishes']);
-const DEFAULT_SERVINGS=4;
+const DEFAULT_SERVINGS=2;
 const DOCUMENTATION_URL='./docs/guide-fonctionnement-courses.pdf?v=299';
 
 function readPreferredServings(){

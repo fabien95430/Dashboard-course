@@ -217,7 +217,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
   const repurchase=read('repurchase-soon.js');
   assert.match(index,/Connexion OAuth sécurisée\. L’autorisation reste chiffrée sur cet appareil\./);
   assert.match(index,/Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local\./);
-  assert.match(dishes,/Modifiez ingrédients et quantités pour 4 personnes\. Les portions s’adaptent automatiquement\./);
+  assert.match(dishes,/Modifiez ingrédients et quantités pour 2 personnes\. Les portions s’adaptent automatiquement\./);
   assert.match(dishes,/À ajouter manuellement si besoin\./);
   assert.match(missing,/Ajoutez les produits ou plats absents du catalogue\./);
   assert.match(settings,/Documentation, historique et informations de l’application\./);
@@ -226,28 +226,30 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 
-test('la version visible runtime passe à v364 et recharge la génération avec précision image',()=>{
+test('la version visible runtime passe à v365 et recharge le moteur de recettes',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=363/);
+  assert.match(index,/catalog\.js\?v=364/);
   assert.match(index,/app\.js\?v=356/);
-  assert.match(index,/settings-tab-badge\.js\?v=363/);
-  assert.equal((index.match(/page-version\">v363/g)||[]).length,3);
-  assert.match(catalog,/dishes-ui\.js\?v=363/);
+  assert.match(index,/settings-tab-badge\.js\?v=364/);
+  assert.equal((index.match(/page-version\">v365/g)||[]).length,3);
+  assert.match(catalog,/dishes-ui\.js\?v=364/);
+  assert.match(catalog,/catalog-quantities\.js\?v=364/);
   assert.match(catalog,/repurchase-soon\.js\?v=363/);
-  assert.match(catalog,/dish-local-images\.js\?v=363/);
+  assert.match(catalog,/dish-local-images\.js\?v=364/);
   assert.match(settings,/missing-products-dishes\.js\?v=363/);
-  assert.match(sw,/courses-app-v363-r1/);
-  assert.match(sw,/catalog\.js\?v=363/);
+  assert.match(sw,/courses-app-v365-r1/);
+  assert.match(sw,/catalog\.js\?v=364/);
   assert.match(sw,/app\.js\?v=356/);
-  assert.match(sw,/settings-tab-badge\.js\?v=363/);
+  assert.match(sw,/settings-tab-badge\.js\?v=364/);
   assert.match(sw,/missing-products-dishes\.js\?v=363/);
-  assert.match(sw,/dishes-ui\.js\?v=363/);
+  assert.match(sw,/dishes-ui\.js\?v=364/);
+  assert.match(sw,/catalog-quantities\.js\?v=364/);
   assert.match(sw,/repurchase-soon\.js\?v=363/);
   assert.match(sw,/missing-products-fixes\.js\?v=19/);
   assert.match(sw,/missing-products-popup-ui\.js\?v=18/);
-  assert.match(sw,/dish-local-images\.js\?v=363/);
-  assert.match(localImages,/const APP_VERSION='v364'/);
+  assert.match(sw,/dish-local-images\.js\?v=364/);
+  assert.match(localImages,/const APP_VERSION='v365'/);
   assert.match(localImages,/missing-products-fixes\.js\?v=20/);
   assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
 });

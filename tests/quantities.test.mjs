@@ -37,20 +37,20 @@ test('les portions arrondissent les conditionnements à l’unité supérieure',
   assert.equal(api.getQuantity('Crème brûlée','Vanille',8),2);
 });
 
-test('une recette personnalisée ajuste le besoin de base sans changer le moteur d’achat',()=>{
+test('une recette personnalisée ajuste la base de 2 personnes sans changer le moteur d’achat',()=>{
   const api=context.window.COURSES_QUANTITIES;
-  assert.equal(api.getBaseNeed('Spaghetti carbonara','Spaghetti',4),400);
+  assert.equal(api.getBaseNeed('Spaghetti carbonara','Spaghetti',2),200);
   assert.equal(api.getRecipeUnit('Spaghetti'),'g');
   assert.equal(api.getRecipeUnit('Œufs'),'piece');
-  api.setRecipeNeeds('Spaghetti carbonara',{Spaghetti:700,'Œufs':6});
+  api.setRecipeNeeds('Spaghetti carbonara',{Spaghetti:350,'Œufs':3});
   assert.equal(api.hasRecipeNeeds('Spaghetti carbonara'),true);
-  assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',4),700);
   assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',2),350);
+  assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',4),700);
   assert.equal(api.getQuantity('Spaghetti carbonara','Spaghetti',4),2);
-  assert.equal(api.getNeed('Spaghetti carbonara','Œufs',4),6);
+  assert.equal(api.getNeed('Spaghetti carbonara','Œufs',2),3);
   api.resetRecipeNeeds('Spaghetti carbonara');
   assert.equal(api.hasRecipeNeeds('Spaghetti carbonara'),false);
-  assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',4),400);
+  assert.equal(api.getNeed('Spaghetti carbonara','Spaghetti',2),200);
 });
 
 test('les libellés audités décrivent le mode d’achat sans exposer les références techniques',()=>{
@@ -58,13 +58,13 @@ test('les libellés audités décrivent le mode d’achat sans exposer les réf�
   const expected={
     'Pâté':'Barquette','Rillettes':'Pot','Jambon blanc':'Barquette',
     'Thon en boîte':'Boîte','Haricots rouges':'Boîte','Pois chiches':'Boîte','Tomates pelées':'Boîte','Maïs en boîte':'Boîte','Lentilles':'Boîte',
-    'Farine':'Paquet','Sucre':'Paquet','Sucre roux':'Paquet','Sucre glace':'Paquet','Maïzena':'Boîte','Vanille':'Sachet','Levure chimique':'Sachet','Pépites chocolat':'Sachet',
+    'Farine':'Paquet','Sucre':'Paquet','Sucre roux':'Paquet','Sucre glace':'Paquet','Maïzena':'Boîte','Vanille':'Sachet','Levure chimique':'Sachet','Pépites chocolat':'Sachet','Gélatine':'Paquet',
     'Spaghetti':'Paquet','Riz basmati':'Paquet','Nouilles chinoises':'Paquet',
     'Crème liquide':'Brique','Œufs':'Boîte','Mozzarella':'Sachet','Parmesan':'Poids','Fromage râpé':'Sachet','Poulet':'Poids','Saumon':'Poids',
-    'Pain de mie':'Paquet','Brioche':'Paquet','Wraps':'Paquet','Pains burger':'Paquet',
+    'Pain de mie':'Paquet','Brioche':'Paquet','Wraps':'Paquet','Pains burger':'Paquet','Pâte brisée':'Pièce',
     'Fraises':'Barquette','Concombres':'Pièce','Épinards':'Sachet','Poireaux':'Botte','Champignons':'Barquette','Asperges':'Botte','Mâche':'Sachet','Roquette':'Sachet','Persil':'Botte',
-    'Mayonnaise':'Pot','Moutarde':'Pot','Sauce tomate':'Pot','Pesto':'Pot','Huile d\'olive':'Bouteille','Miel':'Pot','Chocolat noir':'Tablette',
-    'Curry':'Flacon','Lait de coco':'Boîte','Harissa':'Tube','Soupes en brique':'Brique','Croûtons':'Sachet',
+    'Mayonnaise':'Pot','Moutarde':'Pot','Sauce tomate':'Pot','Pesto':'Pot','Sauce César':'Flacon','Huile d\'olive':'Bouteille','Miel':'Pot','Chocolat noir':'Tablette',
+    'Curry':'Flacon','Paprika':'Flacon','Curcuma':'Flacon','Chili':'Flacon','Lait de coco':'Boîte','Harissa':'Tube','Soupes en brique':'Brique','Croûtons':'Sachet',
     'Vinaigre ménager':'Bouteille','Lessive capsules':'Boîte','Papier aluminium':'Rouleau','Dentifrice':'Tube','Gants ménage':'Paire','Baume lèvres':'Stick','Croquettes chat':'Sac'
   };
   for(const [name,label] of Object.entries(expected))assert.equal(api.getPurchaseLabel(name),label,name);
@@ -84,10 +84,10 @@ test('chaque produit du catalogue a un conditionnement audité sans grammage arb
   }
 });
 
-test('les lentilles suivent désormais la référence technique d’une conserve',()=>{
+test('les lentilles utilisent la quantité spécifique du plat pour 2 personnes',()=>{
   const api=context.window.COURSES_QUANTITIES;
   assert.equal(api.getPurchaseLabel('Lentilles'),'Boîte');
-  assert.equal(api.getNeed('Saucisse lentille','Lentilles',6),480);
+  assert.equal(api.getNeed('Saucisse lentille','Lentilles',6),420);
   assert.equal(api.getQuantity('Saucisse lentille','Lentilles',6),2);
 });
 
