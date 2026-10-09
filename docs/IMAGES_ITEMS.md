@@ -8,8 +8,8 @@ Cette note est la référence pour recréer ou remplacer l’image d’un produi
 - Les images unitaires sont stockées dans `www/Items/`.
 - `catalog.js` reste la source de vérité pour les noms et catégories des produits.
 - `product-item-images.js` transforme le nom du produit en slug puis charge `./www/Items/<slug>.webp`.
-- Les catégories Fruits & Légumes, Frais, Épicerie, Boissons et Maison utilisent les images unitaires.
-- Les anciens atlas restent uniquement comme **solution de repli** si une image unitaire manque ou ne charge pas. Ne pas les supprimer lors de la régénération d’un seul item.
+- Toutes les catégories utilisent les images unitaires.
+- Si une image unitaire manque ou ne charge pas, l’application utilise uniquement le visuel SVG premium local de secours.
 
 ## Règle visuelle
 
@@ -39,7 +39,7 @@ Ne jamais changer volontairement de style graphique. Si les références de la c
 
 Utiliser ce modèle lorsque l’on demande la régénération d’un item :
 
-> Régénère uniquement l’image de l’item **« [NOM EXACT DU PRODUIT] »** dans le même style que les autres produits existants de sa catégorie **[CATÉGORIE]**. Commence par lire l’état actuel de `main`, `catalog.js`, `product-item-images.js` et plusieurs images existantes de `www/Items/` appartenant à la même catégorie afin de reprendre leur style réel. Génère exactement **un seul produit**, isolé sur **fond transparent**, centré, avec des proportions naturelles et une marge régulière autour. Le cadrage, l’échelle, le niveau de détail, les ombres et la finition doivent rester cohérents avec les références existantes. Aucun décor, aucune main, aucune personne, aucun collage, aucune grille, aucun deuxième produit, aucun texte ajouté autour, aucune marque ou logo inventé. Si le produit est emballé, utiliser un emballage générique cohérent avec les références. Intégrer le résultat en **WebP** dans `www/Items/` avec le nom de fichier attendu par le slug actuel. Ne modifier aucun autre comportement de l’application sauf ce qui est strictement nécessaire pour versionner et invalider le cache conformément aux règles du dépôt. Vérifier le résultat dans Catalogue et Ma liste, sur mobile et avec le mode hors ligne. Conserver l’atlas comme fallback.
+> Régénère uniquement l’image de l’item **« [NOM EXACT DU PRODUIT] »** dans le même style que les autres produits existants de sa catégorie **[CATÉGORIE]**. Commence par lire l’état actuel de `main`, `catalog.js`, `product-item-images.js` et plusieurs images existantes de `www/Items/` appartenant à la même catégorie afin de reprendre leur style réel. Génère exactement **un seul produit**, isolé sur **fond transparent**, centré, avec des proportions naturelles et une marge régulière autour. Le cadrage, l’échelle, le niveau de détail, les ombres et la finition doivent rester cohérents avec les références existantes. Aucun décor, aucune main, aucune personne, aucun collage, aucune grille, aucun deuxième produit, aucun texte ajouté autour, aucune marque ou logo inventé. Si le produit est emballé, utiliser un emballage générique cohérent avec les références. Intégrer le résultat en **WebP** dans `www/Items/` avec le nom de fichier attendu par le slug actuel. Ne modifier aucun autre comportement de l’application sauf ce qui est strictement nécessaire pour versionner et invalider le cache conformément aux règles du dépôt. Vérifier le résultat dans Catalogue et Ma liste, sur mobile et avec le mode hors ligne. Vérifier aussi que le fallback SVG local reste lisible si le WebP ne charge pas.
 
 ## Nom du fichier
 
@@ -98,7 +98,7 @@ L’image n’est validée que si toutes les réponses sont **oui** :
 - aucune marque, aucun logo ou texte parasite n’a-t-il été inventé ?
 - le fichier porte-t-il exactement le slug attendu ?
 - le rendu est-il correct dans Catalogue et Ma liste ?
-- le fallback atlas fonctionne-t-il toujours si le fichier unitaire échoue ?
+- le fallback SVG local reste-t-il lisible si le fichier unitaire échoue ?
 - le mode hors ligne et le cache restent-ils fonctionnels ?
 
 Si un de ces points échoue, corriger ou régénérer l’image avant intégration.
@@ -107,7 +107,7 @@ Si un de ces points échoue, corriger ou régénérer l’image avant intégrati
 
 - Faire le changement minimum nécessaire.
 - Ne pas refondre le système d’images pour remplacer un seul item.
-- Ne pas supprimer les atlas de secours dans une opération de régénération isolée.
+- Ne jamais réintroduire d’atlas, de planche ou de sprite produit : un produit reste un fichier WebP unitaire.
 - Ne pas ajouter de dépendance runtime.
 - Lire l’état courant de `main` au moment de chaque intervention : cette note décrit la méthode, mais le dépôt reste la source de vérité.
 - Respecter la règle du commit atomique et les règles de version visibles de `AGENTS.md`.

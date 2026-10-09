@@ -114,7 +114,7 @@ def main() -> None:
 
     catalog_path = ROOT / 'catalog.js'
     catalog_text = catalog_path.read_text(encoding='utf-8')
-    groups_match = re.search(r"groups:\s*(\{.*?\}),\s*\n\s*meta:", catalog_text, flags=re.S)
+    groups_match = re.search(r"groups:\s*(\{.*?\}),\s*\n\s*favorites:", catalog_text, flags=re.S)
     if not groups_match:
         fail('Structure groups de catalog.js introuvable')
     try:

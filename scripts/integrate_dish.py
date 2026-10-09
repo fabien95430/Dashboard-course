@@ -108,7 +108,7 @@ def parse_json_object(text: str) -> dict:
 
 def load_catalog_names() -> list[str]:
     text = (ROOT / "catalog.js").read_text(encoding="utf-8")
-    match = re.search(r"groups:\s*(\{.*?\}),\s*\n\s*meta:", text, flags=re.S)
+    match = re.search(r"groups:\s*(\{.*?\}),\s*\n\s*favorites:", text, flags=re.S)
     if not match:
         fail("Structure groups de catalog.js introuvable")
     try:

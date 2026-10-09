@@ -5,7 +5,6 @@ const CATALOG = window.COURSES_CATALOG;
 if (!CATALOG) throw new Error('Catalogue indisponible');
 
 const GROUPS = CATALOG.groups;
-const META = CATALOG.meta;
 const FAVORITES = CATALOG.favorites;
 const CATEGORY_META = {
   'Toutes': { label:'Tous' },
@@ -259,6 +258,14 @@ const UI = Object.freeze({
   catalogRefreshBtn: document.getElementById('catalogRefreshBtn')
 });
 const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const productSlug=value=>String(value||'')
+  .toLowerCase()
+  .replace(/œ/g,'oe')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9]+/g,'-')
+  .replace(/^-+|-+$/g,'');
+const productImageSource=name=>'./www/Items/'+productSlug(name)+'.webp';
 const esc = value => String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
 function normalizeHaUrl(value) {
@@ -373,40 +380,6 @@ function catalogProductFor(value){
   const matches=unique(CATALOG_ALIASES.filter(entry=>tokens.every(token=>entry.tokens.some(candidate=>candidate===token||(token.length>=3&&candidate.length>=3&&(candidate.startsWith(token)||token.startsWith(candidate)))))).map(entry=>entry.product));
   return matches.length===1?matches[0]:null;
 }
-const POSITIONS=new Map();
-Object.entries(GROUPS).forEach(([category,subs])=>Object.entries(subs).forEach(([sub,names],row)=>names.forEach((name,col)=>POSITIONS.set(norm(name),{category,sub,row,col}))));
-
-const PRODUCT_SHEETS=Object.freeze({
-  'Frais':{src:'./bring-photo-v5-frais.webp.png?v=15',cols:12,rows:8,ratio:1},
-  'Fruits & Légumes':{src:'./bring-photo-v5-fruits-legumes.webp.png?v=15',cols:12,rows:6,ratio:1},
-  'Épicerie':{src:'./bring-photo-v5-epicerie.webp.png?v=15',cols:12,rows:8,ratio:1},
-  'Boissons':{src:'./bring-photo-v5-boissons.webp.png?v=15',cols:12,rows:4,ratio:1},
-  'Maison':{src:'./bring-photo-v5-maison.webp.png?v=15',cols:12,rows:7,ratio:.875}
-});
-let productSheetsWarmupStarted=false;
-async function warmProductSheets(){
-  if(productSheetsWarmupStarted)return;
-  productSheetsWarmupStarted=true;
-  for(const sheet of Object.values(PRODUCT_SHEETS)){
-    try{
-      const image=new Image();
-      image.decoding='async';
-      image.src=sheet.src;
-      if(typeof image.decode==='function')await image.decode();
-      else await new Promise(resolve=>{
-        if(image.complete){resolve();return}
-        image.onload=resolve;
-        image.onerror=resolve;
-      });
-    }catch(_){}
-  }
-}
-function scheduleProductSheetsWarmup(){
-  const run=()=>{void warmProductSheets()};
-  if('requestIdleCallback' in window)window.requestIdleCallback(run,{timeout:1200});
-  else setTimeout(run,300);
-}
-
 let state={
   haUrl:'',
   accessToken:'',
@@ -575,21 +548,24 @@ function premiumProductVisual(product, compact = false) {
   }
 
 function sprite(product,compact=false){
-  const position=POSITIONS.get(norm(product?.name));
-  const sheet=position&&PRODUCT_SHEETS[position.category];
-  if(!position||!sheet||position.col>=sheet.cols||position.row>=sheet.rows)return premiumProductVisual(product,compact);
   const fallback=premiumProductVisual(product,compact);
-  const left=-(position.col*100),top=-(position.row*100);
-  const width=sheet.cols*100,height=sheet.rows*100;
-  const safeTop=0;
-  const safeLeft=0;
-  const hasIsolatedAtlas=position.category==='Maison'||position.category==='Boissons'||position.category==='Épicerie'||position.category==='Fruits & Légumes'||position.category==='Frais';
-  const safeRight=hasIsolatedAtlas?0:4;
-  const safeBottom=hasIsolatedAtlas?0:4;
-  return '<span class="sprite premium-sprite '+(compact?'is-compact':'')+'" style="--sprite-left:'+left+'%;--sprite-top:'+top+'%;--sprite-width:'+width+'%;--sprite-height:'+height+'%;--sprite-ratio:'+sheet.ratio+';--sprite-safe-top:'+safeTop+'%;--sprite-safe-right:'+safeRight+'%;--sprite-safe-bottom:'+safeBottom+'%;--sprite-safe-left:'+safeLeft+'%" aria-hidden="true">'+
-    '<img src="'+sheet.src+'" alt="" loading="eager" decoding="async" draggable="false" onerror="this.parentElement.classList.add(\'is-fallback\')">'+
+  const source=productImageSource(product?.name);
+  return '<span class="sprite premium-sprite is-single-product-image '+(compact?'is-compact':'')+'" aria-hidden="true">'+
+    '<img src="'+source+'" alt="" loading="'+(compact?'lazy':'eager')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
   '</span>';
+}
+function bindProductImageFallbacks(root){
+  root?.querySelectorAll?.('.premium-sprite.is-single-product-image>img').forEach(image=>{
+    if(image.dataset.productFallbackBound==='1')return;
+    image.dataset.productFallbackBound='1';
+    const fallback=()=>{
+      image.hidden=true;
+      image.parentElement?.classList.add('is-fallback');
+    };
+    image.addEventListener('error',fallback,{once:true});
+    if(image.complete&&image.naturalWidth===0)fallback();
+  });
 }
 
 function usageSave(){saveJson(STORAGE.usage,state.usage)}
@@ -756,6 +732,7 @@ function productCard(product){
     '<button type="button" class="badge"></button>'+
     '<button type="button" class="media">'+sprite(product)+'</button>'+
     '<span class="product-copy"><span class="pname">'+esc(productDisplayName(product.name))+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>';
+  bindProductImageFallbacks(card);
   const add=card.querySelector('.badge');if(add)add.onclick=()=>queueCatalogQuantityChange(product.name,1);
   const remove=card.querySelector('.media');if(remove)remove.onclick=()=>queueCatalogQuantityChange(product.name,-1);
   productCardCache.set(key,card);
@@ -875,6 +852,7 @@ function renderList(){
       '<button class="row-grip list-row-more" type="button" data-name="'+esc(group.summary)+'" aria-label="Actions pour '+esc(group.summary)+'" aria-haspopup="menu">•••</button>'+
     '</div>';
   }).join('');
+  bindProductImageFallbacks(el);
   el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
     event.stopPropagation();
     const row=button.closest('.list-row');
@@ -2958,6 +2936,5 @@ window.addEventListener('pageshow',()=>{
 ['gesturestart','gesturechange','gestureend'].forEach(name=>document.addEventListener(name,event=>event.preventDefault(),{passive:false}));
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{}));
 bindUiEvents();
-scheduleProductSheetsWarmup();
 renderView();init();
 })();

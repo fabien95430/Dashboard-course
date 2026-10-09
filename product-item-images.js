@@ -106,13 +106,6 @@ function onSingleProductImageLoaded(image,source){
   image.closest('.premium-sprite')?.classList.remove('is-fallback');
   requestAnimationFrame(()=>applyVisualScale(image,source));
 }
-function restoreAtlas(card,sprite,image){
-  const source=image.dataset.singleProductAtlasSource||'';
-  if(!source)return;
-  card.classList.remove('has-single-product-image');
-  sprite.classList.remove('is-single-product-image');
-  image.src=source;
-}
 function decorateFallback(card,name,source){
   const fallback=card.querySelector('.product-svg');
   if(!fallback||fallback.dataset.singleProductPending===source)return;
@@ -142,19 +135,13 @@ function decorateCard(card){
   const source=imageSource(name);
   const sprite=card.querySelector('.premium-sprite');
   const image=sprite?.querySelector(':scope > img');
-  if(!sprite||!image){
-    decorateFallback(card,name,source);
-    return;
-  }
+  if(!sprite||!image){decorateFallback(card,name,source);return;}
   card.classList.add('has-single-product-image');
-  if(image.dataset.singleProductSource===source)return;
-  image.dataset.singleProductAtlasSource=image.getAttribute('src')||'';
-  image.dataset.singleProductSource=source;
   sprite.classList.add('is-single-product-image');
-  sprite.classList.remove('is-fallback');
-  image.addEventListener('load',()=>onSingleProductImageLoaded(image,source),{once:true});
-  image.addEventListener('error',()=>restoreAtlas(card,sprite,image),{once:true});
-  image.src=source;
+  const loaded=()=>onSingleProductImageLoaded(image,source);
+  if(image.dataset.singleProductSource!==source){image.dataset.singleProductSource=source;image.src=source;}
+  if(image.complete&&image.naturalWidth>0)loaded();
+  else image.addEventListener('load',loaded,{once:true});
 }
 function decorateProducts(){
   products?.querySelectorAll('.product[data-name]').forEach(decorateCard);

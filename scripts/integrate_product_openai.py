@@ -37,7 +37,7 @@ def require_push() -> None:
 
 def load_groups() -> tuple[str, re.Match[str], dict[str, dict[str, list[str]]]]:
     text=(ROOT / "catalog.js").read_text(encoding="utf-8")
-    match=re.search(r"groups:\s*(\{.*?\}),\s*\n\s*meta:",text,flags=re.S)
+    match=re.search(r"groups:\s*(\{.*?\}),\s*\n\s*favorites:",text,flags=re.S)
     if not match:
         base.fail("Structure groups de catalog.js introuvable")
     try:

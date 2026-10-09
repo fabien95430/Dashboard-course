@@ -15,7 +15,7 @@ Ce flux ne modifie pas la liste Home Assistant `Courses`, OAuth, le WebSocket de
    - le changement minimum nécessaire ;
    - le respect de `catalog.js`, des conventions de visuels, de GitHub Pages, de Home Assistant, de la sécurité et du mobile ;
    - une seule image finale par plat, jamais d’atlas de plats ;
-   - pour un produit, le respect de `docs/ATLAS_PRODUITS.md` et de l’atlas de sa catégorie.
+   - pour un produit, le respect de `docs/IMAGES_ITEMS.md` et d’une image WebP unitaire dans `www/Items/`.
 5. Pour un **produit comme pour un plat**, le même clic arme aussi la notification de fin :
    - si nécessaire, iOS demande l’autorisation des notifications depuis cette action utilisateur ;
    - la PWA récupère la souscription Web Push et la clé publique VAPID via Home Assistant ;

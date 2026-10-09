@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v382';
+const APP_VERSION='v383';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -24,13 +24,6 @@ const CHILD_DISHES=new Set([
   'Riz au lait'
 ]);
 const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eef1eb"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f7f2" stroke="#cbd2c8" stroke-width="12"/><text x="450" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="30" font-weight="700" fill="#708076">Photo indisponible</text></svg>');
-const PRODUCT_VISUALS=Object.freeze([
-  './bring-photo-v5-frais.webp.png?v=15',
-  './bring-photo-v5-fruits-legumes.webp.png?v=15',
-  './bring-photo-v5-epicerie.webp.png?v=15',
-  './bring-photo-v5-boissons.webp.png?v=15',
-  './bring-photo-v5-maison.webp.png?v=15'
-]);
 const PRIMARY_DISH_VISUALS=Object.freeze([
   './www/Plats/spaghetti-carbonara.png?v='+APP_VERSION,
   './www/Plats/spaghetti-bolognaise.png?v='+APP_VERSION,
@@ -276,13 +269,6 @@ function syncPageVersions(){
   }
 }
 
-function installVisualWarmupStyle(){
-  if(document.getElementById('courses-startup-visual-warmup'))return;
-  const style=document.createElement('style');
-  style.id='courses-startup-visual-warmup';
-  style.textContent='html.courses-product-visuals-warming #listItems .list-icon{visibility:hidden!important}';
-  document.head.appendChild(style);
-}
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
@@ -302,7 +288,7 @@ function installMissingProductsFixes(){
 function installProductItemImages(){
   if(document.querySelector('script[data-product-item-images]'))return;
   const script=document.createElement('script');
-  script.src='./product-item-images.js?v=13';
+  script.src='./product-item-images.js?v=14';
   script.defer=true;
   script.dataset.productItemImages='1';
   document.head.appendChild(script);
@@ -377,15 +363,6 @@ async function warmVisual(src,priority='auto'){
     retainedVisuals.set(src,image);
     return true;
   }catch(_){return false}
-}
-async function warmProductVisuals(){
-  document.documentElement.classList.add('courses-product-visuals-warming');
-  try{
-    const work=Promise.allSettled(PRODUCT_VISUALS.map(src=>warmVisual(src,'high')));
-    await Promise.race([work,new Promise(resolve=>setTimeout(resolve,3500))]);
-  }finally{
-    document.documentElement.classList.remove('courses-product-visuals-warming');
-  }
 }
 function scheduleDishVisualWarmup(){
   const run=()=>{void Promise.allSettled(PRIMARY_DISH_VISUALS.map(src=>warmVisual(src,'low')))};
@@ -614,12 +591,10 @@ function bind(){
 }
 
 syncPageVersions();
-installVisualWarmupStyle();
 installMissingProductsFixes();
 installProductItemImages();
 installPurchaseIntelligence();
 bindSecurityKeyboardViewport();
-void warmProductVisuals();
 scheduleDishVisualWarmup();
 versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
 bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});

@@ -234,7 +234,7 @@ function buildProductPrompt(item){
     '- Lire et respecter docs/IMAGES_ITEMS.md et product-item-images.js avant de créer le visuel.',
     '- Générer exactement une image WebP pour ce produit, dans le même style que les items existants de sa catégorie : un seul produit, fond transparent, centré, proportions naturelles, sans décor, sans personne, sans marque ou logo inventé.',
     '- Stocker le visuel dans www/Items/ avec le nom de fichier attendu par le slugify() actuel de product-item-images.js.',
-    '- Ne pas modifier ni supprimer l’atlas de la catégorie : il reste uniquement comme fallback si l’image unitaire manque ou échoue.',
+    '- Utiliser uniquement l’image WebP unitaire dans www/Items/ ; aucun atlas ou sprite produit ne doit être créé ni réintroduit.',
     '- Versionner le visuel/cache selon les conventions actuelles pour que l’image arrive réellement dans l’application.',
     '- Vérifier les impacts sur Ma liste, Catalogue, mode hors ligne, Home Assistant, sécurité, mode test et mobile.',
     '',
@@ -563,7 +563,6 @@ function initMissingProductsAndDishes(){
     return false;
   }
   function reconcileProducts(){
-    if(document.documentElement.classList.contains('courses-product-visuals-warming'))return;
     const catalog=catalogProductLookup();
     if(!catalog.size)return;
     const products=readProducts();
@@ -729,12 +728,7 @@ function initMissingProductsAndDishes(){
   });
   renderedCatalogObserver.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});
 
-  const visualWarmupObserver=new MutationObserver(()=>{
-    if(!document.documentElement.classList.contains('courses-product-visuals-warming'))queueEnhanceProducts();
-  });
-  visualWarmupObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
-
-  settingsButton.addEventListener('click',()=>{
+    settingsButton.addEventListener('click',()=>{
     imageHintInput.value='';
     setMode(lastMode,{animate:false,clearInput:false});
     requestAnimationFrame(()=>{

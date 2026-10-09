@@ -9,7 +9,7 @@ test('le shell de démarrage reste un document HTML et le service worker reste d
   const sw=read('sw.js');
   assert.match(index,/^<!doctype html>/i);
   assert.doesNotMatch(index,/^const CACHE=/);
-  assert.match(sw,/^const CACHE='courses-app-v380-r1';/);
+  assert.match(sw,/^const CACHE='courses-app-v383-r1';/);
   assert.doesNotMatch(sw,/<!doctype html>/i);
 });
 
@@ -24,15 +24,15 @@ test('le lancement reprend le flux direct sans écran de transition supplémenta
   assert.doesNotMatch(index,/rel="preload" as="image" href="\.\/www\/empty-list-premium-v4\.webp\?v=305"/);
 });
 
-test('la version v380 est cohérente entre le shell, le cache et les modules visuels',()=>{
+test('la version v383 est cohérente entre le shell, le cache et les modules visuels',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
   const catalog=read('catalog.js');
   const localImages=read('dish-local-images.js');
-  assert.match(index,/page-version">v380</);
-  assert.match(index,/catalog\.js\?v=380/);
-  assert.match(sw,/catalog\.js\?v=380/);
-  assert.match(sw,/dish-local-images\.js\?v=380/);
-  assert.match(catalog,/dish-local-images\.js\?v=380/);
-  assert.match(localImages,/const APP_VERSION='v380';/);
+  assert.match(index,/page-version">v383</);
+  assert.match(index,/catalog\.js\?v=383/);
+  assert.match(sw,/catalog\.js\?v=383/);
+  assert.match(sw,/dish-local-images\.js\?v=383/);
+  assert.match(catalog,/dish-local-images\.js\?v=383/);
+  assert.match(localImages,/const APP_VERSION='v383';/);
 });
