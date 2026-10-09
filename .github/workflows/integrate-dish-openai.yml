@@ -101,7 +101,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$TEMP_BRANCH"
           if [ "${{ steps.request.outputs.type }}" = "product" ]; then
-            git add catalog.js dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
+            git add catalog.js app.js catalog-quantities.js index.html product-item-images.js dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
             label="produit"
           else
             git add dishes-ui.js dish-local-images.js sw.js "www/Plats/${{ steps.result.outputs.filename }}"

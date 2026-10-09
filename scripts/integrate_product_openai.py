@@ -17,6 +17,16 @@ RESULT_PATH = base.RESULT_PATH
 PRODUCT_PREFIX = "__courses_product__:"
 IMAGE_HINT_MARKER = "||__courses_image_hint__:"
 IMAGE_HINT_MAX = 140
+DISPLAY_MODES=(
+    "Bouteille","Pot","Poids","Barquette","Sachet","Pièce","Paquet","Boîte","Flacon",
+    "Plaquette","Brique","Sac","Tablette","Tube","Rouleau","Paire","Stick","Botte","Unité",
+)
+HINT_DISPLAY_MODES=(
+    ("bouteille","Bouteille"),("pot","Pot"),("barquette","Barquette"),("sachet","Sachet"),
+    ("paquet","Paquet"),("boite","Boîte"),("flacon","Flacon"),("brique","Brique"),
+    ("tube","Tube"),("rouleau","Rouleau"),("tablette","Tablette"),("plaquette","Plaquette"),
+    ("stick","Stick"),("paire","Paire"),("botte","Botte"),("sac","Sac"),
+)
 
 
 def require_push() -> None:
@@ -63,12 +73,23 @@ def parse_product_category(value: str) -> tuple[str,str]:
     return category.strip(),hint
 
 
-def validate_location_result(result: dict, source: dict, name: str) -> tuple[str,str,bool]:
+def display_mode_from_hint(value: str) -> str:
+    normalized=base.normalize(value)
+    for token,mode in HINT_DISPLAY_MODES:
+        if re.search(rf"\b{re.escape(token)}\b",normalized):
+            return mode
+    return ""
+
+
+def validate_location_result(result: dict, source: dict, name: str) -> tuple[str,str,bool,str]:
     category=str(result.get("category") or "").strip()
     subgroup=re.sub(r"\s+"," ",str(result.get("subgroup") or "")).strip()
     create_value=result.get("create_subgroup")
+    display_mode=str(result.get("display_mode") or "").strip()
     if not isinstance(create_value,bool):
         raise RuntimeError("Le classement produit doit préciser create_subgroup avec un booléen")
+    if display_mode not in DISPLAY_MODES:
+        raise RuntimeError("Conditionnement produit généré invalide")
     if category not in source:
         raise RuntimeError("Catégorie produit générée invalide")
     if not subgroup:
@@ -76,7 +97,7 @@ def validate_location_result(result: dict, source: dict, name: str) -> tuple[str
 
     for existing in source[category]:
         if base.normalize(existing)==base.normalize(subgroup):
-            return category,str(existing),False
+            return category,str(existing),False,display_mode
 
     if not create_value:
         raise RuntimeError("Sous-catégorie produit générée inexistante")
@@ -86,10 +107,10 @@ def validate_location_result(result: dict, source: dict, name: str) -> tuple[str
         raise RuntimeError("Nouvelle sous-catégorie produit invalide")
     if base.normalize(subgroup)==base.normalize(name):
         raise RuntimeError("La nouvelle sous-catégorie doit être générique et réutilisable")
-    return category,subgroup,True
+    return category,subgroup,True,display_mode
 
 
-def infer_location(name: str, selected_category: str, groups: dict, api_key: str) -> tuple[str,str,bool]:
+def infer_location(name: str, selected_category: str, groups: dict, image_hint: str, api_key: str) -> tuple[str,str,bool,str]:
     if selected_category and selected_category not in groups:
         base.fail("Catégorie produit invalide")
     source={selected_category:groups[selected_category]} if selected_category else groups
@@ -103,14 +124,21 @@ def infer_location(name: str, selected_category: str, groups: dict, api_key: str
         if selected_category else
         "Choisis la catégorie principale la plus cohérente parmi celles fournies."
     )
+    hint_rule=(
+        f"Précision utilisateur sur le visuel/contenant: {image_hint!r}. Si elle indique clairement un contenant (par exemple pot, bouteille, boîte, sachet), utilise ce même type pour display_mode."
+        if image_hint else
+        "Aucune précision de contenant n'a été fournie; déduis le conditionnement d'achat le plus naturel pour ce produit."
+    )
     prompt=f"""
 Tu classes un nouveau produit dans le catalogue d'une application de courses française.
 Produit demandé: {name}
 {category_rule}
+{hint_rule}
 
-Réponds UNIQUEMENT par un objet JSON avec exactement trois clés:
-"category", "subgroup" et "create_subgroup".
+Réponds UNIQUEMENT par un objet JSON avec exactement quatre clés:
+"category", "subgroup", "create_subgroup" et "display_mode".
 "create_subgroup" doit être un booléen JSON.
+"display_mode" doit être exactement l'une des valeurs suivantes: {json.dumps(DISPLAY_MODES,ensure_ascii=False)}.
 
 Règles de classement:
 - Analyse toutes les sous-catégories et tous les produits existants fournis ci-dessous.
@@ -119,6 +147,8 @@ Règles de classement:
 - Uniquement si aucune sous-catégorie existante n'est réellement cohérente, mets "create_subgroup": true et propose dans "subgroup" un nom français court, générique et réutilisable pour plusieurs produits.
 - Une nouvelle sous-catégorie ne doit jamais être simplement le nom du produit demandé.
 - La catégorie principale doit toujours être recopiée EXACTEMENT depuis le catalogue fourni; n'invente jamais de nouvelle catégorie principale.
+- "display_mode" représente le conditionnement visible dans l'application (Pot, Bouteille, Paquet, Sachet, etc.), jamais une unité de recette.
+- Une précision utilisateur de contenant est prioritaire pour "display_mode" lorsqu'elle est explicite.
 
 Catalogue disponible:
 {json.dumps(candidates,ensure_ascii=False)}
@@ -130,6 +160,9 @@ Catalogue disponible:
     )
     try:
         result=base.parse_json_object(base.response_text(payload))
+        explicit_mode=display_mode_from_hint(image_hint)
+        if explicit_mode:
+            result["display_mode"]=explicit_mode
         return validate_location_result(result,source,name)
     except Exception as error:
         raise RuntimeError(f"Classement produit invalide: {error}") from error
@@ -138,7 +171,7 @@ Catalogue disponible:
 def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") -> str:
     hint=(
         f"Précision visuelle prioritaire fournie par l’utilisateur: {image_hint}. "
-        "Respecter précisément cette forme, ce contenant ou cet emballage; cette précision sert uniquement au visuel et ne modifie jamais le nom du produit. "
+        "Respecter précisément cette forme, ce contenant ou cet emballage; cette précision ne modifie jamais le nom du produit. "
         if image_hint else ""
     )
     return (
@@ -147,7 +180,7 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
         "Reprendre le langage visuel des produits déjà présents dans le catalogue: illustration 3D semi-réaliste de catalogue mobile, "
         "objet détouré propre, volumes simples, textures nettes, lumière studio douce et ombre très légère. "
         "Représenter un seul type de produit, isolé et immédiatement reconnaissable, sur fond totalement transparent. "
-        "Le produit principal doit occuper environ 65 à 75 % du carré, être centré, avec une marge transparente régulière et aucun bord important coupé. "
+        "Le produit principal doit occuper environ 86 à 92 % de sa plus grande dimension dans le carré, être centré, avec une marge transparente régulière et aucun bord important coupé. "
         "En l’absence de précision visuelle utilisateur, privilégier le produit lui-même plutôt que son emballage de vente. Si l'objet est reconnaissable sans emballage "
         "(par exemple pile, thermomètre, éponge, rasoir, fruit ou légume), le montrer hors boîte, hors blister, hors sachet et sans étiquette. "
         "N'utiliser un emballage générique que lorsqu'il est réellement indispensable pour identifier le produit, ou lorsqu’une précision visuelle utilisateur le demande; dans ce cas il doit rester simple, "
@@ -193,11 +226,42 @@ def current_version() -> int:
     return int(match.group(1))
 
 
-def integrate_files(name: str, category: str, subgroup: str, image: bytes, catalog_text: str, groups_match: re.Match[str], groups: dict, already_in_catalog: bool, create_subgroup: bool=False) -> tuple[int,str]:
+def update_display_mode(name: str, display_mode: str) -> None:
+    path=ROOT / "catalog-quantities.js"
+    text=path.read_text(encoding="utf-8")
+    match=re.search(r"(const DISPLAY_MODE_BY_PRODUCT=Object\.freeze\(\{)(.*?)(\n\}\);)",text,flags=re.S)
+    if not match:
+        base.fail("Table des conditionnements introuvable dans catalog-quantities.js")
+    body=match.group(2)
+    quoted=json.dumps(name,ensure_ascii=False)
+    if re.search(rf"(?:^|[,\n]\s*){re.escape(quoted)}\s*:",body):
+        return
+    entry=f"  {quoted}:{json.dumps(display_mode,ensure_ascii=False)}"
+    suffix="," if body.rstrip() and not body.rstrip().endswith(",") else ""
+    replacement=match.group(1)+body.rstrip()+suffix+"\n"+entry+match.group(3)
+    path.write_text(text[:match.start()]+replacement+text[match.end():],encoding="utf-8")
+
+
+def ensure_shell_assets(text: str, assets: list[str]) -> str:
+    match=re.search(r"(const SHELL=\[)(.*?)(\];)",text,flags=re.S)
+    if not match:
+        base.fail("Précache SHELL introuvable dans sw.js")
+    body=match.group(2)
+    for asset in assets:
+        quoted=json.dumps(asset,ensure_ascii=False)
+        if quoted in body or ("'"+asset+"'") in body:
+            continue
+        body=body.rstrip()+("," if body.rstrip() else "")+quoted
+    return text[:match.start()]+match.group(1)+body+match.group(3)+text[match.end():]
+
+
+def integrate_files(name: str, category: str, subgroup: str, display_mode: str, image: bytes, catalog_text: str, groups_match: re.Match[str], groups: dict, already_in_catalog: bool, create_subgroup: bool=False) -> tuple[int,str]:
     local_path=ROOT / "dish-local-images.js"
     sw_path=ROOT / "sw.js"
+    index_path=ROOT / "index.html"
     local_text=local_path.read_text(encoding="utf-8")
     sw_text=sw_path.read_text(encoding="utf-8")
+    index_text=index_path.read_text(encoding="utf-8")
     new_version=current_version()+1
 
     if not already_in_catalog:
@@ -208,9 +272,14 @@ def integrate_files(name: str, category: str, subgroup: str, image: bytes, catal
         elif subgroup not in groups[category]:
             base.fail("Sous-catégorie produit introuvable")
         groups[category][subgroup].append(name)
+        groups[category][subgroup].sort(key=base.normalize)
+        update_display_mode(name,display_mode)
         encoded_groups=json.dumps(groups,ensure_ascii=False,separators=(",",":"))
         catalog_text=catalog_text[:groups_match.start(1)]+encoded_groups+catalog_text[groups_match.end(1):]
-        (ROOT / "catalog.js").write_text(catalog_text,encoding="utf-8")
+
+    catalog_text=re.sub(r"(catalog-quantities\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
+    catalog_text=re.sub(r"(dish-local-images\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
+    (ROOT / "catalog.js").write_text(catalog_text,encoding="utf-8")
 
     local_text,count=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='v{new_version}'",local_text,count=1)
     if count!=1:
@@ -218,6 +287,15 @@ def integrate_files(name: str, category: str, subgroup: str, image: bytes, catal
     sw_text,count=re.subn(r"const CACHE='courses-app-v\d+-r\d+'",f"const CACHE='courses-app-v{new_version}-r1'",sw_text,count=1)
     if count!=1:
         base.fail("Version de cache introuvable dans sw.js")
+    sw_text=ensure_shell_assets(sw_text,[
+        f"./catalog.js?v={new_version}",
+        f"./catalog-quantities.js?v={new_version}",
+        f"./dish-local-images.js?v={new_version}",
+    ])
+    index_text,count=re.subn(r'(<span class="page-version">)v\d+(</span>)',rf'\g<1>v{new_version}\g<2>',index_text)
+    if count!=3:
+        base.fail("Badges de version visibles introuvables dans index.html")
+    index_text=re.sub(r'(catalog\.js\?v=)\d+',rf'\g<1>{new_version}',index_text,count=1)
 
     filename=base.slugify(name)+".webp"
     image_path=ROOT / "www" / "Items" / filename
@@ -225,6 +303,7 @@ def integrate_files(name: str, category: str, subgroup: str, image: bytes, catal
     image_path.write_bytes(image)
     local_path.write_text(local_text,encoding="utf-8")
     sw_path.write_text(sw_text,encoding="utf-8")
+    index_path.write_text(index_text,encoding="utf-8")
     return new_version,filename
 
 
@@ -242,6 +321,7 @@ def main() -> None:
     catalog_text,groups_match,groups=load_groups()
     existing=find_product(groups,name)
     create_subgroup=False
+    display_mode=""
     if existing:
         existing_name,category,subgroup=existing
         filename=base.slugify(existing_name)+".webp"
@@ -257,19 +337,19 @@ def main() -> None:
     else:
         if not api_key:
             base.fail("Secret GitHub OPENAI_API_KEY manquant")
-        category,subgroup,create_subgroup=infer_location(name,selected_category,groups,api_key)
+        category,subgroup,create_subgroup,display_mode=infer_location(name,selected_category,groups,image_hint,api_key)
         already_in_catalog=False
 
     if not api_key:
         base.fail("Secret GitHub OPENAI_API_KEY manquant")
     image=generate_image(name,category,subgroup,image_hint,api_key)
     version,filename=integrate_files(
-        name,category,subgroup,image,catalog_text,groups_match,groups,already_in_catalog,create_subgroup
+        name,category,subgroup,display_mode,image,catalog_text,groups_match,groups,already_in_catalog,create_subgroup
     )
     RESULT_PATH.write_text(json.dumps({
         "ok":True,"already_exists":False,"name":name,"version":version,
         "filename":filename,"category":category,"subgroup":subgroup,
-        "created_subgroup":create_subgroup,
+        "created_subgroup":create_subgroup,"display_mode":display_mode,
     },ensure_ascii=False,indent=2),encoding="utf-8")
 
 
