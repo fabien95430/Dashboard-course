@@ -15,9 +15,24 @@
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <title>Mes courses</title>
+  <style>
+    html,body{background:#f7f7f2}
+    #startupCover{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:#f7f7f2;color:#0d5138;opacity:1;transition:opacity .16s ease;pointer-events:auto}
+    #startupCover.is-dismissed{opacity:0;pointer-events:none}
+    #startupCover>div{display:grid;place-items:center;gap:8px;transform:translateY(-2vh)}
+    #startupCover img{display:block;width:min(42vw,168px);height:auto;object-fit:contain;filter:drop-shadow(0 9px 18px rgba(47,94,57,.06))}
+    #startupCover strong{font:800 22px/1 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Arial,sans-serif;letter-spacing:-.04em}
+    @media(prefers-reduced-motion:reduce){#startupCover{transition:none}}
+  </style>
   <link rel="stylesheet" href="./styles.css?v=348">
 </head>
-<body>
+<body class="is-launching">
+  <div id="startupCover" role="status" aria-label="Ouverture de Mes courses">
+    <div>
+      <img src="./www/empty-list-premium-v4.webp?v=305" alt="" width="190" height="149" loading="eager" decoding="sync" fetchpriority="high">
+      <strong>Mes courses</strong>
+    </div>
+  </div>
   <svg class="svg-sprite" aria-hidden="true">
     <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l1.4 9.1a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L19.5 7H6.1"/><circle cx="9" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/></symbol>
     <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></symbol>
@@ -45,7 +60,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v375</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v376</span></p>
         </div>
         <div class="page-header-actions">
           <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
@@ -129,7 +144,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v375</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v376</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -149,7 +164,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v375</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v376</span></p>
         </div>
       </header>
 
@@ -237,7 +252,7 @@
     </div>
   </section>
 
-  <section id="securityOverlay" class="overlay security-overlay is-visible" aria-modal="true" aria-labelledby="securityTitle">
+  <section id="securityOverlay" class="overlay security-overlay" aria-modal="true" aria-labelledby="securityTitle">
     <button id="securitySettingsBtn" class="security-settings-pill" type="button" aria-label="Réglages">
       <svg><use href="#i-gear"></use></svg><span>Réglages</span>
     </button>
@@ -442,8 +457,8 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./startup/app.js?v=2"></script>
-  <script src="./catalog.js?v=375"></script>
+  <script src="./startup/app.js?v=3"></script>
+  <script src="./catalog.js?v=376"></script>
   <script src="./app.js?v=373"></script>
   <script src="./settings-tab-badge.js?v=364"></script>
 </body>
