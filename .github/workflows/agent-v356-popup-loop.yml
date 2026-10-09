@@ -18,14 +18,14 @@ jobs:
           fetch-depth: 1
 
       - name: Verify expected main
-        run: |
-          test "$(git rev-parse HEAD)" = "f44d6eadfcaf6a97e5740fac213c87767559e30e"
+        run: test "$(git rev-parse HEAD)" = "f44d6eadfcaf6a97e5740fac213c87767559e30e"
 
       - name: Apply v357 fix
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           def replace_exact(path, old, new, count=1):
               p=Path(path)
@@ -35,107 +35,71 @@ jobs:
                   raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old[:90]!r}')
               p.write_text(text.replace(old,new,count),encoding='utf-8')
 
-          # Status decoration: changing an already-correct text node used to retrigger
-          # the childList observer indefinitely.
-          replace_exact('missing-products-fixes.js',
-          """      progress.textContent=failed?'Erreur':'En cours';
-          if(cancelled)progress.textContent='Annulé';
-          progress.classList.toggle('is-error',failed);
-          progress.classList.toggle('is-cancelled',cancelled);
-          progress.classList.toggle('missing-dish-error',failed||cancelled);
-          progress.setAttribute('aria-label',cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours');
-          """,
-          """      const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';
-          if(progress.textContent!==progressLabel)progress.textContent=progressLabel;
-          progress.classList.toggle('is-error',failed);
-          progress.classList.toggle('is-cancelled',cancelled);
-          progress.classList.toggle('missing-dish-error',failed||cancelled);
-          const progressAriaLabel=cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours';
-          if(progress.getAttribute('aria-label')!==progressAriaLabel)progress.setAttribute('aria-label',progressAriaLabel);
-          """)
+          def sub_once(path, pattern, replacement):
+              p=Path(path)
+              text=p.read_text(encoding='utf-8')
+              updated,count=re.subn(pattern,replacement,text,count=1,flags=re.S)
+              if count!=1:
+                  raise SystemExit(f'{path}: regex did not match exactly once: {pattern}')
+              p.write_text(updated,encoding='utf-8')
 
-          # Popup decoration: every write is now idempotent, so the observer settles
-          # after the first real DOM change instead of observing its own redraw forever.
-          replace_exact('missing-products-popup-ui.js',
-          """  thumb.className='missing-request-thumb is-'+type;
-          thumb.innerHTML=thumbSvg(type);
-          """,
-          """  const className='missing-request-thumb is-'+type;
-          if(thumb.className!==className)thumb.className=className;
-          if(thumb.dataset.requestThumbType!==type){
-            thumb.dataset.requestThumbType=type;
-            thumb.innerHTML=thumbSvg(type);
-          }
-          """)
+          sub_once(
+              'missing-products-fixes.js',
+              r"progress\.textContent=failed\?'Erreur':'En cours';\s*if\(cancelled\)progress\.textContent='Annulé';",
+              "const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';\n      if(progress.textContent!==progressLabel)progress.textContent=progressLabel;"
+          )
+          sub_once(
+              'missing-products-fixes.js',
+              r"progress\.setAttribute\('aria-label',cancelled\?'Intégration annulée':failed\?'Erreur lors de l’intégration':'Intégration en cours'\);",
+              "const progressAriaLabel=cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours';\n      if(progress.getAttribute('aria-label')!==progressAriaLabel)progress.setAttribute('aria-label',progressAriaLabel);"
+          )
 
-          replace_exact('missing-products-popup-ui.js',
-          """  if(added){
-            integrate.disabled=true;
-            integrate.textContent='Ajouté ✓';
-            integrate.classList.remove('is-running-label');
-            integrate.classList.add('is-added-label');
-            row.classList.remove('is-running-request');
-            return;
-          }
-          integrate.classList.remove('is-added-label');
-          const running=integrate.classList.contains('is-running')||integrate.disabled;
-          integrate.textContent=running?'En cours…':'Intégrer';
-          integrate.classList.toggle('is-running-label',running);
-          row.classList.toggle('is-running-request',running);
-          """,
-          """  if(added){
-            if(!integrate.disabled)integrate.disabled=true;
-            if(integrate.textContent!=='Ajouté ✓')integrate.textContent='Ajouté ✓';
-            integrate.classList.remove('is-running-label');
-            integrate.classList.add('is-added-label');
-            row.classList.remove('is-running-request');
-            return;
-          }
-          integrate.classList.remove('is-added-label');
-          const running=integrate.classList.contains('is-running')||integrate.disabled;
-          const label=running?'En cours…':'Intégrer';
-          if(integrate.textContent!==label)integrate.textContent=label;
-          integrate.classList.toggle('is-running-label',running);
-          row.classList.toggle('is-running-request',running);
-          """)
+          sub_once(
+              'missing-products-popup-ui.js',
+              r"thumb\.className='missing-request-thumb is-'\+type;\s*thumb\.innerHTML=thumbSvg\(type\);",
+              "const className='missing-request-thumb is-'+type;\n  if(thumb.className!==className)thumb.className=className;\n  if(thumb.dataset.requestThumbType!==type){\n    thumb.dataset.requestThumbType=type;\n    thumb.innerHTML=thumbSvg(type);\n  }"
+          )
+          sub_once(
+              'missing-products-popup-ui.js',
+              r"integrate\.disabled=true;\s*integrate\.textContent='Ajouté ✓';",
+              "if(!integrate.disabled)integrate.disabled=true;\n    if(integrate.textContent!=='Ajouté ✓')integrate.textContent='Ajouté ✓';"
+          )
+          sub_once(
+              'missing-products-popup-ui.js',
+              r"const running=integrate\.classList\.contains\('is-running'\)\|\|integrate\.disabled;\s*integrate\.textContent=running\?'En cours…':'Intégrer';",
+              "const running=integrate.classList.contains('is-running')||integrate.disabled;\n  const label=running?'En cours…':'Intégrer';\n  if(integrate.textContent!==label)integrate.textContent=label;"
+          )
+          sub_once(
+              'missing-products-popup-ui.js',
+              r"row\.classList\.remove\('is-request-product','is-request-dish','is-request-dessert'\);\s*row\.classList\.add\('missing-request-row','is-request-'\+type\);",
+              "if(!row.classList.contains('missing-request-row'))row.classList.add('missing-request-row');\n  ['product','dish','dessert'].forEach(kind=>{\n    const className='is-request-'+kind;\n    const active=kind===type;\n    if(row.classList.contains(className)!==active)row.classList.toggle(className,active);\n  });"
+          )
 
-          replace_exact('missing-products-popup-ui.js',
-          """  row.classList.remove('is-request-product','is-request-dish','is-request-dessert');
-          row.classList.add('missing-request-row','is-request-'+type);
-          """,
-          """  if(!row.classList.contains('missing-request-row'))row.classList.add('missing-request-row');
-          ['product','dish','dessert'].forEach(kind=>{
-            const className='is-request-'+kind;
-            const active=kind===type;
-            if(row.classList.contains(className)!==active)row.classList.toggle(className,active);
-          });
-          """)
-
-          # Global visible version and cache busting for the two repaired owner modules.
           replace_exact('index.html','page-version">v356','page-version">v357',3)
           replace_exact('index.html','./catalog.js?v=356','./catalog.js?v=357')
           replace_exact('catalog.js',"images.src='./dish-local-images.js?v=355';","images.src='./dish-local-images.js?v=357';")
           replace_exact('dish-local-images.js',"const APP_VERSION='v355';","const APP_VERSION='v357';")
           replace_exact('dish-local-images.js',"script.src='./missing-products-fixes.js?v=18';","script.src='./missing-products-fixes.js?v=19';")
           replace_exact('dish-local-images.js',"script.src='./missing-products-popup-ui.js?v=17';","script.src='./missing-products-popup-ui.js?v=18';")
-
           replace_exact('sw.js',"const CACHE='courses-app-v355-r1';","const CACHE='courses-app-v357-r1';")
-          replace_exact('sw.js',
-                        "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355'];",
-                        "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./app.js?v=356','./settings-tab-badge.js?v=356','./catalog.js?v=357','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=357'];")
+          replace_exact(
+              'sw.js',
+              "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355'];",
+              "'./catalog.js?v=355','./missing-products-popup-ui.js?v=17','./dish-local-images.js?v=355','./catalog.js?v=356','./app.js?v=356','./settings-tab-badge.js?v=356','./catalog.js?v=357','./missing-products-fixes.js?v=19','./missing-products-popup-ui.js?v=18','./dish-local-images.js?v=357'];"
+          )
 
           tests=Path('tests/preference-popups.test.mjs')
           source=tests.read_text(encoding='utf-8')
-          source=source.replace(
-              "assert.ok(fixes.includes(\"progress.textContent=failed?'Erreur':'En cours';\"));",
-              "assert.ok(fixes.includes(\"const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';\"));",
-              1
-          )
+          old_status="assert.ok(fixes.includes(\"progress.textContent=failed?'Erreur':'En cours';\"));"
+          new_status="assert.ok(fixes.includes(\"const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';\"));"
+          if source.count(old_status)!=1:
+              raise SystemExit('old status assertion not found exactly once')
+          source=source.replace(old_status,new_status,1)
           marker="test('la version visible passe à v356 et les scripts principaux sont rechargés',()=>{"
           start=source.find(marker)
           if start<0:
               raise SystemExit('v356 version test marker not found')
-          regression=r"""test('les décorations du popup sont idempotentes et ne nourrissent plus leurs MutationObserver',()=>{
+          source=source[:start]+r"""test('les décorations du popup sont idempotentes et ne nourrissent plus leurs MutationObserver',()=>{
             const fixes=read('missing-products-fixes.js');
             const popup=read('missing-products-popup-ui.js');
             assert.match(fixes,/const progressLabel=cancelled\?'Annulé':failed\?'Erreur':'En cours';/);
@@ -168,7 +132,6 @@ jobs:
             assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
           });
           """
-          source=source[:start]+regression
           tests.write_text(source,encoding='utf-8')
           PY
 
