@@ -2793,12 +2793,34 @@ async function init(){
   state.loading=false;renderView();showSetup();status('is-waiting','Configuration requise','Première connexion');
 }
 
-async function refreshFromHeader(button){
+async function refreshApplicationShell(){
+  if(navigator.onLine===false){
+    toast('Mise à jour indisponible hors ligne');
+    return;
+  }
+  const shellUrls=[new URL('./',location.href),new URL('./index.html',location.href)];
+  await Promise.allSettled(shellUrls.map(url=>fetch(url,{cache:'reload'})));
+  if('serviceWorker' in navigator){
+    try{
+      const registration=await navigator.serviceWorker.getRegistration();
+      if(registration){
+        await Promise.race([
+          registration.update(),
+          new Promise(resolve=>setTimeout(resolve,1800))
+        ]);
+      }
+    }catch(_){}
+  }
+  location.reload();
+}
+
+async function refreshFromHeader(button,reloadApplication=false){
   if(button?.classList.contains('is-refreshing'))return;
   button?.classList.add('is-refreshing');
   if(button)button.disabled=true;
   try{
     await refreshItems();
+    if(reloadApplication)await refreshApplicationShell();
   }finally{
     button?.classList.remove('is-refreshing');
     if(button)button.disabled=false;
@@ -2822,7 +2844,7 @@ function bindUiEvents(){
     state.items=loadJson(DEMO_KEY,[])||[];
     hideSetup();hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
   };
-  UI.refreshBtn.onclick=()=>refreshFromHeader(UI.refreshBtn);
+  UI.refreshBtn.onclick=event=>refreshFromHeader(UI.refreshBtn,event.isTrusted);
   UI.listFilterBtn.onclick=event=>{
     event.stopPropagation();
     setListFilterMenuOpen(UI.listFilterMenu.hidden);
