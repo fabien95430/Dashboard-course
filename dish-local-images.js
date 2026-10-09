@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v386';
+const APP_VERSION='v387';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -296,7 +296,7 @@ function installProductItemImages(){
 function installPurchaseIntelligence(){
   if(document.querySelector('script[data-purchase-intelligence]'))return;
   const script=document.createElement('script');
-  script.src='./purchase-intelligence.js?v=386';
+  script.src='./purchase-intelligence.js?v=387';
   script.defer=true;
   script.dataset.purchaseIntelligence='1';
   document.head.appendChild(script);
