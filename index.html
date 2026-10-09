@@ -13,10 +13,11 @@
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
+  <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <title>Mes courses</title>
   <link rel="stylesheet" href="./styles.css?v=348">
 </head>
-<body class="is-launching">
+<body>
   <svg class="svg-sprite" aria-hidden="true">
     <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l1.4 9.1a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L19.5 7H6.1"/><circle cx="9" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/></symbol>
     <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></symbol>
@@ -221,7 +222,7 @@
     </div>
   </section>
 
-  <section id="securityOverlay" class="overlay security-overlay" aria-modal="true" aria-labelledby="securityTitle">
+  <section id="securityOverlay" class="overlay security-overlay is-visible" aria-modal="true" aria-labelledby="securityTitle">
     <button id="securitySettingsBtn" class="security-settings-pill" type="button" aria-label="Réglages">
       <svg><use href="#i-gear"></use></svg><span>Réglages</span>
     </button>
