@@ -1,0 +1,45 @@
+name: Validate atlas cleanup
+
+on:
+  push:
+    branches:
+      - tmp-atlas-cleanup-v375
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply cleanup
+        run: python3 scripts/atlas_cleanup_temp.py
+      - name: Verify syntax and tests
+        shell: bash
+        run: |
+          test ! -e docs/ATLAS_PRODUITS.md
+          test "$(find . -maxdepth 1 -type f \( -name 'bring-photo-v4-*' -o -name 'bring-photo-v5-*' \) | wc -l)" -eq 0
+          node --check app.js
+          node --check product-item-images.js
+          node --check dish-local-images.js
+          node --check missing-products-dishes.js
+          node --check settings-tab-badge.js
+          node --check catalog.js
+          node --check sw.js
+          node --test tests/*.test.mjs
+          git diff --check
+      - name: Commit validated cleanup
+        shell: bash
+        run: |
+          rm .github/workflows/atlas-cleanup-temp.yml scripts/atlas_cleanup_temp.py
+          git add -A
+          git config user.name OpenAI
+          git config user.email noreply@openai.com
+          git commit -m "v383: supprime les anciens atlas produits"
+          git push origin HEAD:tmp-atlas-cleanup-v375
