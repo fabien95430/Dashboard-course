@@ -25,7 +25,9 @@ jobs:
           node-version: '20'
 
       - name: Appliquer la migration
-        run: python3 scripts/agent_category_reorg.py
+        run: |
+          python3 scripts/agent_category_reorg.py
+          python3 scripts/agent_fix_category_tests.py
 
       - name: Vérifier toute la suite Node
         run: node --test tests/*.test.mjs
@@ -35,6 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           rm scripts/agent_category_reorg.py
+          rm scripts/agent_fix_category_tests.py
           rm .github/workflows/agent-category-reorg-v373.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
