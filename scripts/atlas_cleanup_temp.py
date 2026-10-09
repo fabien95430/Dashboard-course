@@ -12,12 +12,10 @@ def one(text,old,new,label):
     if n!=1: raise SystemExit(f'{label}: expected 1 occurrence, got {n}')
     return text.replace(old,new,1)
 
-# Canonicalise the only two legacy item filenames that do not match slugify().
 for old,new in [('www/Items/lait-amande.webp','www/Items/lait-d-amande.webp'),('www/Items/lait-avoine.webp','www/Items/lait-d-avoine.webp')]:
     source=Path(old); target=Path(new)
     if source.exists() and not target.exists(): source.rename(target)
 
-# catalog.js: remove obsolete atlas metadata and point to v383 visual runtime.
 path='catalog.js'; text=read(path)
 text,n=re.subn(r"\n\s*meta:\s*\{[^\n]*\},","",text,count=1)
 if n!=1: raise SystemExit('catalog atlas meta not found')
@@ -25,7 +23,6 @@ text,n=re.subn(r"dish-local-images\.js\?v=\d+",f"dish-local-images.js?v={V}",tex
 if n!=1: raise SystemExit('catalog local images loader not found')
 write(path,text)
 
-# All catalog parsers now stop at favorites instead of the removed atlas meta block.
 for path in ['scripts/integrate_dish.py','scripts/manage_product_catalog.py','scripts/integrate_product_openai.py']:
     text=read(path)
     old=r'groups:\s*(\{.*?\}),\s*\n\s*meta:'
@@ -33,7 +30,6 @@ for path in ['scripts/integrate_dish.py','scripts/manage_product_catalog.py','sc
     if old not in text: raise SystemExit(f'{path}: catalog parser marker not found')
     write(path,text.replace(old,new))
 
-# app.js: direct unitary WebP renderer for Catalogue + Ma liste, local premium SVG only on error.
 path='app.js'; text=read(path)
 text=text.replace("const META = CATALOG.meta;\n",'',1)
 start=text.index('const POSITIONS=new Map();')
@@ -83,7 +79,6 @@ if any(token in text for token in ('PRODUCT_SHEETS','POSITIONS','scheduleProduct
     raise SystemExit('app.js still contains atlas runtime code')
 write(path,text)
 
-# product-item-images.js: keep automatic centering/scaling; never restore an atlas.
 path='product-item-images.js'; text=read(path)
 start=text.index('function restoreAtlas('); end=text.index('function decorateFallback(',start)
 text=text[:start]+text[end:]
@@ -98,10 +93,7 @@ decorate="""function decorateCard(card){
   card.classList.add('has-single-product-image');
   sprite.classList.add('is-single-product-image');
   const loaded=()=>onSingleProductImageLoaded(image,source);
-  if(image.dataset.singleProductSource!==source){
-    image.dataset.singleProductSource=source;
-    image.src=source;
-  }
+  if(image.dataset.singleProductSource!==source){image.dataset.singleProductSource=source;image.src=source;}
   if(image.complete&&image.naturalWidth>0)loaded();
   else image.addEventListener('load',loaded,{once:true});
 }
@@ -110,7 +102,6 @@ text=text[:start]+decorate+text[end:]
 if 'restoreAtlas' in text or 'singleProductAtlasSource' in text: raise SystemExit('atlas fallback remains in product-item-images.js')
 write(path,text)
 
-# dish-local-images.js: no atlas preload/warmup; v383 and product-image cache bump.
 path='dish-local-images.js'; text=read(path)
 text,n=re.subn(r"const APP_VERSION='v\d+';",f"const APP_VERSION='v{V}';",text,count=1)
 if n!=1: raise SystemExit('APP_VERSION not found')
@@ -126,7 +117,6 @@ text=text.replace('installVisualWarmupStyle();\n','',1).replace('void warmProduc
 if 'PRODUCT_VISUALS' in text or 'courses-product-visuals-warming' in text or 'bring-photo-v5-' in text: raise SystemExit('atlas warmup remains')
 write(path,text)
 
-# Missing-product flow no longer references/waits for atlases.
 path='missing-products-dishes.js'; text=read(path)
 old="    '- Ne pas modifier ni supprimer l’atlas de la catégorie : il reste uniquement comme fallback si l’image unitaire manque ou échoue.',"
 new="    '- Utiliser uniquement l’image WebP unitaire dans www/Items/ ; aucun atlas ou sprite produit ne doit être créé ni réintroduit.',"
@@ -142,7 +132,6 @@ if s>=0:
 if 'courses-product-visuals-warming' in text: raise SystemExit('missing-products still waits for atlas warmup')
 write(path,text)
 
-# Loaders / visible version.
 path='settings-tab-badge.js'; text=read(path)
 text,n=re.subn(r"missing-products-dishes\.js\?v=\d+",f"missing-products-dishes.js?v={V}",text,count=1)
 if n!=1: raise SystemExit('missing-products loader not found')
@@ -157,7 +146,6 @@ for file in ['catalog.js','app.js','settings-tab-badge.js']:
     if n!=1: raise SystemExit(f'{file} entry script not found')
 write(path,text)
 
-# Service worker: purge old atlas visual cache, retain unitary Items/Plats and current shell.
 path='sw.js'; text=read(path)
 text,n=re.subn(r"const CACHE='courses-app-v\d+-r1';",f"const CACHE='courses-app-v{V}-r1';",text,count=1)
 if n!=1: raise SystemExit('app cache version not found')
@@ -166,17 +154,14 @@ text=text.replace('const PRODUCT_VISUALS=[','const CORE_VISUALS=[',1)
 text=re.sub(r"^\s*'\./bring-photo-v5-[^']+',\n",'',text,flags=re.M)
 text=text.replace("\n    ||/\\/bring-photo-v5-(?:frais|fruits-legumes|epicerie|boissons|maison)\\.webp\\.png$/.test(url.pathname);",";",1)
 text=text.replace('async function seedProductVisuals(){','async function seedCoreVisuals(){',1).replace('PRODUCT_VISUALS.map','CORE_VISUALS.map').replace('migrateExistingVisuals().then(seedProductVisuals)','migrateExistingVisuals().then(seedCoreVisuals)')
-shell_end=text.index('];',text.index('const SHELL=['))
-prefix=text[:shell_end]
+shell_end=text.index('];',text.index('const SHELL=[')); prefix=text[:shell_end]
 for entry in [f"'./catalog.js?v={V}'",f"'./app.js?v={V}'",f"'./dish-local-images.js?v={V}'","'./product-item-images.js?v=14'",f"'./missing-products-dishes.js?v={V}'",f"'./settings-tab-badge.js?v={V}'","'./catalog-product-admin.js?v=2'"]:
     if entry not in prefix: prefix+=','+entry
 text=prefix+text[shell_end:]
 if 'bring-photo-v5-' in text or 'PRODUCT_VISUALS' in text: raise SystemExit('atlas assets remain in sw.js')
 write(path,text)
 
-# Documentation / agent guidance.
-path='AGENTS.md'; text=read(path)
-heading='## Atlas de visuels produits\n'
+path='AGENTS.md'; text=read(path); heading='## Atlas de visuels produits\n'
 if heading not in text: raise SystemExit('AGENTS atlas section missing')
 text=text[:text.index(heading)]+"""## Visuels des produits
 
@@ -199,22 +184,18 @@ path='docs/AUTOMATISATION_PLATS.md'; text=read(path)
 text=one(text,'   - pour un produit, le respect de `docs/ATLAS_PRODUITS.md` et de l’atlas de sa catégorie.','   - pour un produit, le respect de `docs/IMAGES_ITEMS.md` et d’une image WebP unitaire dans `www/Items/`.','automation docs')
 write(path,text)
 
-# Update parser tests for catalog without atlas meta.
 path='tests/catalog-ordering.test.mjs'; text=read(path)
 text=text.replace(r'/groups:\s*(\{.*?\}),\s*\n\s*meta:/s',r'/groups:\s*(\{.*?\}),\s*\n\s*favorites:/s')
 text=text.replace("assert.equal(locations.get(norm('Confiture fruits rouges'))?.category,'Petit-déjeuner');","assert.equal(locations.get(norm('Lait'))?.category,'Frais');")
 write(path,text)
 
-# Current workflow naming, not the legacy OpenAI run title.
 path='tests/openai-cancellation.test.mjs'; text=read(path)
 text=text.replace(r"assert.match(workflow,/run-name: OpenAI · \$\{\{ github\.event\.client_payload\.request_id \}\}/);",r"assert.match(workflow,/run-name: Courses · \$\{\{ github\.event\.client_payload\.request_id \}\}/);")
 write(path,text)
 
-# Product-image tests now assert no atlas restoration.
 path='tests/openai-products.test.mjs'; text=read(path)
 text=text.replace("test('une nouvelle tuile produit hors atlas peut être remplacée par son image unitaire'","test('une nouvelle tuile produit peut être remplacée par son image unitaire'",1)
-start=text.index("test('Ma liste reprend la même image unitaire que le Catalogue")
-end=text.index('\n});',start)+4
+start=text.index("test('Ma liste reprend la même image unitaire que le Catalogue"); end=text.index('\n});',start)+4
 replacement="""test('Ma liste reprend la même image unitaire que le Catalogue sans atlas de secours',()=>{
   const images=read('product-item-images.js');
   const app=read('app.js');
@@ -225,45 +206,30 @@ replacement="""test('Ma liste reprend la même image unitaire que le Catalogue s
   assert.match(app,/const productImageSource=name=>'\.\/www\/Items\/'\+productSlug\(name\)\+'\.webp'/);
   assert.match(app,/bindProductImageFallbacks\(el\)/);
 });"""
-text=text[:start]+replacement+text[end:]
-write(path,text)
+text=text[:start]+replacement+text[end:]; write(path,text)
 
-# Replace the stale v373 version test with current v383 invariants only.
 path='tests/preference-popups.test.mjs'; text=read(path)
-start=text.index("test('la version visible runtime passe à v373")
-end=text.index('\n});',start)+4
+start=text.index("test('la version visible runtime passe à v373"); end=text.index('\n});',start)+4
 replacement=f"""test('la version visible runtime passe à v{V} et recharge les modules modifiés',()=>{{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
-  assert.match(index,/catalog\\.js\\?v={V}/);
-  assert.match(index,/app\\.js\\?v={V}/);
-  assert.match(index,/settings-tab-badge\\.js\\?v={V}/);
+  assert.match(index,/catalog\\.js\\?v={V}/); assert.match(index,/app\\.js\\?v={V}/); assert.match(index,/settings-tab-badge\\.js\\?v={V}/);
   assert.equal((index.match(/page-version\\">v{V}/g)||[]).length,3);
-  assert.match(catalog,/dish-local-images\\.js\\?v={V}/);
-  assert.match(settings,/missing-products-dishes\\.js\\?v={V}/);
-  assert.match(sw,/courses-app-v{V}-r1/);
-  assert.match(sw,/product-item-images\\.js\\?v=14/);
-  assert.match(localImages,/const APP_VERSION='v{V}'/);
-  assert.match(localImages,/product-item-images\\.js\\?v=14/);
+  assert.match(catalog,/dish-local-images\\.js\\?v={V}/); assert.match(settings,/missing-products-dishes\\.js\\?v={V}/);
+  assert.match(sw,/courses-app-v{V}-r1/); assert.match(sw,/product-item-images\\.js\\?v=14/);
+  assert.match(localImages,/const APP_VERSION='v{V}'/); assert.match(localImages,/product-item-images\\.js\\?v=14/);
 }});"""
-text=text[:start]+replacement+text[end:]
-write(path,text)
+text=text[:start]+replacement+text[end:]; write(path,text)
 
-# Startup shell follows the actual global version.
-path='tests/startup-shell.test.mjs'; text=read(path).replace('v380',f'v{V}')
-write(path,text)
+path='tests/startup-shell.test.mjs'; text=read(path).replace('v380',f'v{V}').replace('v=380',f'v={V}'); write(path,text)
 
-# Offline-shell test excludes runtime no-store fetches: they are not page shell dependencies.
 path='tests/offline-shell.test.mjs'; text=read(path)
 needle="      if(next==='sw.js')continue;\n      requests.add(match[1]);walk(next);"
-text=one(text,needle,"      if(next==='sw.js'||match[1].includes('courses_catalog_admin='))continue;\n      requests.add(match[1]);walk(next);",'offline runtime fetch exclusion')
-write(path,text)
+text=one(text,needle,"      if(next==='sw.js'||match[1].includes('courses_catalog_admin='))continue;\n      requests.add(match[1]);walk(next);",'offline runtime fetch exclusion'); write(path,text)
 
-# New executable guard: no product atlas and every catalogue product has canonical unitary WebP.
 Path('tests/product-images-no-atlas.test.mjs').write_text(r'''import assert from 'node:assert/strict';
 import {existsSync,readdirSync,readFileSync} from 'node:fs';
 import test from 'node:test';
-const root=new URL('../',import.meta.url);
-const read=file=>readFileSync(new URL(file,root),'utf8');
+const root=new URL('../',import.meta.url); const read=file=>readFileSync(new URL(file,root),'utf8');
 const slugify=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 function groups(){const source=read('catalog.js');const match=source.match(/groups:\s*(\{.*?\}),\s*\n\s*favorites:/s);assert.ok(match,'groups introuvable');return JSON.parse(match[1]);}
 test('aucun ancien atlas produit ni chemin atlas ne subsiste',()=>{
@@ -271,13 +237,11 @@ test('aucun ancien atlas produit ni chemin atlas ne subsiste',()=>{
   assert.doesNotMatch(read('app.js'),/PRODUCT_SHEETS|POSITIONS|bring-photo-v[45]|scheduleProductSheetsWarmup|warmProductSheets/);
   assert.doesNotMatch(read('product-item-images.js'),/restoreAtlas|singleProductAtlasSource|bring-photo-v[45]/);
   assert.doesNotMatch(read('dish-local-images.js'),/PRODUCT_VISUALS|courses-product-visuals-warming|bring-photo-v[45]/);
-  assert.doesNotMatch(read('sw.js'),/bring-photo-v[45]|PRODUCT_VISUALS/);
-  assert.doesNotMatch(read('catalog.js'),/\n\s*meta:\s*\{/);
+  assert.doesNotMatch(read('sw.js'),/bring-photo-v[45]|PRODUCT_VISUALS/); assert.doesNotMatch(read('catalog.js'),/\n\s*meta:\s*\{/);
   assert.equal(existsSync(new URL('docs/ATLAS_PRODUITS.md',root)),false);
 });
 test('chaque produit du catalogue dispose de son WebP unitaire canonique',()=>{
-  const missing=[];
-  for(const subgroups of Object.values(groups()))for(const names of Object.values(subgroups||{}))for(const name of names)if(!existsSync(new URL('www/Items/'+slugify(name)+'.webp',root)))missing.push(name);
+  const missing=[]; for(const subgroups of Object.values(groups()))for(const names of Object.values(subgroups||{}))for(const name of names)if(!existsSync(new URL('www/Items/'+slugify(name)+'.webp',root)))missing.push(name);
   assert.deepEqual(missing,[]);
 });
 ''',encoding='utf-8')
