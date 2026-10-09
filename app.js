@@ -17,8 +17,8 @@ const CATEGORY_META = {
   'Enfant': { label:'Enfant' },
   'Favoris': { label:'Favoris' }
 };
-const CATALOG_CATEGORY_ORDER=['Toutes','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Enfant','Favoris'];
-const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Fruits & Légumes','Épicerie','Frais','Boissons','Maison','Enfant']);
+const CATALOG_CATEGORY_ORDER=['Toutes','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Maison','Favoris'];
+const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Maison']);
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
   "Lait sans lactose":"Lait s. lact.",
@@ -145,7 +145,24 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Sacs déjections":"Sacs déject.",
   "Friandises animaux":"Friandises"
 });
-const productDisplayName=name=>CATALOG_DISPLAY_NAMES[name]||name;
+const PRODUCT_DISPLAY_MAX=13;
+function autoProductDisplayName(name){
+  const value=String(name||'').trim();
+  if(value.length<=PRODUCT_DISPLAY_MAX)return value;
+  const words=value.split(/\s+/).filter(Boolean);
+  if(!words.length)return value;
+  let label=words[0];
+  if(label.length>PRODUCT_DISPLAY_MAX)return label.slice(0,PRODUCT_DISPLAY_MAX-1)+'.';
+  for(let index=1;index<words.length;index++){
+    const full=label+' '+words[index];
+    if(full.length<=PRODUCT_DISPLAY_MAX){label=full;continue}
+    const remaining=PRODUCT_DISPLAY_MAX-label.length-1;
+    if(remaining>=2)label+=' '+words[index].slice(0,Math.max(1,remaining-1))+'.';
+    break;
+  }
+  return label;
+}
+const productDisplayName=name=>CATALOG_DISPLAY_NAMES[name]||autoProductDisplayName(name);
 const PURCHASE_HOLD_MS=1100;
 const PURCHASE_EXIT_MS=240;
 const HA_TIMING=Object.freeze({
@@ -581,6 +598,7 @@ function favorites(){
   return out;
 }
 function unique(products){const seen=new Set();return products.filter(p=>{const k=norm(p.name);if(!k||seen.has(k))return false;seen.add(k);return true})}
+const sortProductsAlpha=products=>[...products].sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
 function visibleProducts(){
   const needle=norm(state.productQuery);
   let products;
@@ -594,12 +612,12 @@ function visibleProducts(){
       return {product,score};
     }).filter(Boolean).sort((a,b)=>b.score-a.score||a.product.name.localeCompare(b.product.name,'fr')).map(x=>x.product);
   }else if(state.category==='Toutes'){
-    products=unique(ALL);
+    products=sortProductsAlpha(unique(ALL));
   }else if(state.category==='Favoris'){
     products=favorites();
   }else{
     const subs=GROUPS[state.category]||{};
-    products=unique(Object.entries(subs).flatMap(([sub,names])=>names.map(name=>({name,category:state.category,sub}))));
+    products=sortProductsAlpha(unique(Object.entries(subs).flatMap(([sub,names])=>names.map(name=>({name,category:state.category,sub})))));
   }
   if(state.preferences.hideAdded){
     const selected=selectedSet();

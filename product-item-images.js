@@ -8,6 +8,7 @@ const PRODUCT_NAMES=new Set(CATEGORIES.flatMap(category=>{
 }));
 let products=null;
 let observer=null;
+const visualScaleCache=new Map();
 
 const slugify=value=>String(value||'')
   .toLowerCase()
@@ -48,10 +49,11 @@ function ensureStyles(){
       max-height:none!important;
       object-fit:contain!important;
       object-position:center!important;
-      transform:translateY(4px)!important;
+      transform:translateY(4px) scale(var(--single-product-scale,1))!important;
+      transform-origin:center!important;
     }
     .premium-sprite.is-single-product-image.is-compact>img{
-      transform:translateY(1px)!important;
+      transform:translateY(1px) scale(var(--single-product-scale,1))!important;
     }
     @media(max-width:520px){
       .catalog-view .product .media{
@@ -60,6 +62,35 @@ function ensureStyles(){
     }
   `;
   document.head.appendChild(style);
+}
+function applyVisualScale(image,source){
+  if(!image||!source)return;
+  const cached=visualScaleCache.get(source);
+  if(cached){image.style.setProperty('--single-product-scale',String(cached));return}
+  try{
+    const size=96,canvas=document.createElement('canvas');
+    canvas.width=size;canvas.height=size;
+    const context=canvas.getContext('2d',{willReadFrequently:true});
+    if(!context)return;
+    context.clearRect(0,0,size,size);
+    context.drawImage(image,0,0,size,size);
+    const pixels=context.getImageData(0,0,size,size).data;
+    let minX=size,minY=size,maxX=-1,maxY=-1;
+    for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+      if(pixels[(y*size+x)*4+3]<24)continue;
+      if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
+    }
+    if(maxX<minX||maxY<minY)return;
+    const occupancy=Math.max((maxX-minX+1)/size,(maxY-minY+1)/size);
+    const scale=Math.max(.94,Math.min(1.30,.90/Math.max(.01,occupancy)));
+    const rounded=Math.round(scale*1000)/1000;
+    visualScaleCache.set(source,rounded);
+    image.style.setProperty('--single-product-scale',String(rounded));
+  }catch(_){}
+}
+function onSingleProductImageLoaded(image,source){
+  image.closest('.premium-sprite')?.classList.remove('is-fallback');
+  requestAnimationFrame(()=>applyVisualScale(image,source));
 }
 function restoreAtlas(card,sprite,image){
   const source=image.dataset.singleProductAtlasSource||'';
@@ -83,6 +114,7 @@ function decorateFallback(card,name,source){
     sprite.appendChild(image);
     fallback.replaceWith(sprite);
     card.classList.add('has-single-product-image');
+    onSingleProductImageLoaded(image,source);
   },{once:true});
   image.addEventListener('error',()=>{
     delete fallback.dataset.singleProductPending;
@@ -105,7 +137,7 @@ function decorateCard(card){
   image.dataset.singleProductSource=source;
   sprite.classList.add('is-single-product-image');
   sprite.classList.remove('is-fallback');
-  image.addEventListener('load',()=>sprite.classList.remove('is-fallback'),{once:true});
+  image.addEventListener('load',()=>onSingleProductImageLoaded(image,source),{once:true});
   image.addEventListener('error',()=>restoreAtlas(card,sprite,image),{once:true});
   image.src=source;
 }

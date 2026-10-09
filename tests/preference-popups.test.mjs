@@ -83,10 +83,10 @@ test('la précision image reste séparée du nom et atteint les deux intégratio
   const generator=read('scripts/integrate_product_openai.py');
   assert.match(missing,/STORAGE_PRODUCT_IMAGE_HINTS='courses-missing-product-image-hints-v1'/);
   assert.match(missing,/id="missingProductImageHint"/);
-  assert.match(missing,/Utilisée uniquement pour l’image · le nom reste inchangé/);
   assert.match(missing,/imageHint:productImageHint\(name\)/);
   assert.match(missing,/function saveProductImageHintDraft\(\)/);
-  assert.match(missing,/Précision visuelle fournie par l’utilisateur \(uniquement pour l’image\)/);
+  assert.match(missing,/Précision fournie par l’utilisateur pour le visuel ou le contenant/);
+  assert.match(missing,/conditionnement visible/);
   assert.match(fixes,/PRODUCT_IMAGE_HINT_MARKER='\|\|__courses_image_hint__:'/);
   assert.match(fixes,/dish_category:type==='product'\?productOpenAiCategory\(item\):String\(item\.category\|\|''\)/);
   assert.match(generator,/IMAGE_HINT_MARKER = "\|\|__courses_image_hint__:"/);
@@ -226,30 +226,31 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 
-test('la version visible runtime passe à v365 et recharge le moteur de recettes',()=>{
+test('la version visible runtime passe à v370 et recharge les modules modifiés',()=>{
   const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
   assert.match(index,/styles\.css\?v=348/);
-  assert.match(index,/catalog\.js\?v=364/);
-  assert.match(index,/app\.js\?v=356/);
+  assert.match(index,/catalog\.js\?v=370/);
+  assert.match(index,/app\.js\?v=370/);
   assert.match(index,/settings-tab-badge\.js\?v=364/);
-  assert.equal((index.match(/page-version\">v365/g)||[]).length,3);
+  assert.equal((index.match(/page-version\">v370/g)||[]).length,3);
   assert.match(catalog,/dishes-ui\.js\?v=364/);
-  assert.match(catalog,/catalog-quantities\.js\?v=364/);
+  assert.match(catalog,/catalog-quantities\.js\?v=370/);
   assert.match(catalog,/repurchase-soon\.js\?v=363/);
-  assert.match(catalog,/dish-local-images\.js\?v=364/);
+  assert.match(catalog,/dish-local-images\.js\?v=370/);
   assert.match(settings,/missing-products-dishes\.js\?v=363/);
-  assert.match(sw,/courses-app-v365-r1/);
-  assert.match(sw,/catalog\.js\?v=364/);
-  assert.match(sw,/app\.js\?v=356/);
+  assert.match(sw,/courses-app-v370-r1/);
+  assert.match(sw,/catalog\.js\?v=370/);
+  assert.match(sw,/app\.js\?v=370/);
   assert.match(sw,/settings-tab-badge\.js\?v=364/);
   assert.match(sw,/missing-products-dishes\.js\?v=363/);
   assert.match(sw,/dishes-ui\.js\?v=364/);
-  assert.match(sw,/catalog-quantities\.js\?v=364/);
+  assert.match(sw,/catalog-quantities\.js\?v=370/);
   assert.match(sw,/repurchase-soon\.js\?v=363/);
   assert.match(sw,/missing-products-fixes\.js\?v=19/);
   assert.match(sw,/missing-products-popup-ui\.js\?v=18/);
-  assert.match(sw,/dish-local-images\.js\?v=364/);
-  assert.match(localImages,/const APP_VERSION='v365'/);
+  assert.match(sw,/dish-local-images\.js\?v=370/);
+  assert.match(localImages,/const APP_VERSION='v370'/);
   assert.match(localImages,/missing-products-fixes\.js\?v=20/);
   assert.match(localImages,/missing-products-popup-ui\.js\?v=18/);
+  assert.match(localImages,/product-item-images\.js\?v=11/);
 });

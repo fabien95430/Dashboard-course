@@ -33,6 +33,7 @@ test('le workflow OpenAI route les produits vers une intégration WebP avec noti
   const script=read('scripts/integrate_product_openai.py');
   assert.match(workflow,/python3 scripts\/integrate_product_openai\.py/);
   assert.match(workflow,/www\/Items\/\$\{\{ steps\.result\.outputs\.filename \}\}/);
+  assert.match(workflow,/git add catalog\.js app\.js catalog-quantities\.js index\.html product-item-images\.js dish-local-images\.js sw\.js/);
   assert.match(workflow,/node scripts\/send_web_push\.mjs/);
   assert.match(script,/"output_format":"webp"/);
   assert.match(script,/"background":"transparent"/);
@@ -44,7 +45,13 @@ test('le classement OpenAI reçoit tout le catalogue et peut créer une sous-cat
   const script=read('scripts/integrate_product_openai.py');
   assert.doesNotMatch(script,/list\(names\)\[:8\]/);
   assert.match(script,/category:\{subgroup:list\(names\) for subgroup,names in subgroups\.items\(\)\}/);
-  assert.match(script,/"category", "subgroup" et "create_subgroup"/);
+  assert.match(script,/"category", "subgroup", "create_subgroup" et "display_mode"/);
+  assert.match(script,/display_mode not in DISPLAY_MODES/);
+  assert.match(script,/groups\[category\]\[subgroup\]\.sort\(key=base\.normalize\)/);
+  assert.match(script,/update_display_mode\(name,display_mode\)/);
+  assert.match(script,/def display_mode_from_hint\(value: str\) -> str:/);
+  assert.match(script,/result\["display_mode"\]=explicit_mode/);
+  assert.match(script,/ensure_shell_assets\(sw_text,\[/);
   assert.match(script,/if not isinstance\(create_value,bool\)/);
   assert.match(script,/if create_subgroup:/);
   assert.match(script,/groups\[category\]\[subgroup\]=\[\]/);
@@ -56,4 +63,7 @@ test('une nouvelle tuile produit hors atlas peut être remplacée par son image 
   assert.match(images,/card\.querySelector\('\.product-svg'\)/);
   assert.match(images,/fallback\.replaceWith\(sprite\)/);
   assert.match(images,/sprite\.className='premium-sprite is-single-product-image'/);
+  assert.match(images,/getImageData\(0,0,size,size\)/);
+  assert.match(images,/--single-product-scale/);
+  assert.match(images,/\.90\/Math\.max\(\.01,occupancy\)/);
 });

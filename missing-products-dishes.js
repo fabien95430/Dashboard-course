@@ -217,8 +217,8 @@ function buildProductPrompt(item){
     'Demande : intégrer le produit « '+item.name+' » dans le catalogue.',
     'Catégorie proposée par l’utilisateur : '+category+'.',
     ...(imageHint?[
-      'Précision visuelle fournie par l’utilisateur (uniquement pour l’image) : « '+imageHint+' ».',
-      'Cette précision décrit l’apparence, la forme, le contenant ou l’emballage à représenter et ne doit jamais modifier le nom du produit.'
+      'Précision fournie par l’utilisateur pour le visuel ou le contenant : « '+imageHint+' ».',
+      'Cette précision décrit l’apparence, la forme, le contenant ou l’emballage à représenter. Si elle indique explicitement un contenant, utilise-le aussi comme conditionnement visible. Elle ne doit jamais modifier le nom du produit.'
     ]:[]),
     '',
     'Exécute directement cette demande : le feu vert est donné.',
