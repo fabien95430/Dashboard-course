@@ -45,7 +45,7 @@
       <header class="page-header">
         <div>
           <h1>Ma liste</h1>
-          <p>Vos courses du quotidien <span class="page-version">v372</span></p>
+          <p>Vos courses du quotidien <span class="page-version">v373</span></p>
         </div>
         <div class="page-header-actions">
           <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
@@ -81,23 +81,38 @@
           <button class="list-filter-option" type="button" data-list-category="Toutes" role="radio">
             <span>Toutes</span><i aria-hidden="true"></i>
           </button>
+          <button class="list-filter-option" type="button" data-list-category="Apéritif &amp; snacks" role="radio">
+            <span>Apéritif &amp; snacks</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Boissons" role="radio">
+            <span>Boissons</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Boulangerie" role="radio">
+            <span>Boulangerie</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Cuisine" role="radio">
+            <span>Cuisine</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Enfant" role="radio">
+            <span>Enfant</span><i aria-hidden="true"></i>
+          </button>
           <button class="list-filter-option" type="button" data-list-category="Frais" role="radio">
             <span>Frais</span><i aria-hidden="true"></i>
           </button>
           <button class="list-filter-option" type="button" data-list-category="Fruits &amp; Légumes" role="radio">
             <span>Fruits &amp; Légumes</span><i aria-hidden="true"></i>
           </button>
-          <button class="list-filter-option" type="button" data-list-category="Épicerie" role="radio">
-            <span>Épicerie</span><i aria-hidden="true"></i>
-          </button>
-          <button class="list-filter-option" type="button" data-list-category="Boissons" role="radio">
-            <span>Boissons</span><i aria-hidden="true"></i>
+          <button class="list-filter-option" type="button" data-list-category="Hygiène &amp; soins" role="radio">
+            <span>Hygiène &amp; soins</span><i aria-hidden="true"></i>
           </button>
           <button class="list-filter-option" type="button" data-list-category="Maison" role="radio">
             <span>Maison</span><i aria-hidden="true"></i>
           </button>
-          <button class="list-filter-option" type="button" data-list-category="Enfant" role="radio">
-            <span>Enfant</span><i aria-hidden="true"></i>
+          <button class="list-filter-option" type="button" data-list-category="Petit-déjeuner" role="radio">
+            <span>Petit-déjeuner</span><i aria-hidden="true"></i>
+          </button>
+          <button class="list-filter-option" type="button" data-list-category="Viandes &amp; poissons" role="radio">
+            <span>Viandes &amp; poissons</span><i aria-hidden="true"></i>
           </button>
         </div>
       </div>
@@ -114,7 +129,7 @@
       <header class="page-header">
         <div>
           <h1>Catalogue</h1>
-          <p>Trouvez et ajoutez vos produits <span class="page-version">v372</span></p>
+          <p>Trouvez et ajoutez vos produits <span class="page-version">v373</span></p>
         </div>
         <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
           <svg><use href="#i-refresh"></use></svg>
@@ -134,7 +149,7 @@
       <header class="page-header settings-header">
         <div>
           <h1>Réglages</h1>
-          <p>Personnalisez votre expérience <span class="page-version">v372</span></p>
+          <p>Personnalisez votre expérience <span class="page-version">v373</span></p>
         </div>
       </header>
 
@@ -356,12 +371,17 @@
       </div>
       <div id="missingCategoryGrid" class="missing-category-grid">
         <button class="missing-category-choice is-active" type="button" data-missing-category="" aria-pressed="true"><span>Aucune</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Apéritif &amp; snacks" aria-pressed="false"><span>Apéritif &amp; snacks</span></button>
         <button class="missing-category-choice" type="button" data-missing-category="Boissons" aria-pressed="false"><span>Boissons</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Boulangerie" aria-pressed="false"><span>Boulangerie</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Cuisine" aria-pressed="false"><span>Cuisine</span></button>
         <button class="missing-category-choice" type="button" data-missing-category="Enfant" aria-pressed="false"><span>Enfant</span></button>
-        <button class="missing-category-choice" type="button" data-missing-category="Épicerie" aria-pressed="false"><span>Épicerie</span></button>
-        <button class="missing-category-choice" type="button" data-missing-category="Frais" aria-pressed="false"><span>Produits frais</span></button>
-        <button class="missing-category-choice" type="button" data-missing-category="Fruits &amp; Légumes" aria-pressed="false"><span>Fruits &amp; légumes</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Frais" aria-pressed="false"><span>Frais</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Fruits &amp; Légumes" aria-pressed="false"><span>Fruits &amp; Légumes</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Hygiène &amp; soins" aria-pressed="false"><span>Hygiène &amp; soins</span></button>
         <button class="missing-category-choice" type="button" data-missing-category="Maison" aria-pressed="false"><span>Maison</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Petit-déjeuner" aria-pressed="false"><span>Petit-déjeuner</span></button>
+        <button class="missing-category-choice" type="button" data-missing-category="Viandes &amp; poissons" aria-pressed="false"><span>Viandes &amp; poissons</span></button>
       </div>
     </section>
 
@@ -423,8 +443,8 @@
 
   <div id="toast" class="toast" role="status"></div>
   <script src="./startup/app.js?v=2"></script>
-  <script src="./catalog.js?v=372"></script>
-  <script src="./app.js?v=370"></script>
+  <script src="./catalog.js?v=373"></script>
+  <script src="./app.js?v=373"></script>
   <script src="./settings-tab-badge.js?v=364"></script>
 </body>
 </html>

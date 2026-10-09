@@ -100,7 +100,9 @@ const DISPLAY_MODE_BY_SUB=Object.freeze({
   'Hygiène':'Flacon',
   'Salle de bain & soins':'Flacon',
   'Enfant':'Paquet',
-  'Produits laitiers':'Pot'
+  'Produits laitiers':'Pot',
+  'Poissons en conserve':'Boîte',
+  'Traiteur frais':'Pièce'
 });
 
 const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
@@ -170,7 +172,9 @@ const TECHNICAL_MODE_BY_SUB=Object.freeze({
   'Hygiène':'Flacon',
   'Salle de bain & soins':'Flacon',
   'Enfant':'Paquet',
-  'Produits laitiers':'Pot'
+  'Produits laitiers':'Pot',
+  'Poissons en conserve':'Boîte',
+  'Traiteur frais':'Pièce'
 });
 
 const TECHNICAL_MODE_BY_PRODUCT=Object.freeze({

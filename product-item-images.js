@@ -1,11 +1,9 @@
 (() => {
 'use strict';
 
-const CATEGORIES=['Fruits & Légumes','Frais','Épicerie','Boissons','Maison','Enfant'];
-const PRODUCT_NAMES=new Set(CATEGORIES.flatMap(category=>{
-  const groups=window.COURSES_CATALOG?.groups?.[category]||{};
-  return Object.values(groups).flatMap(names=>Array.isArray(names)?names:[]);
-}));
+const PRODUCT_NAMES=new Set(Object.values(window.COURSES_CATALOG?.groups||{}).flatMap(groups=>
+  Object.values(groups||{}).flatMap(names=>Array.isArray(names)?names:[])
+));
 let products=null;
 let observer=null;
 const visualScaleCache=new Map();

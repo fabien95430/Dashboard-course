@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v372';
+const APP_VERSION='v373';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -302,7 +302,7 @@ function installMissingProductsFixes(){
 function installProductItemImages(){
   if(document.querySelector('script[data-product-item-images]'))return;
   const script=document.createElement('script');
-  script.src='./product-item-images.js?v=11';
+  script.src='./product-item-images.js?v=12';
   script.defer=true;
   script.dataset.productItemImages='1';
   document.head.appendChild(script);
@@ -310,7 +310,7 @@ function installProductItemImages(){
 function installPurchaseIntelligence(){
   if(document.querySelector('script[data-purchase-intelligence]'))return;
   const script=document.createElement('script');
-  script.src='./purchase-intelligence.js?v=4';
+  script.src='./purchase-intelligence.js?v=5';
   script.defer=true;
   script.dataset.purchaseIntelligence='1';
   document.head.appendChild(script);
