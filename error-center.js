@@ -357,15 +357,13 @@ function renderPanel(entries=readEntries()){
 }
 function bindUi(){
   if(uiBound)return true;
-  const button=document.getElementById('preferencesErrorMessages');
   const dialog=document.getElementById('preferencesDialog');
   const content=dialog?.querySelector(':scope>.preference-dialog-scroll');
-  if(!button||!dialog||!content)return false;
+  if(!dialog||!content)return false;
   uiBound=true;
   installStyle();
   let panel=document.getElementById('preferencesErrorCenter');
   if(!panel){panel=document.createElement('div');panel.id='preferencesErrorCenter';panel.className='courses-error-center';panel.hidden=true;content.appendChild(panel)}
-  button.addEventListener('click',showErrorCenter);
   panel.addEventListener('click',event=>{
     if(event.target.closest('.courses-error-back')){showManagementView();return}
     const filter=event.target.closest('[data-error-filter]')?.dataset.errorFilter;
@@ -387,6 +385,12 @@ function bindUi(){
   updateBadge();
   return true;
 }
+function handleErrorCenterTrigger(event){
+  const trigger=event.target.closest?.('#preferencesErrorMessages');
+  if(!trigger)return;
+  if(!bindUi())return;
+  showErrorCenter();
+}
 function bindWhenReady(){
   if(bindUi())return;
   const observer=new MutationObserver(()=>{if(bindUi())observer.disconnect()});
@@ -396,6 +400,7 @@ function bindWhenReady(){
 
 consumeIntegrationParams();
 void importPushInbox();
+document.addEventListener('click',handleErrorCenterTrigger);
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',()=>{bindHaStatus();bindWhenReady();void importPushInbox()},{once:true});
 }else{
