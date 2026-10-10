@@ -48,29 +48,3 @@ function start(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
 else start();
 })();
-
-(() => {
-'use strict';
-
-function forceListImagesEager(root){
-  if(!(root instanceof Element))return;
-  const images=[];
-  if(root.matches?.('.premium-sprite.is-single-product-image>img'))images.push(root);
-  root.querySelectorAll?.('.premium-sprite.is-single-product-image>img').forEach(image=>images.push(image));
-  images.forEach(image=>{
-    if(!image.closest('#listItems'))return;
-    image.loading='eager';
-  });
-}
-function startListImageWarmup(){
-  const list=document.getElementById('listItems');
-  if(!list||list.dataset.eagerImages==='1')return;
-  list.dataset.eagerImages='1';
-  forceListImagesEager(list);
-  new MutationObserver(records=>{
-    records.forEach(record=>record.addedNodes.forEach(node=>forceListImagesEager(node)));
-  }).observe(list,{childList:true,subtree:true});
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startListImageWarmup,{once:true});
-else startListImageWarmup();
-})();

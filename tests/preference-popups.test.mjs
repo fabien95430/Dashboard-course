@@ -225,11 +225,11 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 
-test('la version visible runtime passe à v383 et recharge les modules modifiés',()=>{
-  const index=read('index.html'),catalog=read('catalog.js'),settings=read('settings-tab-badge.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
-  assert.match(index,/catalog\.js\?v=383/); assert.match(index,/app\.js\?v=383/); assert.match(index,/settings-tab-badge\.js\?v=383/);
-  assert.equal((index.match(/page-version\">v383/g)||[]).length,3);
-  assert.match(catalog,/dish-local-images\.js\?v=383/); assert.match(settings,/missing-products-dishes\.js\?v=383/);
-  assert.match(sw,/courses-app-v383-r1/); assert.match(sw,/product-item-images\.js\?v=14/);
-  assert.match(localImages,/const APP_VERSION='v383'/); assert.match(localImages,/product-item-images\.js\?v=14/);
+test('la version visible runtime passe à v391 et recharge les modules modifiés',()=>{
+  const index=read('index.html'),catalog=read('catalog.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
+  assert.match(index,/catalog\.js\?v=391/); assert.match(index,/app\.js\?v=391/); assert.match(index,/error-feedback-bridge\.js\?v=391/);
+  assert.equal((index.match(/page-version\">v391/g)||[]).length,3);
+  assert.match(catalog,/dishes-ui\.js\?v=391/); assert.match(catalog,/dish-local-images\.js\?v=391/);
+  assert.match(sw,/courses-app-v391-r1/); assert.match(sw,/app\.js\?v=391/); assert.match(sw,/dishes-ui\.js\?v=391/);
+  assert.match(localImages,/const APP_VERSION='v391'/);
 });

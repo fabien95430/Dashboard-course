@@ -13,12 +13,12 @@ test('le centre d erreurs reste chargé sans restaurer le shell de démarrage',(
   const sw=read('sw.js');
   const localImages=read('dish-local-images.js');
   assert.match(index,/error-center\.js\?v=390/);
-  assert.match(index,/error-feedback-bridge\.js\?v=390/);
-  assert.ok(index.indexOf('error-center.js?v=390')<index.indexOf('error-feedback-bridge.js?v=390'));
+  assert.match(index,/error-feedback-bridge\.js\?v=391/);
+  assert.ok(index.indexOf('error-center.js?v=390')<index.indexOf('error-feedback-bridge.js?v=391'));
   assert.doesNotMatch(index,/startup\/app\.js/);
-  assert.match(sw,/courses-app-v390-r1/);
+  assert.match(sw,/courses-app-v391-r1/);
   assert.match(sw,/error-center\.js\?v=390/);
-  assert.match(sw,/error-feedback-bridge\.js\?v=390/);
-  assert.match(localImages,/const APP_VERSION='v390'/);
-  assert.equal((index.match(/page-version">v390/g)||[]).length,3);
+  assert.match(sw,/error-feedback-bridge\.js\?v=391/);
+  assert.match(localImages,/const APP_VERSION='v391'/);
+  assert.equal((index.match(/page-version">v391/g)||[]).length,3);
 });

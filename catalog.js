@@ -32,7 +32,7 @@
   const loadDishes=()=>{
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
     const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=364';
+    script.src='./dishes-ui.js?v=391';
     script.async=false;
     script.dataset.catalogDishes='script';
     script.addEventListener('load',loadLiquid,{once:true});
@@ -59,7 +59,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=390';
+    images.src='./dish-local-images.js?v=391';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadRepurchaseSoon,{once:true});
