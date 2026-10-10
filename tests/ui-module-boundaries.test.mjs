@@ -39,7 +39,7 @@ test('les responsabilités extraites ont des propriétaires explicites',()=>{
 });
 
 
-test('P4 conserve un démarrage déterministe et diffère seulement les fonctions Catalogue',()=>{
+test('P4 conserve un démarrage déterministe puis prépare Produits avant les fonctions secondaires des Plats',()=>{
   const catalog=read('catalog.js');
   const index=read('index.html');
   const sw=read('sw.js');
@@ -54,13 +54,19 @@ test('P4 conserve un démarrage déterministe et diffère seulement les fonction
   const settingsBadgeAsset=index.match(/\.\/settings-tab-badge\.js\?v=\d+/)?.[0]||'';
   for(const [asset,label] of [[appUiAsset,'app-ui'],[runtimeAsset,'runtime-features'],[dishImagesAsset,'dish-local-images'],[repurchaseAsset,'repurchase-soon'],[quantitiesAsset,'catalog-quantities'],[dishesAsset,'dishes-ui'],[liquidAsset,'catalog-liquid'],[settingsUiAsset,'settings-ui'],[settingsBadgeAsset,'settings-tab-badge']])assert.ok(asset,'asset '+label+' introuvable');
   assert.match(catalog,/script\.addEventListener\('load',loadRuntimeFeatures,\{once:true\}\)/);
-  assert.match(catalog,/document\.addEventListener\('courses:view-changed',event=>\{/);
-  assert.match(catalog,/if\(event\.detail\?\.view==='catalog'\)startCatalogFeatures\(\);/);
-  assert.match(catalog,/if\(catalogFeaturesStarted\|\|!runtimeReady\)return;/);
-  assert.match(catalog,/images\.addEventListener\('load',loadRepurchaseSoon,\{once:true\}\)/);
-  assert.match(catalog,/script\.addEventListener\('load',loadQuantities,\{once:true\}\)/);
+  assert.match(catalog,/document\.addEventListener\('courses:status-changed',event=>\{/);
+  assert.match(catalog,/if\(title==='Synchronisé'\|\|title==='Mode test'\)startProductCatalog\(\);/);
+  assert.match(catalog,/if\(productCatalogStarted\|\|!runtimeReady\)return;/);
   assert.match(catalog,/quantities\.addEventListener\('load',loadDishes,\{once:true\}\)/);
   assert.match(catalog,/script\.addEventListener\('load',loadLiquid,\{once:true\}\)/);
+  assert.match(catalog,/liquid\.addEventListener\('load',markProductCatalogReady,\{once:true\}\)/);
+  assert.match(catalog,/document\.addEventListener\('courses:view-changed',event=>\{/);
+  assert.match(catalog,/if\(event\.detail\?\.view!=='catalog'\)return;/);
+  assert.match(catalog,/startProductCatalog\(\);\s*startDishFeatures\(\);/);
+  assert.match(catalog,/if\(dishFeaturesStarted\|\|!productCatalogReady\)return;/);
+  assert.match(catalog,/images\.addEventListener\('load',loadRepurchaseSoon,\{once:true\}\)/);
+  assert.doesNotMatch(catalog,/new MutationObserver/);
+  assert.doesNotMatch(catalog,/setInterval\(/);
   assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));
   for(const asset of [appUiAsset,runtimeAsset,dishImagesAsset,repurchaseAsset,quantitiesAsset,dishesAsset,liquidAsset,settingsUiAsset,settingsBadgeAsset])assert.ok(sw.includes(asset),asset+' absent du précache');
 });
