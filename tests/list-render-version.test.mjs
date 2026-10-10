@@ -14,7 +14,7 @@ test('la version globale et les révisions actives associées restent cohérente
   assert.ok(index.includes(`./catalog.js?v=${revision}`));
   assert.match(index,/\.\/bottom-nav-liquid\.js\?v=414/);
   assert.match(index,/\.\/app\.js\?v=415/);
-  assert.match(catalog,/\.\/app-ui\.js\?v=418/);
+  assert.ok(catalog.includes(`./app-ui.js?v=${revision}`));
   assert.ok(catalog.includes(`./dish-local-images.js?v=${revision}`));
   assert.match(catalog,/\.\/runtime-features\.js\?v=416/);
   assert.match(runtime,/\.\/missing-products-fixes\.js\?v=416/);
@@ -24,7 +24,7 @@ test('la version globale et les révisions actives associées restent cohérente
   assert.ok(sw.includes(`./catalog.js?v=${revision}`));
   assert.match(sw,/\.\/bottom-nav-liquid\.js\?v=414/);
   assert.match(sw,/\.\/app\.js\?v=415/);
-  assert.match(sw,/\.\/app-ui\.js\?v=418/);
+  assert.ok(sw.includes(`./app-ui.js?v=${revision}`));
   assert.ok(sw.includes(`./dish-local-images.js?v=${revision}`));
   assert.match(sw,/\.\/runtime-features\.js\?v=416/);
   assert.match(sw,/\.\/missing-products-fixes\.js\?v=416/);
