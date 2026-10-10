@@ -1,4 +1,4 @@
-const CACHE='courses-app-v397-r1';
+const CACHE='courses-app-v398-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -10,8 +10,9 @@ const SHELL=[
   './index.html',
   './styles.css?v=348',
   './product-item-first-paint.css?v=1',
-  './catalog.js?v=397',
-  './app.js?v=397',
+  './catalog.js?v=398',
+  './preferences-service.js?v=398',
+  './app.js?v=398',
   './settings-tab-badge.js?v=388',
   './error-center.js?v=395',
   './error-feedback-bridge.js?v=394',
@@ -22,7 +23,7 @@ const SHELL=[
   './dishes-ui.js?v=391',
   './catalog-quantities.js?v=389',
   './repurchase-soon.js?v=363',
-  './dish-local-images.js?v=397',
+  './dish-local-images.js?v=398',
   './missing-products-fixes.js?v=397',
   './missing-products-popup-ui.js?v=18',
   './product-item-images.js?v=397',
@@ -50,6 +51,7 @@ function isPersistentVisual(url){
 function isStartupShellAsset(url){
   return url.pathname.endsWith('/styles.css')
     ||url.pathname.endsWith('/catalog.js')
+    ||url.pathname.endsWith('/preferences-service.js')
     ||url.pathname.endsWith('/app.js')
     ||url.pathname.endsWith('/settings-tab-badge.js')
     ||url.pathname.endsWith('/error-center.js')

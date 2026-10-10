@@ -192,7 +192,6 @@ const STORAGE = {
   entity:'courses-external-entity-v1',
   entityPreference:'courses-external-entity-preference-v1',
   usage:'courses-external-usage-v1',
-  preferences:'courses-preferences-v1',
   missingProducts:'courses-missing-products-v1',
   autoLockMinutes:'courses-auto-lock-minutes-v1'
 };
@@ -305,30 +304,15 @@ function clearUnlockGuard(){
   try{sessionStorage.removeItem(UNLOCK_GUARD_KEY)}catch(_){}
 }
 
-const DEFAULT_PREFERENCES=Object.freeze({
-  listSort:'added',
-  startView:'list',
-  hideAdded:false,
-  smartFavorites:true
-});
-function readPreferences(){
-  const saved=loadJson(STORAGE.preferences,{})||{};
-  const listSort=['added','category','alpha'].includes(saved.listSort)?saved.listSort:DEFAULT_PREFERENCES.listSort;
-  const startView=['list','catalog'].includes(saved.startView)?saved.startView:DEFAULT_PREFERENCES.startView;
-  return {
-    listSort,
-    startView,
-    hideAdded:saved.hideAdded===true,
-    smartFavorites:saved.smartFavorites!==false
-  };
-}
-function persistPreferences(){saveJson(STORAGE.preferences,state.preferences)}
+const PREFERENCES=window.COURSES_PREFERENCES;
+if(!PREFERENCES)throw new Error('Préférences indisponibles');
+function persistPreferences(){state.preferences=PREFERENCES.write(state.preferences)}
 function readAutoLockMinutes(){
   const saved=Number(localStorage.getItem(STORAGE.autoLockMinutes));
   return AUTO_LOCK_MINUTES.includes(saved)?saved:5;
 }
 function autoLockDelayMs(){return state.autoLockMinutes*60*1000}
-const INITIAL_PREFERENCES=readPreferences();
+const INITIAL_PREFERENCES=PREFERENCES.read();
 function readMissingProducts(){
   const saved=loadJson(STORAGE.missingProducts,[]);
   if(!Array.isArray(saved))return [];
@@ -2356,12 +2340,12 @@ function openPreferences(){
 function savePreferencesSettings(){
   const nextSort=UI.preferencesListSort.value;
   const nextStartView=UI.preferencesStartView.value;
-  state.preferences={
-    listSort:['added','category','alpha'].includes(nextSort)?nextSort:DEFAULT_PREFERENCES.listSort,
-    startView:['list','catalog'].includes(nextStartView)?nextStartView:DEFAULT_PREFERENCES.startView,
-    hideAdded:UI.preferencesHideAdded.checked,
-    smartFavorites:UI.preferencesSmartFavorites.checked
-  };
+  state.preferences=PREFERENCES.normalize({
+  listSort:nextSort,
+  startView:nextStartView,
+  hideAdded:UI.preferencesHideAdded.checked,
+  smartFavorites:UI.preferencesSmartFavorites.checked
+});
   persistPreferences();
   UI.preferencesDialog.close();
   renderProducts();
