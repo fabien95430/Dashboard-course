@@ -76,19 +76,51 @@ function installProductImageFirstPaintStyles(){
     #listItems .premium-sprite.is-single-product-image.is-compact>img{
       transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
     }
+    #listItems .premium-sprite.is-list-image-loading>img{
+      visibility:hidden!important;
+    }
+    #listItems .premium-sprite.is-list-image-loading>.sprite-fallback{
+      display:grid!important;
+      place-items:center!important;
+    }
+    #listItems .premium-sprite.is-list-image-loading .product-svg{
+      width:100%!important;
+      height:100%!important;
+    }
   `;
   document.head.appendChild(style);
 }
+function prepareListImage(image){
+  if(!(image instanceof HTMLImageElement)||!image.closest('#listItems'))return;
+  image.loading='eager';
+  image.decoding='sync';
+  try{image.fetchPriority='high'}catch(_){}
+  if(image.dataset.listFirstPaintBound==='1')return;
+  image.dataset.listFirstPaintBound='1';
+  const sprite=image.closest('.premium-sprite');
+  if(!sprite)return;
+  const showImage=()=>{
+    image.hidden=false;
+    sprite.classList.remove('is-list-image-loading','is-fallback');
+  };
+  const showFallback=()=>{
+    image.hidden=true;
+    sprite.classList.remove('is-list-image-loading');
+    sprite.classList.add('is-fallback');
+  };
+  if(image.complete){
+    if(image.naturalWidth>0)showImage();
+    else showFallback();
+    return;
+  }
+  sprite.classList.add('is-list-image-loading');
+  image.addEventListener('load',showImage,{once:true});
+  image.addEventListener('error',showFallback,{once:true});
+}
 function tuneListProductImages(root){
   if(!(root instanceof Element))return;
-  const images=[];
-  if(root.matches?.('.premium-sprite.is-single-product-image>img'))images.push(root);
-  root.querySelectorAll?.('.premium-sprite.is-single-product-image>img').forEach(image=>images.push(image));
-  images.forEach(image=>{
-    if(!image.closest('#listItems'))return;
-    image.loading='eager';
-    try{image.fetchPriority='high'}catch(_){}
-  });
+  if(root.matches?.('.premium-sprite.is-single-product-image>img'))prepareListImage(root);
+  root.querySelectorAll?.('.premium-sprite.is-single-product-image>img').forEach(prepareListImage);
 }
 function startProductImageFirstPaint(){
   installProductImageFirstPaintStyles();
