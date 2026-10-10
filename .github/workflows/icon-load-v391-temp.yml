@@ -16,7 +16,9 @@ jobs:
         with:
           node-version: 22
       - name: Apply fix
-        run: python3 scripts/icon_load_v391_temp.py
+        run: |
+          python3 scripts/icon_load_v391_temp.py
+          python3 scripts/icon_load_v391_testfix_temp.py
       - name: Verify
         run: |
           node --check app.js
@@ -31,7 +33,7 @@ jobs:
         run: |
           git config user.name OpenAI
           git config user.email noreply@openai.com
-          git rm .github/workflows/icon-load-v391-temp.yml scripts/icon_load_v391_temp.py
+          git rm .github/workflows/icon-load-v391-temp.yml scripts/icon_load_v391_temp.py scripts/icon_load_v391_testfix_temp.py
           git add app.js dishes-ui.js error-feedback-bridge.js index.html catalog.js dish-local-images.js sw.js tests/product-images-no-atlas.test.mjs tests/startup-shell.test.mjs tests/error-center-loading.test.mjs tests/catalog-ordering.test.mjs tests/preference-popups.test.mjs
           git commit -m "v391: accélère les icônes produits"
           git push origin HEAD:tmp-icons-v391
