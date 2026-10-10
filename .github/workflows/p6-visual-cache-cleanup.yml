@@ -1,0 +1,97 @@
+name: P6 nettoyage cache visuel
+
+on:
+  push:
+    branches: [p6-visual-cache-cleanup]
+
+permissions:
+  contents: write
+
+jobs:
+  transform-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: p6-visual-cache-cleanup
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Appliquer P6
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path, value): Path(path).write_text(value, encoding='utf-8')
+
+          sw=read('sw.js')
+          sw=sw.replace("const CACHE='courses-app-v413-r1';","const CACHE='courses-app-v414-r1';")
+          for old,new in [
+              ('./catalog.js?v=413','./catalog.js?v=414'),
+              ('./bottom-nav-liquid.js?v=413','./bottom-nav-liquid.js?v=414'),
+              ('./app.js?v=413','./app.js?v=414'),
+              ('./dish-local-images.js?v=413','./dish-local-images.js?v=414'),
+          ]:
+              sw=sw.replace(old,new)
+          sw,count=re.subn(r"\nasync function migrateExistingVisuals\(\)\{.*?\n\}\n","\n",sw,count=1,flags=re.S)
+          if count!=1: raise SystemExit('migration visuelle introuvable')
+          old="    migrateExistingVisuals().then(seedCoreVisuals)"
+          if old not in sw: raise SystemExit('chaîne install visuelle introuvable')
+          sw=sw.replace(old,"    seedCoreVisuals()",1)
+          write('sw.js',sw)
+
+          index=read('index.html').replace('v413','v414')
+          write('index.html',index)
+
+          catalog=read('catalog.js')
+          old="./dish-local-images.js?v=413"
+          if old not in catalog: raise SystemExit('révision images catalogue introuvable')
+          write('catalog.js',catalog.replace(old,'./dish-local-images.js?v=414',1))
+
+          images=read('dish-local-images.js')
+          old="const APP_VERSION='v413';"
+          if old not in images: raise SystemExit('version images introuvable')
+          write('dish-local-images.js',images.replace(old,"const APP_VERSION='v414';",1))
+
+          version_test=read('tests/list-render-version.test.mjs').replace('v413','v414').replace('P4 publie la version globale v414','P6 publie la version globale v414')
+          write('tests/list-render-version.test.mjs',version_test)
+          write('tests/app-responsibility-extraction.test.mjs',read('tests/app-responsibility-extraction.test.mjs').replace('v413','v414'))
+
+          write('tests/visual-cache-cleanup.test.mjs',"""import test from 'node:test';
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+
+          const sw=fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8');
+
+          test('P6 conserve un cache visuel persistant sans remigration des anciens caches',()=>{
+            assert.match(sw,/const VISUAL_CACHE='courses-visuals-v2';/);
+            assert.doesNotMatch(sw,/function migrateExistingVisuals|migrateExistingVisuals\(/);
+            assert.match(sw,/caches\.keys\(\)[\s\S]*?key!==CACHE&&key!==VISUAL_CACHE&&key!==ERROR_INBOX_CACHE/);
+            assert.match(sw,/caches\.open\(VISUAL_CACHE\)/);
+          });
+
+          test('les visuels critiques sont toujours seedés et les items/plats restent persistants',()=>{
+            for(const asset of ['welcome-cart-transparent-v46.png','welcome-background-v40.webp','www/empty-list-premium-v4.webp'])assert.ok(sw.includes(asset),asset+' absent des visuels critiques');
+            assert.match(sw,/url\.pathname\.includes\('\/www\/Plats\/'\)/);
+            assert.match(sw,/url\.pathname\.includes\('\/www\/Items\/'\)/);
+            assert.match(sw,/caches\.open\(CACHE\)\.then\(cache=>cache\.addAll\(SHELL\)\),\s*seedCoreVisuals\(\)/s);
+          });
+          """.replace(/^          /gm,''))
+
+          Path('.github/workflows/p6-visual-cache-cleanup.yml').unlink()
+      - name: Valider le dépôt
+        run: bash scripts/validate_repo.sh
+      - name: Commit de l'arbre validé
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "v414: simplifie le cache visuel persistant"
+          git push origin HEAD:p6-visual-cache-cleanup
