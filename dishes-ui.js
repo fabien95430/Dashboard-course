@@ -810,6 +810,7 @@ function renderDishSheetIngredients(){
   dishSheetCount.textContent=count+' ingrédient'+(count>1?'s':'');
   dishConfirmButton.disabled=count===0||Boolean(busyDish);
   dishConfirmButton.querySelector('span').textContent=count?'Ajouter à ma liste':'Sélectionnez un ingrédient';
+  document.dispatchEvent(new CustomEvent('courses:dish-ingredients-rendered',{detail:{dish:currentDish.name}}));
 }
 async function confirmDishAdd(){
   if(!currentDish||busyDish||dishConfirmButton.disabled)return;

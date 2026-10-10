@@ -716,6 +716,9 @@ function productCard(product){
   productCardCache.set(key,card);
   return card;
 }
+function notifyProductsUpdated(){
+  document.dispatchEvent(new CustomEvent('courses:products-updated'));
+}
 function renderProducts(){
   const el=$('#products'),products=visibleProducts();
   if(!el)return;
@@ -726,6 +729,7 @@ function renderProducts(){
     empty.className='empty is-wide';
     empty.textContent='Aucun produit ne correspond à cette recherche.';
     el.replaceChildren(empty);
+    notifyProductsUpdated();
     return;
   }
   const fragment=document.createDocumentFragment();
@@ -735,12 +739,14 @@ function renderProducts(){
     fragment.appendChild(card);
   });
   el.replaceChildren(fragment);
+  notifyProductsUpdated();
 }
 function setProductQuantity(name,quantity){
   const key=norm(name);
   const card=[...document.querySelectorAll('#products .product')].find(entry=>norm(entry.dataset.name)===key);
   if(!card)return;
   updateProductCardQuantity(card,name,quantity);
+  notifyProductsUpdated();
 }
 const catalogQuantityQueue=new Map();
 function catalogQuantityForDisplay(name,confirmed=productQuantity(name)){
@@ -791,6 +797,9 @@ function emitListChangedIfNeeded(groups=activeGroups()){
   listChangeSignature=signature;
   document.dispatchEvent(new CustomEvent('courses:list-changed',{detail:{count:groups.length}}));
 }
+function notifyListRendered(){
+  document.dispatchEvent(new CustomEvent('courses:list-rendered'));
+}
 function syncProductSelection(){
   const groups=activeGroups();
   emitListChangedIfNeeded(groups);
@@ -798,8 +807,9 @@ function syncProductSelection(){
   const quantities=new Map(groups.map(group=>[norm(group.summary),group.count]));
   document.querySelectorAll('#products .product').forEach(card=>{
     const name=card.dataset.name||'';
-    setProductQuantity(name,catalogQuantityForDisplay(name,quantities.get(norm(name))||0));
+    updateProductCardQuantity(card,name,catalogQuantityForDisplay(name,quantities.get(norm(name))||0));
   });
+  notifyProductsUpdated();
 }
 function renderSelectionAndList(){
   syncProductSelection();
@@ -813,10 +823,11 @@ function renderList(){
   const el=$('#listItems');
   if(!el)return;
   const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
-  if(state.loading&&!groups.length){el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';return}
+  if(state.loading&&!groups.length){el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';notifyListRendered();return}
   if(!rows.length){
     const message=needle?'Aucun article trouvé.':(state.listCategoryFilter!=='Toutes'?'Aucun article dans cette catégorie.':(state.error?'Liste indisponible.':'La liste est vide.'));
     el.innerHTML='<div class="empty">'+message+'</div>';
+    notifyListRendered();
     return;
   }
   const showCategorySections=state.preferences.listSort==='category';
@@ -851,6 +862,7 @@ function renderList(){
     undoPurchase(button.dataset.name||'',button.closest('.list-row'));
   });
   bindListReorder(el);
+  notifyListRendered();
 }
 function listDomMatchesCurrentState(){
   const root=$('#listItems');

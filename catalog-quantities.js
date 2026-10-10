@@ -323,10 +323,10 @@ let list=null;
 let products=null;
 let shoppingList=null;
 let pending=false;
-let productObserver=null;
-let listObserver=null;
-let shoppingListObserver=null;
-let dialogObserver=null;
+let productFrame=0;
+let shoppingListFrame=0;
+let dishFrame=0;
+let eventsBound=false;
 const STORAGE_SERVINGS='courses-dish-servings-v1';
 const STORAGE_RECIPE_NEEDS='courses-dish-need-overrides-v2';
 const LEGACY_STORAGE_RECIPE_NEEDS='courses-dish-need-overrides-v1';
@@ -686,8 +686,31 @@ function decorateDishRows(){
     }
   });
 }
+function scheduleProductRefresh(){
+  if(productFrame)return;
+  productFrame=requestAnimationFrame(()=>{productFrame=0;decorateProducts()});
+}
+function scheduleShoppingListRefresh(){
+  if(shoppingListFrame)return;
+  shoppingListFrame=requestAnimationFrame(()=>{shoppingListFrame=0;decorateShoppingList()});
+}
 function scheduleDishRefresh(){
-  queueMicrotask(()=>requestAnimationFrame(decorateDishRows));
+  if(dishFrame)return;
+  queueMicrotask(()=>{
+    if(dishFrame)return;
+    dishFrame=requestAnimationFrame(()=>{dishFrame=0;decorateDishRows()});
+  });
+}
+function bindUiEvents(){
+  if(eventsBound)return;
+  eventsBound=true;
+  document.addEventListener('courses:products-updated',scheduleProductRefresh);
+  document.addEventListener('courses:list-rendered',scheduleShoppingListRefresh);
+  document.addEventListener('courses:list-changed',()=>{
+    scheduleShoppingListRefresh();
+    scheduleDishRefresh();
+  });
+  document.addEventListener('courses:dish-ingredients-rendered',scheduleDishRefresh);
 }
 function setServings(value){
   const input=dialog?.querySelector('.dish-servings-value');
@@ -785,22 +808,7 @@ function bind(){
   decorateProducts();
   decorateShoppingList();
   decorateDishRows();
-
-  productObserver?.disconnect();
-  productObserver=new MutationObserver(()=>requestAnimationFrame(decorateProducts));
-  productObserver.observe(products,{childList:true,subtree:true,attributes:true,attributeFilter:['data-quantity']});
-
-  listObserver?.disconnect();
-  listObserver=new MutationObserver(scheduleDishRefresh);
-  listObserver.observe(list,{childList:true});
-
-  shoppingListObserver?.disconnect();
-  shoppingListObserver=new MutationObserver(()=>requestAnimationFrame(decorateShoppingList));
-  shoppingListObserver.observe(shoppingList,{childList:true,subtree:true});
-
-  dialogObserver?.disconnect();
-  dialogObserver=new MutationObserver(scheduleDishRefresh);
-  dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open']});
+  bindUiEvents();
 
   document.dispatchEvent(new CustomEvent('courses:quantities-ready'));
   return true;
