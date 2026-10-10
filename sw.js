@@ -1,4 +1,4 @@
-const CACHE='courses-app-v418-r1';
+const CACHE='courses-app-v419-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -25,8 +25,8 @@ const SHELL=[
   './dishes-ui.js?v=408',
   './catalog-quantities.js?v=408',
   './repurchase-soon.js?v=410',
-  './dish-local-images.js?v=418',
-  './app-ui.js?v=418',
+  './dish-local-images.js?v=419',
+  './app-ui.js?v=419',
   './runtime-features.js?v=416',
   './missing-products-fixes.js?v=416',
   './missing-products-popup-ui.js?v=410',
