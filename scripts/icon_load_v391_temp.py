@@ -34,7 +34,7 @@ text = read(path)
 text = once(
     text,
     "const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';",
-    "const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';\nconst ingredientImageSource=name=>'./www/Items/'+normalize(name).replace(/\\s+/g,'-')+'.webp';",
+    "const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';\nconst ingredientImageSource=name=>'./www/Items/'+normalize(name).replace(/\s+/g,'-')+'.webp';",
     'ingredient image source',
 )
 text = once(text, "const ingredientThumbCache=new Map();\n", '', 'ingredient thumb cache')
@@ -157,7 +157,9 @@ text = read(path).replace('v383', 'v391').replace('v=383', 'v=391')
 write(path, text)
 
 path = 'tests/error-center-loading.test.mjs'
-text = read(path).replace('error-feedback-bridge\\.js\\?v=390', 'error-feedback-bridge\\.js\\?v=391')
+text = read(path)
+text = text.replace('error-feedback-bridge\\.js\\?v=390', 'error-feedback-bridge\\.js\\?v=391')
+text = text.replace('error-feedback-bridge.js?v=390', 'error-feedback-bridge.js?v=391')
 write(path, text)
 
 path = 'tests/catalog-ordering.test.mjs'
