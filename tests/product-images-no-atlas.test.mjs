@@ -21,7 +21,7 @@ test('chaque produit du catalogue dispose de son WebP unitaire canonique',()=>{
 test('Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel',()=>{
   const app=read('app.js');
   const dishes=read('dishes-ui.js');
-  assert.ok(app.includes(`loading="eager" fetchpriority="'+(compact?'high':'auto')+'"`));
+  assert.ok(app.includes(`loading="'+(compact?'eager':'lazy')+'" fetchpriority="'+(compact?'high':'auto')+'"`));
   assert.ok(dishes.includes("const ingredientImageSource=name=>'./www/Items/'"));
   assert.ok(dishes.includes("+'.webp';"));
   assert.ok(dishes.includes('loading="eager" fetchpriority="high"'));

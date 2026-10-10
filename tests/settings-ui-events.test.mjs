@@ -13,14 +13,16 @@ test('les portions de préférence passent par le propriétaire des quantités',
   assert.match(quantities,/new CustomEvent\('courses:quantities-ready'\)/);
 });
 
-test('l entrée Catalogue repose sur des événements propriétaires et non sur le DOM observé',()=>{
+test('l entrée Catalogue a un propriétaire unique et reste événementielle',()=>{
   const app=read('app.js');
   const dishes=read('dishes-ui.js');
   const settings=read('settings-ui.js');
   assert.match(app,/new CustomEvent\('courses:view-changed',\{detail:\{view:state\.view\}\}\)/);
   assert.match(dishes,/new CustomEvent\('courses:catalog-mode-ready',\{detail:\{mode\}\}\)/);
-  assert.match(settings,/document\.addEventListener\('courses:view-changed',sync\)/);
-  assert.match(settings,/document\.addEventListener\('courses:catalog-mode-ready',sync\)/);
+  assert.match(dishes,/document\.addEventListener\('courses:view-changed',event=>\{/);
+  assert.match(dishes,/view==='catalog'&&mode!=='products'/);
+  assert.match(dishes,/setMode\('products'\)/);
+  assert.doesNotMatch(settings,/courses:catalog-mode-ready|applyPreferredCatalogMode|bindCatalogEntry/);
   assert.doesNotMatch(settings,/new MutationObserver/);
   assert.doesNotMatch(settings,/observer\.observe\(document\.body/);
 });

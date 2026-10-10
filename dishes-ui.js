@@ -96,7 +96,6 @@ const DISHES=Object.freeze([
 ]);
 
 const FILTERS=['Tous','Favoris','Dessert','Enfants','Pâtes','Poissons','Poulet','Rapides','Végé','Viandes'];
-const STORAGE_MODE='courses-catalog-mode-v1';
 const STORAGE_FAVORITES='courses-dish-favorites-v1';
 const STORAGE_CUSTOMIZATIONS='courses-dish-customizations-v1';
 const RECIPE_CUSTOMIZATION_SERVINGS=2;
@@ -113,7 +112,7 @@ const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normal
 const ingredientImageSource=name=>'./www/Items/'+dishSlug(name)+'.webp';
 const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';
 
-let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';
+let mode='products';
 let filter='Tous';
 let favorites=readFavorites();
 let recipeCustomizations={};
@@ -288,9 +287,12 @@ function buildUi(){
   searchInput.addEventListener('input',()=>{if(mode==='dishes'&&!drivingCatalog)renderDishes()});
   window.addEventListener('resize',()=>requestAnimationFrame(()=>syncModeLens(false)),{passive:true});
   document.querySelector('.tab[data-view="catalog"]')?.addEventListener('click',()=>requestAnimationFrame(()=>syncModeLens(false)));
+  document.addEventListener('courses:view-changed',event=>{
+    if(event.detail?.view==='catalog'&&mode!=='products')setMode('products');
+  });
 
   validateDishes();
-  setMode(mode,true);
+  setMode('products',true);
   document.dispatchEvent(new CustomEvent('courses:catalog-mode-ready',{detail:{mode}}));
   return true;
 }
@@ -652,7 +654,6 @@ function validateDishes(){
 function setMode(next,initial=false){
   if(next!=='products'&&next!=='dishes')return;
   mode=next;
-  localStorage.setItem(STORAGE_MODE,mode);
   filter='Tous';
   if(!initial){
     drivingCatalog=true;
