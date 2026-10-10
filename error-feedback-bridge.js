@@ -57,11 +57,11 @@ function installProductImageFirstPaintStyles(){
   const style=document.createElement('style');
   style.id='courses-product-image-first-paint';
   style.textContent=`
-    .premium-sprite.is-single-product-image{
+    #listItems .premium-sprite.is-single-product-image{
       -webkit-clip-path:none!important;
       clip-path:none!important;
     }
-    .premium-sprite.is-single-product-image>img{
+    #listItems .premium-sprite.is-single-product-image>img{
       top:11%!important;
       left:11%!important;
       width:78%!important;
@@ -73,7 +73,7 @@ function installProductImageFirstPaintStyles(){
       transform:translate(var(--single-product-shift-x,0%),calc(4px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
       transform-origin:center!important;
     }
-    .premium-sprite.is-single-product-image.is-compact>img{
+    #listItems .premium-sprite.is-single-product-image.is-compact>img{
       transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
     }
   `;
