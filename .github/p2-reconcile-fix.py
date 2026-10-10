@@ -21,10 +21,10 @@ replace_once('app.js',
 """function reconcileListChildren(root,nodes){
   const wanted=new Set(nodes);
   [...root.children].forEach(child=>{if(!wanted.has(child))child.remove()});
-  let cursor=root.firstChild||null;
+  let cursor=root.children[0]||null;
   nodes.forEach(node=>{
     if(node===cursor){
-      cursor=cursor.nextSibling;
+      cursor=cursor.nextSibling||null;
       return;
     }
     root.insertBefore(node,cursor);
@@ -43,12 +43,5 @@ replace_once('tests/list-render-reuse.test.mjs',
     return index>=0?(this.parentNode.children[index+1]||null):null;
   }
   remove(){""")
-
-replace_once('tests/list-render-reuse.test.mjs',
-"""class FakeRoot{
-  constructor(nodes=[]){""",
-"""class FakeRoot{
-  get firstChild(){return this.children[0]||null}
-  constructor(nodes=[]){""")
 
 print('P2 reconciliation fix applied')
