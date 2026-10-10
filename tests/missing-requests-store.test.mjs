@@ -76,8 +76,10 @@ test('les modules actifs consomment le store sans dupliquer les clés métier',(
 test('le service partagé est chargé avant app.js et précaché',()=>{
   const index=read('index.html'),sw=read('sw.js');
   const storeIndex=index.indexOf('./missing-requests-store.js?v=399');
-  const appIndex=index.indexOf('./app.js?v=399');
-  assert.ok(storeIndex>=0&&appIndex>storeIndex);
+  const appAsset=index.match(/\.\/app\.js\?v=\d+/)?.[0]||'';
+  const appIndex=index.indexOf(appAsset);
+  assert.ok(appAsset&&storeIndex>=0&&appIndex>storeIndex);
+  assert.ok(sw.includes(appAsset));
   assert.match(sw,/\.\/missing-requests-store\.js\?v=399/);
   assert.match(source,/Object\.defineProperty\(window,'COURSES_MISSING_REQUESTS',[\s\S]*?configurable:false,[\s\S]*?enumerable:false,[\s\S]*?writable:false/);
 });

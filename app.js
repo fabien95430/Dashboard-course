@@ -784,9 +784,18 @@ async function flushCatalogQuantityQueue(key,task){
     }
   }
 }
+let listChangeSignature=null;
+function emitListChangedIfNeeded(groups=activeGroups()){
+  const signature=groups.map(group=>norm(group.summary)+'\u0000'+group.count).sort().join('\u0001');
+  if(signature===listChangeSignature)return;
+  listChangeSignature=signature;
+  document.dispatchEvent(new CustomEvent('courses:list-changed',{detail:{count:groups.length}}));
+}
 function syncProductSelection(){
+  const groups=activeGroups();
+  emitListChangedIfNeeded(groups);
   if(state.preferences.hideAdded){renderProducts();return}
-  const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
+  const quantities=new Map(groups.map(group=>[norm(group.summary),group.count]));
   document.querySelectorAll('#products .product').forEach(card=>{
     const name=card.dataset.name||'';
     setProductQuantity(name,catalogQuantityForDisplay(name,quantities.get(norm(name))||0));
@@ -798,6 +807,7 @@ function renderSelectionAndList(){
 }
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery);
+  emitListChangedIfNeeded(groups);
   const rows=sortedGroups(visibleListGroups(groups));
   const canReorder=rows.length>1;
   const el=$('#listItems');

@@ -50,7 +50,7 @@
   const loadRepurchaseSoon=()=>{
     if(document.querySelector('script[data-repurchase-soon]')){loadQuantities();return}
     const script=document.createElement('script');
-    script.src='./repurchase-soon.js?v=363';
+    script.src='./repurchase-soon.js?v=405';
     script.async=false;
     script.dataset.repurchaseSoon='script';
     script.addEventListener('load',loadQuantities,{once:true});
@@ -77,7 +77,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadAppUi();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=404';
+    images.src='./dish-local-images.js?v=405';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadAppUi,{once:true});

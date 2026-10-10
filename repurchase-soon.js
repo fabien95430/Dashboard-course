@@ -13,7 +13,6 @@ Object.entries(CATALOG.groups).forEach(([category,subs])=>Object.entries(subs||{
 }));
 
 let dialog=null;
-let listObserver=null;
 let appObserver=null;
 let refreshFrame=0;
 let booted=false;
@@ -252,11 +251,7 @@ function openDialog(){
 }
 
 function bindEvents(){
-  const list=document.getElementById('listItems');
-  if(list&&!listObserver){
-    listObserver=new MutationObserver(()=>setTimeout(()=>refresh(true),0));
-    listObserver.observe(list,{childList:true,subtree:true,characterData:true});
-  }
+  document.addEventListener('courses:list-changed',()=>refresh(true));
   const app=document.getElementById('app');
   if(app&&!appObserver){
     appObserver=new MutationObserver(()=>{
