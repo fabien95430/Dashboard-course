@@ -31,8 +31,17 @@ write(path,text[:start]+replacement)
 
 path='tests/product-images-no-atlas.test.mjs'
 text=read(path)
-old="  assert.ok(dishes.includes(\"const ingredientImageSource=name=>'./www/Items/'+normalize(name).replace(/\\\\s+/g,'-')+'.webp';\"));"
-new="  assert.ok(dishes.includes(\"const ingredientImageSource=name=>'./www/Items/'\"));\n  assert.ok(dishes.includes(\"+'.webp';\"));"
-if old not in text:
-    raise SystemExit('ingredient image assertion not found')
-write(path,text.replace(old,new,1))
+start=text.index("test('Ma liste et la fiche plat demandent directement leurs WebP")
+replacement="""test('Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel',()=>{
+  const app=read('app.js');
+  const dishes=read('dishes-ui.js');
+  const bridge=read('error-feedback-bridge.js');
+  assert.ok(app.includes(`loading=\"eager\" fetchpriority=\"'+(compact?'high':'auto')+'\"`));
+  assert.ok(dishes.includes("const ingredientImageSource=name=>'./www/Items/'"));
+  assert.ok(dishes.includes("+'.webp';"));
+  assert.ok(dishes.includes('loading=\"eager\" fetchpriority=\"high\"'));
+  assert.doesNotMatch(dishes,/ingredientThumbCache|ingredientThumbRequest|ingredientThumbUserQuery|primeDishIngredientThumbs|setHiddenCatalogQuery|nextPaint\\(\\)/);
+  assert.doesNotMatch(bridge,/forceListImagesEager|startListImageWarmup/);
+});
+"""
+write(path,text[:start]+replacement)
