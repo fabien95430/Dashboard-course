@@ -301,6 +301,7 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
 
     catalog_text = re.sub(r"(dishes-ui\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
     catalog_text = re.sub(r"(dish-local-images\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
+    catalog_text = re.sub(r"(app-ui\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
     local_text = re.sub(r"const APP_VERSION='v\d+'", f"const APP_VERSION='v{new_version}'", local_text, count=1)
     sw_text, count = re.subn(r"const CACHE='courses-app-v\d+-r\d+'", f"const CACHE='courses-app-v{new_version}-r1'", sw_text, count=1)
     if count != 1:
@@ -309,6 +310,7 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
         f"./catalog.js?v={new_version}",
         f"./dishes-ui.js?v={new_version}",
         f"./dish-local-images.js?v={new_version}",
+        f"./app-ui.js?v={new_version}",
     ])
     index_text, count = re.subn(
         r'(<span class="page-version">)v\d+(</span>)',

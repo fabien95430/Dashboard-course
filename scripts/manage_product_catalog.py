@@ -191,6 +191,12 @@ def main() -> None:
         catalog_text,
         count=1,
     )
+    catalog_text = re.sub(
+        r"(app-ui\.js\?v=)\d+",
+        rf"\g<1>{new_version}",
+        catalog_text,
+        count=1,
+    )
     local_text, count = re.subn(
         r"const APP_VERSION='v\d+'",
         f"const APP_VERSION='v{new_version}'",
@@ -199,12 +205,6 @@ def main() -> None:
     )
     if count != 1:
         fail('Version globale introuvable dans dish-local-images.js')
-    local_text = re.sub(
-        r"(purchase-intelligence\.js\?v=)\d+",
-        rf"\g<1>{new_version}",
-        local_text,
-        count=1,
-    )
     sw_text, count = re.subn(
         r"const CACHE='courses-app-v\d+-r\d+'",
         f"const CACHE='courses-app-v{new_version}-r1'",
@@ -215,10 +215,9 @@ def main() -> None:
         fail('Version de cache introuvable dans sw.js')
     sw_text = ensure_shell_assets(sw_text, [
         f'./catalog.js?v={new_version}',
-        f'./app.js?v={new_version}',
         f'./catalog-quantities.js?v={new_version}',
         f'./dish-local-images.js?v={new_version}',
-        f'./purchase-intelligence.js?v={new_version}',
+        f'./app-ui.js?v={new_version}',
     ])
 
     index_text, count = re.subn(
@@ -230,12 +229,6 @@ def main() -> None:
         fail('Badges de version visibles introuvables dans index.html')
     index_text = re.sub(
         r'(catalog\.js\?v=)\d+',
-        rf'\g<1>{new_version}',
-        index_text,
-        count=1,
-    )
-    index_text = re.sub(
-        r'(app\.js\?v=)\d+',
         rf'\g<1>{new_version}',
         index_text,
         count=1,

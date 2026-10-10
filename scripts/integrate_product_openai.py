@@ -307,6 +307,7 @@ def integrate_files(name: str, category: str, subgroup: str, display_mode: str, 
 
     catalog_text=re.sub(r"(catalog-quantities\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
     catalog_text=re.sub(r"(dish-local-images\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
+    catalog_text=re.sub(r"(app-ui\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
     (ROOT / "catalog.js").write_text(catalog_text,encoding="utf-8")
 
     local_text,count=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='v{new_version}'",local_text,count=1)
@@ -319,6 +320,7 @@ def integrate_files(name: str, category: str, subgroup: str, display_mode: str, 
         f"./catalog.js?v={new_version}",
         f"./catalog-quantities.js?v={new_version}",
         f"./dish-local-images.js?v={new_version}",
+        f"./app-ui.js?v={new_version}",
     ])
     index_text,count=re.subn(r'(<span class="page-version">)v\d+(</span>)',rf'\g<1>v{new_version}\g<2>',index_text)
     if count!=3:
