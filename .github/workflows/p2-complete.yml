@@ -17,8 +17,10 @@ jobs:
         with:
           ref: automation/p2-complete
           fetch-depth: 1
-      - name: Preserve validation patch
-        run: cp .github/p2-complete-patch.py /tmp/p2-complete-patch.py
+      - name: Preserve validation patches
+        run: |
+          cp .github/p2-complete-patch.py /tmp/p2-complete-patch.py
+          cp .github/p2-reconcile-fix.py /tmp/p2-reconcile-fix.py
       - name: Checkout source of truth
         uses: actions/checkout@v4
         with:
@@ -28,7 +30,9 @@ jobs:
         with:
           node-version: 24
       - name: Apply complete P2 patch
-        run: python /tmp/p2-complete-patch.py
+        run: |
+          python /tmp/p2-complete-patch.py
+          python /tmp/p2-reconcile-fix.py
       - name: Validate repository
         run: bash scripts/validate_repo.sh
       - name: Publish validated result branch
