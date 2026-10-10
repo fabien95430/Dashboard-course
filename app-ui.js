@@ -282,7 +282,8 @@ function syncListEmptyState(root){
     return;
   }
   const nativeEmpty=Boolean(empty&&empty.children.length===0&&empty.textContent.trim()==='La liste est vide.');
-  if(nativeEmpty&&retainedListEmptyState){
+  const syncingEmpty=Boolean(empty&&empty.querySelector?.('.spinner')&&empty.textContent.trim()==='Synchronisation…');
+  if((nativeEmpty||syncingEmpty)&&retainedListEmptyState){
     root.replaceChildren(retainedListEmptyState);
     root.classList.add('is-list-home-empty');
     return;
