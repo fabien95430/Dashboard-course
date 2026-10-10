@@ -6,7 +6,8 @@ const PRODUCT_NAMES=new Set(Object.values(window.COURSES_CATALOG?.groups||{}).fl
 ));
 let products=null;
 let listItems=null;
-let observer=null;
+let refreshFrame=0;
+let eventsBound=false;
 const visualScaleCache=new Map();
 
 const slugify=value=>String(value||'')
@@ -154,28 +155,30 @@ function decorateAll(){
   decorateProducts();
   decorateList();
 }
+function scheduleDecorateAll(){
+  if(refreshFrame)return;
+  refreshFrame=requestAnimationFrame(()=>{
+    refreshFrame=0;
+    decorateAll();
+  });
+}
+function bindEvents(){
+  if(eventsBound)return;
+  eventsBound=true;
+  document.addEventListener('courses:products-updated',scheduleDecorateAll);
+  document.addEventListener('courses:list-rendered',scheduleDecorateAll);
+}
 function bind(){
   products=document.getElementById('products');
   listItems=document.getElementById('listItems');
   if(!products||!listItems)return false;
   ensureStyles();
+  bindEvents();
   decorateAll();
-  observer?.disconnect();
-  observer=new MutationObserver(mutations=>{
-    if(!mutations.some(mutation=>mutation.addedNodes.length))return;
-    requestAnimationFrame(decorateAll);
-  });
-  observer.observe(products,{childList:true,subtree:true});
-  observer.observe(listItems,{childList:true,subtree:true});
   return true;
 }
 function init(){
-  if(bind())return;
-  const bootstrap=new MutationObserver(()=>{
-    if(bind())bootstrap.disconnect();
-  });
-  bootstrap.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(()=>bootstrap.disconnect(),10000);
+  bind();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
 else init();

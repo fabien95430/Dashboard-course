@@ -8,14 +8,9 @@ let trustedListNames=null;
 let trustedListQuantities=null;
 let pending=null;
 let pendingTimer=0;
-let gridObserver=null;
-let listObserver=null;
-let toastObserver=null;
-let dialogObserver=null;
-let observedGrid=null;
-let observedList=null;
-let observedToast=null;
-let observedDialog=null;
+let cardFrame=0;
+let reconcileFrame=0;
+let guardFrame=0;
 
 function readEntries(){
   try{
@@ -243,14 +238,17 @@ function syncDialogGuard(){
   if(count)count.textContent=selected+' ingrédient'+(selected>1?'s':'');
   const button=dialog.querySelector('.dish-sheet-add');
   const label=button?.querySelector('span');
-  if(!button||!label||button.classList.contains('is-busy'))return;
+  const publish=()=>document.dispatchEvent(new CustomEvent('courses:dish-availability-updated',{detail:{dish:dialog.querySelector('.dish-sheet-head h2')?.textContent?.trim()||''}}));
+  if(!button||!label||button.classList.contains('is-busy')){publish();return}
   if(!available){
     button.disabled=true;
     label.textContent='Tout est déjà dans Ma liste';
+    publish();
     return;
   }
   button.disabled=selected===0;
   label.textContent=selected?'Ajouter à ma liste':'Sélectionnez un ingrédient';
+  publish();
 }
 function reconcileList(){
   const state=readListState();
@@ -324,51 +322,33 @@ function consumeDishAddSettled(event){
     :(pending?.name===name?pending.ingredients:[]);
   commitDishEntry(name,ingredients);
 }
-function consumeToast(){
-  if(!pending||!observedToast?.classList.contains('is-visible'))return;
-  const message=String(observedToast.textContent||'').trim();
-  if(!message)return;
-  if(message.startsWith('Ajout partiel')){
-    clearPending();
-    return;
-  }
-  const success=message==='Les ingrédients sélectionnés sont déjà dans Ma liste'||message==='Les quantités nécessaires sont déjà dans Ma liste'||message.startsWith(pending.name+' · ');
-  if(!success)return;
-  commitDishEntry(pending.name,pending.ingredients);
+function scheduleCards(){
+  if(cardFrame)return;
+  cardFrame=requestAnimationFrame(()=>{cardFrame=0;syncCards()});
 }
-function bindObservers(){
+function scheduleReconcileList(){
+  if(reconcileFrame)return;
+  reconcileFrame=requestAnimationFrame(()=>{reconcileFrame=0;reconcileList()});
+}
+function scheduleDialogGuard(){
+  if(guardFrame)return;
+  guardFrame=requestAnimationFrame(()=>{guardFrame=0;syncDialogGuard()});
+}
+function bindMarkerEvents(){
   ensureStyle();
-  const grid=document.getElementById('dishes');
-  if(grid&&grid!==observedGrid){
-    gridObserver?.disconnect();
-    observedGrid=grid;
-    gridObserver=new MutationObserver(syncCards);
-    gridObserver.observe(grid,{childList:true,subtree:true});
-    syncCards();
-  }
-  const list=document.getElementById('listItems');
-  if(list&&list!==observedList){
-    listObserver?.disconnect();
-    observedList=list;
-    listObserver=new MutationObserver(()=>requestAnimationFrame(reconcileList));
-    listObserver.observe(list,{childList:true,subtree:true,attributes:true,attributeFilter:['class','data-name']});
-    requestAnimationFrame(reconcileList);
-  }
-  const toast=document.getElementById('toast');
-  if(toast&&toast!==observedToast){
-    toastObserver?.disconnect();
-    observedToast=toast;
-    toastObserver=new MutationObserver(consumeToast);
-    toastObserver.observe(toast,{attributes:true,childList:true,characterData:true,subtree:true,attributeFilter:['class']});
-  }
-  const dialog=document.getElementById('dishDialog');
-  if(dialog&&dialog!==observedDialog){
-    dialogObserver?.disconnect();
-    observedDialog=dialog;
-    dialogObserver=new MutationObserver(()=>requestAnimationFrame(syncDialogGuard));
-    dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open','data-recipe-quantity'],childList:true,subtree:true});
-    requestAnimationFrame(syncDialogGuard);
-  }
+  document.addEventListener('courses:dishes-rendered',scheduleCards);
+  document.addEventListener('courses:list-rendered',scheduleReconcileList);
+  document.addEventListener('courses:list-changed',scheduleReconcileList);
+  document.addEventListener('courses:dish-quantities-updated',scheduleDialogGuard);
+  document.addEventListener('courses:dish-sheet-opened',scheduleDialogGuard);
+  document.addEventListener('courses:quantities-ready',()=>{
+    scheduleReconcileList();
+    scheduleDialogGuard();
+  });
+  document.addEventListener('courses:catalog-mode-ready',scheduleCards);
+  scheduleCards();
+  scheduleReconcileList();
+  scheduleDialogGuard();
 }
 
 document.addEventListener('courses:dish-add-settled',consumeDishAddSettled);
@@ -388,16 +368,8 @@ document.addEventListener('click',event=>{
     }
     trackPendingFromButton(addButton);
   }
-  if(event.target.closest?.('#listFilterMenu [data-list-category]'))requestAnimationFrame(()=>requestAnimationFrame(reconcileList));
 },true);
-document.addEventListener('input',event=>{
-  if(event.target?.id==='listSearch')requestAnimationFrame(reconcileList);
-},true);
-
-const bootstrapObserver=new MutationObserver(bindObservers);
-bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindObservers,{once:true});
-else bindObservers();
+bindMarkerEvents();
 })();
 
 (() => {
@@ -589,8 +561,11 @@ function bindConfirmationFeedback(){
   return true;
 }
 
-const confirmationObserver=new MutationObserver(()=>{if(bindConfirmationFeedback())confirmationObserver.disconnect()});
-if(!bindConfirmationFeedback())confirmationObserver.observe(document.documentElement,{childList:true,subtree:true});
+function scheduleConfirmationBinding(){requestAnimationFrame(bindConfirmationFeedback)}
+document.addEventListener('courses:quantities-ready',scheduleConfirmationBinding);
+document.addEventListener('courses:catalog-mode-ready',scheduleConfirmationBinding);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleConfirmationBinding,{once:true});
+else scheduleConfirmationBinding();
 document.addEventListener('keydown',event=>{
   if(!confirmationBusy||!['Enter',' '].includes(event.key))return;
   if(!event.target?.closest?.('#dishes .dish-card'))return;

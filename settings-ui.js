@@ -186,7 +186,7 @@ document.head.appendChild(script);
 'use strict';
 if(document.querySelector('script[data-dish-added-marker]'))return;
 const script=document.createElement('script');
-script.src='./dish-added-marker.js?v=1';
+script.src='./dish-added-marker.js?v=408';
 script.defer=true;
 script.dataset.dishAddedMarker='1';
 document.head.appendChild(script);

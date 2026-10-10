@@ -685,6 +685,7 @@ function decorateDishRows(){
       }
     }
   });
+  document.dispatchEvent(new CustomEvent('courses:dish-quantities-updated',{detail:{dish:currentDish()}}));
 }
 function scheduleProductRefresh(){
   if(productFrame)return;

@@ -115,7 +115,7 @@ test('Ma liste reprend la même image unitaire que le Catalogue sans atlas de se
   const app=read('app.js');
   assert.match(images,/listItems=document\.getElementById\('listItems'\)/);
   assert.match(images,/listItems\?\.querySelectorAll\('\.list-row\[data-name\]'\)\.forEach\(decorateCard\)/);
-  assert.match(images,/observer\.observe\(listItems,\{childList:true,subtree:true\}\)/);
+  assert.match(images,/document\.addEventListener\('courses:list-rendered',scheduleDecorateAll\)/);
   assert.doesNotMatch(images,/restoreAtlas|singleProductAtlasSource/);
   assert.match(app,/const productImageSource=name=>'\.\/www\/Items\/'\+productSlug\(name\)\+'\.webp'/);
   assert.match(app,/bindProductImageFallbacks\(el\)/);

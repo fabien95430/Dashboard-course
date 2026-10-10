@@ -32,7 +32,7 @@ test('le vert et le partiel dépendent uniquement de la liste réellement connue
 });
 
 const settleStart=source.indexOf('function commitDishEntry(name,ingredients){');
-const settleEnd=source.indexOf('function consumeToast(){',settleStart);
+const settleEnd=source.indexOf('function scheduleCards(){',settleStart);
 assert.ok(settleStart>=0&&settleEnd>settleStart,'confirmation directe introuvable');
 
 function settle(detail){

@@ -741,6 +741,9 @@ function dishCard(dish){
   syncDishFavorite(card,dish.name);
   return card;
 }
+function notifyDishesRendered(count){
+  document.dispatchEvent(new CustomEvent('courses:dishes-rendered',{detail:{count}}));
+}
 function renderDishes(){
   if(!dishesGrid||mode!=='dishes')return;
   const dishes=visibleDishes();
@@ -750,11 +753,13 @@ function renderDishes(){
     empty.className='dish-empty';
     empty.textContent=filter==='Favoris'?'Aucun plat favori pour le moment.':'Aucun plat trouvé.';
     dishesGrid.replaceChildren(empty);
+    notifyDishesRendered(0);
     return;
   }
   const fragment=document.createDocumentFragment();
   dishes.forEach(dish=>fragment.appendChild(dishCard(dish)));
   dishesGrid.replaceChildren(fragment);
+  notifyDishesRendered(dishes.length);
 }
 function toggleFavorite(name,fromSheet=false){
   if(favorites.has(name))favorites.delete(name);else favorites.add(name);
@@ -775,6 +780,7 @@ function openDishSheet(dish){
   if(typeof dishDialog.showModal==='function')dishDialog.showModal();
   else dishDialog.setAttribute('open','');
   document.documentElement.classList.add('dish-sheet-open');
+  document.dispatchEvent(new CustomEvent('courses:dish-sheet-opened',{detail:{dish:dish.name}}));
 }
 function closeDishSheet(){
   if(!dishDialog||busyDish)return;
