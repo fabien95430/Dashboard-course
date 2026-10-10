@@ -139,6 +139,26 @@ function integrationKey(payload){
   const name=scrub(payload?.itemName||payload?.name||'',120);
   return 'integration:'+type.toLowerCase()+':'+normalize(name);
 }
+function resolveIntegrationItem(itemType,itemName){
+  const wantedType=String(itemType||'').toLowerCase()==='product'?'product':'dish';
+  const wantedName=normalize(itemName);
+  if(!wantedName)return false;
+  const entries=readEntries();
+  const now=Date.now();
+  let changed=false;
+  entries.forEach(entry=>{
+    if(entry.resolved||!String(entry.key||'').startsWith('integration:'))return;
+    const meta=entry.meta&&typeof entry.meta==='object'?entry.meta:{};
+    const metaType=String(meta.itemType||'').toLowerCase();
+    const metaName=normalize(meta.itemName||'');
+    if(metaType!==wantedType||metaName!==wantedName)return;
+    entry.resolved=true;
+    entry.resolvedAt=now;
+    changed=true;
+  });
+  if(changed)writeEntries(entries);
+  return changed;
+}
 function handleIntegrationSignal(payload={}){
   const status=String(payload.status||'').toLowerCase();
   if(status!=='error'&&status!=='added')return;
@@ -148,6 +168,7 @@ function handleIntegrationSignal(payload={}){
   const key=integrationKey({itemType,itemName,requestId});
   if(status==='added'){
     resolve(key);
+    resolveIntegrationItem(itemType,itemName);
     if(!requestId)resolvePrefix('integration:'+itemType+':'+normalize(itemName));
     resolvePrefix('integration-local:');
     return;

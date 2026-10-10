@@ -13,20 +13,20 @@ test('le centre d erreurs reste chargé sans restaurer le shell de démarrage',(
   const sw=read('sw.js');
   const catalog=read('catalog.js');
   const localImages=read('dish-local-images.js');
-  assert.match(index,/catalog\.js\?v=394/);
-  assert.match(index,/error-center\.js\?v=394/);
+  assert.match(index,/catalog\.js\?v=395/);
+  assert.match(index,/error-center\.js\?v=395/);
   assert.match(index,/error-feedback-bridge\.js\?v=394/);
-  assert.ok(index.indexOf('error-center.js?v=394')<index.indexOf('error-feedback-bridge.js?v=394'));
+  assert.ok(index.indexOf('error-center.js?v=395')<index.indexOf('error-feedback-bridge.js?v=394'));
   assert.doesNotMatch(index,/startup\/app\.js/);
-  assert.match(catalog,/dish-local-images\.js\?v=394/);
-  assert.match(sw,/courses-app-v394-r1/);
+  assert.match(catalog,/dish-local-images\.js\?v=395/);
+  assert.match(sw,/courses-app-v395-r1/);
   assert.match(sw,/product-item-first-paint\.css\?v=1/);
-  assert.match(sw,/catalog\.js\?v=394/);
-  assert.match(sw,/dish-local-images\.js\?v=394/);
-  assert.match(sw,/error-center\.js\?v=394/);
+  assert.match(sw,/catalog\.js\?v=395/);
+  assert.match(sw,/dish-local-images\.js\?v=395/);
+  assert.match(sw,/error-center\.js\?v=395/);
   assert.match(sw,/error-feedback-bridge\.js\?v=394/);
-  assert.match(localImages,/const APP_VERSION='v394'/);
-  assert.equal((index.match(/page-version">v394/g)||[]).length,3);
+  assert.match(localImages,/const APP_VERSION='v395'/);
+  assert.equal((index.match(/page-version">v395/g)||[]).length,3);
 });
 
 test('le clic Messages d erreur ouvre le centre même si le bouton est créé dynamiquement',()=>{
@@ -54,4 +54,10 @@ test('les anomalies transitoires se referment quand leur cause a disparu',()=>{
   assert.match(bridge,/resolvePrefix\?\.\('notifications:'\)/);
   assert.doesNotMatch(errorCenter,/setInterval\s*\(/);
   assert.doesNotMatch(bridge,/setInterval\s*\(/);
+});
+
+test('une intégration réussie résout les anciennes erreurs du même élément',()=>{
+  const errorCenter=read('error-center.js');
+  assert.match(errorCenter,/function resolveIntegrationItem\(itemType,itemName\)[\s\S]*?startsWith\('integration:'\)[\s\S]*?metaType!==wantedType\|\|metaName!==wantedName[\s\S]*?entry\.resolved=true/);
+  assert.match(errorCenter,/if\(status==='added'\)\{[\s\S]*?resolve\(key\);[\s\S]*?resolveIntegrationItem\(itemType,itemName\)/);
 });
