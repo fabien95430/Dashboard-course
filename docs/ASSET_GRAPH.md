@@ -22,16 +22,11 @@ Le cache applicatif `courses-app-vN-r1`, les trois badges visibles et `APP_VERSI
 
 Les visuels de plats et produits restent dans le cache visuel persistant séparé. Le nettoyage du `SHELL` ne doit pas réintroduire d’atlas ni déplacer les WebP unitaires de `www/Items/`.
 
-## Fichiers historiques hors graphe actif
+## Code historique supprimé
 
-Les fichiers suivants sont actuellement hors du graphe de chargement et hors du précache :
+L’étape 7 a supprimé les anciennes implémentations qui étaient déjà hors du graphe actif et hors du précache : `startup/app.js`, `missing-products-fixes-core.js`, `list-actions.js` et `list-swipe.js`. Les marqueurs techniques sans contenu `__noop__`, `__nope__` et `_noop2` ont également été retirés.
 
-- `startup/app.js`
-- `missing-products-fixes-core.js`
-- `list-actions.js`
-- `list-swipe.js`
-
-Ils sont seulement qualifiés comme candidats à un nettoyage ultérieur. Ils ne sont pas supprimés pendant l’étape 1 afin de séparer clairement le nettoyage du cache de la suppression de code historique.
+Le comportement correspondant reste porté uniquement par les modules actifs décrits ci-dessus ; aucun chemin de compatibilité historique n’est conservé.
 
 
 ## Demandes manquantes

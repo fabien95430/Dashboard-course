@@ -20,7 +20,10 @@ test('le nettoyage CSS conserve les safe areas iOS et le plein ecran PWA',()=>{
 test('la feuille nettoyee est chargee avec la version applicative courante',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
-  assert.match(index,/styles\.css\?v=401/);
-  assert.match(sw,/styles\.css\?v=401/);
-  assert.equal((index.match(/page-version">v401/g)||[]).length,3);
+  const localImages=read('dish-local-images.js');
+  const version=localImages.match(/const APP_VERSION='v(\d+)'/)?.[1]||'';
+  assert.match(version,/^\d+$/);
+  assert.match(index,new RegExp('styles\\.css\\?v='+version));
+  assert.match(sw,new RegExp('styles\\.css\\?v='+version));
+  assert.equal((index.match(new RegExp('page-version\">v'+version,'g'))||[]).length,3);
 });

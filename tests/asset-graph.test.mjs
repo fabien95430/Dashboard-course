@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import test from 'node:test';
 
 const root=new URL('../',import.meta.url);
@@ -46,12 +46,9 @@ test('tout le graphe JS CSS actif est précaché avec son URL exacte',()=>{
   assert.deepEqual(missing,[],'Ressources actives absentes du SHELL');
 });
 
-test('les anciens modules candidats au nettoyage restent hors du graphe actif',()=>{
-  const shell=shellAssets().map(assetPath);
-  const {visited}=runtimeAssets();
-  for(const file of ['startup/app.js','missing-products-fixes-core.js','list-actions.js','list-swipe.js']){
-    assert.equal(visited.has(file),false,file+' ne doit pas être chargé');
-    assert.equal(shell.includes('./'+file),false,file+' ne doit pas être précaché');
+test('les anciens modules et marqueurs techniques supprimés ne réapparaissent pas',()=>{
+  for(const file of ['startup/app.js','missing-products-fixes-core.js','list-actions.js','list-swipe.js','__noop__','__nope__','_noop2']){
+    assert.equal(existsSync(new URL(file,root)),false,file+' ne doit plus exister');
   }
 });
 

@@ -47,7 +47,7 @@ test('le client partagé respecte verrouillage, mode test et fermeture du socket
 });
 
 test('les consommateurs Home Assistant passent par le client partagé',()=>{
-  for(const file of ['missing-products-fixes.js','catalog-product-admin.js','missing-products-fixes-core.js','list-swipe.js']){
+  for(const file of ['missing-products-fixes.js','catalog-product-admin.js']){
     const source=read(file);
     assert.match(source,/window\.COURSES_HA_CLIENT/,file+' ne consomme pas le client partagé');
     assert.doesNotMatch(source,/\bhaSocket\b|\bhaSeq\b|\bhaPending\b/,file+' conserve un état WebSocket parallèle');
