@@ -4,7 +4,7 @@ Ce document décrit le chargement actif de l’application statique. Il ne rempl
 
 ## Chaîne de chargement
 
-`index.html` charge directement le shell principal : `styles.css`, `product-item-first-paint.css`, `catalog.js`, `app.js`, `settings-tab-badge.js`, `error-center.js` et `error-feedback-bridge.js`.
+`index.html` charge directement le shell principal : `styles.css`, `product-item-first-paint.css`, `catalog.js`, `preferences-service.js`, `missing-requests-store.js`, `app.js`, `settings-tab-badge.js`, `error-center.js` et `error-feedback-bridge.js`.
 
 `catalog.js` charge ensuite `dishes.css`, `catalog-liquid.css`, `dish-local-images.js`, `repurchase-soon.js`, `catalog-quantities.js`, `dishes-ui.js` puis `catalog-liquid.js`. `catalog-liquid.css` importe `dish-detail.css`.
 
@@ -32,3 +32,8 @@ Les fichiers suivants sont actuellement hors du graphe de chargement et hors du 
 - `list-swipe.js`
 
 Ils sont seulement qualifiés comme candidats à un nettoyage ultérieur. Ils ne sont pas supprimés pendant l’étape 1 afin de séparer clairement le nettoyage du cache de la suppression de code historique.
+
+
+## Demandes manquantes
+
+`missing-requests-store.js` est la source locale unique pour les produits manquants, les plats manquants, les plats déjà intégrés conservés dans le popup et les précisions de visuel produit. `app.js`, `missing-products-dishes.js` et `missing-products-fixes.js` consomment cette API sans relire directement ces clés `localStorage`.

@@ -1,53 +1,12 @@
 (() => {
 'use strict';
 
-const STORAGE_DISHES='courses-missing-dishes-v1';
-const STORAGE_ADDED_DISHES='courses-missing-dishes-added-v1';
-const STORAGE_PRODUCTS='courses-missing-products-v1';
-const STORAGE_PRODUCT_IMAGE_HINTS='courses-missing-product-image-hints-v1';
-const PRODUCT_IMAGE_HINT_MAX=140;
+const REQUESTS=window.COURSES_MISSING_REQUESTS;
+if(!REQUESTS)throw new Error('Demandes manquantes indisponibles');
+const PRODUCT_IMAGE_HINT_MAX=REQUESTS.productImageHintMax;
 const CHATGPT_URL='https://chatgpt.com/';
-const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const normalize=REQUESTS.normalize;
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-
-function sanitizeProductImageHint(value){
-  return String(value||'').trim().replace(/\s+/g,' ').slice(0,PRODUCT_IMAGE_HINT_MAX);
-}
-function readProductImageHints(){
-  try{
-    const saved=JSON.parse(localStorage.getItem(STORAGE_PRODUCT_IMAGE_HINTS)||'{}');
-    return saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:{};
-  }catch(_){
-    return {};
-  }
-}
-function saveProductImageHints(hints){
-  try{localStorage.setItem(STORAGE_PRODUCT_IMAGE_HINTS,JSON.stringify(hints))}catch(_){}
-}
-function productImageHint(name){
-  const key=normalize(name);
-  return key?sanitizeProductImageHint(readProductImageHints()[key]):'';
-}
-function setProductImageHint(name,value){
-  const key=normalize(name);
-  if(!key)return;
-  const hints=readProductImageHints();
-  const hint=sanitizeProductImageHint(value);
-  if(hint)hints[key]=hint;
-  else delete hints[key];
-  saveProductImageHints(hints);
-}
-function pruneProductImageHints(products){
-  const keep=new Set((products||[]).map(item=>normalize(item?.name)).filter(Boolean));
-  const hints=readProductImageHints();
-  let changed=false;
-  Object.keys(hints).forEach(key=>{
-    if(keep.has(key))return;
-    delete hints[key];
-    changed=true;
-  });
-  if(changed)saveProductImageHints(hints);
-}
 
 function catalogDishCategories(){
   const categories=[...document.querySelectorAll('.dish-filter[data-value]')]
@@ -61,84 +20,14 @@ function sanitizeDishCategory(value){
   const categories=catalogDishCategories();
   return !categories.length||categories.includes(category)?category:'';
 }
-function sanitizeDish(item,index=0){
-  const name=String(item?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
-  if(!name)return null;
-  const category=sanitizeDishCategory(item?.category);
-  const id=String(item?.id||('dish-'+index+'-'+normalize(name)));
-  return {id,name,category};
-}
 function readDishes(){
-  try{
-    const saved=JSON.parse(localStorage.getItem(STORAGE_DISHES)||'[]');
-    if(!Array.isArray(saved))return [];
-    return saved.slice(-100).map(sanitizeDish).filter(Boolean);
-  }catch(_){
-    return [];
-  }
-}
-function saveDishes(items){
-  try{localStorage.setItem(STORAGE_DISHES,JSON.stringify(items.slice(-100).map(sanitizeDish).filter(Boolean)))}catch(_){}
-  syncCombinedCount();
+  return REQUESTS.readDishes().map(item=>({...item,category:sanitizeDishCategory(item.category)}));
 }
 function readAddedDishes(){
-  try{
-    const saved=JSON.parse(localStorage.getItem(STORAGE_ADDED_DISHES)||'[]');
-    if(!Array.isArray(saved))return [];
-    return saved.slice(-50).map(sanitizeDish).filter(Boolean);
-  }catch(_){
-    return [];
-  }
+  return REQUESTS.readAddedDishes().map(item=>({...item,category:sanitizeDishCategory(item.category)}));
 }
-function saveAddedDishes(items){
-  try{localStorage.setItem(STORAGE_ADDED_DISHES,JSON.stringify(items.slice(-50).map(sanitizeDish).filter(Boolean)))}catch(_){}
-}
-function rememberAddedDish(item){
-  const added=readAddedDishes().filter(entry=>entry.id!==item.id&&normalize(entry.name)!==normalize(item.name));
-  added.push(item);
-  saveAddedDishes(added);
-}
-function forgetAddedDish(id){
-  const added=readAddedDishes();
-  const next=added.filter(entry=>entry.id!==id);
-  if(next.length!==added.length)saveAddedDishes(next);
-  return next.length!==added.length;
-}
-function sanitizeProduct(item,index=0){
-  const name=String(item?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
-  if(!name)return null;
-  return {
-    id:String(item?.id||('product-'+index+'-'+normalize(name))),
-    name,
-    category:String(item?.category||'').trim().slice(0,80),
-    imageHint:productImageHint(name)
-  };
-}
-function readProducts(){
-  try{
-    const saved=JSON.parse(localStorage.getItem(STORAGE_PRODUCTS)||'[]');
-    if(!Array.isArray(saved))return [];
-    return saved.slice(-100).map(sanitizeProduct).filter(Boolean);
-  }catch(_){
-    return [];
-  }
-}
-function randomId(){
-  if(globalThis.crypto?.getRandomValues){
-    const bytes=crypto.getRandomValues(new Uint8Array(8));
-    return Array.from(bytes,byte=>byte.toString(16).padStart(2,'0')).join('');
-  }
-  return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-}
-function productCount(){return readProducts().length}
-function pendingDishCount(){return readDishes().length}
-function syncCombinedCount(){
-  const source=document.getElementById('settingsMissingProductsCount');
-  if(!source)return;
-  const total=productCount()+pendingDishCount();
-  if(source.textContent!==String(total))source.textContent=String(total);
-  if(source.hidden!==(total===0))source.hidden=total===0;
-}
+const readProducts=()=>REQUESTS.readProducts();
+const productCount=()=>REQUESTS.counts().products;
 function appNotify(title,detail=''){
   const dialog=document.getElementById('missingProductsDialog');
   const toast=dialog?.open?document.getElementById('missingProductsFeedback'):document.getElementById('toast');
@@ -207,7 +96,7 @@ function launchChatGpt(prompt){
 }
 function buildProductPrompt(item){
   const category=item.category||'non précisée';
-  const imageHint=sanitizeProductImageHint(item.imageHint);
+  const imageHint=REQUESTS.productImageHint(item.name);
   return [
     'Tu travailles sur le projet Application Course.',
     '',
@@ -295,9 +184,6 @@ function initMissingProductsAndDishes(){
   const listHeading=dialog?.querySelector('.missing-products-list-heading strong');
   const listCount=document.getElementById('missingProductsListCount');
   if(!dialog||!settingsButton||!input||!addButton||!addRow||!categoryPanel||!categoryHeading||!categoryGrid||!productList||!listHeading||!listCount)return;
-
-  const countSource=document.getElementById('settingsMissingProductsCount');
-  if(countSource)new MutationObserver(()=>queueMicrotask(syncCombinedCount)).observe(countSource,{attributes:true,childList:true,characterData:true,subtree:true});
 
   const settingsCopy=settingsButton.querySelector('.settings-copy');
   if(settingsCopy){
@@ -466,40 +352,30 @@ function initMissingProductsAndDishes(){
     if(mode!=='products')return;
     const name=String(input.value||'').trim().replace(/\s+/g,' ').slice(0,80);
     if(!name)return;
-    setProductImageHint(name,imageHintInput.value);
+    REQUESTS.setProductImageHint(name,imageHintInput.value);
     queueMicrotask(()=>{
       if(!String(input.value||'').trim())imageHintInput.value='';
     });
   }
   function addDish(){
-    const name=String(input.value||'').trim().replace(/\s+/g,' ').slice(0,80);
-    if(!name){
-      input.focus();
-      return;
-    }
-    dishes=readDishes();
-    const alreadyAdded=readAddedDishes();
-    if([...dishes,...alreadyAdded].some(item=>normalize(item.name)===normalize(name)))return;
-    const item={id:randomId(),name,category:dishCategory};
-    dishes.push(item);
-    saveDishes(dishes);
-    input.value='';
-    dishCategory='';
-    renderMode();
-    notifyRequest(name);
-    navigator.vibrate?.(8);
-  }
-  function removeDish(id){
-    dishes=readDishes();
-    const next=dishes.filter(entry=>entry.id!==id);
-    const removedPending=next.length!==dishes.length;
-    const removedAdded=forgetAddedDish(id);
-    if(!removedPending&&!removedAdded)return;
-    dishes=next;
-    if(removedPending)saveDishes(dishes);
-    renderMode();
-    navigator.vibrate?.(6);
-  }
+  const name=String(input.value||'').trim().replace(/\s+/g,' ').slice(0,80);
+  if(!name){input.focus();return}
+  const result=REQUESTS.addDish({name,category:dishCategory});
+  if(!result.ok)return;
+  dishes=result.items;
+  input.value='';
+  dishCategory='';
+  renderMode();
+  notifyRequest(name);
+  navigator.vibrate?.(8);
+}
+function removeDish(id){
+  const result=REQUESTS.removeDish(id);
+  if(!result.ok)return;
+  dishes=result.items;
+  renderMode();
+  navigator.vibrate?.(6);
+}
   function integrateDish(id){
     const item=readDishes().find(entry=>entry.id===id);
     if(!item)return;
@@ -562,7 +438,6 @@ function initMissingProductsAndDishes(){
       notifyAdded('product',item.name);
       remove.click();
     });
-    syncCombinedCount();
   }
   function dishImageReady(item){
     const card=[...document.querySelectorAll('#dishes .dish-card[data-dish]')].find(entry=>normalize(entry.dataset.dish)===normalize(item.name));
@@ -583,9 +458,9 @@ function initMissingProductsAndDishes(){
     const current=readDishes();
     const completed=current.filter(item=>dishImageReady(item));
     if(!completed.length)return false;
-    completed.forEach(rememberAddedDish);
+    completed.forEach(REQUESTS.rememberAddedDish);
     const completedIds=new Set(completed.map(item=>item.id));
-    saveDishes(current.filter(item=>!completedIds.has(item.id)));
+    REQUESTS.writeDishes(current.filter(item=>!completedIds.has(item.id)));
     completed.forEach(item=>{
       if(completedThisSession.has('dish:'+item.id))return;
       completedThisSession.add('dish:'+item.id);
@@ -600,7 +475,7 @@ function initMissingProductsAndDishes(){
   }
   function syncNewProductRequests(){
     const products=readProducts();
-    pruneProductImageHints(products);
+    REQUESTS.pruneProductImageHints(products);
     const nextIds=new Set(products.map(item=>item.id));
     const added=[];
     products.forEach(item=>{
@@ -612,7 +487,6 @@ function initMissingProductsAndDishes(){
     });
     knownProductIds=nextIds;
     if(mode==='products')listCount.textContent=String(products.length);
-    syncCombinedCount();
     queueEnhanceProducts();
     if(added.length)revealProduct(added[added.length-1].id);
   }
@@ -730,7 +604,6 @@ function initMissingProductsAndDishes(){
   });
 
   renderMode();
-  syncCombinedCount();
   queueEnhanceProducts();
   reconcileDishes();
 }

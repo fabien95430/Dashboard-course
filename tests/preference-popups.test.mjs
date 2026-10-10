@@ -79,14 +79,16 @@ test('un nouveau produit à générer déclenche la notification système dédi�
 test('la précision image reste séparée du nom et atteint les deux intégrations produit',()=>{
   const missing=read('missing-products-dishes.js');
   const fixes=read('missing-products-fixes.js');
+  const store=read('missing-requests-store.js');
   const generator=read('scripts/integrate_product_openai.py');
-  assert.match(missing,/STORAGE_PRODUCT_IMAGE_HINTS='courses-missing-product-image-hints-v1'/);
+  assert.match(store,/productImageHints:'courses-missing-product-image-hints-v1'/);
   assert.match(missing,/id="missingProductImageHint"/);
-  assert.match(missing,/imageHint:productImageHint\(name\)/);
+  assert.match(missing,/REQUESTS\.productImageHint\(item\.name\)/);
   assert.match(missing,/function saveProductImageHintDraft\(\)/);
   assert.match(missing,/Précision fournie par l’utilisateur pour le visuel ou le contenant/);
   assert.match(missing,/conditionnement visible/);
   assert.match(fixes,/PRODUCT_IMAGE_HINT_MARKER='\|\|__courses_image_hint__:'/);
+  assert.match(fixes,/REQUESTS\.productImageHint\(item\?\.name\)/);
   assert.match(fixes,/dish_category:type==='product'\?productOpenAiCategory\(item\):String\(item\.category\|\|''\)/);
   assert.match(generator,/IMAGE_HINT_MARKER = "\|\|__courses_image_hint__:"/);
   assert.match(generator,/def parse_product_category\(value: str\) -> tuple\[str,str\]:/);

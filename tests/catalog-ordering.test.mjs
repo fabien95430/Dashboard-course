@@ -9,7 +9,9 @@ const norm=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize(
 test('les catégories du catalogue gardent Tous en tête, Favoris à la fin et le reste en ordre alphabétique',()=>{
   const app=read('app.js');
   assert.match(app,/const CATALOG_CATEGORY_ORDER=\['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'\]/);
-  assert.match(app,/const MISSING_PRODUCT_CATEGORIES=Object\.freeze\(\['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons'\]\)/);
+  const requests=read('missing-requests-store.js');
+assert.match(requests,/const PRODUCT_CATEGORIES=Object\.freeze\(\['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons'\]\)/);
+assert.match(app,/const MISSING_PRODUCT_CATEGORIES=MISSING_REQUESTS\.productCategories;/);
 });
 
 test('chaque sous-catégorie de catalog.js est stockée en ordre alphabétique',()=>{

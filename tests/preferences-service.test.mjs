@@ -74,10 +74,10 @@ test('app.js délègue la persistance sans dupliquer le stockage des préférenc
 test('le service est chargé avant app.js et reste dans le shell hors ligne',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
-  const serviceIndex=index.indexOf('./preferences-service.js?v=398');
-  const appIndex=index.indexOf('./app.js?v=398');
+  const serviceIndex=index.indexOf('./preferences-service.js?');
+  const appIndex=index.indexOf('./app.js?');
   assert.ok(serviceIndex>=0&&appIndex>serviceIndex,'ordre de chargement incorrect');
-  assert.match(sw,/\.\/preferences-service\.js\?v=398/);
+  assert.match(sw,/\.\/preferences-service\.js\?v=\d+/);
   assert.match(sw,/url\.pathname\.endsWith\('\/preferences-service\.js'\)/);
   assert.match(source,/Object\.defineProperty\(window,'COURSES_PREFERENCES',[\s\S]*?configurable:false,[\s\S]*?enumerable:false,[\s\S]*?writable:false/);
 });

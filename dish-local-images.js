@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v398';
+const APP_VERSION='v399';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -272,7 +272,7 @@ function syncPageVersions(){
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
-    script.src='./missing-products-fixes.js?v=397';
+    script.src='./missing-products-fixes.js?v=399';
     script.defer=true;
     script.dataset.missingProductsFixes='1';
     document.head.appendChild(script);

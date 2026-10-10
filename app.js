@@ -22,7 +22,6 @@ const CATEGORY_META = {
   'Favoris': { label:'Favoris' }
 };
 const CATALOG_CATEGORY_ORDER=['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'];
-const MISSING_PRODUCT_CATEGORIES=Object.freeze(['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons']);
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
   "Lait sans lactose":"Lait s. lact.",
@@ -192,7 +191,6 @@ const STORAGE = {
   entity:'courses-external-entity-v1',
   entityPreference:'courses-external-entity-preference-v1',
   usage:'courses-external-usage-v1',
-  missingProducts:'courses-missing-products-v1',
   autoLockMinutes:'courses-auto-lock-minutes-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
@@ -313,18 +311,9 @@ function readAutoLockMinutes(){
 }
 function autoLockDelayMs(){return state.autoLockMinutes*60*1000}
 const INITIAL_PREFERENCES=PREFERENCES.read();
-function readMissingProducts(){
-  const saved=loadJson(STORAGE.missingProducts,[]);
-  if(!Array.isArray(saved))return [];
-  return saved.slice(-100).map((entry,index)=>{
-    const name=String(entry?.name||'').trim().replace(/\s+/g,' ').slice(0,80);
-    if(!name)return null;
-    const category=MISSING_PRODUCT_CATEGORIES.includes(entry?.category)?entry.category:'';
-    const id=String(entry?.id||('legacy-'+index+'-'+norm(name)));
-    return {id,name,category};
-  }).filter(Boolean);
-}
-function persistMissingProducts(){saveJson(STORAGE.missingProducts,state.missingProducts)}
+const MISSING_REQUESTS=window.COURSES_MISSING_REQUESTS;
+if(!MISSING_REQUESTS)throw new Error('Demandes manquantes indisponibles');
+const MISSING_PRODUCT_CATEGORIES=MISSING_REQUESTS.productCategories;
 
 const COURSES_ENTITY='todo.courses';
 const URL_ENTITY='todo.url';
@@ -401,11 +390,16 @@ let state={
   listRefreshTimer:null,
   listReorderRefreshPending:false,
   missingProductCategory:'',
-  missingProducts:readMissingProducts(),
+  missingProducts:MISSING_REQUESTS.readProducts(),
   autoLockMinutes:readAutoLockMinutes(),
   usage:loadJson(STORAGE.usage,{})||{},
   preferences:INITIAL_PREFERENCES
 };
+function syncMissingRequestsFromStore(){
+  state.missingProducts=MISSING_REQUESTS.readProducts();
+  renderSettingsPage();
+}
+window.addEventListener(MISSING_REQUESTS.eventName,syncMissingRequestsFromStore);
 
 const hashName = (value) => {
   let hash = 2166136261;
@@ -1485,7 +1479,7 @@ function renderSettingsPage(){
   if(connectionDot)connectionDot.classList.toggle('is-online',connected);
   const missingCount=$('#settingsMissingProductsCount');
   if(missingCount){
-    const count=state.missingProducts.length;
+    const count=MISSING_REQUESTS.counts().total;
     missingCount.textContent=String(count);
     missingCount.hidden=count===0;
   }
@@ -2306,12 +2300,12 @@ function addMissingProduct(){
     setDialogFeedback(UI.missingProductsFeedback,'Indique le nom du produit','error');
     return;
   }
-  if(state.missingProducts.some(item=>norm(item.name)===norm(name))){
-    setDialogFeedback(UI.missingProductsFeedback,'Ce produit est déjà noté','error');
+  const result=MISSING_REQUESTS.addProduct({name,category:state.missingProductCategory});
+  if(!result.ok){
+    if(result.reason==='duplicate')setDialogFeedback(UI.missingProductsFeedback,'Ce produit est déjà noté','error');
     return;
   }
-  state.missingProducts.push({id:secureRandomToken(8),name,category:state.missingProductCategory});
-  persistMissingProducts();
+  state.missingProducts=result.items;
   UI.missingProductName.value='';
   state.missingProductCategory='';
   renderMissingProducts();
@@ -2320,10 +2314,9 @@ function addMissingProduct(){
   setDialogFeedback(UI.missingProductsFeedback,'Produit ajouté');
 }
 function removeMissingProduct(id){
-  const next=state.missingProducts.filter(item=>item.id!==id);
-  if(next.length===state.missingProducts.length)return;
-  state.missingProducts=next;
-  persistMissingProducts();
+  const result=MISSING_REQUESTS.removeProduct(id);
+  if(!result.ok)return;
+  state.missingProducts=result.items;
   renderMissingProducts();
   renderSettingsPage();
   navigator.vibrate?.(6);

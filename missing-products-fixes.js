@@ -1,15 +1,13 @@
 (()=>{
 'use strict';
 
-const STORAGE_DISHES='courses-missing-dishes-v1';
-const STORAGE_PRODUCTS='courses-missing-products-v1';
+const REQUESTS=window.COURSES_MISSING_REQUESTS;
+if(!REQUESTS)throw new Error('Demandes manquantes indisponibles');
 const STORAGE_RUNNING_DISHES='courses-missing-dishes-running-v1';
 const STORAGE_RUNNING_PRODUCTS='courses-missing-products-running-v1';
 const STORAGE_OPENAI_REQUESTS='courses-openai-request-status-v1';
-const STORAGE_PRODUCT_IMAGE_HINTS='courses-missing-product-image-hints-v1';
 const PRODUCT_PREFIX='__courses_product__:';
 const PRODUCT_IMAGE_HINT_MARKER='||__courses_image_hint__:';
-const PRODUCT_IMAGE_HINT_MAX=140;
 const OPENAI_RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/actions/workflows/integrate-dish-openai.yml/runs?event=repository_dispatch&per_page=100';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
 const OPENAI_COOLDOWN_MS=30000;
@@ -31,33 +29,13 @@ function readJson(key,fallback){
     return fallback;
   }
 }
-function readDishes(){
-  const value=readJson(STORAGE_DISHES,[]);
-  return Array.isArray(value)?value:[];
-}
-function readProducts(){
-  const value=readJson(STORAGE_PRODUCTS,[]);
-  return Array.isArray(value)?value:[];
-}
-function normalizeProductKey(value){
-  return String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
-}
-function sanitizeProductImageHint(value){
-  return String(value||'').trim().replace(/\s+/g,' ').slice(0,PRODUCT_IMAGE_HINT_MAX);
-}
-function productImageHint(item){
-  const key=normalizeProductKey(item?.name);
-  if(!key)return '';
-  const hints=readJson(STORAGE_PRODUCT_IMAGE_HINTS,{});
-  if(!hints||typeof hints!=='object'||Array.isArray(hints))return '';
-  return sanitizeProductImageHint(hints[key]);
-}
+
 function productOpenAiCategory(item){
   const category=String(item?.category||'');
-  const hint=productImageHint(item);
+  const hint=REQUESTS.productImageHint(item?.name);
   return hint?category+PRODUCT_IMAGE_HINT_MARKER+encodeURIComponent(hint):category;
 }
-function itemsForType(type){return type==='product'?readProducts():readDishes()}
+function itemsForType(type){return type==='product'?REQUESTS.readProducts():REQUESTS.readDishes()}
 function runningKey(type){return type==='product'?STORAGE_RUNNING_PRODUCTS:STORAGE_RUNNING_DISHES}
 function readRunning(type){
   const value=readJson(runningKey(type),[]);
