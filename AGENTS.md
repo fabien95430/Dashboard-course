@@ -43,6 +43,14 @@ Si GitHub Actions est réellement nécessaire, limiter le coût : checkout shall
 
 Ne jamais utiliser l’API OpenAI payante du projet pour traiter une demande automatique.
 
+## Validation continue
+
+Le workflow `.github/workflows/validate.yml` est le garde-fou permanent du dépôt. Il doit rester en lecture seule, s’exécuter sur les pull requests et sur les pushes vers `main`, et utiliser `bash scripts/validate_repo.sh` comme source unique de la validation locale et CI.
+
+Avant un commit final, exécuter `bash scripts/validate_repo.sh` lorsque l’environnement le permet. Ne pas affaiblir la CI en retirant un test ou un invariant pour faire passer un changement.
+
+Le test `tests/product-images-no-atlas.test.mjs` conserve actuellement une dette connue sur son troisième cas : la validation accepte soit sa baseline exacte de 2 réussites / 1 échec sur ce cas, soit sa résolution complète. Toute autre dégradation doit faire échouer la CI. Lorsque ce test devient entièrement vert, supprimer cette exception dans le même changement.
+
 ## Visuels des plats
 
 Pour une demande `dish`, le visuel local fait partie de l’intégration lorsqu’il n’existe pas déjà.
