@@ -10,9 +10,7 @@ const HOUSEHOLD_KEYS=['courses-dish-preferred-servings-v1','courses-dish-serving
 const HISTORY_DAYS=400;
 const DAY=86400000;
 const SAME_TRIP=18*60*60*1000;
-const WATCH_TTL=20000;
 const DISH_WATCH_TTL=90000;
-const UNDO_TTL=2*60*1000;
 const LABEL='Acheté récemment';
 
 // Fenêtres de disponibilité probables. Elles évitent les doublons mais ne remplacent jamais une DLC.
@@ -95,11 +93,7 @@ Object.entries(CATALOG.groups).forEach(([category,subs])=>Object.entries(subs||{
   (Array.isArray(names)?names:[]).forEach(name=>META.set(norm(name),{name,category,sub}));
 }));
 const PRODUCT_RULES=new Map(Object.entries(PRODUCT).map(([name,rule])=>[norm(name),rule]));
-const pending=new Map();
-const undoRecords=new Map();
 let state=readState();
-let toastObserver=null;
-let dishObserver=null;
 let refreshFrame=0;
 let dishPending=null;
 let dishPendingTimer=0;
@@ -132,11 +126,7 @@ function clearDishPending(){
 function setEnabled(value){
   const enabled=value!==false;
   try{localStorage.setItem(ENABLED_KEY,enabled?'1':'0')}catch(_){}
-  if(!enabled){
-    pending.forEach(token=>{if(token?.timer)clearTimeout(token.timer)});
-    pending.clear();
-    clearDishPending();
-  }
+  if(!enabled)clearDishPending();
   syncPreferenceToggle();scheduleDish();return enabled;
 }
 function syncPreferenceToggle(){
@@ -284,7 +274,6 @@ function record(name,qty=1,at=Date.now()){
   const meta=META.get(norm(name));if(!meta)return null;
   const key=norm(meta.name),events=Array.isArray(state.purchases[key])?state.purchases[key]:[],last=events.at(-1);
   const merges=Boolean(last&&at-last.at<=SAME_TRIP);
-  const snapshot=merges?{mode:'merge',at:last.at,firstAt:last.firstAt,qty:last.qty,household:last.household}:{mode:'push'};
   if(merges){
     last.firstAt=Number(last.firstAt)||Number(last.at)||at;
     last.qty=Math.max(1,Number(last.qty)||1)+Math.max(1,Number(qty)||1);
@@ -292,24 +281,7 @@ function record(name,qty=1,at=Date.now()){
   }else{
     events.push({at,firstAt:at,qty:Math.max(1,Number(qty)||1),household:readHousehold()});
   }
-  state.purchases[key]=events;persist();scheduleDish();
-  const undo={key,name:meta.name,snapshot,recordedAt:at,timer:0};
-  undo.timer=setTimeout(()=>undoRecords.delete(key),UNDO_TTL);undoRecords.set(key,undo);return undo;
-}
-function undoRecorded(name){
-  const key=norm(name),undo=undoRecords.get(key);if(!undo)return false;
-  if(undo.timer)clearTimeout(undo.timer);undoRecords.delete(key);
-  const events=Array.isArray(state.purchases[key])?state.purchases[key]:[];
-  if(undo.snapshot.mode==='merge'){
-    if(events.length)events[events.length-1]={
-      at:undo.snapshot.at,
-      firstAt:Number(undo.snapshot.firstAt)||undo.snapshot.at,
-      qty:undo.snapshot.qty,
-      household:undo.snapshot.household||readHousehold()
-    };
-  }else if(events.length){events.pop()}
-  if(events.length)state.purchases[key]=events;else delete state.purchases[key];
-  persist();scheduleDish();return true;
+  state.purchases[key]=events;persist();scheduleDish();return true;
 }
 function recordFeedback(name,at=Date.now()){
   if(!isEnabled())return;
@@ -339,24 +311,9 @@ function recent(name,at=Date.now(),requiredQty=1){
   if(stock.ageDays>=stock.profile.recentDays||stock.estimatedQty<needed)return null;
   return {...stock,requiredQty:needed};
 }
-function rowQty(row){
-  const value=Number(String(row?.querySelector('.list-qty')?.textContent||'').replace(/[^0-9]/g,''));
-  return Number.isFinite(value)&&value>0?value:1;
-}
 function rowRequiredQty(row){
   const value=Number(row?.dataset?.recipeQuantity);
   return Number.isFinite(value)&&value>0?Math.ceil(value):1;
-}
-function watchPurchase(button){
-  if(!isEnabled())return;
-  const row=button?.closest?.('.list-row'),name=String(button?.dataset?.name||row?.dataset?.name||'').trim();if(!name)return;
-  const key=norm(name),previous=pending.get(key);if(previous?.timer)clearTimeout(previous.timer);
-  const token={name,qty:rowQty(row),timer:0};token.timer=setTimeout(()=>pending.delete(key),WATCH_TTL);pending.set(key,token);
-}
-function cancelPurchase(button){
-  const row=button?.closest?.('.list-row'),name=String(button?.dataset?.name||row?.dataset?.name||'').trim(),key=norm(name);
-  const token=pending.get(key);if(token?.timer)clearTimeout(token.timer);pending.delete(key);
-  if(name)undoRecorded(name);
 }
 function watchDishConsumption(button){
   if(!isEnabled()){clearDishPending();return}
@@ -396,22 +353,20 @@ function recordDishConsumptions(token,at=Date.now()){
   if(changed){persist();scheduleDish()}
   return changed;
 }
-function consumeToast(){
+function consumePurchaseSettled(event){
   if(!isEnabled())return;
-  const text=String(document.getElementById('toast')?.textContent||'').trim();if(!text)return;
-  if(text.endsWith(' acheté')){
-    for(const [key,token] of pending){
-      if(text!==token.name+' acheté')continue;
-      if(token.timer)clearTimeout(token.timer);pending.delete(key);record(token.name,token.qty);break;
-    }
-    return;
-  }
+  const detail=event?.detail||{};
+  const name=String(detail.name||'').trim();
+  if(!name)return;
+  record(name,Math.max(1,Number(detail.quantity)||1));
+}
+function consumeDishAddSettled(event){
   if(!dishPending)return;
-  if(text.startsWith('Ajout partiel')){clearDishPending();return}
-  const success=text==='Les ingrédients sélectionnés sont déjà dans Ma liste'
-    ||text==='Les quantités nécessaires sont déjà dans Ma liste'
-    ||text.startsWith(dishPending.dish+' · ');
-  if(!success)return;
+  const detail=event?.detail||{};
+  const name=String(detail.name||'').trim();
+  if(name&&norm(name)!==norm(dishPending.dish))return;
+  const result=detail.result;
+  if(!result||Number(result.failed)>0){clearDishPending();return}
   const token=dishPending;clearDishPending();recordDishConsumptions(token);
 }
 function styles(){
@@ -450,31 +405,30 @@ function scheduleDish(){
   if(refreshFrame)return;
   refreshFrame=requestAnimationFrame(()=>{refreshFrame=0;decorateDish()});
 }
-function bindDish(){
-  const dialog=document.getElementById('dishDialog');if(!dialog)return false;
-  dishObserver?.disconnect();dishObserver=new MutationObserver(scheduleDish);
-  dishObserver.observe(dialog,{subtree:true,childList:true,attributes:true,attributeFilter:['open','disabled','data-recipe-quantity']});
-  dialog.addEventListener('click',event=>{
-    if(!event.isTrusted)return;
-    const row=event.target?.closest?.('.dish-ingredient.is-recent-purchase');if(!row||!dialog.contains(row))return;
-    setTimeout(()=>{
-      if(row.getAttribute('aria-pressed')!=='true')return;
-      const name=String(row.dataset.ingredient||'');row.dataset.recentPurchaseOverride='1';clearRecent(row);recordFeedback(name);
-    },0);
-  },true);
-  scheduleDish();return true;
+function consumeRecentDishClick(event){
+  if(!event.isTrusted)return;
+  const row=event.target?.closest?.('#dishDialog .dish-ingredient.is-recent-purchase');if(!row)return;
+  setTimeout(()=>{
+    if(row.getAttribute('aria-pressed')!=='true')return;
+    const name=String(row.dataset.ingredient||'');row.dataset.recentPurchaseOverride='1';clearRecent(row);recordFeedback(name);
+  },0);
 }
-function bindPurchases(){
+function bindHistoryEvents(){
   document.addEventListener('click',event=>{
-    const dishAdd=event.target?.closest?.('#dishDialog .dish-sheet-add');if(dishAdd)watchDishConsumption(dishAdd);
-    const buy=event.target?.closest?.('.purchase-check');if(buy){watchPurchase(buy);return}
-    const undo=event.target?.closest?.('.undo-purchase');if(undo)cancelPurchase(undo);
+    const dishAdd=event.target?.closest?.('#dishDialog .dish-sheet-add');
+    if(dishAdd)watchDishConsumption(dishAdd);
   },true);
-  const toast=document.getElementById('toast');
-  if(toast){
-    toastObserver?.disconnect();toastObserver=new MutationObserver(consumeToast);
-    toastObserver.observe(toast,{attributes:true,attributeFilter:['class'],childList:true,characterData:true,subtree:true});
-  }
+  document.addEventListener('courses:purchase-settled',consumePurchaseSettled);
+  document.addEventListener('courses:dish-add-settled',consumeDishAddSettled);
+}
+function bindDishEvents(){
+  document.addEventListener('courses:dish-ingredients-rendered',scheduleDish);
+  document.addEventListener('courses:dish-quantities-updated',scheduleDish);
+  document.addEventListener('courses:dish-availability-updated',scheduleDish);
+  document.addEventListener('courses:dish-sheet-opened',scheduleDish);
+  document.addEventListener('courses:quantities-ready',scheduleDish);
+  document.addEventListener('click',consumeRecentDishClick,true);
+  scheduleDish();
 }
 function bindHousehold(){
   document.addEventListener('click',event=>{
@@ -488,15 +442,7 @@ function bindHousehold(){
 }
 function init(){
   try{const p=navigator.storage?.persist?.();if(p&&typeof p.catch==='function')p.catch(()=>{})}catch(_){}
-  prune();rebuild();writeState();styles();bindPurchases();bindHousehold();
-  if(!installPreferenceToggle()){
-    const observer=new MutationObserver(()=>{if(installPreferenceToggle())observer.disconnect()});
-    observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),10000);
-  }
-  if(!bindDish()){
-    const observer=new MutationObserver(()=>{if(bindDish())observer.disconnect()});
-    observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),10000);
-  }
+  prune();rebuild();writeState();styles();installPreferenceToggle();bindHistoryEvents();bindDishEvents();bindHousehold();
   window.COURSES_PURCHASE_INTELLIGENCE=Object.freeze({
     retentionDays:HISTORY_DAYS,
     profileFor:name=>profile(name),

@@ -81,14 +81,18 @@ Les données restent dans le stockage local du navigateur. Ce module n’envoie 
 
 Un simple clic sur la coche d’achat ne suffit pas.
 
-Le moteur prépare l’événement, puis attend la confirmation visuelle du flux existant : le toast `<produit> acheté`.
+`app.js`, propriétaire du flux **Ma liste**, publie l’événement métier `courses:purchase-settled` uniquement lorsque l’action d’achat a dépassé la fenêtre d’annulation et qu’elle est acceptée par le flux courant. L’événement fournit directement le nom, la quantité du groupe acheté et indique si l’action a été placée dans la file hors ligne chiffrée.
 
-Une fois cette confirmation reçue, il mémorise :
+Le moteur n’interprète donc plus le texte d’un toast pour reconnaître un achat.
+
+Une fois cet événement reçu, il mémorise :
 
 - la date ;
-- la quantité réellement présente sur la ligne de **Ma liste** ;
+- la quantité réellement présente dans le groupe de **Ma liste** ;
 - la taille du foyer ;
 - le début du cycle d’achat.
+
+Le comportement hors ligne reste inchangé : une action correctement enregistrée dans la file locale est considérée comme un achat accepté par l’application, puis synchronisée avec Home Assistant dès que la connexion revient.
 
 ### Courses rapprochées
 
@@ -105,11 +109,9 @@ Le cycle possède :
 
 ## Annulation d’un achat
 
-Lorsque l’action d’achat est annulée dans la fenêtre prévue par l’interface, l’événement ajouté par le moteur est également annulé.
+L’événement `courses:purchase-settled` n’est publié qu’après la fenêtre d’annulation de l’interface.
 
-Si l’achat avait été fusionné avec un cycle existant, l’état précédent du cycle est restauré.
-
-Cela évite qu’une action annulée contamine l’apprentissage.
+Si l’utilisateur choisit **Annuler** pendant cette fenêtre, aucun achat n’est ajouté à l’historique et aucun rollback du moteur probabiliste n’est nécessaire.
 
 ## Taille du foyer
 
@@ -191,7 +193,7 @@ Lorsqu’un plat est ajouté avec succès, le moteur regarde les ingrédients qu
 
 Ces ingrédients représentent les produits que le plat prévoit d’utiliser depuis le stock déjà présent.
 
-Après confirmation de l’ajout du plat, leur quantité est débitée dans `consumptions`.
+Après l’événement métier `courses:dish-add-settled` confirmant l’ajout du plat, leur quantité est débitée dans `consumptions`.
 
 Les ingrédients restés sélectionnés ne sont pas débités : ils sont destinés à être achetés.
 

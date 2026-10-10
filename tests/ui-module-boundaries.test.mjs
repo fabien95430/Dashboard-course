@@ -30,9 +30,11 @@ test('les responsabilités extraites ont des propriétaires explicites',()=>{
   assert.match(settingsUi,/const PREFERENCE_DIALOG_SELECTOR=/);
   assert.match(settingsUi,/function initApplicationManagement\(\)/);
   assert.match(settingsUi,/function initAdministratorSettings\(\)/);
-  for(const asset of ['./missing-products-fixes.js?v=399','./missing-products-popup-ui.js?v=18','./purchase-intelligence.js?v=387'])assert.ok(runtime.includes(asset),asset+' doit être chargé par runtime-features');
+  for(const asset of ['./missing-products-fixes.js?v=399','./missing-products-popup-ui.js?v=18'])assert.ok(runtime.includes(asset),asset+' doit être chargé par runtime-features');
   const productImagesAsset=runtime.match(/\.\/product-item-images\.js\?v=\d+/)?.[0]||'';
+  const purchaseIntelligenceAsset=runtime.match(/\.\/purchase-intelligence\.js\?v=\d+/)?.[0]||'';
   assert.ok(productImagesAsset,'asset product-item-images introuvable');
+  assert.ok(purchaseIntelligenceAsset,'asset purchase-intelligence introuvable');
 });
 
 test('le nouvel ordre de chargement reste déterministe et précaché',()=>{

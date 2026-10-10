@@ -28,7 +28,7 @@ function installProductItemImages(){
 function installPurchaseIntelligence(){
   if(document.querySelector('script[data-purchase-intelligence]'))return;
   const script=document.createElement('script');
-  script.src='./purchase-intelligence.js?v=387';
+  script.src='./purchase-intelligence.js?v=409';
   script.defer=true;
   script.dataset.purchaseIntelligence='1';
   document.head.appendChild(script);

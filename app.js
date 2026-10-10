@@ -649,6 +649,15 @@ function status(kind,title,detail=''){
   renderSettingsPage();
 }
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
+function publishPurchaseSettled(name,quantity,queued=false){
+  const item=String(name||'').trim();
+  if(!item)return;
+  document.dispatchEvent(new CustomEvent('courses:purchase-settled',{detail:{
+    name:item,
+    quantity:Math.max(1,Number(quantity)||1),
+    queued:Boolean(queued)
+  }}));
+}
 function clearDialogFeedback(target){
   if(!target)return;
   clearTimeout(target._t);
@@ -2188,6 +2197,7 @@ async function removeGroup(name,row=null,intent='purchase'){
       const items=(loadJson(DEMO_KEY,[])||[]).filter(keepOtherItems);
       saveJson(DEMO_KEY,items);
       state.items=items;
+      if(isPurchase)publishPurchaseSettled(item,group.count,false);
       toast(successMessage);
       return;
     }
@@ -2195,6 +2205,7 @@ async function removeGroup(name,row=null,intent='purchase'){
     const uids=group.uids.filter(Boolean);
     if(!uids.length)throw new Error('Identifiant de l’article indisponible');
     await Promise.all(uids.map(completeTodoItem));
+    if(isPurchase)publishPurchaseSettled(item,group.count,false);
     toast(successMessage);
   }catch(error){
     toast('Suppression impossible');
@@ -2706,16 +2717,19 @@ removeGroup=async function(name,row=null,intent='purchase'){
     if(!socketReady()){
       await queueOfflineCompletion(item,uids);
       queuedOffline=true;
+      if(isPurchase)publishPurchaseSettled(item,group.count,true);
       toast(successMessage);
       return;
     }
     try{
       await Promise.all(uids.map(completeTodoItem));
+      if(isPurchase)publishPurchaseSettled(item,group.count,false);
       toast(successMessage);
     }catch(error){
       if(!isTransientHaError(error))throw error;
       await queueOfflineCompletion(item,uids);
       queuedOffline=true;
+      if(isPurchase)publishPurchaseSettled(item,group.count,true);
       toast(successMessage);
     }
   }catch(error){
