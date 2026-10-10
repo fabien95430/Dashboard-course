@@ -1240,298 +1240,8 @@ function undoPurchase(name,row){
   toast('Article conservé');
 }
 
-const bottomNavLiquid={x:0,vx:0,tx:0,w:0,tw:0,vw:0,lift:0,vl:0,tl:0,last:0,ready:false,frame:0,scrub:null,justScrubbed:false};
-function bottomNavReduced(){
-  return Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-}
-function bottomNavItems(){return [...document.querySelectorAll('.tabs .tab')]}
-function bottomNavContain(x,w,sx,minLeft,maxRight){
-  const room=Math.max(1,maxRight-minLeft);
-  let visual=w*sx;
-  const overshootLeft=Math.max(0,minLeft-x);
-  const overshootRight=Math.max(0,x+w-maxRight);
-  visual-=(overshootLeft+overshootRight)*0.6;
-  visual=Math.max(w*0.72,Math.min(visual,room));
-  let center=x+w/2;
-  center=Math.max(minLeft+visual/2,Math.min(maxRight-visual/2,center));
-  return {x:center-w/2,sx:visual/w};
-}
-function bottomNavRubber(distance,dimension=60){
-  const d=Math.abs(distance);
-  return Math.sign(distance)*(1-1/(d*0.55/dimension+1))*dimension;
-}
-function bottomNavScrubTarget(){
-  const st=bottomNavLiquid,items=bottomNavItems(),track=document.querySelector('.tabs');
-  if(!track||!items.length||!st.scrub)return st.tx;
-  const rect=track.getBoundingClientRect();
-  const x=st.scrub.clientX-rect.left-track.clientLeft-st.w/2;
-  const min=items[0].offsetLeft;
-  const last=items[items.length-1];
-  const max=last.offsetLeft+last.offsetWidth-st.w;
-  if(x<min)return min+bottomNavRubber(x-min);
-  if(x>max)return max+bottomNavRubber(x-max);
-  return x;
-}
-function bottomNavNearest(){
-  const st=bottomNavLiquid,center=st.x+st.w/2;
-  let best=null,bestDistance=Infinity;
-  bottomNavItems().forEach(item=>{
-    const distance=Math.abs(item.offsetLeft+item.offsetWidth/2-center);
-    if(distance<bestDistance){bestDistance=distance;best=item}
-  });
-  return best;
-}
-function markBottomNavUnder(clear=false){
-  const st=bottomNavLiquid,center=st.x+st.w/2;
-  bottomNavItems().forEach(item=>{
-    const under=!clear&&st.lift>0.18&&center>=item.offsetLeft&&center<item.offsetLeft+item.offsetWidth;
-    if(item.classList.contains('is-liquid-under')!==under)item.classList.toggle('is-liquid-under',under);
-  });
-}
-function bottomNavEnsureLensCopies(items=bottomNavItems()){
-  items.forEach(item=>{
-    if(item.querySelector('.tab-lens-copy'))return;
-    const icon=[...item.children].find(node=>node.tagName==='svg');
-    const label=[...item.children].find(node=>node.tagName==='SPAN');
-    if(!icon||!label)return;
-    const copy=document.createElement('i');
-    copy.className='tab-lens-copy';
-    copy.setAttribute('aria-hidden','true');
-    copy.append(icon.cloneNode(true),label.cloneNode(true));
-    item.append(copy);
-  });
-}
-function bottomNavAlignLensCopy(item,copy){
-  const icon=[...item.children].find(node=>node.tagName==='svg');
-  const label=[...item.children].find(node=>node.tagName==='SPAN');
-  const copyIcon=[...copy.children].find(node=>node.tagName==='svg');
-  const copyLabel=[...copy.children].find(node=>node.tagName==='SPAN');
-  if(!icon||!label||!copyIcon||!copyLabel)return;
-  const itemRect=item.getBoundingClientRect();
-  const place=(source,target)=>{
-    const rect=source.getBoundingClientRect();
-    target.style.left=(rect.left-itemRect.left).toFixed(2)+'px';
-    target.style.top=(rect.top-itemRect.top).toFixed(2)+'px';
-    target.style.width=rect.width.toFixed(2)+'px';
-    target.style.height=rect.height.toFixed(2)+'px';
-  };
-  const labelStyle=getComputedStyle(label);
-  ['font-family','font-size','font-weight','font-style','line-height','letter-spacing','text-transform','font-kerning','font-variation-settings'].forEach(prop=>{
-    const value=labelStyle.getPropertyValue(prop);
-    if(value)copyLabel.style.setProperty(prop,value,'important');
-  });
-  place(icon,copyIcon);
-  place(label,copyLabel);
-}
-function bottomNavMaskOriginalContent(item,visualLeft=null,visualRight=null){
-  const itemRect=item.getBoundingClientRect();
-  const sources=[...item.children].filter(node=>node.tagName==='svg'||node.tagName==='SPAN');
-  sources.forEach(source=>{
-    if(visualLeft===null||visualRight===null){
-      source.style.webkitMaskImage='';
-      source.style.maskImage='';
-      return;
-    }
-    const rect=source.getBoundingClientRect();
-    if(!rect.width)return;
-    const sourceLeft=item.offsetLeft+(rect.left-itemRect.left);
-    const sourceRight=sourceLeft+rect.width;
-    const overlapLeft=Math.max(sourceLeft,visualLeft);
-    const overlapRight=Math.min(sourceRight,visualRight);
-    if(overlapRight<=overlapLeft){
-      source.style.webkitMaskImage='';
-      source.style.maskImage='';
-      return;
-    }
-    const left=Math.max(0,overlapLeft-sourceLeft);
-    const right=Math.min(rect.width,overlapRight-sourceLeft);
-    const mask=left<=0.01&&right>=rect.width-0.01
-      ?'linear-gradient(transparent,transparent)'
-      :`linear-gradient(to right,#000 0,#000 ${left.toFixed(2)}px,transparent ${left.toFixed(2)}px,transparent ${right.toFixed(2)}px,#000 ${right.toFixed(2)}px,#000 100%)`;
-    source.style.webkitMaskImage=mask;
-    source.style.maskImage=mask;
-  });
-}
-function paintBottomNavLensContent(track,items,visualLeft,visualRight,lift,speed){
-  bottomNavEnsureLensCopies(items);
-  const st=bottomNavLiquid;
-  const moving=Boolean(st.scrub)||lift>0.035||Math.abs(st.vx)>18;
-  track.classList.toggle('is-liquid-moving',moving);
-  const reduced=bottomNavReduced();
-  const intensity=Math.min(1,Math.max(0,lift*.72+speed*.55));
-  const scale=reduced?1:1+intensity*.16;
-  const shift=reduced?0:Math.max(-3.5,Math.min(3.5,st.vx/360));
-  track.style.setProperty('--nav-lens-content-scale',scale.toFixed(4));
-  track.style.setProperty('--nav-lens-content-shift',shift.toFixed(2)+'px');
-  items.forEach(item=>{
-    const copy=item.querySelector('.tab-lens-copy');
-    if(!copy)return;
-    if(!moving){
-      copy.style.opacity='0';
-      copy.style.clipPath='inset(0 100% 0 0)';
-      copy.style.webkitClipPath='inset(0 100% 0 0)';
-      bottomNavMaskOriginalContent(item);
-      return;
-    }
-    bottomNavAlignLensCopy(item,copy);
-    const itemLeft=item.offsetLeft;
-    const itemRight=itemLeft+item.offsetWidth;
-    const overlapLeft=Math.max(itemLeft,visualLeft);
-    const overlapRight=Math.min(itemRight,visualRight);
-    if(overlapRight<=overlapLeft){
-      copy.style.opacity='0';
-      bottomNavMaskOriginalContent(item);
-      return;
-    }
-    bottomNavMaskOriginalContent(item,visualLeft,visualRight);
-    const clipLeft=Math.max(0,overlapLeft-itemLeft);
-    const clipRight=Math.max(0,itemRight-overlapRight);
-    const clip=`inset(0 ${clipRight.toFixed(2)}px 0 ${clipLeft.toFixed(2)}px)`;
-    copy.style.clipPath=clip;
-    copy.style.webkitClipPath=clip;
-    copy.style.opacity='1';
-  });
-}
-function paintBottomNavLiquid(){
-  const track=document.querySelector('.tabs');
-  if(!track)return;
-  const st=bottomNavLiquid;
-  const lift=Math.max(-0.12,Math.min(1.12,st.lift));
-  const speed=Math.min(1,Math.abs(st.vx)/1700);
-  const items=bottomNavItems();
-  if(!items.length||!st.w)return;
-  const minLeft=items[0].offsetLeft;
-  const last=items[items.length-1];
-  const maxRight=last.offsetLeft+last.offsetWidth;
-  const lensW=st.w*0.84;
-  const lensX=st.x+(st.w-lensW)/2;
-  const box=bottomNavContain(lensX,lensW,1+lift*0.08+speed*0.22,minLeft,maxRight);
-  const sy=1+lift*0.09-speed*0.03;
-  const visualWidth=lensW*box.sx;
-  const visualLeft=box.x+(lensW-visualWidth)/2;
-  const visualRight=visualLeft+visualWidth;
-  track.style.setProperty('--nav-liquid-x',box.x.toFixed(2)+'px');
-  track.style.setProperty('--nav-liquid-w',lensW.toFixed(2)+'px');
-  track.style.setProperty('--nav-liquid-sx',box.sx.toFixed(4));
-  track.style.setProperty('--nav-liquid-sy',sy.toFixed(4));
-  track.style.setProperty('--nav-liquid-lift',Math.max(0,Math.min(1,lift)).toFixed(3));
-  paintBottomNavLensContent(track,items,visualLeft,visualRight,Math.max(0,Math.min(1,lift)),speed);
-}
-function stepBottomNavLiquid(time){
-  bottomNavLiquid.frame=0;
-  const track=document.querySelector('.tabs');
-  if(!track||!track.isConnected)return;
-  const st=bottomNavLiquid;
-  const dt=st.last?Math.min(0.032,Math.max(0.001,(time-st.last)/1000)):1/60;
-  st.last=time;
-  if(st.scrub){
-    st.tx=bottomNavScrubTarget();
-    st.tl=1;
-  }
-  const steps=Math.max(1,Math.ceil(dt/0.008));
-  const h=dt/steps;
-  for(let i=0;i<steps;i+=1){
-    st.vx+=(250*(st.tx-st.x)-24*st.vx)*h;
-    st.x+=st.vx*h;
-    st.vw+=(250*(st.tw-st.w)-24*st.vw)*h;
-    st.w+=st.vw*h;
-    st.vl+=(360*(st.tl-st.lift)-22*st.vl)*h;
-    st.lift+=st.vl*h;
-  }
-  if(!st.scrub&&st.tl===1&&Math.abs(st.tx-st.x)<10)st.tl=0;
-  markBottomNavUnder();
-  paintBottomNavLiquid();
-  const settled=!st.scrub&&Math.abs(st.tx-st.x)<0.25&&Math.abs(st.vx)<4
-    &&Math.abs(st.tw-st.w)<0.25&&Math.abs(st.tl-st.lift)<0.004&&Math.abs(st.vl)<0.05;
-  if(settled){
-    Object.assign(st,{x:st.tx,vx:0,w:st.tw,vw:0,lift:st.tl,vl:0});
-    paintBottomNavLiquid();
-    markBottomNavUnder(true);
-    return;
-  }
-  st.frame=requestAnimationFrame(stepBottomNavLiquid);
-}
-function syncBottomNavLiquid(animate=true){
-  const active=document.querySelector('.tabs .tab.is-active');
-  if(!active||!active.offsetWidth)return;
-  const st=bottomNavLiquid;
-  st.tx=active.offsetLeft;
-  st.tw=active.offsetWidth;
-  if(!animate||!st.ready||bottomNavReduced()){
-    if(st.frame)cancelAnimationFrame(st.frame);
-    Object.assign(st,{x:st.tx,vx:0,w:st.tw,vw:0,lift:0,vl:0,tl:0,last:0,ready:true,frame:0});
-    paintBottomNavLiquid();
-    markBottomNavUnder(true);
-    return;
-  }
-  if(Math.abs(st.tx-st.x)<0.25&&Math.abs(st.tw-st.w)<0.25)return;
-  if(Math.abs(st.tx-st.x)>2)st.tl=1;
-  if(!st.frame){
-    st.last=0;
-    st.frame=requestAnimationFrame(stepBottomNavLiquid);
-  }
-}
-function startBottomNavLiquid(){
-  const st=bottomNavLiquid;
-  if(st.frame)return;
-  st.last=0;
-  st.frame=requestAnimationFrame(stepBottomNavLiquid);
-}
-function bindBottomNavLiquid(){
-  const track=document.querySelector('.tabs');
-  if(!track||track.dataset.liquidBound==='1')return;
-  track.dataset.liquidBound='1';
-  track.addEventListener('pointerdown',event=>{
-    if(!event.isPrimary||event.button>0)return;
-    const item=event.target?.closest?.('.tab');
-    if(!item||!item.classList.contains('is-active'))return;
-    if(!bottomNavLiquid.ready)syncBottomNavLiquid(false);
-    bottomNavLiquid.scrub={id:event.pointerId,clientX:event.clientX,startX:event.clientX,moved:false};
-    try{track.setPointerCapture(event.pointerId)}catch(_){}
-    bottomNavLiquid.tl=1;
-    if(bottomNavReduced()){
-      bottomNavLiquid.lift=1;
-      paintBottomNavLiquid();
-    }else{
-      startBottomNavLiquid();
-    }
-  });
-  track.addEventListener('pointermove',event=>{
-    const scrub=bottomNavLiquid.scrub;
-    if(!scrub||event.pointerId!==scrub.id)return;
-    scrub.clientX=event.clientX;
-    if(Math.abs(event.clientX-scrub.startX)>6)scrub.moved=true;
-    if(bottomNavReduced()){
-      bottomNavLiquid.x=bottomNavScrubTarget();
-      markBottomNavUnder();
-      paintBottomNavLiquid();
-    }else{
-      startBottomNavLiquid();
-    }
-  });
-  const finish=(event,cancelled)=>{
-    const scrub=bottomNavLiquid.scrub;
-    if(!scrub||event.pointerId!==scrub.id)return;
-    const moved=scrub.moved;
-    bottomNavLiquid.scrub=null;
-    try{track.releasePointerCapture(event.pointerId)}catch(_){}
-    bottomNavLiquid.tl=0;
-    const target=moved&&!cancelled?bottomNavNearest():null;
-    if(moved&&!cancelled){
-      bottomNavLiquid.justScrubbed=true;
-      setTimeout(()=>{bottomNavLiquid.justScrubbed=false},0);
-    }
-    if(target&&!target.classList.contains('is-active')){
-      state.view=target.dataset.view||'list';
-      navigator.vibrate?.(4);
-      showView();
-    }else{
-      syncBottomNavLiquid(!bottomNavReduced());
-    }
-  };
-  track.addEventListener('pointerup',event=>finish(event,false));
-  track.addEventListener('pointercancel',event=>finish(event,true));
-}
+const BOTTOM_NAV=window.COURSES_BOTTOM_NAV;
+if(!BOTTOM_NAV)throw new Error('Navigation liquide indisponible');
 
 let publishedView='';
 function showView(){
@@ -1544,7 +1254,7 @@ function showView(){
     publishedView=state.view;
     document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));
   }
-  syncBottomNavLiquid(true);
+  BOTTOM_NAV.sync(true);
 }
 function renderView(){
   showView();
@@ -3014,15 +2724,18 @@ function bindUiEvents(){
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!UI.listFilterMenu.hidden)setListFilterMenuOpen(false)});
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{
-    if(bottomNavLiquid.justScrubbed)return;
+    if(BOTTOM_NAV.shouldIgnoreClick())return;
     const next=button.dataset.view||'list';
-    if(next===state.view){syncBottomNavLiquid(false);return}
+    if(next===state.view){BOTTOM_NAV.sync(false);return}
     state.view=next;
     navigator.vibrate?.(4);
     showView();
   });
-  bindBottomNavLiquid();
-  window.addEventListener('resize',()=>syncBottomNavLiquid(false),{passive:true});
+  BOTTOM_NAV.bind(next=>{
+    state.view=next;
+    navigator.vibrate?.(4);
+    showView();
+  });
 }
 ['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
 function resumeForegroundSession(){
