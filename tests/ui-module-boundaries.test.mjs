@@ -59,12 +59,12 @@ test('P4 conserve un démarrage déterministe puis prépare Produits avant les f
   assert.match(catalog,/if\(productCatalogStarted\|\|!runtimeReady\)return;/);
   assert.match(catalog,/quantities\.addEventListener\('load',loadDishes,\{once:true\}\)/);
   assert.match(catalog,/script\.addEventListener\('load',loadLiquid,\{once:true\}\)/);
-  assert.match(catalog,/liquid\.addEventListener\('load',markProductCatalogReady,\{once:true\}\)/);
+  assert.match(catalog,/liquid\.addEventListener\('load',loadDishLocalImages,\{once:true\}\)/);
   assert.match(catalog,/document\.addEventListener\('courses:view-changed',event=>\{/);
   assert.match(catalog,/if\(event\.detail\?\.view!=='catalog'\)return;/);
-  assert.match(catalog,/startProductCatalog\(\);\s*startDishFeatures\(\);/);
+  assert.match(catalog,/const startCatalogView=\(\)=>\{[\s\S]*startProductCatalog\(\);[\s\S]*loadRepurchaseSoon\(\);[\s\S]*startDishFeatures\(\);/);
   assert.match(catalog,/if\(dishFeaturesStarted\|\|!productCatalogReady\)return;/);
-  assert.match(catalog,/images\.addEventListener\('load',loadRepurchaseSoon,\{once:true\}\)/);
+  assert.match(catalog,/images\.addEventListener\('load',loadDishAddedMarker,\{once:true\}\)/);
   assert.doesNotMatch(catalog,/new MutationObserver/);
   assert.doesNotMatch(catalog,/setInterval\(/);
   assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));

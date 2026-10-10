@@ -529,7 +529,7 @@ function sprite(product,compact=false){
   const fallback=premiumProductVisual(product,compact);
   const source=productImageSource(product?.name);
   return '<span class="sprite premium-sprite is-single-product-image '+(compact?'is-compact':'')+'" aria-hidden="true">'+
-    '<img src="'+source+'" alt="" loading="eager" fetchpriority="'+(compact?'high':'auto')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+
+    '<img src="'+source+'" alt="" loading="'+(compact?'eager':'lazy')+'" fetchpriority="'+(compact?'high':'auto')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
   '</span>';
 }
@@ -707,7 +707,7 @@ function selectCategory(category){
 }
 function renderCategories(){
   const el=$('#categories');
-  if(!el)return;
+  if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
   if(el.childElementCount!==CATALOG_CATEGORY_ORDER.length){
     el.innerHTML=CATALOG_CATEGORY_ORDER.map(category=>'<button type="button" class="cat" data-category="'+esc(category)+'"><span class="cat-label">'+esc(CATEGORY_META[category].label)+'</span></button>').join('');
     el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>selectCategory(button.dataset.category||'Toutes'));
@@ -751,8 +751,9 @@ function notifyProductsUpdated(){
   document.dispatchEvent(new CustomEvent('courses:products-updated'));
 }
 function renderProducts(){
-  const el=$('#products'),products=visibleProducts();
-  if(!el)return;
+  const el=$('#products');
+  if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
+  const products=visibleProducts();
   const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
   const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
   if(!products.length){
@@ -1271,13 +1272,14 @@ function showView(){
   document.querySelectorAll('.tab').forEach(button=>button.classList.toggle('is-active',button.dataset.view===state.view));
   if(publishedView!==state.view){
     publishedView=state.view;
+    if(state.view==='catalog'){renderCategories();renderProducts()}
     document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));
   }
   BOTTOM_NAV.sync(true);
 }
 function renderView(){
   showView();
-  renderCategories();renderProducts();renderList();renderSettingsPage();
+  renderList();renderSettingsPage();
 }
 function renderSettingsPage(){
   const connection=$('#settingsConnectionSummary');

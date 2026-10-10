@@ -3,13 +3,16 @@
 
 const STORAGE_PREFERRED_SERVINGS='courses-dish-preferred-servings-v1';
 const STORAGE_SERVINGS='courses-dish-servings-v1';
-const STORAGE_PREFERRED_CATALOG_MODE='courses-catalog-preferred-mode-v1';
-const STORAGE_CATALOG_MODE='courses-catalog-mode-v1';
 const SERVING_OPTIONS=Object.freeze([2,4,5]);
-const CATALOG_MODE_OPTIONS=Object.freeze(['products','dishes']);
 const DEFAULT_SERVINGS=2;
 const DOCUMENTATION_URL='./docs/guide-fonctionnement-courses.pdf?v=299';
 
+function clearLegacyCatalogMode(){
+  try{
+    localStorage.removeItem('courses-catalog-preferred-mode-v1');
+    localStorage.removeItem('courses-catalog-mode-v1');
+  }catch(_){}
+}
 function readPreferredServings(){
   try{
     const value=Number(localStorage.getItem(STORAGE_PREFERRED_SERVINGS));
@@ -18,69 +21,25 @@ function readPreferredServings(){
     return DEFAULT_SERVINGS;
   }
 }
-
 function persistPreferredServings(value){
   try{
     localStorage.setItem(STORAGE_PREFERRED_SERVINGS,String(value));
     localStorage.setItem(STORAGE_SERVINGS,String(value));
   }catch(_){}
 }
-
-function readPreferredCatalogMode(){
-  try{
-    const preferred=localStorage.getItem(STORAGE_PREFERRED_CATALOG_MODE);
-    if(CATALOG_MODE_OPTIONS.includes(preferred))return preferred;
-    return localStorage.getItem(STORAGE_CATALOG_MODE)==='dishes'?'dishes':'products';
-  }catch(_){
-    return 'products';
-  }
-}
-
-function persistPreferredCatalogMode(value){
-  if(!CATALOG_MODE_OPTIONS.includes(value))return;
-  try{localStorage.setItem(STORAGE_PREFERRED_CATALOG_MODE,value)}catch(_){}
-}
-
 function syncDishServings(value){
   try{localStorage.setItem(STORAGE_SERVINGS,String(value))}catch(_){}
   const quantities=window.COURSES_QUANTITIES;
   if(typeof quantities?.setServings!=='function')return false;
   return quantities.setServings(value)!==false;
 }
-
 function bindDishServingsSync(){
   const sync=()=>syncDishServings(readPreferredServings());
   document.addEventListener('courses:quantities-ready',sync);
   sync();
 }
-
-function applyPreferredCatalogMode(){
-  const catalogView=document.getElementById('catalogView');
-  if(!catalogView?.classList.contains('is-active'))return false;
-  const preferred=readPreferredCatalogMode();
-  const button=document.querySelector(`.catalog-mode[data-mode="${preferred}"]`);
-  if(!button)return false;
-  if(!button.classList.contains('is-active'))button.click();
-  return true;
-}
-
-function bindCatalogEntry(){
-  let applied=false;
-  const sync=()=>{
-    const catalogView=document.getElementById('catalogView');
-    if(!catalogView?.classList.contains('is-active')){
-      applied=false;
-      return;
-    }
-    if(applied)return;
-    applied=applyPreferredCatalogMode();
-  };
-  document.addEventListener('courses:view-changed',sync);
-  document.addEventListener('courses:catalog-mode-ready',sync);
-  sync();
-}
-
 function initPreferencesExtras(){
+  clearLegacyCatalogMode();
   const dialog=document.getElementById('preferencesDialog');
   const startView=document.getElementById('preferencesStartView');
   const saveButton=document.getElementById('savePreferences');
@@ -107,39 +66,22 @@ function initPreferencesExtras(){
   }
 
   const startField=startView.closest('.field');
-
-  let catalogModeSelect=document.getElementById('preferencesCatalogMode');
-  if(!catalogModeSelect){
-    const field=document.createElement('label');
-    field.className='field';
-    field.innerHTML='<span>Ouverture du Catalogue</span><select id="preferencesCatalogMode" aria-label="Ouverture du Catalogue"><option value="products">Produits</option><option value="dishes">Plats</option></select>';
-    startField?.after(field);
-    catalogModeSelect=field.querySelector('select');
-  }
-
   let servingsSelect=document.getElementById('preferencesServings');
   if(!servingsSelect){
     const field=document.createElement('label');
     field.className='field';
     field.innerHTML='<span>Nombre de personnes</span><select id="preferencesServings" aria-label="Nombre de personnes"><option value="2">2 personnes</option><option value="4">4 personnes</option><option value="5">5 personnes</option></select>';
-    (catalogModeSelect?.closest('.field')||startField)?.after(field);
+    startField?.after(field);
     servingsSelect=field.querySelector('select');
   }
-  if(!catalogModeSelect||!servingsSelect)return;
+  if(!servingsSelect)return;
 
   const initialServings=readPreferredServings();
-  const initialCatalogMode=readPreferredCatalogMode();
   persistPreferredServings(initialServings);
-  persistPreferredCatalogMode(initialCatalogMode);
   servingsSelect.value=String(initialServings);
-  catalogModeSelect.value=initialCatalogMode;
   bindDishServingsSync();
-  bindCatalogEntry();
 
-  const syncSelects=()=>{
-    servingsSelect.value=String(readPreferredServings());
-    catalogModeSelect.value=readPreferredCatalogMode();
-  };
+  const syncSelects=()=>{servingsSelect.value=String(readPreferredServings())};
   dialog.addEventListener('close',syncSelects);
   document.getElementById('settingsPreferencesBtn')?.addEventListener('click',syncSelects);
   saveButton.addEventListener('click',()=>{
@@ -147,10 +89,6 @@ function initPreferencesExtras(){
     if(SERVING_OPTIONS.includes(nextServings)){
       persistPreferredServings(nextServings);
       syncDishServings(nextServings);
-    }
-    const nextCatalogMode=catalogModeSelect.value;
-    if(CATALOG_MODE_OPTIONS.includes(nextCatalogMode)){
-      persistPreferredCatalogMode(nextCatalogMode);
     }
   },true);
 }
@@ -179,16 +117,6 @@ const script=document.createElement('script');
 script.src='./missing-products-modern.js?v=410';
 script.defer=true;
 script.dataset.missingProductsModern='1';
-document.head.appendChild(script);
-})();
-
-(() => {
-'use strict';
-if(document.querySelector('script[data-dish-added-marker]'))return;
-const script=document.createElement('script');
-script.src='./dish-added-marker.js?v=408';
-script.defer=true;
-script.dataset.dishAddedMarker='1';
 document.head.appendChild(script);
 })();
 
@@ -421,6 +349,7 @@ function initApplicationManagement(){
     if(title)title.textContent='Gestion de l’application';
     if(intro)intro.textContent='Documentation, historique et informations de l’application.';
     if(!dialog.open)dialog.showModal();
+    document.dispatchEvent(new CustomEvent('courses:settings-management-opened'));
   }
 
   selectionsButton.addEventListener('click',showSelections,true);

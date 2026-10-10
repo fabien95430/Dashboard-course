@@ -108,13 +108,14 @@ function onSingleProductImageLoaded(image,source){
   image.closest('.premium-sprite')?.classList.remove('is-fallback');
   requestAnimationFrame(()=>applyVisualScale(image,source));
 }
-function decorateFallback(card,name,source){
+function decorateFallback(card,name,source,eager=false){
   const fallback=card.querySelector('.product-svg');
   if(!fallback||fallback.dataset.singleProductPending===source)return;
   fallback.dataset.singleProductPending=source;
   const compact=fallback.classList.contains('is-compact');
   const image=new Image();
   image.alt='';
+  image.loading=eager?'eager':'lazy';
   image.decoding='async';
   image.dataset.singleProductSource=source;
   image.addEventListener('load',()=>{
@@ -131,30 +132,27 @@ function decorateFallback(card,name,source){
   },{once:true});
   image.src=source;
 }
-function decorateCard(card){
+function decorateCard(card,eager=false){
   const name=String(card?.dataset?.name||'');
   if(!PRODUCT_NAMES.has(name))return;
   const source=imageSource(name);
   const sprite=card.querySelector('.premium-sprite');
   const image=sprite?.querySelector(':scope > img');
-  if(!sprite||!image){decorateFallback(card,name,source);return;}
+  if(!sprite||!image){decorateFallback(card,name,source,eager);return;}
   card.classList.add('has-single-product-image');
   sprite.classList.add('is-single-product-image');
-  image.loading='eager';
+  image.loading=eager?'eager':'lazy';
   const loaded=()=>onSingleProductImageLoaded(image,source);
   if(image.dataset.singleProductSource!==source){image.dataset.singleProductSource=source;image.src=source;}
   if(image.complete&&image.naturalWidth>0)loaded();
   else image.addEventListener('load',loaded,{once:true});
 }
 function decorateProducts(){
-  products?.querySelectorAll('.product[data-name]').forEach(decorateCard);
+  if(!document.getElementById('catalogView')?.classList.contains('is-active'))return;
+  products?.querySelectorAll('.product[data-name]').forEach(card=>decorateCard(card,false));
 }
 function decorateList(){
-  listItems?.querySelectorAll('.list-row[data-name]').forEach(decorateCard);
-}
-function decorateAll(){
-  decorateProducts();
-  decorateList();
+  listItems?.querySelectorAll('.list-row[data-name]').forEach(card=>decorateCard(card,true));
 }
 function scheduleDecorateProducts(){
   if(productRefreshFrame)return;
@@ -175,6 +173,7 @@ function bindEvents(){
   eventsBound=true;
   document.addEventListener('courses:products-updated',scheduleDecorateProducts);
   document.addEventListener('courses:list-rendered',scheduleDecorateList);
+  document.addEventListener('courses:view-changed',event=>{if(event.detail?.view==='catalog')scheduleDecorateProducts()});
 }
 function bind(){
   products=document.getElementById('products');
@@ -182,7 +181,7 @@ function bind(){
   if(!products||!listItems)return false;
   ensureStyles();
   bindEvents();
-  decorateAll();
+  decorateList();
   return true;
 }
 function init(){
@@ -190,14 +189,4 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
 else init();
-})();
-
-(() => {
-'use strict';
-if(document.querySelector('script[data-catalog-product-admin]'))return;
-const script=document.createElement('script');
-script.src='./catalog-product-admin.js?v=410';
-script.defer=true;
-script.dataset.catalogProductAdmin='1';
-document.head.appendChild(script);
 })();
