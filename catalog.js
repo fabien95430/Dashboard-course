@@ -59,7 +59,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=391';
+    images.src='./dish-local-images.js?v=392';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadRepurchaseSoon,{once:true});

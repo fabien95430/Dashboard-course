@@ -2771,11 +2771,61 @@ async function init(){
   state.loading=false;renderView();showSetup();status('is-waiting','Configuration requise','Première connexion');
 }
 
-async function refreshFromHeader(button){
+function currentAppVersion(){
+  const badge=document.querySelector('.page-version')?.textContent||'';
+  const match=String(badge).match(/v(\d+)/i);
+  return match?Number(match[1]):0;
+}
+async function deployedAppVersion(){
+  if(navigator.onLine===false)return 0;
+  try{
+    const response=await fetch('./index.html?courses-version-check='+Date.now(),{cache:'no-store'});
+    if(!response.ok)return 0;
+    const html=await response.text();
+    const versions=[...html.matchAll(/class=\"page-version\">v(\d+)/g)].map(match=>Number(match[1]));
+    return versions.length?Math.max(...versions):0;
+  }catch(_){return 0}
+}
+function waitForServiceWorkerActivation(worker,timeoutMs=15000){
+  if(!worker||worker.state==='activated')return Promise.resolve(true);
+  return new Promise(resolve=>{
+    let settled=false;
+    const finish=value=>{
+      if(settled)return;
+      settled=true;
+      clearTimeout(timer);
+      worker.removeEventListener('statechange',onStateChange);
+      resolve(value);
+    };
+    const onStateChange=()=>{
+      if(worker.state==='activated')finish(true);
+      else if(worker.state==='redundant')finish(false);
+    };
+    const timer=setTimeout(()=>finish(false),timeoutMs);
+    worker.addEventListener('statechange',onStateChange);
+    onStateChange();
+  });
+}
+async function installLatestAppVersion(){
+  if(!('serviceWorker' in navigator)||navigator.onLine===false)return false;
+  const current=currentAppVersion(),latest=await deployedAppVersion();
+  if(!latest||latest<=current)return false;
+  const registration=await navigator.serviceWorker.getRegistration();
+  if(!registration)return false;
+  try{await registration.update()}catch(_){return false}
+  const worker=registration.installing||registration.waiting;
+  if(worker&&!await waitForServiceWorkerActivation(worker))return false;
+  return true;
+}
+async function refreshFromHeader(button,checkUpdate=false){
   if(button?.classList.contains('is-refreshing'))return;
   button?.classList.add('is-refreshing');
   if(button)button.disabled=true;
   try{
+    if(checkUpdate&&await installLatestAppVersion()){
+      location.reload();
+      return;
+    }
     await refreshItems();
   }finally{
     button?.classList.remove('is-refreshing');
@@ -2800,7 +2850,7 @@ function bindUiEvents(){
     state.items=loadJson(DEMO_KEY,[])||[];
     hideSetup();hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
   };
-  UI.refreshBtn.onclick=()=>refreshFromHeader(UI.refreshBtn);
+  UI.refreshBtn.onclick=event=>refreshFromHeader(UI.refreshBtn,event.isTrusted);
   UI.listFilterBtn.onclick=event=>{
     event.stopPropagation();
     setListFilterMenuOpen(UI.listFilterMenu.hidden);
@@ -2825,7 +2875,7 @@ function bindUiEvents(){
     navigator.vibrate?.(4);
   });
   $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
-  UI.catalogRefreshBtn.onclick=()=>refreshFromHeader(UI.catalogRefreshBtn);
+  UI.catalogRefreshBtn.onclick=event=>refreshFromHeader(UI.catalogRefreshBtn,event.isTrusted);
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;
   if(UI.autoLockSelect)UI.autoLockSelect.onchange=()=>setAutoLockMinutes(UI.autoLockSelect.value);

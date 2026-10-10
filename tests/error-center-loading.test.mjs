@@ -16,9 +16,9 @@ test('le centre d erreurs reste chargé sans restaurer le shell de démarrage',(
   assert.match(index,/error-feedback-bridge\.js\?v=391/);
   assert.ok(index.indexOf('error-center.js?v=390')<index.indexOf('error-feedback-bridge.js?v=391'));
   assert.doesNotMatch(index,/startup\/app\.js/);
-  assert.match(sw,/courses-app-v391-r1/);
+  assert.match(sw,/courses-app-v392-r1/);
   assert.match(sw,/error-center\.js\?v=390/);
   assert.match(sw,/error-feedback-bridge\.js\?v=391/);
-  assert.match(localImages,/const APP_VERSION='v391'/);
-  assert.equal((index.match(/page-version">v391/g)||[]).length,3);
+  assert.match(localImages,/const APP_VERSION='v392'/);
+  assert.equal((index.match(/page-version">v392/g)||[]).length,3);
 });
