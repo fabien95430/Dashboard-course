@@ -9,6 +9,12 @@ function reportOnce(key,payload){
   recent.set(key,now);
   window.CoursesErrors?.report?.({key,...payload});
 }
+function resolveRecoveredFeedback(text){
+  if(!text.startsWith('Intégration OpenAI lancée')&&!text.startsWith('Intégration automatique lancée'))return false;
+  window.CoursesErrors?.resolvePrefix?.('integration-local:');
+  window.CoursesErrors?.resolvePrefix?.('notifications:');
+  return true;
+}
 function inspect(node){
   if(!(node instanceof Element))return;
   const candidates=[];
@@ -18,6 +24,7 @@ function inspect(node){
     if(!item.classList.contains('is-visible'))return;
     const text=String(item.textContent||'').trim();
     if(!text)return;
+    if(resolveRecoveredFeedback(text))return;
     if(text.startsWith('Notification requise')){
       const detail=text.split('—').slice(1).join('—').trim()||'La notification de fin ne peut pas être préparée.';
       reportOnce('notifications:'+detail.toLowerCase(),{

@@ -5,6 +5,7 @@ const STORAGE_KEY='courses-error-center-v1';
 const PUSH_INBOX_CACHE='courses-error-inbox-v1';
 const MAX_ENTRIES=80;
 const RESOLVED_TTL_MS=30*24*60*60*1000;
+const TRANSIENT_PREFIXES=Object.freeze(['resource:','javascript:','promise:','integration-local:','notifications:']);
 let currentFilter='active';
 let uiBound=false;
 
@@ -19,6 +20,13 @@ function scrub(value,max=900){
 }
 function normalize(value){
   return String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+function currentAppVersion(){
+  return scrub(document.querySelector('.page-version')?.textContent||window.COURSES_APP_VERSION||'',24)||'unknown';
+}
+function isTransientKey(key){
+  const value=String(key||'').toLowerCase();
+  return TRANSIENT_PREFIXES.some(prefix=>value.startsWith(prefix));
 }
 function readEntries(){
   try{
@@ -43,6 +51,20 @@ function notifyChanged(entries=readEntries()){
   updateBadge(entries);
   renderPanel(entries);
 }
+function reconcilePreviousVersionEntries(){
+  const version=currentAppVersion();
+  const entries=readEntries();
+  const now=Date.now();
+  let changed=false;
+  entries.forEach(entry=>{
+    if(entry.resolved||!isTransientKey(entry.key)||String(entry.appVersion||'')===version)return;
+    entry.resolved=true;
+    entry.resolvedAt=now;
+    changed=true;
+  });
+  if(changed)writeEntries(entries);
+  return changed;
+}
 function report(input={}){
   const now=Date.now();
   const severity=input.severity==='warning'?'warning':'error';
@@ -53,6 +75,7 @@ function report(input={}){
   const rawKey=input.key||[source,title,message].filter(Boolean).join(':');
   const key=scrub(rawKey,280).toLowerCase()||('error:'+now);
   const action=scrub(input.action||'',40);
+  const appVersion=scrub(input.appVersion||currentAppVersion(),24)||'unknown';
   const meta={};
   if(input.meta&&typeof input.meta==='object'){
     for(const [name,value] of Object.entries(input.meta))meta[scrub(name,40)]=scrub(value,180);
@@ -67,13 +90,14 @@ function report(input={}){
     existing.details=details;
     existing.action=action;
     existing.meta=meta;
+    existing.appVersion=appVersion;
     existing.lastAt=now;
     existing.count=Math.max(1,Number(existing.count)||1)+1;
     writeEntries(entries);
     return existing.id;
   }
   const id=(globalThis.crypto?.randomUUID?.()||('err-'+now+'-'+Math.random().toString(36).slice(2,9)));
-  entries.unshift({id,key,severity,source,title,message,details,action,meta,createdAt:now,lastAt:now,count:1,resolved:false,resolvedAt:0});
+  entries.unshift({id,key,severity,source,title,message,details,action,meta,appVersion,createdAt:now,lastAt:now,count:1,resolved:false,resolvedAt:0});
   writeEntries(entries);
   return id;
 }
@@ -125,6 +149,7 @@ function handleIntegrationSignal(payload={}){
   if(status==='added'){
     resolve(key);
     if(!requestId)resolvePrefix('integration:'+itemType+':'+normalize(itemName));
+    resolvePrefix('integration-local:');
     return;
   }
   const stage=String(payload.stage||'').toLowerCase();
@@ -207,6 +232,21 @@ function resourceInfo(target){
     message:file+' n’a pas pu être chargé.',details:path
   };
 }
+function resolveResourceTarget(target){
+  const info=resourceInfo(target);
+  if(info)resolve(info.key);
+}
+function reconcileLoadedResources(){
+  document.querySelectorAll('img').forEach(image=>{
+    if(image.complete&&image.naturalWidth>0)resolveResourceTarget(image);
+  });
+  document.querySelectorAll('link[rel~="stylesheet"]').forEach(link=>{
+    if(link.sheet)resolveResourceTarget(link);
+  });
+}
+window.addEventListener('load',event=>{
+  if(event.target&&event.target!==window)resolveResourceTarget(event.target);
+},true);
 window.addEventListener('error',event=>{
   if(event.target&&event.target!==window){
     const info=resourceInfo(event.target);
@@ -398,14 +438,19 @@ function bindWhenReady(){
   setTimeout(()=>observer.disconnect(),12000);
 }
 
+reconcilePreviousVersionEntries();
 consumeIntegrationParams();
 void importPushInbox();
 document.addEventListener('click',handleErrorCenterTrigger);
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',()=>{bindHaStatus();bindWhenReady();void importPushInbox()},{once:true});
+  document.addEventListener('DOMContentLoaded',()=>{bindHaStatus();bindWhenReady();reconcileLoadedResources();void importPushInbox()},{once:true});
 }else{
-  bindHaStatus();bindWhenReady();void importPushInbox();
+  bindHaStatus();bindWhenReady();reconcileLoadedResources();void importPushInbox();
 }
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void importPushInbox()});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState!=='visible')return;
+  reconcileLoadedResources();
+  void importPushInbox();
+});
 window.addEventListener('courses-errors-changed',()=>updateBadge());
 })();
