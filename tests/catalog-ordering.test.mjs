@@ -56,7 +56,7 @@ test('chaque produit appartient à une seule catégorie principale cohérente',(
   assert.equal(locations.get(norm('Saumon'))?.category,'Viandes & poissons');
   assert.equal(locations.get(norm('Pain'))?.category,'Boulangerie');
   assert.equal(locations.get(norm('Paprika'))?.category,'Cuisine');
-  assert.equal(locations.get(norm('Chips nature'))?.category,'Apéritif & snacks');
+  assert.equal(locations.get(norm('Chips'))?.category,'Apéritif & snacks');
   assert.equal(locations.get(norm('Shampoing'))?.category,'Hygiène & soins');
   assert.equal(locations.get(norm('Piles AA'))?.sub,'Équipement');
   assert.equal(locations.get(norm('Pile AAA'))?.sub,'Équipement');

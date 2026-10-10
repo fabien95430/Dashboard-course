@@ -16,3 +16,16 @@ test('chaque produit du catalogue dispose de son WebP unitaire canonique',()=>{
   const missing=[]; for(const subgroups of Object.values(groups()))for(const names of Object.values(subgroups||{}))for(const name of names)if(!existsSync(new URL('www/Items/'+slugify(name)+'.webp',root)))missing.push(name);
   assert.deepEqual(missing,[]);
 });
+
+
+test('Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel',()=>{
+  const app=read('app.js');
+  const dishes=read('dishes-ui.js');
+  const bridge=read('error-feedback-bridge.js');
+  assert.ok(app.includes(`loading="eager" fetchpriority="'+(compact?'high':'auto')+'"`));
+  assert.ok(dishes.includes("const ingredientImageSource=name=>'./www/Items/'"));
+  assert.ok(dishes.includes("+'.webp';"));
+  assert.ok(dishes.includes('loading="eager" fetchpriority="high"'));
+  assert.doesNotMatch(dishes,/ingredientThumbCache|ingredientThumbRequest|ingredientThumbUserQuery|primeDishIngredientThumbs|setHiddenCatalogQuery|nextPaint\(\)/);
+  assert.doesNotMatch(bridge,/forceListImagesEager|startListImageWarmup/);
+});
