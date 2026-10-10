@@ -47,6 +47,7 @@ write('sw.js',sw);
 
 let versionTest=read('tests/list-render-version.test.mjs');
 versionTest=versionTest.replaceAll('v411','v412');
+versionTest=versionTest.replaceAll('v=411','v=412');
 versionTest=versionTest.replace('P2 publie la version globale v412 et les révisions app associées','P3 publie la version globale v412 et les révisions app associées');
 versionTest=versionTest.replace("  assert.match(index,/\\.\\/app\\.js\\?v=412/);","  assert.match(index,/\\.\\/bottom-nav-liquid\\.js\\?v=412/);\n  assert.match(index,/\\.\\/app\\.js\\?v=412/);");
 versionTest=versionTest.replace("  assert.match(sw,/\\.\\/app\\.js\\?v=412/);","  assert.match(sw,/\\.\\/bottom-nav-liquid\\.js\\?v=412/);\n  assert.match(sw,/\\.\\/app\\.js\\?v=412/);");
