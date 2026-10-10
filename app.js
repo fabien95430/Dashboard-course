@@ -812,6 +812,57 @@ function emitListChangedIfNeeded(groups=activeGroups()){
 function notifyListRendered(){
   document.dispatchEvent(new CustomEvent('courses:list-rendered'));
 }
+let listRenderStructureSignature='';
+function listStructureSignature(rows,showCategorySections){
+  return (showCategorySections?'category':'flat')+'\u0002'+rows.map(group=>{
+    const product=catalogProductFor(group.summary);
+    return [
+      norm(group.summary),
+      group.summary,
+      product?.category||'Autres',
+      product?.sub||product?.category||'Article',
+      product?sprite(product,true):'<span class="unknown">•</span>'
+    ].join('\u0000');
+  }).join('\u0001');
+}
+function patchListRowState(row,group){
+  const key=norm(group.summary),busy=state.productBusy.has(key);
+  let changed=false;
+  if(row.classList.contains('is-busy')!==busy){row.classList.toggle('is-busy',busy);changed=true}
+  const check=row.querySelector('.purchase-check');
+  if(check&&check.disabled!==busy){check.disabled=busy;changed=true}
+  const desiredQuantity=group.count>1?'x'+group.count:'';
+  let quantity=row.querySelector('.list-qty');
+  if(desiredQuantity){
+    if(!quantity){
+      quantity=document.createElement('span');
+      quantity.className='list-qty';
+      const undo=row.querySelector('.undo-purchase');
+      if(undo)undo.before(quantity);else row.appendChild(quantity);
+      changed=true;
+    }
+    if(quantity.textContent!==desiredQuantity){quantity.textContent=desiredQuantity;changed=true}
+  }else if(quantity){
+    quantity.remove();
+    changed=true;
+  }
+  return changed;
+}
+function patchRenderedListRows(root,rows,structureSignature){
+  if(!root||!rows.length||structureSignature!==listRenderStructureSignature)return false;
+  const rendered=[...root.querySelectorAll('.list-row')];
+  if(rendered.length!==rows.length)return false;
+  const compatible=rows.every((group,index)=>{
+    const row=rendered[index],key=norm(group.summary);
+    return row?.dataset?.key===key&&row.dataset.name===group.summary;
+  });
+  if(!compatible)return false;
+  let changed=false;
+  rows.forEach((group,index)=>{if(patchListRowState(rendered[index],group))changed=true});
+  updateListReorderAvailability(root);
+  if(changed)notifyListRendered();
+  return true;
+}
 function syncProductSelection(){
   const groups=activeGroups();
   emitListChangedIfNeeded(groups);
@@ -835,14 +886,22 @@ function renderList(){
   const el=$('#listItems');
   if(!el)return;
   const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
-  if(state.loading&&!groups.length){el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';notifyListRendered();return}
+  if(state.loading&&!groups.length){
+    listRenderStructureSignature='';
+    el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';
+    notifyListRendered();
+    return;
+  }
   if(!rows.length){
+    listRenderStructureSignature='';
     const message=needle?'Aucun article trouvé.':(state.listCategoryFilter!=='Toutes'?'Aucun article dans cette catégorie.':(state.error?'Liste indisponible.':'La liste est vide.'));
     el.innerHTML='<div class="empty">'+message+'</div>';
     notifyListRendered();
     return;
   }
   const showCategorySections=state.preferences.listSort==='category';
+  const structureSignature=listStructureSignature(rows,showCategorySections);
+  if(patchRenderedListRows(el,rows,structureSignature))return;
   let previousCategory='';
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=catalogProductFor(group.summary),busy=state.productBusy.has(key);
@@ -863,6 +922,7 @@ function renderList(){
       '<button class="row-grip list-row-more" type="button" data-name="'+esc(group.summary)+'" aria-label="Actions pour '+esc(group.summary)+'" aria-haspopup="menu">•••</button>'+
     '</div>';
   }).join('');
+  listRenderStructureSignature=structureSignature;
   bindProductImageFallbacks(el);
   el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
     event.stopPropagation();
@@ -876,26 +936,6 @@ function renderList(){
   bindListReorder(el);
   notifyListRendered();
 }
-function listDomMatchesCurrentState(){
-  const root=$('#listItems');
-  if(!root)return false;
-  const groups=activeGroups();
-  const rows=sortedGroups(visibleListGroups(groups));
-  if(!rows.length)return false;
-  const rendered=[...root.querySelectorAll('.list-row')];
-  if(rendered.length!==rows.length)return false;
-  const canReorder=rows.length>1;
-  return rows.every((group,index)=>{
-    const row=rendered[index],key=norm(group.summary);
-    const quantity=group.count>1?'x'+group.count:'';
-    const grip=row.querySelector('.row-grip');
-    return row.dataset.key===key
-      &&row.dataset.name===group.summary
-      &&(row.querySelector('.list-qty')?.textContent||'')===quantity
-      &&row.classList.contains('is-busy')===state.productBusy.has(key)
-      &&!!grip;
-  });
-}
 function updateListReorderAvailability(root){
   if(!root)return false;
   const rows=[...root.querySelectorAll('.list-row')];
@@ -907,6 +947,7 @@ function removeRenderedListRow(row){
   syncProductSelection();
   const root=$('#listItems');
   if(!row||!root||!root.contains(row)){renderList();return}
+  listRenderStructureSignature='';
   row.remove();
   root.querySelectorAll('.list-category-heading').forEach(heading=>{
     if(!heading.nextElementSibling?.classList.contains('list-row'))heading.remove();
@@ -2010,7 +2051,7 @@ async function refreshItems(){
     const incoming=Array.isArray(result?.items)?result.items:[];
     state.items=incoming.filter(item=>!state.pendingRemoval.has(norm(itemSummary(item))));
     state.loading=false;state.error='';syncProductSelection();
-    if(!listDomMatchesCurrentState())renderList();
+    renderList();
     status('', 'Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
   }catch(error){
     state.loading=false;
@@ -2655,7 +2696,7 @@ refreshItems=async function(){
     state.error='';
     await persistOfflineState();
     syncProductSelection();
-    if(!listDomMatchesCurrentState())renderList();
+    renderList();
     status('','Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
   }catch(error){
     state.loading=false;

@@ -77,7 +77,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadAppUi();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=410';
+    images.src='./dish-local-images.js?v=411';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadAppUi,{once:true});
