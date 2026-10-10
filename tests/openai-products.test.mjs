@@ -44,6 +44,18 @@ test('le workflow OpenAI route les produits vers une intégration WebP avec noti
   assert.match(script,/ROOT \/ "catalog\.js"/);
 });
 
+test('les visuels produits OpenAI sont générés au plus petit carré valide et pensés pour une vignette 192 px',()=>{
+  const script=read('scripts/integrate_product_openai.py');
+  const validator=read('scripts/validate_generated_asset.py');
+  assert.match(script,/PRODUCT_IMAGE_SIZE = "816x816"/);
+  assert.match(script,/"size":PRODUCT_IMAGE_SIZE/);
+  assert.match(script,/cible d'affichage finale de 192×192 px/);
+  assert.match(script,/Éviter les micro-détails/);
+  assert.match(script,/textures photographiques complexes/);
+  assert.match(validator,/expected=\(816,816\)/);
+  assert.doesNotMatch(script,/"size":"1024x1024"/);
+});
+
 test('le classement OpenAI reçoit tout le catalogue et peut créer une sous-catégorie',()=>{
   const script=read('scripts/integrate_product_openai.py');
   assert.doesNotMatch(script,/list\(names\)\[:8\]/);

@@ -17,6 +17,7 @@ RESULT_PATH = base.RESULT_PATH
 PRODUCT_PREFIX = "__courses_product__:"
 IMAGE_HINT_MARKER = "||__courses_image_hint__:"
 IMAGE_HINT_MAX = 140
+PRODUCT_IMAGE_SIZE = "816x816"
 DISPLAY_MODES=(
     "Bouteille","Pot","Poids","Barquette","Sachet","Pièce","Paquet","Boîte","Flacon",
     "Plaquette","Brique","Sac","Tablette","Tube","Rouleau","Paire","Stick","Botte","Unité",
@@ -211,16 +212,18 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
     return (
         f"Vignette produit pour une application de courses: {name}. Catégorie {category}, sous-groupe {subgroup}. "
         +hint+
-        "Reprendre le langage visuel des produits déjà présents dans le catalogue: illustration 3D semi-réaliste de catalogue mobile, "
-        "objet détouré propre, volumes simples, textures nettes, lumière studio douce et ombre très légère. "
-        "Représenter un seul type de produit, isolé et immédiatement reconnaissable, sur fond totalement transparent. "
-        "Le produit principal doit occuper environ 86 à 92 % de sa plus grande dimension dans le carré, être centré, avec une marge transparente régulière et aucun bord important coupé. "
+        "Reprendre fidèlement le langage visuel des produits déjà présents dans le catalogue: rendu 3D semi-réaliste, propre, simple, premium et cohérent avec les autres items existants. "
+        "L'image est destinée à une petite vignette mobile avec une cible d'affichage finale de 192×192 px. Elle doit donc rester immédiatement identifiable à cette taille. "
+        "Utiliser des formes lisibles, des volumes simples, des contours nets, des textures sobres et uniquement les détails indispensables à l'identification du produit. "
+        "Représenter exactement un seul type de produit, isolé sur fond totalement transparent, centré, avec des proportions naturelles et une marge transparente régulière. "
+        "Le produit principal doit occuper environ 86 à 92 % de sa plus grande dimension dans le carré et aucun bord important ne doit être coupé. "
+        "Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins, petits accessoires secondaires et détails invisibles à petite taille. "
         "En l’absence de précision visuelle utilisateur, privilégier le produit lui-même plutôt que son emballage de vente. Si l'objet est reconnaissable sans emballage "
         "(par exemple pile, thermomètre, éponge, rasoir, fruit ou légume), le montrer hors boîte, hors blister, hors sachet et sans étiquette. "
         "N'utiliser un emballage générique que lorsqu'il est réellement indispensable pour identifier le produit, ou lorsqu’une précision visuelle utilisateur le demande; dans ce cas il doit rester simple, "
-        "sans marque, sans logo et sans texte lisible. Éviter les grands blocs rectangulaires ou les packagings qui dominent la vignette. "
+        "sans marque, sans logo, sans texte lisible, visuellement léger et non dominant. Éviter les grands blocs rectangulaires ou les packagings massifs. "
         "Aucun décor, table, rayon, main, personne, collage, grille ou deuxième type de produit. Aucun texte ajouté autour du produit. "
-        "Le produit doit rester parfaitement lisible à petite taille et visuellement cohérent avec les autres icônes du catalogue."
+        "Le rendu final doit être clair, compact, harmonisé avec les autres icônes du catalogue et parfaitement lisible en petite vignette mobile."
     )
 
 
@@ -231,7 +234,7 @@ def generate_image(name: str, category: str, subgroup: str, image_hint: str, api
         {
             "model":model,
             "prompt":image_prompt(name,category,subgroup,image_hint),
-            "size":"1024x1024",
+            "size":PRODUCT_IMAGE_SIZE,
             "quality":"high",
             "output_format":"webp",
             "background":"transparent",

@@ -10,6 +10,7 @@ Cette note est la référence pour recréer ou remplacer l’image d’un produi
 - `product-item-images.js` transforme le nom du produit en slug puis charge `./www/Items/<slug>.webp`.
 - Toutes les catégories utilisent les images unitaires.
 - Si une image unitaire manque ou ne charge pas, l’application utilise uniquement le visuel SVG premium local de secours.
+- Pour les nouveaux visuels produits générés via OpenAI, l’automatisation utilise actuellement **816×816 px**, le plus petit carré valide pour le modèle configuré, tout en optimisant le rendu pour une **petite vignette mobile cible de 192×192 px**.
 
 ## Règle visuelle
 
@@ -31,6 +32,8 @@ Le nouvel item doit conserver exactement le langage visuel déjà présent dans 
 - aucun texte ajouté autour du produit ;
 - ne jamais inventer une marque ou un logo.
 
+Le visuel étant destiné à une petite vignette mobile, privilégier des formes lisibles, des volumes simples, des contours nets et des textures sobres. Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins et détails invisibles à petite taille.
+
 Pour un produit emballé, garder un emballage simple et générique cohérent avec les items voisins. Ne pas créer de texte lisible ou de marque fictive uniquement pour remplir l’étiquette.
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
@@ -39,7 +42,7 @@ Ne jamais changer volontairement de style graphique. Si les références de la c
 
 Utiliser ce modèle lorsque l’on demande la régénération d’un item :
 
-> Régénère uniquement l’image de l’item **« [NOM EXACT DU PRODUIT] »** dans le même style que les autres produits existants de sa catégorie **[CATÉGORIE]**. Commence par lire l’état actuel de `main`, `catalog.js`, `product-item-images.js` et plusieurs images existantes de `www/Items/` appartenant à la même catégorie afin de reprendre leur style réel. Génère exactement **un seul produit**, isolé sur **fond transparent**, centré, avec des proportions naturelles et une marge régulière autour. Le cadrage, l’échelle, le niveau de détail, les ombres et la finition doivent rester cohérents avec les références existantes. Aucun décor, aucune main, aucune personne, aucun collage, aucune grille, aucun deuxième produit, aucun texte ajouté autour, aucune marque ou logo inventé. Si le produit est emballé, utiliser un emballage générique cohérent avec les références. Intégrer le résultat en **WebP** dans `www/Items/` avec le nom de fichier attendu par le slug actuel. Ne modifier aucun autre comportement de l’application sauf ce qui est strictement nécessaire pour versionner et invalider le cache conformément aux règles du dépôt. Vérifier le résultat dans Catalogue et Ma liste, sur mobile et avec le mode hors ligne. Vérifier aussi que le fallback SVG local reste lisible si le WebP ne charge pas.
+> Régénère uniquement l’image de l’item **« [NOM EXACT DU PRODUIT] »** dans le même style que les autres produits existants de sa catégorie **[CATÉGORIE]**. Commence par lire l’état actuel de `main`, `catalog.js`, `product-item-images.js` et plusieurs images existantes de `www/Items/` appartenant à la même catégorie afin de reprendre leur style réel. Le rendu doit être 3D semi-réaliste, propre, simple, premium et immédiatement identifiable en petite vignette mobile, avec une cible d’affichage finale de **192×192 px**. Utilise des formes lisibles, des volumes simples, des contours nets, des textures sobres et uniquement les détails indispensables à l’identification. Génère exactement **un seul produit**, isolé sur **fond transparent**, centré, avec des proportions naturelles et une marge régulière autour. Le produit principal doit occuper environ 86 à 92 % de sa plus grande dimension dans le carré, sans bord important coupé. Évite les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins, petits accessoires secondaires et détails invisibles à petite taille. Aucun décor, aucune main, aucune personne, aucun collage, aucune grille, aucun deuxième produit, aucun texte ajouté autour, aucune marque ou logo inventé. Si le produit est emballé, utilise un emballage générique simple, visuellement léger et non dominant, cohérent avec les références. Intègre le résultat en **WebP** dans `www/Items/` avec le nom de fichier attendu par le slug actuel. Ne modifie aucun autre comportement de l’application sauf ce qui est strictement nécessaire pour versionner et invalider le cache conformément aux règles du dépôt. Vérifie le résultat dans Catalogue et Ma liste, sur mobile et avec le mode hors ligne. Vérifie aussi que le fallback SVG local reste lisible si le WebP ne charge pas.
 
 ## Nom du fichier
 

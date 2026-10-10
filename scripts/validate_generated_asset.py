@@ -72,7 +72,7 @@ def main() -> None:
     try:
         if item_type=='product':
             width,height=webp_dimensions(image)
-            expected=(1024,1024)
+            expected=(816,816)
             if path.suffix.lower()!='.webp':
                 raise ValueError('Le visuel produit doit être enregistré en WebP')
         else:
