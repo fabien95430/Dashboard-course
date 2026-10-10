@@ -94,6 +94,7 @@ jobs:
           for attempt in 1 2 3; do
             git fetch origin main
             git rebase origin/main
+            bash scripts/validate_repo.sh
             if git push origin HEAD:main; then
               exit 0
             fi
