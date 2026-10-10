@@ -1868,6 +1868,43 @@ function request(payload){
     state.ws.send(JSON.stringify({id,...payload}));
   });
 }
+function haClientIsConnected(){
+  return !state.locked&&!state.demo&&state.ws?.readyState===WebSocket.OPEN;
+}
+function validateHaClientPayload(payload){
+  if(!payload||typeof payload!=='object'||Array.isArray(payload)||payload.type==='auth'){
+    throw new Error('Requête Home Assistant invalide');
+  }
+}
+async function haClientRequest(payload){
+  validateHaClientPayload(payload);
+  if(state.demo)throw new Error('Home Assistant indisponible en mode test.');
+  if(state.locked)throw new Error(STATUS_TEXT.unlockRequired);
+  if(!haClientIsConnected()){
+    UI.refreshBtn?.click();
+    const started=Date.now();
+    while(Date.now()-started<1800){
+      if(state.locked)throw new Error(STATUS_TEXT.unlockRequired);
+      if(state.demo)throw new Error('Home Assistant indisponible en mode test.');
+      if(haClientIsConnected())break;
+      await new Promise(resolve=>setTimeout(resolve,60));
+    }
+  }
+  if(!haClientIsConnected())throw new Error('Connexion Home Assistant indisponible.');
+  return request(payload);
+}
+const COURSES_HA_CLIENT=Object.freeze({
+  request:payload=>haClientRequest(payload),
+  callService:(domain,service,serviceData={})=>haClientRequest({type:'call_service',domain,service,service_data:serviceData}),
+  getStates:()=>haClientRequest({type:'get_states'}),
+  isConnected:haClientIsConnected
+});
+Object.defineProperty(window,'COURSES_HA_CLIENT',{
+  value:COURSES_HA_CLIENT,
+  configurable:false,
+  enumerable:false,
+  writable:false
+});
 function todoList(){
   return request({type:'todo/item/list',entity_id:state.entity});
 }

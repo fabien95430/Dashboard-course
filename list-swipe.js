@@ -5,11 +5,7 @@ const DEMO_KEY='courses-external-demo-items-v2';
 const ENTITY_KEY='courses-external-entity-v1';
 const SWIPE_TRIGGER_RATIO=.28;
 const SWIPE_MAX_RATIO=.42;
-const REQUEST_TIMEOUT_MS=12000;
-const FIRST_REQUEST_ID=1800000000;
 
-let haSocket=null;
-let nextRequestId=FIRST_REQUEST_ID;
 let activeSwipe=null;
 
 function norm(value){
@@ -37,54 +33,14 @@ function rowQuantity(row){
   return Number.isFinite(value)&&value>0?value:1;
 }
 
-const nativeWebSocketSend=window.WebSocket?.prototype?.send;
-if(nativeWebSocketSend&&!window.WebSocket.prototype.__coursesRemoveSwipeCapture){
-  Object.defineProperty(window.WebSocket.prototype,'__coursesRemoveSwipeCapture',{value:true,configurable:false,enumerable:false,writable:false});
-  window.WebSocket.prototype.send=function(data){
-    try{
-      const url=new URL(this.url,location.href);
-      if(url.pathname.endsWith('/api/websocket'))haSocket=this;
-    }catch(_){}
-    return nativeWebSocketSend.call(this,data);
-  };
+function sharedHaClient(){
+  const client=window.COURSES_HA_CLIENT;
+  if(!client||typeof client.request!=='function'||typeof client.isConnected!=='function'){
+    throw new Error('Client Home Assistant indisponible.');
+  }
+  return client;
 }
-
-function haRequest(payload){
-  return new Promise((resolve,reject)=>{
-    const socket=haSocket;
-    if(!socket||socket.readyState!==WebSocket.OPEN){reject(new Error('Home Assistant hors ligne'));return}
-    const id=nextRequestId++;
-    const timer=setTimeout(()=>{
-      cleanup();
-      reject(new Error('Home Assistant ne répond pas'));
-    },REQUEST_TIMEOUT_MS);
-    const cleanup=()=>{
-      clearTimeout(timer);
-      socket.removeEventListener('message',onMessage);
-      socket.removeEventListener('close',onClose);
-    };
-    const onClose=()=>{
-      cleanup();
-      reject(new Error('Connexion interrompue'));
-    };
-    const onMessage=event=>{
-      let message;
-      try{message=JSON.parse(event.data)}catch(_){return}
-      if(message?.type!=='result'||message.id!==id)return;
-      cleanup();
-      if(message.success)resolve(message.result);
-      else reject(new Error(message.error?.message||'Retrait impossible'));
-    };
-    socket.addEventListener('message',onMessage);
-    socket.addEventListener('close',onClose,{once:true});
-    try{
-      nativeWebSocketSend.call(socket,JSON.stringify({id,...payload}));
-    }catch(error){
-      cleanup();
-      reject(error);
-    }
-  });
-}
+function haRequest(payload){return sharedHaClient().request(payload)}
 
 async function removeRemoteItems(name,count){
   const entity=currentEntity();
@@ -146,7 +102,7 @@ async function removeWithoutPurchase(row){
       finishSuccess(row,name);
       return;
     }
-    if(!haSocket||haSocket.readyState!==WebSocket.OPEN){
+    if(!window.COURSES_HA_CLIENT?.isConnected?.()){
       throw new Error(navigator.onLine===false?'Retrait indisponible hors ligne':'Home Assistant non connecté');
     }
     await removeRemoteItems(name,count);

@@ -3,13 +3,9 @@
 
 const DELETE_PREFIX='__courses_delete_product__:';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
-const HA_REQUEST_TIMEOUT_MS=12000;
 const PENDING_KEY='courses-catalog-delete-pending-v1';
 const PENDING_TTL_MS=30*60*1000;
 const RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/actions/workflows/integrate-dish-openai.yml/runs?event=repository_dispatch&per_page=50';
-let haSocket=null;
-let haSeq=997000000;
-const haPending=new Map();
 let currentQuery='';
 let currentConfirm='';
 let uiBound=false;
@@ -55,51 +51,16 @@ function setPending(name,state){
 }
 function pendingFor(name){return readPending()[norm(name)]||null}
 
-function bindHaSocket(socket){
-  if(!socket||socket===haSocket)return;
-  haSocket=socket;
-  socket.addEventListener('message',event=>{
-    let message;try{message=JSON.parse(event.data)}catch(_){return}
-    if(message.type!=='result'||!haPending.has(message.id))return;
-    const pending=haPending.get(message.id);haPending.delete(message.id);clearTimeout(pending.timer);
-    if(message.success)pending.resolve(message.result);
-    else pending.reject(new Error(message.error?.message||'Erreur Home Assistant'));
-  });
-  socket.addEventListener('close',()=>{
-    if(haSocket!==socket)return;
-    haSocket=null;
-    haPending.forEach(pending=>{clearTimeout(pending.timer);pending.reject(new Error('Connexion Home Assistant interrompue'))});
-    haPending.clear();
-  });
-}
-function installHaBridge(){
-  if(!('WebSocket' in window)||window.__coursesCatalogAdminBridge)return;
-  window.__coursesCatalogAdminBridge=true;
-  const previousSend=WebSocket.prototype.send;
-  WebSocket.prototype.send=function(data){
-    try{if(String(this.url||'').includes('/api/websocket'))bindHaSocket(this)}catch(_){}
-    return previousSend.call(this,data);
-  };
-}
-function sendHaRequest(socket,payload){
-  return new Promise((resolve,reject)=>{
-    const id=haSeq++;
-    const timer=setTimeout(()=>{haPending.delete(id);reject(new Error('Home Assistant ne répond pas.'))},HA_REQUEST_TIMEOUT_MS);
-    haPending.set(id,{resolve,reject,timer});
-    try{socket.send(JSON.stringify({id,...payload}))}catch(error){clearTimeout(timer);haPending.delete(id);reject(error)}
-  });
-}
-async function waitForHaSocket(){
-  if(haSocket?.readyState===WebSocket.OPEN)return haSocket;
-  document.getElementById('refreshBtn')?.click();
-  const start=Date.now();
-  while(Date.now()-start<1800){
-    if(haSocket?.readyState===WebSocket.OPEN)return haSocket;
-    await new Promise(resolve=>setTimeout(resolve,60));
+function sharedHaClient(){
+  const client=window.COURSES_HA_CLIENT;
+  if(!client||typeof client.request!=='function'||typeof client.callService!=='function'||typeof client.getStates!=='function'||typeof client.isConnected!=='function'){
+    throw new Error('Client Home Assistant indisponible.');
   }
-  throw new Error('Connexion Home Assistant indisponible.');
+  return client;
 }
-async function haRequest(payload){return sendHaRequest(await waitForHaSocket(),payload)}
+function haRequest(payload){return sharedHaClient().request(payload)}
+function haCallService(domain,service,serviceData={}){return sharedHaClient().callService(domain,service,serviceData)}
+
 function base64UrlToBytes(value){
   const padding='='.repeat((4-value.length%4)%4);
   const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');
@@ -110,7 +71,7 @@ async function optionalPushData(){
   const empty={push_endpoint:'',push_p256dh:'',push_auth:'',push_public_key:''};
   if(!('Notification' in window)||Notification.permission!=='granted'||!('serviceWorker' in navigator)||!('PushManager' in window))return empty;
   try{
-    const states=await haRequest({type:'get_states'});
+    const states=await sharedHaClient().getStates();
     const entity=Array.isArray(states)?states.find(item=>item?.entity_id===VAPID_ENTITY):null;
     const publicKey=String(entity?.state||'').trim();
     if(publicKey.length<80)return empty;
@@ -124,11 +85,10 @@ async function optionalPushData(){
 }
 async function requestDeletion(name){
   const requestId=randomId();
-  const socket=await waitForHaSocket();
   const push=await optionalPushData();
-  await sendHaRequest(socket,{type:'call_service',domain:'rest_command',service:'courses_integrate_dish_openai',service_data:{
+  await sharedHaClient().callService('rest_command','courses_integrate_dish_openai',{
     dish_name:DELETE_PREFIX+name,dish_category:'',request_id:requestId,...push
-  }});
+  });
   setPending(name,{requestId,startedAt:Date.now()});
   return requestId;
 }
@@ -301,7 +261,6 @@ function bindWhenReady(){
   setTimeout(()=>observer.disconnect(),12000);
 }
 
-installHaBridge();
 if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',event=>{
   const payload=event.data?.payload||{};
   if(event.data?.type!=='courses-error-signal'||payload.itemType!=='product')return;

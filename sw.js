@@ -1,4 +1,4 @@
-const CACHE='courses-app-v396-r1';
+const CACHE='courses-app-v397-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -7,12 +7,11 @@ const CORE_VISUALS=[
   './www/empty-list-premium-v4.webp?v=305'
 ];
 const SHELL=[
-  './',
   './index.html',
   './styles.css?v=348',
   './product-item-first-paint.css?v=1',
-  './catalog.js?v=396',
-  './app.js?v=392',
+  './catalog.js?v=397',
+  './app.js?v=397',
   './settings-tab-badge.js?v=388',
   './error-center.js?v=395',
   './error-feedback-bridge.js?v=394',
@@ -23,11 +22,11 @@ const SHELL=[
   './dishes-ui.js?v=391',
   './catalog-quantities.js?v=389',
   './repurchase-soon.js?v=363',
-  './dish-local-images.js?v=396',
-  './missing-products-fixes.js?v=20',
+  './dish-local-images.js?v=397',
+  './missing-products-fixes.js?v=397',
   './missing-products-popup-ui.js?v=18',
-  './product-item-images.js?v=14',
-  './catalog-product-admin.js?v=2',
+  './product-item-images.js?v=397',
+  './catalog-product-admin.js?v=397',
   './purchase-intelligence.js?v=387',
   './missing-products-dishes.js?v=388',
   './missing-products-modern.js?v=6',
