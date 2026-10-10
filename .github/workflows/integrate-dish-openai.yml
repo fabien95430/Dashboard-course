@@ -68,8 +68,9 @@ jobs:
         id: request
         shell: python
         run: |
-          import os
+          import hashlib, json, os
           raw=str(os.environ.get('DISH_NAME') or '').strip()
+          context=str(os.environ.get('DISH_CATEGORY') or '').strip()
           product_prefix='__courses_product__:'
           delete_prefix='__courses_delete_product__:'
           if raw.startswith(delete_prefix):
@@ -83,25 +84,92 @@ jobs:
               item_name=raw
           if not item_name:
               raise SystemExit('Nom de demande manquant')
+          checkpoint_key=''
+          checkpoint_branch=''
+          if item_type in {'product','dish'}:
+              fingerprint=json.dumps([item_type,item_name,context],ensure_ascii=False,separators=(',',':'))
+              checkpoint_key=hashlib.sha256(fingerprint.encode('utf-8')).hexdigest()[:24]
+              checkpoint_branch='automation/openai-checkpoint-'+checkpoint_key
           with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as out:
               out.write(f"type={item_type}\n")
               out.write(f"name={item_name}\n")
+              out.write(f"checkpoint_key={checkpoint_key}\n")
+              out.write(f"checkpoint_branch={checkpoint_branch}\n")
+
+      - name: Restaurer une génération OpenAI conservée
+        id: checkpoint_restore
+        if: steps.request.outputs.checkpoint_branch != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="${{ steps.request.outputs.checkpoint_branch }}"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            git fetch --depth=1 origin "$branch"
+            rm -rf .courses-openai-checkpoint
+            git archive FETCH_HEAD .courses-openai-checkpoint | tar -x
+            echo "restored=true" >> "$GITHUB_OUTPUT"
+            echo "Checkpoint OpenAI restauré depuis $branch"
+          else
+            echo "restored=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Traiter la demande
         id: integrate
         continue-on-error: true
+        env:
+          COURSES_CHECKPOINT_KEY: ${{ steps.request.outputs.checkpoint_key }}
         shell: bash
         run: |
           set -euo pipefail
           if [ "${{ steps.request.outputs.type }}" = "delete_product" ]; then
             python3 scripts/manage_product_catalog.py
           elif [ "${{ steps.request.outputs.type }}" = "product" ]; then
-            python3 scripts/integrate_product_openai.py
-            python3 scripts/validate_generated_asset.py product
+            python3 scripts/run_openai_integration.py product
           else
-            python3 scripts/integrate_dish_openai.py
-            python3 scripts/validate_generated_asset.py dish
+            python3 scripts/run_openai_integration.py dish
           fi
+
+      - name: Valider le visuel généré
+        id: asset
+        if: steps.integrate.outcome == 'success' && steps.request.outputs.type != 'delete_product'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_generated_asset.py "${{ steps.request.outputs.type }}"
+
+      - name: Invalider uniquement le visuel du checkpoint
+        if: steps.asset.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d .courses-openai-checkpoint ]; then
+            find .courses-openai-checkpoint -maxdepth 1 -type f \( -name '*-image.json' -o -name '*-image.bin' \) -delete
+          fi
+
+      - name: Conserver la génération OpenAI pour une relance
+        id: checkpoint
+        if: always() && steps.request.outputs.checkpoint_branch != ''
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -d .courses-openai-checkpoint ] || [ -z "$(find .courses-openai-checkpoint -maxdepth 1 -type f -print -quit)" ]; then
+            echo "saved=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          branch="${{ steps.request.outputs.checkpoint_branch }}"
+          checkpoint_index="$(mktemp)"
+          rm -f "$checkpoint_index"
+          GIT_INDEX_FILE="$checkpoint_index" git add -f .courses-openai-checkpoint
+          checkpoint_tree="$(GIT_INDEX_FILE="$checkpoint_index" git write-tree)"
+          checkpoint_commit="$(printf '%s\n' "Checkpoint OpenAI ${{ steps.request.outputs.checkpoint_key }}" | git commit-tree "$checkpoint_tree")"
+          git push --force origin "$checkpoint_commit:refs/heads/$branch"
+          rm -f "$checkpoint_index"
+          echo "saved=true" >> "$GITHUB_OUTPUT"
+          echo "Checkpoint OpenAI conservé sur $branch"
 
       - name: Lire le résultat
         id: result
@@ -128,7 +196,7 @@ jobs:
 
       - name: Sauvegarder la modification sur une branche temporaire
         id: preserve
-        if: steps.integrate.outcome == 'success' && steps.result.outputs.already_exists != 'true'
+        if: steps.integrate.outcome == 'success' && steps.result.outputs.ok == 'true' && steps.result.outputs.already_exists != 'true' && (steps.request.outputs.type == 'delete_product' || steps.asset.outcome == 'success') && (steps.request.outputs.type == 'delete_product' || steps.checkpoint.outcome == 'success')
         shell: bash
         run: |
           set -euo pipefail
@@ -181,7 +249,7 @@ jobs:
 
       - name: Confirmer le déploiement GitHub Pages
         id: deploy
-        if: steps.integrate.outcome == 'success' && (steps.result.outputs.already_exists == 'true' || steps.commit.outcome == 'success')
+        if: steps.integrate.outcome == 'success' && steps.result.outputs.ok == 'true' && (steps.request.outputs.type == 'delete_product' || steps.asset.outcome == 'success') && (steps.result.outputs.already_exists == 'true' || steps.commit.outcome == 'success')
         continue-on-error: true
         shell: bash
         run: |
@@ -225,6 +293,16 @@ jobs:
         shell: bash
         run: git push origin --delete "$TEMP_BRANCH"
 
+      - name: Supprimer le checkpoint OpenAI après publication
+        if: steps.deploy.outcome == 'success' && steps.request.outputs.checkpoint_branch != ''
+        continue-on-error: true
+        shell: bash
+        run: |
+          branch="${{ steps.request.outputs.checkpoint_branch }}"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            git push origin --delete "$branch"
+          fi
+
       - name: Installer l'émetteur Web Push
         if: always() && env.PUSH_ENDPOINT != ''
         run: npm install --no-save --no-package-lock web-push@3.6.7
@@ -240,7 +318,7 @@ jobs:
         env:
           PUSH_STATUS: error
           PUSH_ERROR: ${{ steps.result.outputs.error }}
-          PUSH_STAGE: ${{ steps.integrate.outcome != 'success' && 'integration' || 'deployment' }}
+          PUSH_STAGE: ${{ steps.integrate.outcome != 'success' && 'integration' || steps.asset.outcome == 'failure' && 'validation' || steps.checkpoint.outcome == 'failure' && 'checkpoint' || 'deployment' }}
         run: node scripts/send_web_push.mjs
 
       - name: Signaler un échec

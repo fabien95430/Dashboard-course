@@ -33,8 +33,11 @@ test('le lancement OpenAI reste visible dans le popup et notifie Courses immédi
 
 test('le workflow OpenAI route les produits vers une intégration WebP avec notification Web Push',()=>{
   const workflow=read('.github/workflows/integrate-dish-openai.yml');
+  const runner=read('scripts/run_openai_integration.py');
   const script=read('scripts/integrate_product_openai.py');
-  assert.match(workflow,/python3 scripts\/integrate_product_openai\.py/);
+  assert.match(workflow,/python3 scripts\/run_openai_integration\.py product/);
+  assert.match(runner,/import integrate_product_openai as product/);
+  assert.match(runner,/product\.main\(\)/);
   assert.match(workflow,/www\/Items\/\$\{\{ steps\.result\.outputs\.filename \}\}/);
   assert.match(workflow,/git add catalog\.js app\.js catalog-quantities\.js index\.html product-item-images\.js dish-local-images\.js sw\.js/);
   assert.match(workflow,/node scripts\/send_web_push\.mjs/);
