@@ -16,13 +16,9 @@ test('la CI permanente valide main et les pull requests en lecture seule',()=>{
   assert.match(workflow,/bash scripts\/validate_repo\.sh/);
 });
 
-test('le validateur contrôle la syntaxe et toute la suite sans masquer la dette images',()=>{
+test('le validateur contrôle la syntaxe et toute la suite sans exception',()=>{
   const script=read('scripts/validate_repo.sh');
   assert.match(script,/node --check/);
-  assert.match(script,/tests\/\*\.test\.mjs/);
-  assert.match(script,/product-images-no-atlas\.test\.mjs/);
-  assert.match(script,/# pass 2/);
-  assert.match(script,/# fail 1/);
-  assert.match(script,/not ok 3 - Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel/);
-  assert.match(script,/if \[\[ "\$image_code" -ne 0 \]\]; then/);
+  assert.match(script,/node --test --test-reporter=tap tests\/\*\.test\.mjs/);
+  assert.doesNotMatch(script,/product-images-no-atlas|# pass 2|# fail 1|image_code|not ok 3/);
 });

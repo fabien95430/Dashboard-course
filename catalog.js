@@ -17,7 +17,7 @@
 
   const liquidStyle=document.createElement('link');
   liquidStyle.rel='stylesheet';
-  liquidStyle.href='./catalog-liquid.css?v=3';
+  liquidStyle.href='./catalog-liquid.css?v=4';
   liquidStyle.dataset.catalogLiquid='style';
   document.head.appendChild(liquidStyle);
 
@@ -32,7 +32,7 @@
   const loadDishes=()=>{
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
     const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=391';
+    script.src='./dishes-ui.js?v=403';
     script.async=false;
     script.dataset.catalogDishes='script';
     script.addEventListener('load',loadLiquid,{once:true});
@@ -77,7 +77,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadAppUi();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=402';
+    images.src='./dish-local-images.js?v=403';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadAppUi,{once:true});

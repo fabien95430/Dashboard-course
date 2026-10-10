@@ -110,6 +110,7 @@ const DISH_SPECIAL_SLUGS=Object.freeze({
 });
 const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poulet légumes','Gratin pommes de terre','Pâtes jambon','Purée carotte poulet','Risotto poulet','Saumon brocoli','Steak frites','Velouté carottes','Crème brûlée','Riz au lait']);
 const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const ingredientImageSource=name=>'./www/Items/'+dishSlug(name)+'.webp';
 const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';
 
 let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';
@@ -157,10 +158,7 @@ let recipeCustomizationSelection=new Set();
 let recipeCustomizationNeeds={};
 let toastTimer=0;
 let lensTimer=0;
-const ingredientThumbCache=new Map();
 const dishCardCache=new Map();
-let ingredientThumbRequest=0;
-let ingredientThumbUserQuery=null;
 
 function readFavorites(){
   try{return new Set(JSON.parse(localStorage.getItem(STORAGE_FAVORITES)||'[]').map(String))}catch(_){return new Set()}
@@ -258,8 +256,8 @@ function buildUi(){
   modeSwitch.setAttribute('role','tablist');
   modeSwitch.setAttribute('aria-label','Type de catalogue');
   modeSwitch.innerHTML=
-    '<span class="catalog-mode-lens" aria-hidden="true"></span>'+ 
-    '<button type="button" class="catalog-mode" data-mode="products" role="tab"><svg><use href="#i-grid"></use></svg><span>Produits</span></button>'+ 
+    '<span class="catalog-mode-lens" aria-hidden="true"></span>'+
+    '<button type="button" class="catalog-mode" data-mode="products" role="tab"><svg><use href="#i-grid"></use></svg><span>Produits</span></button>'+
     '<button type="button" class="catalog-mode" data-mode="dishes" role="tab"><span class="catalog-mode-fork" aria-hidden="true">🍴</span><span>Plats</span></button>';
 
   dishFilters=document.createElement('div');
@@ -302,20 +300,20 @@ function buildDishDialog(){
   dishDialog.innerHTML=
     '<div class="dish-sheet-photo-wrap">'+
       '<img class="dish-sheet-photo" alt="" decoding="async" referrerpolicy="no-referrer">'+
-      '<button type="button" class="dish-sheet-close" aria-label="Fermer">‹</button>'+ 
-      '<button type="button" class="dish-sheet-favorite" aria-label="Ajouter aux favoris">♡</button>'+ 
-    '</div>'+ 
+      '<button type="button" class="dish-sheet-close" aria-label="Fermer">‹</button>'+
+      '<button type="button" class="dish-sheet-favorite" aria-label="Ajouter aux favoris">♡</button>'+
+    '</div>'+
     '<div class="dish-sheet-head">'+
-      '<h2></h2>'+ 
+      '<h2></h2>'+
       '<div class="dish-sheet-meta">'+
-        '<p><svg><use href="#i-cart"></use></svg><strong class="dish-sheet-count">0 ingrédient</strong></p>'+ 
-        '<div class="dish-sheet-tags" aria-hidden="true"></div>'+ 
-      '</div>'+ 
-    '</div>'+ 
-    '<div class="dish-sheet-list" aria-label="Ingrédients à ajouter"></div>'+ 
+        '<p><svg><use href="#i-cart"></use></svg><strong class="dish-sheet-count">0 ingrédient</strong></p>'+
+        '<div class="dish-sheet-tags" aria-hidden="true"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="dish-sheet-list" aria-label="Ingrédients à ajouter"></div>'+
     '<div class="dish-sheet-footer">'+
-      '<div class="dish-sheet-note"><span aria-hidden="true">ⓘ</span><div><strong>Sel, huile, poivre non inclus</strong><small>À ajouter manuellement si besoin.</small></div></div>'+ 
-      '<button type="button" class="dish-sheet-add"><svg><use href="#i-cart"></use></svg><span>Ajouter à ma liste</span></button>'+ 
+      '<div class="dish-sheet-note"><span aria-hidden="true">ⓘ</span><div><strong>Sel, huile, poivre non inclus</strong><small>À ajouter manuellement si besoin.</small></div></div>'+
+      '<button type="button" class="dish-sheet-add"><svg><use href="#i-cart"></use></svg><span>Ajouter à ma liste</span></button>'+
     '</div>';
   document.body.appendChild(dishDialog);
   dishSheetPhoto=dishDialog.querySelector('.dish-sheet-photo');
@@ -394,13 +392,13 @@ function buildRecipeCustomizationDialog(){
   recipeCustomizationDialog.className='dialog recipe-customization-dialog';
   recipeCustomizationDialog.tabIndex=-1;
   recipeCustomizationDialog.innerHTML=
-    '<h3>Personnalisation des recettes</h3>'+ 
-    '<p class="dialog-intro">Modifiez ingrédients et quantités pour 2 personnes. Les portions s’adaptent automatiquement.</p>'+ 
-    '<div class="recipe-customization-search-wrap"><label class="recipe-customization-search"><svg aria-hidden="true"><use href="#i-search"></use></svg><input type="search" autocomplete="off" placeholder="Rechercher un plat…" aria-label="Rechercher un plat" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="recipeCustomizationSuggestions"></label><div id="recipeCustomizationSuggestions" class="recipe-customization-suggestions" role="listbox" hidden></div></div>'+ 
-    '<p class="recipe-customization-status" aria-live="polite"></p>'+ 
-    '<div class="recipe-customization-list" aria-label="Aliments et quantités de la recette"></div>'+ 
-    '<div class="recipe-customization-add"><button class="recipe-customization-add-button" type="button">＋ Ajouter un ingrédient</button><div class="recipe-customization-ingredient-picker" hidden><div class="recipe-customization-ingredient-search-row"><label class="recipe-customization-ingredient-search"><svg aria-hidden="true"><use href="#i-search"></use></svg><input type="search" autocomplete="off" placeholder="Rechercher un ingrédient…" aria-label="Rechercher un ingrédient" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="recipeCustomizationIngredientSuggestions"></label><button class="recipe-customization-ingredient-cancel" type="button">Annuler</button></div><div id="recipeCustomizationIngredientSuggestions" class="recipe-customization-ingredient-suggestions" role="listbox"></div></div></div>'+ 
-    '<p class="recipe-customization-feedback dialog-feedback" role="status" aria-live="polite"></p>'+ 
+    '<h3>Personnalisation des recettes</h3>'+
+    '<p class="dialog-intro">Modifiez ingrédients et quantités pour 2 personnes. Les portions s’adaptent automatiquement.</p>'+
+    '<div class="recipe-customization-search-wrap"><label class="recipe-customization-search"><svg aria-hidden="true"><use href="#i-search"></use></svg><input type="search" autocomplete="off" placeholder="Rechercher un plat…" aria-label="Rechercher un plat" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="recipeCustomizationSuggestions"></label><div id="recipeCustomizationSuggestions" class="recipe-customization-suggestions" role="listbox" hidden></div></div>'+
+    '<p class="recipe-customization-status" aria-live="polite"></p>'+
+    '<div class="recipe-customization-list" aria-label="Aliments et quantités de la recette"></div>'+
+    '<div class="recipe-customization-add"><button class="recipe-customization-add-button" type="button">＋ Ajouter un ingrédient</button><div class="recipe-customization-ingredient-picker" hidden><div class="recipe-customization-ingredient-search-row"><label class="recipe-customization-ingredient-search"><svg aria-hidden="true"><use href="#i-search"></use></svg><input type="search" autocomplete="off" placeholder="Rechercher un ingrédient…" aria-label="Rechercher un ingrédient" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="recipeCustomizationIngredientSuggestions"></label><button class="recipe-customization-ingredient-cancel" type="button">Annuler</button></div><div id="recipeCustomizationIngredientSuggestions" class="recipe-customization-ingredient-suggestions" role="listbox"></div></div></div>'+
+    '<p class="recipe-customization-feedback dialog-feedback" role="status" aria-live="polite"></p>'+
     '<div class="dialog-actions"><button class="secondary recipe-customization-reset" type="button">Réinitialiser</button><button class="primary recipe-customization-save" type="button">Enregistrer</button></div>';
   document.body.appendChild(recipeCustomizationDialog);
   recipeCustomizationSearch=recipeCustomizationDialog.querySelector('.recipe-customization-search input');
@@ -728,9 +726,9 @@ function dishCard(dish){
   card.setAttribute('role','button');
   card.setAttribute('aria-label','Voir les ingrédients de '+dish.name);
   card.innerHTML=
-    '<div class="dish-visual"><img src="'+dishPhotoUrl(dish.name)+'" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>'+ 
-    '<button type="button" class="dish-favorite" aria-label="Ajouter aux favoris" aria-pressed="false">♡</button>'+ 
-    '<div class="dish-copy"><strong>'+escapeHtml(dish.name)+'</strong><small>'+dish.ingredients.length+' ingrédients</small></div>'+ 
+    '<div class="dish-visual"><img src="'+dishPhotoUrl(dish.name)+'" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>'+
+    '<button type="button" class="dish-favorite" aria-label="Ajouter aux favoris" aria-pressed="false">♡</button>'+
+    '<div class="dish-copy"><strong>'+escapeHtml(dish.name)+'</strong><small>'+dish.ingredients.length+' ingrédients</small></div>'+
     '<span class="dish-add" aria-hidden="true">+</span>';
   const cardImage=card.querySelector('.dish-visual img');
   bindDishImageFallback(cardImage);
@@ -776,18 +774,9 @@ function openDishSheet(dish){
   if(typeof dishDialog.showModal==='function')dishDialog.showModal();
   else dishDialog.setAttribute('open','');
   document.documentElement.classList.add('dish-sheet-open');
-  void primeDishIngredientThumbs(dish);
-}
-function cancelIngredientThumbs(){
-  ingredientThumbRequest+=1;
-  if(ingredientThumbUserQuery!==null){
-    setHiddenCatalogQuery(ingredientThumbUserQuery);
-    ingredientThumbUserQuery=null;
-  }
 }
 function closeDishSheet(){
   if(!dishDialog||busyDish)return;
-  cancelIngredientThumbs();
   if(dishDialog.open)dishDialog.close();else dishDialog.removeAttribute('open');
   document.documentElement.classList.remove('dish-sheet-open');
   currentDish=null;
@@ -801,48 +790,14 @@ function renderDishSheetFavorite(){
   dishSheetFavorite.setAttribute('aria-pressed',favorite?'true':'false');
   dishSheetFavorite.setAttribute('aria-label',favorite?'Retirer des favoris':'Ajouter aux favoris');
 }
-async function primeDishIngredientThumbs(dish){
-  const missing=recipeIngredientsForDish(dish).filter(name=>!ingredientThumbCache.has(name));
-  if(!missing.length||busyDish)return;
-  if(ingredientThumbUserQuery===null)ingredientThumbUserQuery=searchInput.value;
-  const userQuery=ingredientThumbUserQuery;
-  const token=++ingredientThumbRequest;
-  try{
-    for(const name of missing){
-      if(token!==ingredientThumbRequest||currentDish!==dish||busyDish)return;
-      setHiddenCatalogQuery(name);
-      await nextPaint();
-      if(token!==ingredientThumbRequest||currentDish!==dish||busyDish)return;
-      const card=[...productsGrid.querySelectorAll('.product')].find(item=>item.dataset.name===name);
-      const media=card?.querySelector('.media');
-      if(!media)continue;
-      const holder=document.createElement('span');
-      holder.innerHTML=media.innerHTML;
-      holder.querySelector('.premium-sprite')?.classList.add('is-compact');
-      holder.querySelector('.product-svg')?.classList.add('is-compact');
-      const markup=holder.innerHTML;
-      ingredientThumbCache.set(name,markup);
-      const row=[...dishSheetList.querySelectorAll('.dish-ingredient')].find(item=>item.dataset.ingredient===name);
-      const thumb=row?.querySelector('.dish-ingredient-thumb');
-      if(thumb)thumb.innerHTML=markup;
-    }
-  }finally{
-    if(token===ingredientThumbRequest&&!busyDish){
-      setHiddenCatalogQuery(userQuery);
-      ingredientThumbUserQuery=null;
-      await nextPaint();
-    }
-  }
-}
 function renderDishSheetIngredients(){
   if(!currentDish)return;
   dishSheetList.innerHTML=recipeIngredientsForDish(currentDish).map(name=>{
     const selected=selectedIngredients.has(name);
-    const thumb=ingredientThumbCache.get(name)||'';
     return '<button type="button" class="dish-ingredient '+(selected?'is-selected':'')+'" data-ingredient="'+escapeHtml(name)+'" aria-pressed="'+(selected?'true':'false')+'">'+
-      '<span class="dish-ingredient-thumb" aria-hidden="true">'+thumb+'</span>'+ 
-      '<span class="dish-ingredient-name">'+escapeHtml(name)+'</span>'+ 
-      '<span class="dish-ingredient-check" aria-hidden="true">'+(selected?'✓':'')+'</span>'+ 
+      '<span class="dish-ingredient-thumb" aria-hidden="true"><img src="'+escapeHtml(ingredientImageSource(name))+'" alt="" loading="eager" fetchpriority="high" decoding="async"></span>'+
+      '<span class="dish-ingredient-name">'+escapeHtml(name)+'</span>'+
+      '<span class="dish-ingredient-check" aria-hidden="true">'+(selected?'✓':'')+'</span>'+
       '</button>';
   }).join('');
   dishSheetList.querySelectorAll('.dish-ingredient').forEach(row=>row.addEventListener('click',()=>{
@@ -857,7 +812,6 @@ function renderDishSheetIngredients(){
 }
 async function confirmDishAdd(){
   if(!currentDish||busyDish||dishConfirmButton.disabled)return;
-  cancelIngredientThumbs();
   const dish=currentDish;
   const operation=window.COURSES_QUANTITIES.addSelected();
   closeDishSheet();
@@ -876,14 +830,6 @@ async function confirmDishAdd(){
   if(!result.added){showToast('Les quantités nécessaires sont déjà dans Ma liste');return}
   showToast(dish.name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':''));
 }
-function setHiddenCatalogQuery(value){
-  drivingCatalog=true;
-  searchInput.value=value;
-  searchInput.dispatchEvent(new Event('input',{bubbles:true}));
-  drivingCatalog=false;
-}
-function nextPaint(){return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))}
-
 function init(){
   buildUi();
 }

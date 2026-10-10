@@ -249,7 +249,13 @@
   max-width:48px!important;
   max-height:48px!important;
 }
-.dish-ingredient-thumb img{pointer-events:none!important}
+.dish-ingredient-thumb img{
+  width:48px!important;
+  height:48px!important;
+  display:block!important;
+  object-fit:contain!important;
+  pointer-events:none!important;
+}
 .dish-ingredient-name{
   min-width:0!important;
   color:#101b16!important;

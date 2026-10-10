@@ -49,7 +49,7 @@ Le workflow `.github/workflows/validate.yml` est le garde-fou permanent du dép�
 
 Avant un commit final, exécuter `bash scripts/validate_repo.sh` lorsque l’environnement le permet. Ne pas affaiblir la CI en retirant un test ou un invariant pour faire passer un changement.
 
-Le test `tests/product-images-no-atlas.test.mjs` conserve actuellement une dette connue sur son troisième cas : la validation accepte soit sa baseline exacte de 2 réussites / 1 échec sur ce cas, soit sa résolution complète. Toute autre dégradation doit faire échouer la CI. Lorsque ce test devient entièrement vert, supprimer cette exception dans le même changement.
+Toute la suite `tests/*.test.mjs` doit être verte. Aucune baseline en échec ne doit être tolérée par le validateur permanent.
 
 ## Visuels des plats
 

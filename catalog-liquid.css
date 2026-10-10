@@ -1,4 +1,4 @@
-@import url("./dish-detail.css?v=5");
+@import url("./dish-detail.css?v=6");
 
 /* v179 — lentille plus basse et centrée uniformément */
 .catalog-view .page-header h1::after{content:"v199"!important}
