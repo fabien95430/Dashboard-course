@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const quantities=readFileSync(new URL('../catalog-quantities.js',import.meta.url),'utf8');
 const dishes=readFileSync(new URL('../dishes-ui.js',import.meta.url),'utf8');
 const catalog=readFileSync(new URL('../catalog.js',import.meta.url),'utf8');
-const settings=readFileSync(new URL('../settings-tab-badge.js',import.meta.url),'utf8');
+const settings=readFileSync(new URL('../settings-ui.js',import.meta.url),'utf8');
 
 function quantityApi(contributions={}){
   const storage=new Map([['courses-dish-contributions-v1',JSON.stringify(contributions)]]);

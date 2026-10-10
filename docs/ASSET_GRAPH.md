@@ -4,13 +4,13 @@ Ce document décrit le chargement actif de l’application statique. Il ne rempl
 
 ## Chaîne de chargement
 
-`index.html` charge directement le shell principal : `styles.css`, `product-item-first-paint.css`, `catalog.js`, `preferences-service.js`, `missing-requests-store.js`, `app.js`, `settings-tab-badge.js`, `error-center.js` et `error-feedback-bridge.js`.
+`index.html` charge directement le shell principal : `styles.css`, `product-item-first-paint.css`, `catalog.js`, `preferences-service.js`, `missing-requests-store.js`, `app.js`, `settings-tab-badge.js`, `settings-ui.js`, `error-center.js` et `error-feedback-bridge.js`.
 
-`catalog.js` charge ensuite `dishes.css`, `catalog-liquid.css`, `dish-local-images.js`, `repurchase-soon.js`, `catalog-quantities.js`, `dishes-ui.js` puis `catalog-liquid.js`. `catalog-liquid.css` importe `dish-detail.css`.
+`catalog.js` charge ensuite `dishes.css`, `catalog-liquid.css`, `dish-local-images.js`, `app-ui.js`, `runtime-features.js`, `repurchase-soon.js`, `catalog-quantities.js`, `dishes-ui.js` puis `catalog-liquid.js`. `catalog-liquid.css` importe `dish-detail.css`.
 
-`dish-local-images.js` charge `missing-products-fixes.js`, `missing-products-popup-ui.js`, `product-item-images.js` et `purchase-intelligence.js`.
+`runtime-features.js` charge `missing-products-fixes.js`, `missing-products-popup-ui.js`, `product-item-images.js` et `purchase-intelligence.js`.
 
-`settings-tab-badge.js` charge `missing-products-dishes.js`, `missing-products-modern.js` et `dish-added-marker.js`.
+`settings-ui.js` charge `missing-products-dishes.js`, `missing-products-modern.js` et `dish-added-marker.js`.
 
 `product-item-images.js` charge `catalog-product-admin.js`.
 
@@ -37,3 +37,10 @@ Ils sont seulement qualifiés comme candidats à un nettoyage ultérieur. Ils ne
 ## Demandes manquantes
 
 `missing-requests-store.js` est la source locale unique pour les produits manquants, les plats manquants, les plats déjà intégrés conservés dans le popup et les précisions de visuel produit. `app.js`, `missing-products-dishes.js` et `missing-products-fixes.js` consomment cette API sans relire directement ces clés `localStorage`.
+
+
+## Frontières des modules UI
+
+`dish-local-images.js` est limité aux visuels locaux de plats, à leur fallback et à leur préchauffage. Les comportements transverses de présentation (versions visibles, clavier de sécurité, état vide de Ma liste et styles UI associés) appartiennent à `app-ui.js`.
+
+`settings-tab-badge.js` ne gère que le badge Réglages et le badge d’application. Les préférences, la gestion de l’application, la stabilité clavier des popups et la section Administrateur appartiennent à `settings-ui.js`.

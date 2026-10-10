@@ -9,7 +9,7 @@ const root=resolve(here,'..');
 const read=name=>readFileSync(resolve(root,name),'utf8');
 
 test('les popups de préférences utilisent la même coque extérieure et un scroll interne',()=>{
-  const source=read('settings-tab-badge.js');
+  const source=read('settings-ui.js');
   assert.match(source,/#preferencesDialog,\s*#missingProductsDialog,\s*\.recipe-customization-dialog\{[\s\S]*?width:min\(calc\(100% - 28px\),430px\)!important;[\s\S]*?height:min\(590px,calc\(100svh[\s\S]*?padding:20px!important;[\s\S]*?border-radius:26px!important;[\s\S]*?overflow:hidden!important/);
   assert.match(source,/#preferencesDialog\[open\],\s*#missingProductsDialog\[open\],\s*\.recipe-customization-dialog\[open\]\{\s*display:flex!important;\s*flex-direction:column!important/);
   assert.match(source,/function ensurePreferenceDialogScroll\(dialog\)[\s\S]*?content\.className='preference-dialog-scroll'/);
@@ -28,7 +28,7 @@ test('le design moderne des produits manquants ne redéfinit plus les dimensions
 });
 
 test('le clavier ne déplace ni ne redimensionne les popups de préférences pendant la saisie',()=>{
-  const source=read('settings-tab-badge.js');
+  const source=read('settings-ui.js');
   const selector=source.match(/const PREFERENCE_DIALOG_SELECTOR='([^']+)'/)?.[1];
   assert.equal(selector,'#preferencesDialog,#missingProductsDialog,.recipe-customization-dialog');
   assert.doesNotMatch(selector,/#settingsDialog|#connectionDialog/);
@@ -214,7 +214,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
   const index=read('index.html');
   const dishes=read('dishes-ui.js');
   const missing=read('missing-products-dishes.js');
-  const settings=read('settings-tab-badge.js');
+  const settings=read('settings-ui.js');
   const repurchase=read('repurchase-soon.js');
   assert.match(index,/Connexion OAuth sécurisée\. L’autorisation reste chiffrée sur cet appareil\./);
   assert.match(index,/Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local\./);

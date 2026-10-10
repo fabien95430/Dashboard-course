@@ -1,4 +1,4 @@
-const CACHE='courses-app-v399-r1';
+const CACHE='courses-app-v400-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -10,11 +10,12 @@ const SHELL=[
   './index.html',
   './styles.css?v=348',
   './product-item-first-paint.css?v=1',
-  './catalog.js?v=399',
+  './catalog.js?v=400',
   './preferences-service.js?v=398',
   './missing-requests-store.js?v=399',
   './app.js?v=399',
-  './settings-tab-badge.js?v=399',
+  './settings-tab-badge.js?v=400',
+  './settings-ui.js?v=400',
   './error-center.js?v=395',
   './error-feedback-bridge.js?v=394',
   './dishes.css?v=3',
@@ -24,7 +25,9 @@ const SHELL=[
   './dishes-ui.js?v=391',
   './catalog-quantities.js?v=389',
   './repurchase-soon.js?v=363',
-  './dish-local-images.js?v=399',
+  './dish-local-images.js?v=400',
+  './app-ui.js?v=400',
+  './runtime-features.js?v=400',
   './missing-products-fixes.js?v=399',
   './missing-products-popup-ui.js?v=18',
   './product-item-images.js?v=397',
@@ -56,6 +59,7 @@ function isStartupShellAsset(url){
     ||url.pathname.endsWith('/missing-requests-store.js')
     ||url.pathname.endsWith('/app.js')
     ||url.pathname.endsWith('/settings-tab-badge.js')
+    ||url.pathname.endsWith('/settings-ui.js')
     ||url.pathname.endsWith('/error-center.js')
     ||url.pathname.endsWith('/error-feedback-bridge.js');
 }
