@@ -155,7 +155,7 @@ jobs:
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "Modification conservée sur $TEMP_BRANCH"
 
-      - name: Rebaser et publier sur main
+      - name: Rebaser, valider et publier sur main
         id: commit
         if: steps.preserve.outcome == 'success'
         shell: bash
@@ -168,6 +168,7 @@ jobs:
               echo "Conflit avec main : la modification reste conservée sur $TEMP_BRANCH." >&2
               exit 1
             fi
+            bash scripts/validate_repo.sh
             git push --force-with-lease origin HEAD:"$TEMP_BRANCH"
             if git push origin HEAD:main; then
               echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
