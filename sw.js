@@ -1,4 +1,4 @@
-const CACHE='courses-app-v422-r1';
+const CACHE='courses-app-v423-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -6,42 +6,7 @@ const CORE_VISUALS=[
   './welcome-background-v40.webp',
   './www/empty-list-premium-v4.webp?v=305'
 ];
-const SHELL=[
-  './index.html',
-  './styles.css?v=404',
-  './product-item-first-paint.css?v=1',
-  './catalog.js?v=422',
-  './preferences-service.js?v=398',
-  './missing-requests-store.js?v=399',
-  './bottom-nav-liquid.js?v=414',
-  './app.js?v=415',
-  './settings-tab-badge.js?v=410',
-  './settings-ui.js?v=410',
-  './error-center.js?v=410',
-  './dishes.css?v=3',
-  './catalog-liquid.css?v=4',
-  './dish-detail.css?v=6',
-  './catalog-liquid.js?v=297',
-  './dishes-ui.js?v=408',
-  './catalog-quantities.js?v=419',
-  './repurchase-soon.js?v=410',
-  './dish-local-images.js?v=422',
-  './app-ui.js?v=422',
-  './runtime-features.js?v=416',
-  './missing-products-fixes.js?v=416',
-  './missing-products-popup-ui.js?v=410',
-  './product-item-images.js?v=415',
-  './catalog-product-admin.js?v=410',
-  './purchase-intelligence.js?v=409',
-  './missing-products-dishes.js?v=410',
-  './missing-products-modern.js?v=410',
-  './dish-added-marker.js?v=408',
-  './manifest.webmanifest?v=43',
-  './icon-premium-v40.svg',
-  './icon.svg',
-  './apple-touch-icon.png',
-  './docs/guide-fonctionnement-courses.pdf?v=299'
-];
+const SHELL=["./index.html","./styles.css?v=404","./product-item-first-paint.css?v=1","./catalog.js?v=423","./preferences-service.js?v=398","./missing-requests-store.js?v=399","./bottom-nav-liquid.js?v=414","./app.js?v=415","./settings-tab-badge.js?v=410","./settings-ui.js?v=410","./error-center.js?v=410","./dishes.css?v=3","./catalog-liquid.css?v=4","./dish-detail.css?v=6","./catalog-liquid.js?v=297","./dishes-ui.js?v=408","./catalog-quantities.js?v=423","./repurchase-soon.js?v=410","./dish-local-images.js?v=423","./app-ui.js?v=423","./runtime-features.js?v=416","./missing-products-fixes.js?v=416","./missing-products-popup-ui.js?v=410","./product-item-images.js?v=415","./catalog-product-admin.js?v=410","./purchase-intelligence.js?v=409","./missing-products-dishes.js?v=410","./missing-products-modern.js?v=410","./dish-added-marker.js?v=408","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];
 const refreshedVisuals=new Set();
 
 function isPersistentVisual(url){
