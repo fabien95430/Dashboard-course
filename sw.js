@@ -1,4 +1,4 @@
-const CACHE='courses-app-v413-r1';
+const CACHE='courses-app-v414-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -10,11 +10,11 @@ const SHELL=[
   './index.html',
   './styles.css?v=404',
   './product-item-first-paint.css?v=1',
-  './catalog.js?v=413',
+  './catalog.js?v=414',
   './preferences-service.js?v=398',
   './missing-requests-store.js?v=399',
-  './bottom-nav-liquid.js?v=413',
-  './app.js?v=413',
+  './bottom-nav-liquid.js?v=414',
+  './app.js?v=414',
   './settings-tab-badge.js?v=410',
   './settings-ui.js?v=410',
   './error-center.js?v=410',
@@ -25,7 +25,7 @@ const SHELL=[
   './dishes-ui.js?v=408',
   './catalog-quantities.js?v=408',
   './repurchase-soon.js?v=410',
-  './dish-local-images.js?v=413',
+  './dish-local-images.js?v=414',
   './app-ui.js?v=410',
   './runtime-features.js?v=410',
   './missing-products-fixes.js?v=410',
@@ -63,20 +63,6 @@ function isStartupShellAsset(url){
     ||url.pathname.endsWith('/error-center.js');
 }
 
-async function migrateExistingVisuals(){
-  const target=await caches.open(VISUAL_CACHE);
-  const cacheNames=await caches.keys();
-  for(const cacheName of cacheNames){
-    if(cacheName===VISUAL_CACHE)continue;
-    const source=await caches.open(cacheName);
-    const requests=await source.keys();
-    await Promise.all(requests.filter(request=>isPersistentVisual(new URL(request.url))).map(async request=>{
-      if(await target.match(request))return;
-      const response=await source.match(request);
-      if(response)await target.put(request,response.clone());
-    }));
-  }
-}
 
 async function seedCoreVisuals(){
   const cache=await caches.open(VISUAL_CACHE);
@@ -144,7 +130,7 @@ async function deliverErrorSignal(payload){
 self.addEventListener('install',event=>event.waitUntil(
   Promise.all([
     caches.open(CACHE).then(cache=>cache.addAll(SHELL)),
-    migrateExistingVisuals().then(seedCoreVisuals)
+    seedCoreVisuals()
   ]).then(()=>self.skipWaiting())
 ));
 
