@@ -48,3 +48,58 @@ function start(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
 else start();
 })();
+
+(() => {
+'use strict';
+
+function installProductImageFirstPaintStyles(){
+  if(document.getElementById('courses-product-image-first-paint'))return;
+  const style=document.createElement('style');
+  style.id='courses-product-image-first-paint';
+  style.textContent=`
+    .premium-sprite.is-single-product-image{
+      -webkit-clip-path:none!important;
+      clip-path:none!important;
+    }
+    .premium-sprite.is-single-product-image>img{
+      top:11%!important;
+      left:11%!important;
+      width:78%!important;
+      height:78%!important;
+      max-width:none!important;
+      max-height:none!important;
+      object-fit:contain!important;
+      object-position:center!important;
+      transform:translate(var(--single-product-shift-x,0%),calc(4px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
+      transform-origin:center!important;
+    }
+    .premium-sprite.is-single-product-image.is-compact>img{
+      transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+function tuneListProductImages(root){
+  if(!(root instanceof Element))return;
+  const images=[];
+  if(root.matches?.('.premium-sprite.is-single-product-image>img'))images.push(root);
+  root.querySelectorAll?.('.premium-sprite.is-single-product-image>img').forEach(image=>images.push(image));
+  images.forEach(image=>{
+    if(!image.closest('#listItems'))return;
+    image.loading='eager';
+    try{image.fetchPriority='high'}catch(_){}
+  });
+}
+function startProductImageFirstPaint(){
+  installProductImageFirstPaintStyles();
+  const list=document.getElementById('listItems');
+  if(!list||list.dataset.productImageFirstPaint==='1')return;
+  list.dataset.productImageFirstPaint='1';
+  tuneListProductImages(list);
+  new MutationObserver(records=>{
+    records.forEach(record=>record.addedNodes.forEach(node=>tuneListProductImages(node)));
+  }).observe(list,{childList:true,subtree:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startProductImageFirstPaint,{once:true});
+else startProductImageFirstPaint();
+})();
