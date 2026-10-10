@@ -63,7 +63,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=417';
+    images.src='./dish-local-images.js?v=418';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadRepurchaseSoon,{once:true});
@@ -97,7 +97,7 @@
   const loadAppUi=()=>{
     if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
     const script=document.createElement('script');
-    script.src='./app-ui.js?v=410';
+    script.src='./app-ui.js?v=418';
     script.async=false;
     script.dataset.appUi='script';
     script.addEventListener('load',loadRuntimeFeatures,{once:true});

@@ -28,11 +28,19 @@ test('les consommateurs P1 écoutent les événements propriétaires au lieu du 
   assert.match(images,/document\.addEventListener\('courses:dishes-rendered'/);
   assert.match(images,/document\.addEventListener\('courses:dish-sheet-opened'/);
   assert.match(appUi,/document\.addEventListener\('courses:list-rendered'/);
-  assert.match(appUi,/document\.addEventListener\('courses:status-changed'/);
   assert.match(errors,/document\.addEventListener\('courses:status-changed',sync\)/);
   assert.match(errors,/document\.addEventListener\('courses:settings-management-ready',bindUi/);
   assert.match(repurchase,/document\.addEventListener\('courses:lock-changed'/);
   assert.match(fixes,/document\.addEventListener\('courses:missing-requests-rendered',decorateOpenAiButtons\)/);
   assert.match(popup,/document\.addEventListener\('courses:missing-requests-rendered',queueDecorate\)/);
   assert.match(admin,/document\.addEventListener\('courses:settings-management-ready',bindUi/);
+});
+
+test('Ma liste affiche son panier vide sans attendre Home Assistant et seulement sur le vrai état vide',()=>{
+  const app=read('app.js'),appUi=read('app-ui.js');
+  assert.match(app,/state\.error\?'Liste indisponible\.':'La liste est vide\.'/);
+  assert.match(appUi,/const nativeEmpty=Boolean\(empty&&empty\.children\.length===0&&empty\.textContent\.trim\(\)==='La liste est vide\.'\)/);
+  assert.match(appUi,/const shouldEnhance=Boolean\(empty&&\(nativeEmpty\|\|empty\.classList\.contains\('list-empty-state'\)\)\)/);
+  assert.doesNotMatch(appUi,/listEmptyStateConfirmed/);
+  assert.doesNotMatch(appUi,/document\.addEventListener\('courses:status-changed'/);
 });

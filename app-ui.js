@@ -271,11 +271,6 @@ function bindSecurityKeyboardViewport(){
   });
   requestAnimationFrame(syncSecurityKeyboardState);
 }
-function listEmptyStateConfirmed(){
-  if(navigator.onLine===false)return true;
-  const title=document.querySelector('#status strong')?.textContent?.trim()||'';
-  return title==='Synchronisé'||title==='Mode test';
-}
 function syncListEmptyState(root){
   if(!root)return;
   const design='premium-v4';
@@ -285,11 +280,6 @@ function syncListEmptyState(root){
     return;
   }
   const nativeEmpty=Boolean(empty&&empty.children.length===0&&empty.textContent.trim()==='La liste est vide.');
-  if(nativeEmpty&&!listEmptyStateConfirmed()){
-    root.classList.remove('is-list-home-empty');
-    empty.hidden=true;
-    return;
-  }
   if(empty)empty.hidden=false;
   const shouldEnhance=Boolean(empty&&(nativeEmpty||empty.classList.contains('list-empty-state')));
   root.classList.toggle('is-list-home-empty',shouldEnhance);
@@ -322,7 +312,6 @@ function bind(){
 syncPageVersions();
 bindSecurityKeyboardViewport();
 document.addEventListener('courses:list-rendered',()=>syncListEmptyState(document.getElementById('listItems')));
-document.addEventListener('courses:status-changed',()=>syncListEmptyState(document.getElementById('listItems')));
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
 })();
