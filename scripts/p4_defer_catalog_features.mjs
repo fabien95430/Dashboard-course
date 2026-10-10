@@ -123,7 +123,12 @@ catalog=catalog.slice(0,start)+loader;
 write('catalog.js',catalog);
 
 let index=read('index.html');
-index=index.replaceAll('v412','v413');
+const badges=index.match(/<span class="page-version">v412<\/span>/g)||[];
+if(badges.length!==3)throw new Error(`badges v412 inattendus: ${badges.length}`);
+index=index.replaceAll('<span class="page-version">v412</span>','<span class="page-version">v413</span>');
+index=replaceOnce(index,'<script src="./catalog.js?v=412"></script>','<script src="./catalog.js?v=413"></script>','révision catalog');
+index=replaceOnce(index,'<script src="./bottom-nav-liquid.js?v=412"></script>','<script src="./bottom-nav-liquid.js?v=413"></script>','révision navigation');
+index=replaceOnce(index,'<script src="./app.js?v=412"></script>','<script src="./app.js?v=413"></script>','révision app');
 write('index.html',index);
 
 let images=read('dish-local-images.js');
@@ -131,14 +136,38 @@ images=replaceOnce(images,"const APP_VERSION='v412';","const APP_VERSION='v413';
 write('dish-local-images.js',images);
 
 let sw=read('sw.js');
-sw=sw.replaceAll('v412','v413');
+sw=replaceOnce(sw,"const CACHE='courses-app-v412-r1';","const CACHE='courses-app-v413-r1';",'cache application');
+sw=replaceOnce(sw,"  './catalog.js?v=412',","  './catalog.js?v=413',",'précache catalog');
+sw=replaceOnce(sw,"  './bottom-nav-liquid.js?v=412',","  './bottom-nav-liquid.js?v=413',",'précache navigation');
+sw=replaceOnce(sw,"  './app.js?v=412',","  './app.js?v=413',",'précache app');
+sw=replaceOnce(sw,"  './dish-local-images.js?v=412',","  './dish-local-images.js?v=413',",'précache images plats');
 write('sw.js',sw);
 
-for(const path of ['tests/list-render-version.test.mjs','tests/app-responsibility-extraction.test.mjs']){
-  let source=read(path).replaceAll('v412','v413');
-  if(path.endsWith('list-render-version.test.mjs'))source=source.replace('P3 publie la version globale v413','P4 publie la version globale v413');
-  write(path,source);
-}
+write('tests/list-render-version.test.mjs',String.raw`import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
+
+test('P4 publie la version globale v413 et les révisions app associées',()=>{
+  const index=read('index.html'),catalog=read('catalog.js'),sw=read('sw.js'),images=read('dish-local-images.js');
+  assert.equal((index.match(/<span class="page-version">v413<\/span>/g)||[]).length,3);
+  assert.match(index,/\.\/catalog\.js\?v=413/);
+  assert.match(index,/\.\/bottom-nav-liquid\.js\?v=413/);
+  assert.match(index,/\.\/app\.js\?v=413/);
+  assert.match(catalog,/\.\/dish-local-images\.js\?v=413/);
+  assert.match(images,/const APP_VERSION='v413';/);
+  assert.match(sw,/const CACHE='courses-app-v413-r1';/);
+  assert.match(sw,/\.\/catalog\.js\?v=413/);
+  assert.match(sw,/\.\/bottom-nav-liquid\.js\?v=413/);
+  assert.match(sw,/\.\/app\.js\?v=413/);
+  assert.match(sw,/\.\/dish-local-images\.js\?v=413/);
+});
+`);
+
+let extraction=read('tests/app-responsibility-extraction.test.mjs');
+extraction=extraction.replaceAll('v=412','v=413');
+write('tests/app-responsibility-extraction.test.mjs',extraction);
 
 write('tests/deferred-catalog-startup.test.mjs',`import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -151,26 +180,62 @@ test('P4 garde le démarrage critique séparé des fonctions Catalogue lourdes',
   const bootstrapEnd=source.indexOf("if(document.readyState==='loading')",bootstrapStart);
   assert.ok(bootstrapStart>=0&&bootstrapEnd>bootstrapStart);
   const bootstrap=source.slice(bootstrapStart,bootstrapEnd);
-  assert.match(bootstrap,/loadAppUi\(\)/);
-  assert.doesNotMatch(bootstrap,/loadDishLocalImages|loadRepurchaseSoon|loadQuantities|loadDishes|loadLiquid/);
+  assert.ok(bootstrap.includes('loadAppUi();'));
+  for(const heavy of ['loadDishLocalImages();','loadRepurchaseSoon();','loadQuantities();','loadDishes();','loadLiquid();'])assert.equal(bootstrap.includes(heavy),false,heavy+' ne doit pas faire partie du démarrage critique');
 });
 
-test('les fonctions Catalogue se déclenchent uniquement à l entrée dans la vue propriétaire',()=>{
-  assert.match(source,/document\.addEventListener\('courses:view-changed',event=>\{\s*if\(event\.detail\?\.view==='catalog'\)startCatalogFeatures\(\);\s*\}\)/s);
-  assert.match(source,/const startCatalogFeatures=\(\)=>\{\s*catalogFeaturesRequested=true;\s*if\(catalogFeaturesStarted\|\|!runtimeReady\)return;\s*catalogFeaturesStarted=true;\s*loadDishLocalImages\(\);\s*\};/s);
-  assert.doesNotMatch(source,/new MutationObserver|setInterval\s*\(/);
+test('les fonctions Catalogue se déclenchent à l entrée dans la vue propriétaire sans observation ni polling',()=>{
+  assert.ok(source.includes("document.addEventListener('courses:view-changed',event=>{"));
+  assert.ok(source.includes("if(event.detail?.view==='catalog')startCatalogFeatures();"));
+  assert.ok(source.includes('if(catalogFeaturesStarted||!runtimeReady)return;'));
+  assert.ok(source.includes('catalogFeaturesStarted=true;'));
+  assert.ok(source.includes('loadDishLocalImages();'));
+  assert.equal(source.includes('new MutationObserver'),false);
+  assert.equal(source.includes('setInterval('),false);
 });
 
 test('la chaîne différée conserve son ordre et attend les fonctions runtime de Ma liste',()=>{
-  const dish=source.indexOf('const loadDishLocalImages=()=>');
-  const repurchase=source.indexOf('const loadRepurchaseSoon=()=>');
-  const quantities=source.indexOf('const loadQuantities=()=>');
-  const dishes=source.indexOf('const loadDishes=()=>');
-  const liquid=source.indexOf('const loadLiquid=()=>');
-  assert.ok(liquid>=0&&dishes>liquid&&quantities>dishes&&repurchase>quantities&&dish>repurchase);
-  assert.match(source,/runtimeReady=true;\s*if\(catalogFeaturesRequested\)startCatalogFeatures\(\)/s);
+  assert.ok(source.includes("images.addEventListener('load',loadRepurchaseSoon,{once:true});"));
+  assert.ok(source.includes("script.addEventListener('load',loadQuantities,{once:true});"));
+  assert.ok(source.includes("quantities.addEventListener('load',loadDishes,{once:true});"));
+  assert.ok(source.includes("script.addEventListener('load',loadLiquid,{once:true});"));
+  assert.ok(source.includes('runtimeReady=true;'));
+  assert.ok(source.includes('if(catalogFeaturesRequested)startCatalogFeatures();'));
 });
 `);
+
+let boundaries=read('tests/ui-module-boundaries.test.mjs');
+const boundaryStart=boundaries.indexOf("\ntest('le nouvel ordre de chargement reste déterministe et précaché'");
+if(boundaryStart<0)throw new Error('test de frontière de chargement introuvable');
+boundaries=boundaries.slice(0,boundaryStart)+String.raw`
+
+test('P4 conserve un démarrage déterministe et diffère seulement les fonctions Catalogue',()=>{
+  const catalog=read('catalog.js');
+  const index=read('index.html');
+  const sw=read('sw.js');
+  const appUiAsset=catalog.match(/\.\/app-ui\.js\?v=\d+/)?.[0]||'';
+  const runtimeAsset=catalog.match(/\.\/runtime-features\.js\?v=\d+/)?.[0]||'';
+  const dishImagesAsset=catalog.match(/\.\/dish-local-images\.js\?v=\d+/)?.[0]||'';
+  const repurchaseAsset=catalog.match(/\.\/repurchase-soon\.js\?v=\d+/)?.[0]||'';
+  const quantitiesAsset=catalog.match(/\.\/catalog-quantities\.js\?v=\d+/)?.[0]||'';
+  const dishesAsset=catalog.match(/\.\/dishes-ui\.js\?v=\d+/)?.[0]||'';
+  const liquidAsset=catalog.match(/\.\/catalog-liquid\.js\?v=\d+/)?.[0]||'';
+  const settingsUiAsset=index.match(/\.\/settings-ui\.js\?v=\d+/)?.[0]||'';
+  const settingsBadgeAsset=index.match(/\.\/settings-tab-badge\.js\?v=\d+/)?.[0]||'';
+  for(const [asset,label] of [[appUiAsset,'app-ui'],[runtimeAsset,'runtime-features'],[dishImagesAsset,'dish-local-images'],[repurchaseAsset,'repurchase-soon'],[quantitiesAsset,'catalog-quantities'],[dishesAsset,'dishes-ui'],[liquidAsset,'catalog-liquid'],[settingsUiAsset,'settings-ui'],[settingsBadgeAsset,'settings-tab-badge']])assert.ok(asset,'asset '+label+' introuvable');
+  assert.match(catalog,/script\.addEventListener\('load',loadRuntimeFeatures,\{once:true\}\)/);
+  assert.match(catalog,/document\.addEventListener\('courses:view-changed',event=>\{/);
+  assert.match(catalog,/if\(event\.detail\?\.view==='catalog'\)startCatalogFeatures\(\);/);
+  assert.match(catalog,/if\(catalogFeaturesStarted\|\|!runtimeReady\)return;/);
+  assert.match(catalog,/images\.addEventListener\('load',loadRepurchaseSoon,\{once:true\}\)/);
+  assert.match(catalog,/script\.addEventListener\('load',loadQuantities,\{once:true\}\)/);
+  assert.match(catalog,/quantities\.addEventListener\('load',loadDishes,\{once:true\}\)/);
+  assert.match(catalog,/script\.addEventListener\('load',loadLiquid,\{once:true\}\)/);
+  assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));
+  for(const asset of [appUiAsset,runtimeAsset,dishImagesAsset,repurchaseAsset,quantitiesAsset,dishesAsset,liquidAsset,settingsUiAsset,settingsBadgeAsset])assert.ok(sw.includes(asset),asset+' absent du précache');
+});
+`;
+write('tests/ui-module-boundaries.test.mjs',boundaries);
 
 for(const path of ['scripts/p4_defer_catalog_features.mjs','.github/workflows/p4-defer-catalog.yml']){
   try{fs.unlinkSync(path)}catch(error){if(error.code!=='ENOENT')throw error}
