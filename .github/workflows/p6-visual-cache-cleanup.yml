@@ -69,13 +69,14 @@ jobs:
 
           version_test=read('tests/list-render-version.test.mjs')
           version_test=replace_required(version_test,'P4 publie la version globale v413','P6 publie la version globale v414','titre test version',1)
-          version_test=replace_required(version_test,'v413','v414','attentes test version')
-          if 'v413' in version_test: raise SystemExit('v413 subsiste dans list-render-version')
+          version_test=replace_required(version_test,'v413','v414','version visible test')
+          version_test=replace_required(version_test,'v=413','v=414','révisions URL test')
+          if 'v413' in version_test or 'v=413' in version_test: raise SystemExit('ancienne version subsiste dans list-render-version')
           write('tests/list-render-version.test.mjs',version_test)
 
           nav_test=read('tests/app-responsibility-extraction.test.mjs')
-          nav_test=replace_required(nav_test,'v413','v414','attentes test navigation')
-          if 'v413' in nav_test: raise SystemExit('v413 subsiste dans app-responsibility-extraction')
+          nav_test=replace_required(nav_test,'v=413','v=414','révisions test navigation')
+          if 'v=413' in nav_test: raise SystemExit('ancienne révision subsiste dans app-responsibility-extraction')
           write('tests/app-responsibility-extraction.test.mjs',nav_test)
 
           test_content=dedent(r"""
