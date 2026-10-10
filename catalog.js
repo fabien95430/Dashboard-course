@@ -21,6 +21,10 @@
   liquidStyle.dataset.catalogLiquid='style';
   document.head.appendChild(liquidStyle);
 
+  let runtimeReady=false;
+  let catalogFeaturesRequested=false;
+  let catalogFeaturesStarted=false;
+
   const loadLiquid=()=>{
     if(document.querySelector('script[data-catalog-liquid]'))return;
     const liquid=document.createElement('script');
@@ -56,13 +60,38 @@
     script.addEventListener('load',loadQuantities,{once:true});
     document.body.appendChild(script);
   };
+  const loadDishLocalImages=()=>{
+    if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
+    const images=document.createElement('script');
+    images.src='./dish-local-images.js?v=413';
+    images.async=false;
+    images.dataset.dishLocalImages='script';
+    images.addEventListener('load',loadRepurchaseSoon,{once:true});
+    document.body.appendChild(images);
+  };
+  const startCatalogFeatures=()=>{
+    catalogFeaturesRequested=true;
+    if(catalogFeaturesStarted||!runtimeReady)return;
+    catalogFeaturesStarted=true;
+    loadDishLocalImages();
+  };
+  document.addEventListener('courses:view-changed',event=>{
+    if(event.detail?.view==='catalog')startCatalogFeatures();
+  });
   const loadRuntimeFeatures=()=>{
-    if(document.querySelector('script[data-runtime-features]')){loadRepurchaseSoon();return}
+    if(document.querySelector('script[data-runtime-features]')){
+      runtimeReady=true;
+      if(catalogFeaturesRequested)startCatalogFeatures();
+      return;
+    }
     const script=document.createElement('script');
     script.src='./runtime-features.js?v=410';
     script.async=false;
     script.dataset.runtimeFeatures='script';
-    script.addEventListener('load',loadRepurchaseSoon,{once:true});
+    script.addEventListener('load',()=>{
+      runtimeReady=true;
+      if(catalogFeaturesRequested)startCatalogFeatures();
+    },{once:true});
     document.body.appendChild(script);
   };
   const loadAppUi=()=>{
@@ -74,15 +103,10 @@
     script.addEventListener('load',loadRuntimeFeatures,{once:true});
     document.body.appendChild(script);
   };
-  const load=()=>{
-    if(document.querySelector('script[data-dish-local-images]')){loadAppUi();return}
-    const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=412';
-    images.async=false;
-    images.dataset.dishLocalImages='script';
-    images.addEventListener('load',loadAppUi,{once:true});
-    document.body.appendChild(images);
+  const bootstrap=()=>{
+    loadAppUi();
+    if(document.getElementById('catalogView')?.classList.contains('is-active'))startCatalogFeatures();
   };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});
-  else load();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootstrap,{once:true});
+  else bootstrap();
 })();
