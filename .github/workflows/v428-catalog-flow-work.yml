@@ -1,0 +1,651 @@
+name: v428 catalog flow work
+
+on:
+  push:
+    branches:
+      - automation/v428-catalog-flow-work
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply audited v428 refactor
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path, text):
+              Path(path).write_text(text, encoding='utf-8')
+
+          def replace_once(path, old, new):
+              text=read(path)
+              count=text.count(old)
+              if count!=1:
+                  raise SystemExit(f'{path}: expected one occurrence, got {count}: {old[:80]!r}')
+              write(path,text.replace(old,new,1))
+
+          # catalog.js: product preparation is independent from dishes; catalog-only extras start on catalog entry.
+          path='catalog.js'
+          text=read(path)
+          marker="\n(() => {\n  'use strict';\n\n  const style=document.createElement('link');"
+          pos=text.find(marker)
+          if pos<0:
+              raise SystemExit('catalog.js loader marker not found')
+          tail=r'''(() => {
+  'use strict';
+
+  let runtimeReady=false;
+  let productCatalogRequested=false;
+  let productCatalogStarted=false;
+  let productCatalogReady=false;
+  let dishFeaturesRequested=false;
+  let dishFeaturesStarted=false;
+  let catalogExtrasStarted=false;
+
+  const loadDishStyles=()=>{
+    if(!document.querySelector('link[data-catalog-dishes]')){
+      const style=document.createElement('link');
+      style.rel='stylesheet';
+      style.href='./dishes.css?v=3';
+      style.dataset.catalogDishes='style';
+      document.head.appendChild(style);
+    }
+    if(!document.querySelector('link[data-catalog-liquid]')){
+      const liquidStyle=document.createElement('link');
+      liquidStyle.rel='stylesheet';
+      liquidStyle.href='./catalog-liquid.css?v=4';
+      liquidStyle.dataset.catalogLiquid='style';
+      document.head.appendChild(liquidStyle);
+    }
+  };
+  const loadRepurchaseSoon=()=>{
+    if(document.querySelector('script[data-repurchase-soon]'))return;
+    const script=document.createElement('script');
+    script.src='./repurchase-soon.js?v=410';
+    script.async=false;
+    script.dataset.repurchaseSoon='script';
+    document.body.appendChild(script);
+  };
+  const loadCatalogProductAdmin=()=>{
+    if(document.querySelector('script[data-catalog-product-admin]'))return;
+    const script=document.createElement('script');
+    script.src='./catalog-product-admin.js?v=410';
+    script.async=false;
+    script.dataset.catalogProductAdmin='script';
+    document.body.appendChild(script);
+  };
+  const loadDishAddedMarker=()=>{
+    if(document.querySelector('script[data-dish-added-marker]'))return;
+    const marker=document.createElement('script');
+    marker.src='./dish-added-marker.js?v=408';
+    marker.async=false;
+    marker.dataset.dishAddedMarker='script';
+    document.body.appendChild(marker);
+  };
+  const loadDishLocalImages=()=>{
+    if(document.querySelector('script[data-dish-local-images]')){loadDishAddedMarker();return}
+    const images=document.createElement('script');
+    images.src='./dish-local-images.js?v=428';
+    images.async=false;
+    images.dataset.dishLocalImages='script';
+    images.addEventListener('load',loadDishAddedMarker,{once:true});
+    document.body.appendChild(images);
+  };
+  const loadLiquid=()=>{
+    if(document.querySelector('script[data-catalog-liquid]')){loadDishLocalImages();return}
+    const liquid=document.createElement('script');
+    liquid.src='./catalog-liquid.js?v=297';
+    liquid.async=false;
+    liquid.dataset.catalogLiquid='script';
+    liquid.addEventListener('load',loadDishLocalImages,{once:true});
+    document.body.appendChild(liquid);
+  };
+  const loadDishes=()=>{
+    if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
+    loadDishStyles();
+    const script=document.createElement('script');
+    script.src='./dishes-ui.js?v=428';
+    script.async=false;
+    script.dataset.catalogDishes='script';
+    script.addEventListener('load',loadLiquid,{once:true});
+    document.body.appendChild(script);
+  };
+  const loadQuantities=()=>{
+    if(window.COURSES_QUANTITIES){loadDishes();return}
+    if(document.querySelector('script[data-catalog-quantities]'))return;
+    const quantities=document.createElement('script');
+    quantities.src='./catalog-quantities.js?v=426';
+    quantities.async=false;
+    quantities.dataset.catalogQuantities='script';
+    quantities.addEventListener('load',loadDishes,{once:true});
+    document.body.appendChild(quantities);
+  };
+  const startDishFeatures=()=>{
+    dishFeaturesRequested=true;
+    if(dishFeaturesStarted||!productCatalogReady)return;
+    dishFeaturesStarted=true;
+    loadQuantities();
+  };
+  const markProductCatalogReady=()=>{
+    if(productCatalogReady)return;
+    productCatalogReady=true;
+    document.dispatchEvent(new CustomEvent('courses:catalog-products-ready'));
+    if(dishFeaturesRequested)startDishFeatures();
+  };
+  const startProductCatalog=()=>{
+    productCatalogRequested=true;
+    if(productCatalogStarted||!runtimeReady)return;
+    productCatalogStarted=true;
+    markProductCatalogReady();
+  };
+  const startCatalogView=()=>{
+    startProductCatalog();
+    if(!catalogExtrasStarted){
+      catalogExtrasStarted=true;
+      loadRepurchaseSoon();
+    }
+    startDishFeatures();
+  };
+  document.addEventListener('courses:status-changed',event=>{
+    const title=event.detail?.title;
+    if(title==='Synchronisé'||title==='Mode test')startProductCatalog();
+  });
+  document.addEventListener('courses:view-changed',event=>{
+    if(event.detail?.view!=='catalog')return;
+    startCatalogView();
+  });
+  document.addEventListener('courses:settings-management-opened',loadCatalogProductAdmin);
+  const loadRuntimeFeatures=()=>{
+    if(document.querySelector('script[data-runtime-features]')){
+      runtimeReady=true;
+      if(productCatalogRequested)startProductCatalog();
+      return;
+    }
+    const script=document.createElement('script');
+    script.src='./runtime-features.js?v=428';
+    script.async=false;
+    script.dataset.runtimeFeatures='script';
+    script.addEventListener('load',()=>{
+      runtimeReady=true;
+      if(productCatalogRequested)startProductCatalog();
+    },{once:true});
+    document.body.appendChild(script);
+  };
+  const loadAppUi=()=>{
+    if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
+    const script=document.createElement('script');
+    script.src='./app-ui.js?v=427';
+    script.async=false;
+    script.dataset.appUi='script';
+    script.addEventListener('load',loadRuntimeFeatures,{once:true});
+    document.body.appendChild(script);
+  };
+  const bootstrap=()=>{
+    loadAppUi();
+    if(document.getElementById('catalogView')?.classList.contains('is-active'))startCatalogView();
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootstrap,{once:true});
+  else bootstrap();
+})();'''
+          write(path,text[:pos+1]+tail)
+
+          # settings-ui.js: keep servings preference, remove automatic Products/Dishes preference and defer dish/admin owners.
+          path='settings-ui.js'
+          text=read(path)
+          split_marker="\n})();\n\n(() => {"
+          end=text.find(split_marker)
+          if end<0:
+              raise SystemExit('settings-ui.js first IIFE marker not found')
+          first=r'''(() => {
+'use strict';
+
+const STORAGE_PREFERRED_SERVINGS='courses-dish-preferred-servings-v1';
+const STORAGE_SERVINGS='courses-dish-servings-v1';
+const SERVING_OPTIONS=Object.freeze([2,4,5]);
+const DEFAULT_SERVINGS=2;
+const DOCUMENTATION_URL='./docs/guide-fonctionnement-courses.pdf?v=299';
+
+function clearLegacyCatalogMode(){
+  try{
+    localStorage.removeItem('courses-catalog-preferred-mode-v1');
+    localStorage.removeItem('courses-catalog-mode-v1');
+  }catch(_){}
+}
+function readPreferredServings(){
+  try{
+    const value=Number(localStorage.getItem(STORAGE_PREFERRED_SERVINGS));
+    return SERVING_OPTIONS.includes(value)?value:DEFAULT_SERVINGS;
+  }catch(_){
+    return DEFAULT_SERVINGS;
+  }
+}
+function persistPreferredServings(value){
+  try{
+    localStorage.setItem(STORAGE_PREFERRED_SERVINGS,String(value));
+    localStorage.setItem(STORAGE_SERVINGS,String(value));
+  }catch(_){}
+}
+function syncDishServings(value){
+  try{localStorage.setItem(STORAGE_SERVINGS,String(value))}catch(_){}
+  const quantities=window.COURSES_QUANTITIES;
+  if(typeof quantities?.setServings!=='function')return false;
+  return quantities.setServings(value)!==false;
+}
+function bindDishServingsSync(){
+  const sync=()=>syncDishServings(readPreferredServings());
+  document.addEventListener('courses:quantities-ready',sync);
+  sync();
+}
+function initPreferencesExtras(){
+  clearLegacyCatalogMode();
+  const dialog=document.getElementById('preferencesDialog');
+  const startView=document.getElementById('preferencesStartView');
+  const saveButton=document.getElementById('savePreferences');
+  if(!dialog||!startView||!saveButton)return;
+
+  let documentationButton=document.getElementById('preferencesDocumentation');
+  if(!documentationButton){
+    documentationButton=document.createElement('button');
+    documentationButton.id='preferencesDocumentation';
+    documentationButton.type='button';
+    documentationButton.className='secondary';
+    documentationButton.textContent='Documentation';
+    documentationButton.setAttribute('aria-label','Ouvrir la documentation PDF');
+    saveButton.before(documentationButton);
+    documentationButton.addEventListener('click',()=>{
+      const link=document.createElement('a');
+      link.href=DOCUMENTATION_URL;
+      link.target='_blank';
+      link.rel='noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+  }
+
+  const startField=startView.closest('.field');
+  let servingsSelect=document.getElementById('preferencesServings');
+  if(!servingsSelect){
+    const field=document.createElement('label');
+    field.className='field';
+    field.innerHTML='<span>Nombre de personnes</span><select id="preferencesServings" aria-label="Nombre de personnes"><option value="2">2 personnes</option><option value="4">4 personnes</option><option value="5">5 personnes</option></select>';
+    startField?.after(field);
+    servingsSelect=field.querySelector('select');
+  }
+  if(!servingsSelect)return;
+
+  const initialServings=readPreferredServings();
+  persistPreferredServings(initialServings);
+  servingsSelect.value=String(initialServings);
+  bindDishServingsSync();
+
+  const syncSelects=()=>{servingsSelect.value=String(readPreferredServings())};
+  dialog.addEventListener('close',syncSelects);
+  document.getElementById('settingsPreferencesBtn')?.addEventListener('click',syncSelects);
+  saveButton.addEventListener('click',()=>{
+    const nextServings=Number(servingsSelect.value);
+    if(SERVING_OPTIONS.includes(nextServings)){
+      persistPreferredServings(nextServings);
+      syncDishServings(nextServings);
+    }
+  },true);
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initPreferencesExtras,{once:true});
+}else{
+  initPreferencesExtras();
+}
+})()'''
+          text=first+text[end+len("\n})();"):]
+          marker_block="""(() => {
+'use strict';
+if(document.querySelector('script[data-dish-added-marker]'))return;
+const script=document.createElement('script');
+script.src='./dish-added-marker.js?v=408';
+script.defer=true;
+script.dataset.dishAddedMarker='1';
+document.head.appendChild(script);
+})();
+
+"""
+          if text.count(marker_block)!=1:
+              raise SystemExit('settings-ui.js dish marker loader not found once')
+          text=text.replace(marker_block,'',1)
+          old="""    if(!dialog.open)dialog.showModal();
+  }
+
+  selectionsButton.addEventListener('click',showSelections,true);"""
+          new="""    if(!dialog.open)dialog.showModal();
+    document.dispatchEvent(new CustomEvent('courses:settings-management-opened'));
+  }
+
+  selectionsButton.addEventListener('click',showSelections,true);"""
+          if text.count(old)!=1:
+              raise SystemExit('settings-ui.js management open hook not found once')
+          text=text.replace(old,new,1)
+          write(path,text)
+
+          # dishes-ui.js: Products is the only entry state; Plats is explicit and is never restored from storage.
+          replace_once('dishes-ui.js',"const STORAGE_MODE='courses-catalog-mode-v1';\n",'')
+          replace_once('dishes-ui.js',"let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';","let mode='products';")
+          replace_once('dishes-ui.js',"  mode=next;\n  localStorage.setItem(STORAGE_MODE,mode);\n  filter='Tous';","  mode=next;\n  filter='Tous';")
+          old="""  modeSwitch.querySelectorAll('.catalog-mode').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
+  searchInput.addEventListener('input',()=>{if(mode==='dishes'&&!drivingCatalog)renderDishes()});
+  window.addEventListener('resize',()=>requestAnimationFrame(()=>syncModeLens(false)),{passive:true});
+  document.querySelector('.tab[data-view="catalog"]')?.addEventListener('click',()=>requestAnimationFrame(()=>syncModeLens(false)));
+
+  validateDishes();
+  setMode(mode,true);"""
+          new="""  modeSwitch.querySelectorAll('.catalog-mode').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
+  searchInput.addEventListener('input',()=>{if(mode==='dishes'&&!drivingCatalog)renderDishes()});
+  window.addEventListener('resize',()=>requestAnimationFrame(()=>syncModeLens(false)),{passive:true});
+  document.querySelector('.tab[data-view="catalog"]')?.addEventListener('click',()=>requestAnimationFrame(()=>syncModeLens(false)));
+  document.addEventListener('courses:view-changed',event=>{
+    if(event.detail?.view==='catalog'&&mode!=='products')setMode('products');
+  });
+
+  validateDishes();
+  setMode('products',true);"""
+          replace_once('dishes-ui.js',old,new)
+
+          # app.js: do not build the hidden catalogue; list thumbnails remain eager, catalogue thumbnails are lazy.
+          old="""    '<img src="'+source+'" alt="" loading="eager" fetchpriority="'+(compact?'high':'auto')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+"""
+          new="""    '<img src="'+source+'" alt="" loading="'+(compact?'eager':'lazy')+'" fetchpriority="'+(compact?'high':'auto')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+"""
+          replace_once('app.js',old,new)
+          replace_once('app.js',"""function renderCategories(){
+  const el=$('#categories');
+  if(!el)return;""","""function renderCategories(){
+  const el=$('#categories');
+  if(!el||!$('#catalogView')?.classList.contains('is-active'))return;""")
+          replace_once('app.js',"""function renderProducts(){
+  const el=$('#products'),products=visibleProducts();
+  if(!el)return;""","""function renderProducts(){
+  const el=$('#products');
+  if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
+  const products=visibleProducts();""")
+          replace_once('app.js',"""  if(publishedView!==state.view){
+    publishedView=state.view;
+    document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));
+  }""","""  if(publishedView!==state.view){
+    publishedView=state.view;
+    if(state.view==='catalog'){renderCategories();renderProducts()}
+    document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));
+  }""")
+          replace_once('app.js',"""function renderView(){
+  showView();
+  renderCategories();renderProducts();renderList();renderSettingsPage();
+}""","""function renderView(){
+  showView();
+  renderList();renderSettingsPage();
+}""")
+
+          # product-item-images.js: list is prioritized, hidden catalogue is ignored, admin owner is removed.
+          replace_once('product-item-images.js','function decorateFallback(card,name,source){','function decorateFallback(card,name,source,eager=false){')
+          replace_once('product-item-images.js',"""  const image=new Image();
+  image.alt='';
+  image.decoding='async';""","""  const image=new Image();
+  image.alt='';
+  image.loading=eager?'eager':'lazy';
+  image.decoding='async';""")
+          replace_once('product-item-images.js','function decorateCard(card){','function decorateCard(card,eager=false){')
+          replace_once('product-item-images.js',"if(!sprite||!image){decorateFallback(card,name,source);return;}","if(!sprite||!image){decorateFallback(card,name,source,eager);return;}")
+          replace_once('product-item-images.js',"  image.loading='eager';","  image.loading=eager?'eager':'lazy';")
+          old="""function decorateProducts(){
+  products?.querySelectorAll('.product[data-name]').forEach(decorateCard);
+}
+function decorateList(){
+  listItems?.querySelectorAll('.list-row[data-name]').forEach(decorateCard);
+}
+function decorateAll(){
+  decorateProducts();
+  decorateList();
+}"""
+          new="""function decorateProducts(){
+  if(!document.getElementById('catalogView')?.classList.contains('is-active'))return;
+  products?.querySelectorAll('.product[data-name]').forEach(card=>decorateCard(card,false));
+}
+function decorateList(){
+  listItems?.querySelectorAll('.list-row[data-name]').forEach(card=>decorateCard(card,true));
+}"""
+          replace_once('product-item-images.js',old,new)
+          replace_once('product-item-images.js',"""  document.addEventListener('courses:products-updated',scheduleDecorateProducts);
+  document.addEventListener('courses:list-rendered',scheduleDecorateList);""","""  document.addEventListener('courses:products-updated',scheduleDecorateProducts);
+  document.addEventListener('courses:list-rendered',scheduleDecorateList);
+  document.addEventListener('courses:view-changed',event=>{if(event.detail?.view==='catalog')scheduleDecorateProducts()});""")
+          replace_once('product-item-images.js','  decorateAll();','  decorateList();')
+          admin_loader="""
+(() => {
+'use strict';
+if(document.querySelector('script[data-catalog-product-admin]'))return;
+const script=document.createElement('script');
+script.src='./catalog-product-admin.js?v=410';
+script.defer=true;
+script.dataset.catalogProductAdmin='1';
+document.head.appendChild(script);
+})();"""
+          text=read('product-item-images.js')
+          if text.count(admin_loader)!=1:
+              raise SystemExit('product-item-images.js admin loader not found once')
+          write('product-item-images.js',text.replace(admin_loader,'',1).rstrip()+'\n')
+
+          # Runtime / global version.
+          replace_once('runtime-features.js',"./product-item-images.js?v=415","./product-item-images.js?v=428")
+          replace_once('dish-local-images.js',"const APP_VERSION='v427';","const APP_VERSION='v428';")
+
+          # Visible version and direct startup revisions.
+          text=read('index.html')
+          if text.count('<span class="page-version">v427</span>')!=3:
+              raise SystemExit('index.html expected three v427 badges')
+          text=text.replace('<span class="page-version">v427</span>','<span class="page-version">v428</span>')
+          for old,new in [('./catalog.js?v=427','./catalog.js?v=428'),('./app.js?v=415','./app.js?v=428'),('./settings-ui.js?v=410','./settings-ui.js?v=428')]:
+              if text.count(old)!=1:
+                  raise SystemExit(f'index.html expected one {old}')
+              text=text.replace(old,new,1)
+          write('index.html',text)
+
+          # Service worker: only the real startup shell is pre-cached; catalog/dish/admin assets are cached when requested.
+          text=read('sw.js')
+          text=text.replace("const CACHE='courses-app-v427-r1';","const CACHE='courses-app-v428-r1';",1)
+          shell='const SHELL=["./index.html","./styles.css?v=404","./product-item-first-paint.css?v=1","./catalog.js?v=428","./preferences-service.js?v=398","./missing-requests-store.js?v=399","./bottom-nav-liquid.js?v=414","./app.js?v=428","./settings-tab-badge.js?v=410","./settings-ui.js?v=428","./error-center.js?v=410","./app-ui.js?v=427","./runtime-features.js?v=428","./missing-products-fixes.js?v=427","./missing-products-popup-ui.js?v=410","./product-item-images.js?v=428","./purchase-intelligence.js?v=409","./missing-products-dishes.js?v=410","./missing-products-modern.js?v=410","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png"];'
+          text,count=re.subn(r'const SHELL=\[[^\n]*\];',shell,text,count=1)
+          if count!=1:
+              raise SystemExit('sw.js SHELL not replaced')
+          write('sw.js',text)
+
+          # Asset graph now documents the actual deferred boundaries.
+          path='docs/ASSET_GRAPH.md'
+          text=read(path)
+          old="""`catalog.js` charge ensuite `dishes.css`, `catalog-liquid.css`, `dish-local-images.js`, `app-ui.js`, `runtime-features.js`, `repurchase-soon.js`, `catalog-quantities.js`, `dishes-ui.js` puis `catalog-liquid.js`. `catalog-liquid.css` importe `dish-detail.css`.
+
+`runtime-features.js` charge `missing-products-fixes.js`, `missing-products-popup-ui.js`, `product-item-images.js` et `purchase-intelligence.js`.
+
+`settings-ui.js` charge `missing-products-dishes.js`, `missing-products-modern.js` et `dish-added-marker.js`.
+
+`product-item-images.js` charge `catalog-product-admin.js`."""
+          new="""`catalog.js` charge d’abord `app-ui.js` puis `runtime-features.js`. Après la synchronisation de **Ma liste**, le Catalogue Produits est déclaré prêt sans charger les dépendances des plats. À la première entrée dans Catalogue, `repurchase-soon.js` peut être chargé en parallèle, puis la branche Plats prépare `catalog-quantities.js`, `dishes.css`, `catalog-liquid.css`, `dishes-ui.js`, `catalog-liquid.js`, `dish-local-images.js` et enfin `dish-added-marker.js`. `catalog-liquid.css` importe `dish-detail.css`.
+
+`runtime-features.js` charge `missing-products-fixes.js`, `missing-products-popup-ui.js`, `product-item-images.js` et `purchase-intelligence.js`. `product-item-images.js` ne charge plus l’administration du catalogue et ne décore le Catalogue que lorsqu’il est visible.
+
+`settings-ui.js` charge `missing-products-dishes.js` et `missing-products-modern.js`. `catalog-product-admin.js` n’est demandé qu’à l’ouverture de **Gestion de l’application**."""
+          if text.count(old)!=1:
+              raise SystemExit('docs/ASSET_GRAPH.md loader paragraph not found once')
+          text=text.replace(old,new,1)
+          text=text.replace("`sw.js` doit conserver une seule URL active par chemin dans `SHELL`. Lorsqu’un fichier change de version de query string, son ancienne entrée doit être remplacée et non conservée en parallèle.","`sw.js` ne précache dans `SHELL` que les ressources nécessaires au démarrage réel. Les assets Catalogue/Plats/administration différés sont mis en cache lorsqu’ils sont effectivement demandés. Une seule URL active par chemin reste autorisée dans `SHELL`.")
+          text=text.replace("`dish-local-images.js` est limité aux visuels locaux de plats, à leur fallback et à leur préchauffage.","`dish-local-images.js` est limité aux visuels locaux de plats et à leur fallback.")
+          write(path,text)
+
+          # Tests for the new boundaries.
+          write('tests/deferred-catalog-startup.test.mjs',r'''import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
+const source=read('catalog.js');
+const sw=read('sw.js');
+
+test('le démarrage critique reste centré sur Ma liste',()=>{
+  const bootstrapStart=source.indexOf('const bootstrap=()=>{');
+  const bootstrapEnd=source.indexOf("if(document.readyState==='loading')",bootstrapStart);
+  assert.ok(bootstrapStart>=0&&bootstrapEnd>bootstrapStart);
+  const bootstrap=source.slice(bootstrapStart,bootstrapEnd);
+  assert.ok(bootstrap.includes('loadAppUi();'));
+  for(const heavy of ['loadQuantities();','loadDishes();','loadLiquid();','loadDishLocalImages();','loadRepurchaseSoon();'])assert.equal(bootstrap.includes(heavy),false,heavy+' ne doit pas faire partie du démarrage critique');
+});
+
+test('le Catalogue Produits devient prêt sans charger la branche Plats',()=>{
+  assert.ok(source.includes("document.addEventListener('courses:status-changed',event=>{"));
+  assert.ok(source.includes("if(title==='Synchronisé'||title==='Mode test')startProductCatalog();"));
+  const start=source.indexOf('const startProductCatalog=()=>{');
+  const end=source.indexOf('const startCatalogView=()=>{',start);
+  const block=source.slice(start,end);
+  assert.ok(block.includes('if(productCatalogStarted||!runtimeReady)return;'));
+  assert.ok(block.includes('productCatalogStarted=true;'));
+  assert.ok(block.includes('markProductCatalogReady();'));
+  assert.equal(block.includes('loadQuantities();'),false);
+  assert.equal(block.includes('loadDishes();'),false);
+  assert.ok(source.includes("new CustomEvent('courses:catalog-products-ready')"));
+});
+
+test('les fonctions secondaires attendent l entrée dans Catalogue',()=>{
+  const start=source.indexOf('const startCatalogView=()=>{');
+  const end=source.indexOf("document.addEventListener('courses:status-changed'",start);
+  const block=source.slice(start,end);
+  assert.ok(block.includes('startProductCatalog();'));
+  assert.ok(block.includes('loadRepurchaseSoon();'));
+  assert.ok(block.includes('startDishFeatures();'));
+  assert.ok(source.includes('if(dishFeaturesStarted||!productCatalogReady)return;'));
+  assert.ok(source.includes('dishFeaturesStarted=true;'));
+  assert.ok(source.includes('loadQuantities();'));
+  assert.ok(source.includes("quantities.addEventListener('load',loadDishes,{once:true});"));
+  assert.ok(source.includes("script.addEventListener('load',loadLiquid,{once:true});"));
+  assert.ok(source.includes("liquid.addEventListener('load',loadDishLocalImages,{once:true});"));
+  assert.ok(source.includes("images.addEventListener('load',loadDishAddedMarker,{once:true});"));
+  assert.equal(source.includes('new MutationObserver'),false);
+  assert.equal(source.includes('setInterval('),false);
+});
+
+test('le Service Worker ne précache plus les fonctions Catalogue différées',()=>{
+  const shell=sw.match(/const SHELL=(\[[^\n]+\]);/)?.[1]||'';
+  assert.ok(shell);
+  for(const deferred of ['dishes-ui.js','catalog-quantities.js','catalog-liquid.js','dish-local-images.js','dish-added-marker.js','repurchase-soon.js','catalog-product-admin.js','guide-fonctionnement-courses.pdf']){
+    assert.equal(shell.includes(deferred),false,deferred+' ne doit pas être précaché au démarrage');
+  }
+  for(const startup of ['catalog.js?v=428','app.js?v=428','settings-ui.js?v=428','runtime-features.js?v=428','product-item-images.js?v=428'])assert.ok(shell.includes(startup),startup+' absent du shell de démarrage');
+});
+
+test('le runtime de Ma liste reste prioritaire avant la préparation du Catalogue',()=>{
+  assert.ok(source.includes('runtimeReady=true;'));
+  assert.ok(source.includes('if(productCatalogRequested)startProductCatalog();'));
+  const productStart=source.indexOf('const startProductCatalog=()=>{');
+  const runtimeStart=source.indexOf('const loadRuntimeFeatures=()=>{');
+  assert.ok(productStart>=0&&runtimeStart>productStart);
+});
+''')
+
+          write('tests/catalog-entry-contract.test.mjs',r'''import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
+
+test('Catalogue entre toujours sur Produits et Plats reste une action explicite',()=>{
+  const dishes=read('dishes-ui.js'),settings=read('settings-ui.js');
+  assert.match(dishes,/let mode='products';/);
+  assert.match(dishes,/setMode\('products',true\)/);
+  assert.match(dishes,/courses:view-changed[\s\S]*view==='catalog'&&mode!=='products'[\s\S]*setMode\('products'\)/);
+  assert.doesNotMatch(dishes,/STORAGE_MODE|localStorage\.setItem\([^\n]*catalog-mode|localStorage\.getItem\([^\n]*catalog-mode/);
+  assert.doesNotMatch(settings,/preferencesCatalogMode|Ouverture du Catalogue|applyPreferredCatalogMode|bindCatalogEntry/);
+  assert.match(settings,/removeItem\('courses-catalog-preferred-mode-v1'\)/);
+  assert.match(settings,/removeItem\('courses-catalog-mode-v1'\)/);
+});
+
+test('Ma liste garde la priorité et le Catalogue caché nest plus construit',()=>{
+  const app=read('app.js');
+  assert.match(app,/loading="'\+\(compact\?'eager':'lazy'\)\+'/);
+  assert.match(app,/function renderCategories\(\)[\s\S]*catalogView[^\n]*is-active[^\n]*return/);
+  assert.match(app,/function renderProducts\(\)[\s\S]*catalogView[^\n]*is-active[^\n]*return/);
+  assert.match(app,/if\(state\.view==='catalog'\)\{renderCategories\(\);renderProducts\(\)\}/);
+  const renderView=app.slice(app.indexOf('function renderView(){'),app.indexOf('function renderSettingsPage(){'));
+  assert.doesNotMatch(renderView,/renderCategories\(\)|renderProducts\(\)/);
+});
+
+test('les images produits respectent la visibilité et ne possèdent plus ladministration',()=>{
+  const images=read('product-item-images.js');
+  assert.match(images,/image\.loading=eager\?'eager':'lazy'/);
+  assert.match(images,/catalogView[^\n]*is-active[^\n]*return/);
+  assert.match(images,/courses:view-changed/);
+  assert.doesNotMatch(images,/decorateAll/);
+  assert.doesNotMatch(images,/catalog-product-admin\.js/);
+});
+
+test('les propriétaires secondaires sont chargés depuis leur vrai contexte',()=>{
+  const catalog=read('catalog.js'),settings=read('settings-ui.js');
+  assert.match(catalog,/courses:settings-management-opened',loadCatalogProductAdmin/);
+  assert.match(catalog,/loadRepurchaseSoon\(\)/);
+  assert.match(catalog,/loadDishAddedMarker/);
+  assert.doesNotMatch(settings,/data-dish-added-marker|dish-added-marker\.js/);
+  assert.match(settings,/new CustomEvent\('courses:settings-management-opened'\)/);
+});
+''')
+
+          write('tests/list-render-version.test.mjs',r'''import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
+
+test('la version globale et les révisions actives associées restent cohérentes',()=>{
+  const index=read('index.html'),catalog=read('catalog.js'),runtime=read('runtime-features.js'),sw=read('sw.js'),images=read('dish-local-images.js');
+  const versions=[...index.matchAll(/<span class="page-version">(v\d+)<\/span>/g)].map(match=>match[1]);
+  assert.equal(versions.length,3);
+  assert.equal(new Set(versions).size,1);
+  const [version]=versions;
+  const revision=version.slice(1);
+  assert.equal(version,'v428');
+  assert.ok(index.includes(`./catalog.js?v=${revision}`));
+  assert.ok(index.includes(`./app.js?v=${revision}`));
+  assert.ok(index.includes(`./settings-ui.js?v=${revision}`));
+  assert.match(index,/\.\/bottom-nav-liquid\.js\?v=414/);
+  assert.match(catalog,/\.\/app-ui\.js\?v=427/);
+  assert.ok(catalog.includes(`./dish-local-images.js?v=${revision}`));
+  assert.ok(catalog.includes(`./dishes-ui.js?v=${revision}`));
+  assert.ok(catalog.includes(`./runtime-features.js?v=${revision}`));
+  assert.match(catalog,/\.\/catalog-quantities\.js\?v=426/);
+  assert.match(runtime,/\.\/missing-products-fixes\.js\?v=427/);
+  assert.ok(runtime.includes(`./product-item-images.js?v=${revision}`));
+  assert.ok(images.includes(`const APP_VERSION='${version}';`));
+  assert.ok(sw.includes(`const CACHE='courses-app-${version}-r1';`));
+  assert.ok(sw.includes(`./catalog.js?v=${revision}`));
+  assert.ok(sw.includes(`./app.js?v=${revision}`));
+  assert.ok(sw.includes(`./settings-ui.js?v=${revision}`));
+  assert.ok(sw.includes(`./runtime-features.js?v=${revision}`));
+  assert.ok(sw.includes(`./product-item-images.js?v=${revision}`));
+  assert.match(sw,/\.\/app-ui\.js\?v=427/);
+  assert.match(sw,/\.\/missing-products-fixes\.js\?v=427/);
+});
+''')
+          PY
+      - name: Validate repository
+        run: bash scripts/validate_repo.sh
+      - name: Commit validated tree
+        shell: bash
+        run: |
+          rm .github/workflows/v428-catalog-flow-work.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "v428: sépare réellement Ma liste, Produits et Plats"
+          git push origin HEAD:automation/v428-catalog-flow-work
