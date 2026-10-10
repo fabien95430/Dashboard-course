@@ -21,12 +21,14 @@ replace_once('app.js',
 """function reconcileListChildren(root,nodes){
   const wanted=new Set(nodes);
   [...root.children].forEach(child=>{if(!wanted.has(child))child.remove()});
-  let anchor=null;
-  for(let index=nodes.length-1;index>=0;index--){
-    const node=nodes[index];
-    if(node.parentNode!==root||node.nextSibling!==anchor)root.insertBefore(node,anchor);
-    anchor=node;
-  }
+  let cursor=root.firstChild||null;
+  nodes.forEach(node=>{
+    if(node===cursor){
+      cursor=cursor.nextSibling;
+      return;
+    }
+    root.insertBefore(node,cursor);
+  });
 }""")
 
 replace_once('tests/list-render-reuse.test.mjs',
@@ -41,5 +43,12 @@ replace_once('tests/list-render-reuse.test.mjs',
     return index>=0?(this.parentNode.children[index+1]||null):null;
   }
   remove(){""")
+
+replace_once('tests/list-render-reuse.test.mjs',
+"""class FakeRoot{
+  constructor(nodes=[]){""",
+"""class FakeRoot{
+  get firstChild(){return this.children[0]||null}
+  constructor(nodes=[]){""")
 
 print('P2 reconciliation fix applied')
