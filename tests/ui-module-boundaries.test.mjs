@@ -8,7 +8,8 @@ const read=file=>readFileSync(new URL(file,root),'utf8');
 test('dish-local-images reste limité aux visuels des plats',()=>{
   const source=read('dish-local-images.js');
   assert.match(source,/function localDishImage\(name\)/);
-  assert.match(source,/function warmRenderedDishCards\(\)/);
+  assert.match(source,/function localizeImage\(image,name\)/);
+  assert.match(source,/function localizeCards\(grid\)/);
   for(const forbidden of ['syncPageVersions','securityViewportHeight','syncListEmptyState','installMissingProductsFixes','installProductItemImages','installPurchaseIntelligence'])assert.equal(source.includes(forbidden),false,forbidden+' ne doit plus appartenir aux images de plats');
 });
 

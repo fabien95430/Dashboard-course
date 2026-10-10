@@ -25,8 +25,8 @@ test('les propriétaires publient les cycles transverses restants',()=>{
 test('les consommateurs P1 écoutent les événements propriétaires au lieu du DOM',()=>{
   const images=read('dish-local-images.js'),appUi=read('app-ui.js'),errors=read('error-center.js'),repurchase=read('repurchase-soon.js');
   const fixes=read('missing-products-fixes.js'),popup=read('missing-products-popup-ui.js'),admin=read('catalog-product-admin.js');
-  assert.match(images,/document\.addEventListener\('courses:lock-changed'/);
   assert.match(images,/document\.addEventListener\('courses:dishes-rendered'/);
+  assert.match(images,/document\.addEventListener\('courses:dish-sheet-opened'/);
   assert.match(appUi,/document\.addEventListener\('courses:list-rendered'/);
   assert.match(appUi,/document\.addEventListener\('courses:status-changed'/);
   assert.match(errors,/document\.addEventListener\('courses:status-changed',sync\)/);
