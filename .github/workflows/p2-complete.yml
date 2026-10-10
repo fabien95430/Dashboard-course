@@ -1,0 +1,56 @@
+name: p2-complete
+
+on:
+  push:
+    branches:
+      - automation/p2-complete
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Read validation patch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/p2-complete
+          fetch-depth: 1
+      - name: Preserve validation patch
+        run: cp .github/p2-complete-patch.py /tmp/p2-complete-patch.py
+      - name: Checkout source of truth
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Apply complete P2 patch
+        run: python /tmp/p2-complete-patch.py
+      - name: Validate repository
+        run: bash scripts/validate_repo.sh
+      - name: Publish validated result branch
+        run: |
+          expected="app.js
+          catalog.js
+          dish-local-images.js
+          index.html
+          sw.js
+          tests/list-render-reuse.test.mjs"
+          actual="$(git status --short | sed 's/^...//' | sort)"
+          wanted="$(printf '%s\n' "$expected" | sed '/^[[:space:]]*$/d' | sed 's/^[[:space:]]*//' | sort)"
+          if [ "$actual" != "$wanted" ]; then
+            echo "Unexpected changed files"
+            echo "Actual:"
+            printf '%s\n' "$actual"
+            echo "Expected:"
+            printf '%s\n' "$wanted"
+            exit 1
+          fi
+          git config user.name "OpenAI validation"
+          git config user.email "noreply@openai.com"
+          git add -A
+          git commit -m "v411: optimise le rendu de Ma liste"
+          git push origin HEAD:refs/heads/automation/p2-complete-result --force
