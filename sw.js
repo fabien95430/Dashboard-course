@@ -1,4 +1,4 @@
-const CACHE='courses-app-v400-r1';
+const CACHE='courses-app-v401-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -8,9 +8,9 @@ const CORE_VISUALS=[
 ];
 const SHELL=[
   './index.html',
-  './styles.css?v=348',
+  './styles.css?v=401',
   './product-item-first-paint.css?v=1',
-  './catalog.js?v=400',
+  './catalog.js?v=401',
   './preferences-service.js?v=398',
   './missing-requests-store.js?v=399',
   './app.js?v=399',
@@ -25,7 +25,7 @@ const SHELL=[
   './dishes-ui.js?v=391',
   './catalog-quantities.js?v=389',
   './repurchase-soon.js?v=363',
-  './dish-local-images.js?v=400',
+  './dish-local-images.js?v=401',
   './app-ui.js?v=400',
   './runtime-features.js?v=400',
   './missing-products-fixes.js?v=399',
