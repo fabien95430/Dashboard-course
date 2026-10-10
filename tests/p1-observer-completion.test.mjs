@@ -44,3 +44,10 @@ test('Ma liste affiche son panier vide sans attendre Home Assistant et seulement
   assert.doesNotMatch(appUi,/listEmptyStateConfirmed/);
   assert.doesNotMatch(appUi,/document\.addEventListener\('courses:status-changed'/);
 });
+
+test('Ma liste réutilise le même panier premium pendant les rendus vides successifs',()=>{
+  const appUi=read('app-ui.js');
+  assert.match(appUi,/let retainedListEmptyState=null;/);
+  assert.match(appUi,/if\(nativeEmpty&&retainedListEmptyState\)\{\s*root\.replaceChildren\(retainedListEmptyState\);\s*root\.classList\.add\('is-list-home-empty'\);\s*return;\s*\}/);
+  assert.match(appUi,/retainedListEmptyState=empty;/);
+});

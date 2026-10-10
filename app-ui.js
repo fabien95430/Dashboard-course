@@ -3,6 +3,7 @@
 
 const APP_VERSION=String(window.COURSES_APP_VERSION||document.querySelector('.page-version')?.textContent||'').trim();
 let securityKeyboardBaseline=0;
+let retainedListEmptyState=null;
 
 function syncPageVersions(){
   document.querySelectorAll('.page-header').forEach(header=>{
@@ -276,10 +277,16 @@ function syncListEmptyState(root){
   const design='premium-v4';
   const empty=root.children.length===1&&root.firstElementChild?.classList.contains('empty')?root.firstElementChild:null;
   if(empty?.classList.contains('list-empty-state')&&empty.dataset.emptyDesign===design){
+    retainedListEmptyState=empty;
     root.classList.add('is-list-home-empty');
     return;
   }
   const nativeEmpty=Boolean(empty&&empty.children.length===0&&empty.textContent.trim()==='La liste est vide.');
+  if(nativeEmpty&&retainedListEmptyState){
+    root.replaceChildren(retainedListEmptyState);
+    root.classList.add('is-list-home-empty');
+    return;
+  }
   if(empty)empty.hidden=false;
   const shouldEnhance=Boolean(empty&&(nativeEmpty||empty.classList.contains('list-empty-state')));
   root.classList.toggle('is-list-home-empty',shouldEnhance);
@@ -302,6 +309,7 @@ function syncListEmptyState(root){
   empty.querySelector('.list-empty-action')?.addEventListener('click',()=>{
     document.querySelector('.tab[data-view="catalog"]')?.click();
   });
+  retainedListEmptyState=empty;
 }
 
 function bind(){
