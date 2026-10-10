@@ -138,7 +138,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Confiture fraise":"Pot",
   "Confiture mirabelles":"Pot",
   "Chips":"Paquet",
-  "Pâte feuilletée":"Paquet"
+  "Pâte feuilletée":"Paquet",
+  "Kinder Maxi":"Boîte"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
