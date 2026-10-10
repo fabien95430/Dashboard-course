@@ -28,6 +28,117 @@ jobs:
           script=script.replace("})()'''","})();'''",1)
           exec(compile(script,'v428-apply.py','exec'),{})
           PYRUN
+      - name: Preserve offline contract and update regression tests
+        shell: bash
+        run: |
+          python - <<'PYFIX'
+          from pathlib import Path
+          import re
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path,text): Path(path).write_text(text,encoding='utf-8')
+          def once(path,old,new):
+              text=read(path)
+              if text.count(old)!=1: raise SystemExit(f'{path}: expected one match for {old[:80]!r}, got {text.count(old)}')
+              write(path,text.replace(old,new,1))
+
+          # Preserve the established offline-first contract: deferred modules are precached but not executed at startup.
+          sw=read('sw.js')
+          shell='const SHELL=["./index.html","./styles.css?v=404","./product-item-first-paint.css?v=1","./catalog.js?v=428","./preferences-service.js?v=398","./missing-requests-store.js?v=399","./bottom-nav-liquid.js?v=414","./app.js?v=428","./settings-tab-badge.js?v=410","./settings-ui.js?v=428","./error-center.js?v=410","./dishes.css?v=3","./catalog-liquid.css?v=4","./dish-detail.css?v=6","./catalog-liquid.js?v=297","./dishes-ui.js?v=428","./catalog-quantities.js?v=426","./repurchase-soon.js?v=410","./dish-local-images.js?v=428","./app-ui.js?v=427","./runtime-features.js?v=428","./missing-products-fixes.js?v=427","./missing-products-popup-ui.js?v=410","./product-item-images.js?v=428","./catalog-product-admin.js?v=410","./purchase-intelligence.js?v=409","./missing-products-dishes.js?v=410","./missing-products-modern.js?v=410","./dish-added-marker.js?v=408","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];'
+          sw,count=re.subn(r'const SHELL=\[[^\n]*\];',shell,sw,count=1)
+          if count!=1: raise SystemExit('sw SHELL replacement failed')
+          write('sw.js',sw)
+
+          docs=read('docs/ASSET_GRAPH.md')
+          docs=docs.replace('`sw.js` ne précache dans `SHELL` que les ressources nécessaires au démarrage réel. Les assets Catalogue/Plats/administration différés sont mis en cache lorsqu’ils sont effectivement demandés. Une seule URL active par chemin reste autorisée dans `SHELL`.','`sw.js` conserve dans `SHELL` le graphe actif nécessaire au fonctionnement hors ligne. Le précache rend les assets disponibles mais ne les exécute pas : les frontières de chargement runtime ci-dessus restent différées. Une seule URL active par chemin est autorisée dans `SHELL`.')
+          write('docs/ASSET_GRAPH.md',docs)
+
+          # Version-only legacy expectation.
+          once('tests/app-responsibility-extraction.test.mjs',"const appIndex=index.indexOf('./app.js?v=415');","const appIndex=index.indexOf('./app.js?v=428');")
+
+          # Ma liste stays eager; hidden catalogue is explicitly lazy.
+          once('tests/openai-products.test.mjs',"assert.match(images,/listItems\\?\\.querySelectorAll\\('\\.list-row\\[data-name\\]'\\)\\.forEach\\(decorateCard\\)/);","assert.match(images,/listItems\\?\\.querySelectorAll\\('\\.list-row\\[data-name\\]'\\)\\.forEach\\(card=>decorateCard\\(card,true\\)\\)/);")
+          once('tests/product-images-no-atlas.test.mjs',"assert.ok(app.includes(`loading=\"eager\" fetchpriority=\"'+(compact?'high':'auto')+'\"`));","assert.ok(app.includes(`loading=\"'+(compact?'eager':'lazy')+'\" fetchpriority=\"'+(compact?'high':'auto')+'\"`));")
+
+          # Settings no longer owns Catalogue mode. dishes-ui owns the explicit entry contract.
+          write('tests/settings-ui-events.test.mjs',"""import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+
+const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
+
+test('les portions de préférence passent par le propriétaire des quantités',()=>{
+  const settings=read('settings-ui.js');
+  const quantities=read('catalog-quantities.js');
+  assert.match(settings,/const quantities=window\\.COURSES_QUANTITIES/);
+  assert.match(settings,/document\\.addEventListener\\('courses:quantities-ready',sync\\)/);
+  assert.match(quantities,/addSelected:addSelectedQuantities,\\s*setServings,\\s*bind/);
+  assert.match(quantities,/new CustomEvent\\('courses:quantities-ready'\\)/);
+});
+
+test('l entrée Catalogue a un propriétaire unique et reste événementielle',()=>{
+  const app=read('app.js');
+  const dishes=read('dishes-ui.js');
+  const settings=read('settings-ui.js');
+  assert.match(app,/new CustomEvent\\('courses:view-changed',\\{detail:\\{view:state\\.view\\}\\}\\)/);
+  assert.match(dishes,/new CustomEvent\\('courses:catalog-mode-ready',\\{detail:\\{mode\\}\\}\\)/);
+  assert.match(dishes,/document\\.addEventListener\\('courses:view-changed',event=>\\{/);
+  assert.match(dishes,/view==='catalog'&&mode!=='products'/);
+  assert.match(dishes,/setMode\\('products'\\)/);
+  assert.doesNotMatch(settings,/courses:catalog-mode-ready|applyPreferredCatalogMode|bindCatalogEntry/);
+  assert.doesNotMatch(settings,/new MutationObserver/);
+  assert.doesNotMatch(settings,/observer\\.observe\\(document\\.body/);
+});
+""")
+
+          # P4 now marks Products ready independently, then prepares secondary dish features on Catalogue entry.
+          path='tests/ui-module-boundaries.test.mjs'
+          text=read(path)
+          start=text.index("test('P4 conserve un démarrage déterministe puis prépare Produits avant les fonctions secondaires des Plats'")
+          end=text.index("\n});",start)+4
+          new="""test('P4 conserve un démarrage déterministe puis prépare Produits avant les fonctions secondaires des Plats',()=>{
+  const catalog=read('catalog.js');
+  const index=read('index.html');
+  const sw=read('sw.js');
+  const assets=['app-ui','runtime-features','dish-local-images','repurchase-soon','catalog-quantities','dishes-ui','catalog-liquid'];
+  const refs=assets.map(name=>[name,catalog.match(new RegExp('\\\\./'+name.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+'\\\\.js\\\\?v=\\\\d+'))?.[0]||'']);
+  const settingsUiAsset=index.match(/\\.\\/settings-ui\\.js\\?v=\\d+/)?.[0]||'';
+  const settingsBadgeAsset=index.match(/\\.\\/settings-tab-badge\\.js\\?v=\\d+/)?.[0]||'';
+  for(const [name,asset] of refs)assert.ok(asset,'asset '+name+' introuvable');
+  assert.ok(settingsUiAsset&&settingsBadgeAsset);
+  assert.match(catalog,/script\\.addEventListener\\('load',loadRuntimeFeatures,\\{once:true\\}\\)/);
+  assert.match(catalog,/if\\(title==='Synchronisé'\\|\\|title==='Mode test'\\)startProductCatalog\\(\\);/);
+  assert.match(catalog,/if\\(productCatalogStarted\\|\\|!runtimeReady\\)return;/);
+  assert.match(catalog,/productCatalogStarted=true;\\s*markProductCatalogReady\\(\\);/);
+  assert.match(catalog,/new CustomEvent\\('courses:catalog-products-ready'\\)/);
+  assert.match(catalog,/quantities\\.addEventListener\\('load',loadDishes,\\{once:true\\}\\)/);
+  assert.match(catalog,/script\\.addEventListener\\('load',loadLiquid,\\{once:true\\}\\)/);
+  assert.match(catalog,/liquid\\.addEventListener\\('load',loadDishLocalImages,\\{once:true\\}\\)/);
+  assert.match(catalog,/images\\.addEventListener\\('load',loadDishAddedMarker,\\{once:true\\}\\)/);
+  assert.match(catalog,/document\\.addEventListener\\('courses:view-changed',event=>\\{/);
+  assert.match(catalog,/if\\(event\\.detail\\?\\.view!=='catalog'\\)return;/);
+  assert.match(catalog,/const startCatalogView=\\(\\)=>\\{[\\s\\S]*startProductCatalog\\(\\);[\\s\\S]*loadRepurchaseSoon\\(\\);[\\s\\S]*startDishFeatures\\(\\);/);
+  assert.match(catalog,/if\\(dishFeaturesStarted\\|\\|!productCatalogReady\\)return;/);
+  assert.doesNotMatch(catalog,/new MutationObserver|setInterval\\(/);
+  assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));
+  for(const [,asset] of refs)assert.ok(sw.includes(asset),asset+' absent du précache');
+  for(const asset of [settingsUiAsset,settingsBadgeAsset])assert.ok(sw.includes(asset),asset+' absent du précache');
+});"""
+          write(path,text[:start]+new+text[end:])
+
+          # Deferred execution and full offline availability are both required.
+          path='tests/deferred-catalog-startup.test.mjs'
+          text=read(path)
+          start=text.index("test('le Service Worker ne précache plus les fonctions Catalogue différées'")
+          end=text.index("\n});",start)+4
+          new="""test('le précache hors ligne conserve les fonctions différées sans les exécuter au démarrage',()=>{
+  const shell=sw.match(/const SHELL=(\\[[^\\n]+\\]);/)?.[1]||'';
+  assert.ok(shell);
+  for(const deferred of ['dishes-ui.js?v=428','catalog-quantities.js?v=426','catalog-liquid.js?v=297','dish-local-images.js?v=428','dish-added-marker.js?v=408','repurchase-soon.js?v=410','catalog-product-admin.js?v=410'])assert.ok(shell.includes(deferred),deferred+' absent du précache hors ligne');
+  for(const startup of ['catalog.js?v=428','app.js?v=428','settings-ui.js?v=428','runtime-features.js?v=428','product-item-images.js?v=428'])assert.ok(shell.includes(startup),startup+' absent du shell');
+});"""
+          write(path,text[:start]+new+text[end:])
+          PYFIX
       - name: Validate repository
         run: bash scripts/validate_repo.sh
       - name: Commit validated tree
