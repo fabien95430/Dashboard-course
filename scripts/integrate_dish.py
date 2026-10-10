@@ -62,6 +62,29 @@ def js_quote(value: str) -> str:
     return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"
 
 
+def ensure_shell_assets(text: str, assets: list[str]) -> str:
+    match = re.search(r"(const SHELL=\[)(.*?)(\];)", text, flags=re.S)
+    if not match:
+        fail("Précache SHELL introuvable dans sw.js")
+    entries = re.findall(r"[\"'](\./[^\"']+)[\"']", match.group(2))
+    replacements = {asset.split('?', 1)[0]: asset for asset in assets}
+    result: list[str] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        path = entry.split('?', 1)[0]
+        if path in seen_paths:
+            continue
+        result.append(replacements.get(path, entry))
+        seen_paths.add(path)
+    for path, asset in replacements.items():
+        if path in seen_paths:
+            continue
+        result.append(asset)
+        seen_paths.add(path)
+    body = ','.join(json.dumps(asset, ensure_ascii=False) for asset in result)
+    return text[:match.start()] + match.group(1) + body + match.group(3) + text[match.end():]
+
+
 def api_json(url: str, payload: dict, api_key: str, timeout: int = 180) -> dict:
     request = urllib.request.Request(
         url,
@@ -250,12 +273,16 @@ def append_child_set(text: str, name: str) -> str:
 
 
 def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tuple[int, str]:
+    catalog_path = ROOT / "catalog.js"
     dishes_path = ROOT / "dishes-ui.js"
     local_images_path = ROOT / "dish-local-images.js"
     sw_path = ROOT / "sw.js"
+    index_path = ROOT / "index.html"
+    catalog_text = catalog_path.read_text(encoding="utf-8")
     dishes_text = dishes_path.read_text(encoding="utf-8")
     local_text = local_images_path.read_text(encoding="utf-8")
     sw_text = sw_path.read_text(encoding="utf-8")
+    index_text = index_path.read_text(encoding="utf-8")
 
     version_match = re.search(r"const APP_VERSION='v(\d+)'", local_text)
     if not version_match:
@@ -272,10 +299,25 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
         dishes_text = append_child_set(dishes_text, name)
         local_text = append_child_set(local_text, name)
 
+    catalog_text = re.sub(r"(dishes-ui\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
+    catalog_text = re.sub(r"(dish-local-images\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
     local_text = re.sub(r"const APP_VERSION='v\d+'", f"const APP_VERSION='v{new_version}'", local_text, count=1)
     sw_text, count = re.subn(r"const CACHE='courses-app-v\d+-r\d+'", f"const CACHE='courses-app-v{new_version}-r1'", sw_text, count=1)
     if count != 1:
         fail("Version de cache introuvable dans sw.js")
+    sw_text = ensure_shell_assets(sw_text, [
+        f"./catalog.js?v={new_version}",
+        f"./dishes-ui.js?v={new_version}",
+        f"./dish-local-images.js?v={new_version}",
+    ])
+    index_text, count = re.subn(
+        r'(<span class="page-version">)v\d+(</span>)',
+        rf'\g<1>v{new_version}\g<2>',
+        index_text,
+    )
+    if count != 3:
+        fail("Badges de version visibles introuvables dans index.html")
+    index_text = re.sub(r"(catalog\.js\?v=)\d+", rf"\g<1>{new_version}", index_text, count=1)
 
     filename = ("enfant-" if child else "") + slugify(name) + ".png"
     image_path = ROOT / "www" / "Plats" / filename
@@ -283,9 +325,11 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
         fail(f"Le fichier image existe déjà: {filename}")
     image_path.parent.mkdir(parents=True, exist_ok=True)
     image_path.write_bytes(image)
+    catalog_path.write_text(catalog_text, encoding="utf-8")
     dishes_path.write_text(dishes_text, encoding="utf-8")
     local_images_path.write_text(local_text, encoding="utf-8")
     sw_path.write_text(sw_text, encoding="utf-8")
+    index_path.write_text(index_text, encoding="utf-8")
     return new_version, filename
 
 

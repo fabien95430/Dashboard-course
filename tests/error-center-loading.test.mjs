@@ -13,20 +13,24 @@ test('le centre d erreurs reste chargé sans restaurer le shell de démarrage',(
   const sw=read('sw.js');
   const catalog=read('catalog.js');
   const localImages=read('dish-local-images.js');
-  assert.match(index,/catalog\.js\?v=395/);
-  assert.match(index,/error-center\.js\?v=395/);
-  assert.match(index,/error-feedback-bridge\.js\?v=394/);
-  assert.ok(index.indexOf('error-center.js?v=395')<index.indexOf('error-feedback-bridge.js?v=394'));
+  const version=localImages.match(/const APP_VERSION='(v\d+)'/)?.[1];
+  assert.ok(version,'version applicative introuvable');
+  const number=version.slice(1);
+  const catalogRef=index.match(/catalog\.js\?v=\d+/)?.[0];
+  const errorCenterRef=index.match(/error-center\.js\?v=\d+/)?.[0];
+  const errorBridgeRef=index.match(/error-feedback-bridge\.js\?v=\d+/)?.[0];
+  assert.equal(catalogRef,'catalog.js?v='+number);
+  assert.ok(errorCenterRef&&errorBridgeRef,'modules du centre d erreurs introuvables');
+  assert.ok(index.indexOf(errorCenterRef)<index.indexOf(errorBridgeRef));
   assert.doesNotMatch(index,/startup\/app\.js/);
-  assert.match(catalog,/dish-local-images\.js\?v=395/);
-  assert.match(sw,/courses-app-v395-r1/);
+  assert.match(catalog,new RegExp('dish-local-images\\.js\\?v='+number));
+  assert.match(sw,new RegExp("courses-app-"+version+"-r\\d+"));
   assert.match(sw,/product-item-first-paint\.css\?v=1/);
-  assert.match(sw,/catalog\.js\?v=395/);
-  assert.match(sw,/dish-local-images\.js\?v=395/);
-  assert.match(sw,/error-center\.js\?v=395/);
-  assert.match(sw,/error-feedback-bridge\.js\?v=394/);
-  assert.match(localImages,/const APP_VERSION='v395'/);
-  assert.equal((index.match(/page-version">v395/g)||[]).length,3);
+  assert.ok(sw.includes('./'+catalogRef));
+  assert.ok(sw.includes('./dish-local-images.js?v='+number));
+  assert.ok(sw.includes('./'+errorCenterRef));
+  assert.ok(sw.includes('./'+errorBridgeRef));
+  assert.equal((index.match(new RegExp('page-version\\">'+version,'g'))||[]).length,3);
 });
 
 test('le clic Messages d erreur ouvre le centre même si le bouton est créé dynamiquement',()=>{

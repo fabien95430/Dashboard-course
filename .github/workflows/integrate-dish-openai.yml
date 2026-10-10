@@ -129,7 +129,7 @@ jobs:
             git add catalog.js app.js catalog-quantities.js index.html product-item-images.js dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"
             message="v${{ steps.result.outputs.version }}: ajoute le produit ${{ steps.request.outputs.name }} via OpenAI"
           else
-            git add dishes-ui.js dish-local-images.js sw.js "www/Plats/${{ steps.result.outputs.filename }}"
+            git add catalog.js index.html dishes-ui.js dish-local-images.js sw.js "www/Plats/${{ steps.result.outputs.filename }}"
             message="v${{ steps.result.outputs.version }}: ajoute le plat ${{ steps.request.outputs.name }} via OpenAI"
           fi
           git diff --cached --check

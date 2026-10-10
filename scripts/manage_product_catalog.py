@@ -58,16 +58,7 @@ def current_version() -> int:
 
 
 def ensure_shell_assets(text: str, assets: list[str]) -> str:
-    match = re.search(r"(const SHELL=\[)(.*?)(\];)", text, flags=re.S)
-    if not match:
-        fail('Précache SHELL introuvable dans sw.js')
-    body = match.group(2)
-    for asset in assets:
-        quoted = json.dumps(asset, ensure_ascii=False)
-        if quoted in body or ("'" + asset + "'") in body:
-            continue
-        body = body.rstrip() + (',' if body.rstrip() else '') + quoted
-    return text[:match.start()] + match.group(1) + body + match.group(3) + text[match.end():]
+    return base.ensure_shell_assets(text, assets)
 
 
 def remove_from_favorites(catalog_text: str, name: str) -> str:
