@@ -188,7 +188,7 @@ else init();
 'use strict';
 if(document.querySelector('script[data-catalog-product-admin]'))return;
 const script=document.createElement('script');
-script.src='./catalog-product-admin.js?v=397';
+script.src='./catalog-product-admin.js?v=410';
 script.defer=true;
 script.dataset.catalogProductAdmin='1';
 document.head.appendChild(script);

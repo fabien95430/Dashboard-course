@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v409';
+const APP_VERSION='v410';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -38,7 +38,6 @@ const capturedDishVisuals=new Set(PRIMARY_DISH_VISUALS);
 const warmedDishVisuals=new Set();
 let renderedDishWarmupQueued=false;
 let dishVisualWarmupRunning=false;
-let dishUnlockObserver=null;
 const slugify=value=>String(value||'')
   .toLowerCase()
   .replace(/œ/g,'oe')
@@ -109,19 +108,7 @@ async function warmCapturedDishVisuals(){
 }
 function scheduleCapturedDishWarmup(){
   captureRenderedDishVisuals();
-  if(appUnlocked()){
-    void warmCapturedDishVisuals();
-    return;
-  }
-  const app=document.getElementById('app');
-  if(!app||dishUnlockObserver)return;
-  dishUnlockObserver=new MutationObserver(()=>{
-    if(!appUnlocked())return;
-    dishUnlockObserver.disconnect();
-    dishUnlockObserver=null;
-    queueRenderedDishWarmup();
-  });
-  dishUnlockObserver.observe(app,{attributes:true,attributeFilter:['class']});
+  if(appUnlocked())void warmCapturedDishVisuals();
 }
 function warmRenderedDishCards(){
   const images=captureRenderedDishVisuals();
@@ -205,38 +192,20 @@ function retryLocalImages(){
   localizeDialog(dialog);
 }
 
-let gridObserver=null;
-let dialogObserver=null;
-const bootstrapObserver=new MutationObserver(()=>bind());
-const dishWarmupObserver=new MutationObserver(mutations=>{
-  if(!mutations.some(mutation=>mutation.addedNodes.length))return;
-  if(!document.querySelector('#dishes .dish-card img'))return;
-  queueRenderedDishWarmup();
-  dishWarmupObserver.disconnect();
-});
-
 function bind(){
-  const grid=document.getElementById('dishes');
-  if(grid&&!gridObserver){
-    localizeCards(grid);
-    gridObserver=new MutationObserver(()=>localizeCards(grid));
-    gridObserver.observe(grid,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});
-  }
-  const dialog=document.getElementById('dishDialog');
-  if(dialog&&!dialogObserver){
-    localizeDialog(dialog);
-    dialogObserver=new MutationObserver(()=>localizeDialog(dialog));
-    dialogObserver.observe(dialog,{attributes:true,subtree:true,attributeFilter:['open','src']});
-  }
-  if(gridObserver&&dialogObserver)bootstrapObserver.disconnect();
+  localizeCards(document.getElementById('dishes'));
+  localizeDialog(document.getElementById('dishDialog'));
 }
 
 scheduleDishVisualWarmup();
-bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
-dishWarmupObserver.observe(document.documentElement,{childList:true,subtree:true});
-document.addEventListener('click',event=>{
-  if(event.target.closest?.('.catalog-mode[data-mode="dishes"],.tab[data-view="catalog"]'))setTimeout(queueRenderedDishWarmup,0);
-},true);
+document.addEventListener('courses:dishes-rendered',()=>{
+  localizeCards(document.getElementById('dishes'));
+  queueRenderedDishWarmup();
+});
+document.addEventListener('courses:dish-sheet-opened',()=>localizeDialog(document.getElementById('dishDialog')));
+document.addEventListener('courses:catalog-mode-ready',event=>{if(event.detail?.mode==='dishes')queueRenderedDishWarmup()});
+document.addEventListener('courses:view-changed',event=>{if(event.detail?.view==='catalog')queueRenderedDishWarmup()});
+document.addEventListener('courses:lock-changed',event=>{if(event.detail?.locked===false)queueRenderedDishWarmup()});
 window.addEventListener('online',retryLocalImages,{passive:true});
 window.addEventListener('online',queueRenderedDishWarmup,{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});

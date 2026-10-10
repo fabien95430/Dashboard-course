@@ -50,3 +50,17 @@ test('Ma liste publie l achat accepté avec sa quantité et l état hors ligne',
   assert.match(app,/publishPurchaseSettled\(item,group\.count,true\)/);
 });
 
+test('P1 termine le découplage des états globaux et demandes manquantes',()=>{
+  const app=read('app.js');
+  const missing=read('missing-products-dishes.js');
+  const fixes=read('missing-products-fixes.js');
+  assert.match(app,/new CustomEvent\('courses:status-changed'/);
+  assert.match(app,/new CustomEvent\('courses:lock-changed'/);
+  assert.match(app,/new CustomEvent\('courses:dialog-opened'/);
+  assert.doesNotMatch(missing,/new MutationObserver/);
+  assert.match(missing,/window\.addEventListener\(REQUESTS\.eventName/);
+  assert.match(missing,/document\.addEventListener\('courses:products-updated',reconcileProducts\)/);
+  assert.match(missing,/document\.addEventListener\('courses:dishes-rendered'/);
+  assert.doesNotMatch(fixes,/new MutationObserver/);
+});
+

@@ -29,6 +29,6 @@ w.addEventListener('pointerdown',event=>{if(!event.isPrimary||event.button>0)ret
 w.addEventListener('pointermove',event=>{const scrub=liquid.scrub;if(!scrub||event.pointerId!==scrub.id)return;scrub.clientX=event.clientX;if(Math.abs(event.clientX-scrub.startX)>6)scrub.moved=true;if(reduced()){liquid.x=scrubTarget();markUnder();paint()}else start()});
 const finish=(event,cancelled)=>{const scrub=liquid.scrub;if(!scrub||event.pointerId!==scrub.id)return;const moved=scrub.moved;liquid.scrub=null;try{w.releasePointerCapture(event.pointerId)}catch(_){}liquid.tl=0;const target=moved&&!cancelled?nearest():null;if(moved&&!cancelled){liquid.justScrubbed=true;setTimeout(()=>{liquid.justScrubbed=false},0)}if(target&&!target.classList.contains('is-active')){navigator.vibrate?.(4);liquid.allowProgrammatic=true;try{target.click()}finally{liquid.allowProgrammatic=false}}else sync(!reduced())};
 w.addEventListener('pointerup',event=>finish(event,false));w.addEventListener('pointercancel',event=>finish(event,true));
-new MutationObserver(()=>requestAnimationFrame(()=>sync(true))).observe(w,{attributes:true,subtree:true,attributeFilter:['class']});
+document.addEventListener('courses:missing-requests-rendered',()=>requestAnimationFrame(()=>sync(true)));
 ensureLensCopies();addEventListener('resize',()=>requestAnimationFrame(()=>sync(false)),{passive:true});requestAnimationFrame(()=>sync(false));return true}
-css();if(!bind()){const o=new MutationObserver(()=>{if(bind())o.disconnect()});o.observe(document.documentElement,{childList:true,subtree:true});setTimeout(()=>o.disconnect(),8000)}})();
+css();if(!bind()&&document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true})})();

@@ -50,7 +50,7 @@
   const loadRepurchaseSoon=()=>{
     if(document.querySelector('script[data-repurchase-soon]')){loadQuantities();return}
     const script=document.createElement('script');
-    script.src='./repurchase-soon.js?v=405';
+    script.src='./repurchase-soon.js?v=410';
     script.async=false;
     script.dataset.repurchaseSoon='script';
     script.addEventListener('load',loadQuantities,{once:true});
@@ -59,7 +59,7 @@
   const loadRuntimeFeatures=()=>{
     if(document.querySelector('script[data-runtime-features]')){loadRepurchaseSoon();return}
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=409';
+    script.src='./runtime-features.js?v=410';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',loadRepurchaseSoon,{once:true});
@@ -68,7 +68,7 @@
   const loadAppUi=()=>{
     if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
     const script=document.createElement('script');
-    script.src='./app-ui.js?v=400';
+    script.src='./app-ui.js?v=410';
     script.async=false;
     script.dataset.appUi='script';
     script.addEventListener('load',loadRuntimeFeatures,{once:true});
@@ -77,7 +77,7 @@
   const load=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadAppUi();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=409';
+    images.src='./dish-local-images.js?v=410';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadAppUi,{once:true});

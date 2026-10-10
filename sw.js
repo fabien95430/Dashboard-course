@@ -1,4 +1,4 @@
-const CACHE='courses-app-v409-r1';
+const CACHE='courses-app-v410-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -10,31 +10,30 @@ const SHELL=[
   './index.html',
   './styles.css?v=404',
   './product-item-first-paint.css?v=1',
-  './catalog.js?v=409',
+  './catalog.js?v=410',
   './preferences-service.js?v=398',
   './missing-requests-store.js?v=399',
-  './app.js?v=409',
-  './settings-tab-badge.js?v=400',
-  './settings-ui.js?v=408',
-  './error-center.js?v=395',
-  './error-feedback-bridge.js?v=394',
+  './app.js?v=410',
+  './settings-tab-badge.js?v=410',
+  './settings-ui.js?v=410',
+  './error-center.js?v=410',
   './dishes.css?v=3',
   './catalog-liquid.css?v=4',
   './dish-detail.css?v=6',
   './catalog-liquid.js?v=297',
   './dishes-ui.js?v=408',
   './catalog-quantities.js?v=408',
-  './repurchase-soon.js?v=405',
-  './dish-local-images.js?v=409',
-  './app-ui.js?v=400',
-  './runtime-features.js?v=409',
-  './missing-products-fixes.js?v=399',
-  './missing-products-popup-ui.js?v=18',
-  './product-item-images.js?v=408',
-  './catalog-product-admin.js?v=397',
+  './repurchase-soon.js?v=410',
+  './dish-local-images.js?v=410',
+  './app-ui.js?v=410',
+  './runtime-features.js?v=410',
+  './missing-products-fixes.js?v=410',
+  './missing-products-popup-ui.js?v=410',
+  './product-item-images.js?v=410',
+  './catalog-product-admin.js?v=410',
   './purchase-intelligence.js?v=409',
-  './missing-products-dishes.js?v=399',
-  './missing-products-modern.js?v=6',
+  './missing-products-dishes.js?v=410',
+  './missing-products-modern.js?v=410',
   './dish-added-marker.js?v=408',
   './manifest.webmanifest?v=43',
   './icon-premium-v40.svg',
@@ -60,8 +59,7 @@ function isStartupShellAsset(url){
     ||url.pathname.endsWith('/app.js')
     ||url.pathname.endsWith('/settings-tab-badge.js')
     ||url.pathname.endsWith('/settings-ui.js')
-    ||url.pathname.endsWith('/error-center.js')
-    ||url.pathname.endsWith('/error-feedback-bridge.js');
+    ||url.pathname.endsWith('/error-center.js');
 }
 
 async function migrateExistingVisuals(){

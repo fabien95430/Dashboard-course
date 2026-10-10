@@ -359,10 +359,6 @@ function bind(){
   dialog.dataset.missingPopupUiBound='1';
   ensureCloseButton(dialog);
   bindModeSwitch(dialog);
-  new MutationObserver(mutations=>{
-    queueDecorate();
-    if(mutations.some(mutation=>mutation.target===dialog&&mutation.attributeName==='open'))resetModeLens(dialog);
-  }).observe(dialog,{childList:true,subtree:true,attributes:true,attributeFilter:['class','disabled','hidden','open']});
   dialog.addEventListener('close',()=>resetPopupInteraction(dialog));
   dialog.addEventListener('cancel',event=>{
     event.preventDefault();
@@ -381,9 +377,13 @@ document.addEventListener('pointerdown',event=>{
 },true);
 document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenu();},true);
 window.addEventListener('resize',closeMenu,{passive:true});
-if(!bind()){
-  const observer=new MutationObserver(()=>{if(bind())observer.disconnect()});
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(()=>observer.disconnect(),10000);
-}
+document.addEventListener('courses:missing-requests-rendered',queueDecorate);
+document.addEventListener('courses:missing-integration-ui-updated',queueDecorate);
+document.addEventListener('courses:dialog-opened',event=>{
+  if(event.detail?.id!=='missingProductsDialog')return;
+  const dialog=document.getElementById('missingProductsDialog');
+  if(dialog)resetModeLens(dialog);
+  queueDecorate();
+});
+if(!bind()&&document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 })();

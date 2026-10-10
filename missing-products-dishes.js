@@ -28,6 +28,9 @@ function readAddedDishes(){
 }
 const readProducts=()=>REQUESTS.readProducts();
 const productCount=()=>REQUESTS.counts().products;
+function notifyMissingRequestsRendered(mode){
+  document.dispatchEvent(new CustomEvent('courses:missing-requests-rendered',{detail:{mode}}));
+}
 function appNotify(title,detail=''){
   const dialog=document.getElementById('missingProductsDialog');
   const toast=dialog?.open?document.getElementById('missingProductsFeedback'):document.getElementById('toast');
@@ -291,6 +294,7 @@ function initMissingProductsAndDishes(){
     const rows=[...dishes.map(item=>({item,added:false})),...added.map(item=>({item,added:true}))];
     if(!rows.length){
       dishesList.innerHTML='<div class="missing-products-empty">Aucun plat noté pour le moment.</div>';
+      notifyMissingRequestsRendered('dishes');
       return;
     }
     dishesList.innerHTML=rows.map(entry=>{
@@ -307,6 +311,7 @@ function initMissingProductsAndDishes(){
         '<button class="missing-product-remove" type="button" data-remove-missing-dish="'+escapeHtml(item.id)+'" aria-label="Supprimer '+escapeHtml(item.name)+'"><svg><use href="#i-trash"></use></svg></button>'+
       '</div>';
     }).join('');
+    notifyMissingRequestsRendered('dishes');
   }
   function renderMode(){
     const dishesMode=mode==='dishes';
@@ -409,6 +414,7 @@ function removeDish(id){
       }
       integrate.dataset.integrateMissingProduct=item.id;
     });
+    notifyMissingRequestsRendered('products');
   }
   function queueEnhanceProducts(){
     if(productEnhanceQueued)return;
@@ -565,29 +571,18 @@ function removeDish(id){
     removeDish(remove.dataset.removeMissingDish||'');
   });
 
-  new MutationObserver(()=>{
-    if(mode==='products')renderCategorySelect();
-  }).observe(categoryGrid,{attributes:true,subtree:true,attributeFilter:['class','aria-pressed']});
-
-  const productObserver=new MutationObserver(syncNewProductRequests);
-  productObserver.observe(productList,{childList:true,subtree:true});
-
-  let catalogCategoryObserver=null;
-  if(!catalogDishCategories().length){
-    catalogCategoryObserver=new MutationObserver(()=>{
-      if(!catalogDishCategories().length)return;
-      catalogCategoryObserver.disconnect();
-      catalogCategoryObserver=null;
-      if(mode==='dishes')renderCategorySelect();
-    });
-    catalogCategoryObserver.observe(document.documentElement,{childList:true,subtree:true});
-  }
-
-  const renderedCatalogObserver=new MutationObserver(()=>{
-    reconcileProducts();
+  document.addEventListener('courses:missing-product-category-changed',()=>{
+    if(mode==='products')queueMicrotask(renderCategorySelect);
+  });
+  window.addEventListener(REQUESTS.eventName,()=>{
+    syncNewProductRequests();
+    if(mode==='dishes')renderDishes();
+  });
+  document.addEventListener('courses:products-updated',reconcileProducts);
+  document.addEventListener('courses:dishes-rendered',()=>{
+    if(mode==='dishes')renderCategorySelect();
     reconcileDishes();
   });
-  renderedCatalogObserver.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});
 
     settingsButton.addEventListener('click',()=>{
     imageHintInput.value='';

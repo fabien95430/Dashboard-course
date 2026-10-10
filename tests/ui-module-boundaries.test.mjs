@@ -30,11 +30,11 @@ test('les responsabilités extraites ont des propriétaires explicites',()=>{
   assert.match(settingsUi,/const PREFERENCE_DIALOG_SELECTOR=/);
   assert.match(settingsUi,/function initApplicationManagement\(\)/);
   assert.match(settingsUi,/function initAdministratorSettings\(\)/);
-  for(const asset of ['./missing-products-fixes.js?v=399','./missing-products-popup-ui.js?v=18'])assert.ok(runtime.includes(asset),asset+' doit être chargé par runtime-features');
+  const missingFixesAsset=runtime.match(/\.\/missing-products-fixes\.js\?v=\d+/)?.[0]||'';
+  const missingPopupAsset=runtime.match(/\.\/missing-products-popup-ui\.js\?v=\d+/)?.[0]||'';
   const productImagesAsset=runtime.match(/\.\/product-item-images\.js\?v=\d+/)?.[0]||'';
   const purchaseIntelligenceAsset=runtime.match(/\.\/purchase-intelligence\.js\?v=\d+/)?.[0]||'';
-  assert.ok(productImagesAsset,'asset product-item-images introuvable');
-  assert.ok(purchaseIntelligenceAsset,'asset purchase-intelligence introuvable');
+  for(const [asset,label] of [[missingFixesAsset,'missing-products-fixes'],[missingPopupAsset,'missing-products-popup-ui'],[productImagesAsset,'product-item-images'],[purchaseIntelligenceAsset,'purchase-intelligence']])assert.ok(asset,'asset '+label+' introuvable');
 });
 
 test('le nouvel ordre de chargement reste déterministe et précaché',()=>{
@@ -42,12 +42,17 @@ test('le nouvel ordre de chargement reste déterministe et précaché',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
   assert.match(catalog,/images\.addEventListener\('load',loadAppUi,\{once:true\}\)/);
-  assert.match(catalog,/const loadAppUi=\(\)=>\{[\s\S]*?script\.src='\.\/app-ui\.js\?v=400';[\s\S]*?script\.addEventListener\('load',loadRuntimeFeatures/);
+  const appUiAsset=catalog.match(/\.\/app-ui\.js\?v=\d+/)?.[0]||'';
+  assert.ok(appUiAsset,'asset app-ui introuvable');
+  const appUiLoader=catalog.indexOf("script.src='"+appUiAsset+"'");
+  assert.ok(appUiLoader>=0&&catalog.indexOf("script.addEventListener('load',loadRuntimeFeatures",appUiLoader)>appUiLoader);
   assert.match(catalog,/const loadRuntimeFeatures=\(\)=>\{[\s\S]*?script\.src='\.\/runtime-features\.js\?v=\d+';[\s\S]*?script\.addEventListener\('load',loadRepurchaseSoon/);
   const runtimeAsset=catalog.match(/\.\/runtime-features\.js\?v=\d+/)?.[0]||'';
   const settingsUiAsset=index.match(/\.\/settings-ui\.js\?v=\d+/)?.[0]||'';
+  const settingsBadgeAsset=index.match(/\.\/settings-tab-badge\.js\?v=\d+/)?.[0]||'';
   assert.ok(runtimeAsset,'asset runtime-features introuvable');
   assert.ok(settingsUiAsset,'asset settings-ui introuvable');
-  assert.ok(index.indexOf('./settings-tab-badge.js?v=400')<index.indexOf(settingsUiAsset));
-  for(const asset of ['./app-ui.js?v=400',runtimeAsset,settingsUiAsset])assert.ok(sw.includes(asset),asset+' absent du précache');
+  assert.ok(settingsBadgeAsset,'asset settings-tab-badge introuvable');
+  assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));
+  for(const asset of [appUiAsset,runtimeAsset,settingsUiAsset,settingsBadgeAsset])assert.ok(sw.includes(asset),asset+' absent du précache');
 });

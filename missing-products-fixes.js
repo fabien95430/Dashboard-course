@@ -324,16 +324,22 @@ async function integrateWithOpenAi(type,id,requestId){
   try{
     push=await requiredPushData();
   }catch(error){
-    appNotify('Notification requise',String(error?.message||'Impossible d’armer la notification de fin.').slice(0,140));
+    const detail=String(error?.message||'Impossible d’armer la notification de fin.').slice(0,140);
+    window.CoursesErrors?.report?.({key:'notifications:'+detail.toLowerCase(),severity:'error',source:'Notifications',title:'Notifications indisponibles',message:detail});
+    appNotify('Notification requise',detail);
     return false;
   }
   try{
     await haCallService('rest_command','courses_integrate_dish_openai',{...serviceData,...push});
     void notifyIntegrationStarted(type,item,serviceData.request_id);
+    window.CoursesErrors?.resolvePrefix?.('integration-local:');
+    window.CoursesErrors?.resolvePrefix?.('notifications:');
     appNotify('Intégration OpenAI lancée',String(item.name||''));
     return true;
   }catch(error){
-    appNotify('Intégration OpenAI impossible',String(error?.message||'Réessaie après avoir vérifié Home Assistant.').slice(0,140));
+    const detail=String(error?.message||'Réessaie après avoir vérifié Home Assistant.').slice(0,140);
+    window.CoursesErrors?.report?.({key:'integration-local:'+detail.toLowerCase(),severity:'error',source:'Intégration',title:'Intégration impossible',message:detail,action:'open-missing'});
+    appNotify('Intégration OpenAI impossible',detail);
     return false;
   }
 }
@@ -457,6 +463,7 @@ function decorateOpenAiButtons(){
     const cancelled=!added&&openAiRequestState('dish',id)?.status==='cancelled';
     ensureOpenAiButton(row,'dish',id,!added&&!cancelled&&runningDishes.has(id),added,cancelled);
   });
+  document.dispatchEvent(new CustomEvent('courses:missing-integration-ui-updated'));
   return true;
 }
 function bindOpenAiUi(){
@@ -528,15 +535,6 @@ function bindOpenAiUi(){
     if(!dialog)return false;
     decorateOpenAiButtons();
     requestOpenAiReconciliation();
-    let decorateQueued=false;
-    new MutationObserver(()=>{
-      if(decorateQueued)return;
-      decorateQueued=true;
-      queueMicrotask(()=>{
-        decorateQueued=false;
-        decorateOpenAiButtons();
-      });
-    }).observe(dialog,{childList:true,subtree:true});
     dialog.addEventListener('close',()=>{
       pruneRunning('product');
       pruneRunning('dish');
@@ -544,17 +542,18 @@ function bindOpenAiUi(){
     });
     return true;
   };
+  document.addEventListener('courses:missing-requests-rendered',decorateOpenAiButtons);
+  document.addEventListener('courses:dialog-opened',event=>{
+    if(event.detail?.id!=='missingProductsDialog')return;
+    decorateOpenAiButtons();
+    requestOpenAiReconciliation();
+  });
   document.getElementById('settingsMissingProductsBtn')?.addEventListener('click',requestOpenAiReconciliation);
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible')requestOpenAiReconciliation();
   });
   window.addEventListener('focus',requestOpenAiReconciliation,{passive:true});
-  if(bindDialog())return;
-  const observer=new MutationObserver(()=>{
-    if(bindDialog())observer.disconnect();
-  });
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(()=>observer.disconnect(),10000);
+  if(!bindDialog()&&document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindDialog,{once:true});
 }
 
 bindOpenAiUi();

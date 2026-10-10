@@ -60,7 +60,7 @@ test('supprimer un produit manquant garde le popup ouvert',()=>{
 test('supprimer un plat manquant garde le popup ouvert',()=>{
   const source=read('missing-products-dishes.js');
   const start=source.indexOf("dishesList.addEventListener('click',event=>{");
-  const end=source.indexOf('new MutationObserver(',start);
+  const end=source.indexOf("settingsButton.addEventListener('click'",start);
   assert.ok(start>=0&&end>start,'gestionnaire de suppression des plats introuvable');
   const handler=source.slice(start,end);
   assert.match(handler,/const remove=event\.target\.closest\('\[data-remove-missing-dish\]'\);/);

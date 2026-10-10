@@ -166,7 +166,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=399';
+script.src='./missing-products-dishes.js?v=410';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
@@ -176,7 +176,7 @@ document.head.appendChild(script);
 'use strict';
 if(document.querySelector('script[data-missing-products-modern]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-modern.js?v=6';
+script.src='./missing-products-modern.js?v=410';
 script.defer=true;
 script.dataset.missingProductsModern='1';
 document.head.appendChild(script);
@@ -428,10 +428,14 @@ function initApplicationManagement(){
   dialog.addEventListener('close',showSelections);
 }
 
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',initApplicationManagement,{once:true});
-}else{
+function initializeApplicationManagement(){
   initApplicationManagement();
+  document.dispatchEvent(new CustomEvent('courses:settings-management-ready'));
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initializeApplicationManagement,{once:true});
+}else{
+  initializeApplicationManagement();
 }
 })();
 

@@ -1,9 +1,10 @@
 (() => {
 'use strict';
 
+const REQUESTS=window.COURSES_MISSING_REQUESTS;
 const source=document.getElementById('settingsMissingProductsCount');
 const tab=document.querySelector('.tabs .tab[data-view="settings"]');
-if(!source||!tab)return;
+if(!REQUESTS||!source||!tab)return;
 
 const badge=document.createElement('i');
 badge.className='settings-tab-badge';
@@ -54,10 +55,10 @@ async function syncAppIconBadge(count){
 }
 
 function syncBadge(){
-  const count=Math.max(0,Number(source.textContent)||0);
+  const count=Math.max(0,Number(REQUESTS.counts?.().total)||0);
   badge.textContent=count>99?'99+':String(count);
-  badge.style.display=count>0&&!source.hidden?'grid':'none';
-  if(count>0&&!source.hidden)requestAnimationFrame(positionBadge);
+  badge.style.display=count>0?'grid':'none';
+  if(count>0)requestAnimationFrame(positionBadge);
   void syncAppIconBadge(count);
 }
 
@@ -73,14 +74,14 @@ const missingProductsButton=document.getElementById('settingsMissingProductsBtn'
 const addMissingProductButton=document.getElementById('addMissingProduct');
 const missingProductName=document.getElementById('missingProductName');
 missingProductsButton?.addEventListener('click',()=>{
-  const count=Math.max(0,Number(source.textContent)||0);
+  const count=Math.max(0,Number(REQUESTS.counts?.().total)||0);
   if(count>0)void requestBadgePermission();
 });
 addMissingProductButton?.addEventListener('click',()=>{
   if(String(missingProductName?.value||'').trim())void requestBadgePermission();
 });
 
-new MutationObserver(syncBadge).observe(source,{attributes:true,childList:true,characterData:true,subtree:true});
+window.addEventListener(REQUESTS.eventName,syncBadge);
 window.addEventListener('resize',()=>requestAnimationFrame(positionBadge),{passive:true});
 syncBadge();
 })();

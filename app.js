@@ -647,6 +647,7 @@ function status(kind,title,detail=''){
   const el=$('#status');el.className='status '+kind;
   el.innerHTML='<span></span><div><strong>'+esc(title)+'</strong><small>'+esc(detail)+'</small></div>';
   renderSettingsPage();
+  document.dispatchEvent(new CustomEvent('courses:status-changed',{detail:{kind,title,detail}}));
 }
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
 function publishPurchaseSettled(name,quantity,queued=false){
@@ -675,7 +676,9 @@ function setDialogFeedback(target,message,kind='success'){
 requestAnimationFrame(()=>setTimeout(()=>document.body.classList.remove('is-launching'),180));
 function refreshVisualLock(){
   const blocked=UI.setup.classList.contains('is-visible')||UI.securityOverlay.classList.contains('is-visible');
-  $('#app').classList.toggle('is-locked',blocked);
+  const app=$('#app'),changed=app.classList.contains('is-locked')!==blocked;
+  app.classList.toggle('is-locked',blocked);
+  if(changed)document.dispatchEvent(new CustomEvent('courses:lock-changed',{detail:{locked:blocked}}));
 }
 function showSetup(message=''){
   UI.securityOverlay.classList.remove('is-visible');
@@ -2221,6 +2224,7 @@ async function removeGroup(name,row=null,intent='purchase'){
 function showNeutralDialog(dialog){
   if(!dialog)return;
   dialog.showModal();
+  document.dispatchEvent(new CustomEvent('courses:dialog-opened',{detail:{id:dialog.id||''}}));
   requestAnimationFrame(()=>{
     const active=document.activeElement;
     if(active&&active!==dialog&&dialog.contains(active))active.blur?.();
@@ -2328,6 +2332,7 @@ function setMissingProductCategory(category){
   const next=String(category||'');
   if(!MISSING_PRODUCT_CATEGORIES.includes(next))return;
   state.missingProductCategory=next;
+  document.dispatchEvent(new CustomEvent('courses:missing-product-category-changed',{detail:{category:next}}));
   renderMissingCategorySelection();
   navigator.vibrate?.(4);
 }

@@ -3,8 +3,6 @@
 
 const APP_VERSION=String(window.COURSES_APP_VERSION||document.querySelector('.page-version')?.textContent||'').trim();
 let securityKeyboardBaseline=0;
-let listEmptyObserver=null;
-let versionFrame=0;
 
 function syncPageVersions(){
   document.querySelectorAll('.page-header').forEach(header=>{
@@ -316,30 +314,15 @@ function syncListEmptyState(root){
   });
 }
 
-const bootstrapObserver=new MutationObserver(()=>bind());
-const versionObserver=new MutationObserver(()=>{
-  if(versionFrame)return;
-  versionFrame=requestAnimationFrame(()=>{
-    versionFrame=0;
-    syncPageVersions();
-  });
-});
-
 function bind(){
   syncPageVersions();
-  const listItems=document.getElementById('listItems');
-  if(listItems&&!listEmptyObserver){
-    syncListEmptyState(listItems);
-    listEmptyObserver=new MutationObserver(()=>syncListEmptyState(listItems));
-    listEmptyObserver.observe(listItems,{childList:true,subtree:true,characterData:true});
-  }
-  if(listEmptyObserver)bootstrapObserver.disconnect();
+  syncListEmptyState(document.getElementById('listItems'));
 }
 
 syncPageVersions();
 bindSecurityKeyboardViewport();
-versionObserver.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
-bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
+document.addEventListener('courses:list-rendered',()=>syncListEmptyState(document.getElementById('listItems')));
+document.addEventListener('courses:status-changed',()=>syncListEmptyState(document.getElementById('listItems')));
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
 })();

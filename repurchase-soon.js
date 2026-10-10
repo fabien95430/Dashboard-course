@@ -13,7 +13,6 @@ Object.entries(CATALOG.groups).forEach(([category,subs])=>Object.entries(subs||{
 }));
 
 let dialog=null;
-let appObserver=null;
 let refreshFrame=0;
 let booted=false;
 
@@ -252,14 +251,10 @@ function openDialog(){
 
 function bindEvents(){
   document.addEventListener('courses:list-changed',()=>refresh(true));
-  const app=document.getElementById('app');
-  if(app&&!appObserver){
-    appObserver=new MutationObserver(()=>{
-      if(appLocked()&&dialog?.open)dialog.close();
-      else refresh(true);
-    });
-    appObserver.observe(app,{attributes:true,attributeFilter:['class']});
-  }
+  document.addEventListener('courses:lock-changed',event=>{
+    if(event.detail?.locked){if(dialog?.open)dialog.close();return}
+    refresh(true);
+  });
   window.addEventListener('storage',event=>{
     if(event.key==='courses-purchase-intelligence-v1'||event.key==='courses-purchase-intelligence-enabled-v1')refresh(true);
   });

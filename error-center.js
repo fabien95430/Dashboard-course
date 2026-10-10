@@ -310,7 +310,7 @@ function bindHaStatus(){
       lastKey='';
     }
   };
-  new MutationObserver(sync).observe(status,{attributes:true,childList:true,characterData:true,subtree:true});
+  document.addEventListener('courses:status-changed',sync);
   sync();
   return true;
 }
@@ -454,9 +454,7 @@ function handleErrorCenterTrigger(event){
 }
 function bindWhenReady(){
   if(bindUi())return;
-  const observer=new MutationObserver(()=>{if(bindUi())observer.disconnect()});
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(()=>observer.disconnect(),12000);
+  document.addEventListener('courses:settings-management-ready',bindUi,{once:true});
 }
 
 reconcilePreviousVersionEntries();

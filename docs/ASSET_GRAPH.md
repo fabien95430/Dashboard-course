@@ -4,7 +4,7 @@ Ce document décrit le chargement actif de l’application statique. Il ne rempl
 
 ## Chaîne de chargement
 
-`index.html` charge directement le shell principal : `styles.css`, `product-item-first-paint.css`, `catalog.js`, `preferences-service.js`, `missing-requests-store.js`, `app.js`, `settings-tab-badge.js`, `settings-ui.js`, `error-center.js` et `error-feedback-bridge.js`.
+`index.html` charge directement le shell principal : `styles.css`, `product-item-first-paint.css`, `catalog.js`, `preferences-service.js`, `missing-requests-store.js`, `app.js`, `settings-tab-badge.js`, `settings-ui.js` et `error-center.js`.
 
 `catalog.js` charge ensuite `dishes.css`, `catalog-liquid.css`, `dish-local-images.js`, `app-ui.js`, `runtime-features.js`, `repurchase-soon.js`, `catalog-quantities.js`, `dishes-ui.js` puis `catalog-liquid.js`. `catalog-liquid.css` importe `dish-detail.css`.
 
