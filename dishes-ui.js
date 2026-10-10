@@ -111,7 +111,6 @@ const DISH_SPECIAL_SLUGS=Object.freeze({
 const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poulet légumes','Gratin pommes de terre','Pâtes jambon','Purée carotte poulet','Risotto poulet','Saumon brocoli','Steak frites','Velouté carottes','Crème brûlée','Riz au lait']);
 const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';
-const ingredientImageSource=name=>'./www/Items/'+normalize(name).replace(/\s+/g,'-')+'.webp';
 
 let mode=localStorage.getItem(STORAGE_MODE)==='dishes'?'dishes':'products';
 let filter='Tous';
@@ -158,7 +157,10 @@ let recipeCustomizationSelection=new Set();
 let recipeCustomizationNeeds={};
 let toastTimer=0;
 let lensTimer=0;
+const ingredientThumbCache=new Map();
 const dishCardCache=new Map();
+let ingredientThumbRequest=0;
+let ingredientThumbUserQuery=null;
 
 function readFavorites(){
   try{return new Set(JSON.parse(localStorage.getItem(STORAGE_FAVORITES)||'[]').map(String))}catch(_){return new Set()}
@@ -774,9 +776,18 @@ function openDishSheet(dish){
   if(typeof dishDialog.showModal==='function')dishDialog.showModal();
   else dishDialog.setAttribute('open','');
   document.documentElement.classList.add('dish-sheet-open');
+  void primeDishIngredientThumbs(dish);
+}
+function cancelIngredientThumbs(){
+  ingredientThumbRequest+=1;
+  if(ingredientThumbUserQuery!==null){
+    setHiddenCatalogQuery(ingredientThumbUserQuery);
+    ingredientThumbUserQuery=null;
+  }
 }
 function closeDishSheet(){
   if(!dishDialog||busyDish)return;
+  cancelIngredientThumbs();
   if(dishDialog.open)dishDialog.close();else dishDialog.removeAttribute('open');
   document.documentElement.classList.remove('dish-sheet-open');
   currentDish=null;
@@ -790,12 +801,44 @@ function renderDishSheetFavorite(){
   dishSheetFavorite.setAttribute('aria-pressed',favorite?'true':'false');
   dishSheetFavorite.setAttribute('aria-label',favorite?'Retirer des favoris':'Ajouter aux favoris');
 }
+async function primeDishIngredientThumbs(dish){
+  const missing=recipeIngredientsForDish(dish).filter(name=>!ingredientThumbCache.has(name));
+  if(!missing.length||busyDish)return;
+  if(ingredientThumbUserQuery===null)ingredientThumbUserQuery=searchInput.value;
+  const userQuery=ingredientThumbUserQuery;
+  const token=++ingredientThumbRequest;
+  try{
+    for(const name of missing){
+      if(token!==ingredientThumbRequest||currentDish!==dish||busyDish)return;
+      setHiddenCatalogQuery(name);
+      await nextPaint();
+      if(token!==ingredientThumbRequest||currentDish!==dish||busyDish)return;
+      const card=[...productsGrid.querySelectorAll('.product')].find(item=>item.dataset.name===name);
+      const media=card?.querySelector('.media');
+      if(!media)continue;
+      const holder=document.createElement('span');
+      holder.innerHTML=media.innerHTML;
+      holder.querySelector('.premium-sprite')?.classList.add('is-compact');
+      holder.querySelector('.product-svg')?.classList.add('is-compact');
+      const markup=holder.innerHTML;
+      ingredientThumbCache.set(name,markup);
+      const row=[...dishSheetList.querySelectorAll('.dish-ingredient')].find(item=>item.dataset.ingredient===name);
+      const thumb=row?.querySelector('.dish-ingredient-thumb');
+      if(thumb)thumb.innerHTML=markup;
+    }
+  }finally{
+    if(token===ingredientThumbRequest&&!busyDish){
+      setHiddenCatalogQuery(userQuery);
+      ingredientThumbUserQuery=null;
+      await nextPaint();
+    }
+  }
+}
 function renderDishSheetIngredients(){
   if(!currentDish)return;
   dishSheetList.innerHTML=recipeIngredientsForDish(currentDish).map(name=>{
     const selected=selectedIngredients.has(name);
-    const source=ingredientImageSource(name);
-    const thumb='<span class="sprite premium-sprite is-single-product-image is-compact"><img src="'+source+'" alt="" loading="eager" fetchpriority="high" decoding="async" draggable="false" data-single-product-source="'+source+'"></span>';
+    const thumb=ingredientThumbCache.get(name)||'';
     return '<button type="button" class="dish-ingredient '+(selected?'is-selected':'')+'" data-ingredient="'+escapeHtml(name)+'" aria-pressed="'+(selected?'true':'false')+'">'+
       '<span class="dish-ingredient-thumb" aria-hidden="true">'+thumb+'</span>'+ 
       '<span class="dish-ingredient-name">'+escapeHtml(name)+'</span>'+ 
@@ -814,6 +857,7 @@ function renderDishSheetIngredients(){
 }
 async function confirmDishAdd(){
   if(!currentDish||busyDish||dishConfirmButton.disabled)return;
+  cancelIngredientThumbs();
   const dish=currentDish;
   const operation=window.COURSES_QUANTITIES.addSelected();
   closeDishSheet();
@@ -831,6 +875,17 @@ async function confirmDishAdd(){
   if(result.failed){showToast('Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
   if(!result.added){showToast('Les quantités nécessaires sont déjà dans Ma liste');return}
   showToast(dish.name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':''));
+}
+function setHiddenCatalogQuery(value){
+  drivingCatalog=true;
+  searchInput.value=value;
+  searchInput.dispatchEvent(new Event('input',{bubbles:true}));
+  drivingCatalog=false;
+}
+function nextPaint(){return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))}
+
+function init(){
+  buildUi();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
