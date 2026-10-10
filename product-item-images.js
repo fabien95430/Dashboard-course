@@ -138,6 +138,7 @@ function decorateCard(card){
   if(!sprite||!image){decorateFallback(card,name,source);return;}
   card.classList.add('has-single-product-image');
   sprite.classList.add('is-single-product-image');
+  image.loading='eager';
   const loaded=()=>onSingleProductImageLoaded(image,source);
   if(image.dataset.singleProductSource!==source){image.dataset.singleProductSource=source;image.src=source;}
   if(image.complete&&image.naturalWidth>0)loaded();
