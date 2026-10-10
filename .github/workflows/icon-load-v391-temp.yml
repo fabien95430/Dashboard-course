@@ -21,7 +21,6 @@ jobs:
           from pathlib import Path
           import re
 
-          V='391'
           def read(path): return Path(path).read_text(encoding='utf-8')
           def write(path,text): Path(path).write_text(text,encoding='utf-8')
           def once(text,old,new,label):
@@ -29,7 +28,7 @@ jobs:
               if count!=1: raise SystemExit(f'{label}: expected 1 occurrence, got {count}')
               return text.replace(old,new,1)
 
-          # Ma liste: the owning renderer starts the image request immediately.
+          # Ma liste: le renderer propriétaire lance le WebP dès la création de la ligne.
           path='app.js'; text=read(path)
           text=once(text,
             "    '<img src=\"'+source+'\" alt=\"\" loading=\"'+(compact?'lazy':'eager')+'\" decoding=\"async\" draggable=\"false\" data-single-product-source=\"'+source+'\">'+",
@@ -37,7 +36,7 @@ jobs:
             'app product image loading')
           write(path,text)
 
-          # Dish ingredient thumbs: direct canonical WebP, no hidden Catalogue search/timing dependency.
+          # Fiche plat: WebP canonique direct, sans recherche Catalogue cachée.
           path='dishes-ui.js'; text=read(path)
           text=once(text,
             "const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';",
@@ -58,14 +57,14 @@ jobs:
           if 'setHiddenCatalogQuery' in text or 'nextPaint()' in text: raise SystemExit('hidden catalogue image path still present')
           write(path,text)
 
-          # Remove the temporary eager-loading patch from the unrelated error module.
+          # Retire la rustine Ma liste ajoutée dans le module d'erreurs.
           path='error-feedback-bridge.js'; text=read(path)
           marker="\n(() => {\n'use strict';\n\nfunction forceListImagesEager(root){"
           if marker not in text: raise SystemExit('temporary list image patch not found')
           text=text.split(marker,1)[0].rstrip()+"\n"
           write(path,text)
 
-          # Version/cache and loaders.
+          # Version/cache et loaders.
           path='index.html'; text=read(path)
           text=text.replace('page-version">v390','page-version">v391')
           if text.count('page-version">v391')!=3: raise SystemExit('index page versions not all v391')
@@ -93,14 +92,32 @@ jobs:
           text=prefix+text[shell_end:]
           write(path,text)
 
-          # Executable regression coverage for immediate icons and module ownership.
+          # Régression exécutable: aucun délai artificiel ni rustine inter-module.
           path='tests/product-images-no-atlas.test.mjs'; text=read(path)
-          test_block=r'''\ntest('Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel',()=>{\n  const app=read('app.js');\n  const dishes=read('dishes-ui.js');\n  const bridge=read('error-feedback-bridge.js');\n  assert.match(app,/loading=\\\"eager\\\" fetchpriority=\\\"'\\+\\(compact\\?'high':'auto'\\)\\+'\\\"/);\n  assert.match(dishes,/const ingredientImageSource=name=>'.\\/www\\/Items\\/'\\+normalize\\(name\\)\\.replace\\(\\/\\\\s\\+\\/g,'-'\\)\\+'\\.webp'/);\n  assert.match(dishes,/dish-ingredient-thumb[\\s\\S]*?loading=\\\"eager\\\" fetchpriority=\\\"high\\\"/);\n  assert.doesNotMatch(dishes,/ingredientThumbCache|ingredientThumbRequest|ingredientThumbUserQuery|primeDishIngredientThumbs|setHiddenCatalogQuery|nextPaint\\(\\)/);\n  assert.doesNotMatch(bridge,/forceListImagesEager|startListImageWarmup/);\n});\n'''
-          if "Ma liste et la fiche plat demandent directement leurs WebP" not in text: text+=test_block
+          if "Ma liste et la fiche plat demandent directement leurs WebP" not in text:
+              text += """
+
+test('Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel',()=>{
+  const app=read('app.js');
+  const dishes=read('dishes-ui.js');
+  const bridge=read('error-feedback-bridge.js');
+  assert.ok(app.includes('loading="eager" fetchpriority="\'+(compact?\'high\':\'auto\')+\'"'));
+  assert.ok(dishes.includes("const ingredientImageSource=name=>'./www/Items/'+normalize(name).replace(/\\s+/g,'-')+'.webp';"));
+  assert.ok(dishes.includes('loading="eager" fetchpriority="high"'));
+  assert.doesNotMatch(dishes,/ingredientThumbCache|ingredientThumbRequest|ingredientThumbUserQuery|primeDishIngredientThumbs|setHiddenCatalogQuery|nextPaint\(\)/);
+  assert.doesNotMatch(bridge,/forceListImagesEager|startListImageWarmup/);
+});
+"""
           write(path,text)
 
-          # Bring global-version tests up to the current release instead of the obsolete v383 assertions.
-          path='tests/startup-shell.test.mjs'; text=read(path).replace('v383','v391')
+          # Assertions historiques remises au niveau du main courant.
+          path='tests/startup-shell.test.mjs'; text=read(path).replace('v383','v391').replace('v=383','v=391')
+          write(path,text)
+
+          path='tests/error-center-loading.test.mjs'; text=read(path).replace('error-feedback-bridge\\.js\\?v=390','error-feedback-bridge\\.js\\?v=391')
+          write(path,text)
+
+          path='tests/catalog-ordering.test.mjs'; text=read(path).replace("norm('Chips nature')","norm('Chips')")
           write(path,text)
 
           path='tests/preference-popups.test.mjs'; text=read(path)
@@ -126,6 +143,6 @@ jobs:
           git config user.name OpenAI
           git config user.email noreply@openai.com
           git rm .github/workflows/icon-load-v391-temp.yml
-          git add app.js dishes-ui.js error-feedback-bridge.js index.html catalog.js dish-local-images.js sw.js tests/product-images-no-atlas.test.mjs tests/startup-shell.test.mjs tests/preference-popups.test.mjs
+          git add app.js dishes-ui.js error-feedback-bridge.js index.html catalog.js dish-local-images.js sw.js tests/product-images-no-atlas.test.mjs tests/startup-shell.test.mjs tests/error-center-loading.test.mjs tests/catalog-ordering.test.mjs tests/preference-popups.test.mjs
           git commit -m "v391: accélère les icônes produits"
           git push origin HEAD:tmp-icons-v391
