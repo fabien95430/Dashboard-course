@@ -51,3 +51,10 @@ test('Ma liste réutilise le même panier premium pendant les rendus vides succe
   assert.match(appUi,/if\(nativeEmpty&&retainedListEmptyState\)\{\s*root\.replaceChildren\(retainedListEmptyState\);\s*root\.classList\.add\('is-list-home-empty'\);\s*return;\s*\}/);
   assert.match(appUi,/retainedListEmptyState=empty;/);
 });
+
+test('Ma liste conserve le panier premium pendant la synchronisation initiale vide',()=>{
+  const app=read('app.js'),appUi=read('app-ui.js');
+  assert.match(app,/Synchronisation…/);
+  assert.match(appUi,/const syncingEmpty=Boolean\(empty&&empty\.querySelector\('\.spinner'\)&&empty\.textContent\.trim\(\)==='Synchronisation…'\)/);
+  assert.match(appUi,/if\(syncingEmpty&&retainedListEmptyState\)\{\s*root\.replaceChildren\(retainedListEmptyState\);\s*root\.classList\.add\('is-list-home-empty'\);\s*return;\s*\}/);
+});

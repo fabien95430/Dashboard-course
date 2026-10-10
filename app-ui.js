@@ -281,6 +281,12 @@ function syncListEmptyState(root){
     root.classList.add('is-list-home-empty');
     return;
   }
+  const syncingEmpty=Boolean(empty&&empty.querySelector('.spinner')&&empty.textContent.trim()==='Synchronisation…');
+  if(syncingEmpty&&retainedListEmptyState){
+    root.replaceChildren(retainedListEmptyState);
+    root.classList.add('is-list-home-empty');
+    return;
+  }
   const nativeEmpty=Boolean(empty&&empty.children.length===0&&empty.textContent.trim()==='La liste est vide.');
   if(nativeEmpty&&retainedListEmptyState){
     root.replaceChildren(retainedListEmptyState);
