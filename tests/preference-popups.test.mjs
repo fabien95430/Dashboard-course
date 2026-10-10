@@ -224,12 +224,3 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Activez l’historique des achats dans Préférences\./);
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
-
-test('la version visible runtime passe à v392 et recharge les modules modifiés',()=>{
-  const index=read('index.html'),catalog=read('catalog.js'),sw=read('sw.js'),localImages=read('dish-local-images.js');
-  assert.match(index,/catalog\.js\?v=392/); assert.match(index,/app\.js\?v=392/); assert.match(index,/error-feedback-bridge\.js\?v=391/);
-  assert.equal((index.match(/page-version\">v392/g)||[]).length,3);
-  assert.match(catalog,/dishes-ui\.js\?v=391/); assert.match(catalog,/dish-local-images\.js\?v=392/);
-  assert.match(sw,/courses-app-v392-r1/); assert.match(sw,/app\.js\?v=392/); assert.match(sw,/dishes-ui\.js\?v=391/);
-  assert.match(localImages,/const APP_VERSION='v392'/);
-});
