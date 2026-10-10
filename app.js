@@ -99,7 +99,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Chocolat chaud":"Chocolat ch.",
   "Filtres à café":"Filtre à café",
   "Bière sans alcool":"Bière 0%",
-  "Apéritif anisé":"Apéritif anis",
+
   "Nettoyant multi-usages":"Nettoyant MU",
   "Nettoyant vitres":"Nettoyant vit",
   "Vinaigre ménager":"Vinaigre mén.",
