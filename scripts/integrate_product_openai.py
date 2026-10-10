@@ -158,14 +158,48 @@ Catalogue disponible:
         {"model":model,"input":prompt,"store":False},
         api_key,
     )
-    try:
-        result=base.parse_json_object(base.response_text(payload))
+
+    def decode_result(response: dict) -> dict:
+        result=base.parse_json_object(base.response_text(response))
         explicit_mode=display_mode_from_hint(image_hint)
         if explicit_mode:
             result["display_mode"]=explicit_mode
-        return validate_location_result(result,source,name)
-    except Exception as error:
-        raise RuntimeError(f"Classement produit invalide: {error}") from error
+        return result
+
+    try:
+        return validate_location_result(decode_result(payload),source,name)
+    except Exception as first_error:
+        allowed_subgroups={category:list(subgroups) for category,subgroups in source.items()}
+        retry_prompt=f"""
+Le premier classement du produit {name!r} est invalide: {first_error}.
+Corrige uniquement le classement, sans inventer de nouvelle sous-catégorie.
+{category_rule}
+{hint_rule}
+
+Réponds UNIQUEMENT par un objet JSON avec exactement quatre clés:
+"category", "subgroup", "create_subgroup" et "display_mode".
+- "subgroup" doit recopier EXACTEMENT l'une des sous-catégories existantes autorisées ci-dessous.
+- "create_subgroup" doit être false.
+- "category" doit recopier EXACTEMENT la catégorie correspondante.
+- "display_mode" doit être exactement l'une des valeurs suivantes: {json.dumps(DISPLAY_MODES,ensure_ascii=False)}.
+
+Sous-catégories existantes autorisées:
+{json.dumps(allowed_subgroups,ensure_ascii=False)}
+
+Catalogue avec exemples:
+{json.dumps(candidates,ensure_ascii=False)}
+""".strip()
+        retry_payload=base.api_json(
+            "https://api.openai.com/v1/responses",
+            {"model":model,"input":retry_prompt,"store":False},
+            api_key,
+        )
+        try:
+            retry_result=decode_result(retry_payload)
+            retry_result["create_subgroup"]=False
+            return validate_location_result(retry_result,source,name)
+        except Exception as retry_error:
+            raise RuntimeError(f"Classement produit invalide après nouvelle tentative: {retry_error}") from retry_error
 
 
 def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") -> str:

@@ -22,15 +22,32 @@ jobs:
       DISH_CATEGORY: ${{ github.event.client_payload.category }}
       REQUEST_ID: ${{ github.event.client_payload.request_id }}
       TEMP_BRANCH: automation/item-${{ github.run_id }}
-      PUSH_ENDPOINT: ${{ github.event.client_payload.push_endpoint }}
-      PUSH_P256DH: ${{ github.event.client_payload.push_p256dh }}
-      PUSH_AUTH: ${{ github.event.client_payload.push_auth }}
-      PUSH_PUBLIC_KEY: ${{ github.event.client_payload.push_public_key }}
       COURSES_BASE_URL: https://fabien95430.github.io/Dashboard-course/
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       COURSES_VAPID_PRIVATE_KEY: ${{ secrets.COURSES_VAPID_PRIVATE_KEY }}
 
     steps:
+      - name: Masquer la souscription Web Push
+        shell: python
+        run: |
+          import json, os
+          from pathlib import Path
+          event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text(encoding='utf-8'))
+          payload=event.get('client_payload') or {}
+          fields={
+              'PUSH_ENDPOINT':'push_endpoint',
+              'PUSH_P256DH':'push_p256dh',
+              'PUSH_AUTH':'push_auth',
+              'PUSH_PUBLIC_KEY':'push_public_key',
+          }
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as env:
+              for env_name,payload_name in fields.items():
+                  value=''.join(str(payload.get(payload_name) or '').splitlines()).strip()
+                  if not value:
+                      continue
+                  print(f'::add-mask::{value}')
+                  env.write(f'{env_name}={value}\n')
+
       - name: Récupérer main
         uses: actions/checkout@v4
         with:

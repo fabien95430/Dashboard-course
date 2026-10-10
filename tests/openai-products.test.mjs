@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
+import {fileURLToPath} from 'node:url';
 
 const root=new URL('../',import.meta.url);
+const rootPath=fileURLToPath(root);
 const read=file=>readFileSync(new URL(file,root),'utf8');
 
 test('un produit manquant utilise le même déclencheur OpenAI et le même relais Home Assistant qu’un plat',()=>{
@@ -56,6 +59,44 @@ test('le classement OpenAI reçoit tout le catalogue et peut créer une sous-cat
   assert.match(script,/if create_subgroup:/);
   assert.match(script,/groups\[category\]\[subgroup\]=\[\]/);
   assert.match(script,/created_subgroup/);
+});
+
+test('un sous-groupe inventé est reclassé parmi les sous-catégories existantes',()=>{
+  const program=String.raw`
+import json, sys
+sys.path.insert(0,'scripts')
+import integrate_product_openai as product
+responses=[
+    {'category':'Apéritif & snacks','subgroup':'Chocolats','create_subgroup':False,'display_mode':'Paquet'},
+    {'category':'Apéritif & snacks','subgroup':'Biscuits & goûters','create_subgroup':False,'display_mode':'Paquet'},
+]
+calls=[]
+def fake_api_json(*args,**kwargs):
+    calls.append(1)
+    return responses.pop(0)
+product.base.api_json=fake_api_json
+product.base.response_text=lambda payload: json.dumps(payload,ensure_ascii=False)
+product.base.parse_json_object=lambda text: json.loads(text)
+groups={'Apéritif & snacks':{'Apéritif':['Chips'],'Biscuits & goûters':['Cookies']}}
+result=product.infer_location('Kinder Maxi','Apéritif & snacks',groups,'Kinder maxi - boîte','test-key')
+assert result==('Apéritif & snacks','Biscuits & goûters',False,'Boîte'), result
+assert len(calls)==2, calls
+`;
+  const run=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
+  assert.equal(run.status,0,run.stderr||run.stdout);
+});
+
+test('les données Web Push sont masquées avant les actions du workflow',()=>{
+  const workflow=read('.github/workflows/integrate-dish-openai.yml');
+  assert.doesNotMatch(workflow,/PUSH_ENDPOINT:\s*\$\{\{ github\.event\.client_payload\.push_endpoint \}\}/);
+  assert.doesNotMatch(workflow,/PUSH_P256DH:\s*\$\{\{ github\.event\.client_payload\.push_p256dh \}\}/);
+  assert.doesNotMatch(workflow,/PUSH_AUTH:\s*\$\{\{ github\.event\.client_payload\.push_auth \}\}/);
+  assert.doesNotMatch(workflow,/PUSH_PUBLIC_KEY:\s*\$\{\{ github\.event\.client_payload\.push_public_key \}\}/);
+  assert.match(workflow,/name: Masquer la souscription Web Push/);
+  assert.match(workflow,/GITHUB_EVENT_PATH/);
+  assert.match(workflow,/::add-mask::/);
+  assert.match(workflow,/GITHUB_ENV/);
+  assert.ok(workflow.indexOf('Masquer la souscription Web Push')<workflow.indexOf('Récupérer main'));
 });
 
 test('une nouvelle tuile produit peut être remplacée par son image unitaire',()=>{
