@@ -7,8 +7,11 @@ const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 test('les images produit suivent les rendus propriétaires sans observer le DOM',()=>{
   const source=read('product-item-images.js');
   assert.doesNotMatch(source,/new MutationObserver/);
-  assert.match(source,/document\.addEventListener\('courses:products-updated',scheduleDecorateAll\)/);
-  assert.match(source,/document\.addEventListener\('courses:list-rendered',scheduleDecorateAll\)/);
+  assert.match(source,/document\.addEventListener\('courses:products-updated',scheduleDecorateProducts\)/);
+  assert.match(source,/document\.addEventListener\('courses:list-rendered',scheduleDecorateList\)/);
+  assert.match(source,/function scheduleDecorateProducts\(\)[\s\S]*decorateProducts\(\)/);
+  assert.match(source,/function scheduleDecorateList\(\)[\s\S]*decorateList\(\)/);
+  assert.doesNotMatch(source,/scheduleDecorateAll/);
 });
 
 test('le marqueur des plats suit les événements métier sans observer le DOM',()=>{

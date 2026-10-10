@@ -6,7 +6,8 @@ const PRODUCT_NAMES=new Set(Object.values(window.COURSES_CATALOG?.groups||{}).fl
 ));
 let products=null;
 let listItems=null;
-let refreshFrame=0;
+let productRefreshFrame=0;
+let listRefreshFrame=0;
 let eventsBound=false;
 const visualScaleCache=new Map();
 
@@ -155,18 +156,25 @@ function decorateAll(){
   decorateProducts();
   decorateList();
 }
-function scheduleDecorateAll(){
-  if(refreshFrame)return;
-  refreshFrame=requestAnimationFrame(()=>{
-    refreshFrame=0;
-    decorateAll();
+function scheduleDecorateProducts(){
+  if(productRefreshFrame)return;
+  productRefreshFrame=requestAnimationFrame(()=>{
+    productRefreshFrame=0;
+    decorateProducts();
+  });
+}
+function scheduleDecorateList(){
+  if(listRefreshFrame)return;
+  listRefreshFrame=requestAnimationFrame(()=>{
+    listRefreshFrame=0;
+    decorateList();
   });
 }
 function bindEvents(){
   if(eventsBound)return;
   eventsBound=true;
-  document.addEventListener('courses:products-updated',scheduleDecorateAll);
-  document.addEventListener('courses:list-rendered',scheduleDecorateAll);
+  document.addEventListener('courses:products-updated',scheduleDecorateProducts);
+  document.addEventListener('courses:list-rendered',scheduleDecorateList);
 }
 function bind(){
   products=document.getElementById('products');

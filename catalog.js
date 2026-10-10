@@ -63,7 +63,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=414';
+    images.src='./dish-local-images.js?v=415';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadRepurchaseSoon,{once:true});
@@ -85,7 +85,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=410';
+    script.src='./runtime-features.js?v=415';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
