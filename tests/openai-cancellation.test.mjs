@@ -28,7 +28,7 @@ test('un échec GitHub passe la demande à Erreur et libère immédiatement la r
   assert.match(fixes,/function markOpenAiFailed\(entry,conclusion='failure'\)/);
   assert.match(fixes,/openAiErrors\.add\(key\)/);
   assert.match(fixes,/status:'failed'/);
-  assert.match(fixes,/run\.conclusion&&run\.conclusion!=='success'/);
+  assert.match(fixes,/if\(run\.conclusion==='success'\)\{[\s\S]*?return;[\s\S]*?if\(run\.conclusion\)\{/);
   assert.match(fixes,/request\?\.status==='failed'/);
   assert.match(fixes,/failed=!added&&status==='failed'/);
   assert.match(fixes,/button\.disabled=added\|\|running\|\|openAiCooldown\.has\(key\)/);

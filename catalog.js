@@ -39,7 +39,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){loadRepurchaseSoon();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=426';
+    images.src='./dish-local-images.js?v=427';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',loadRepurchaseSoon,{once:true});
@@ -106,7 +106,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=416';
+    script.src='./runtime-features.js?v=427';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
@@ -118,7 +118,7 @@
   const loadAppUi=()=>{
     if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
     const script=document.createElement('script');
-    script.src='./app-ui.js?v=426';
+    script.src='./app-ui.js?v=427';
     script.async=false;
     script.dataset.appUi='script';
     script.addEventListener('load',loadRuntimeFeatures,{once:true});

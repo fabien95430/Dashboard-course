@@ -16,8 +16,8 @@ test('la version globale et les révisions actives associées restent cohérente
   assert.match(index,/\.\/app\.js\?v=415/);
   assert.ok(catalog.includes(`./app-ui.js?v=${revision}`));
   assert.ok(catalog.includes(`./dish-local-images.js?v=${revision}`));
-  assert.match(catalog,/\.\/runtime-features\.js\?v=416/);
-  assert.match(runtime,/\.\/missing-products-fixes\.js\?v=416/);
+  assert.match(catalog,/\.\/runtime-features\.js\?v=427/);
+  assert.match(runtime,/\.\/missing-products-fixes\.js\?v=427/);
   assert.match(runtime,/\.\/product-item-images\.js\?v=415/);
   assert.ok(images.includes(`const APP_VERSION='${version}';`));
   assert.ok(sw.includes(`const CACHE='courses-app-${version}-r1';`));
@@ -26,7 +26,7 @@ test('la version globale et les révisions actives associées restent cohérente
   assert.match(sw,/\.\/app\.js\?v=415/);
   assert.ok(sw.includes(`./app-ui.js?v=${revision}`));
   assert.ok(sw.includes(`./dish-local-images.js?v=${revision}`));
-  assert.match(sw,/\.\/runtime-features\.js\?v=416/);
-  assert.match(sw,/\.\/missing-products-fixes\.js\?v=416/);
+  assert.match(sw,/\.\/runtime-features\.js\?v=427/);
+  assert.match(sw,/\.\/missing-products-fixes\.js\?v=427/);
   assert.match(sw,/\.\/product-item-images\.js\?v=415/);
 });

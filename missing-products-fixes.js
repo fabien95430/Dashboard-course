@@ -171,6 +171,16 @@ function trackedRunningOpenAiRequests(){
     return [{key,type,id,state}];
   });
 }
+function markOpenAiSucceeded(entry){
+  const current=openAiRequestState(entry.type,entry.id);
+  if(!current)return false;
+  const key=cooldownKey(entry.type,entry.id);
+  setRunning(entry.type,entry.id,false);
+  openAiCooldown.delete(key);
+  openAiErrors.delete(key);
+  setOpenAiRequestState(entry.type,entry.id,null);
+  return true;
+}
 function markOpenAiCancelled(entry){
   const current=openAiRequestState(entry.type,entry.id);
   if(!current||current.status==='cancelled')return null;
@@ -228,6 +238,7 @@ async function reconcileOpenAiRequests(){
       if(!response.ok)return false;
       const data=await response.json();
       const runs=Array.isArray(data?.workflow_runs)?data.workflow_runs:[];
+      const succeeded=[];
       const cancelled=[];
       const failed=[];
       tracked.forEach(entry=>{
@@ -241,17 +252,21 @@ async function reconcileOpenAiRequests(){
           return;
         }
         if(run.status!=='completed')return;
+        if(run.conclusion==='success'){
+          if(markOpenAiSucceeded(entry))succeeded.push(entry.id);
+          return;
+        }
         if(run.conclusion==='cancelled'){
           const name=markOpenAiCancelled(entry);
           if(name)cancelled.push(name);
           return;
         }
-        if(run.conclusion&&run.conclusion!=='success'){
+        if(run.conclusion){
           const name=markOpenAiFailed(entry,String(run.conclusion));
           if(name)failed.push(name);
         }
       });
-      if(!cancelled.length&&!failed.length)return false;
+      if(!succeeded.length&&!cancelled.length&&!failed.length)return false;
       decorateOpenAiButtons();
       notifyOpenAiCancelled(cancelled);
       notifyOpenAiFailed(failed);
