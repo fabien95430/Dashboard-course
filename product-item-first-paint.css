@@ -1,0 +1,20 @@
+/* Cadrage des WebP unitaires de Ma liste disponible dès le premier rendu. */
+#listItems .premium-sprite.is-single-product-image{
+  -webkit-clip-path:none!important;
+  clip-path:none!important;
+}
+#listItems .premium-sprite.is-single-product-image>img{
+  top:11%!important;
+  left:11%!important;
+  width:78%!important;
+  height:78%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:translate(var(--single-product-shift-x,0%),calc(4px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
+  transform-origin:center!important;
+}
+#listItems .premium-sprite.is-single-product-image.is-compact>img{
+  transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
+}
