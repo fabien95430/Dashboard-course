@@ -1468,12 +1468,17 @@ function bindBottomNavLiquid(){
   track.addEventListener('pointercancel',event=>finish(event,true));
 }
 
+let publishedView='';
 function showView(){
   if(state.view!=='list')setListFilterMenuOpen(false);
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
   $('#listView').classList.toggle('is-active',state.view==='list');
   $('#settingsView').classList.toggle('is-active',state.view==='settings');
   document.querySelectorAll('.tab').forEach(button=>button.classList.toggle('is-active',button.dataset.view===state.view));
+  if(publishedView!==state.view){
+    publishedView=state.view;
+    document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));
+  }
   syncBottomNavLiquid(true);
 }
 function renderView(){

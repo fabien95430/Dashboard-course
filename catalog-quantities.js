@@ -691,11 +691,12 @@ function scheduleDishRefresh(){
 }
 function setServings(value){
   const input=dialog?.querySelector('.dish-servings-value');
-  if(!input)return;
+  if(!input)return false;
   const next=Math.max(1,Math.min(12,Math.round(Number(value)||BASE_SERVINGS)));
   input.value=String(next);
   try{localStorage.setItem(STORAGE_SERVINGS,String(next))}catch(_){}
   decorateDishRows();
+  return true;
 }
 function buildServingsControl(){
   const head=dialog?.querySelector('.dish-sheet-head');
@@ -769,6 +770,7 @@ window.COURSES_QUANTITIES=Object.freeze({
   resetRecipeNeeds,
   getPurchaseLabel:purchaseLabel,
   addSelected:addSelectedQuantities,
+  setServings,
   bind
 });
 function bind(){
@@ -800,6 +802,7 @@ function bind(){
   dialogObserver=new MutationObserver(scheduleDishRefresh);
   dialogObserver.observe(dialog,{attributes:true,attributeFilter:['open']});
 
+  document.dispatchEvent(new CustomEvent('courses:quantities-ready'));
   return true;
 }
 })();

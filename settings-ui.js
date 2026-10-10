@@ -43,20 +43,15 @@ function persistPreferredCatalogMode(value){
 
 function syncDishServings(value){
   try{localStorage.setItem(STORAGE_SERVINGS,String(value))}catch(_){}
-  const input=document.querySelector('.dish-servings-value');
-  if(!input)return false;
-  input.value=String(value);
-  input.dispatchEvent(new Event('input',{bubbles:true}));
-  return true;
+  const quantities=window.COURSES_QUANTITIES;
+  if(typeof quantities?.setServings!=='function')return false;
+  return quantities.setServings(value)!==false;
 }
 
-function watchDishServings(){
+function bindDishServingsSync(){
   const sync=()=>syncDishServings(readPreferredServings());
-  if(sync())return;
-  const observer=new MutationObserver(()=>{
-    if(sync())observer.disconnect();
-  });
-  observer.observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('courses:quantities-ready',sync);
+  sync();
 }
 
 function applyPreferredCatalogMode(){
@@ -69,24 +64,19 @@ function applyPreferredCatalogMode(){
   return true;
 }
 
-function watchCatalogEntry(){
-  const catalogView=document.getElementById('catalogView');
-  if(!catalogView)return;
+function bindCatalogEntry(){
   let applied=false;
   const sync=()=>{
-    if(!catalogView.classList.contains('is-active')){
+    const catalogView=document.getElementById('catalogView');
+    if(!catalogView?.classList.contains('is-active')){
       applied=false;
       return;
     }
     if(applied)return;
     applied=applyPreferredCatalogMode();
   };
-  new MutationObserver(sync).observe(catalogView,{
-    attributes:true,
-    attributeFilter:['class'],
-    childList:true,
-    subtree:true
-  });
+  document.addEventListener('courses:view-changed',sync);
+  document.addEventListener('courses:catalog-mode-ready',sync);
   sync();
 }
 
@@ -143,8 +133,8 @@ function initPreferencesExtras(){
   persistPreferredCatalogMode(initialCatalogMode);
   servingsSelect.value=String(initialServings);
   catalogModeSelect.value=initialCatalogMode;
-  watchDishServings();
-  watchCatalogEntry();
+  bindDishServingsSync();
+  bindCatalogEntry();
 
   const syncSelects=()=>{
     servingsSelect.value=String(readPreferredServings());

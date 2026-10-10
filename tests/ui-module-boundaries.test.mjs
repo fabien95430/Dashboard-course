@@ -40,6 +40,8 @@ test('le nouvel ordre de chargement reste déterministe et précaché',()=>{
   assert.match(catalog,/images\.addEventListener\('load',loadAppUi,\{once:true\}\)/);
   assert.match(catalog,/const loadAppUi=\(\)=>\{[\s\S]*?script\.src='\.\/app-ui\.js\?v=400';[\s\S]*?script\.addEventListener\('load',loadRuntimeFeatures/);
   assert.match(catalog,/const loadRuntimeFeatures=\(\)=>\{[\s\S]*?script\.src='\.\/runtime-features\.js\?v=400';[\s\S]*?script\.addEventListener\('load',loadRepurchaseSoon/);
-  assert.ok(index.indexOf('./settings-tab-badge.js?v=400')<index.indexOf('./settings-ui.js?v=400'));
-  for(const asset of ['./app-ui.js?v=400','./runtime-features.js?v=400','./settings-ui.js?v=400'])assert.ok(sw.includes(asset),asset+' absent du précache');
+  const settingsUiAsset=index.match(/\.\/settings-ui\.js\?v=\d+/)?.[0]||'';
+  assert.ok(settingsUiAsset,'asset settings-ui introuvable');
+  assert.ok(index.indexOf('./settings-tab-badge.js?v=400')<index.indexOf(settingsUiAsset));
+  for(const asset of ['./app-ui.js?v=400','./runtime-features.js?v=400',settingsUiAsset])assert.ok(sw.includes(asset),asset+' absent du précache');
 });

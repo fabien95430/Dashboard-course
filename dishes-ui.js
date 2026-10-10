@@ -291,6 +291,7 @@ function buildUi(){
 
   validateDishes();
   setMode(mode,true);
+  document.dispatchEvent(new CustomEvent('courses:catalog-mode-ready',{detail:{mode}}));
   return true;
 }
 function buildDishDialog(){
