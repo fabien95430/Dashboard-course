@@ -42,7 +42,8 @@ test('les fonctions secondaires attendent l entrée dans Catalogue',()=>{
   assert.ok(source.includes("quantities.addEventListener('load',loadDishes,{once:true});"));
   assert.ok(source.includes("script.addEventListener('load',loadLiquid,{once:true});"));
   assert.ok(source.includes("liquid.addEventListener('load',loadDishLocalImages,{once:true});"));
-  assert.ok(source.includes("images.addEventListener('load',loadDishAddedMarker,{once:true});"));
+  assert.ok(source.includes("images.addEventListener('load',onDishLocalImagesReady,{once:true});"));
+  assert.match(source,/const onDishLocalImagesReady=\(\)=>\{[\s\S]*loadDishAddedMarker\(\);[\s\S]*if\(productImagesIdle\)warmDishImages\(\);/);
   assert.equal(source.includes('new MutationObserver'),false);
   assert.equal(source.includes('setInterval('),false);
 });
@@ -50,8 +51,8 @@ test('les fonctions secondaires attendent l entrée dans Catalogue',()=>{
 test('le précache hors ligne conserve les fonctions différées sans les exécuter au démarrage',()=>{
   const shell=sw.match(/const SHELL=(\[[^\n]+\]);/)?.[1]||'';
   assert.ok(shell);
-  for(const deferred of ['dishes-ui.js?v=428','catalog-quantities.js?v=426','catalog-liquid.js?v=297','dish-local-images.js?v=428','dish-added-marker.js?v=408','repurchase-soon.js?v=410','catalog-product-admin.js?v=410'])assert.ok(shell.includes(deferred),deferred+' absent du précache hors ligne');
-  for(const startup of ['catalog.js?v=428','app.js?v=428','settings-ui.js?v=428','runtime-features.js?v=428','product-item-images.js?v=428'])assert.ok(shell.includes(startup),startup+' absent du shell');
+  for(const deferred of ['dishes-ui.js?v=429','catalog-quantities.js?v=426','catalog-liquid.js?v=297','dish-local-images.js?v=429','dish-added-marker.js?v=408','repurchase-soon.js?v=410','catalog-product-admin.js?v=410'])assert.ok(shell.includes(deferred),deferred+' absent du précache hors ligne');
+  for(const startup of ['catalog.js?v=429','app.js?v=428','settings-ui.js?v=428','runtime-features.js?v=429','product-item-images.js?v=429'])assert.ok(shell.includes(startup),startup+' absent du shell');
 });
 
 test('le runtime de Ma liste reste prioritaire avant la préparation du Catalogue',()=>{

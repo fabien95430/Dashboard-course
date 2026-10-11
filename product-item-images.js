@@ -9,6 +9,8 @@ let listItems=null;
 let productRefreshFrame=0;
 let listRefreshFrame=0;
 let eventsBound=false;
+let productIdleFrame=0;
+let productImagesIdle=false;
 const visualScaleCache=new Map();
 
 const slugify=value=>String(value||'')
@@ -64,6 +66,38 @@ function ensureStyles(){
   `;
   document.head.appendChild(style);
 }
+function productCardVisible(card){
+  const rect=card?.getBoundingClientRect?.();
+  if(!rect)return false;
+  const viewport=window.innerHeight||document.documentElement.clientHeight||0;
+  return rect.bottom>=0&&rect.top<=viewport;
+}
+function publishProductImagesIdle(){
+  if(!document.getElementById('catalogView')?.classList.contains('is-active'))return;
+  const cards=[...(products?.querySelectorAll('.product[data-name]')||[])].filter(productCardVisible);
+  const pending=cards.some(card=>{
+    const image=card.querySelector('.premium-sprite>img');
+    if(image&&!image.complete)return true;
+    return Boolean(card.querySelector('.product-svg[data-single-product-pending]'));
+  });
+  if(pending){productImagesIdle=false;return}
+  if(productImagesIdle)return;
+  productImagesIdle=true;
+  document.dispatchEvent(new CustomEvent('courses:product-images-idle',{detail:{visible:cards.length}}));
+}
+function scheduleProductImagesIdleCheck(){
+  if(productIdleFrame)return;
+  productIdleFrame=requestAnimationFrame(()=>{
+    productIdleFrame=0;
+    publishProductImagesIdle();
+  });
+}
+function bindProductImageSettle(image){
+  if(!image||image.dataset.productImageSettleBound==='1')return;
+  image.dataset.productImageSettleBound='1';
+  image.addEventListener('load',scheduleProductImagesIdleCheck);
+  image.addEventListener('error',scheduleProductImagesIdleCheck);
+}
 function applyVisualScale(image,source){
   if(!image||!source)return;
   const cached=visualScaleCache.get(source);
@@ -118,6 +152,7 @@ function decorateFallback(card,name,source,eager=false){
   image.loading=eager?'eager':'lazy';
   image.decoding='async';
   image.dataset.singleProductSource=source;
+  bindProductImageSettle(image);
   image.addEventListener('load',()=>{
     if(!fallback.isConnected)return;
     const sprite=document.createElement('span');
@@ -138,6 +173,7 @@ function decorateCard(card,eager=false){
   const source=imageSource(name);
   const sprite=card.querySelector('.premium-sprite');
   const image=sprite?.querySelector(':scope > img');
+  bindProductImageSettle(image);
   if(!sprite||!image){decorateFallback(card,name,source,eager);return;}
   card.classList.add('has-single-product-image');
   sprite.classList.add('is-single-product-image');
@@ -149,7 +185,9 @@ function decorateCard(card,eager=false){
 }
 function decorateProducts(){
   if(!document.getElementById('catalogView')?.classList.contains('is-active'))return;
+  productImagesIdle=false;
   products?.querySelectorAll('.product[data-name]').forEach(card=>decorateCard(card,false));
+  scheduleProductImagesIdleCheck();
 }
 function decorateList(){
   listItems?.querySelectorAll('.list-row[data-name]').forEach(card=>decorateCard(card,true));
