@@ -158,6 +158,8 @@ let recipeCustomizationSelection=new Set();
 let recipeCustomizationNeeds={};
 let toastTimer=0;
 let lensTimer=0;
+let dishGridWarmupScheduled=false;
+let dishGridState='';
 const dishCardCache=new Map();
 
 function readFavorites(){
@@ -317,6 +319,7 @@ function buildUi(){
 
   validateDishes();
   setMode('products',true);
+  scheduleDishGridWarmup();
   document.dispatchEvent(new CustomEvent('courses:catalog-mode-ready',{detail:{mode}}));
   return true;
 }
@@ -709,13 +712,15 @@ function setMode(next,initial=false){
   if(dishes)renderDishes();
 }
 function syncModeLens(animate=true){
-  if(!modeSwitch)return;
+  if(!modeSwitch||modeSwitch.dataset.catalogLiquidBound==='1')return;
   const active=modeSwitch.querySelector('.catalog-mode.is-active');
   if(!active||!active.offsetWidth)return;
+  const width=active.offsetWidth*.84;
+  const x=active.offsetLeft+(active.offsetWidth-width)/2;
   clearTimeout(lensTimer);
   modeSwitch.classList.toggle('is-switching',animate);
-  modeSwitch.style.setProperty('--catalog-lens-x',active.offsetLeft+'px');
-  modeSwitch.style.setProperty('--catalog-lens-w',active.offsetWidth+'px');
+  modeSwitch.style.setProperty('--catalog-lens-x',x+'px');
+  modeSwitch.style.setProperty('--catalog-lens-w',width+'px');
   if(animate)lensTimer=setTimeout(()=>modeSwitch.classList.remove('is-switching'),430);
 }
 function renderDishFilters(){
@@ -771,8 +776,32 @@ function dishCard(dish){
 function notifyDishesRendered(count){
   document.dispatchEvent(new CustomEvent('courses:dishes-rendered',{detail:{count}}));
 }
+function prepareDishGrid(){
+  dishGridWarmupScheduled=false;
+  if(!dishesGrid||dishGridState==='default'||mode==='dishes')return;
+  const fragment=document.createDocumentFragment();
+  DISHES.forEach(dish=>fragment.appendChild(dishCard(dish)));
+  dishesGrid.replaceChildren(fragment);
+  dishGridState='default';
+  dishCount.textContent=DISHES.length+' plat'+(DISHES.length>1?'s':'');
+  notifyDishesRendered(DISHES.length);
+}
+function scheduleDishGridWarmup(){
+  if(dishGridWarmupScheduled||dishGridState==='default')return;
+  dishGridWarmupScheduled=true;
+  const run=()=>prepareDishGrid();
+  if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:1200});
+  else setTimeout(run,0);
+}
 function renderDishes(){
   if(!dishesGrid||mode!=='dishes')return;
+  const defaultView=filter==='Tous'&&!normalize(searchInput?.value||'');
+  if(defaultView&&dishGridState==='default'){
+    DISHES.forEach(dish=>syncDishFavorite(dishCardCache.get(dish.name),dish.name));
+    dishCount.textContent=DISHES.length+' plat'+(DISHES.length>1?'s':'');
+    notifyDishesRendered(DISHES.length);
+    return;
+  }
   const dishes=visibleDishes();
   dishCount.textContent=dishes.length+' plat'+(dishes.length>1?'s':'');
   if(!dishes.length){
@@ -780,12 +809,14 @@ function renderDishes(){
     empty.className='dish-empty';
     empty.textContent=filter==='Favoris'?'Aucun plat favori pour le moment.':'Aucun plat trouvé.';
     dishesGrid.replaceChildren(empty);
+    dishGridState='custom';
     notifyDishesRendered(0);
     return;
   }
   const fragment=document.createDocumentFragment();
   dishes.forEach(dish=>fragment.appendChild(dishCard(dish)));
   dishesGrid.replaceChildren(fragment);
+  dishGridState=defaultView&&dishes.length===DISHES.length?'default':'custom';
   notifyDishesRendered(dishes.length);
 }
 function toggleFavorite(name,fromSheet=false){

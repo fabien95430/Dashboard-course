@@ -40,3 +40,36 @@ test('la variante sûre garde content-visibility auto hors des cartes',()=>{
   assert.doesNotMatch(css,/\.product[^\{]*\{[^\}]*content-visibility\s*:\s*auto/i);
   assert.doesNotMatch(css,/\.catalog-view \.page-version\{[\s\S]*?transform:/);
 });
+
+
+test('la grille Plats se prépare en arrière-plan avant le premier affichage',()=>{
+  const dishes=read('dishes-ui.js');
+  const prepareStart=dishes.indexOf('function prepareDishGrid(){');
+  const scheduleStart=dishes.indexOf('function scheduleDishGridWarmup(){',prepareStart);
+  const renderStart=dishes.indexOf('function renderDishes(){',scheduleStart);
+  assert.ok(prepareStart>=0&&scheduleStart>prepareStart&&renderStart>scheduleStart);
+  const prepare=dishes.slice(prepareStart,scheduleStart),schedule=dishes.slice(scheduleStart,renderStart);
+  assert.match(prepare,/DISHES\.forEach\(dish=>fragment\.appendChild\(dishCard\(dish\)\)\)/);
+  assert.match(prepare,/dishesGrid\.replaceChildren\(fragment\)/);
+  assert.match(prepare,/mode==='dishes'/);
+  assert.match(schedule,/requestIdleCallback\(run,\{timeout:1200\}\)/);
+  assert.doesNotMatch(schedule,/setInterval|setMode\('dishes'/);
+  assert.match(dishes,/setMode\('products',true\);\s*scheduleDishGridWarmup\(\);/);
+  const renderEnd=dishes.indexOf('function toggleFavorite(',renderStart);
+  const render=dishes.slice(renderStart,renderEnd);
+  assert.match(render,/defaultView&&dishGridState==='default'/);
+  assert.match(render,/dishGridState=defaultView&&dishes\.length===DISHES\.length\?'default':'custom'/);
+});
+
+test('la lentille Produits Plats garde la même géométrie avant et après le module liquid',()=>{
+  const dishes=read('dishes-ui.js'),firstPaint=read('product-item-first-paint.css'),liquid=read('catalog-liquid.js');
+  assert.match(firstPaint,/--catalog-lens-x:calc\(3px \+ 9\.5238%\)/);
+  assert.match(firstPaint,/--catalog-lens-w:calc\(42% - 2\.52px\)/);
+  assert.match(liquid,/const lensW=liquid\.w\*0\.84;/);
+  const syncStart=dishes.indexOf('function syncModeLens(animate=true){');
+  const syncEnd=dishes.indexOf('function renderDishFilters(){',syncStart);
+  const sync=dishes.slice(syncStart,syncEnd);
+  assert.match(sync,/modeSwitch\.dataset\.catalogLiquidBound==='1'/);
+  assert.match(sync,/const width=active\.offsetWidth\*\.84;/);
+  assert.match(sync,/active\.offsetLeft\+\(active\.offsetWidth-width\)\/2/);
+});

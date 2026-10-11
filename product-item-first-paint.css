@@ -31,8 +31,8 @@ html .catalog-view{
 html .catalog-view>.page-header{order:0!important}
 html .catalog-view>.catalog-controls{display:contents!important}
 html .catalog-mode-switch{
-  --catalog-lens-x:3px;
-  --catalog-lens-w:calc(50% - 3px);
+  --catalog-lens-x:calc(3px + 9.5238%);
+  --catalog-lens-w:calc(42% - 2.52px);
   --catalog-liquid-sx:1;
   --catalog-liquid-sy:1;
   --catalog-liquid-lift:0;
