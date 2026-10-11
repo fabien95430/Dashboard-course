@@ -1,4 +1,4 @@
-name: ChatGPT restore existing dish visuals
+name: ChatGPT restore existing dish visual
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
       - name: Prepare image recovery
         run: python -m pip install --disable-pip-version-check --quiet Pillow
 
-      - name: Reassemble and validate existing generated visuals
+      - name: Reassemble and validate existing Sushis visual
         shell: python
         run: |
           from pathlib import Path
@@ -27,58 +27,18 @@ jobs:
           import base64, io
 
           root=Path('.chatgpt')
-          def text(name):
-              return ''.join((root/name).read_text(encoding='utf-8').split())
-          def decode(value):
-              return base64.b64decode(value,validate=True)
-          def valid(data):
-              try:
-                  with Image.open(io.BytesIO(data)) as image:
-                      image.verify()
-                  return True
-              except Exception:
-                  return False
-
-          sushi_names=[
+          names=[
               'sushi.part000.b64','sushi.part001.b64','sushi.part002.b64','sushi.part003.b64',
               'sushi.part004a.b64','sushi.part004b.b64','sushi.part004c.b64'
           ]
-          sushi=decode(''.join(text(name) for name in sushi_names))
-          if not valid(sushi):
-              raise SystemExit('Visuel Sushis conservé invalide')
-          Path('/tmp/sushis.jpg').write_bytes(sushi)
-
-          first=text('saucisse.fix000a.b64')+text('saucisse.fix000b.b64')
-          second=text('saucisse.fix001a.b64')+text('saucisse.fix001b.b64')
-          tail=[text(f'saucisse.part00{i}.b64') for i in range(2,6)]
-          candidates=[]
-          builders=[
-              lambda: decode(first+second+''.join(tail)),
-              lambda: decode(first)+decode(second)+b''.join(decode(value) for value in tail),
-              lambda: b''.join(decode(text(name)) for name in [
-                  'saucisse.fix000a.b64','saucisse.fix000b.b64',
-                  'saucisse.fix001a.b64','saucisse.fix001b.b64',
-                  'saucisse.part002.b64','saucisse.part003.b64','saucisse.part004.b64','saucisse.part005.b64'
-              ]),
-          ]
-          for index,builder in enumerate(builders,1):
-              try:
-                  data=builder()
-              except Exception as exc:
-                  print(f'candidate {index}: decode impossible: {exc}')
-                  continue
-              print(f'candidate {index}: {len(data)} octets, valide={valid(data)}')
-              if valid(data):
-                  candidates.append((index,data))
-          if not candidates:
-              raise SystemExit('Aucune reconstruction valide du visuel Saucisse lentille')
-          mode,saucisse=candidates[0]
-          Path('/tmp/saucisse-lentille.jpg').write_bytes(saucisse)
-          print(f'Reconstruction Saucisse retenue: candidate {mode}')
-
-          for path in ('/tmp/sushis.jpg','/tmp/saucisse-lentille.jpg'):
-              with Image.open(path) as image:
-                  print(path,image.format,image.size)
+          encoded=''.join(''.join((root/name).read_text(encoding='utf-8').split()) for name in names)
+          data=base64.b64decode(encoded,validate=True)
+          with Image.open(io.BytesIO(data)) as image:
+              image.verify()
+          with Image.open(io.BytesIO(data)) as image:
+              if image.format!='JPEG' or image.size!=(512,341):
+                  raise SystemExit(f'Visuel historique inattendu: {image.format} {image.size}')
+          Path('/tmp/sushis.jpg').write_bytes(data)
 
       - name: Switch to current main safely
         shell: bash
@@ -91,58 +51,61 @@ jobs:
           test "$actual" = "$EXPECTED_HEAD"
           git checkout -B main origin/main
 
-      - name: Restore both visuals and bump v452
+      - name: Restore Sushis visual and bump v452
         shell: python
         run: |
           from pathlib import Path
           from PIL import Image
           import re
 
-          for path in (Path('www/Plats/sushis.png'),Path('www/Plats/saucisse-lentille.png')):
-            if path.exists(): raise SystemExit(f'Visuel déjà présent: {path}')
+          target=Path('www/Plats/sushis.png')
+          if target.exists():
+              raise SystemExit(f'Visuel déjà présent: {target}')
 
           dishes=Path('dishes-ui.js').read_text(encoding='utf-8')
-          for name in ('Sushis','Saucisse lentille'):
-            if not re.search(r"\{name:'"+re.escape(name)+r"'",dishes):
-              raise SystemExit(f'Plat absent: {name}')
+          if not re.search(r"\{name:'Sushis'",dishes):
+              raise SystemExit('Plat Sushis absent')
 
           local_path=Path('dish-local-images.js')
           local=local_path.read_text(encoding='utf-8')
           local,count=re.subn(r"const APP_VERSION='v451'","const APP_VERSION='v452'",local,count=1)
-          if count!=1: raise SystemExit('Version v451 introuvable dans dish-local-images.js')
+          if count!=1:
+              raise SystemExit('Version v451 introuvable dans dish-local-images.js')
           local_path.write_text(local,encoding='utf-8')
 
           catalog_path=Path('catalog.js')
           catalog=catalog_path.read_text(encoding='utf-8')
           catalog,count=re.subn(r"dish-local-images\.js\?v=451","dish-local-images.js?v=452",catalog,count=1)
-          if count!=1: raise SystemExit('Révision dish-local-images v451 introuvable dans catalog.js')
+          if count!=1:
+              raise SystemExit('Révision dish-local-images v451 introuvable dans catalog.js')
           catalog_path.write_text(catalog,encoding='utf-8')
 
           index_path=Path('index.html')
           index=index_path.read_text(encoding='utf-8')
           if index.count('<span class="page-version">v451</span>')!=3:
-            raise SystemExit('Badges v451 inattendus dans index.html')
+              raise SystemExit('Badges v451 inattendus dans index.html')
           index=index.replace('<span class="page-version">v451</span>','<span class="page-version">v452</span>')
           index,count=re.subn(r"catalog\.js\?v=451","catalog.js?v=452",index,count=1)
-          if count!=1: raise SystemExit('Révision catalog v451 introuvable dans index.html')
+          if count!=1:
+              raise SystemExit('Révision catalog v451 introuvable dans index.html')
           index_path.write_text(index,encoding='utf-8')
 
           sw_path=Path('sw.js')
           sw=sw_path.read_text(encoding='utf-8')
           sw,count=re.subn(r"const CACHE='courses-app-v451-r1'","const CACHE='courses-app-v452-r1'",sw,count=1)
-          if count!=1: raise SystemExit('Cache v451 introuvable dans sw.js')
+          if count!=1:
+              raise SystemExit('Cache v451 introuvable dans sw.js')
           sw,count_catalog=re.subn(r"\./catalog\.js\?v=451","./catalog.js?v=452",sw,count=1)
           sw,count_images=re.subn(r"\./dish-local-images\.js\?v=451","./dish-local-images.js?v=452",sw,count=1)
           if count_catalog!=1 or count_images!=1:
-            raise SystemExit('Révisions v451 inattendues dans le shell du service worker')
+              raise SystemExit('Révisions v451 inattendues dans le shell du service worker')
           sw_path.write_text(sw,encoding='utf-8')
 
-          for source,target in [('/tmp/sushis.jpg',Path('www/Plats/sushis.png')),('/tmp/saucisse-lentille.jpg',Path('www/Plats/saucisse-lentille.png'))]:
-            image=Image.open(source).convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
-            image.save(target,'PNG',optimize=True)
-            with Image.open(target) as check:
+          image=Image.open('/tmp/sushis.jpg').convert('RGB').resize((1536,1024),Image.Resampling.LANCZOS)
+          image.save(target,'PNG',optimize=True)
+          with Image.open(target) as check:
               if check.format!='PNG' or check.size!=(1536,1024):
-                raise SystemExit(f'Visuel invalide: {target}')
+                  raise SystemExit(f'Visuel final invalide: {check.format} {check.size}')
 
       - name: Validate and publish atomically
         shell: bash
@@ -150,12 +113,11 @@ jobs:
           set -euo pipefail
           bash scripts/validate_repo.sh
           test -s www/Plats/sushis.png
-          test -s www/Plats/saucisse-lentille.png
           grep -Fq "const APP_VERSION='v452'" dish-local-images.js
           test "$(grep -o '<span class="page-version">v452</span>' index.html | wc -l)" -eq 3
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add catalog.js dish-local-images.js index.html sw.js www/Plats/sushis.png www/Plats/saucisse-lentille.png
+          git add catalog.js dish-local-images.js index.html sw.js www/Plats/sushis.png
           git diff --cached --check
-          git commit -m "v452: restaure les visuels Sushis et Saucisse lentille"
+          git commit -m "v452: restaure le visuel Sushis"
           git push origin HEAD:main
