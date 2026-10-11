@@ -9,11 +9,7 @@ let securityViewportRestoreFrame=0;
 let retainedListEmptyState=null;
 
 function syncPageVersions(){
-  document.querySelectorAll('.page-header').forEach(header=>{
-    const title=header.querySelector('h1');
-    const badge=header.querySelector('.page-version');
-    if(!title||!badge)return;
-    if(badge.parentElement!==title)title.appendChild(badge);
+  document.querySelectorAll('.page-version').forEach(badge=>{
     if(badge.textContent!==APP_VERSION)badge.textContent=APP_VERSION;
   });
   if(!document.getElementById('app-version-ui')){
@@ -321,12 +317,6 @@ function syncListEmptyState(root){
   const empty=root.children.length===1&&root.firstElementChild?.classList.contains('empty')?root.firstElementChild:null;
   if(empty?.classList.contains('list-empty-state')&&empty.dataset.emptyDesign===design){
     retainedListEmptyState=empty;
-    root.classList.add('is-list-home-empty');
-    return;
-  }
-  const syncingEmpty=Boolean(empty&&empty.querySelector('.spinner')&&empty.textContent.trim()==='Synchronisation…');
-  if(syncingEmpty&&retainedListEmptyState){
-    root.replaceChildren(retainedListEmptyState);
     root.classList.add('is-list-home-empty');
     return;
   }

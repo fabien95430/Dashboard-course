@@ -36,7 +36,7 @@ test('les consommateurs P1 écoutent les événements propriétaires au lieu du 
   assert.match(admin,/document\.addEventListener\('courses:settings-management-ready',bindUi/);
 });
 
-test('Ma liste affiche son panier vide sans attendre Home Assistant et seulement sur le vrai état vide',()=>{
+test('Ma liste affiche le panier premium seulement sur le vrai état vide',()=>{
   const app=read('app.js'),appUi=read('app-ui.js');
   assert.match(app,/state\.error\?'Liste indisponible\.':'La liste est vide\.'/);
   assert.match(appUi,/const nativeEmpty=Boolean\(empty&&empty\.children\.length===0&&empty\.textContent\.trim\(\)==='La liste est vide\.'\)/);
@@ -45,16 +45,16 @@ test('Ma liste affiche son panier vide sans attendre Home Assistant et seulement
   assert.doesNotMatch(appUi,/document\.addEventListener\('courses:status-changed'/);
 });
 
-test('Ma liste réutilise le même panier premium pendant les rendus vides successifs',()=>{
+test('Ma liste réutilise le même panier premium entre vrais rendus vides',()=>{
   const appUi=read('app-ui.js');
   assert.match(appUi,/let retainedListEmptyState=null;/);
   assert.match(appUi,/if\(nativeEmpty&&retainedListEmptyState\)\{\s*root\.replaceChildren\(retainedListEmptyState\);\s*root\.classList\.add\('is-list-home-empty'\);\s*return;\s*\}/);
   assert.match(appUi,/retainedListEmptyState=empty;/);
 });
 
-test('Ma liste conserve le panier premium pendant la synchronisation initiale vide',()=>{
+test('Ma liste conserve Synchronisation tant que Home Assistant na pas confirmé son contenu',()=>{
   const app=read('app.js'),appUi=read('app-ui.js');
   assert.match(app,/Synchronisation…/);
-  assert.match(appUi,/const syncingEmpty=Boolean\(empty&&empty\.querySelector\('\.spinner'\)&&empty\.textContent\.trim\(\)==='Synchronisation…'\)/);
-  assert.match(appUi,/if\(syncingEmpty&&retainedListEmptyState\)\{\s*root\.replaceChildren\(retainedListEmptyState\);\s*root\.classList\.add\('is-list-home-empty'\);\s*return;\s*\}/);
+  assert.doesNotMatch(appUi,/syncingEmpty/);
+  assert.doesNotMatch(appUi,/Synchronisation…/);
 });
