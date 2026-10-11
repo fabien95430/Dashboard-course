@@ -432,6 +432,7 @@ function decorateRunningRows(dialog,type,running){
     const cancelled=!added&&request?.status==='cancelled';
     const persistedFailed=!added&&request?.status==='failed';
     const active=!added&&!cancelled&&!persistedFailed&&running.has(id);
+    const reconstruction=active&&request?.reconstruction===true;
     const failed=!added&&!active&&!cancelled&&(persistedFailed||openAiErrors.has(cooldownKey(type,id)));
     const copy=row.querySelector('.missing-product-copy');
     let progress=copy?.querySelector('.missing-dish-progress');
@@ -444,11 +445,13 @@ function decorateRunningRows(dialog,type,running){
       }
       const progressLabel=cancelled?'Annulé':failed?'Erreur':'En cours';
       if(progress.textContent!==progressLabel)progress.textContent=progressLabel;
+      if(reconstruction&&progress.textContent!=='Reconstruction')progress.textContent='Reconstruction';
       progress.classList.toggle('is-error',failed);
       progress.classList.toggle('is-cancelled',cancelled);
       progress.classList.toggle('missing-dish-error',failed||cancelled);
       const progressAriaLabel=cancelled?'Intégration annulée':failed?'Erreur lors de l’intégration':'Intégration en cours';
       if(progress.getAttribute('aria-label')!==progressAriaLabel)progress.setAttribute('aria-label',progressAriaLabel);
+      if(reconstruction)progress.setAttribute('aria-label','Reconstruction de l’intégration en cours');
     }else if(progress){
       progress.remove();
     }
@@ -543,10 +546,13 @@ function bindOpenAiUi(){
       openAiErrors.delete(key);
       const item=itemsForType(type).find(entry=>String(entry?.id||'')===id);
       if(!item)return;
+      const previousRequest=openAiRequestState(type,id);
+      const reconstruction=previousRequest?.status==='cancelled'||previousRequest?.status==='failed';
       const requestId=randomId();
       setOpenAiRequestState(type,id,{
         requestId,
         status:'running',
+        reconstruction,
         name:String(item.name||''),
         startedAt:Date.now()
       });

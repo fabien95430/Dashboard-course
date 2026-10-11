@@ -51,8 +51,8 @@ test('les fonctions secondaires attendent l entrée dans Catalogue',()=>{
 test('le précache hors ligne conserve les fonctions différées sans les exécuter au démarrage',()=>{
   const shell=sw.match(/const SHELL=(\[[^\n]+\]);/)?.[1]||'';
   assert.ok(shell);
-  for(const deferred of ['dishes-ui.js?v=429','catalog-quantities.js?v=426','catalog-liquid.js?v=297','dish-local-images.js?v=429','dish-added-marker.js?v=408','repurchase-soon.js?v=410','catalog-product-admin.js?v=410'])assert.ok(shell.includes(deferred),deferred+' absent du précache hors ligne');
-  for(const startup of ['catalog.js?v=429','app.js?v=428','settings-ui.js?v=428','runtime-features.js?v=429','product-item-images.js?v=429'])assert.ok(shell.includes(startup),startup+' absent du shell');
+  for(const deferred of ['dishes-ui.js?v=429','catalog-quantities.js?v=426','catalog-liquid.js?v=297','dish-local-images.js?v=430','dish-added-marker.js?v=408','repurchase-soon.js?v=410','catalog-product-admin.js?v=410'])assert.ok(shell.includes(deferred),deferred+' absent du précache hors ligne');
+  for(const startup of ['catalog.js?v=430','app.js?v=428','settings-ui.js?v=428','runtime-features.js?v=430','product-item-images.js?v=429'])assert.ok(shell.includes(startup),startup+' absent du shell');
 });
 
 test('le runtime de Ma liste reste prioritaire avant la préparation du Catalogue',()=>{
