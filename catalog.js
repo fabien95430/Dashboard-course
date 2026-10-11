@@ -63,7 +63,7 @@
   const loadCatalogProductAdmin=()=>{
     if(document.querySelector('script[data-catalog-product-admin]'))return;
     const script=document.createElement('script');
-    script.src='./catalog-product-admin.js?v=411';
+    script.src='./catalog-product-admin.js?v=412';
     script.async=false;
     script.dataset.catalogProductAdmin='script';
     document.body.appendChild(script);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=450';
+    images.src='./dish-local-images.js?v=451';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});

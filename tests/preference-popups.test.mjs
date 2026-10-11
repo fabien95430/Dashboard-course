@@ -240,7 +240,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
 });
 
 
-test('les trois vues de gestion utilisent la flèche retour dans le titre',()=>{
+test('les trois vues de gestion utilisent un chevron retour discret dans le titre',()=>{
   const settings=read('settings-ui.js');
   const errors=read('error-center.js');
   const catalog=read('catalog-product-admin.js');
@@ -249,6 +249,10 @@ test('les trois vues de gestion utilisent la flèche retour dans le titre',()=>{
   assert.ok(settings.includes("back.dataset.preferenceBack==='preferences'"));
   assert.ok(errors.includes("window.COURSES_SETTINGS_NAV.setTitle('Messages d’erreur','management')"));
   assert.ok(catalog.includes("window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management')"));
+  assert.match(settings,/\.preference-title-back\{[^}]*background:transparent/);
+  assert.match(settings,/\.preference-title-back\{[^}]*border-radius:0/);
+  assert.doesNotMatch(settings,/\.preference-title-back\{[^}]*background:rgba/);
   assert.doesNotMatch(errors,/courses-error-back/);
   assert.doesNotMatch(catalog,/courses-product-admin-back/);
+  assert.doesNotMatch(catalog,/courses-product-admin-note|Suppression définitive du catalogue et de GitHub/);
 });

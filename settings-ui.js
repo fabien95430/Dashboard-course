@@ -272,8 +272,8 @@ function installPreferenceDialogAppearance(){
       -webkit-backdrop-filter:blur(8px)!important;
       backdrop-filter:blur(8px)!important;
     }
-    #preferencesDialog .preference-dialog-scroll>h3{display:flex;align-items:center;gap:8px}
-    .preference-title-back{width:32px;height:32px;flex:0 0 32px;margin:-2px 0 -2px -5px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(7,62,44,.06);color:#0b7040;font:inherit;font-size:31px;line-height:1;font-weight:500;-webkit-tap-highlight-color:transparent}
+    #preferencesDialog .preference-dialog-scroll>h3{display:flex;align-items:center;gap:6px}
+    .preference-title-back{width:18px;height:32px;flex:0 0 18px;margin:-2px 0 -2px -2px;padding:0;border:0;border-radius:0;display:grid;place-items:center;background:transparent;color:#0b7040;font:inherit;font-size:28px;line-height:1;font-weight:500;-webkit-tap-highlight-color:transparent}
     .preference-title-back:focus{outline:none}.preference-title-back:focus-visible{outline:2px solid rgba(11,112,64,.28);outline-offset:2px}
     #preferencesApplicationManagement .application-management-options:empty{display:none!important}
   `;
