@@ -715,6 +715,8 @@ function renderCategories(){
   syncCategorySelection();
 }
 const productCardCache=new Map();
+let productGridReady=false;
+let productEmptyState=null;
 function updateProductCardQuantity(card,name,quantity){
   const value=Math.max(0,Number(quantity)||0),active=value>0;
   card.dataset.quantity=String(value);
@@ -750,27 +752,45 @@ function productCard(product){
 function notifyProductsUpdated(){
   document.dispatchEvent(new CustomEvent('courses:products-updated'));
 }
+function ensureProductGrid(el,quantities){
+  if(productGridReady)return;
+  const fragment=document.createDocumentFragment();
+  sortProductsAlpha(unique(ALL)).forEach(product=>{
+    const card=productCard(product);
+    updateProductCardQuantity(card,product.name,catalogQuantityForDisplay(product.name,quantities.get(norm(product.name))||0));
+    fragment.appendChild(card);
+  });
+  productEmptyState=document.createElement('div');
+  productEmptyState.className='empty is-wide';
+  productEmptyState.textContent='Aucun produit ne correspond à cette recherche.';
+  productEmptyState.hidden=true;
+  fragment.appendChild(productEmptyState);
+  el.replaceChildren(fragment);
+  productGridReady=true;
+}
+function syncProductGrid(products,quantities){
+  const ranks=new Map(products.map((product,index)=>[norm(product.name),index]));
+  productCardCache.forEach((card,key)=>{
+    const rank=ranks.get(key),visible=rank!==undefined;
+    card.hidden=!visible;
+    card.style.order=visible?String(rank):'';
+    if(!visible)return;
+    const name=card.dataset.name||'';
+    updateProductCardQuantity(card,name,catalogQuantityForDisplay(name,quantities.get(key)||0));
+  });
+  if(productEmptyState){
+    productEmptyState.hidden=products.length!==0;
+    productEmptyState.style.order=String(products.length);
+  }
+}
 function renderProducts(){
   const el=$('#products');
   if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
   const products=visibleProducts();
   const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
+  ensureProductGrid(el,quantities);
+  syncProductGrid(products,quantities);
   const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
-  if(!products.length){
-    const empty=document.createElement('div');
-    empty.className='empty is-wide';
-    empty.textContent='Aucun produit ne correspond à cette recherche.';
-    el.replaceChildren(empty);
-    notifyProductsUpdated();
-    return;
-  }
-  const fragment=document.createDocumentFragment();
-  products.forEach(product=>{
-    const card=productCard(product);
-    updateProductCardQuantity(card,product.name,catalogQuantityForDisplay(product.name,quantities.get(norm(product.name))||0));
-    fragment.appendChild(card);
-  });
-  el.replaceChildren(fragment);
   notifyProductsUpdated();
 }
 function setProductQuantity(name,quantity){

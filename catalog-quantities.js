@@ -595,7 +595,7 @@ function ensureStyles(){
 }
 function decorateProducts(){
   if(!products)return;
-  products.querySelectorAll('.product[data-name]').forEach(card=>{
+  products.querySelectorAll('.product[data-name]:not([hidden])').forEach(card=>{
     const name=String(card.dataset.name||'');
     const variableStep=variablePurchaseStepFor(name);
     const quantity=Math.max(0,Number(card.dataset.quantity)||0);

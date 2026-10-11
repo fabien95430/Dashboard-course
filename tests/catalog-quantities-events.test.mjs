@@ -19,7 +19,11 @@ test('les propriétaires publient les changements après leurs rendus',()=>{
   const dishes=read('dishes-ui.js');
   assert.match(app,/function notifyProductsUpdated\(\)[\s\S]*?new CustomEvent\('courses:products-updated'\)/);
   assert.match(app,/function notifyListRendered\(\)[\s\S]*?new CustomEvent\('courses:list-rendered'\)/);
-  assert.match(app,/function renderProducts\(\)[\s\S]*?el\.replaceChildren\(fragment\);\s*notifyProductsUpdated\(\)/);
+  const productRender=app.slice(app.indexOf('function renderProducts(){'),app.indexOf('function setProductQuantity(',app.indexOf('function renderProducts(){')));
+  assert.match(productRender,/ensureProductGrid\(el,quantities\);/);
+  assert.match(productRender,/syncProductGrid\(products,quantities\);/);
+  assert.match(productRender,/notifyProductsUpdated\(\);/);
+  assert.doesNotMatch(productRender,/replaceChildren\(/);
   assert.match(app,/function renderList\(\)[\s\S]*?bindListReorder\(el\);\s*notifyListRendered\(\)/);
   assert.match(dishes,/function renderDishSheetIngredients\(\)[\s\S]*?new CustomEvent\('courses:dish-ingredients-rendered',\{detail:\{dish:currentDish\.name\}\}\)/);
 });
