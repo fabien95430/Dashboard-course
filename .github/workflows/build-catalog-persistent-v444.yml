@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - automation/catalog-persistent-v444-build
+    paths:
+      - .github/workflows/build-catalog-persistent-v444.yml
 
 permissions:
   contents: write
 
 jobs:
   build:
-    if: github.event.head_commit.message != 'v444 candidate build'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,26 +25,24 @@ jobs:
 
           def read(path):
               return Path(path).read_text(encoding='utf-8')
-          def write(path, text):
-              Path(path).write_text(text, encoding='utf-8')
-          def replace_once(text, old, new, label):
+          def write(path,text):
+              Path(path).write_text(text,encoding='utf-8')
+          def one(text,old,new,label):
               count=text.count(old)
               if count != 1:
-                  raise SystemExit(f'{label}: expected exactly one match, got {count}')
+                  raise SystemExit(f'{label}: expected one match, got {count}')
               return text.replace(old,new,1)
-          def replace_exact(text, old, new, label, expected=1):
-              count=text.count(old)
-              if count != expected:
-                  raise SystemExit(f'{label}: expected {expected} matches, got {count}')
+          def exact(text,old,new,label,count):
+              found=text.count(old)
+              if found != count:
+                  raise SystemExit(f'{label}: expected {count} matches, got {found}')
               return text.replace(old,new)
 
-          # app.js — mount every product card once, then only update visibility/order.
-          path='app.js'
-          text=read(path)
-          text=replace_once(text,
+          path='app.js'; text=read(path)
+          text=one(text,
               "const productCardCache=new Map();\nfunction updateProductCardQuantity(card,name,quantity){",
               "const productCardCache=new Map();\nlet productGridReady=false;\nlet productEmptyState=null;\nfunction updateProductCardQuantity(card,name,quantity){",
-              'app product grid state')
+              'app grid state')
           old="""function renderProducts(){
             const el=$('#products');
             if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
@@ -87,14 +86,12 @@ jobs:
           function syncProductGrid(products,quantities){
             const ranks=new Map(products.map((product,index)=>[norm(product.name),index]));
             productCardCache.forEach((card,key)=>{
-              const rank=ranks.get(key);
-              const visible=rank!==undefined;
+              const rank=ranks.get(key),visible=rank!==undefined;
               card.hidden=!visible;
               card.style.order=visible?String(rank):'';
-              if(visible){
-                const name=card.dataset.name||'';
-                updateProductCardQuantity(card,name,catalogQuantityForDisplay(name,quantities.get(key)||0));
-              }
+              if(!visible)return;
+              const name=card.dataset.name||'';
+              updateProductCardQuantity(card,name,catalogQuantityForDisplay(name,quantities.get(key)||0));
             });
             if(productEmptyState){
               productEmptyState.hidden=products.length!==0;
@@ -112,61 +109,63 @@ jobs:
             notifyProductsUpdated();
           }
 """
-          text=replace_once(text,old,new,'app renderProducts')
+          text=one(text,old,new,'app renderProducts')
           write(path,text)
 
-          # dishes-ui.js — no synthetic input when already empty; keep Products grid mounted.
-          path='dishes-ui.js'
-          text=read(path)
-          text=replace_once(text,"if(!initial){\n    drivingCatalog=true;","if(!initial&&searchInput.value){\n    drivingCatalog=true;",'dishes fake input')
-          text=replace_once(text,
+          path='dishes-ui.js'; text=read(path)
+          text=one(text,"if(!initial){\n    drivingCatalog=true;","if(!initial&&searchInput.value){\n    drivingCatalog=true;",'dishes fake input')
+          text=one(text,
               "  productsGrid.hidden=dishes;",
               "  productsGrid.classList.toggle('is-catalog-mode-hidden',dishes);\n  productsGrid.setAttribute('aria-hidden',String(dishes));\n  productsGrid.inert=dishes;",
-              'dishes persistent product grid')
+              'dishes product grid visibility')
           write(path,text)
 
-          # product-item-images.js — hidden cards are never considered viewport-visible.
-          path='product-item-images.js'
-          text=read(path)
-          text=replace_once(text,
+          path='product-item-images.js'; text=read(path)
+          text=one(text,
               "function productCardVisible(card){\n  const rect=card?.getBoundingClientRect?.();",
               "function productCardVisible(card){\n  if(!card||card.hidden||products?.classList.contains('is-catalog-mode-hidden'))return false;\n  const rect=card.getBoundingClientRect?.();",
-              'product image visibility guard')
-          text=replace_once(text,
+              'image visibility guard')
+          text=one(text,
               "  productImagesIdle=false;\n  products?.querySelectorAll('.product[data-name]').forEach(card=>decorateCard(card,false));\n  scheduleProductImagesIdleCheck();",
               "  productImagesIdle=false;\n  if(!products?.classList.contains('is-catalog-mode-hidden')){\n    products?.querySelectorAll('.product[data-name]:not([hidden])').forEach(card=>decorateCard(card,false));\n  }\n  scheduleProductImagesIdleCheck();",
-              'visible product image decoration')
+              'image decoration visible cards')
           write(path,text)
 
-          # catalog-quantities.js — decorate only cards that are currently displayed.
-          path='catalog-quantities.js'
-          text=read(path)
-          text=replace_once(text,
+          path='catalog-quantities.js'; text=read(path)
+          text=one(text,
               "  products.querySelectorAll('.product[data-name]').forEach(card=>{",
               "  products.querySelectorAll('.product[data-name]:not([hidden])').forEach(card=>{",
-              'visible quantity decoration')
+              'quantities visible cards')
           write(path,text)
 
-          # First-paint CSS — Products and Dishes share the same grid cell; hidden Products keep layout state.
-          path='product-item-first-paint.css'
-          text=read(path)
-          text=replace_once(text,
+          path='product-item-first-paint.css'; text=read(path)
+          text=one(text,
               "html .catalog-view>#products,\nhtml .catalog-view>.dishes-grid{order:4!important}",
               "html .catalog-view>#products,\nhtml .catalog-view>.dishes-grid{\n  order:4!important;\n  grid-row:5!important;\n  grid-column:1!important;\n  min-height:0!important;\n}\nhtml .catalog-view>#products.is-catalog-mode-hidden{\n  content-visibility:hidden!important;\n  visibility:hidden!important;\n  pointer-events:none!important;\n}",
-              'catalog persistent grid css')
-          text=replace_once(text,
+              'persistent grid css')
+          text=one(text,
               "  html .catalog-view .page-version{\n    transform:translateY(14px)!important;\n  }\n",
               "",
-              'catalog version badge alignment')
+              'catalog badge alignment')
           write(path,text)
 
-          # Regression tests: events still publish after the persistent-grid sync, and no rebuild occurs after first mount.
-          path='tests/catalog-quantities-events.test.mjs'
-          text=read(path)
-          text=replace_once(text,
+          path='tests/catalog-quantities-events.test.mjs'; text=read(path)
+          text=one(text,
               "  assert.match(app,/function renderProducts\\(\\)[\\s\\S]*?el\\.replaceChildren\\(fragment\\);\\s*notifyProductsUpdated\\(\\)/);",
               "  const productRender=app.slice(app.indexOf('function renderProducts(){'),app.indexOf('function setProductQuantity(',app.indexOf('function renderProducts(){')));\n  assert.match(productRender,/ensureProductGrid\\(el,quantities\\);/);\n  assert.match(productRender,/syncProductGrid\\(products,quantities\\);/);\n  assert.match(productRender,/notifyProductsUpdated\\(\\);/);\n  assert.doesNotMatch(productRender,/replaceChildren\\(/);",
-              'catalog quantities render event test')
+              'quantities render test')
+          write(path,text)
+
+          path='tests/catalog-first-paint-shell.test.mjs'; text=read(path)
+          text=one(text,
+              "  assert.match(firstPaint,/catalog-view \\.page-version\\{[\\s\\S]*?translateY\\(14px\\)/);",
+              "  assert.doesNotMatch(firstPaint,/catalog-view \\.page-version\\{[\\s\\S]*?translateY\\(/);",
+              'badge first paint test')
+          text=one(text,"<script src=\"./app.js?v=428\"></script>","<script src=\"./app.js?v=429\"></script>",'first paint app revision test')
+          write(path,text)
+
+          path='tests/app-responsibility-extraction.test.mjs'; text=read(path)
+          text=one(text,"./app.js?v=428","./app.js?v=429",'navigation app revision test')
           write(path,text)
 
           persistent_test="""import test from 'node:test';
@@ -175,82 +174,74 @@ jobs:
 
           const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
-          test('la grille Produits est montée une seule fois puis filtrée sans détacher ses cartes',()=>{
+          test('la grille Produits est montée une fois puis filtrée sans détacher ses cartes',()=>{
             const app=read('app.js');
             const ensureStart=app.indexOf('function ensureProductGrid(');
             const syncStart=app.indexOf('function syncProductGrid(',ensureStart);
             const renderStart=app.indexOf('function renderProducts(){',syncStart);
             const renderEnd=app.indexOf('function setProductQuantity(',renderStart);
             assert.ok(ensureStart>=0&&syncStart>ensureStart&&renderStart>syncStart&&renderEnd>renderStart);
-            const ensure=app.slice(ensureStart,syncStart);
-            const sync=app.slice(syncStart,renderStart);
-            const render=app.slice(renderStart,renderEnd);
-            assert.match(ensure,/el\.replaceChildren\(fragment\)/);
-            assert.match(sync,/card\.hidden=!visible/);
-            assert.match(sync,/card\.style\.order=visible\?String\(rank\):''/);
-            assert.match(render,/ensureProductGrid\(el,quantities\)/);
-            assert.match(render,/syncProductGrid\(products,quantities\)/);
-            assert.doesNotMatch(render,/replaceChildren\(/);
+            const ensure=app.slice(ensureStart,syncStart),sync=app.slice(syncStart,renderStart),render=app.slice(renderStart,renderEnd);
+            assert.match(ensure,/el\\.replaceChildren\\(fragment\\)/);
+            assert.match(sync,/card\\.hidden=!visible/);
+            assert.match(sync,/card\\.style\\.order=visible\\?String\\(rank\\):''/);
+            assert.doesNotMatch(render,/replaceChildren\\(/);
           });
 
           test('la bascule Produits Plats conserve la grille et ne simule pas une saisie vide',()=>{
             const dishes=read('dishes-ui.js');
-            const start=dishes.indexOf('function setMode(next,initial=false){');
-            const end=dishes.indexOf('function syncModeLens(',start);
-            const block=dishes.slice(start,end);
-            assert.match(block,/if\(!initial&&searchInput\.value\)/);
-            assert.match(block,/productsGrid\.classList\.toggle\('is-catalog-mode-hidden',dishes\)/);
-            assert.match(block,/productsGrid\.inert=dishes/);
-            assert.doesNotMatch(block,/productsGrid\.hidden=dishes/);
+            const start=dishes.indexOf('function setMode(next,initial=false){'),end=dishes.indexOf('function syncModeLens(',start),block=dishes.slice(start,end);
+            assert.match(block,/if\\(!initial&&searchInput\\.value\\)/);
+            assert.match(block,/productsGrid\\.classList\\.toggle\\('is-catalog-mode-hidden',dishes\\)/);
+            assert.match(block,/productsGrid\\.inert=dishes/);
+            assert.doesNotMatch(block,/productsGrid\\.hidden=dishes/);
           });
 
-          test('les modules images et quantités ignorent les cartes Produits masquées',()=>{
-            const images=read('product-item-images.js');
-            const quantities=read('catalog-quantities.js');
-            assert.match(images,/card\.hidden\|\|products\?\.classList\.contains\('is-catalog-mode-hidden'\)/);
-            assert.match(images,/\.product\[data-name\]:not\(\[hidden\]\)/);
-            assert.match(quantities,/\.product\[data-name\]:not\(\[hidden\]\)/);
+          test('images et quantités ignorent les cartes Produits masquées',()=>{
+            const images=read('product-item-images.js'),quantities=read('catalog-quantities.js');
+            assert.match(images,/card\\.hidden\\|\\|products\\?\\.classList\\.contains\\('is-catalog-mode-hidden'\\)/);
+            assert.match(images,/\\.product\\[data-name\\]:not\\(\\[hidden\\]\\)/);
+            assert.match(quantities,/\\.product\\[data-name\\]:not\\(\\[hidden\\]\\)/);
           });
 
-          test('la variante sûre masque la grille sans activer content-visibility auto sur les cartes',()=>{
+          test('la variante sûre garde content-visibility auto hors des cartes',()=>{
             const css=read('product-item-first-paint.css');
-            assert.match(css,/#products\.is-catalog-mode-hidden\{[\s\S]*content-visibility:hidden!important/);
-            assert.doesNotMatch(css,/\.product[^\{]*\{[^\}]*content-visibility\s*:\s*auto/i);
-            assert.doesNotMatch(css,/\.catalog-view \.page-version\{[\s\S]*?transform:/);
+            assert.match(css,/#products\\.is-catalog-mode-hidden\\{[\\s\\S]*content-visibility:hidden!important/);
+            assert.doesNotMatch(css,/\\.product[^\\{]*\\{[^\\}]*content-visibility\\s*:\\s*auto/i);
+            assert.doesNotMatch(css,/\\.catalog-view \\.page-version\\{[\\s\\S]*?transform:/);
           });
           """
           write('tests/catalog-persistent-grid.test.mjs',persistent_test)
 
-          # Global version and asset revisions.
           path='index.html'; text=read(path)
-          text=replace_exact(text,'<span class="page-version">v443</span>','<span class="page-version">v444</span>','visible version badges',3)
+          text=exact(text,'<span class="page-version">v443</span>','<span class="page-version">v444</span>','visible badges',3)
           for old,new,label in [
-              ('./product-item-first-paint.css?v=443','./product-item-first-paint.css?v=444','first paint ref'),
-              ('./catalog.js?v=443','./catalog.js?v=444','catalog ref'),
-              ('./app.js?v=428','./app.js?v=429','app ref')]:
-              text=replace_once(text,old,new,label)
+              ('./product-item-first-paint.css?v=443','./product-item-first-paint.css?v=444','first paint revision'),
+              ('./catalog.js?v=443','./catalog.js?v=444','catalog revision'),
+              ('./app.js?v=428','./app.js?v=429','app revision')]:
+              text=one(text,old,new,label)
           write(path,text)
 
           path='catalog.js'; text=read(path)
           for old,new,label in [
-              ("./dishes-ui.js?v=443","./dishes-ui.js?v=444",'dishes ref'),
-              ("./catalog-quantities.js?v=438","./catalog-quantities.js?v=439",'quantities ref'),
-              ("./dish-local-images.js?v=443","./dish-local-images.js?v=444",'dish images ref'),
-              ("./runtime-features.js?v=431","./runtime-features.js?v=432",'runtime ref')]:
-              text=replace_once(text,old,new,label)
+              ("./dishes-ui.js?v=443","./dishes-ui.js?v=444",'dishes revision'),
+              ("./catalog-quantities.js?v=438","./catalog-quantities.js?v=439",'quantities revision'),
+              ("./dish-local-images.js?v=443","./dish-local-images.js?v=444",'dish images revision'),
+              ("./runtime-features.js?v=431","./runtime-features.js?v=432",'runtime revision')]:
+              text=one(text,old,new,label)
           write(path,text)
 
           path='runtime-features.js'; text=read(path)
-          text=replace_once(text,"./product-item-images.js?v=442","./product-item-images.js?v=443",'product images ref')
+          text=one(text,"./product-item-images.js?v=442","./product-item-images.js?v=443",'product images revision')
           write(path,text)
 
           path='dish-local-images.js'; text=read(path)
-          text=replace_once(text,"const APP_VERSION='v443';","const APP_VERSION='v444';",'dish image app version')
+          text=one(text,"const APP_VERSION='v443';","const APP_VERSION='v444';",'app version')
           write(path,text)
 
           path='sw.js'; text=read(path)
-          replacements=[
-              ("const CACHE='courses-app-v443-r1';","const CACHE='courses-app-v444-r1';",'sw cache'),
+          for old,new,label in [
+              ("const CACHE='courses-app-v443-r1';","const CACHE='courses-app-v444-r1';",'cache version'),
               ('./product-item-first-paint.css?v=443','./product-item-first-paint.css?v=444','sw first paint'),
               ('./catalog.js?v=443','./catalog.js?v=444','sw catalog'),
               ('./app.js?v=428','./app.js?v=429','sw app'),
@@ -258,9 +249,8 @@ jobs:
               ('./catalog-quantities.js?v=438','./catalog-quantities.js?v=439','sw quantities'),
               ('./dish-local-images.js?v=443','./dish-local-images.js?v=444','sw dish images'),
               ('./runtime-features.js?v=431','./runtime-features.js?v=432','sw runtime'),
-              ('./product-item-images.js?v=442','./product-item-images.js?v=443','sw product images')]
-          for old,new,label in replacements:
-              text=replace_once(text,old,new,label)
+              ('./product-item-images.js?v=442','./product-item-images.js?v=443','sw product images')]:
+              text=one(text,old,new,label)
           write(path,text)
           PY
       - name: Validate repository
@@ -270,6 +260,6 @@ jobs:
         run: |
           git config user.name "Fabien"
           git config user.email "canape-silence-8o@icloud.com"
-          git add app.js dishes-ui.js product-item-images.js catalog-quantities.js product-item-first-paint.css tests/catalog-quantities-events.test.mjs tests/catalog-persistent-grid.test.mjs index.html catalog.js runtime-features.js dish-local-images.js sw.js
+          git add app.js dishes-ui.js product-item-images.js catalog-quantities.js product-item-first-paint.css tests/catalog-quantities-events.test.mjs tests/catalog-first-paint-shell.test.mjs tests/app-responsibility-extraction.test.mjs tests/catalog-persistent-grid.test.mjs index.html catalog.js runtime-features.js dish-local-images.js sw.js
           git commit -m "v444 candidate build"
           git push origin HEAD:automation/catalog-persistent-v444-build
