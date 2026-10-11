@@ -1825,7 +1825,7 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   line-height:1.2;
   font-weight:760;
   letter-spacing:.1px;
-  vertical-align:1px;
+  vertical-align:bottom;
   white-space:nowrap;
 }
 
@@ -1864,7 +1864,7 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   .page-version{
     height:14px;
     line-height:12px;
-    vertical-align:baseline;
+    vertical-align:bottom;
   }
 }
 
