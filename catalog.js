@@ -17,22 +17,39 @@
   let dishFeaturesStarted=false;
   let catalogExtrasStarted=false;
   let productImagesIdle=false;
+  let dishStylesReadyPromise=null;
 
+  const ensureStylesheet=(selector,href,datasetKey)=>{
+    let style=document.querySelector(selector);
+    if(style?.sheet)return Promise.resolve();
+    return new Promise((resolve,reject)=>{
+      const onLoad=()=>resolve();
+      const onError=()=>reject(new Error('Impossible de charger '+href));
+      if(!style){
+        style=document.createElement('link');
+        style.rel='stylesheet';
+        style.href=href;
+        style.dataset[datasetKey]='style';
+        style.addEventListener('load',onLoad,{once:true});
+        style.addEventListener('error',onError,{once:true});
+        document.head.appendChild(style);
+        return;
+      }
+      style.addEventListener('load',onLoad,{once:true});
+      style.addEventListener('error',onError,{once:true});
+      if(style.sheet)resolve();
+    });
+  };
   const loadDishStyles=()=>{
-    if(!document.querySelector('link[data-catalog-dishes]')){
-      const style=document.createElement('link');
-      style.rel='stylesheet';
-      style.href='./dishes.css?v=3';
-      style.dataset.catalogDishes='style';
-      document.head.appendChild(style);
-    }
-    if(!document.querySelector('link[data-catalog-liquid]')){
-      const liquidStyle=document.createElement('link');
-      liquidStyle.rel='stylesheet';
-      liquidStyle.href='./catalog-liquid.css?v=4';
-      liquidStyle.dataset.catalogLiquid='style';
-      document.head.appendChild(liquidStyle);
-    }
+    if(dishStylesReadyPromise)return dishStylesReadyPromise;
+    dishStylesReadyPromise=Promise.all([
+      ensureStylesheet('link[data-catalog-dishes]','./dishes.css?v=4','catalogDishes'),
+      ensureStylesheet('link[data-catalog-liquid]','./catalog-liquid.css?v=5','catalogLiquid')
+    ]).catch(error=>{
+      dishStylesReadyPromise=null;
+      throw error;
+    });
+    return dishStylesReadyPromise;
   };
   const loadRepurchaseSoon=()=>{
     if(document.querySelector('script[data-repurchase-soon]'))return;
@@ -66,7 +83,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=432';
+    images.src='./dish-local-images.js?v=433';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -83,13 +100,15 @@
   };
   const loadDishes=()=>{
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
-    loadDishStyles();
-    const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=429';
-    script.async=false;
-    script.dataset.catalogDishes='script';
-    script.addEventListener('load',loadLiquid,{once:true});
-    document.body.appendChild(script);
+    loadDishStyles().then(()=>{
+      if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
+      const script=document.createElement('script');
+      script.src='./dishes-ui.js?v=429';
+      script.async=false;
+      script.dataset.catalogDishes='script';
+      script.addEventListener('load',loadLiquid,{once:true});
+      document.body.appendChild(script);
+    }).catch(error=>console.error('Chargement des styles Plats impossible',error));
   };
   const loadQuantities=()=>{
     if(window.COURSES_QUANTITIES){loadDishes();return}
