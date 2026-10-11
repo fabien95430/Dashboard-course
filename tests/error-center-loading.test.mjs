@@ -24,7 +24,7 @@ test('le centre d erreurs reste chargé sans restaurer le shell de démarrage',(
   assert.doesNotMatch(index,/startup\/app\.js/);
   assert.match(catalog,new RegExp('dish-local-images\\.js\\?v='+number));
   assert.match(sw,new RegExp("courses-app-"+version+"-r\\d+"));
-  assert.match(sw,/product-item-first-paint\.css\?v=1/);
+  assert.match(sw,/product-item-first-paint\.css\?v=2/);
   assert.ok(sw.includes('./'+catalogRef));
   assert.ok(sw.includes('./dish-local-images.js?v='+number));
   assert.ok(sw.includes('./'+errorCenterRef));
