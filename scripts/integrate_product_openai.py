@@ -263,7 +263,7 @@ def current_version() -> int:
     return int(match.group(1))
 
 
-def update_display_mode(name: str, display_mode: str) -> None:
+def update_display_mode(name: str, display_mode: str) -> bool:
     path=ROOT / "catalog-quantities.js"
     text=path.read_text(encoding="utf-8")
     match=re.search(r"(const DISPLAY_MODE_BY_PRODUCT=Object\.freeze\(\{)(.*?)(\n\}\);)",text,flags=re.S)
@@ -272,11 +272,12 @@ def update_display_mode(name: str, display_mode: str) -> None:
     body=match.group(2)
     quoted=json.dumps(name,ensure_ascii=False)
     if re.search(rf"(?:^|[,\n]\s*){re.escape(quoted)}\s*:",body):
-        return
+        return False
     entry=f"  {quoted}:{json.dumps(display_mode,ensure_ascii=False)}"
     suffix="," if body.rstrip() and not body.rstrip().endswith(",") else ""
     replacement=match.group(1)+body.rstrip()+suffix+"\n"+entry+match.group(3)
     path.write_text(text[:match.start()]+replacement+text[match.end():],encoding="utf-8")
+    return True
 
 
 def ensure_shell_assets(text: str, assets: list[str]) -> str:
@@ -291,6 +292,7 @@ def integrate_files(name: str, category: str, subgroup: str, display_mode: str, 
     sw_text=sw_path.read_text(encoding="utf-8")
     index_text=index_path.read_text(encoding="utf-8")
     new_version=current_version()+1
+    quantities_changed=False
 
     if not already_in_catalog:
         if create_subgroup:
@@ -301,14 +303,19 @@ def integrate_files(name: str, category: str, subgroup: str, display_mode: str, 
             base.fail("Sous-catégorie produit introuvable")
         groups[category][subgroup].append(name)
         groups[category][subgroup].sort(key=base.normalize)
-        update_display_mode(name,display_mode)
+        quantities_changed=update_display_mode(name,display_mode)
         encoded_groups=json.dumps(groups,ensure_ascii=False,separators=(",",":"))
         catalog_text=catalog_text[:groups_match.start(1)]+encoded_groups+catalog_text[groups_match.end(1):]
 
-    catalog_text=re.sub(r"(catalog-quantities\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
+    if quantities_changed:
+        catalog_text=re.sub(r"(catalog-quantities\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
     catalog_text=re.sub(r"(dish-local-images\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
-    catalog_text=re.sub(r"(app-ui\.js\?v=)\d+",rf"\g<1>{new_version}",catalog_text,count=1)
     (ROOT / "catalog.js").write_text(catalog_text,encoding="utf-8")
+
+    catalog_quantities_match=re.search(r"['\"](\./catalog-quantities\.js\?v=\d+)['\"]",catalog_text)
+    if not catalog_quantities_match:
+        base.fail("Révision active de catalog-quantities.js introuvable dans catalog.js")
+    catalog_quantities_asset=catalog_quantities_match.group(1)
 
     local_text,count=re.subn(r"const APP_VERSION='v\d+'",f"const APP_VERSION='v{new_version}'",local_text,count=1)
     if count!=1:
@@ -318,9 +325,8 @@ def integrate_files(name: str, category: str, subgroup: str, display_mode: str, 
         base.fail("Version de cache introuvable dans sw.js")
     sw_text=ensure_shell_assets(sw_text,[
         f"./catalog.js?v={new_version}",
-        f"./catalog-quantities.js?v={new_version}",
+        catalog_quantities_asset,
         f"./dish-local-images.js?v={new_version}",
-        f"./app-ui.js?v={new_version}",
     ])
     index_text,count=re.subn(r'(<span class="page-version">)v\d+(</span>)',rf'\g<1>v{new_version}\g<2>',index_text)
     if count!=3:

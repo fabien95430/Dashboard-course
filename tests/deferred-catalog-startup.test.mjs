@@ -4,7 +4,15 @@ import fs from 'node:fs';
 
 const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const source=read('catalog.js');
+const index=read('index.html');
+const runtime=read('runtime-features.js');
 const sw=read('sw.js');
+const assetRef=(text,path)=>{
+  const marker='./'+path+'?v=';
+  const start=text.indexOf(marker);
+  if(start<0)return '';
+  return text.slice(start).match(/^\.\/[^"'\s]+/)?.[0]||'';
+};
 
 test('le démarrage critique reste centré sur Ma liste',()=>{
   const bootstrapStart=source.indexOf('const bootstrap=()=>{');
@@ -48,11 +56,29 @@ test('les fonctions secondaires attendent l entrée dans Catalogue',()=>{
   assert.equal(source.includes('setInterval('),false);
 });
 
-test('le précache hors ligne conserve les fonctions différées sans les exécuter au démarrage',()=>{
+test('le précache hors ligne conserve les URL réellement chargées pour les fonctions différées',()=>{
   const shell=sw.match(/const SHELL=(\[[^\n]+\]);/)?.[1]||'';
   assert.ok(shell);
-  for(const deferred of ['dishes-ui.js?v=429','catalog-quantities.js?v=426','catalog-liquid.js?v=297','dish-local-images.js?v=430','dish-added-marker.js?v=408','repurchase-soon.js?v=410','catalog-product-admin.js?v=410'])assert.ok(shell.includes(deferred),deferred+' absent du précache hors ligne');
-  for(const startup of ['catalog.js?v=430','app.js?v=428','settings-ui.js?v=428','runtime-features.js?v=430','product-item-images.js?v=429'])assert.ok(shell.includes(startup),startup+' absent du shell');
+  const deferred=[
+    assetRef(source,'dishes-ui.js'),
+    assetRef(source,'catalog-quantities.js'),
+    assetRef(source,'catalog-liquid.js'),
+    assetRef(source,'dish-local-images.js'),
+    assetRef(source,'dish-added-marker.js'),
+    assetRef(source,'repurchase-soon.js'),
+    assetRef(source,'catalog-product-admin.js'),
+  ];
+  const startup=[
+    assetRef(index,'catalog.js'),
+    assetRef(index,'app.js'),
+    assetRef(index,'settings-ui.js'),
+    assetRef(source,'runtime-features.js'),
+    assetRef(runtime,'product-item-images.js'),
+  ];
+  for(const ref of [...deferred,...startup]){
+    assert.ok(ref,'URL active introuvable');
+    assert.ok(shell.includes(ref),ref+' absent du précache hors ligne');
+  }
 });
 
 test('le runtime de Ma liste reste prioritaire avant la préparation du Catalogue',()=>{

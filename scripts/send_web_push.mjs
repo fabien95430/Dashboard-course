@@ -38,6 +38,7 @@ if(!publicKey||!privateKey){
 const success=status==='added';
 const publicStatus=success?(deleteProduct?'deleted':'added'):'error';
 const itemLabel=itemType==='product'?'produit':'plat';
+const publicationBlocked=!success&&!deleteProduct&&stage==='deployment';
 const fallbackError=stage==='deployment'
   ?'La publication ou le déploiement GitHub Pages n’a pas pu être confirmé.'
   :deleteProduct
@@ -55,14 +56,16 @@ if(!success){
 }
 
 const payload={
-  title:success?(deleteProduct?'Suppression terminée':'Ajout terminé'):'Courses',
+  title:success?(deleteProduct?'Suppression terminée':'Ajout terminé'):publicationBlocked?'Publication bloquée':'Courses',
   body:success
     ?deleteProduct
       ?`${itemName} a été supprimé définitivement du catalogue.`
       :`${itemName} est maintenant disponible dans le catalogue.`
-    :deleteProduct
-      ?`⚠️ La suppression du produit « ${itemName} » a échoué.`
-      :`⚠️ L’intégration du ${itemLabel} « ${itemName} » a échoué.`,
+    :publicationBlocked
+      ?`${itemName} est prêt, mais sa publication a été bloquée.`
+      :deleteProduct
+        ?`⚠️ La suppression du produit « ${itemName} » a échoué.`
+        :`⚠️ L’intégration du ${itemLabel} « ${itemName} » a échoué.`,
   tag:requestId?`courses-${deleteProduct?'product-delete':itemType}-${requestId}`:`courses-${deleteProduct?'product-delete':itemType}-integration`,
   status:publicStatus,
   itemType,

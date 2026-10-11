@@ -144,6 +144,7 @@ def main() -> None:
 
     quantities_path = ROOT / 'catalog-quantities.js'
     quantities_text = quantities_path.read_text(encoding='utf-8')
+    original_quantities_text = quantities_text
     quantities_text = remove_object_entry(quantities_text, 'PURCHASE_REFERENCES', name, r"\{[^{}]*\}")
     quantities_text = remove_object_entry(
         quantities_text,
@@ -157,6 +158,7 @@ def main() -> None:
         name,
         r"'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"",
     )
+    quantities_changed = quantities_text != original_quantities_text
 
     app_path = ROOT / 'app.js'
     app_text = app_path.read_text(encoding='utf-8')
@@ -179,24 +181,23 @@ def main() -> None:
     index_text = index_path.read_text(encoding='utf-8')
     new_version = current_version() + 1
 
-    catalog_text = re.sub(
-        r"(catalog-quantities\.js\?v=)\d+",
-        rf"\g<1>{new_version}",
-        catalog_text,
-        count=1,
-    )
+    if quantities_changed:
+        catalog_text = re.sub(
+            r"(catalog-quantities\.js\?v=)\d+",
+            rf"\g<1>{new_version}",
+            catalog_text,
+            count=1,
+        )
     catalog_text = re.sub(
         r"(dish-local-images\.js\?v=)\d+",
         rf"\g<1>{new_version}",
         catalog_text,
         count=1,
     )
-    catalog_text = re.sub(
-        r"(app-ui\.js\?v=)\d+",
-        rf"\g<1>{new_version}",
-        catalog_text,
-        count=1,
-    )
+    catalog_quantities_match = re.search(r"['\"](\./catalog-quantities\.js\?v=\d+)['\"]", catalog_text)
+    if not catalog_quantities_match:
+        fail('Révision active de catalog-quantities.js introuvable dans catalog.js')
+    catalog_quantities_asset = catalog_quantities_match.group(1)
     local_text, count = re.subn(
         r"const APP_VERSION='v\d+'",
         f"const APP_VERSION='v{new_version}'",
@@ -215,9 +216,8 @@ def main() -> None:
         fail('Version de cache introuvable dans sw.js')
     sw_text = ensure_shell_assets(sw_text, [
         f'./catalog.js?v={new_version}',
-        f'./catalog-quantities.js?v={new_version}',
+        catalog_quantities_asset,
         f'./dish-local-images.js?v={new_version}',
-        f'./app-ui.js?v={new_version}',
     ])
 
     index_text, count = re.subn(
