@@ -26,8 +26,8 @@ test('le Catalogue possède sa structure finale dès le HTML initial',()=>{
 });
 
 test('les libellés et actions de Ma liste et du Catalogue sont définitifs dès la première frame',()=>{
-  assert.match(index,/<h1>Ma liste <span class="page-version">v\d+<\/span><\/h1>\s*<p>Votre liste de courses<\/p>/);
-  assert.match(index,/<h1>Catalogue <span class="page-version">v\d+<\/span><\/h1>\s*<p>Ajouter vos produits<\/p>/);
+  assert.match(index,/<div class="page-title-row">\s*<h1>Ma liste<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>\s*<p>Votre liste de courses<\/p>/);
+  assert.match(index,/<div class="page-title-row">\s*<h1>Catalogue<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>\s*<p>Ajouter vos produits<\/p>/);
   const listHeader=index.slice(index.indexOf('<section id="listView"'),index.indexOf('</header>',index.indexOf('<section id="listView"')));
   assert.ok(listHeader.indexOf('id="listFilterBtn"')<listHeader.indexOf('id="refreshBtn"'),'le filtre doit précéder le rafraîchissement sur Ma liste');
   const catalogHeader=index.slice(index.indexOf('<section id="catalogView"'),index.indexOf('</header>',index.indexOf('<section id="catalogView"')));
@@ -53,31 +53,36 @@ test('app-ui est branché avant app.js pour enrichir la vraie liste vide sans re
   assert.match(appUi,/courses:list-rendered/);
 });
 
-test('les badges de version sont déjà dans les h1 et ne sont plus déplacés par JavaScript',()=>{
+test('les badges de version sont à côté des h1 dans une ligne de titre commune',()=>{
   for(const title of ['Ma liste','Catalogue','Réglages']){
-    assert.match(index,new RegExp('<h1>'+title+' <span class="page-version">v\\d+</span></h1>'));
+    const titlePos=index.indexOf('<h1>'+title+'</h1>');
+    assert.ok(titlePos>=0,'titre '+title+' introuvable');
+    const rowStart=index.lastIndexOf('<div class="page-title-row">',titlePos);
+    const rowEnd=index.indexOf('</div>',titlePos);
+    assert.ok(rowStart>=0&&rowEnd>titlePos,'ligne de titre '+title+' introuvable');
+    const row=index.slice(rowStart,rowEnd+6);
+    const versionStart=row.indexOf('<span class="page-version">');
+    const versionEnd=row.indexOf('</span>',versionStart);
+    assert.ok(versionStart>=0&&versionEnd>versionStart,'badge '+title+' introuvable');
+    const version=row.slice(versionStart+'<span class="page-version">'.length,versionEnd);
+    assert.match(version,/^v[0-9]+$/);
   }
-  assert.doesNotMatch(appUi,/appendChild\(badge\)/);
+  assert.ok(!appUi.includes('appendChild(badge)'));
 });
 
-test('les trois badges de version partagent le même alignement bas sur iPhone',()=>{
-  const sharedTitleRules=[...styles.matchAll(/\.list-view \.page-header h1,\s*\.catalog-view \.page-header h1,\s*\.settings-view \.page-header h1\{([^}]*)\}/g)].map(match=>match[1]);
-  assert.ok(sharedTitleRules.some(rule=>
-    /display:flex!important/.test(rule)&&
-    /align-items:flex-end!important/.test(rule)&&
-    /column-gap:5px!important/.test(rule)
-  ),'les trois titres doivent partager le même conteneur flex aligné en bas');
+test('les trois badges de version partagent une géométrie unique sur iPhone',()=>{
+  const rows=[...index.matchAll(/<div class="page-title-row">\s*<h1>(Ma liste|Catalogue|Réglages)<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>/g)];
+  assert.equal(rows.length,3,'les trois vues doivent utiliser exactement la même structure titre + badge');
+  const rowRule=styles.match(/\.page-title-row\{([^}]*)\}/)?.[1]||'';
+  assert.match(rowRule,/display:flex/);
+  assert.match(rowRule,/align-items:flex-end/);
+  assert.match(rowRule,/gap:5px/);
+  assert.match(styles,/\.page-title-row\{\s*height:32px;\s*\}/,'la ligne de titre mobile doit avoir une hauteur fixe');
   const badgeRules=[...styles.matchAll(/\.page-version\{([^}]*)\}/g)].map(match=>match[1]);
-  assert.ok(badgeRules.some(rule=>
-    /display:inline-flex/.test(rule)&&
-    /align-items:center/.test(rule)&&
-    /justify-content:center/.test(rule)
-  ),'le badge doit utiliser une boîte inline-flex commune');
-  assert.ok(badgeRules.some(rule=>
-    /height:14px/.test(rule)&&
-    /min-height:14px/.test(rule)&&
-    /margin-left:0/.test(rule)&&
-    /flex:0 0 auto/.test(rule)
-  ),'le badge mobile doit garder la même géométrie sur les trois vues');
+  assert.ok(badgeRules.some(rule=>/display:flex/.test(rule)&&/align-items:center/.test(rule)&&/justify-content:center/.test(rule)),'le badge doit utiliser une boîte commune centrée');
+  assert.ok(badgeRules.some(rule=>/height:14px/.test(rule)&&/line-height:12px/.test(rule)),'le badge mobile doit garder une hauteur fixe identique');
+  assert.ok(badgeRules.every(rule=>!/vertical-align/.test(rule)),'les anciens vertical-align v447 doivent être supprimés');
+  const sharedTitleRules=[...styles.matchAll(/\.list-view \.page-header h1,\s*\.catalog-view \.page-header h1,\s*\.settings-view \.page-header h1\{([^}]*)\}/g)].map(match=>match[1]);
+  assert.ok(sharedTitleRules.every(rule=>!/display:flex!important/.test(rule)&&!/align-items:flex-end!important/.test(rule)&&!/column-gap:5px!important/.test(rule)),'les h1 ne doivent plus porter le flex v448');
   assert.doesNotMatch(styles,/\.catalog-view \.page-version\s*\{/);
 });

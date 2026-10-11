@@ -1814,11 +1814,17 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
 }
 
 /* ===== UI v61 — version visible sur chaque page ===== */
+.page-title-row{
+  display:flex;
+  align-items:flex-end;
+  gap:5px;
+}
 .page-version{
-  display:inline-flex;
+  display:flex;
   align-items:center;
   justify-content:center;
-  margin-left:5px;
+  flex:0 0 auto;
+  margin:0;
   padding:1px 5px;
   border-radius:999px;
   background:rgba(7,62,44,.08);
@@ -1827,7 +1833,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   line-height:1.2;
   font-weight:760;
   letter-spacing:.1px;
-  vertical-align:bottom;
   white-space:nowrap;
 }
 
@@ -1836,9 +1841,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   .list-view .page-header h1,
   .catalog-view .page-header h1,
   .settings-view .page-header h1{
-    display:flex!important;
-    align-items:flex-end!important;
-    column-gap:5px!important;
     font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
     font-size:32px!important;
     line-height:32px!important;
@@ -1866,13 +1868,12 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   .settings-view .page-header p{
     line-height:16px!important;
   }
+  .page-title-row{
+    height:32px;
+  }
   .page-version{
     height:14px;
-    min-height:14px;
-    margin-left:0;
     line-height:12px;
-    vertical-align:bottom;
-    flex:0 0 auto;
   }
 }
 
