@@ -15,13 +15,15 @@ jobs:
         with:
           fetch-depth: 1
       - name: Apply audited patch
-        run: python .github/v429_apply.py
+        run: |
+          python .github/v429_apply.py
+          python .github/v429_fix_tests.py
       - name: Validate repository
         run: bash scripts/validate_repo.sh
       - name: Commit validated tree
         shell: bash
         run: |
-          rm .github/v429_apply.py .github/workflows/v429-dish-image-pipeline-work.yml
+          rm .github/v429_apply.py .github/v429_fix_tests.py .github/workflows/v429-dish-image-pipeline-work.yml
           find . -type d -name __pycache__ -prune -exec rm -rf {} +
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
