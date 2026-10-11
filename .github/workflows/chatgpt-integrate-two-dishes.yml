@@ -16,44 +16,69 @@ jobs:
         with:
           fetch-depth: 20
 
-      - name: Reassemble existing generated visuals
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat \
-            .chatgpt/sushi.part000.b64 \
-            .chatgpt/sushi.part001.b64 \
-            .chatgpt/sushi.part002.b64 \
-            .chatgpt/sushi.part003.b64 \
-            .chatgpt/sushi.part004a.b64 \
-            .chatgpt/sushi.part004b.b64 \
-            .chatgpt/sushi.part004c.b64 \
-            | tr -d '\r\n' | base64 -d > /tmp/sushis.jpg
-          cat \
-            .chatgpt/saucisse.fix000a.b64 \
-            .chatgpt/saucisse.fix000b.b64 \
-            .chatgpt/saucisse.fix001a.b64 \
-            .chatgpt/saucisse.fix001b.b64 \
-            .chatgpt/saucisse.part002.b64 \
-            .chatgpt/saucisse.part003.b64 \
-            .chatgpt/saucisse.part004.b64 \
-            .chatgpt/saucisse.part005.b64 \
-            | tr -d '\r\n' | base64 -d > /tmp/saucisse-lentille.jpg
-          test -s /tmp/sushis.jpg
-          test -s /tmp/saucisse-lentille.jpg
-
-      - name: Prepare image conversion
+      - name: Prepare image recovery
         run: python -m pip install --disable-pip-version-check --quiet Pillow
 
-      - name: Validate recovered source images
+      - name: Reassemble and validate existing generated visuals
         shell: python
         run: |
+          from pathlib import Path
           from PIL import Image
+          import base64, io
+
+          root=Path('.chatgpt')
+          def text(name):
+              return ''.join((root/name).read_text(encoding='utf-8').split())
+          def decode(value):
+              return base64.b64decode(value,validate=True)
+          def valid(data):
+              try:
+                  with Image.open(io.BytesIO(data)) as image:
+                      image.verify()
+                  return True
+              except Exception:
+                  return False
+
+          sushi_names=[
+              'sushi.part000.b64','sushi.part001.b64','sushi.part002.b64','sushi.part003.b64',
+              'sushi.part004a.b64','sushi.part004b.b64','sushi.part004c.b64'
+          ]
+          sushi=decode(''.join(text(name) for name in sushi_names))
+          if not valid(sushi):
+              raise SystemExit('Visuel Sushis conservé invalide')
+          Path('/tmp/sushis.jpg').write_bytes(sushi)
+
+          first=text('saucisse.fix000a.b64')+text('saucisse.fix000b.b64')
+          second=text('saucisse.fix001a.b64')+text('saucisse.fix001b.b64')
+          tail=[text(f'saucisse.part00{i}.b64') for i in range(2,6)]
+          candidates=[]
+          builders=[
+              lambda: decode(first+second+''.join(tail)),
+              lambda: decode(first)+decode(second)+b''.join(decode(value) for value in tail),
+              lambda: b''.join(decode(text(name)) for name in [
+                  'saucisse.fix000a.b64','saucisse.fix000b.b64',
+                  'saucisse.fix001a.b64','saucisse.fix001b.b64',
+                  'saucisse.part002.b64','saucisse.part003.b64','saucisse.part004.b64','saucisse.part005.b64'
+              ]),
+          ]
+          for index,builder in enumerate(builders,1):
+              try:
+                  data=builder()
+              except Exception as exc:
+                  print(f'candidate {index}: decode impossible: {exc}')
+                  continue
+              print(f'candidate {index}: {len(data)} octets, valide={valid(data)}')
+              if valid(data):
+                  candidates.append((index,data))
+          if not candidates:
+              raise SystemExit('Aucune reconstruction valide du visuel Saucisse lentille')
+          mode,saucisse=candidates[0]
+          Path('/tmp/saucisse-lentille.jpg').write_bytes(saucisse)
+          print(f'Reconstruction Saucisse retenue: candidate {mode}')
+
           for path in ('/tmp/sushis.jpg','/tmp/saucisse-lentille.jpg'):
               with Image.open(path) as image:
-                  image.verify()
-              with Image.open(path) as image:
-                  print(path, image.format, image.size)
+                  print(path,image.format,image.size)
 
       - name: Switch to current main safely
         shell: bash
