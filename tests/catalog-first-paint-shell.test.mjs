@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 const read=path=>fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const index=read('index.html');
+const styles=read('styles.css');
 const firstPaint=read('product-item-first-paint.css');
 const dishes=read('dishes-ui.js');
 const repurchase=read('repurchase-soon.js');
@@ -57,4 +58,26 @@ test('les badges de version sont déjà dans les h1 et ne sont plus déplacés p
     assert.match(index,new RegExp('<h1>'+title+' <span class="page-version">v\\d+</span></h1>'));
   }
   assert.doesNotMatch(appUi,/appendChild\(badge\)/);
+});
+
+test('les trois badges de version partagent le même alignement bas sur iPhone',()=>{
+  const sharedTitleRules=[...styles.matchAll(/\.list-view \.page-header h1,\s*\.catalog-view \.page-header h1,\s*\.settings-view \.page-header h1\{([^}]*)\}/g)].map(match=>match[1]);
+  assert.ok(sharedTitleRules.some(rule=>
+    /display:flex!important/.test(rule)&&
+    /align-items:flex-end!important/.test(rule)&&
+    /column-gap:5px!important/.test(rule)
+  ),'les trois titres doivent partager le même conteneur flex aligné en bas');
+  const badgeRules=[...styles.matchAll(/\.page-version\{([^}]*)\}/g)].map(match=>match[1]);
+  assert.ok(badgeRules.some(rule=>
+    /display:inline-flex/.test(rule)&&
+    /align-items:center/.test(rule)&&
+    /justify-content:center/.test(rule)
+  ),'le badge doit utiliser une boîte inline-flex commune');
+  assert.ok(badgeRules.some(rule=>
+    /height:14px/.test(rule)&&
+    /min-height:14px/.test(rule)&&
+    /margin-left:0/.test(rule)&&
+    /flex:0 0 auto/.test(rule)
+  ),'le badge mobile doit garder la même géométrie sur les trois vues');
+  assert.doesNotMatch(styles,/\.catalog-view \.page-version\s*\{/);
 });

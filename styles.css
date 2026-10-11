@@ -1815,7 +1815,9 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
 
 /* ===== UI v61 — version visible sur chaque page ===== */
 .page-version{
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   margin-left:5px;
   padding:1px 5px;
   border-radius:999px;
@@ -1834,6 +1836,9 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   .list-view .page-header h1,
   .catalog-view .page-header h1,
   .settings-view .page-header h1{
+    display:flex!important;
+    align-items:flex-end!important;
+    column-gap:5px!important;
     font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif!important;
     font-size:32px!important;
     line-height:32px!important;
@@ -1863,8 +1868,11 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
   }
   .page-version{
     height:14px;
+    min-height:14px;
+    margin-left:0;
     line-height:12px;
     vertical-align:bottom;
+    flex:0 0 auto;
   }
 }
 
