@@ -27,7 +27,7 @@ test('le lancement reprend le flux direct sans écran de transition supplémenta
   assert.doesNotMatch(index,/id="startupCover"/);
   assert.doesNotMatch(index,/startup\/app\.js/);
   assert.doesNotMatch(sw,/startup\/app\.js/);
-  assert.doesNotMatch(index,/rel="preload" as="image" href="\.\/www\/empty-list-premium-v4\.webp\?v=305"/);
+  assert.match(index,/rel="preload" as="image" href="\.\/www\/empty-list-premium-v4\.webp\?v=305" fetchpriority="high"/);
 });
 
 test('la version courante reste cohérente entre le shell, le cache et les modules visuels',()=>{

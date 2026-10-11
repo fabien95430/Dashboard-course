@@ -19,6 +19,10 @@
   transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
 }
 
+/* Les actions finales du Catalogue existent dès la première frame. */
+html .catalog-view .repurchase-header-button{position:relative!important}
+html .catalog-view .repurchase-header-button svg{width:22px!important;height:22px!important}
+
 /* Le Catalogue visible utilise directement sa structure finale Produits / Plats. */
 html .catalog-view{
   grid-template-rows:112px 46px 58px 48px minmax(0,1fr)!important;
@@ -121,6 +125,9 @@ html .catalog-view>.dishes-grid{order:4!important}
   html .catalog-view{
     grid-template-rows:82px 46px 42px 38px minmax(0,1fr)!important;
     gap:8px!important;
+  }
+  html .catalog-view .page-version{
+    transform:translateY(14px)!important;
   }
   html .catalog-view>.page-search{
     height:42px!important;

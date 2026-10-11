@@ -79,9 +79,6 @@ function ensureStyles(){
   const style=document.createElement('style');
   style.id='courses-repurchase-soon-style';
   style.textContent=`
-    .repurchase-header-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
-    .repurchase-header-button{position:relative!important}
-    .repurchase-header-button svg{width:22px!important;height:22px!important}
     .repurchase-count{
       position:absolute;right:-4px;top:-5px;min-width:19px;height:19px;padding:0 4px;border:2px solid rgba(255,255,255,.98);
       border-radius:999px;display:grid;place-items:center;background:#2378f2;color:#fff;box-sizing:border-box;
@@ -149,19 +146,11 @@ function ensureStyles(){
 }
 
 function ensureButton(){
+  const button=document.getElementById('repurchaseSoonBtn');
   const refresh=document.getElementById('catalogRefreshBtn');
-  if(!refresh)return false;
-  if(document.getElementById('repurchaseSoonBtn'))return true;
-  const actions=document.createElement('div');
-  actions.className='repurchase-header-actions';
-  refresh.before(actions);
-  const button=document.createElement('button');
-  button.id='repurchaseSoonBtn';
-  button.className='icon-btn repurchase-header-button';
-  button.type='button';
-  button.setAttribute('aria-label','À racheter bientôt');
-  button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"></circle><path d="M12 7.7v4.8l3 1.8"></path></svg><i class="repurchase-count" aria-hidden="true" hidden></i>';
-  actions.append(button,refresh);
+  if(!button||!refresh)return false;
+  if(button.dataset.repurchaseBound==='1')return true;
+  button.dataset.repurchaseBound='1';
   button.addEventListener('click',openDialog);
   return true;
 }

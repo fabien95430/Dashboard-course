@@ -695,7 +695,7 @@ function setMode(next,initial=false){
   dishCount.hidden=!dishes;
   searchInput.placeholder=dishes?'Rechercher un plat…':'Rechercher un produit…';
   if(catalogSubtitle){
-    catalogSubtitle.firstChild.textContent=dishes?'Choisissez un plat et vérifiez ses ingrédients ':'Trouvez et ajoutez vos produits ';
+    catalogSubtitle.firstChild.textContent=dishes?'Choisissez un plat à cuisiner ':'Ajouter vos produits ';
   }
   modeSwitch.querySelectorAll('.catalog-mode').forEach(button=>{
     const active=button.dataset.mode===mode;

@@ -13,9 +13,10 @@
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="preload" as="image" href="./welcome-background-v40.webp" fetchpriority="high">
   <link rel="preload" as="image" href="./welcome-cart-transparent-v46.png" fetchpriority="high">
+  <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <title>Mes courses</title>
   <link rel="stylesheet" href="./styles.css?v=404">
-  <link rel="stylesheet" href="./product-item-first-paint.css?v=3">
+  <link rel="stylesheet" href="./product-item-first-paint.css?v=443">
 </head>
 <body class="is-launching">
   <svg class="svg-sprite" aria-hidden="true">
@@ -44,15 +45,15 @@
     <section id="listView" class="view list-view is-active">
       <header class="page-header">
         <div>
-          <h1>Ma liste <span class="page-version">v442</span></h1>
-          <p>Vos courses du quotidien</p>
+          <h1>Ma liste <span class="page-version">v443</span></h1>
+          <p>Votre liste de courses</p>
         </div>
         <div class="page-header-actions">
-          <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
-            <svg><use href="#i-refresh"></use></svg>
-          </button>
           <button id="listFilterBtn" class="icon-btn list-filter-btn" type="button" aria-label="Trier ou filtrer la liste" aria-expanded="false" aria-controls="listFilterMenu">
             <svg><use href="#i-filter"></use></svg>
+          </button>
+          <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
+            <svg><use href="#i-refresh"></use></svg>
           </button>
         </div>
       </header>
@@ -104,12 +105,18 @@
     <section id="catalogView" class="view catalog-view">
       <header class="page-header">
         <div>
-          <h1>Catalogue <span class="page-version">v442</span></h1>
-          <p>Trouvez et ajoutez vos produits</p>
+          <h1>Catalogue <span class="page-version">v443</span></h1>
+          <p>Ajouter vos produits</p>
         </div>
-        <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
-          <svg><use href="#i-refresh"></use></svg>
-        </button>
+        <div class="page-header-actions">
+          <button id="repurchaseSoonBtn" class="icon-btn repurchase-header-button" type="button" aria-label="À racheter bientôt">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"></circle><path d="M12 7.7v4.8l3 1.8"></path></svg>
+            <i class="repurchase-count" aria-hidden="true" hidden></i>
+          </button>
+          <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
+            <svg><use href="#i-refresh"></use></svg>
+          </button>
+        </div>
       </header>
 
       <label class="searchbox page-search">
@@ -134,7 +141,7 @@
     <section id="settingsView" class="view settings-view">
       <header class="page-header settings-header">
         <div>
-          <h1>Réglages <span class="page-version">v442</span></h1>
+          <h1>Réglages <span class="page-version">v443</span></h1>
           <p>Personnalisez votre expérience</p>
         </div>
       </header>
@@ -426,10 +433,11 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=442"></script>
+  <script src="./catalog.js?v=443"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=399"></script>
   <script src="./bottom-nav-liquid.js?v=414"></script>
+  <script src="./app-ui.js?v=442" data-app-ui="script"></script>
   <script src="./app.js?v=428"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
   <script src="./settings-ui.js?v=428"></script>
