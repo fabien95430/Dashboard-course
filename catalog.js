@@ -18,6 +18,7 @@
   let catalogExtrasStarted=false;
   let productImagesIdle=false;
   let dishStylesReadyPromise=null;
+  let dishWarmupScheduled=false;
 
   const ensureStylesheet=(selector,href,datasetKey)=>{
     let style=document.querySelector(selector);
@@ -78,12 +79,12 @@
   };
   const onDishLocalImagesReady=()=>{
     loadDishAddedMarker();
-    if(productImagesIdle)warmDishImages();
+    warmDishImages();
   };
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=441';
+    images.src='./dish-local-images.js?v=442';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -103,7 +104,7 @@
     loadDishStyles().then(()=>{
       if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
       const script=document.createElement('script');
-      script.src='./dishes-ui.js?v=429';
+      script.src='./dishes-ui.js?v=442';
       script.async=false;
       script.dataset.catalogDishes='script';
       script.addEventListener('load',loadLiquid,{once:true});
@@ -126,10 +127,19 @@
     dishFeaturesStarted=true;
     loadQuantities();
   };
+  const scheduleDishFeaturesWarmup=()=>{
+    if(dishFeaturesStarted||dishWarmupScheduled)return;
+    dishWarmupScheduled=true;
+    const run=()=>{dishWarmupScheduled=false;startDishFeatures();};
+    if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:900});
+    else setTimeout(run,0);
+  };
   const markProductCatalogReady=()=>{
     if(productCatalogReady)return;
     productCatalogReady=true;
+    window.COURSES_CATALOG_PRODUCTS_READY=true;
     document.dispatchEvent(new CustomEvent('courses:catalog-products-ready'));
+    window.COURSES_PRODUCT_IMAGES?.warm?.();
     if(dishFeaturesRequested)startDishFeatures();
   };
   const startProductCatalog=()=>{
@@ -148,7 +158,10 @@
   };
   document.addEventListener('courses:status-changed',event=>{
     const title=event.detail?.title;
-    if(title==='Synchronisé'||title==='Mode test')startProductCatalog();
+    if(title==='Synchronisé'||title==='Mode test'){
+      startProductCatalog();
+      scheduleDishFeaturesWarmup();
+    }
   });
   document.addEventListener('courses:product-images-idle',()=>{
     productImagesIdle=true;
@@ -166,7 +179,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=430';
+    script.src='./runtime-features.js?v=431';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
@@ -178,7 +191,7 @@
   const loadAppUi=()=>{
     if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
     const script=document.createElement('script');
-    script.src='./app-ui.js?v=439';
+    script.src='./app-ui.js?v=442';
     script.async=false;
     script.dataset.appUi='script';
     script.addEventListener('load',loadRuntimeFeatures,{once:true});

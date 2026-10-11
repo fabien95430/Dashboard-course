@@ -17,14 +17,16 @@ test('le centre d erreurs reste chargé sans restaurer le shell de démarrage',(
   assert.ok(version,'version applicative introuvable');
   const number=version.slice(1);
   const catalogRef=index.match(/catalog\.js\?v=\d+/)?.[0];
+  const firstPaintRef=index.match(/product-item-first-paint\.css\?v=\d+/)?.[0];
   const errorCenterRef=index.match(/error-center\.js\?v=\d+/)?.[0];
   assert.equal(catalogRef,'catalog.js?v='+number);
+  assert.ok(firstPaintRef,'style du premier rendu Catalogue introuvable');
   assert.ok(errorCenterRef,'module du centre d erreurs introuvable');
   assert.doesNotMatch(index,/error-feedback-bridge\.js/);
   assert.doesNotMatch(index,/startup\/app\.js/);
   assert.match(catalog,new RegExp('dish-local-images\\.js\\?v='+number));
   assert.match(sw,new RegExp("courses-app-"+version+"-r\\d+"));
-  assert.match(sw,/product-item-first-paint\.css\?v=1/);
+  assert.ok(sw.includes('./'+firstPaintRef));
   assert.ok(sw.includes('./'+catalogRef));
   assert.ok(sw.includes('./dish-local-images.js?v='+number));
   assert.ok(sw.includes('./'+errorCenterRef));

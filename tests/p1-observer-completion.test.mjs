@@ -36,13 +36,15 @@ test('les consommateurs P1 écoutent les événements propriétaires au lieu du 
   assert.match(admin,/document\.addEventListener\('courses:settings-management-ready',bindUi/);
 });
 
-test('Ma liste affiche le panier premium seulement sur le vrai état vide',()=>{
+test('Ma liste attend la confirmation Home Assistant avant le panier premium',()=>{
   const app=read('app.js'),appUi=read('app-ui.js');
   assert.match(app,/state\.error\?'Liste indisponible\.':'La liste est vide\.'/);
+  assert.match(appUi,/let listEmptyStateConfirmed=false;/);
+  assert.match(appUi,/if\(!listEmptyStateConfirmed\)\{/);
   assert.match(appUi,/const nativeEmpty=Boolean\(empty&&empty\.children\.length===0&&empty\.textContent\.trim\(\)==='La liste est vide\.'\)/);
   assert.match(appUi,/const shouldEnhance=Boolean\(empty&&\(nativeEmpty\|\|empty\.classList\.contains\('list-empty-state'\)\)\)/);
-  assert.doesNotMatch(appUi,/listEmptyStateConfirmed/);
-  assert.doesNotMatch(appUi,/document\.addEventListener\('courses:status-changed'/);
+  assert.match(appUi,/listEmptyStateConfirmed=title==='Synchronisé'\|\|title==='Mode test'/);
+  assert.match(appUi,/document\.addEventListener\('courses:status-changed',syncListConfirmation\)/);
 });
 
 test('Ma liste réutilise le même panier premium entre vrais rendus vides',()=>{

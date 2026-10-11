@@ -4,7 +4,7 @@ import test from 'node:test';
 
 const read=file=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
 
-test('les cartes de plats restent lazy et le warmup attend la fin du lot Produits visible',()=>{
+test('les cartes de plats restent lazy et leur warmup démarre hors du rendu critique',()=>{
   const products=read('product-item-images.js');
   const catalog=read('catalog.js');
   const dishes=read('dishes-ui.js');
@@ -13,8 +13,8 @@ test('les cartes de plats restent lazy et le warmup attend la fin du lot Produit
   assert.match(products,/new CustomEvent\('courses:product-images-idle'/);
   assert.match(products,/filter\(productCardVisible\)/);
   assert.match(products,/if\(pending\)\{productImagesIdle=false;return\}/);
-  assert.match(catalog,/document\.addEventListener\('courses:product-images-idle',\(\)=>\{/);
-  assert.match(catalog,/productImagesIdle=true;\s*warmDishImages\(\);/);
+  assert.match(catalog,/const scheduleDishFeaturesWarmup=\(\)=>\{/);
+  assert.match(catalog,/onDishLocalImagesReady=\(\)=>\{[\s\S]*loadDishAddedMarker\(\);[\s\S]*warmDishImages\(\);/);
   assert.match(dishes,/window\.COURSES_DISH_NAMES=Object\.freeze\(DISHES\.map\(dish=>dish\.name\)\)/);
   assert.match(images,/window\.COURSES_DISH_IMAGES=Object\.freeze\(\{warm:warmDishImages\}\)/);
   assert.match(images,/image\.fetchPriority='low'/);
@@ -30,5 +30,6 @@ test('le préchargement Plats reste événementiel et ne revient pas dans le dé
   const bootstrap=catalog.slice(start,end);
   assert.ok(start>=0&&end>start);
   assert.doesNotMatch(bootstrap,/warmDishImages\(\)|loadDishLocalImages\(\)|startDishFeatures\(\)/);
+  assert.match(catalog,/if\(title==='Synchronisé'\|\|title==='Mode test'\)\{[\s\S]*scheduleDishFeaturesWarmup\(\);/);
   assert.doesNotMatch(catalog,/setInterval\(|new MutationObserver/);
 });

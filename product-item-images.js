@@ -11,6 +11,10 @@ let listRefreshFrame=0;
 let eventsBound=false;
 let productIdleFrame=0;
 let productImagesIdle=false;
+let warmQueue=[];
+let warmScheduled=false;
+let warmActive=0;
+const warmedSources=new Set();
 const visualScaleCache=new Map();
 
 const slugify=value=>String(value||'')
@@ -24,6 +28,48 @@ const slugify=value=>String(value||'')
 function imageSource(name){
   return './www/Items/'+slugify(name)+'.webp';
 }
+function scheduleProductWarmup(){
+  if(warmScheduled||warmActive>=3||!warmQueue.length)return;
+  warmScheduled=true;
+  const run=()=>{
+    warmScheduled=false;
+    warmProductImagesStep();
+  };
+  if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:1200});
+  else setTimeout(run,0);
+}
+function warmProductImagesStep(){
+  while(warmActive<3&&warmQueue.length){
+    const source=warmQueue.shift();
+    if(!source||warmedSources.has(source))continue;
+    warmActive+=1;
+    const image=new Image();
+    image.alt='';
+    image.decoding='async';
+    image.fetchPriority='low';
+    const done=()=>{
+      warmActive=Math.max(0,warmActive-1);
+      warmedSources.add(source);
+      scheduleProductWarmup();
+    };
+    image.addEventListener('load',done,{once:true});
+    image.addEventListener('error',done,{once:true});
+    image.src=source;
+  }
+  scheduleProductWarmup();
+}
+function warmProductImages(){
+  const queued=new Set(warmQueue);
+  for(const name of PRODUCT_NAMES){
+    const source=imageSource(name);
+    if(warmedSources.has(source)||queued.has(source))continue;
+    warmQueue.push(source);
+    queued.add(source);
+  }
+  scheduleProductWarmup();
+  return true;
+}
+window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages});
 function ensureStyles(){
   if(document.getElementById('courses-product-item-images-style'))return;
   const style=document.createElement('style');
@@ -212,6 +258,7 @@ function bindEvents(){
   document.addEventListener('courses:products-updated',scheduleDecorateProducts);
   document.addEventListener('courses:list-rendered',scheduleDecorateList);
   document.addEventListener('courses:view-changed',event=>{if(event.detail?.view==='catalog')scheduleDecorateProducts()});
+  document.addEventListener('courses:catalog-products-ready',warmProductImages);
 }
 function bind(){
   products=document.getElementById('products');
@@ -220,6 +267,7 @@ function bind(){
   ensureStyles();
   bindEvents();
   decorateList();
+  if(window.COURSES_CATALOG_PRODUCTS_READY)warmProductImages();
   return true;
 }
 function init(){

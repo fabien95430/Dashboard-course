@@ -23,9 +23,8 @@ test('le démarrage critique reste centré sur Ma liste',()=>{
   for(const heavy of ['loadQuantities();','loadDishes();','loadLiquid();','loadDishLocalImages();','loadRepurchaseSoon();'])assert.equal(bootstrap.includes(heavy),false,heavy+' ne doit pas faire partie du démarrage critique');
 });
 
-test('le Catalogue Produits devient prêt sans charger la branche Plats',()=>{
+test('le Catalogue Produits devient prêt sans charger synchroniquement la branche Plats',()=>{
   assert.ok(source.includes("document.addEventListener('courses:status-changed',event=>{"));
-  assert.ok(source.includes("if(title==='Synchronisé'||title==='Mode test')startProductCatalog();"));
   const start=source.indexOf('const startProductCatalog=()=>{');
   const end=source.indexOf('const startCatalogView=()=>{',start);
   const block=source.slice(start,end);
@@ -37,7 +36,7 @@ test('le Catalogue Produits devient prêt sans charger la branche Plats',()=>{
   assert.ok(source.includes("new CustomEvent('courses:catalog-products-ready')"));
 });
 
-test('les fonctions secondaires attendent l entrée dans Catalogue',()=>{
+test('les fonctions Plats sont préparées en idle après synchronisation et restent disponibles à l entrée Catalogue',()=>{
   const start=source.indexOf('const startCatalogView=()=>{');
   const end=source.indexOf("document.addEventListener('courses:status-changed'",start);
   const block=source.slice(start,end);
@@ -47,11 +46,13 @@ test('les fonctions secondaires attendent l entrée dans Catalogue',()=>{
   assert.ok(source.includes('if(dishFeaturesStarted||!productCatalogReady)return;'));
   assert.ok(source.includes('dishFeaturesStarted=true;'));
   assert.ok(source.includes('loadQuantities();'));
+  assert.ok(source.includes('const scheduleDishFeaturesWarmup=()=>{'));
+  assert.match(source,/if\(title==='Synchronisé'\|\|title==='Mode test'\)\{[\s\S]*scheduleDishFeaturesWarmup\(\);/);
   assert.ok(source.includes("quantities.addEventListener('load',loadDishes,{once:true});"));
   assert.ok(source.includes("script.addEventListener('load',loadLiquid,{once:true});"));
   assert.ok(source.includes("liquid.addEventListener('load',loadDishLocalImages,{once:true});"));
   assert.ok(source.includes("images.addEventListener('load',onDishLocalImagesReady,{once:true});"));
-  assert.match(source,/const onDishLocalImagesReady=\(\)=>\{[\s\S]*loadDishAddedMarker\(\);[\s\S]*if\(productImagesIdle\)warmDishImages\(\);/);
+  assert.match(source,/const onDishLocalImagesReady=\(\)=>\{[\s\S]*loadDishAddedMarker\(\);[\s\S]*warmDishImages\(\);/);
   assert.equal(source.includes('new MutationObserver'),false);
   assert.equal(source.includes('setInterval('),false);
 });

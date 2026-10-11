@@ -8,13 +8,19 @@ const firstPaint=read('product-item-first-paint.css');
 const dishes=read('dishes-ui.js');
 const appUi=read('app-ui.js');
 
-test('le rollback Catalogue revient à un seul propriétaire de la structure Produits Plats',()=>{
+test('le Catalogue possède sa structure finale dès le HTML initial',()=>{
   assert.doesNotMatch(index,/catalog-mode-first-paint/);
-  assert.doesNotMatch(index,/class="catalog-mode-switch"/);
-  assert.doesNotMatch(firstPaint,/catalog-mode-first-paint|catalog-mode-switch|catalog-controls/);
-  assert.match(dishes,/controls=document\.createElement\('div'\);[\s\S]*controls\.className='catalog-controls'/);
-  assert.match(dishes,/modeSwitch=document\.createElement\('div'\);[\s\S]*modeSwitch\.className='catalog-mode-switch'/);
-  assert.match(dishes,/productCategories\.before\(controls\);[\s\S]*controls\.append\(modeSwitch,productCategories,dishFilters\)/);
+  assert.match(index,/class="catalog-controls"/);
+  assert.match(index,/class="catalog-mode-switch"/);
+  assert.match(index,/id="dishCount" hidden/);
+  assert.match(index,/class="dish-filters"[^>]*hidden/);
+  assert.match(index,/id="dishes" class="dishes-grid" hidden/);
+  assert.match(firstPaint,/catalog-mode-switch/);
+  assert.match(firstPaint,/catalog-controls/);
+  assert.match(dishes,/controls=catalogView\.querySelector\(':scope > \.catalog-controls'\)/);
+  assert.match(dishes,/modeSwitch=controls\.querySelector\('\.catalog-mode-switch'\)/);
+  assert.match(dishes,/dishesGrid=document\.getElementById\('dishes'\)/);
+  assert.doesNotMatch(dishes,/productCategories\.before\(controls\);\s*controls\.append\(modeSwitch,productCategories,dishFilters\);/);
 });
 
 test('les badges de version sont déjà dans les h1 et ne sont plus déplacés par JavaScript',()=>{

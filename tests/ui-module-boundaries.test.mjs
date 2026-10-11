@@ -55,7 +55,7 @@ test('P4 conserve un démarrage déterministe puis prépare Produits avant les f
   for(const [asset,label] of [[appUiAsset,'app-ui'],[runtimeAsset,'runtime-features'],[dishImagesAsset,'dish-local-images'],[repurchaseAsset,'repurchase-soon'],[quantitiesAsset,'catalog-quantities'],[dishesAsset,'dishes-ui'],[liquidAsset,'catalog-liquid'],[settingsUiAsset,'settings-ui'],[settingsBadgeAsset,'settings-tab-badge']])assert.ok(asset,'asset '+label+' introuvable');
   assert.match(catalog,/script\.addEventListener\('load',loadRuntimeFeatures,\{once:true\}\)/);
   assert.match(catalog,/document\.addEventListener\('courses:status-changed',event=>\{/);
-  assert.match(catalog,/if\(title==='Synchronisé'\|\|title==='Mode test'\)startProductCatalog\(\);/);
+  assert.match(catalog,/if\(title==='Synchronisé'\|\|title==='Mode test'\)\{[\s\S]*startProductCatalog\(\);[\s\S]*scheduleDishFeaturesWarmup\(\);[\s\S]*\}/);
   assert.match(catalog,/if\(productCatalogStarted\|\|!runtimeReady\)return;/);
   assert.match(catalog,/quantities\.addEventListener\('load',loadDishes,\{once:true\}\)/);
   assert.match(catalog,/script\.addEventListener\('load',loadLiquid,\{once:true\}\)/);
@@ -65,7 +65,7 @@ test('P4 conserve un démarrage déterministe puis prépare Produits avant les f
   assert.match(catalog,/const startCatalogView=\(\)=>\{[\s\S]*startProductCatalog\(\);[\s\S]*loadRepurchaseSoon\(\);[\s\S]*startDishFeatures\(\);/);
   assert.match(catalog,/if\(dishFeaturesStarted\|\|!productCatalogReady\)return;/);
   assert.match(catalog,/images\.addEventListener\('load',onDishLocalImagesReady,\{once:true\}\)/);
-  assert.match(catalog,/const onDishLocalImagesReady=\(\)=>\{[\s\S]*loadDishAddedMarker\(\);[\s\S]*if\(productImagesIdle\)warmDishImages\(\);/);
+  assert.match(catalog,/const onDishLocalImagesReady=\(\)=>\{[\s\S]*loadDishAddedMarker\(\);[\s\S]*warmDishImages\(\);/);
   assert.doesNotMatch(catalog,/new MutationObserver/);
   assert.doesNotMatch(catalog,/setInterval\(/);
   assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));

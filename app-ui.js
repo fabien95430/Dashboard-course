@@ -7,6 +7,7 @@ let securityViewportSession=false;
 let securityViewportRestoring=false;
 let securityViewportRestoreFrame=0;
 let retainedListEmptyState=null;
+let listEmptyStateConfirmed=false;
 
 function syncPageVersions(){
   document.querySelectorAll('.page-version').forEach(badge=>{
@@ -315,6 +316,11 @@ function syncListEmptyState(root){
   if(!root)return;
   const design='premium-v4';
   const empty=root.children.length===1&&root.firstElementChild?.classList.contains('empty')?root.firstElementChild:null;
+  if(!listEmptyStateConfirmed){
+    root.classList.remove('is-list-home-empty');
+    if(empty)empty.hidden=false;
+    return;
+  }
   if(empty?.classList.contains('list-empty-state')&&empty.dataset.emptyDesign===design){
     retainedListEmptyState=empty;
     root.classList.add('is-list-home-empty');
@@ -350,6 +356,11 @@ function syncListEmptyState(root){
   });
   retainedListEmptyState=empty;
 }
+function syncListConfirmation(event){
+  const title=String(event.detail?.title||'');
+  listEmptyStateConfirmed=title==='Synchronisé'||title==='Mode test';
+  syncListEmptyState(document.getElementById('listItems'));
+}
 
 function bind(){
   syncPageVersions();
@@ -358,6 +369,7 @@ function bind(){
 
 syncPageVersions();
 bindSecurityKeyboardViewport();
+document.addEventListener('courses:status-changed',syncListConfirmation);
 document.addEventListener('courses:list-rendered',()=>syncListEmptyState(document.getElementById('listItems')));
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
