@@ -4,9 +4,12 @@
 const REQUESTS=window.COURSES_MISSING_REQUESTS;
 if(!REQUESTS)throw new Error('Demandes manquantes indisponibles');
 const PRODUCT_IMAGE_HINT_MAX=REQUESTS.productImageHintMax;
+const PRODUCT_QUEUE_NOTIFICATION_DELAY_MS=10000;
+const PRODUCT_RUNNING_STORAGE='courses-missing-products-running-v1';
 const CHATGPT_URL='https://chatgpt.com/';
 const normalize=REQUESTS.normalize;
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const pendingProductNotifications=new Map();
 
 function catalogDishCategories(){
   const categories=[...document.querySelectorAll('.dish-filter[data-value]')]
@@ -44,18 +47,30 @@ function appNotify(title,detail=''){
 function notifyRequest(name){
   appNotify('Ajout en cours',name);
 }
-async function notifyProductQueued(id){
-  if(!('Notification' in window)||!('serviceWorker' in navigator))return false;
-  let permission=Notification.permission;
-  if(permission==='default'){
-    try{permission=await Notification.requestPermission()}catch(_){return false}
+function productNotificationTag(id,kind){
+  const safe=String(id||'request').replace(/[^a-zA-Z0-9._-]+/g,'-').slice(0,80)||'request';
+  return 'courses-product-'+safe+'-'+String(kind||'notice');
+}
+function runningProductIds(){
+  try{
+    const value=JSON.parse(localStorage.getItem(PRODUCT_RUNNING_STORAGE)||'[]');
+    return new Set(Array.isArray(value)?value.map(String):[]);
+  }catch(_){
+    return new Set();
   }
-  if(permission!=='granted')return false;
+}
+async function ensureProductNotificationPermission(){
+  if(!('Notification' in window)||!('serviceWorker' in navigator))return 'unsupported';
+  if(Notification.permission!=='default')return Notification.permission;
+  try{return await Notification.requestPermission()}catch(_){return Notification.permission}
+}
+async function showProductNotification(title,body,tag){
+  if(await ensureProductNotificationPermission()!=='granted')return false;
   try{
     const registration=await navigator.serviceWorker.ready;
-    await registration.showNotification('Produit à générer',{
-      body:'Un produit a été ajouté à la liste',
-      tag:'courses-product-to-generate-'+String(id||'request'),
+    await registration.showNotification(title,{
+      body,
+      tag,
       icon:'./apple-touch-icon.png',
       badge:'./apple-touch-icon.png',
       data:{url:'./'},
@@ -65,6 +80,58 @@ async function notifyProductQueued(id){
   }catch(_){
     return false;
   }
+}
+function notifyProductQueued(id){
+  const key=String(id||'');
+  if(!key)return false;
+  const previous=pendingProductNotifications.get(key);
+  if(previous)clearTimeout(previous);
+  void ensureProductNotificationPermission();
+  const timer=setTimeout(()=>{
+    pendingProductNotifications.delete(key);
+    const item=readProducts().find(entry=>String(entry?.id||'')===key);
+    if(!item||runningProductIds().has(key))return;
+    if(catalogProductLookup().has(normalize(item.name)))return;
+    void showProductNotification(
+      'Produit à générer',
+      '« '+String(item.name||'Produit')+' » a été ajouté aux produits manquants.',
+      productNotificationTag(key,'queued')
+    );
+  },PRODUCT_QUEUE_NOTIFICATION_DELAY_MS);
+  pendingProductNotifications.set(key,timer);
+  return true;
+}
+function notifyProductAlreadyPresent(id,name){
+  return showProductNotification(
+    'Produit déjà présent',
+    '« '+String(name||'Produit')+' » existe déjà dans le catalogue. Aucun ajout effectué.',
+    productNotificationTag(id,'already-present')
+  );
+}
+function notifyProductAlreadyPending(id,name){
+  return showProductNotification(
+    'Produit déjà en attente',
+    '« '+String(name||'Produit')+' » est déjà dans les produits manquants. Aucun doublon créé.',
+    productNotificationTag(id,'already-pending')
+  );
+}
+async function closeProductQueuedNotification(id){
+  if(!('serviceWorker' in navigator))return;
+  try{
+    const registration=await navigator.serviceWorker.ready;
+    const notifications=await registration.getNotifications({tag:productNotificationTag(id,'queued')});
+    notifications.forEach(notification=>notification.close());
+  }catch(_){}
+}
+function cancelQueuedProductNotification(id){
+  const key=String(id||'');
+  if(!key)return;
+  const timer=pendingProductNotifications.get(key);
+  if(timer){
+    clearTimeout(timer);
+    pendingProductNotifications.delete(key);
+  }
+  void closeProductQueuedNotification(key);
 }
 function notifyAdded(type,name){
   const title=type==='dish'?'Plat ajouté':'Produit ajouté';
@@ -275,6 +342,7 @@ function initMissingProductsAndDishes(){
   let productEnhanceQueued=false;
   let knownProductIds=new Set(readProducts().map(item=>item.id));
   const completedThisSession=new Set();
+  const catalogDuplicateIds=new Set();
 
   function selectedProductCategory(){
     return categoryGrid.querySelector('.missing-category-choice.is-active')?.dataset?.missingCategory||'';
@@ -362,6 +430,15 @@ function initMissingProductsAndDishes(){
       if(!String(input.value||'').trim())imageHintInput.value='';
     });
   }
+  function notifyDuplicateProductAttempt(){
+    if(mode!=='products')return false;
+    const name=String(input.value||'').trim().replace(/\s+/g,' ').slice(0,80);
+    if(!name)return false;
+    const duplicate=readProducts().find(item=>normalize(item.name)===normalize(name));
+    if(!duplicate)return false;
+    void notifyProductAlreadyPending(duplicate.id,name);
+    return true;
+  }
   function addDish(){
   const name=String(input.value||'').trim().replace(/\s+/g,' ').slice(0,80);
   if(!name){input.focus();return}
@@ -440,8 +517,10 @@ function removeDish(id){
       const row=[...productList.querySelectorAll('[data-missing-product-row]')].find(entry=>entry.dataset.missingProductRow===item.id);
       const remove=row?.querySelector('[data-remove-missing]');
       if(!remove)return;
+      cancelQueuedProductNotification(item.id);
       completedThisSession.add('product:'+item.id);
-      notifyAdded('product',item.name);
+      const duplicate=catalogDuplicateIds.delete(item.id);
+      if(!duplicate)notifyAdded('product',item.name);
       remove.click();
     });
   }
@@ -483,12 +562,19 @@ function removeDish(id){
     const products=readProducts();
     REQUESTS.pruneProductImageHints(products);
     const nextIds=new Set(products.map(item=>item.id));
+    const catalog=catalogProductLookup();
     const added=[];
     products.forEach(item=>{
       if(!knownProductIds.has(item.id)){
         added.push(item);
-        notifyRequest(item.name);
-        void notifyProductQueued(item.id);
+        if(catalog.has(normalize(item.name))){
+          catalogDuplicateIds.add(item.id);
+          appNotify('Produit déjà présent','« '+item.name+' » existe déjà dans le catalogue.');
+          void notifyProductAlreadyPresent(item.id,item.name);
+        }else{
+          notifyRequest(item.name);
+          void notifyProductQueued(item.id);
+        }
       }
     });
     knownProductIds=nextIds;
@@ -529,6 +615,7 @@ function removeDish(id){
 
   addButton.addEventListener('click',event=>{
     if(mode==='products'){
+      notifyDuplicateProductAttempt();
       saveProductImageHintDraft();
       return;
     }
@@ -539,6 +626,7 @@ function removeDish(id){
   input.addEventListener('keydown',event=>{
     if(event.key!=='Enter')return;
     if(mode==='products'){
+      notifyDuplicateProductAttempt();
       saveProductImageHintDraft();
       return;
     }
@@ -573,6 +661,10 @@ function removeDish(id){
 
   document.addEventListener('courses:missing-product-category-changed',()=>{
     if(mode==='products')queueMicrotask(renderCategorySelect);
+  });
+  document.addEventListener('courses:integration-started',event=>{
+    if(event.detail?.type!=='product')return;
+    cancelQueuedProductNotification(event.detail?.id);
   });
   window.addEventListener(REQUESTS.eventName,()=>{
     syncNewProductRequests();
