@@ -114,7 +114,6 @@ function installStyle(){
   style.id='courses-product-admin-style';
   style.textContent=`
     .courses-product-admin{display:grid;gap:11px;padding-bottom:5px}
-    .courses-product-admin-back{justify-self:start;border:0;background:transparent;color:#0b7040;font:inherit;font-size:12px;font-weight:800;padding:2px 0 5px}
     .courses-product-admin-note{padding:10px 12px;border-radius:15px;background:#f4f7f5;color:#657269;font-size:10.5px;line-height:1.4}
     .courses-product-admin-search{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid rgba(34,65,45,.11);border-radius:14px;background:#fff}
     .courses-product-admin-search svg{width:15px;height:15px;color:#78827c}.courses-product-admin-search input{min-width:0;flex:1;border:0!important;outline:0;background:transparent;font:inherit;font-size:12px;color:#24392c}.courses-product-admin-search span{font-size:9.5px;color:#8a928d;font-weight:750}
@@ -133,15 +132,6 @@ function panelElements(){
   const content=dialog?.querySelector(':scope>.preference-dialog-scroll');
   return {dialog,content,panel:document.getElementById('preferencesProductCatalogPanel'),title:content?.querySelector(':scope>h3'),intro:content?.querySelector(':scope>.dialog-intro')};
 }
-function showManagement(){
-  const {content,panel,title,intro}=panelElements();
-  const management=document.getElementById('preferencesApplicationManagement');
-  if(!content||!management)return;
-  [...content.children].forEach(node=>{if(node===title||node===intro||node===management)return;node.hidden=true});
-  if(panel)panel.hidden=true;management.hidden=false;
-  if(title)title.textContent='Gestion de l’application';
-  if(intro)intro.textContent='Documentation, historique et informations de l’application.';
-}
 function visibleProducts(){
   const query=norm(currentQuery);
   return products().filter(item=>!query||norm(item.name+' '+item.category+' '+item.subgroup).includes(query));
@@ -153,7 +143,7 @@ function confirmMarkup(item){
 function render(){
   const panel=document.getElementById('preferencesProductCatalogPanel');if(!panel)return;
   const rows=visibleProducts(),allCount=products().length;
-  panel.innerHTML='<button class="courses-product-admin-back" type="button">‹ Gestion de l’application</button>'+
+  panel.innerHTML=
     '<div class="courses-product-admin-note">Suppression définitive du catalogue et de GitHub. Si un plat utilise encore le produit, l’opération est bloquée. Un article déjà présent dans Home Assistant reste dans Ma liste.</div>'+
     '<label class="courses-product-admin-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><input type="search" value="'+esc(currentQuery)+'" placeholder="Rechercher un produit…" autocomplete="off" data-product-admin-search><span>'+allCount+'</span></label>'+
     '<div class="courses-product-admin-list">'+(rows.map(item=>{
@@ -219,7 +209,7 @@ async function reconcilePending(){
 function showCatalog(){
   const {dialog,content,panel,title,intro}=panelElements();if(!dialog||!content||!panel)return;
   [...content.children].forEach(node=>{if(node===title||node===intro||node===panel)return;node.hidden=true});
-  panel.hidden=false;if(title)title.textContent='Catalogue produit';if(intro)intro.textContent='Gérez les produits présents dans le catalogue de l’application.';
+  panel.hidden=false;if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management');else if(title)title.textContent='Catalogue produit';if(intro)intro.textContent='Gérez les produits présents dans le catalogue de l’application.';
   currentQuery='';currentConfirm='';render();if(!dialog.open)dialog.showModal();
   void reconcilePending();
 }
@@ -246,7 +236,6 @@ function bindUi(){
     }
   });
   panel.addEventListener('click',event=>{
-    if(event.target.closest('.courses-product-admin-back')){showManagement();return}
     const del=event.target.closest('[data-delete-product]');if(del){void beginDeletion(del.dataset.deleteProduct||'',del);return}
     if(event.target.closest('.courses-product-admin-cancel')){currentConfirm='';render();return}
     const finalButton=event.target.closest('[data-confirm-delete]');if(finalButton){void confirmDeletion(finalButton.dataset.confirmDelete||'',finalButton)}

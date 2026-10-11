@@ -323,7 +323,6 @@ function installStyle(){
     #preferencesErrorMessages .security-setting-icon{position:relative;overflow:visible}
     .courses-error-badge{position:absolute;top:-7px;right:-8px;min-width:19px;height:19px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#ff3b30;color:#fff;font-size:9.5px;line-height:15px;font-weight:850;display:none;place-items:center;box-sizing:border-box;box-shadow:0 2px 7px rgba(207,33,26,.22)}
     .courses-error-center{display:grid;gap:12px;padding-bottom:4px}
-    .courses-error-back{justify-self:start;border:0;background:transparent;color:#0b7040;font:inherit;font-size:12px;font-weight:800;padding:2px 0 5px}
     .courses-error-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;border:1px solid rgba(27,65,44,.10);border-radius:18px;background:rgba(248,250,248,.92)}
     .courses-error-summary strong{font-size:14px;color:#22372a}.courses-error-summary small{display:block;margin-top:2px;color:#768078;font-size:10.5px}
     .courses-error-count{min-width:34px;height:34px;padding:0 8px;border-radius:12px;background:rgba(255,59,48,.10);color:#d93025;display:grid;place-items:center;font-size:13px;font-weight:850}
@@ -362,19 +361,6 @@ function panelElements(){
   const panel=document.getElementById('preferencesErrorCenter');
   return {dialog,content,panel,title:content?.querySelector(':scope>h3'),intro:content?.querySelector(':scope>.dialog-intro')};
 }
-function showManagementView(){
-  const {content,panel,title,intro}=panelElements();
-  const management=document.getElementById('preferencesApplicationManagement');
-  if(!content||!management)return;
-  [...content.children].forEach(node=>{
-    if(node===title||node===intro||node===management)return;
-    node.hidden=true;
-  });
-  if(panel)panel.hidden=true;
-  management.hidden=false;
-  if(title)title.textContent='Gestion de l’application';
-  if(intro)intro.textContent='Documentation, historique et informations de l’application.';
-}
 function showErrorCenter(){
   const {dialog,content,panel,title,intro}=panelElements();
   if(!dialog||!content||!panel)return;
@@ -383,7 +369,7 @@ function showErrorCenter(){
     node.hidden=true;
   });
   panel.hidden=false;
-  if(title)title.textContent='Messages d’erreur';
+  if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Messages d’erreur','management');else if(title)title.textContent='Messages d’erreur';
   if(intro)intro.textContent='Anomalies actives et problèmes récemment résolus.';
   currentFilter='active';
   renderPanel();
@@ -410,7 +396,6 @@ function renderPanel(entries=readEntries()){
       '<div class="courses-error-actions">'+action+(entry.resolved?'':'<button type="button" data-error-resolve="'+escapeHtml(entry.key)+'">Marquer comme résolue</button>')+'</div></div></div></article>';
   }).join('');
   panel.innerHTML=
-    '<button class="courses-error-back" type="button">‹ Gestion de l’application</button>'+
     '<div class="courses-error-summary"><div><strong>État de l’application</strong><small>'+active.length+' anomalie'+(active.length>1?'s':'')+' active'+(active.length>1?'s':'')+'</small></div><span class="courses-error-count">'+active.length+'</span></div>'+
     '<div class="courses-error-tabs"><button type="button" data-error-filter="active" class="'+(currentFilter==='active'?'is-active':'')+'">À traiter ('+active.length+')</button><button type="button" data-error-filter="resolved" class="'+(currentFilter==='resolved'?'is-active':'')+'">Résolues ('+resolved.length+')</button></div>'+
     '<div class="courses-error-list">'+(cards||'<div class="courses-error-empty"><strong>'+(currentFilter==='active'?'Aucune erreur active':'Aucune erreur résolue')+'</strong>'+(currentFilter==='active'?'L’application ne signale actuellement aucun problème nécessitant votre attention.':'Les problèmes corrigés apparaîtront ici pendant 30 jours.')+'</div>')+'</div>'+
@@ -426,7 +411,6 @@ function bindUi(){
   let panel=document.getElementById('preferencesErrorCenter');
   if(!panel){panel=document.createElement('div');panel.id='preferencesErrorCenter';panel.className='courses-error-center';panel.hidden=true;content.appendChild(panel)}
   panel.addEventListener('click',event=>{
-    if(event.target.closest('.courses-error-back')){showManagementView();return}
     const filter=event.target.closest('[data-error-filter]')?.dataset.errorFilter;
     if(filter){currentFilter=filter==='resolved'?'resolved':'active';renderPanel();return}
     const resolveButton=event.target.closest('[data-error-resolve]');

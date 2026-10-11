@@ -238,3 +238,17 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(repurchase,/Activez l’historique des achats dans Préférences\./);
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
+
+
+test('les trois vues de gestion utilisent la flèche retour dans le titre',()=>{
+  const settings=read('settings-ui.js');
+  const errors=read('error-center.js');
+  const catalog=read('catalog-product-admin.js');
+  assert.ok(settings.includes("button.className='preference-title-back'"));
+  assert.ok(settings.includes("setTitle('Gestion de l’application','preferences')"));
+  assert.ok(settings.includes("back.dataset.preferenceBack==='preferences'"));
+  assert.ok(errors.includes("window.COURSES_SETTINGS_NAV.setTitle('Messages d’erreur','management')"));
+  assert.ok(catalog.includes("window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management')"));
+  assert.doesNotMatch(errors,/courses-error-back/);
+  assert.doesNotMatch(catalog,/courses-product-admin-back/);
+});

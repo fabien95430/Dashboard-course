@@ -272,6 +272,9 @@ function installPreferenceDialogAppearance(){
       -webkit-backdrop-filter:blur(8px)!important;
       backdrop-filter:blur(8px)!important;
     }
+    #preferencesDialog .preference-dialog-scroll>h3{display:flex;align-items:center;gap:8px}
+    .preference-title-back{width:32px;height:32px;flex:0 0 32px;margin:-2px 0 -2px -5px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(7,62,44,.06);color:#0b7040;font:inherit;font-size:31px;line-height:1;font-weight:500;-webkit-tap-highlight-color:transparent}
+    .preference-title-back:focus{outline:none}.preference-title-back:focus-visible{outline:2px solid rgba(11,112,64,.28);outline-offset:2px}
     #preferencesApplicationManagement .application-management-options:empty{display:none!important}
   `;
   document.head.appendChild(style);
@@ -336,21 +339,45 @@ function initApplicationManagement(){
   const selectionNodes=[...content.children].filter(node=>node!==title&&node!==intro&&node!==managementPanel);
   const originalHidden=new Map(selectionNodes.map(node=>[node,node.hidden]));
 
+  function setTitle(label,back=''){
+    if(!title)return;
+    title.textContent='';
+    if(back){
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='preference-title-back';
+      button.dataset.preferenceBack=back;
+      button.setAttribute('aria-label',back==='preferences'?'Retour aux préférences':'Retour à Gestion de l’application');
+      button.textContent='‹';
+      title.appendChild(button);
+    }
+    title.append(document.createTextNode(label));
+  }
+
   function showSelections(){
+    [...content.children].forEach(node=>{if(node!==title&&node!==intro)node.hidden=true});
     selectionNodes.forEach(node=>{node.hidden=Boolean(originalHidden.get(node))});
     managementPanel.hidden=true;
-    if(title)title.textContent=originalTitle;
+    setTitle(originalTitle);
     if(intro)intro.textContent=originalIntro;
   }
 
   function showManagement(){
-    selectionNodes.forEach(node=>{node.hidden=true});
+    [...content.children].forEach(node=>{if(node===title||node===intro||node===managementPanel)return;node.hidden=true});
     managementPanel.hidden=false;
-    if(title)title.textContent='Gestion de l’application';
+    setTitle('Gestion de l’application','preferences');
     if(intro)intro.textContent='Documentation, historique et informations de l’application.';
     if(!dialog.open)dialog.showModal();
     document.dispatchEvent(new CustomEvent('courses:settings-management-opened'));
   }
+
+  window.COURSES_SETTINGS_NAV=Object.freeze({setTitle});
+  content.addEventListener('click',event=>{
+    const back=event.target.closest('.preference-title-back');
+    if(!back)return;
+    if(back.dataset.preferenceBack==='preferences')showSelections();
+    else showManagement();
+  });
 
   selectionsButton.addEventListener('click',showSelections,true);
   managementButton.addEventListener('click',showManagement);
