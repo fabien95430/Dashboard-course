@@ -273,13 +273,14 @@ function bind(){
     if(!scrub||event.pointerId!==scrub.id)return;
     scrub.clientX=event.clientX;
     if(Math.abs(event.clientX-scrub.startX)>6)scrub.moved=true;
-    if(reduced()){
-      liquid.x=scrubTarget();
-      markUnder();
-      paint();
-    }else{
-      start();
-    }
+    const target=scrubTarget();
+    liquid.x=target;
+    liquid.tx=target;
+    liquid.vx=0;
+    liquid.tl=1;
+    if(reduced())liquid.lift=1;
+    markUnder();
+    paint();
   });
   const finish=(event,cancelled)=>{
     const scrub=liquid.scrub;

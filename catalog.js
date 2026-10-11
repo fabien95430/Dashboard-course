@@ -83,7 +83,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=440';
+    images.src='./dish-local-images.js?v=441';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -92,7 +92,7 @@
   const loadLiquid=()=>{
     if(document.querySelector('script[data-catalog-liquid]')){loadDishLocalImages();return}
     const liquid=document.createElement('script');
-    liquid.src='./catalog-liquid.js?v=297';
+    liquid.src='./catalog-liquid.js?v=441';
     liquid.async=false;
     liquid.dataset.catalogLiquid='script';
     liquid.addEventListener('load',loadDishLocalImages,{once:true});
