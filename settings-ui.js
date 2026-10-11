@@ -219,12 +219,38 @@ function installPreferenceDialogAppearance(){
       box-sizing:border-box;
       overflow:hidden!important;
       overscroll-behavior:contain;
+      border:1px solid rgba(255,255,255,.72)!important;
+      background:linear-gradient(165deg,rgba(255,255,255,.88),rgba(245,250,247,.78))!important;
+      color:#122018!important;
+      box-shadow:0 30px 80px rgba(24,46,32,.20),inset 0 1px 0 rgba(255,255,255,.94),inset 0 -1px 0 rgba(75,103,85,.06)!important;
+      -webkit-backdrop-filter:blur(30px) saturate(150%)!important;
+      backdrop-filter:blur(30px) saturate(150%)!important;
+    }
+    #connectionDialog,
+    #settingsDialog{
+      border:1px solid rgba(255,255,255,.72)!important;
+      background:linear-gradient(165deg,rgba(255,255,255,.88),rgba(245,250,247,.78))!important;
+      color:#122018!important;
+      box-shadow:0 30px 80px rgba(24,46,32,.20),inset 0 1px 0 rgba(255,255,255,.94),inset 0 -1px 0 rgba(75,103,85,.06)!important;
+      -webkit-backdrop-filter:blur(30px) saturate(150%)!important;
+      backdrop-filter:blur(30px) saturate(150%)!important;
     }
     #preferencesDialog[open],
     #missingProductsDialog[open],
     .recipe-customization-dialog[open]{
       display:flex!important;
       flex-direction:column!important;
+    }
+    #connectionDialog[open],
+    #settingsDialog[open],
+    #preferencesDialog[open],
+    #missingProductsDialog[open],
+    .recipe-customization-dialog[open]{
+      animation:courses-managed-dialog-in .22s cubic-bezier(.22,.82,.2,1);
+    }
+    @keyframes courses-managed-dialog-in{
+      from{opacity:0;transform:translateY(12px) scale(.985)}
+      to{opacity:1;transform:none}
     }
     .preference-dialog-scroll{
       flex:1 1 auto;
@@ -268,14 +294,127 @@ function installPreferenceDialogAppearance(){
     #preferencesDialog::backdrop,
     #missingProductsDialog::backdrop,
     .recipe-customization-dialog::backdrop{
-      background:rgba(28,38,31,.28)!important;
+      background:rgba(24,35,28,.24)!important;
       -webkit-backdrop-filter:blur(8px)!important;
       backdrop-filter:blur(8px)!important;
+    }
+    #connectionDialog::backdrop,
+    #settingsDialog::backdrop{
+      background:rgba(24,35,28,.24)!important;
+      -webkit-backdrop-filter:blur(8px)!important;
+      backdrop-filter:blur(8px)!important;
+    }
+    #preferencesDialog h3,
+    #missingProductsDialog h3,
+    #connectionDialog h3,
+    #settingsDialog h3,
+    .recipe-customization-dialog h3{
+      color:#0b3d29!important;
+      letter-spacing:-.35px;
+    }
+    #preferencesDialog .dialog-intro,
+    #missingProductsDialog .dialog-intro,
+    #settingsDialog .dialog-intro,
+    .recipe-customization-dialog .dialog-intro{
+      color:#77827b!important;
+    }
+    #preferencesDialog .field input,
+    #preferencesDialog .field select,
+    #connectionDialog .field input,
+    #connectionDialog .field select,
+    #settingsDialog .field input,
+    #settingsDialog .field select,
+    #missingProductsDialog .missing-products-add input,
+    .recipe-customization-dialog .recipe-customization-search,
+    .recipe-customization-dialog .recipe-customization-ingredient-search{
+      border-color:rgba(54,77,62,.10)!important;
+      background:rgba(255,255,255,.56)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.88),0 5px 16px rgba(38,66,48,.035)!important;
+    }
+    #preferencesDialog .preference-options,
+    #settingsDialog .security-settings-summary,
+    #settingsDialog .change-password-panel,
+    #missingProductsDialog .missing-category-panel,
+    .recipe-customization-dialog .recipe-customization-item,
+    .recipe-customization-dialog .recipe-customization-ingredient-picker{
+      border-color:rgba(54,77,62,.08)!important;
+      background:rgba(255,255,255,.46)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.76),0 7px 20px rgba(38,66,48,.035)!important;
+    }
+    #preferencesDialog .security-action-row,
+    #settingsDialog .security-action-row,
+    #missingProductsDialog .missing-product-row,
+    #missingProductsDialog .missing-dish-row{
+      border-color:rgba(54,77,62,.08)!important;
+      background:rgba(255,255,255,.52)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.78),0 7px 20px rgba(38,66,48,.035)!important;
+    }
+    #missingProductsDialog .missing-category-choice{
+      border-color:rgba(54,77,62,.09)!important;
+      background:rgba(255,255,255,.52)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.72)!important;
+    }
+    #missingProductsDialog .missing-category-choice.is-active{
+      border-color:rgba(31,148,78,.22)!important;
+      background:linear-gradient(155deg,rgba(231,248,236,.82),rgba(245,251,247,.60))!important;
+    }
+    .recipe-customization-dialog .recipe-customization-item.is-selected{
+      border-color:rgba(31,148,78,.20)!important;
+      background:linear-gradient(155deg,rgba(231,248,236,.78),rgba(247,252,248,.60))!important;
+      color:#145d37!important;
+    }
+    .recipe-customization-dialog .recipe-customization-quantity{
+      border-color:rgba(54,77,62,.09)!important;
+      background:rgba(255,255,255,.62)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.84)!important;
+    }
+    .recipe-customization-dialog .recipe-customization-suggestions{
+      border-color:rgba(54,77,62,.09)!important;
+      background:rgba(250,252,250,.90)!important;
+      box-shadow:0 20px 46px rgba(29,54,38,.16),inset 0 1px 0 rgba(255,255,255,.90)!important;
+      -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+      backdrop-filter:blur(24px) saturate(145%)!important;
+    }
+    .recipe-customization-dialog .recipe-customization-add-button{
+      border-color:rgba(35,139,80,.42)!important;
+      background:rgba(248,252,249,.48)!important;
+    }
+    #preferencesDialog .dialog-actions button:not(.primary),
+    #connectionDialog .dialog-actions button:not(.primary),
+    .recipe-customization-dialog .dialog-actions button:not(.primary),
+    #settingsDialog .secondary{
+      border-color:rgba(54,77,62,.09)!important;
+      background:rgba(255,255,255,.50)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.82),0 6px 18px rgba(38,66,48,.04)!important;
+    }
+    #preferencesDialog .dialog-actions .primary,
+    #connectionDialog .dialog-actions .primary,
+    #missingProductsDialog .missing-products-add .primary,
+    #settingsDialog .primary,
+    .recipe-customization-dialog .dialog-actions .primary{
+      border:0!important;
+      background:linear-gradient(180deg,#2ca15b,#208a4d)!important;
+      color:#fff!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 9px 22px rgba(24,132,70,.18)!important;
+    }
+    #missingProductsDialog .missing-products-close{
+      border:1px solid rgba(255,255,255,.62)!important;
+      background:rgba(242,245,243,.60)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.76),0 5px 14px rgba(37,58,45,.06)!important;
+      -webkit-backdrop-filter:blur(16px) saturate(140%)!important;
+      backdrop-filter:blur(16px) saturate(140%)!important;
     }
     #preferencesDialog .preference-dialog-scroll>h3{display:flex;align-items:center;gap:6px}
     .preference-title-back{width:18px;height:32px;flex:0 0 18px;margin:-2px 0 -2px -2px;padding:0;border:0;border-radius:0;display:grid;place-items:center;background:transparent;color:#0b7040;font:inherit;font-size:28px;line-height:1;font-weight:500;-webkit-tap-highlight-color:transparent}
     .preference-title-back:focus{outline:none}.preference-title-back:focus-visible{outline:2px solid rgba(11,112,64,.28);outline-offset:2px}
     #preferencesApplicationManagement .application-management-options:empty{display:none!important}
+    @media(prefers-reduced-motion:reduce){
+      #connectionDialog[open],
+      #settingsDialog[open],
+      #preferencesDialog[open],
+      #missingProductsDialog[open],
+      .recipe-customization-dialog[open]{animation:none}
+    }
   `;
   document.head.appendChild(style);
 }
