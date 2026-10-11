@@ -27,7 +27,9 @@ test('Ma liste garde la priorité et le Catalogue caché nest plus construit',()
 
 test('les images produits respectent la visibilité et ne possèdent plus ladministration',()=>{
   const images=read('product-item-images.js');
-  assert.match(images,/image\.loading=eager\?'eager':'lazy'/);
+  assert.match(images,/function imageLoading\(source,eager=false\)\{\s*return eager\|\|warmedSources\.has\(source\)\?'eager':'lazy';/);
+  assert.match(images,/image\.loading=imageLoading\(source,eager\)/);
+  assert.match(images,/promoteWarmedImages\(source\);/);
   assert.match(images,/catalogView[^\n]*is-active[^\n]*return/);
   assert.match(images,/courses:view-changed/);
   assert.doesNotMatch(images,/decorateAll/);

@@ -50,6 +50,7 @@ function warmProductImagesStep(){
     const done=()=>{
       warmActive=Math.max(0,warmActive-1);
       warmedSources.add(source);
+      promoteWarmedImages(source);
       scheduleProductWarmup();
     };
     image.addEventListener('load',done,{once:true});
@@ -57,6 +58,15 @@ function warmProductImagesStep(){
     image.src=source;
   }
   scheduleProductWarmup();
+}
+function imageLoading(source,eager=false){
+  return eager||warmedSources.has(source)?'eager':'lazy';
+}
+function promoteWarmedImages(source){
+  if(!products||!source)return;
+  products.querySelectorAll('.premium-sprite>img[data-single-product-source="'+source+'"]').forEach(image=>{
+    if(image.loading!=='eager')image.loading='eager';
+  });
 }
 function warmProductImages(){
   const queued=new Set(warmQueue);
@@ -196,7 +206,7 @@ function decorateFallback(card,name,source,eager=false){
   const compact=fallback.classList.contains('is-compact');
   const image=new Image();
   image.alt='';
-  image.loading=eager?'eager':'lazy';
+  image.loading=imageLoading(source,eager);
   image.decoding='async';
   image.dataset.singleProductSource=source;
   bindProductImageSettle(image);
@@ -224,7 +234,7 @@ function decorateCard(card,eager=false){
   if(!sprite||!image){decorateFallback(card,name,source,eager);return;}
   card.classList.add('has-single-product-image');
   sprite.classList.add('is-single-product-image');
-  image.loading=eager?'eager':'lazy';
+  image.loading=imageLoading(source,eager);
   const loaded=()=>onSingleProductImageLoaded(image,source);
   if(image.dataset.singleProductSource!==source){image.dataset.singleProductSource=source;image.src=source;}
   if(image.complete&&image.naturalWidth>0)loaded();
