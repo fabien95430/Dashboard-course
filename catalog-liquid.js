@@ -43,15 +43,24 @@ function scrubTarget(){
   if(x>max)return max+rubber(x-max);
   return x;
 }
-function nearest(){
-  const center=liquid.x+liquid.w/2;
+function pointerTarget(clientX){
+  const list=items();
+  if(!track||!list.length)return null;
+  const local=clientX-trackOrigin();
   let best=null,bestDistance=Infinity;
-  items().forEach(item=>{
+  list.forEach(item=>{
     const metrics=itemMetrics(item);
-    const distance=Math.abs(metrics.x+metrics.w/2-center);
+    const distance=Math.abs(metrics.x+metrics.w/2-local);
     if(distance<bestDistance){bestDistance=distance;best=item}
   });
   return best;
+}
+function activatePointerTarget(clientX){
+  const target=pointerTarget(clientX);
+  if(!target||target.classList.contains('is-active'))return;
+  navigator.vibrate?.(4);
+  liquid.allowProgrammatic=true;
+  try{target.click()}finally{liquid.allowProgrammatic=false}
 }
 function markUnder(clear=false){
   const center=liquid.x+liquid.w/2;
@@ -273,13 +282,13 @@ function bind(){
     if(!scrub||event.pointerId!==scrub.id)return;
     scrub.clientX=event.clientX;
     if(Math.abs(event.clientX-scrub.startX)>6)scrub.moved=true;
-    if(reduced()){
-      liquid.x=scrubTarget();
-      markUnder();
-      paint();
-    }else{
-      start();
-    }
+    liquid.tx=scrubTarget();
+    liquid.x=liquid.tx;
+    liquid.vx=0;
+    markUnder();
+    paint();
+    if(scrub.moved)activatePointerTarget(event.clientX);
+    if(!reduced())start();
   });
   const finish=(event,cancelled)=>{
     const scrub=liquid.scrub;
@@ -288,7 +297,7 @@ function bind(){
     liquid.scrub=null;
     try{track.releasePointerCapture(event.pointerId)}catch(_){}
     liquid.tl=0;
-    const target=moved&&!cancelled?nearest():null;
+    const target=moved&&!cancelled?pointerTarget(scrub.clientX):null;
     if(moved&&!cancelled){
       liquid.justScrubbed=true;
       setTimeout(()=>{liquid.justScrubbed=false},0);
