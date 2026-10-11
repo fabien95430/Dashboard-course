@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v428';
+const APP_VERSION='v429';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -24,6 +24,10 @@ const CHILD_DISHES=new Set([
   'Riz au lait'
 ]);
 const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eef1eb"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f7f2" stroke="#cbd2c8" stroke-width="12"/><text x="450" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="30" font-weight="700" fill="#708076">Photo indisponible</text></svg>');
+let warmQueue=[];
+let warmScheduled=false;
+let warmRunning=false;
+const warmedSources=new Set();
 const slugify=value=>String(value||'')
   .toLowerCase()
   .replace(/œ/g,'oe')
@@ -36,6 +40,49 @@ function localDishImage(name){
   const slug=SPECIAL_SLUGS[name]||slugify(name);
   return './www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+slug+'.png?v='+encodeURIComponent(APP_VERSION);
 }
+function scheduleWarmStep(){
+  if(warmScheduled||warmRunning||!warmQueue.length)return;
+  warmScheduled=true;
+  const run=()=>{
+    warmScheduled=false;
+    warmNextDishImage();
+  };
+  if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:1200});
+  else setTimeout(run,0);
+}
+function warmNextDishImage(){
+  if(warmRunning)return;
+  const source=warmQueue.shift();
+  if(!source)return;
+  if(warmedSources.has(source)){scheduleWarmStep();return}
+  warmRunning=true;
+  const image=new Image();
+  image.alt='';
+  image.decoding='async';
+  image.fetchPriority='low';
+  const done=()=>{
+    warmRunning=false;
+    warmedSources.add(source);
+    scheduleWarmStep();
+  };
+  image.addEventListener('load',done,{once:true});
+  image.addEventListener('error',done,{once:true});
+  image.src=source;
+}
+function warmDishImages(){
+  const names=Array.isArray(window.COURSES_DISH_NAMES)?window.COURSES_DISH_NAMES:[];
+  if(!names.length)return false;
+  const queued=new Set(warmQueue);
+  for(const name of names){
+    const source=localDishImage(name);
+    if(warmedSources.has(source)||queued.has(source))continue;
+    warmQueue.push(source);
+    queued.add(source);
+  }
+  scheduleWarmStep();
+  return true;
+}
+window.COURSES_DISH_IMAGES=Object.freeze({warm:warmDishImages});
 function sameImageSource(image,source){
   const current=image?.getAttribute?.('src')||'';
   if(current===source)return true;

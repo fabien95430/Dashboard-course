@@ -94,6 +94,7 @@ const DISHES=Object.freeze([
   {name:'Riz au lait',photoId:'',tags:['Dessert'],ingredients:['Lait entier','Riz long','Sucre','Vanille']},
   {name:'Rougail saucisse',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Tomates pelées','Oignons jaunes','Ail','Piments','Riz long','Gingembre','Curcuma']},
 ]);
+window.COURSES_DISH_NAMES=Object.freeze(DISHES.map(dish=>dish.name));
 
 const FILTERS=['Tous','Favoris','Dessert','Enfants','Pâtes','Poissons','Poulet','Rapides','Végé','Viandes'];
 const STORAGE_FAVORITES='courses-dish-favorites-v1';

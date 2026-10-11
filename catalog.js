@@ -16,6 +16,7 @@
   let dishFeaturesRequested=false;
   let dishFeaturesStarted=false;
   let catalogExtrasStarted=false;
+  let productImagesIdle=false;
 
   const loadDishStyles=()=>{
     if(!document.querySelector('link[data-catalog-dishes]')){
@@ -49,6 +50,7 @@
     script.dataset.catalogProductAdmin='script';
     document.body.appendChild(script);
   };
+  const warmDishImages=()=>window.COURSES_DISH_IMAGES?.warm?.();
   const loadDishAddedMarker=()=>{
     if(document.querySelector('script[data-dish-added-marker]'))return;
     const marker=document.createElement('script');
@@ -57,13 +59,17 @@
     marker.dataset.dishAddedMarker='script';
     document.body.appendChild(marker);
   };
+  const onDishLocalImagesReady=()=>{
+    loadDishAddedMarker();
+    if(productImagesIdle)warmDishImages();
+  };
   const loadDishLocalImages=()=>{
-    if(document.querySelector('script[data-dish-local-images]')){loadDishAddedMarker();return}
+    if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=428';
+    images.src='./dish-local-images.js?v=429';
     images.async=false;
     images.dataset.dishLocalImages='script';
-    images.addEventListener('load',loadDishAddedMarker,{once:true});
+    images.addEventListener('load',onDishLocalImagesReady,{once:true});
     document.body.appendChild(images);
   };
   const loadLiquid=()=>{
@@ -79,7 +85,7 @@
     if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
     loadDishStyles();
     const script=document.createElement('script');
-    script.src='./dishes-ui.js?v=428';
+    script.src='./dishes-ui.js?v=429';
     script.async=false;
     script.dataset.catalogDishes='script';
     script.addEventListener('load',loadLiquid,{once:true});
@@ -125,6 +131,10 @@
     const title=event.detail?.title;
     if(title==='Synchronisé'||title==='Mode test')startProductCatalog();
   });
+  document.addEventListener('courses:product-images-idle',()=>{
+    productImagesIdle=true;
+    warmDishImages();
+  });
   document.addEventListener('courses:view-changed',event=>{
     if(event.detail?.view!=='catalog')return;
     startCatalogView();
@@ -137,7 +147,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=428';
+    script.src='./runtime-features.js?v=429';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{

@@ -64,7 +64,8 @@ test('P4 conserve un démarrage déterministe puis prépare Produits avant les f
   assert.match(catalog,/if\(event\.detail\?\.view!=='catalog'\)return;/);
   assert.match(catalog,/const startCatalogView=\(\)=>\{[\s\S]*startProductCatalog\(\);[\s\S]*loadRepurchaseSoon\(\);[\s\S]*startDishFeatures\(\);/);
   assert.match(catalog,/if\(dishFeaturesStarted\|\|!productCatalogReady\)return;/);
-  assert.match(catalog,/images\.addEventListener\('load',loadDishAddedMarker,\{once:true\}\)/);
+  assert.match(catalog,/images\.addEventListener\('load',onDishLocalImagesReady,\{once:true\}\)/);
+  assert.match(catalog,/const onDishLocalImagesReady=\(\)=>\{[\s\S]*loadDishAddedMarker\(\);[\s\S]*if\(productImagesIdle\)warmDishImages\(\);/);
   assert.doesNotMatch(catalog,/new MutationObserver/);
   assert.doesNotMatch(catalog,/setInterval\(/);
   assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));
