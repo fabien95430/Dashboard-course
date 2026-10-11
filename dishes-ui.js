@@ -679,7 +679,7 @@ function setMode(next,initial=false){
   if(next!=='products'&&next!=='dishes')return;
   mode=next;
   filter='Tous';
-  if(!initial){
+  if(!initial&&searchInput.value){
     drivingCatalog=true;
     searchInput.value='';
     searchInput.dispatchEvent(new Event('input',{bubbles:true}));
@@ -688,7 +688,9 @@ function setMode(next,initial=false){
   const dishes=mode==='dishes';
   catalogView.classList.toggle('is-dishes-mode',dishes);
   productCategories.hidden=dishes;
-  productsGrid.hidden=dishes;
+  productsGrid.classList.toggle('is-catalog-mode-hidden',dishes);
+  productsGrid.setAttribute('aria-hidden',String(dishes));
+  productsGrid.inert=dishes;
   dishFilters.hidden=!dishes;
   dishesGrid.hidden=!dishes;
   productCount.hidden=dishes;

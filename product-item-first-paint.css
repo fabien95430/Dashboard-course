@@ -119,15 +119,22 @@ html .catalog-controls>.categories .cat{
 }
 html .catalog-controls>.categories .cat-label{font-size:15px!important}
 html .catalog-view>#products,
-html .catalog-view>.dishes-grid{order:4!important}
+html .catalog-view>.dishes-grid{
+  order:4!important;
+  grid-row:5!important;
+  grid-column:1!important;
+  min-height:0!important;
+}
+html .catalog-view>#products.is-catalog-mode-hidden{
+  content-visibility:hidden!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
 
 @media(max-width:520px){
   html .catalog-view{
     grid-template-rows:82px 46px 42px 38px minmax(0,1fr)!important;
     gap:8px!important;
-  }
-  html .catalog-view .page-version{
-    transform:translateY(14px)!important;
   }
   html .catalog-view>.page-search{
     height:42px!important;

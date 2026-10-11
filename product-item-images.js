@@ -113,7 +113,8 @@ function ensureStyles(){
   document.head.appendChild(style);
 }
 function productCardVisible(card){
-  const rect=card?.getBoundingClientRect?.();
+  if(!card||card.hidden||products?.classList.contains('is-catalog-mode-hidden'))return false;
+  const rect=card.getBoundingClientRect?.();
   if(!rect)return false;
   const viewport=window.innerHeight||document.documentElement.clientHeight||0;
   return rect.bottom>=0&&rect.top<=viewport;
@@ -232,7 +233,9 @@ function decorateCard(card,eager=false){
 function decorateProducts(){
   if(!document.getElementById('catalogView')?.classList.contains('is-active'))return;
   productImagesIdle=false;
-  products?.querySelectorAll('.product[data-name]').forEach(card=>decorateCard(card,false));
+  if(!products?.classList.contains('is-catalog-mode-hidden')){
+    products?.querySelectorAll('.product[data-name]:not([hidden])').forEach(card=>decorateCard(card,false));
+  }
   scheduleProductImagesIdleCheck();
 }
 function decorateList(){

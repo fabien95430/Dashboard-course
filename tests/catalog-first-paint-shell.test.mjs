@@ -32,7 +32,7 @@ test('les libellés et actions de Ma liste et du Catalogue sont définitifs dès
   const catalogHeader=index.slice(index.indexOf('<section id="catalogView"'),index.indexOf('</header>',index.indexOf('<section id="catalogView"')));
   assert.ok(catalogHeader.indexOf('id="repurchaseSoonBtn"')<catalogHeader.indexOf('id="catalogRefreshBtn"'),'À racheter bientôt doit précéder le rafraîchissement du Catalogue');
   assert.match(firstPaint,/repurchase-header-button/);
-  assert.match(firstPaint,/catalog-view \.page-version\{[\s\S]*?translateY\(14px\)/);
+  assert.doesNotMatch(firstPaint,/catalog-view \.page-version\{[\s\S]*?translateY\(/);
   assert.match(dishes,/dishes\?'Choisissez un plat à cuisiner ':'Ajouter vos produits '/);
 });
 
@@ -45,7 +45,7 @@ test('le bouton À racheter bientôt est seulement branché par son module propr
 
 test('app-ui est branché avant app.js pour enrichir la vraie liste vide sans rendu tardif',()=>{
   const appUiScript=index.indexOf('<script src="./app-ui.js?v=442" data-app-ui="script"></script>');
-  const appScript=index.indexOf('<script src="./app.js?v=428"></script>');
+  const appScript=index.indexOf('<script src="./app.js?v=429"></script>');
   assert.ok(appUiScript>=0&&appScript>appUiScript,'app-ui doit être chargé avant app.js');
   assert.match(appUi,/if\(!listEmptyStateConfirmed\)\{/);
   assert.match(appUi,/title==='Synchronisé'\|\|title==='Mode test'/);
