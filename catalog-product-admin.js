@@ -1,17 +1,22 @@
 (()=>{
 'use strict';
 
-const DELETE_PREFIX='__courses_delete_product__:';
+const DELETE_PRODUCT_PREFIX='__courses_delete_product__:';
+const DELETE_DISH_PREFIX='__courses_delete_dish__:';
 const VAPID_ENTITY='input_text.courses_vapid_public_key';
-const PENDING_KEY='courses-catalog-delete-pending-v1';
+const PENDING_KEY='courses-catalog-delete-pending-v2';
 const PENDING_TTL_MS=30*60*1000;
 const RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/actions/workflows/integrate-dish-openai.yml/runs?event=repository_dispatch&per_page=50';
+let currentMode='products';
 let currentQuery='';
 let currentConfirm='';
+let dishRows=null;
+let dishRowsPromise=null;
 let uiBound=false;
 
 const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const norm=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const pendingKey=(type,name)=>type+':'+norm(name);
 
 function randomId(){
   if(globalThis.crypto?.getRandomValues){
@@ -30,6 +35,27 @@ function products(){
   });
   return rows.sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
 }
+function decodeJs(value){return String(value||'').replace(/\\'/g,"'").replace(/\\"/g,'"').replace(/\\\\/g,'\\')}
+function quotedValues(value){return [...String(value||'').matchAll(/'((?:\\.|[^'])*)'/g)].map(match=>decodeJs(match[1]))}
+async function dishes(){
+  if(dishRows)return dishRows;
+  if(dishRowsPromise)return dishRowsPromise;
+  dishRowsPromise=fetch('./dishes-ui.js?courses_catalog_admin='+Date.now(),{cache:'no-store'}).then(async response=>{
+    if(!response.ok)throw new Error('Impossible de charger les plats du catalogue.');
+    const text=await response.text();
+    const rows=[];
+    const pattern=/\{name:'((?:\\.|[^'])*)',photoId:.*?tags:\[([^\]]*)\],ingredients:\[([^\]]*)\]\}/gs;
+    let match;
+    while((match=pattern.exec(text))){
+      const tags=quotedValues(match[2]);
+      const ingredients=quotedValues(match[3]);
+      rows.push({name:decodeJs(match[1]),category:tags[0]||'Plat',subgroup:ingredients.length+' ingrédient'+(ingredients.length>1?'s':'')});
+    }
+    dishRows=rows.sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
+    return dishRows;
+  }).finally(()=>{dishRowsPromise=null});
+  return dishRowsPromise;
+}
 function readPending(){
   try{
     const value=JSON.parse(localStorage.getItem(PENDING_KEY)||'{}');
@@ -43,13 +69,13 @@ function readPending(){
     return value;
   }catch(_){return {}}
 }
-function setPending(name,state){
-  const key=norm(name);if(!key)return;
+function setPending(type,name,state){
+  const key=pendingKey(type,name);if(!norm(name))return;
   const pending=readPending();
   if(state)pending[key]=state;else delete pending[key];
   try{localStorage.setItem(PENDING_KEY,JSON.stringify(pending))}catch(_){}
 }
-function pendingFor(name){return readPending()[norm(name)]||null}
+function pendingFor(type,name){return readPending()[pendingKey(type,name)]||null}
 
 function sharedHaClient(){
   const client=window.COURSES_HA_CLIENT;
@@ -83,17 +109,17 @@ async function optionalPushData(){
     return {push_endpoint:String(subscription.endpoint),push_p256dh:String(json.keys.p256dh),push_auth:String(json.keys.auth),push_public_key:publicKey};
   }catch(_){return empty}
 }
-async function requestDeletion(name){
+async function requestDeletion(itemType,name){
   const requestId=randomId();
   const push=await optionalPushData();
+  const prefix=itemType==='dish'?DELETE_DISH_PREFIX:DELETE_PRODUCT_PREFIX;
   await sharedHaClient().callService('rest_command','courses_integrate_dish_openai',{
-    dish_name:DELETE_PREFIX+name,dish_category:'',request_id:requestId,...push
+    dish_name:prefix+name,dish_category:'',request_id:requestId,...push
   });
-  setPending(name,{requestId,startedAt:Date.now()});
+  setPending(itemType,name,{requestId,startedAt:Date.now(),itemType,name});
   return requestId;
 }
 
-function decodeJs(value){return String(value||'').replace(/\\'/g,"'").replace(/\\"/g,'"').replace(/\\\\/g,'\\')}
 async function recipeUsages(name){
   const response=await fetch('./dishes-ui.js?courses_catalog_admin='+Date.now(),{cache:'no-store'});
   if(!response.ok)throw new Error('Impossible de vérifier les recettes avant suppression.');
@@ -102,7 +128,7 @@ async function recipeUsages(name){
   const pattern=/\{name:'((?:\\.|[^'])*)',photoId:.*?ingredients:\[([^\]]*)\]\}/gs;
   let match;
   while((match=pattern.exec(text))){
-    const ingredients=[...match[2].matchAll(/'((?:\\.|[^'])*)'/g)].map(value=>decodeJs(value[1]));
+    const ingredients=quotedValues(match[2]);
     if(ingredients.some(value=>norm(value)===wanted))used.push(decodeJs(match[1]));
   }
   return [...new Set(used)];
@@ -114,6 +140,8 @@ function installStyle(){
   style.id='courses-product-admin-style';
   style.textContent=`
     .courses-product-admin{display:grid;gap:11px;padding-bottom:5px}
+    .courses-product-admin-modes{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid rgba(34,65,45,.10);border-radius:15px;background:rgba(235,240,236,.72)}
+    .courses-product-admin-mode{height:34px;border:0;border-radius:11px;background:transparent;color:#66736b;font:inherit;font-size:11px;font-weight:780}.courses-product-admin-mode.is-active{background:#fff;color:#184c32;box-shadow:0 2px 8px rgba(36,62,45,.10),inset 0 1px 0 rgba(255,255,255,.9)}
     .courses-product-admin-search{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid rgba(34,65,45,.11);border-radius:14px;background:#fff}
     .courses-product-admin-search svg{width:15px;height:15px;color:#78827c}.courses-product-admin-search input{min-width:0;flex:1;border:0!important;outline:0;background:transparent;font:inherit;font-size:12px;color:#24392c}.courses-product-admin-search span{font-size:9.5px;color:#8a928d;font-weight:750}
     .courses-product-admin-list{display:grid;gap:7px}.courses-product-admin-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 10px 10px 12px;border:1px solid rgba(33,64,44,.09);border-radius:16px;background:#fff}
@@ -131,51 +159,76 @@ function panelElements(){
   const content=dialog?.querySelector(':scope>.preference-dialog-scroll');
   return {dialog,content,panel:document.getElementById('preferencesProductCatalogPanel'),title:content?.querySelector(':scope>h3'),intro:content?.querySelector(':scope>.dialog-intro')};
 }
-function visibleProducts(){
+function titleForMode(){
+  const {title,intro}=panelElements();
+  if(currentMode==='products'){
+    if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management');else if(title)title.textContent='Catalogue produit';
+    if(intro)intro.textContent='Gérez les produits présents dans le catalogue de l’application.';
+  }else{
+    if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue plats','management');else if(title)title.textContent='Catalogue plats';
+    if(intro)intro.textContent='Gérez les plats et leurs recettes présents dans le catalogue.';
+  }
+}
+function visibleRows(rows){
   const query=norm(currentQuery);
-  return products().filter(item=>!query||norm(item.name+' '+item.category+' '+item.subgroup).includes(query));
+  return rows.filter(item=>!query||norm(item.name+' '+item.category+' '+item.subgroup).includes(query));
 }
-function confirmMarkup(item){
-  if(currentConfirm!==item.name)return '';
-  return '<div class="courses-product-admin-confirm"><strong>Supprimer définitivement « '+esc(item.name)+' » ?</strong><p>Le produit sera retiré du catalogue et son image supprimée du dépôt GitHub. La liste Home Assistant n’est pas modifiée.</p><div class="courses-product-admin-confirm-actions"><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-confirm-delete" type="button" data-confirm-delete="'+esc(item.name)+'">Supprimer définitivement</button></div></div>';
+function confirmMarkup(item,itemType){
+  if(currentConfirm!==pendingKey(itemType,item.name))return '';
+  const message=itemType==='product'
+    ?'Le produit sera retiré du catalogue et son image supprimée du dépôt GitHub. La liste Home Assistant n’est pas modifiée.'
+    :'Le plat, sa recette et son image seront supprimés définitivement. Les produits du catalogue et la liste Home Assistant ne sont pas modifiés.';
+  return '<div class="courses-product-admin-confirm"><strong>Supprimer définitivement « '+esc(item.name)+' » ?</strong><p>'+message+'</p><div class="courses-product-admin-confirm-actions"><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-confirm-delete" type="button" data-confirm-delete="'+esc(item.name)+'" data-item-type="'+itemType+'">Supprimer définitivement</button></div></div>';
 }
-function render(){
+function renderRows(rows,itemType){
   const panel=document.getElementById('preferencesProductCatalogPanel');if(!panel)return;
-  const rows=visibleProducts(),allCount=products().length;
+  const visible=visibleRows(rows);
+  const label=itemType==='dish'?'plat':'produit';
   panel.innerHTML=
-    '<label class="courses-product-admin-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><input type="search" value="'+esc(currentQuery)+'" placeholder="Rechercher un produit…" autocomplete="off" data-product-admin-search><span>'+allCount+'</span></label>'+
-    '<div class="courses-product-admin-list">'+(rows.map(item=>{
-      const pending=pendingFor(item.name);
-      return '<article class="courses-product-admin-row" data-product="'+esc(item.name)+'"><div class="courses-product-admin-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.category)+' · '+esc(item.subgroup)+'</small></div>'+
-        (pending?'<span class="courses-product-admin-pending">Suppression…</span>':'<button class="courses-product-admin-delete" type="button" aria-label="Supprimer '+esc(item.name)+'" data-delete-product="'+esc(item.name)+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8.5 0 .8 13h9.4l.8-13M10 11v5m4-5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>')+confirmMarkup(item)+'</article>';
-    }).join('')||'<div class="courses-product-admin-empty">Aucun produit ne correspond à cette recherche.</div>')+'</div><div class="courses-product-admin-feedback" role="status" aria-live="polite"></div>';
+    '<div class="courses-product-admin-modes" role="tablist" aria-label="Type de catalogue"><button class="courses-product-admin-mode'+(currentMode==='products'?' is-active':'')+'" type="button" role="tab" aria-selected="'+(currentMode==='products')+'" data-catalog-admin-mode="products">Produits</button><button class="courses-product-admin-mode'+(currentMode==='dishes'?' is-active':'')+'" type="button" role="tab" aria-selected="'+(currentMode==='dishes')+'" data-catalog-admin-mode="dishes">Plats</button></div>'+
+    '<label class="courses-product-admin-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><input type="search" value="'+esc(currentQuery)+'" placeholder="Rechercher un '+label+'…" autocomplete="off" data-product-admin-search><span>'+rows.length+'</span></label>'+
+    '<div class="courses-product-admin-list">'+(visible.map(item=>{
+      const pending=pendingFor(itemType,item.name);
+      return '<article class="courses-product-admin-row" data-item="'+esc(item.name)+'"><div class="courses-product-admin-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.category)+' · '+esc(item.subgroup)+'</small></div>'+
+        (pending?'<span class="courses-product-admin-pending">Suppression…</span>':'<button class="courses-product-admin-delete" type="button" aria-label="Supprimer '+esc(item.name)+'" data-delete-item="'+esc(item.name)+'" data-item-type="'+itemType+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8.5 0 .8 13h9.4l.8-13M10 11v5m4-5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>')+confirmMarkup(item,itemType)+'</article>';
+    }).join('')||'<div class="courses-product-admin-empty">Aucun '+label+' ne correspond à cette recherche.</div>')+'</div><div class="courses-product-admin-feedback" role="status" aria-live="polite"></div>';
+}
+async function render(){
+  if(currentMode==='products'){renderRows(products(),'product');return}
+  const panel=document.getElementById('preferencesProductCatalogPanel');if(!panel)return;
+  panel.innerHTML='<div class="courses-product-admin-feedback">Chargement des plats…</div>';
+  try{renderRows(await dishes(),'dish')}catch(error){panel.innerHTML='<div class="courses-product-admin-empty">'+esc(error?.message||'Impossible de charger les plats.')+'</div>'}
 }
 function feedback(message,type=''){
   const el=document.querySelector('#preferencesProductCatalogPanel .courses-product-admin-feedback');if(!el)return;
   el.textContent=message||'';el.className='courses-product-admin-feedback'+(type?' is-'+type:'');
 }
-async function beginDeletion(name,button){
-  button.disabled=true;feedback('Vérification des recettes…');
+async function beginDeletion(itemType,name,button){
+  button.disabled=true;
+  if(itemType==='dish'){
+    currentConfirm=pendingKey(itemType,name);await render();return;
+  }
+  feedback('Vérification des recettes…');
   try{
     const usages=await recipeUsages(name);
     if(usages.length){
       feedback('Suppression bloquée : utilisé par '+usages.slice(0,5).join(', ')+(usages.length>5?'…':''),'error');
       button.disabled=false;return;
     }
-    currentConfirm=name;render();
+    currentConfirm=pendingKey(itemType,name);await render();
   }catch(error){
     button.disabled=false;feedback(String(error?.message||'Vérification impossible.'),'error');
   }
 }
-async function confirmDeletion(name,button){
+async function confirmDeletion(itemType,name,button){
   button.disabled=true;feedback('Envoi de la suppression à GitHub…');
   try{
-    await requestDeletion(name);
-    currentConfirm='';render();
+    await requestDeletion(itemType,name);
+    currentConfirm='';await render();
     feedback('Suppression demandée. GitHub applique la modification en arrière-plan.','ok');
   }catch(error){
     button.disabled=false;feedback(String(error?.message||'Suppression impossible.'),'error');
-    window.CoursesErrors?.report?.({key:'catalog-delete:'+norm(name),severity:'error',source:'Catalogue',title:'Suppression de « '+name+' » impossible',message:String(error?.message||'La demande n’a pas pu être envoyée.')});
+    window.CoursesErrors?.report?.({key:'catalog-delete:'+itemType+':'+norm(name),severity:'error',source:'Catalogue',title:'Suppression de « '+name+' » impossible',message:String(error?.message||'La demande n’a pas pu être envoyée.')});
   }
 }
 async function reconcilePending(){
@@ -191,12 +244,13 @@ async function reconcilePending(){
     for(const [key,state] of entries){
       const run=runs.find(candidate=>String(candidate?.display_title||'').includes(String(state?.requestId||'')));
       if(run?.status!=='completed')continue;
-      const name=products().find(item=>norm(item.name)===key)?.name||key;
-      setPending(name,null);changed=true;
+      const itemType=state?.itemType==='dish'?'dish':'product';
+      const name=String(state?.name||key.split(':').slice(1).join(':'));
+      setPending(itemType,name,null);changed=true;
       if(run.conclusion==='success')completed=true;
-      else window.CoursesErrors?.report?.({key:'catalog-delete:'+key,severity:'error',source:'Catalogue',title:'Suppression du produit impossible',message:'Le workflow GitHub de suppression a échoué.'});
+      else window.CoursesErrors?.report?.({key:'catalog-delete:'+key,severity:'error',source:'Catalogue',title:'Suppression du '+(itemType==='dish'?'plat':'produit')+' impossible',message:'Le workflow GitHub de suppression a échoué.'});
     }
-    if(changed)render();
+    if(changed)await render();
     if(completed){
       const registration=await navigator.serviceWorker?.getRegistration?.();
       await registration?.update?.();
@@ -205,10 +259,9 @@ async function reconcilePending(){
   }catch(_){}
 }
 function showCatalog(){
-  const {dialog,content,panel,title,intro}=panelElements();if(!dialog||!content||!panel)return;
-  [...content.children].forEach(node=>{if(node===title||node===intro||node===panel)return;node.hidden=true});
-  panel.hidden=false;if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management');else if(title)title.textContent='Catalogue produit';if(intro)intro.textContent='Gérez les produits présents dans le catalogue de l’application.';
-  currentQuery='';currentConfirm='';render();if(!dialog.open)dialog.showModal();
+  const {dialog,content,panel}=panelElements();if(!dialog||!content||!panel)return;
+  [...content.children].forEach(node=>{if(node===panel||node===content.querySelector(':scope>h3')||node===content.querySelector(':scope>.dialog-intro'))return;node.hidden=true});
+  panel.hidden=false;currentMode='products';currentQuery='';currentConfirm='';titleForMode();void render();if(!dialog.open)dialog.showModal();
   void reconcilePending();
 }
 function bindUi(){
@@ -222,7 +275,7 @@ function bindUi(){
   let button=document.getElementById('preferencesProductCatalog');
   if(!button){
     button=document.createElement('button');button.id='preferencesProductCatalog';button.type='button';button.className='security-action-row';
-    button.innerHTML='<span class="security-setting-icon"><svg><use href="#i-grid"></use></svg></span><span class="security-setting-copy"><strong>Catalogue produit</strong><small>Consulter et supprimer définitivement des produits</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+    button.innerHTML='<span class="security-setting-icon"><svg><use href="#i-grid"></use></svg></span><span class="security-setting-copy"><strong>Catalogue</strong><small>Consulter et supprimer des produits ou des plats</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
     if(errorButton)errorButton.before(button);else management.appendChild(button);
   }
   let panel=document.getElementById('preferencesProductCatalogPanel');
@@ -230,13 +283,15 @@ function bindUi(){
   button.addEventListener('click',showCatalog);
   panel.addEventListener('input',event=>{
     if(event.target.matches('[data-product-admin-search]')){
-      currentQuery=event.target.value;currentConfirm='';render();panel.querySelector('[data-product-admin-search]')?.focus();
+      currentQuery=event.target.value;currentConfirm='';void render().then(()=>panel.querySelector('[data-product-admin-search]')?.focus());
     }
   });
   panel.addEventListener('click',event=>{
-    const del=event.target.closest('[data-delete-product]');if(del){void beginDeletion(del.dataset.deleteProduct||'',del);return}
-    if(event.target.closest('.courses-product-admin-cancel')){currentConfirm='';render();return}
-    const finalButton=event.target.closest('[data-confirm-delete]');if(finalButton){void confirmDeletion(finalButton.dataset.confirmDelete||'',finalButton)}
+    const mode=event.target.closest('[data-catalog-admin-mode]');
+    if(mode){currentMode=mode.dataset.catalogAdminMode==='dishes'?'dishes':'products';currentQuery='';currentConfirm='';titleForMode();void render();return}
+    const del=event.target.closest('[data-delete-item]');if(del){void beginDeletion(del.dataset.itemType||'product',del.dataset.deleteItem||'',del);return}
+    if(event.target.closest('.courses-product-admin-cancel')){currentConfirm='';void render();return}
+    const finalButton=event.target.closest('[data-confirm-delete]');if(finalButton){void confirmDeletion(finalButton.dataset.itemType||'product',finalButton.dataset.confirmDelete||'',finalButton)}
   });
   dialog.addEventListener('close',()=>{panel.hidden=true;currentConfirm=''});
   return true;
@@ -248,13 +303,14 @@ function bindWhenReady(){
 
 if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',event=>{
   const payload=event.data?.payload||{};
-  if(event.data?.type!=='courses-error-signal'||payload.itemType!=='product')return;
+  if(event.data?.type!=='courses-error-signal'||(payload.itemType!=='product'&&payload.itemType!=='dish'))return;
   const name=String(payload.itemName||'');if(!name)return;
+  const itemType=payload.itemType==='dish'?'dish':'product';
   if(payload.status==='deleted'){
-    setPending(name,null);
+    setPending(itemType,name,null);
     navigator.serviceWorker.getRegistration().then(reg=>reg?.update?.()).finally(()=>setTimeout(()=>location.reload(),350));
   }else if(payload.status==='error'){
-    setPending(name,null);render();
+    setPending(itemType,name,null);void render();
   }
 });
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindWhenReady,{once:true});else bindWhenReady();

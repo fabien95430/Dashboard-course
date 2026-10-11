@@ -9,11 +9,16 @@ const status=String(process.env.PUSH_STATUS||'error');
 const rawName=String(process.env.DISH_NAME||'').trim();
 const productPrefix='__courses_product__:';
 const deleteProductPrefix='__courses_delete_product__:';
+const deleteDishPrefix='__courses_delete_dish__:';
 const deleteProduct=rawName.startsWith(deleteProductPrefix);
-const itemType=deleteProduct?'product':rawName.startsWith(productPrefix)?'product':'dish';
+const deleteDish=rawName.startsWith(deleteDishPrefix);
+const deleting=deleteProduct||deleteDish;
+const itemType=deleteProduct?'product':deleteDish?'dish':rawName.startsWith(productPrefix)?'product':'dish';
 const itemName=(deleteProduct
   ?rawName.slice(deleteProductPrefix.length)
-  :itemType==='product'?rawName.slice(productPrefix.length):rawName
+  :deleteDish
+    ?rawName.slice(deleteDishPrefix.length)
+    :itemType==='product'?rawName.slice(productPrefix.length):rawName
 ).trim()||(itemType==='product'?'Produit':'Plat');
 const requestId=String(process.env.REQUEST_ID||'').trim();
 const stage=String(process.env.PUSH_STAGE||'').trim();
@@ -36,22 +41,24 @@ if(!publicKey||!privateKey){
 }
 
 const success=status==='added';
-const publicStatus=success?(deleteProduct?'deleted':'added'):'error';
+const publicStatus=success?(deleting?'deleted':'added'):'error';
 const itemLabel=itemType==='product'?'produit':'plat';
-const publicationBlocked=!success&&!deleteProduct&&stage==='deployment';
+const publicationBlocked=!success&&!deleteProduct&&stage==='deployment'&&!deleteDish;
 const failureStageLabel={
   integration:'Génération ou intégration',
   validation:'Validation du visuel',
   checkpoint:'Sauvegarde de la génération',
   repository:'Validation ou publication du dépôt',
   deployment:'Validation ou publication du dépôt / GitHub Pages'
-}[stage]||(deleteProduct?'Suppression du catalogue':`Intégration du ${itemLabel}`);
+}[stage]||(deleting?'Suppression du catalogue':`Intégration du ${itemLabel}`);
 const fallbackError=stage==='deployment'
   ?'La publication ou le déploiement GitHub Pages n’a pas pu être confirmé.'
-  :deleteProduct
-    ?`La suppression du produit n’a pas pu être terminée.`
+  :deleting
+    ?`La suppression du ${itemLabel} n’a pas pu être terminée.`
     :`L’intégration du ${itemLabel} n’a pas pu être terminée.`;
 const failureReason=errorDetail||fallbackError;
+const integrationSuccessTitle=deleteProduct?'Produit supprimé':itemType==='product'?'Produit intégré':'Plat intégré';
+const integrationFailureTitle=publicationBlocked?'Publication bloquée':deleteProduct?'Suppression échouée':'Intégration échouée';
 
 const target=new URL(baseUrl);
 target.searchParams.set(itemType==='product'?'courses_product':'courses_dish',itemName);
@@ -64,22 +71,22 @@ if(!success){
 
 const payload={
   title:success
-    ?deleteProduct?'Produit supprimé':itemType==='product'?'Produit intégré':'Plat intégré'
-    :publicationBlocked?'Publication bloquée':deleteProduct?'Suppression échouée':'Intégration échouée',
+    ?deleteDish?'Plat supprimé':integrationSuccessTitle
+    :deleteDish?'Suppression échouée':integrationFailureTitle,
   body:success
-    ?deleteProduct
+    ?deleting
       ?`« ${itemName} » a été supprimé du catalogue.`
       :`« ${itemName} » est maintenant disponible dans le catalogue.`
     :publicationBlocked
       ?`« ${itemName} » est prêt, mais sa publication a été bloquée.`
-      :deleteProduct
+      :deleting
         ?`« ${itemName} » n’a pas pu être supprimé · ${failureStageLabel}.`
         :`« ${itemName} » n’a pas pu être intégré · ${failureStageLabel}.`,
-  tag:requestId?`courses-${deleteProduct?'product-delete':itemType}-${requestId}`:`courses-${deleteProduct?'product-delete':itemType}-integration`,
+  tag:requestId?`courses-${deleting?itemType+'-delete':itemType}-${requestId}`:`courses-${deleting?itemType+'-delete':itemType}-integration`,
   status:publicStatus,
   itemType,
   itemName,
-  operation:deleteProduct?'delete':'integrate',
+  operation:deleting?'delete':'integrate',
   requestId,
   stage:success?'':stage,
   error:success?'':failureReason,

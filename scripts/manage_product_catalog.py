@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remove one product from the catalog and its GitHub-tracked references."""
+"""Remove one product or dish from the catalog and its GitHub-tracked references."""
 from __future__ import annotations
 
 import json
@@ -11,7 +11,8 @@ import integrate_dish as base
 
 ROOT = base.ROOT
 RESULT_PATH = base.RESULT_PATH
-DELETE_PREFIX = '__courses_delete_product__:'
+DELETE_PRODUCT_PREFIX = '__courses_delete_product__:'
+DELETE_DISH_PREFIX = '__courses_delete_dish__:'
 
 
 def fail(message: str) -> "NoReturn":
@@ -92,21 +93,133 @@ def remove_object_entry(text: str, constant: str, name: str, value_pattern: str)
         updated, count = re.subn(entry, '', body, count=1, flags=re.S)
     if count == 0:
         return text
-    # An entry removal can leave indentation on an otherwise empty line.
-    # Keep git diff --check strict without reformatting unrelated code.
     updated = re.sub(r'(?m)^[ \t]+$', '', updated)
     return text[:wrapper.start(2)] + updated + text[wrapper.end(2):]
 
 
-def main() -> None:
-    raw = re.sub(r"\s+", " ", str(os.getenv('DISH_NAME') or '')).strip()
-    if not raw.startswith(DELETE_PREFIX):
-        fail('Demande de suppression invalide')
-    requested = raw[len(DELETE_PREFIX):].strip()
-    if not requested or len(requested) > 80:
-        fail('Nom de produit invalide')
+def object_string_value(text: str, constant: str, name: str) -> str | None:
+    wrapper = re.search(
+        rf"const\s+{re.escape(constant)}\s*=\s*Object\.freeze\(\{{(.*?)\}}\);",
+        text,
+        flags=re.S,
+    )
+    if not wrapper:
+        return None
+    wanted = base.normalize(name)
+    pair = re.compile(r"('(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\")\s*:\s*('(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\")")
+    for match in pair.finditer(wrapper.group(1)):
+        key = match.group(1)[1:-1]
+        value = match.group(2)[1:-1]
+        if base.normalize(decode_js(key)) == wanted:
+            return decode_js(value)
+    return None
 
+
+def set_contains(text: str, constant: str, name: str) -> bool:
+    wrapper = re.search(rf"const\s+{re.escape(constant)}\s*=\s*new Set\(\[(.*?)\]\);", text, flags=re.S)
+    if not wrapper:
+        return False
+    wanted = base.normalize(name)
+    return any(base.normalize(decode_js(value)) == wanted for value in re.findall(r"'((?:\\.|[^'])*)'", wrapper.group(1)))
+
+
+def remove_set_value(text: str, constant: str, name: str) -> str:
+    wrapper = re.search(rf"(const\s+{re.escape(constant)}\s*=\s*new Set\(\[)(.*?)(\]\);)", text, flags=re.S)
+    if not wrapper:
+        return text
+    body = wrapper.group(2)
+    values = [decode_js(value) for value in re.findall(r"'((?:\\.|[^'])*)'", body)]
+    wanted = base.normalize(name)
+    filtered = [value for value in values if base.normalize(value) != wanted]
+    if len(filtered) == len(values):
+        return text
+    if '\n' in body:
+        replacement = '\n' + ''.join(f"  {base.js_quote(value)},\n" for value in filtered)
+    else:
+        replacement = ','.join(base.js_quote(value) for value in filtered)
+    return text[:wrapper.start(2)] + replacement + text[wrapper.end(2):]
+
+
+def find_dish(text: str, requested: str):
+    wanted = base.normalize(requested)
+    pattern = re.compile(
+        r"(?P<prefix>^[ \t]*)\{name:'(?P<name>(?:\\.|[^'])*)',photoId:(?P<photo>'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"),tags:\[(?P<tags>[^\]]*)\],ingredients:\[(?P<ingredients>[^\]]*)\]\},?",
+        flags=re.S | re.M,
+    )
+    for match in pattern.finditer(text):
+        name = decode_js(match.group('name'))
+        if base.normalize(name) == wanted:
+            return name, match
+    return None
+
+
+def remove_dish_record(text: str, requested: str) -> tuple[str, str]:
+    found = find_dish(text, requested)
+    if not found:
+        fail('Plat introuvable dans dishes-ui.js')
+    name, match = found
+    end = match.end()
+    if end < len(text) and text[end:end + 1] == '\n':
+        end += 1
+    return text[:match.start()] + text[end:], name
+
+
+def bump_common_versions(
+    catalog_text: str,
+    local_text: str,
+    sw_text: str,
+    index_text: str,
+    new_version: int,
+    shell_assets: list[str],
+) -> tuple[str, str, str, str]:
+    catalog_text = re.sub(
+        r"(dish-local-images\.js\?v=)\d+",
+        rf"\g<1>{new_version}",
+        catalog_text,
+        count=1,
+    )
+    local_text, count = re.subn(
+        r"const APP_VERSION='v\d+'",
+        f"const APP_VERSION='v{new_version}'",
+        local_text,
+        count=1,
+    )
+    if count != 1:
+        fail('Version globale introuvable dans dish-local-images.js')
+    sw_text, count = re.subn(
+        r"const CACHE='courses-app-v\d+-r\d+'",
+        f"const CACHE='courses-app-v{new_version}-r1'",
+        sw_text,
+        count=1,
+    )
+    if count != 1:
+        fail('Version de cache introuvable dans sw.js')
+    sw_text = ensure_shell_assets(sw_text, shell_assets)
+    index_text, count = re.subn(
+        r'(<span class="page-version">)v\d+(</span>)',
+        rf'\g<1>v{new_version}\g<2>',
+        index_text,
+    )
+    if count != 3:
+        fail('Badges de version visibles introuvables dans index.html')
+    index_text = re.sub(
+        r'(catalog\.js\?v=)\d+',
+        rf'\g<1>{new_version}',
+        index_text,
+        count=1,
+    )
+    return catalog_text, local_text, sw_text, index_text
+
+
+def delete_product(requested: str) -> dict:
     catalog_path = ROOT / 'catalog.js'
+    quantities_path = ROOT / 'catalog-quantities.js'
+    app_path = ROOT / 'app.js'
+    intelligence_path = ROOT / 'purchase-intelligence.js'
+    local_path = ROOT / 'dish-local-images.js'
+    sw_path = ROOT / 'sw.js'
+    index_path = ROOT / 'index.html'
+
     catalog_text = catalog_path.read_text(encoding='utf-8')
     groups_match = re.search(r"groups:\s*(\{.*?\}),\s*\n\s*favorites:", catalog_text, flags=re.S)
     if not groups_match:
@@ -135,14 +248,9 @@ def main() -> None:
         del groups[category][subgroup]
 
     encoded_groups = json.dumps(groups, ensure_ascii=False, separators=(',', ':'))
-    catalog_text = (
-        catalog_text[:groups_match.start(1)]
-        + encoded_groups
-        + catalog_text[groups_match.end(1):]
-    )
+    catalog_text = catalog_text[:groups_match.start(1)] + encoded_groups + catalog_text[groups_match.end(1):]
     catalog_text = remove_from_favorites(catalog_text, name)
 
-    quantities_path = ROOT / 'catalog-quantities.js'
     quantities_text = quantities_path.read_text(encoding='utf-8')
     original_quantities_text = quantities_text
     quantities_text = remove_object_entry(quantities_text, 'PURCHASE_REFERENCES', name, r"\{[^{}]*\}")
@@ -160,7 +268,6 @@ def main() -> None:
     )
     quantities_changed = quantities_text != original_quantities_text
 
-    app_path = ROOT / 'app.js'
     app_text = app_path.read_text(encoding='utf-8')
     app_text = remove_object_entry(
         app_text,
@@ -168,70 +275,27 @@ def main() -> None:
         name,
         r"'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"",
     )
-
-    intelligence_path = ROOT / 'purchase-intelligence.js'
     intelligence_text = intelligence_path.read_text(encoding='utf-8')
     intelligence_text = remove_object_entry(intelligence_text, 'PRODUCT', name, r"\{[^{}]*\}")
 
-    local_path = ROOT / 'dish-local-images.js'
-    sw_path = ROOT / 'sw.js'
-    index_path = ROOT / 'index.html'
     local_text = local_path.read_text(encoding='utf-8')
     sw_text = sw_path.read_text(encoding='utf-8')
     index_text = index_path.read_text(encoding='utf-8')
     new_version = current_version() + 1
 
     if quantities_changed:
-        catalog_text = re.sub(
-            r"(catalog-quantities\.js\?v=)\d+",
-            rf"\g<1>{new_version}",
-            catalog_text,
-            count=1,
-        )
-    catalog_text = re.sub(
-        r"(dish-local-images\.js\?v=)\d+",
-        rf"\g<1>{new_version}",
-        catalog_text,
-        count=1,
-    )
+        catalog_text = re.sub(r"(catalog-quantities\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
     catalog_quantities_match = re.search(r"['\"](\./catalog-quantities\.js\?v=\d+)['\"]", catalog_text)
     if not catalog_quantities_match:
         fail('Révision active de catalog-quantities.js introuvable dans catalog.js')
     catalog_quantities_asset = catalog_quantities_match.group(1)
-    local_text, count = re.subn(
-        r"const APP_VERSION='v\d+'",
-        f"const APP_VERSION='v{new_version}'",
+    catalog_text, local_text, sw_text, index_text = bump_common_versions(
+        catalog_text,
         local_text,
-        count=1,
-    )
-    if count != 1:
-        fail('Version globale introuvable dans dish-local-images.js')
-    sw_text, count = re.subn(
-        r"const CACHE='courses-app-v\d+-r\d+'",
-        f"const CACHE='courses-app-v{new_version}-r1'",
         sw_text,
-        count=1,
-    )
-    if count != 1:
-        fail('Version de cache introuvable dans sw.js')
-    sw_text = ensure_shell_assets(sw_text, [
-        f'./catalog.js?v={new_version}',
-        catalog_quantities_asset,
-        f'./dish-local-images.js?v={new_version}',
-    ])
-
-    index_text, count = re.subn(
-        r'(<span class="page-version">)v\d+(</span>)',
-        rf'\g<1>v{new_version}\g<2>',
         index_text,
-    )
-    if count != 3:
-        fail('Badges de version visibles introuvables dans index.html')
-    index_text = re.sub(
-        r'(catalog\.js\?v=)\d+',
-        rf'\g<1>{new_version}',
-        index_text,
-        count=1,
+        new_version,
+        [f'./catalog.js?v={new_version}', catalog_quantities_asset, f'./dish-local-images.js?v={new_version}'],
     )
 
     filename = base.slugify(name) + '.webp'
@@ -247,19 +311,121 @@ def main() -> None:
     if image_path.exists():
         image_path.unlink()
 
-    RESULT_PATH.write_text(
-        json.dumps({
-            'ok': True,
-            'deleted': True,
-            'already_exists': False,
-            'name': name,
-            'version': new_version,
-            'filename': filename,
-            'category': category,
-            'subgroup': subgroup,
-        }, ensure_ascii=False, indent=2),
-        encoding='utf-8',
+    return {
+        'ok': True,
+        'deleted': True,
+        'already_exists': False,
+        'item_type': 'product',
+        'name': name,
+        'version': new_version,
+        'filename': filename,
+        'category': category,
+        'subgroup': subgroup,
+    }
+
+
+def delete_dish(requested: str) -> dict:
+    catalog_path = ROOT / 'catalog.js'
+    dishes_path = ROOT / 'dishes-ui.js'
+    quantities_path = ROOT / 'catalog-quantities.js'
+    local_path = ROOT / 'dish-local-images.js'
+    sw_path = ROOT / 'sw.js'
+    index_path = ROOT / 'index.html'
+
+    catalog_text = catalog_path.read_text(encoding='utf-8')
+    dishes_text = dishes_path.read_text(encoding='utf-8')
+    quantities_text = quantities_path.read_text(encoding='utf-8')
+    original_quantities_text = quantities_text
+    local_text = local_path.read_text(encoding='utf-8')
+    sw_text = sw_path.read_text(encoding='utf-8')
+    index_text = index_path.read_text(encoding='utf-8')
+
+    found = find_dish(dishes_text, requested)
+    if not found:
+        fail('Plat introuvable dans dishes-ui.js')
+    name, _ = found
+    child = set_contains(dishes_text, 'CHILD_DISHES', name) or set_contains(local_text, 'CHILD_DISHES', name)
+    special_slug = object_string_value(dishes_text, 'DISH_SPECIAL_SLUGS', name) or object_string_value(local_text, 'SPECIAL_SLUGS', name)
+    filename = ('enfant-' if child else '') + (special_slug or base.slugify(name)) + '.png'
+
+    dishes_text, name = remove_dish_record(dishes_text, name)
+    dishes_text = remove_set_value(dishes_text, 'CHILD_DISHES', name)
+    dishes_text = remove_object_entry(
+        dishes_text,
+        'DISH_SPECIAL_SLUGS',
+        name,
+        r"'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"",
     )
+    local_text = remove_set_value(local_text, 'CHILD_DISHES', name)
+    local_text = remove_object_entry(
+        local_text,
+        'SPECIAL_SLUGS',
+        name,
+        r"'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"",
+    )
+    quantities_text = remove_object_entry(quantities_text, 'DISH_NEEDS_FOR_TWO', name, r"\{[^{}]*\}")
+    quantities_changed = quantities_text != original_quantities_text
+
+    new_version = current_version() + 1
+    catalog_text = re.sub(r"(dishes-ui\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
+    if quantities_changed:
+        catalog_text = re.sub(r"(catalog-quantities\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
+    catalog_quantities_match = re.search(r"['\"](\./catalog-quantities\.js\?v=\d+)['\"]", catalog_text)
+    if not catalog_quantities_match:
+        fail('Révision active de catalog-quantities.js introuvable dans catalog.js')
+    catalog_quantities_asset = catalog_quantities_match.group(1)
+    catalog_text, local_text, sw_text, index_text = bump_common_versions(
+        catalog_text,
+        local_text,
+        sw_text,
+        index_text,
+        new_version,
+        [
+            f'./catalog.js?v={new_version}',
+            f'./dishes-ui.js?v={new_version}',
+            catalog_quantities_asset,
+            f'./dish-local-images.js?v={new_version}',
+        ],
+    )
+
+    image_path = ROOT / 'www' / 'Plats' / filename
+    catalog_path.write_text(catalog_text, encoding='utf-8')
+    dishes_path.write_text(dishes_text, encoding='utf-8')
+    quantities_path.write_text(quantities_text, encoding='utf-8')
+    local_path.write_text(local_text, encoding='utf-8')
+    sw_path.write_text(sw_text, encoding='utf-8')
+    index_path.write_text(index_text, encoding='utf-8')
+    if image_path.exists():
+        image_path.unlink()
+
+    return {
+        'ok': True,
+        'deleted': True,
+        'already_exists': False,
+        'item_type': 'dish',
+        'name': name,
+        'version': new_version,
+        'filename': filename,
+        'category': '',
+        'subgroup': '',
+    }
+
+
+def main() -> None:
+    raw = re.sub(r"\s+", " ", str(os.getenv('DISH_NAME') or '')).strip()
+    if raw.startswith(DELETE_PRODUCT_PREFIX):
+        item_type = 'product'
+        requested = raw[len(DELETE_PRODUCT_PREFIX):].strip()
+    elif raw.startswith(DELETE_DISH_PREFIX):
+        item_type = 'dish'
+        requested = raw[len(DELETE_DISH_PREFIX):].strip()
+    else:
+        fail('Demande de suppression invalide')
+    if not requested or len(requested) > 80:
+        fail('Nom de produit ou de plat invalide')
+
+    result = delete_dish(requested) if item_type == 'dish' else delete_product(requested)
+    RESULT_PATH.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
 
 
 if __name__ == '__main__':
