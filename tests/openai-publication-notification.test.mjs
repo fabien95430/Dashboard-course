@@ -6,6 +6,6 @@ const source=readFileSync(new URL('../scripts/send_web_push.mjs',import.meta.url
 
 test('un blocage de publication est distingué d un échec de génération OpenAI',()=>{
   assert.match(source,/const publicationBlocked=!success&&!deleteProduct&&stage==='deployment'/);
-  assert.ok(source.includes("publicationBlocked?'Publication bloquée':'Courses'"));
-  assert.ok(source.includes('`${itemName} est prêt, mais sa publication a été bloquée.`'));
+  assert.ok(source.includes("publicationBlocked?'Publication bloquée':deleteProduct?'Suppression échouée':'Intégration échouée'"));
+  assert.ok(source.includes('`« ${itemName} » est prêt, mais sa publication a été bloquée.`'));
 });

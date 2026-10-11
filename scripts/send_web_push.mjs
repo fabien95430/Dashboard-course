@@ -39,6 +39,13 @@ const success=status==='added';
 const publicStatus=success?(deleteProduct?'deleted':'added'):'error';
 const itemLabel=itemType==='product'?'produit':'plat';
 const publicationBlocked=!success&&!deleteProduct&&stage==='deployment';
+const failureStageLabel={
+  integration:'Génération ou intégration',
+  validation:'Validation du visuel',
+  checkpoint:'Sauvegarde de la génération',
+  repository:'Validation ou publication du dépôt',
+  deployment:'Validation ou publication du dépôt / GitHub Pages'
+}[stage]||(deleteProduct?'Suppression du catalogue':`Intégration du ${itemLabel}`);
 const fallbackError=stage==='deployment'
   ?'La publication ou le déploiement GitHub Pages n’a pas pu être confirmé.'
   :deleteProduct
@@ -56,16 +63,18 @@ if(!success){
 }
 
 const payload={
-  title:success?(deleteProduct?'Suppression terminée':'Ajout terminé'):publicationBlocked?'Publication bloquée':'Courses',
+  title:success
+    ?deleteProduct?'Produit supprimé':itemType==='product'?'Produit intégré':'Plat intégré'
+    :publicationBlocked?'Publication bloquée':deleteProduct?'Suppression échouée':'Intégration échouée',
   body:success
     ?deleteProduct
-      ?`${itemName} a été supprimé définitivement du catalogue.`
-      :`${itemName} est maintenant disponible dans le catalogue.`
+      ?`« ${itemName} » a été supprimé du catalogue.`
+      :`« ${itemName} » est maintenant disponible dans le catalogue.`
     :publicationBlocked
-      ?`${itemName} est prêt, mais sa publication a été bloquée.`
+      ?`« ${itemName} » est prêt, mais sa publication a été bloquée.`
       :deleteProduct
-        ?`⚠️ La suppression du produit « ${itemName} » a échoué.`
-        :`⚠️ L’intégration du ${itemLabel} « ${itemName} » a échoué.`,
+        ?`« ${itemName} » n’a pas pu être supprimé · ${failureStageLabel}.`
+        :`« ${itemName} » n’a pas pu être intégré · ${failureStageLabel}.`,
   tag:requestId?`courses-${deleteProduct?'product-delete':itemType}-${requestId}`:`courses-${deleteProduct?'product-delete':itemType}-integration`,
   status:publicStatus,
   itemType,

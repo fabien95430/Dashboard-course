@@ -69,11 +69,23 @@ test('supprimer un plat manquant garde le popup ouvert',()=>{
   assert.ok(handler.indexOf('event.stopPropagation()')<handler.indexOf('removeDish('));
 });
 
-test('un nouveau produit à générer déclenche la notification système dédiée',()=>{
+test('les notifications produit évitent le doublon ajout puis génération et expliquent les refus',()=>{
   const source=read('missing-products-dishes.js');
-  assert.match(source,/registration\.showNotification\('Produit à générer',\{/);
-  assert.match(source,/body:'Un produit a été ajouté à la liste'/);
-  assert.match(source,/if\(!knownProductIds\.has\(item\.id\)\)\{[\s\S]*?notifyRequest\(item\.name\);[\s\S]*?void notifyProductQueued\(item\.id\);/);
+  assert.match(source,/const PRODUCT_QUEUE_NOTIFICATION_DELAY_MS=10000;/);
+  assert.match(source,/setTimeout\(\(\)=>\{[\s\S]*?showProductNotification\([\s\S]*?'Produit à générer',[\s\S]*?a été ajouté aux produits manquants/);
+  assert.match(source,/document\.addEventListener\('courses:integration-started',[\s\S]*?cancelQueuedProductNotification\(event\.detail\?\.id\)/);
+  assert.match(source,/function notifyProductAlreadyPresent\([\s\S]*?'Produit déjà présent',[\s\S]*?Aucun ajout effectué\./);
+  assert.match(source,/function notifyProductAlreadyPending\([\s\S]*?'Produit déjà en attente',[\s\S]*?Aucun doublon créé\./);
+  assert.match(source,/if\(catalog\.has\(normalize\(item\.name\)\)\)\{[\s\S]*?notifyProductAlreadyPresent\(item\.id,item\.name\)[\s\S]*?\}else\{[\s\S]*?notifyRequest\(item\.name\);[\s\S]*?void notifyProductQueued\(item\.id\);/);
+});
+
+test('les notifications finales distinguent succès, suppression et étape d échec',()=>{
+  const source=read('scripts/send_web_push.mjs');
+  assert.match(source,/failureStageLabel=\{/);
+  assert.match(source,/repository:'Validation ou publication du dépôt'/);
+  assert.match(source,/deployment:'Validation ou publication du dépôt \/ GitHub Pages'/);
+  assert.match(source,/deleteProduct\?'Produit supprimé':itemType==='product'\?'Produit intégré':'Plat intégré'/);
+  assert.match(source,/deleteProduct\?'Suppression échouée':'Intégration échouée'/);
 });
 
 test('la précision image reste séparée du nom et atteint les deux intégrations produit',()=>{
