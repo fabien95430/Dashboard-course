@@ -3,6 +3,9 @@
 
 const APP_VERSION=String(window.COURSES_APP_VERSION||document.querySelector('.page-version')?.textContent||'').trim();
 let securityKeyboardBaseline=0;
+let securityViewportSession=false;
+let securityViewportRestoring=false;
+let securityViewportRestoreFrame=0;
 let retainedListEmptyState=null;
 
 function syncPageVersions(){
@@ -229,17 +232,47 @@ function syncPageVersions(){
 function securityViewportHeight(){
   return Math.round(window.visualViewport?.height||window.innerHeight||document.documentElement.clientHeight||0);
 }
+function securityViewportOffsetTop(){
+  return Math.max(0,Math.round(window.visualViewport?.offsetTop||0));
+}
 function isSecurityPasswordField(target=document.activeElement){
   return target===document.getElementById('securityPassword')||target===document.getElementById('securityConfirm');
+}
+function syncSecurityViewportPosition(){
+  const shell=document.querySelector('.security-shell');
+  if(!shell)return;
+  const visible=document.getElementById('securityOverlay')?.classList.contains('is-visible');
+  if(visible)securityViewportSession=true;
+  const offset=visible?securityViewportOffsetTop():0;
+  if(offset)shell.style.top=offset+'px';
+  else shell.style.removeProperty('top');
+}
+function restoreSecurityViewportOrigin(){
+  if(document.getElementById('securityOverlay')?.classList.contains('is-visible'))return;
+  const scrolling=document.scrollingElement;
+  if(scrolling){scrolling.scrollTop=0;scrolling.scrollLeft=0}
+  if(window.scrollX||window.scrollY)window.scrollTo(0,0);
+  syncSecurityViewportPosition();
+  securityViewportRestoring=securityViewportOffsetTop()>0||window.scrollX!==0||window.scrollY!==0;
+}
+function scheduleSecurityViewportRestore(){
+  if(securityViewportRestoreFrame)return;
+  securityViewportRestoreFrame=requestAnimationFrame(()=>{
+    securityViewportRestoreFrame=0;
+    restoreSecurityViewportOrigin();
+  });
 }
 function syncSecurityKeyboardState(){
   const shell=document.querySelector('.security-shell');
   if(!shell)return;
   const overlay=document.getElementById('securityOverlay');
+  const visible=Boolean(overlay?.classList.contains('is-visible'));
   const active=isSecurityPasswordField();
-  if(!overlay?.classList.contains('is-visible')||!active){
+  syncSecurityViewportPosition();
+  if(!visible||!active){
     shell.classList.remove('is-password-open');
     if(!active)securityKeyboardBaseline=0;
+    if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
     return;
   }
   const current=securityViewportHeight();
@@ -260,7 +293,9 @@ function bindSecurityKeyboardViewport(){
     requestAnimationFrame(syncSecurityKeyboardState);
   },true);
   window.visualViewport?.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
+  window.visualViewport?.addEventListener('scroll',syncSecurityKeyboardState,{passive:true});
   window.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
+  window.addEventListener('scroll',syncSecurityKeyboardState,{passive:true});
   window.addEventListener('pageshow',()=>{
     securityKeyboardBaseline=0;
     requestAnimationFrame(syncSecurityKeyboardState);
@@ -269,6 +304,14 @@ function bindSecurityKeyboardViewport(){
     if(document.visibilityState!=='visible')return;
     securityKeyboardBaseline=0;
     requestAnimationFrame(syncSecurityKeyboardState);
+  });
+  document.addEventListener('courses:lock-changed',event=>{
+    if(event.detail?.locked!==false||!securityViewportSession)return;
+    if(isSecurityPasswordField(document.activeElement))document.activeElement.blur();
+    securityKeyboardBaseline=0;
+    securityViewportSession=false;
+    securityViewportRestoring=true;
+    scheduleSecurityViewportRestore();
   });
   requestAnimationFrame(syncSecurityKeyboardState);
 }
