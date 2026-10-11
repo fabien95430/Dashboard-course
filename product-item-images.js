@@ -4,6 +4,7 @@
 const PRODUCT_NAMES=new Set(Object.values(window.COURSES_CATALOG?.groups||{}).flatMap(groups=>
   Object.values(groups||{}).flatMap(names=>Array.isArray(names)?names:[])
 ));
+const PRODUCT_NAMES_DISPLAY_ORDER=[...PRODUCT_NAMES].sort((a,b)=>a.localeCompare(b,'fr',{sensitivity:'base'}));
 let products=null;
 let listItems=null;
 let productRefreshFrame=0;
@@ -70,7 +71,7 @@ function promoteWarmedImages(source){
 }
 function warmProductImages(){
   const queued=new Set(warmQueue);
-  for(const name of PRODUCT_NAMES){
+  for(const name of PRODUCT_NAMES_DISPLAY_ORDER){
     const source=imageSource(name);
     if(warmedSources.has(source)||queued.has(source))continue;
     warmQueue.push(source);
