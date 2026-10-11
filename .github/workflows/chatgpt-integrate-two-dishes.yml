@@ -20,15 +20,40 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          : > /tmp/sushis.jpg
-          for part in .chatgpt/sushi.part*.b64; do base64 -d "$part" >> /tmp/sushis.jpg; done
-          : > /tmp/saucisse-lentille.jpg
-          for part in .chatgpt/saucisse.part*.b64; do base64 -d "$part" >> /tmp/saucisse-lentille.jpg; done
+          cat \
+            .chatgpt/sushi.part000.b64 \
+            .chatgpt/sushi.part001.b64 \
+            .chatgpt/sushi.part002.b64 \
+            .chatgpt/sushi.part003.b64 \
+            .chatgpt/sushi.part004a.b64 \
+            .chatgpt/sushi.part004b.b64 \
+            .chatgpt/sushi.part004c.b64 \
+            | tr -d '\r\n' | base64 -d > /tmp/sushis.jpg
+          cat \
+            .chatgpt/saucisse.fix000a.b64 \
+            .chatgpt/saucisse.fix000b.b64 \
+            .chatgpt/saucisse.fix001a.b64 \
+            .chatgpt/saucisse.fix001b.b64 \
+            .chatgpt/saucisse.part002.b64 \
+            .chatgpt/saucisse.part003.b64 \
+            .chatgpt/saucisse.part004.b64 \
+            .chatgpt/saucisse.part005.b64 \
+            | tr -d '\r\n' | base64 -d > /tmp/saucisse-lentille.jpg
           test -s /tmp/sushis.jpg
           test -s /tmp/saucisse-lentille.jpg
 
       - name: Prepare image conversion
         run: python -m pip install --disable-pip-version-check --quiet Pillow
+
+      - name: Validate recovered source images
+        shell: python
+        run: |
+          from PIL import Image
+          for path in ('/tmp/sushis.jpg','/tmp/saucisse-lentille.jpg'):
+              with Image.open(path) as image:
+                  image.verify()
+              with Image.open(path) as image:
+                  print(path, image.format, image.size)
 
       - name: Switch to current main safely
         shell: bash
