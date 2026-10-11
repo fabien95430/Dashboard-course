@@ -1,0 +1,294 @@
+from pathlib import Path
+from textwrap import dedent
+
+
+def read(path):
+    return Path(path).read_text(encoding='utf-8')
+
+
+def write(path, text):
+    Path(path).write_text(text, encoding='utf-8')
+
+
+def one(text, old, new, label):
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f'{label}: expected one match, got {count}')
+    return text.replace(old, new, 1)
+
+
+def exact(text, old, new, label, count):
+    found = text.count(old)
+    if found != count:
+        raise SystemExit(f'{label}: expected {count} matches, got {found}')
+    return text.replace(old, new)
+
+
+# app.js — mount every product card once, then only update visibility/order.
+path = 'app.js'
+text = read(path)
+text = one(
+    text,
+    "const productCardCache=new Map();\nfunction updateProductCardQuantity(card,name,quantity){",
+    "const productCardCache=new Map();\nlet productGridReady=false;\nlet productEmptyState=null;\nfunction updateProductCardQuantity(card,name,quantity){",
+    'app grid state',
+)
+old = """function renderProducts(){
+  const el=$('#products');
+  if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
+  const products=visibleProducts();
+  const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
+  const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
+  if(!products.length){
+    const empty=document.createElement('div');
+    empty.className='empty is-wide';
+    empty.textContent='Aucun produit ne correspond à cette recherche.';
+    el.replaceChildren(empty);
+    notifyProductsUpdated();
+    return;
+  }
+  const fragment=document.createDocumentFragment();
+  products.forEach(product=>{
+    const card=productCard(product);
+    updateProductCardQuantity(card,product.name,catalogQuantityForDisplay(product.name,quantities.get(norm(product.name))||0));
+    fragment.appendChild(card);
+  });
+  el.replaceChildren(fragment);
+  notifyProductsUpdated();
+}
+"""
+new = """function ensureProductGrid(el,quantities){
+  if(productGridReady)return;
+  const fragment=document.createDocumentFragment();
+  sortProductsAlpha(unique(ALL)).forEach(product=>{
+    const card=productCard(product);
+    updateProductCardQuantity(card,product.name,catalogQuantityForDisplay(product.name,quantities.get(norm(product.name))||0));
+    fragment.appendChild(card);
+  });
+  productEmptyState=document.createElement('div');
+  productEmptyState.className='empty is-wide';
+  productEmptyState.textContent='Aucun produit ne correspond à cette recherche.';
+  productEmptyState.hidden=true;
+  fragment.appendChild(productEmptyState);
+  el.replaceChildren(fragment);
+  productGridReady=true;
+}
+function syncProductGrid(products,quantities){
+  const ranks=new Map(products.map((product,index)=>[norm(product.name),index]));
+  productCardCache.forEach((card,key)=>{
+    const rank=ranks.get(key),visible=rank!==undefined;
+    card.hidden=!visible;
+    card.style.order=visible?String(rank):'';
+    if(!visible)return;
+    const name=card.dataset.name||'';
+    updateProductCardQuantity(card,name,catalogQuantityForDisplay(name,quantities.get(key)||0));
+  });
+  if(productEmptyState){
+    productEmptyState.hidden=products.length!==0;
+    productEmptyState.style.order=String(products.length);
+  }
+}
+function renderProducts(){
+  const el=$('#products');
+  if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
+  const products=visibleProducts();
+  const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
+  ensureProductGrid(el,quantities);
+  syncProductGrid(products,quantities);
+  const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
+  notifyProductsUpdated();
+}
+"""
+text = one(text, old, new, 'app renderProducts')
+write(path, text)
+
+# dishes-ui.js — preserve the mounted Products grid and avoid a synthetic input when already empty.
+path = 'dishes-ui.js'
+text = read(path)
+text = one(
+    text,
+    "if(!initial){\n    drivingCatalog=true;",
+    "if(!initial&&searchInput.value){\n    drivingCatalog=true;",
+    'dishes fake input',
+)
+text = one(
+    text,
+    "  productsGrid.hidden=dishes;",
+    "  productsGrid.classList.toggle('is-catalog-mode-hidden',dishes);\n  productsGrid.setAttribute('aria-hidden',String(dishes));\n  productsGrid.inert=dishes;",
+    'dishes product grid visibility',
+)
+write(path, text)
+
+# product-item-images.js — hidden persistent cards are not viewport-visible and are not redecorated.
+path = 'product-item-images.js'
+text = read(path)
+text = one(
+    text,
+    "function productCardVisible(card){\n  const rect=card?.getBoundingClientRect?.();",
+    "function productCardVisible(card){\n  if(!card||card.hidden||products?.classList.contains('is-catalog-mode-hidden'))return false;\n  const rect=card.getBoundingClientRect?.();",
+    'image visibility guard',
+)
+text = one(
+    text,
+    "  productImagesIdle=false;\n  products?.querySelectorAll('.product[data-name]').forEach(card=>decorateCard(card,false));\n  scheduleProductImagesIdleCheck();",
+    "  productImagesIdle=false;\n  if(!products?.classList.contains('is-catalog-mode-hidden')){\n    products?.querySelectorAll('.product[data-name]:not([hidden])').forEach(card=>decorateCard(card,false));\n  }\n  scheduleProductImagesIdleCheck();",
+    'image decoration visible cards',
+)
+write(path, text)
+
+# catalog-quantities.js — only decorate cards currently displayed; app.js refreshes state before reveal.
+path = 'catalog-quantities.js'
+text = read(path)
+text = one(
+    text,
+    "  products.querySelectorAll('.product[data-name]').forEach(card=>{",
+    "  products.querySelectorAll('.product[data-name]:not([hidden])').forEach(card=>{",
+    'quantities visible cards',
+)
+write(path, text)
+
+# Critical catalogue CSS — keep Products mounted behind Plats; align version badge with Ma liste.
+path = 'product-item-first-paint.css'
+text = read(path)
+text = one(
+    text,
+    "html .catalog-view>#products,\nhtml .catalog-view>.dishes-grid{order:4!important}",
+    "html .catalog-view>#products,\nhtml .catalog-view>.dishes-grid{\n  order:4!important;\n  grid-row:5!important;\n  grid-column:1!important;\n  min-height:0!important;\n}\nhtml .catalog-view>#products.is-catalog-mode-hidden{\n  content-visibility:hidden!important;\n  visibility:hidden!important;\n  pointer-events:none!important;\n}",
+    'persistent grid css',
+)
+text = one(
+    text,
+    "  html .catalog-view .page-version{\n    transform:translateY(14px)!important;\n  }\n",
+    "",
+    'catalog badge alignment',
+)
+write(path, text)
+
+# Existing regression tests follow the new persistent-grid invariant.
+path = 'tests/catalog-quantities-events.test.mjs'
+text = read(path)
+text = one(
+    text,
+    "  assert.match(app,/function renderProducts\\(\\)[\\s\\S]*?el\\.replaceChildren\\(fragment\\);\\s*notifyProductsUpdated\\(\\)/);",
+    "  const productRender=app.slice(app.indexOf('function renderProducts(){'),app.indexOf('function setProductQuantity(',app.indexOf('function renderProducts(){')));\n  assert.match(productRender,/ensureProductGrid\\(el,quantities\\);/);\n  assert.match(productRender,/syncProductGrid\\(products,quantities\\);/);\n  assert.match(productRender,/notifyProductsUpdated\\(\\);/);\n  assert.doesNotMatch(productRender,/replaceChildren\\(/);",
+    'quantities render test',
+)
+write(path, text)
+
+path = 'tests/catalog-first-paint-shell.test.mjs'
+text = read(path)
+text = one(
+    text,
+    "  assert.match(firstPaint,/catalog-view \\.page-version\\{[\\s\\S]*?translateY\\(14px\\)/);",
+    "  assert.doesNotMatch(firstPaint,/catalog-view \\.page-version\\{[\\s\\S]*?translateY\\(/);",
+    'badge first paint test',
+)
+text = one(
+    text,
+    '<script src="./app.js?v=428"></script>',
+    '<script src="./app.js?v=429"></script>',
+    'first paint app revision test',
+)
+write(path, text)
+
+path = 'tests/app-responsibility-extraction.test.mjs'
+text = read(path)
+text = one(text, './app.js?v=428', './app.js?v=429', 'navigation app revision test')
+write(path, text)
+
+write(
+    'tests/catalog-persistent-grid.test.mjs',
+    dedent("""\
+    import test from 'node:test';
+    import assert from 'node:assert/strict';
+    import {readFileSync} from 'node:fs';
+
+    const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
+
+    test('la grille Produits est montée une fois puis filtrée sans détacher ses cartes',()=>{
+      const app=read('app.js');
+      const ensureStart=app.indexOf('function ensureProductGrid(');
+      const syncStart=app.indexOf('function syncProductGrid(',ensureStart);
+      const renderStart=app.indexOf('function renderProducts(){',syncStart);
+      const renderEnd=app.indexOf('function setProductQuantity(',renderStart);
+      assert.ok(ensureStart>=0&&syncStart>ensureStart&&renderStart>syncStart&&renderEnd>renderStart);
+      const ensure=app.slice(ensureStart,syncStart),sync=app.slice(syncStart,renderStart),render=app.slice(renderStart,renderEnd);
+      assert.match(ensure,/el\.replaceChildren\(fragment\)/);
+      assert.match(sync,/card\.hidden=!visible/);
+      assert.match(sync,/card\.style\.order=visible\?String\(rank\):''/);
+      assert.doesNotMatch(render,/replaceChildren\(/);
+    });
+
+    test('la bascule Produits Plats conserve la grille et ne simule pas une saisie vide',()=>{
+      const dishes=read('dishes-ui.js');
+      const start=dishes.indexOf('function setMode(next,initial=false){'),end=dishes.indexOf('function syncModeLens(',start),block=dishes.slice(start,end);
+      assert.match(block,/if\(!initial&&searchInput\.value\)/);
+      assert.match(block,/productsGrid\.classList\.toggle\('is-catalog-mode-hidden',dishes\)/);
+      assert.match(block,/productsGrid\.inert=dishes/);
+      assert.doesNotMatch(block,/productsGrid\.hidden=dishes/);
+    });
+
+    test('images et quantités ignorent les cartes Produits masquées',()=>{
+      const images=read('product-item-images.js'),quantities=read('catalog-quantities.js');
+      assert.match(images,/card\.hidden\|\|products\?\.classList\.contains\('is-catalog-mode-hidden'\)/);
+      assert.match(images,/\.product\[data-name\]:not\(\[hidden\]\)/);
+      assert.match(quantities,/\.product\[data-name\]:not\(\[hidden\]\)/);
+    });
+
+    test('la variante sûre garde content-visibility auto hors des cartes',()=>{
+      const css=read('product-item-first-paint.css');
+      assert.match(css,/#products\.is-catalog-mode-hidden\{[\s\S]*content-visibility:hidden!important/);
+      assert.doesNotMatch(css,/\.product[^\{]*\{[^\}]*content-visibility\s*:\s*auto/i);
+      assert.doesNotMatch(css,/\.catalog-view \.page-version\{[\s\S]*?transform:/);
+    });
+    """),
+)
+
+# Global version and cache-busting revisions.
+path = 'index.html'
+text = read(path)
+text = exact(text, '<span class="page-version">v443</span>', '<span class="page-version">v444</span>', 'visible badges', 3)
+for old, new, label in [
+    ('./product-item-first-paint.css?v=443', './product-item-first-paint.css?v=444', 'first paint revision'),
+    ('./catalog.js?v=443', './catalog.js?v=444', 'catalog revision'),
+    ('./app.js?v=428', './app.js?v=429', 'app revision'),
+]:
+    text = one(text, old, new, label)
+write(path, text)
+
+path = 'catalog.js'
+text = read(path)
+for old, new, label in [
+    ('./dishes-ui.js?v=443', './dishes-ui.js?v=444', 'dishes revision'),
+    ('./catalog-quantities.js?v=438', './catalog-quantities.js?v=439', 'quantities revision'),
+    ('./dish-local-images.js?v=443', './dish-local-images.js?v=444', 'dish images revision'),
+    ('./runtime-features.js?v=431', './runtime-features.js?v=432', 'runtime revision'),
+]:
+    text = one(text, old, new, label)
+write(path, text)
+
+path = 'runtime-features.js'
+text = read(path)
+text = one(text, './product-item-images.js?v=442', './product-item-images.js?v=443', 'product images revision')
+write(path, text)
+
+path = 'dish-local-images.js'
+text = read(path)
+text = one(text, "const APP_VERSION='v443';", "const APP_VERSION='v444';", 'app version')
+write(path, text)
+
+path = 'sw.js'
+text = read(path)
+for old, new, label in [
+    ("const CACHE='courses-app-v443-r1';", "const CACHE='courses-app-v444-r1';", 'cache version'),
+    ('./product-item-first-paint.css?v=443', './product-item-first-paint.css?v=444', 'sw first paint'),
+    ('./catalog.js?v=443', './catalog.js?v=444', 'sw catalog'),
+    ('./app.js?v=428', './app.js?v=429', 'sw app'),
+    ('./dishes-ui.js?v=443', './dishes-ui.js?v=444', 'sw dishes'),
+    ('./catalog-quantities.js?v=438', './catalog-quantities.js?v=439', 'sw quantities'),
+    ('./dish-local-images.js?v=443', './dish-local-images.js?v=444', 'sw dish images'),
+    ('./runtime-features.js?v=431', './runtime-features.js?v=432', 'sw runtime'),
+    ('./product-item-images.js?v=442', './product-item-images.js?v=443', 'sw product images'),
+]:
+    text = one(text, old, new, label)
+write(path, text)
