@@ -129,7 +129,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Sacs poubelle 30L":"Sac poub. 30L",
   "Sacs poubelle 50L":"Sac poub. 50L",
   "Sacs congélation":"Sacs cong.",
-  "Filtres aspirateur":"Filtres aspi.",
+
   "Après-shampoing":"Après-shamp.",
   "Brosses à dents":"Brosses dents",
   "Mouchoirs poche":"Mouchoirs p.",
