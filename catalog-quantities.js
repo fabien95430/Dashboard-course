@@ -142,7 +142,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Kinder Maxi":"Boîte",
   "Ricard":"Bouteille",
   "Rhum":"Bouteille",
-  "Gin":"Bouteille"
+  "Gin":"Bouteille",
+  "Sel":"Paquet"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
