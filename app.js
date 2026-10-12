@@ -40,7 +40,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Petits pois surgelés":"Petits pois",
   "Poêlée de légumes":"Poêlée lég.",
   "Poisson surgelé":"Poisson surg.",
-  "Steaks hachés surgelés":"Steaks surg.",
+
   "Pizza surgelée":"Pizza surg.",
   "Glace chocolat":"Glace choco.",
   "Pain aux céréales":"Pain céréales",

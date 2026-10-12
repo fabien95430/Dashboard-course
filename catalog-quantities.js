@@ -110,7 +110,7 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   'Beurre':'Plaquette','Camembert':'Pièce','Chèvre':'Pièce','Mozzarella':'Sachet','Raclette':'Barquette','Reblochon':'Pièce','Fromage râpé':'Sachet',
   'Saucisson':'Pièce','Chorizo':'Pièce','Pâté':'Barquette','Rillettes':'Pot',
   'Surimi':'Paquet','Saumon fumé':'Paquet','Poisson pané':'Boîte','Quiche':'Pièce','Pizza fraîche':'Boîte','Pâtes fraîches':'Paquet',
-  'Steaks hachés surgelés':'Boîte','Pizza surgelée':'Boîte','Glace vanille':'Pot','Glace chocolat':'Pot','Sorbet':'Pot','Glaçons':'Sac',
+  'Pizza surgelée':'Boîte','Glace vanille':'Pot','Glace chocolat':'Pot','Sorbet':'Pot','Glaçons':'Sac',
   'Pain de mie':'Paquet','Brioche':'Paquet','Croissants':'Paquet','Pains au chocolat':'Paquet','Wraps':'Paquet','Pains burger':'Paquet','Pains hot-dog':'Paquet','Galettes de blé':'Paquet','Pâte brisée':'Pièce',
   'Citrons':'Pièce','Kiwis':'Pièce','Fraises':'Barquette','Framboises':'Barquette','Myrtilles':'Barquette','Mûres':'Barquette',
   'Ananas':'Pièce','Mangue':'Pièce','Avocat':'Pièce','Noix de coco':'Pièce','Grenade':'Pièce','Fruit de la passion':'Pièce','Melon':'Pièce',
