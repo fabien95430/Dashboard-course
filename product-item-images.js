@@ -15,10 +15,8 @@ let productImagesIdle=false;
 let warmQueue=[];
 let warmScheduled=false;
 let warmActive=0;
-let cacheRestorePromise=null;
 let warmCycleRequested=false;
 const warmedSources=new Set();
-const cachedSources=new Set();
 const visualScaleCache=new Map();
 const PRODUCT_WARM_VERSION_KEY='courses-product-images-warm-version-v1';
 
@@ -44,26 +42,6 @@ function saveWarmVersion(){
   if(!version)return;
   try{localStorage.setItem(PRODUCT_WARM_VERSION_KEY,version)}catch(_){}
 }
-function restoreCachedProductImages(){
-  if(cacheRestorePromise)return cacheRestorePromise;
-  if(!('caches' in window)){
-    cacheRestorePromise=Promise.resolve(false);
-    return cacheRestorePromise;
-  }
-  cacheRestorePromise=(async()=>{
-    const cacheNames=(await caches.keys()).filter(name=>name.startsWith('courses-visuals-'));
-    const groups=await Promise.all(cacheNames.map(name=>caches.open(name).then(cache=>cache.keys())));
-    const urls=new Set(groups.flat().map(request=>request.url));
-    for(const name of PRODUCT_NAMES_DISPLAY_ORDER){
-      const source=imageSource(name);
-      let href=source;
-      try{href=new URL(source,document.baseURI).href}catch(_){}
-      if(urls.has(href))cachedSources.add(source);
-    }
-    return cachedSources.size>0;
-  })().catch(()=>false);
-  return cacheRestorePromise;
-}
 function markWarmCycleComplete(){
   if(!warmCycleRequested||warmQueue.length||warmActive)return;
   saveWarmVersion();
@@ -87,23 +65,22 @@ function warmProductImagesStep(){
     image.alt='';
     image.decoding='async';
     image.fetchPriority='low';
-    const done=cached=>{
+    const done=()=>{
       warmActive=Math.max(0,warmActive-1);
       warmedSources.add(source);
-      if(cached)cachedSources.add(source);
       promoteWarmedImages(source);
       scheduleProductWarmup();
       markWarmCycleComplete();
     };
-    image.addEventListener('load',()=>done(true),{once:true});
-    image.addEventListener('error',()=>done(false),{once:true});
+    image.addEventListener('load',done,{once:true});
+    image.addEventListener('error',done,{once:true});
     image.src=source;
   }
   scheduleProductWarmup();
   markWarmCycleComplete();
 }
 function imageLoading(source,eager=false){
-  return eager||warmedSources.has(source)||cachedSources.has(source)?'eager':'lazy';
+  return eager||warmedSources.has(source)?'eager':'lazy';
 }
 function promoteWarmedImages(source){
   if(!products||!source)return;
@@ -113,15 +90,9 @@ function promoteWarmedImages(source){
 }
 function queueProductWarmup(){
   warmCycleRequested=true;
-  const reuseCached=storedWarmVersion()===currentAppVersion();
   const queued=new Set(warmQueue);
   for(const name of PRODUCT_NAMES_DISPLAY_ORDER){
     const source=imageSource(name);
-    if(reuseCached&&cachedSources.has(source)){
-      warmedSources.add(source);
-      promoteWarmedImages(source);
-      continue;
-    }
     if(warmedSources.has(source)||queued.has(source))continue;
     warmQueue.push(source);
     queued.add(source);
@@ -130,11 +101,10 @@ function queueProductWarmup(){
   markWarmCycleComplete();
 }
 function warmProductImages(){
-  restoreCachedProductImages().then(()=>{
-    scheduleDecorateProducts();
-    scheduleDecorateList();
-    queueProductWarmup();
-  });
+  scheduleDecorateProducts();
+  scheduleDecorateList();
+  if(storedWarmVersion()===currentAppVersion())return true;
+  queueProductWarmup();
   return true;
 }
 window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages});
