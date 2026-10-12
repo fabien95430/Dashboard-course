@@ -120,7 +120,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Sel lave-vaisselle":"Sel LV",
   "Liquide rinçage":"Liquide rinç.",
   "Nettoyant lave-vaisselle":"Nettoyant LV",
-  "Brosses vaisselle":"Brosses vaiss",
+
   "Papier toilette":"Papier WC",
   "Serviettes papier":"Serviettes",
   "Papier aluminium":"Papier alu",

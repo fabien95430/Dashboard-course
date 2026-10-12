@@ -128,7 +128,7 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   'Chicorée':'Pot','Matcha':'Boîte','Chocolat chaud':'Boîte','Filtres à café':'Boîte',
   'Éponges magiques':'Paquet','Lingettes ménage':'Paquet','Bicarbonate':'Paquet','Vinaigre ménager':'Bouteille',
   'Lessive capsules':'Boîte','Lessive poudre':'Paquet','Lingettes anti-décoloration':'Boîte','Filet de lavage':'Pièce','Pinces à linge':'Paquet','Sacs linge délicat':'Paquet',
-  'Tablettes lave-vaisselle':'Boîte','Sel lave-vaisselle':'Paquet','Éponges':'Paquet','Grattoirs':'Paquet','Brosses vaisselle':'Pièce','Gants ménage':'Paire','Torchons':'Paquet','Essuie-verres':'Paquet',
+  'Tablettes lave-vaisselle':'Boîte','Sel lave-vaisselle':'Paquet','Éponges':'Paquet','Grattoirs':'Paquet','Gants ménage':'Paire','Torchons':'Paquet','Essuie-verres':'Paquet',
   'Papier aluminium':'Rouleau','Film alimentaire':'Rouleau','Papier cuisson':'Rouleau',
   'Dentifrice':'Tube','Brosses à dents':'Pièce','Cotons-tiges':'Boîte','Disques coton':'Paquet','Mouchoirs poche':'Paquet','Papier toilette humide':'Paquet',
   'Crème hydratante':'Tube','Crème mains':'Tube','Baume lèvres':'Stick','Rasoirs':'Paquet','Coton':'Paquet','Protections hygiéniques':'Paquet','Pansements':'Boîte','Thermomètre piles':'Pièce','Pile AAA':'Paquet',
