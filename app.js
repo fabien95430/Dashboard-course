@@ -1887,15 +1887,39 @@ async function addItem(name,{deferRefresh=false}={}){
     navigator.vibrate?.(10);toast(item+' ajouté');renderSelectionAndList();return true;
   }
   if(!state.entity)return;
+  const queueLocal=async()=>{
+    await queueOfflineAdd(item);
+    recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');
+    if(deferRefresh)syncProductSelection();
+    else renderSelectionAndList();
+    return true;
+  };
+  if(!socketReady()){
+    try{return await queueLocal()}
+    catch(error){
+      toast('Ajout impossible');
+      status('is-error','Erreur',error.message||'Ajout impossible');
+      return false;
+    }
+  }
   try{
     await todoService('add_item',{item});
     recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');
     if(deferRefresh){
       state.items=[...state.items,{uid:'',summary:item,status:'needs_action'}];
+      await persistOfflineState();
       return true;
     }
     await refreshItems();return true;
-  }catch(error){toast('Ajout impossible');status('is-error','Erreur',error.message||'Ajout impossible')}
+  }catch(error){
+    if(isTransientHaError(error)){
+      try{return await queueLocal()}
+      catch(queueError){error=queueError}
+    }
+    toast('Ajout impossible');
+    status('is-error','Erreur',error.message||'Ajout impossible');
+    return false;
+  }
 }
 async function completeTodoItem(uid){
   const uidValue=String(uid||'').trim();
@@ -1923,6 +1947,11 @@ async function removeOneItem(name,groupHint=null,{deferRefresh=false}={}){
       navigator.vibrate?.(8);toast(item+' -1');renderSelectionAndList();return true;
     }
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
+    if(state.offlinePending.some(action=>action.entity===state.entity&&action.type==='add'&&norm(action.name)===key)){
+      await cancelQueuedOfflineAdd(item);
+      navigator.vibrate?.(8);toast(item+' -1');
+      return true;
+    }
     if(deferRefresh&&group.uids.filter(Boolean).length<group.count){
       await refreshItems();
       group=activeGroups().find(entry=>norm(entry.summary)===key);
@@ -2238,9 +2267,13 @@ function offlineAad(){return UTF8.encode('courses-offline-v1|'+CLIENT_ID+'|'+nor
 function socketReady(){return !!state.ws&&state.ws.readyState===WebSocket.OPEN}
 function showOfflineStatus(){
   const pending=state.offlinePending.length;
+  if(socketReady()&&!pending){
+    status('','Synchronisé',state.entities.find(e=>e.id===state.entity)?.name||state.entity);
+    return;
+  }
   const title=socketReady()&&pending?'Synchronisation en attente':'Hors ligne';
   const detail=pending
-    ?pending+' achat'+(pending>1?'s':'')+' à synchroniser'
+    ?pending+' modification'+(pending>1?'s':'')+' à synchroniser'
     :(state.offlineLoaded?'Dernière liste enregistrée':'Aucune liste enregistrée');
   status('is-waiting',title,detail);
 }
@@ -2292,8 +2325,21 @@ function sanitizeOfflinePending(actions){
   if(!Array.isArray(actions))return [];
   return actions.slice(-500).map(action=>{
     const entity=String(action?.entity||'').trim();
+    if(!entity.startsWith('todo.'))return null;
+    if(action?.type==='add'){
+      const name=String(action.name||'').trim().slice(0,80);
+      if(!name)return null;
+      return {
+        id:String(action.id||secureRandomToken(8)),
+        type:'add',
+        entity,
+        name,
+        target:Math.max(1,Math.min(100,Number(action.target)||1)),
+        createdAt:Number(action.createdAt)||Date.now()
+      };
+    }
     const uids=Array.isArray(action?.uids)?[...new Set(action.uids.map(uid=>String(uid||'').trim()).filter(Boolean))]:[];
-    if(action?.type!=='complete'||!entity.startsWith('todo.')||!uids.length)return null;
+    if(action?.type!=='complete'||!uids.length)return null;
     return {
       id:String(action.id||secureRandomToken(8)),
       type:'complete',
@@ -2352,40 +2398,115 @@ function isTransientHaError(error){
   const message=String(error?.message||'').toLowerCase();
   return navigator.onLine===false||!socketReady()||/connexion|websocket|ne répond pas|momentanément|inaccessible|interrompue|distante impossible/.test(message);
 }
+async function queueOfflineAdd(name){
+  const item=String(name||'').trim();
+  if(!item||!state.entity)throw new Error('Liste Home Assistant indisponible');
+  const action={
+    id:secureRandomToken(8),
+    type:'add',
+    entity:state.entity,
+    name:item.slice(0,80),
+    target:Math.max(1,Math.min(100,productQuantity(item)+1)),
+    createdAt:Date.now()
+  };
+  const placeholder={uid:'',summary:item,status:'needs_action',offlineActionId:action.id};
+  state.offlinePending.push(action);
+  state.items=[...state.items,placeholder];
+  const saved=await persistOfflineState();
+  if(!saved){
+    state.offlinePending=state.offlinePending.filter(entry=>entry.id!==action.id);
+    state.items=state.items.filter(entry=>entry.offlineActionId!==action.id);
+    throw new Error('Stockage hors ligne indisponible');
+  }
+  showOfflineStatus();
+  return action;
+}
+async function cancelQueuedOfflineAdd(name,all=false){
+  const key=norm(name);
+  const matching=state.offlinePending.filter(action=>action.entity===state.entity&&action.type==='add'&&norm(action.name)===key);
+  if(!matching.length)return 0;
+  const selected=all?matching:[matching.at(-1)];
+  const ids=new Set(selected.map(action=>action.id));
+  const previousPending=state.offlinePending;
+  const previousItems=state.items;
+  state.offlinePending=previousPending.filter(action=>!ids.has(action.id));
+  state.items=previousItems.filter(item=>!ids.has(item.offlineActionId));
+  const saved=await persistOfflineState();
+  if(!saved){
+    state.offlinePending=previousPending;
+    state.items=previousItems;
+    throw new Error('Stockage hors ligne indisponible');
+  }
+  showOfflineStatus();
+  return ids.size;
+}
 async function queueOfflineCompletion(name,uids){
+  const item=String(name||'').trim();
+  const key=norm(item);
   const clean=[...new Set((Array.isArray(uids)?uids:[]).map(uid=>String(uid||'').trim()).filter(Boolean))];
-  if(!clean.length)throw new Error('Identifiant de l’article indisponible');
+  const previousPending=state.offlinePending;
+  const previousItems=state.items;
+  const cancelledAdds=new Set(previousPending
+    .filter(action=>action.entity===state.entity&&action.type==='add'&&norm(action.name)===key)
+    .map(action=>action.id));
+  state.offlinePending=previousPending.filter(action=>!cancelledAdds.has(action.id));
+  state.items=previousItems.filter(item=>!cancelledAdds.has(item.offlineActionId));
   const queued=new Set(state.offlinePending.filter(action=>action.entity===state.entity&&action.type==='complete').flatMap(action=>action.uids));
   const remaining=clean.filter(uid=>!queued.has(uid));
+  if(!remaining.length&&!cancelledAdds.size){
+    state.offlinePending=previousPending;
+    state.items=previousItems;
+    throw new Error('Identifiant de l’article indisponible');
+  }
   const action=remaining.length?{
     id:secureRandomToken(8),
     type:'complete',
     entity:state.entity,
     uids:remaining,
-    name:String(name||'').trim().slice(0,80),
+    name:item.slice(0,80),
     createdAt:Date.now()
   }:null;
   if(action)state.offlinePending.push(action);
   const saved=await persistOfflineState();
   if(!saved){
-    if(action)state.offlinePending=state.offlinePending.filter(entry=>entry.id!==action.id);
+    state.offlinePending=previousPending;
+    state.items=previousItems;
     throw new Error('Stockage hors ligne indisponible');
   }
   showOfflineStatus();
 }
 async function syncOfflinePending(){
-  const actions=state.offlinePending.filter(action=>action.entity===state.entity);
-  if(!actions.length||!state.entity||!socketReady())return;
+  if(!state.offlinePending.some(action=>action.entity===state.entity)||!state.entity||!socketReady())return;
   if(state.offlineSyncing)return state.offlineSyncing;
   const syncing=(async()=>{
     const result=await todoList();
     const remoteItems=Array.isArray(result?.items)?result.items:[];
-    const remotePending=new Set(remoteItems.filter(isPendingItem).map(itemUid).filter(Boolean));
-    for(const action of actions){
-      for(const uid of action.uids){
-        if(!remotePending.has(uid))continue;
-        await completeTodoItem(uid);
-        remotePending.delete(uid);
+    const pendingItems=remoteItems.filter(isPendingItem);
+    const remotePending=new Set(pendingItems.map(itemUid).filter(Boolean));
+    const remoteNames=new Map(pendingItems.map(item=>[itemUid(item),itemSummary(item)]).filter(([uid])=>uid));
+    const remoteCounts=new Map();
+    pendingItems.forEach(item=>{
+      const key=norm(itemSummary(item));
+      if(key)remoteCounts.set(key,(remoteCounts.get(key)||0)+1);
+    });
+    while(socketReady()){
+      const action=state.offlinePending.find(entry=>entry.entity===state.entity);
+      if(!action)break;
+      if(action.type==='add'){
+        const key=norm(action.name),current=remoteCounts.get(key)||0;
+        if(current<action.target){
+          await todoService('add_item',{item:action.name});
+          remoteCounts.set(key,current+1);
+        }
+        state.items=state.items.filter(entry=>entry.offlineActionId!==action.id);
+      }else{
+        for(const uid of action.uids){
+          if(!remotePending.has(uid))continue;
+          const key=norm(remoteNames.get(uid)||action.name);
+          await completeTodoItem(uid);
+          remotePending.delete(uid);
+          if(key)remoteCounts.set(key,Math.max(0,(remoteCounts.get(key)||0)-1));
+        }
       }
       state.offlinePending=state.offlinePending.filter(entry=>entry.id!==action.id);
       await persistOfflineState();
@@ -2395,6 +2516,7 @@ async function syncOfflinePending(){
   try{return await syncing}
   finally{if(state.offlineSyncing===syncing)state.offlineSyncing=null}
 }
+
 
 const onlineScheduleReconnect=scheduleReconnect;
 scheduleReconnect=function(){
@@ -2510,7 +2632,8 @@ removeGroup=async function(name,row=null,intent='purchase'){
   try{
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
     const uids=group.uids.filter(Boolean);
-    if(!uids.length)throw new Error('Identifiant de l’article indisponible');
+    const hasQueuedAdds=state.offlinePending.some(action=>action.entity===state.entity&&action.type==='add'&&norm(action.name)===key);
+    if(!uids.length&&!hasQueuedAdds)throw new Error('Identifiant de l’article indisponible');
     if(!socketReady()){
       await queueOfflineCompletion(item,uids);
       queuedOffline=true;
@@ -2518,8 +2641,9 @@ removeGroup=async function(name,row=null,intent='purchase'){
       toast(successMessage);
       return;
     }
+    if(hasQueuedAdds)await queueOfflineCompletion(item,[]);
     try{
-      await Promise.all(uids.map(completeTodoItem));
+      if(uids.length)await Promise.all(uids.map(completeTodoItem));
       if(isPurchase)publishPurchaseSettled(item,group.count,false);
       toast(successMessage);
     }catch(error){
