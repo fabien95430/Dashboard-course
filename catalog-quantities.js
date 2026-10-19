@@ -155,7 +155,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Philadelphia":"Pot",
   "Speculos":"Paquet",
   "Alcool 70":"Bouteille",
-  "Sirot d’érable":"Bouteille"
+  "Sirot d’érable":"Bouteille",
+  "Granola":"Sachet"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
