@@ -164,7 +164,7 @@ function recordSharedAction({action,type,name}){
   actions.push({id:createId(),action,type,name:cleanText(name)});
   if(writeJson(SHARED_QUEUE,actions)){
     setSharedStatus('waiting','Modifications en attente de synchronisation');
-    void requestSharedSync().catch(()=>{});
+    void requestSharedSync()?.catch(()=>{});
   }
 }
 function recordSharedDiff(type,before,after){

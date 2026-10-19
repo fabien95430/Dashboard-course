@@ -76,3 +76,7 @@ Si cette entité dédiée n'est pas configurée ou est indisponible, l'applicati
 La v466 récupère les demandes encore stockées localement, y compris si la v465 avait indiqué que la migration était terminée. Elle ne confirme cette récupération qu'après une nouvelle lecture du stockage Home Assistant et la vérification de chaque demande attendue. En cas d'échec, aucune demande locale n'est effacée et le popup affiche un message explicite. Le popup permet aussi de redétecter la liste lors de son ouverture.
 
 L'application utilise un abonnement natif Home Assistant `todo/item/subscribe` sur son WebSocket existant. Aucun polling permanent ni nouveau serveur. La liste technique `todo.courses_demandes` n'est jamais choisie pour « Ma liste ».
+
+## Correctif hors ligne v467
+
+Le traitement de file ne provoque plus d'erreur JavaScript lorsque le WebSocket Home Assistant est absent et que la synchronisation n'est pas active. La demande reste dans le stockage local jusqu'à la prochaine reconnexion. Aucune intervention utilisateur ni reconfiguration Home Assistant n'est requise.
