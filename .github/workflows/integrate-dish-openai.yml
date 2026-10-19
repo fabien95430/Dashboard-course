@@ -39,6 +39,7 @@ jobs:
               'PUSH_P256DH':'push_p256dh',
               'PUSH_AUTH':'push_auth',
               'PUSH_PUBLIC_KEY':'push_public_key',
+              'PUSH_SUBSCRIPTIONS':'push_subscriptions',
           }
           with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as env:
               for env_name,payload_name in fields.items():
@@ -46,6 +47,17 @@ jobs:
                   if not value:
                       continue
                   print(f'::add-mask::{value}')
+                  if env_name=='PUSH_SUBSCRIPTIONS':
+                      try:
+                          devices=json.loads(value)
+                          if isinstance(devices,list):
+                              for device in devices[:12]:
+                                  if not isinstance(device,dict):continue
+                                  for field in ('endpoint','p256dh','auth','publicKey'):
+                                      secret=str(device.get(field) or '')
+                                      if secret:print(f'::add-mask::{secret}')
+                      except (ValueError,TypeError):
+                          pass
                   env.write(f'{env_name}={value}\n')
 
       - name: Récupérer main
@@ -319,17 +331,17 @@ jobs:
           fi
 
       - name: Installer l'émetteur Web Push
-        if: always() && env.PUSH_ENDPOINT != ''
+        if: always() && (env.PUSH_ENDPOINT != '' || env.PUSH_SUBSCRIPTIONS != '')
         run: npm install --no-save --no-package-lock web-push@3.6.7
 
       - name: Notification Courses — succès
-        if: steps.integrate.outcome == 'success' && steps.deploy.outcome == 'success' && env.PUSH_ENDPOINT != ''
+        if: steps.integrate.outcome == 'success' && steps.deploy.outcome == 'success' && (env.PUSH_ENDPOINT != '' || env.PUSH_SUBSCRIPTIONS != '')
         env:
           PUSH_STATUS: added
         run: node scripts/send_web_push.mjs
 
       - name: Notification Courses — erreur
-        if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success') && env.PUSH_ENDPOINT != ''
+        if: always() && (steps.integrate.outcome != 'success' || steps.deploy.outcome != 'success') && (env.PUSH_ENDPOINT != '' || env.PUSH_SUBSCRIPTIONS != '')
         env:
           PUSH_STATUS: error
           PUSH_ERROR: ${{ steps.result.outputs.error }}

@@ -47,7 +47,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v478</span>
+            <span class="page-version">v479</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -110,7 +110,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v478</span>
+            <span class="page-version">v479</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -149,7 +149,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v478</span>
+            <span class="page-version">v479</span>
           </div>
           <p>Personnalisez votre expérience</p>
         </div>
@@ -359,6 +359,11 @@
       </div>
     </div>
     <p id="missingSyncStatus" class="missing-sync-status" role="status" aria-live="polite">Vérification de la synchronisation…</p>
+    <div class="missing-notifications-panel">
+      <button id="enableMissingNotifications" type="button" class="secondary">Activer les notifications sur cet iPhone</button>
+      <button id="disableMissingNotifications" type="button" class="secondary" aria-label="Désactiver les notifications sur cet iPhone">Désactiver</button>
+      <small id="missingNotificationsStatus" role="status" aria-live="polite">À activer sur chaque iPhone</small>
+    </div>
     <div class="missing-products-add">
       <input id="missingProductName" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" placeholder="Nom du produit" aria-label="Nom du produit">
       <button id="addMissingProduct" class="primary" type="button">Ajouter</button>
@@ -446,11 +451,12 @@
   <script src="./catalog.js?v=478"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=467"></script>
+  <script src="./courses-notifications.js?v=479"></script>
   <script src="./bottom-nav-liquid.js?v=414"></script>
   <script src="./app-ui.js?v=442" data-app-ui="script"></script>
-  <script src="./app.js?v=466"></script>
+  <script src="./app.js?v=479"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
-  <script src="./settings-ui.js?v=466"></script>
+  <script src="./settings-ui.js?v=479"></script>
   <script src="./error-center.js?v=411"></script>
 </body>
 </html>

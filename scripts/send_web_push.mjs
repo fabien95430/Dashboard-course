@@ -5,6 +5,35 @@ const p256dh=String(process.env.PUSH_P256DH||'').trim();
 const auth=String(process.env.PUSH_AUTH||'').trim();
 const publicKey=String(process.env.PUSH_PUBLIC_KEY||'').trim();
 const privateKey=String(process.env.COURSES_VAPID_PRIVATE_KEY||'').trim();
+let rawSubscriptions=[];
+try{
+  rawSubscriptions=JSON.parse(String(process.env.PUSH_SUBSCRIPTIONS||'[]'));
+  if(!Array.isArray(rawSubscriptions))rawSubscriptions=[];
+}catch(_){rawSubscriptions=[]}
+const seen=new Set();
+const candidates=[...rawSubscriptions.slice(0,12),
+  ...(endpoint&&p256dh&&auth?[{endpoint,p256dh,auth,publicKey}]:[])];
+const recipients=[];
+for(const item of candidates){
+  if(!item||typeof item!=='object')continue;
+  const entry={
+    endpoint:String(item.endpoint||item.push_endpoint||''),
+    p256dh:String(item.p256dh||item.push_p256dh||''),
+    auth:String(item.auth||item.push_auth||''),
+    publicKey:String(item.publicKey||item.push_public_key||publicKey)
+  };
+  try{
+    const uri=new URL(entry.endpoint);
+    if(uri.protocol!=='https:'||uri.username||uri.password)continue;
+  }catch(_){continue}
+  if(!/^[A-Za-z0-9_-]{32,}$/.test(entry.p256dh)||!/^[A-Za-z0-9_-]{10,}$/.test(entry.auth)
+    ||!/^[A-Za-z0-9_-]{80,}$/.test(entry.publicKey)||seen.has(entry.endpoint))continue;
+  seen.add(entry.endpoint);recipients.push(entry);
+  if(recipients.length>=12)break;
+}
+const eventKind=String(process.env.COURSES_EVENT_KIND||'').trim();
+const eventName=String(process.env.COURSES_ITEM_NAME||'').trim().slice(0,80);
+const eventType=process.env.COURSES_ITEM_TYPE==='dish'?'dish':'product';
 const status=String(process.env.PUSH_STATUS||'error');
 const rawName=String(process.env.DISH_NAME||'').trim();
 const productPrefix='__courses_product__:';
@@ -31,12 +60,12 @@ const errorDetail=rawError
   .slice(0,900);
 const baseUrl=String(process.env.COURSES_BASE_URL||'https://fabien95430.github.io/Dashboard-course/').trim();
 
-if(!endpoint||!p256dh||!auth){
-  console.error('Souscription push absente ou incomplète; notification non envoyée.');
+if(!recipients.length){
+  console.error('Aucun appareil avec souscription valide; notification non envoyée.');
   process.exit(1);
 }
-if(!publicKey||!privateKey){
-  console.error('Clés VAPID incomplètes; notification non envoyée.');
+if(!privateKey){
+  console.error('Clé VAPID privée absente; notification non envoyée.');
   process.exit(1);
 }
 
@@ -93,25 +122,41 @@ const payload={
   url:target.toString()
 };
 
-webpush.setVapidDetails(
+if(['request_added','started'].includes(eventKind)&&eventName){
+  const label=eventType==='dish'?'Plat':'Produit';
+  const started=eventKind==='started';
+  payload.title=started?'Intégration OpenAI lancée':label+' manquant ajouté';
+  payload.body=started
+    ?'« '+eventName+' » est en cours de génération.'
+    :'« '+eventName+' » a été ajouté aux demandes manquantes.';
+  payload.tag='courses-'+eventKind+'-'+(requestId||eventName.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+  payload.status=eventKind;
+  payload.itemType=eventType;
+  payload.itemName=eventName;
+  payload.operation=eventKind;
+  payload.requestId=requestId;
+  payload.error='';
+  payload.url=baseUrl;
+}
+async function sendToDevice(subscription){
+  webpush.setVapidDetails(
   'mailto:fabien95430@users.noreply.github.com',
-  publicKey,
-  privateKey
-);
-
-try{
+    subscription.publicKey,privateKey
+  );
   await webpush.sendNotification(
-    {endpoint,keys:{p256dh,auth}},
+    {endpoint:subscription.endpoint,keys:{p256dh:subscription.p256dh,auth:subscription.auth}},
     JSON.stringify(payload),
     {TTL:86400,urgency:'normal'}
   );
-  console.log('Notification Courses envoyée.');
-}catch(error){
-  const code=Number(error?.statusCode||0);
-  if(code===404||code===410){
-    console.error('Souscription push expirée; notification non envoyée.');
-    process.exit(1);
-  }
-  console.error('Échec notification push:',error?.message||error);
-  process.exit(1);
 }
+let sent=0,expired=0;
+for(const subscription of recipients){
+  try{await sendToDevice(subscription);sent++}
+  catch(error){
+    const code=Number(error?.statusCode||0);
+    if(code===404||code===410){expired++;continue}
+    console.error('Échec Web Push sur un appareil :',Number(error?.statusCode||0)||'indisponible');
+  }
+}
+console.log('Notifications Courses : '+sent+' appareil(s), '+expired+' abonnement(s) expiré(s).');
+if(!sent)process.exitCode=1;

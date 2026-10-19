@@ -37,3 +37,6 @@ Le comportement correspondant reste porté uniquement par les modules actifs dé
 `dish-local-images.js` est limité aux visuels locaux de plats et à leur fallback. Les comportements transverses de présentation (versions visibles, clavier de sécurité, état vide de Ma liste et styles UI associés) appartiennent à `app-ui.js`.
 
 `settings-tab-badge.js` ne gère que le badge Réglages et le badge d’application. Les préférences, la gestion de l’application, la stabilité clavier des popups et la section Administrateur appartiennent à `settings-ui.js`.
+
+
+Le module `courses-notifications.js` est chargé directement par `index.html` avant `app.js`; il partage le client HA existant et gère exclusivement les souscriptions Web Push des appareils. Les scripts `missing-products-fixes.js` et `missing-products-dishes.js` lui délèguent l'envoi multi-iPhone, sans nouveau WebSocket ni polling.

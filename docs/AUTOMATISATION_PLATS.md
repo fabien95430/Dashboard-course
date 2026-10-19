@@ -80,3 +80,18 @@ L'application utilise un abonnement natif Home Assistant `todo/item/subscribe` s
 ## Correctif hors ligne v467
 
 Le traitement de file ne provoque plus d'erreur JavaScript lorsque le WebSocket Home Assistant est absent et que la synchronisation n'est pas active. La demande reste dans le stockage local jusqu'à la prochaine reconnexion. Aucune intervention utilisateur ni reconfiguration Home Assistant n'est requise.
+
+## Notifications sur plusieurs iPhone (v479)
+
+Créer dans Home Assistant une liste **Local to-do** distincte nommée **Courses notifications**, dont l'entité est \`todo.courses_notifications\`. Chaque iPhone doit être équipé de la PWA installée sur son écran d'accueil et autoriser ses notifications avec le bouton « Activer les notifications sur cet iPhone » du popup. Les abonnements Web Push (endpoint, clés publiques P-256 et authentification) sont enregistrés exclusivement dans les descriptions de cette liste Home Assistant, accessible uniquement aux utilisateurs HA autorisés ; seuls les identifiants locaux aléatoires sont stockés sur les téléphones. Le bouton « Désactiver » retire le téléphone de cette liste et révoque sa souscription. Aucune clé VAPID privée ou jeton GitHub n'est envoyé au navigateur.
+
+Dans \`rest_command.courses_integrate_dish_openai\`, ajouter au \`client_payload\` sans enlever les champs actuels :
+\`\`\`yaml
+"push_subscriptions": push_subscriptions | default('[]', true)
+\`\`\`
+
+Définir aussi un \`rest_command.courses_notify_all\` qui émet le \`repository_dispatch\` \`courses_notification_event\` avec \`kind: event_kind\`, \`name: item_name\`, \`item_type: item_type\`, \`request_id: request_id\` et \`push_subscriptions: push_subscriptions | default('[]', true)\`. Reprendre le même URL, le même secret d'autorisation GitHub et les mêmes en-têtes que le relais existant. Puis recharger les rest_commands dans Home Assistant.
+
+Un nouvel ajout de demande produit/plat lance une notification d'événement indépendante. Un démarrage OpenAI lance une notification de démarrage. Les workflows d'intégration OpenAI (et du flux manuel existant) utilisent l'abonnement collectif transmis dans le dispatch pour la notification de résultat. Le destinataire historique reste utilisé comme solution de secours si la liste HA ou son nouveau relais ne sont pas encore configurés. Chaque exécution ne traite que 12 appareils distincts au plus et masque leurs abonnements dans les journaux GitHub ; un appareil dont le Push a expiré n'empêche pas les autres d'être notifiés.
+
+Ces notifications ne sont pas produites par le WebSocket lorsque l'application est fermée : le Web Push est livré en arrière-plan par le service worker iOS. Le WebSocket reste chargé de la liste de courses et de la synchronisation des demandes.

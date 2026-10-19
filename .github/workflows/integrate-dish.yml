@@ -27,6 +27,29 @@ jobs:
       COURSES_VAPID_PRIVATE_KEY: ${{ secrets.COURSES_VAPID_PRIVATE_KEY }}
 
     steps:
+      - name: Masquer les abonnements Web Push supplémentaires
+        shell: python
+        run: |
+          import json,os
+          from pathlib import Path
+          event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text(encoding='utf-8'))
+          payload=event.get('client_payload') or {}
+          raw=payload.get('push_subscriptions') or '[]'
+          try:
+              subs=json.loads(raw) if isinstance(raw,str) else raw
+          except (ValueError,TypeError):
+              subs=[]
+          if not isinstance(subs,list):subs=[]
+          for sub in subs[:12]:
+              if isinstance(sub,dict):
+                  for field in ('endpoint','p256dh','auth','publicKey'):
+                      value=str(sub.get(field) or '')
+                      if value:print('::add-mask::'+value)
+          compact=json.dumps(subs[:12],ensure_ascii=True,separators=(',',':'))
+          print('::add-mask::'+compact)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as env:
+              env.write('PUSH_SUBSCRIPTIONS='+compact+'\n')
+
       - name: Récupérer main
         uses: actions/checkout@v4
         with:

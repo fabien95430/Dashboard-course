@@ -318,7 +318,7 @@ const MISSING_PRODUCT_CATEGORIES=MISSING_REQUESTS.productCategories;
 const COURSES_ENTITY='todo.courses';
 const URL_ENTITY='todo.url';
 function preferredTodoEntity(entities){
-  const list=(Array.isArray(entities)?entities:[]).filter(entry=>entry?.id!=='todo.courses_demandes');
+  const list=(Array.isArray(entities)?entities:[]).filter(entry=>entry?.id!=='todo.courses_demandes'&&entry?.id!=='todo.courses_notifications');
   const explicit=String(localStorage.getItem(STORAGE.entityPreference)||'').trim();
   const legacy=String(localStorage.getItem(STORAGE.entity)||'').trim();
   const saved=explicit||legacy;
@@ -1549,6 +1549,8 @@ async function connectAuthorized(token,reuseKnownEntity=false){
   await refreshItems();
   // Réutilise le socket authentifié; la liste partagée est indépendante de Ma liste.
   void MISSING_REQUESTS.connectShared({newConnection:true}).catch(error=>console.warn('courses-app: synchronisation demandes',error));
+  // L'inscription Push n'est automatique que si iOS l'a déjà autorisée.
+  void window.COURSES_NOTIFICATIONS?.register().catch(()=>{});
   armIdleLock();
 }
 async function connectFromRefresh(){
@@ -1800,7 +1802,7 @@ async function discoverEntities(){
   state.entity=URL_ENTITY||saved||COURSES_ENTITY;
   try{
     const states=await request({type:'get_states'});
-    state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')&&s.entity_id!=='todo.courses_demandes').map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
+    state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')&&s.entity_id!=='todo.courses_demandes'&&s.entity_id!=='todo.courses_notifications').map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
     const preferred=preferredTodoEntity(state.entities);
     if(preferred){
       state.entity=preferred.id;

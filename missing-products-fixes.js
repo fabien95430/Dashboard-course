@@ -384,8 +384,19 @@ async function integrateWithOpenAi(type,id,requestId){
     return false;
   }
   try{
-    await haCallService('rest_command','courses_integrate_dish_openai',{...serviceData,...push});
-    void notifyIntegrationStarted(type,item,serviceData.request_id);
+    const notifier=window.COURSES_NOTIFICATIONS;
+    if(notifier)await notifier.register();
+    const targets=notifier?await notifier.recipients(push):[push];
+    await haCallService('rest_command','courses_integrate_dish_openai',{
+      ...serviceData,...push,push_subscriptions:JSON.stringify(targets)
+    });
+    const delivery=notifier?.broadcast({
+      kind:'started',type,name:item.name,requestId:serviceData.request_id
+    });
+    if(delivery){
+      void delivery.then(sent=>{if(!sent)void notifyIntegrationStarted(type,item,serviceData.request_id)})
+        .catch(()=>{void notifyIntegrationStarted(type,item,serviceData.request_id)});
+    }else void notifyIntegrationStarted(type,item,serviceData.request_id);
     window.CoursesErrors?.resolvePrefix?.('integration-local:');
     window.CoursesErrors?.resolvePrefix?.('notifications:');
     appNotify('Intégration OpenAI lancée',String(item.name||''));

@@ -1,0 +1,59 @@
+name: Notifications Courses multi-iPhone
+on:
+  repository_dispatch:
+    types: [courses_notification_event]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      COURSES_VAPID_PRIVATE_KEY: ${{ secrets.COURSES_VAPID_PRIVATE_KEY }}
+      COURSES_EVENT_KIND: ${{ github.event.client_payload.kind }}
+      COURSES_ITEM_NAME: ${{ github.event.client_payload.name }}
+      COURSES_ITEM_TYPE: ${{ github.event.client_payload.item_type }}
+      REQUEST_ID: ${{ github.event.client_payload.request_id }}
+      COURSES_BASE_URL: https://fabien95430.github.io/Dashboard-course/
+    steps:
+      - name: Masquer les abonnements avant tout traitement
+        shell: python
+        run: |
+          import json,os
+          from pathlib import Path
+          event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text(encoding='utf-8'))
+          payload=event.get('client_payload') or {}
+          raw=payload.get('push_subscriptions') or '[]'
+          try:
+              subscriptions=json.loads(raw) if isinstance(raw,str) else raw
+          except (ValueError,TypeError):
+              subscriptions=[]
+          if not isinstance(subscriptions,list):subscriptions=[]
+          subscriptions=subscriptions[:12]
+          for sub in subscriptions:
+              if isinstance(sub,dict):
+                  for field in ('endpoint','p256dh','auth','publicKey'):
+                      secret=str(sub.get(field) or '')
+                      if secret:print('::add-mask::'+secret)
+          compact=json.dumps(subscriptions,ensure_ascii=True,separators=(',',':'))
+          print('::add-mask::'+compact)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as env:
+              env.write('PUSH_SUBSCRIPTIONS='+compact+'\n')
+
+      - name: Récupérer main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Préparer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Installer émetteur Web Push
+        run: npm install --no-save --no-package-lock web-push@3.6.7
+
+      - name: Distribuer aux appareils enregistrés
+        run: node scripts/send_web_push.mjs
