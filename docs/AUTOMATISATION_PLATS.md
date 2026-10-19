@@ -62,3 +62,11 @@ Le flux **Intégrer → ChatGPT** reste indépendant de l’authentification Hom
 - Les mécanismes OAuth, WebSocket, coffre chiffré, verrouillage et biométrie ne sont pas affaiblis.
 - Mobile-first et les safe areas iOS restent inchangés.
 - Aucun framework, backend ou dépendance externe supplémentaire n’est introduit.
+
+## Synchronisation entre téléphones (v465)
+
+Les demandes de produits et de plats manquants sont partagées via une **liste Local to-do Home Assistant dédiée** `todo.courses_demandes`, qui ne doit jamais être utilisée comme liste de courses active. Créer dans Home Assistant **Paramètres → Appareils et services → Ajouter une intégration → Local to-do**, avec le nom **Courses demandes** (vérifier ou adapter son identifiant pour obtenir `todo.courses_demandes`).
+
+Chaque iPhone conserve ses demandes précédentes jusqu'à la première connexion à cette liste, puis celles-ci sont fusionnées par type et nom normalisé sans effacer les demandes de l'autre téléphone. Après cette migration, Home Assistant est prioritaire ; les ajouts et suppressions sont transmis par le WebSocket partagé et les autres appareils sont actualisés sur `subscribe_trigger`, sans polling. Les éditions hors ligne sont mises en file localement jusqu'à la prochaine connexion. La catégorie et la précision d'image produit sont enregistrées dans la description de chaque item Local to-do. Les états d'intégration OpenAI et les préférences restent locaux.
+
+Si cette entité dédiée n'est pas configurée ou est indisponible, l'application conserve son fonctionnement local existant ; aucune demande n'est effacée, mais la synchronisation multiappareil n'est pas active. En mode test, aucune connexion Home Assistant n'est ouverte. OAuth, verrouillage, coffre chiffré, liste `Courses` et catalogue restent inchangés.

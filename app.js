@@ -1546,6 +1546,8 @@ async function connectAuthorized(token,reuseKnownEntity=false){
   status('is-waiting','Connexion…','Liste Home Assistant');
   await subscribe();
   await refreshItems();
+  // Réutilise le socket authentifié; la liste partagée est indépendante de Ma liste.
+  void MISSING_REQUESTS.connectShared().catch(error=>console.warn('courses-app: synchronisation demandes',error));
   armIdleLock();
 }
 async function connectFromRefresh(){
@@ -1761,6 +1763,9 @@ function connectWs(token){
       if(msg.type==='auth_ok'){authed=true;clearTimeout(timeout);resolve();return}
       if(msg.type==='result'&&state.pending.has(msg.id)){const p=state.pending.get(msg.id);state.pending.delete(msg.id);clearTimeout(p.timer);msg.success?p.resolve(msg.result):p.reject(new Error(msg.error?.message||'Erreur Home Assistant'));return}
       if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id===state.entity)scheduleListRefresh();
+      if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id==='todo.courses_demandes'){
+        window.dispatchEvent(new Event('courses:missing-ha-updated'));
+      }
     };
     ws.onerror=()=>{if(!authed){clearTimeout(timeout);reject(new Error('WebSocket Home Assistant indisponible'))}};
     ws.onclose=()=>{
