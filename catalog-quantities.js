@@ -151,7 +151,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Peperroni":"Paquet",
   "Mozzarella râpée":"Sachet",
   "Sauce burger":"Bouteille",
-  "Coulis de fruit":"Bouteille"
+  "Coulis de fruit":"Bouteille",
+  "Philadelphia":"Pot"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
