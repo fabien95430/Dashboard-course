@@ -154,7 +154,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Coulis de fruit":"Bouteille",
   "Philadelphia":"Pot",
   "Speculos":"Paquet",
-  "Alcool 70":"Bouteille"
+  "Alcool 70":"Bouteille",
+  "Sirot d’érable":"Bouteille"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
