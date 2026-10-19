@@ -83,7 +83,7 @@ Le traitement de file ne provoque plus d'erreur JavaScript lorsque le WebSocket 
 
 ## Notifications sur plusieurs iPhone (v479)
 
-Créer dans Home Assistant une liste **Local to-do** distincte nommée **Courses notifications**, dont l'entité est \`todo.courses_notifications\`. Chaque iPhone doit être équipé de la PWA installée sur son écran d'accueil et autoriser ses notifications avec le bouton « Activer les notifications sur cet iPhone » du popup. Les abonnements Web Push (endpoint, clés publiques P-256 et authentification) sont enregistrés exclusivement dans les descriptions de cette liste Home Assistant, accessible uniquement aux utilisateurs HA autorisés ; seuls les identifiants locaux aléatoires sont stockés sur les téléphones. Le bouton « Désactiver » retire le téléphone de cette liste et révoque sa souscription. Aucune clé VAPID privée ou jeton GitHub n'est envoyé au navigateur.
+Créer dans Home Assistant une liste **Local to-do** distincte nommée **Courses notifications**, dont l'entité est \`todo.courses_notifications\`. Chaque iPhone doit être équipé de la PWA installée sur son écran d'accueil et autoriser ses notifications dans **Réglages → Administrateur → Gestion de l’application → Notifications**. Les abonnements Web Push (endpoint, clés publiques P-256 et authentification) sont enregistrés exclusivement dans les descriptions de cette liste Home Assistant, accessible uniquement aux utilisateurs HA autorisés ; seuls les identifiants locaux aléatoires sont stockés sur les téléphones. Le bouton « Désactiver » retire le téléphone de cette liste et révoque sa souscription. Aucune clé VAPID privée ou jeton GitHub n'est envoyé au navigateur.
 
 Dans \`rest_command.courses_integrate_dish_openai\`, ajouter au \`client_payload\` sans enlever les champs actuels :
 \`\`\`yaml
@@ -95,3 +95,12 @@ Définir aussi un \`rest_command.courses_notify_all\` qui émet le \`repository_
 Un nouvel ajout de demande produit/plat lance une notification d'événement indépendante. Un démarrage OpenAI lance une notification de démarrage. Les workflows d'intégration OpenAI (et du flux manuel existant) utilisent l'abonnement collectif transmis dans le dispatch pour la notification de résultat. Le destinataire historique reste utilisé comme solution de secours si la liste HA ou son nouveau relais ne sont pas encore configurés. Chaque exécution ne traite que 12 appareils distincts au plus et masque leurs abonnements dans les journaux GitHub ; un appareil dont le Push a expiré n'empêche pas les autres d'être notifiés.
 
 Ces notifications ne sont pas produites par le WebSocket lorsque l'application est fermée : le Web Push est livré en arrière-plan par le service worker iOS. Le WebSocket reste chargé de la liste de courses et de la synchronisation des demandes.
+
+
+## Emplacement des contrôles (v481)
+
+Le popup **Produits & plats manquants** sert uniquement à gérer les demandes. Ses anciennes commandes Push et son bandeau de statut Home Assistant ont été déplacés, sans modifier leur fonctionnement :
+- **Réglages → Connexion Home Assistant** : état de Ma liste et de la synchronisation des produits/plats manquants, y compris les erreurs.
+- **Réglages → Administrateur → Gestion de l’application → Notifications** : activation, désactivation et nombre d'appareils inscrits. Une sous-vue comporte le retour vers Gestion de l’application.
+
+La migration ne touche pas aux listes `todo.courses_demandes` et `todo.courses_notifications`, à OAuth, au WebSocket, aux secrets et aux notifications Push déjà enregistrées.

@@ -6,8 +6,10 @@ const ha=()=>window.COURSES_HA_CLIENT,connected=()=>!!ha()?.isConnected?.();
 let task=null,status='À activer sur chaque iPhone';
 function setStatus(text){
   status=text;
-  const label=document.getElementById('missingNotificationsStatus');
-  if(label)label.textContent=text;
+  for(const id of ['missingNotificationsStatus','notificationsManagementSummary']){
+    const label=document.getElementById(id);
+    if(label)label.textContent=text;
+  }
 }
 function ownId(){
   const stored=String(localStorage.getItem(OWN_ID_KEY)||'');

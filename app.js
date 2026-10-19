@@ -1302,6 +1302,15 @@ function renderView(){
   showView();
   renderList();renderSettingsPage();
 }
+function renderMissingRequestsConnectionStatus(detail=MISSING_REQUESTS.getSharedStatus?.()){
+  const label=document.getElementById('missingSyncStatus');
+  if(!label)return;
+  label.dataset.state=detail?.state||'waiting';
+  label.textContent=detail?.message||'En attente de Home Assistant';
+}
+window.addEventListener('courses:missing-ha-status',event=>{
+  renderMissingRequestsConnectionStatus(event.detail);
+});
 function renderSettingsPage(){
   const connection=$('#settingsConnectionSummary');
   const connectionDot=$('#settingsConnectionDot');
@@ -1309,6 +1318,12 @@ function renderSettingsPage(){
   if(connection)connection.textContent=connected?'Connecté':(state.locked?'Verrouillé':'Connexion…');
   if(connection)connection.classList.toggle('is-connected',connected);
   if(connectionDot)connectionDot.classList.toggle('is-online',connected);
+  const listSync=$('#connectionListSyncStatus');
+  if(listSync){
+    listSync.textContent=connected?'Connectée':state.locked?'Verrouillée':'Connexion…';
+    listSync.dataset.state=connected?'synced':'waiting';
+  }
+  renderMissingRequestsConnectionStatus();
   const missingCount=$('#settingsMissingProductsCount');
   if(missingCount){
     const count=MISSING_REQUESTS.counts().total;

@@ -300,12 +300,6 @@ function initMissingProductsAndDishes(){
     #missingProductsDialog .missing-category-select{width:100%;min-width:0;height:40px;border:1px solid #e0e7e2;border-radius:12px;background:#fff;color:#27342d;padding:0 11px;font-size:12.5px;font-weight:700;outline:none}
     #missingProductsDialog .missing-category-select:focus{border-color:#cbd8cf;box-shadow:0 0 0 3px rgba(38,144,82,.07)}
     #missingProductsDialog .missing-products-list-heading{margin-top:8px!important;margin-bottom:5px!important}
-    #missingProductsDialog .missing-sync-status{margin:6px 0 10px;padding:5px 10px;border-radius:10px;background:rgba(66,122,82,.065);color:#526f5c;font-size:11px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
-    #missingProductsDialog .missing-notifications-panel{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 9px}
-    #missingProductsDialog .missing-notifications-panel button{font-size:10px;min-height:31px;border-radius:11px;padding:5px 9px}
-    #missingProductsDialog .missing-notifications-panel small{color:#718177;font-size:10px;line-height:1.4;flex:1 0 100%;overflow-wrap:anywhere}
-    #missingProductsDialog .missing-sync-status[data-state="synced"]{background:rgba(14,150,70,.08);color:#127044}
-    #missingProductsDialog .missing-sync-status[data-state="error"],#missingProductsDialog .missing-sync-status[data-state="missing"]{background:rgba(207,104,29,.09);color:#9d5420}
     #missingProductsDialog .missing-products-list,#missingProductsDialog .missing-dishes-list{flex:0 0 auto!important;min-height:auto!important;max-height:none!important;overflow:visible!important;overscroll-behavior:auto!important;-webkit-overflow-scrolling:auto!important}
     #missingProductsDialog .missing-dishes-list[hidden]{display:none!important}
     #missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:38px minmax(0,1fr) auto 42px!important;gap:8px!important}
@@ -705,14 +699,6 @@ function removeDish(id){
     imageHintInput.value='';
   });
 
-  const syncLabel=document.getElementById('missingSyncStatus');
-  function renderSyncStatus(detail=REQUESTS.getSharedStatus?.()){
-    if(!syncLabel||!detail)return;
-    syncLabel.dataset.state=detail.state;
-    syncLabel.textContent=detail.message;
-  }
-  window.addEventListener('courses:missing-ha-status',event=>renderSyncStatus(event.detail));
-  renderSyncStatus();
   renderMode();
   queueEnhanceProducts();
   reconcileDishes();

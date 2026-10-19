@@ -104,7 +104,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=479';
+script.src='./missing-products-dishes.js?v=481';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
@@ -276,6 +276,23 @@ function installPreferenceDialogAppearance(){
     .preference-title-back{width:18px;height:32px;flex:0 0 18px;margin:-2px 0 -2px -2px;padding:0;border:0;border-radius:0;display:grid;place-items:center;background:transparent;color:#0b7040;font:inherit;font-size:28px;line-height:1;font-weight:500;-webkit-tap-highlight-color:transparent}
     .preference-title-back:focus{outline:none}.preference-title-back:focus-visible{outline:2px solid rgba(11,112,64,.28);outline-offset:2px}
     #preferencesApplicationManagement .application-management-options:empty{display:none!important}
+    #preferencesNotificationsPanel[hidden]{display:none!important}
+    #preferencesNotificationsPanel{display:grid;gap:14px;padding-top:18px}
+    #preferencesNotificationsPanel .notifications-management-summary{display:grid;gap:6px;padding:14px;border:1px solid #e4eee6;border-radius:17px;background:#f4f9f4}
+    #preferencesNotificationsPanel .notifications-management-summary strong{font-size:14px;color:#173527}
+    #preferencesNotificationsPanel .notifications-management-summary small{font-size:12px;color:#557364;line-height:1.45;overflow-wrap:anywhere}
+    #preferencesNotificationsPanel .notifications-management-actions{display:flex;gap:8px;flex-wrap:wrap}
+    #preferencesNotificationsPanel .notifications-management-actions button{flex:1 1 130px;min-height:44px;border-radius:13px;padding:8px 12px;font-size:12px;font-weight:750}
+    #preferencesNotificationsPanel .notifications-management-hint{margin:0;font-size:11px;line-height:1.5;color:#7d858d}
+    .connection-dialog .connection-sync-section{margin-top:17px;padding:12px 13px;border:1px solid #e5ede6;border-radius:16px;background:#f8faf7}
+    .connection-dialog .connection-sync-section h4{margin:0 0 9px;font-size:12px;color:#52675a;font-weight:800}
+    .connection-dialog .connection-sync-line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 0;font-size:12px}
+    .connection-dialog .connection-sync-line+.connection-sync-line{border-top:1px solid #e7eee8}
+    .connection-dialog .connection-sync-line>span:first-child{flex:0 0 auto;font-weight:700;color:#26362c}
+    .connection-dialog .connection-sync-line>span:last-child{min-width:0;text-align:right;font-size:11px;line-height:1.4;color:#748076;overflow-wrap:anywhere}
+    .connection-dialog .connection-sync-line>span[data-state="synced"]{color:#147545}
+    .connection-dialog .connection-sync-line>span[data-state="error"],.connection-dialog .connection-sync-line>span[data-state="missing"]{color:#b6652c}
+    @media(max-width:390px){.connection-dialog .connection-sync-line{align-items:flex-start;flex-direction:column;gap:3px}.connection-dialog .connection-sync-line>span:last-child{text-align:left}}
   `;
   document.head.appendChild(style);
 }
@@ -306,7 +323,7 @@ function initApplicationManagement(){
     managementButton.id='settingsApplicationManagementBtn';
     managementButton.className='settings-row';
     managementButton.type='button';
-    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation, historique et informations</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation, notifications et historique</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
     missingProductsButton.after(managementButton);
   }
 
@@ -331,6 +348,22 @@ function initApplicationManagement(){
   documentationButton.className='security-action-row';
   documentationButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-list"></use></svg></span><span class="security-setting-copy"><strong>Documentation</strong><small>Guide complet du fonctionnement de l’application</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
   managementPanel.appendChild(documentationButton);
+
+  let notificationsButton=document.getElementById('preferencesNotificationsButton');
+  if(!notificationsButton){
+    notificationsButton=document.createElement('button');
+    notificationsButton.id='preferencesNotificationsButton';
+    notificationsButton.type='button';
+    notificationsButton.className='security-action-row';
+    notificationsButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-bell"></use></svg></span><span class="security-setting-copy"><strong>Notifications</strong><small id="notificationsManagementSummary">À activer sur chaque iPhone</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+  }
+  managementPanel.appendChild(notificationsButton);
+  const notificationsPanel=document.getElementById('preferencesNotificationsPanel');
+  const currentNotificationStatus=window.COURSES_NOTIFICATIONS?.getStatus?.();
+  if(currentNotificationStatus){
+    const summary=document.getElementById('notificationsManagementSummary');
+    if(summary)summary.textContent=currentNotificationStatus;
+  }
 
   const title=content.querySelector(':scope>h3');
   const intro=content.querySelector(':scope>.dialog-intro');
@@ -366,9 +399,17 @@ function initApplicationManagement(){
     [...content.children].forEach(node=>{if(node===title||node===intro||node===managementPanel)return;node.hidden=true});
     managementPanel.hidden=false;
     setTitle('Gestion de l’application','preferences');
-    if(intro)intro.textContent='Documentation, historique et informations de l’application.';
+    if(intro)intro.textContent='Documentation, notifications et informations de l’application.';
     if(!dialog.open)dialog.showModal();
     document.dispatchEvent(new CustomEvent('courses:settings-management-opened'));
+  }
+
+  function showNotifications(){
+    [...content.children].forEach(node=>{if(node===title||node===intro||node===notificationsPanel)return;node.hidden=true});
+    if(notificationsPanel)notificationsPanel.hidden=false;
+    setTitle('Notifications','management');
+    if(intro)intro.textContent='Gérez les notifications envoyées à cet iPhone.';
+    if(!dialog.open)dialog.showModal();
   }
 
   window.COURSES_SETTINGS_NAV=Object.freeze({setTitle});
@@ -381,6 +422,7 @@ function initApplicationManagement(){
 
   selectionsButton.addEventListener('click',showSelections,true);
   managementButton.addEventListener('click',showManagement);
+  notificationsButton.addEventListener('click',showNotifications);
   dialog.addEventListener('close',showSelections);
 }
 

@@ -29,6 +29,7 @@
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v5.5c0 5.1-3.4 8.1-8 9.5-4.6-1.4-8-4.4-8-9.5V6l8-3Z"/><path d="m8.7 12.1 2.1 2.1 4.5-4.6"/></symbol>
     <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
     <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.1 8.2A7 7 0 0 1 18.8 7L20 12M4 12l1.2 5A7 7 0 0 0 18 15.8"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 10h18c0-2-3-3-3-10Z"/><path d="M10 21h4"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.4A8 8 0 0 0 6.25 5.25L4 7.5"/><path d="M4 4v3.5h3.5"/><path d="M4 16.6a8 8 0 0 0 13.75 2.15L20 16.5"/><path d="M20 20v-3.5h-3.5"/></symbol>
     <symbol id="i-filter" viewBox="0 0 24 24" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
     <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M7.2 5.5a8 8 0 1 0 9.6 0"/></symbol>
@@ -47,7 +48,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v480</span>
+            <span class="page-version">v481</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -110,7 +111,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v480</span>
+            <span class="page-version">v481</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -149,7 +150,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v480</span>
+            <span class="page-version">v481</span>
           </div>
           <p>Personnalisez votre expérience</p>
         </div>
@@ -296,6 +297,17 @@
       <span>Adresse Home Assistant</span>
       <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
     </label>
+    <div class="connection-sync-section" aria-label="État des synchronisations">
+      <h4>Synchronisation</h4>
+      <div class="connection-sync-line">
+        <span>Ma liste</span>
+        <span id="connectionListSyncStatus" role="status">Connexion…</span>
+      </div>
+      <div class="connection-sync-line">
+        <span>Produits &amp; plats manquants</span>
+        <span id="missingSyncStatus" role="status" aria-live="polite">Vérification…</span>
+      </div>
+    </div>
     <p id="connectionDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
     <div class="dialog-actions">
       <button id="saveConnectionSettings" class="primary" type="button">Enregistrer</button>
@@ -346,6 +358,17 @@
       </label>
     </div>
 
+    <div id="preferencesNotificationsPanel" class="notifications-management-panel" hidden>
+      <div class="notifications-management-summary">
+        <strong>Notifications sur cet iPhone</strong>
+        <small id="missingNotificationsStatus" role="status" aria-live="polite">À activer sur chaque iPhone</small>
+      </div>
+      <div class="notifications-management-actions">
+        <button id="enableMissingNotifications" type="button" class="primary">Activer les notifications</button>
+        <button id="disableMissingNotifications" type="button" class="secondary">Désactiver</button>
+      </div>
+      <p class="notifications-management-hint">Activez les notifications sur chaque iPhone pour recevoir les demandes et les résultats d’intégration.</p>
+    </div>
     <div class="dialog-actions">
       <button id="savePreferences" class="primary" type="button">Enregistrer</button>
     </div>
@@ -357,12 +380,6 @@
         <h3>Produits manquants</h3>
         <p class="dialog-intro">Ajoutez les produits ou plats absents du catalogue.</p>
       </div>
-    </div>
-    <p id="missingSyncStatus" class="missing-sync-status" role="status" aria-live="polite">Vérification de la synchronisation…</p>
-    <div class="missing-notifications-panel">
-      <button id="enableMissingNotifications" type="button" class="secondary">Activer les notifications sur cet iPhone</button>
-      <button id="disableMissingNotifications" type="button" class="secondary" aria-label="Désactiver les notifications sur cet iPhone">Désactiver</button>
-      <small id="missingNotificationsStatus" role="status" aria-live="polite">À activer sur chaque iPhone</small>
     </div>
     <div class="missing-products-add">
       <input id="missingProductName" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" placeholder="Nom du produit" aria-label="Nom du produit">
@@ -448,15 +465,15 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=480"></script>
+  <script src="./catalog.js?v=481"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=467"></script>
-  <script src="./courses-notifications.js?v=479"></script>
+  <script src="./courses-notifications.js?v=481"></script>
   <script src="./bottom-nav-liquid.js?v=414"></script>
   <script src="./app-ui.js?v=442" data-app-ui="script"></script>
-  <script src="./app.js?v=479"></script>
+  <script src="./app.js?v=481"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
-  <script src="./settings-ui.js?v=479"></script>
+  <script src="./settings-ui.js?v=481"></script>
   <script src="./error-center.js?v=411"></script>
 </body>
 </html>
