@@ -323,7 +323,7 @@ function initApplicationManagement(){
     managementButton.id='settingsApplicationManagementBtn';
     managementButton.className='settings-row';
     managementButton.type='button';
-    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation, notifications et historique</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation, historique et informations</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
     missingProductsButton.after(managementButton);
   }
 
@@ -399,7 +399,7 @@ function initApplicationManagement(){
     [...content.children].forEach(node=>{if(node===title||node===intro||node===managementPanel)return;node.hidden=true});
     managementPanel.hidden=false;
     setTitle('Gestion de l’application','preferences');
-    if(intro)intro.textContent='Documentation, notifications et informations de l’application.';
+    if(intro)intro.textContent='Documentation, historique et informations de l’application.';
     if(!dialog.open)dialog.showModal();
     document.dispatchEvent(new CustomEvent('courses:settings-management-opened'));
   }
