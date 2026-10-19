@@ -145,7 +145,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Gin":"Bouteille",
   "Sel":"Paquet",
   "Poivre":"Pot",
-  "Amandes":"Pot"
+  "Amandes":"Pot",
+  "Cheddar":"Paquet"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
