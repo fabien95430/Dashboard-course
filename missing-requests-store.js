@@ -15,6 +15,16 @@ const SHARED_ENTITY='todo.courses_demandes';
 const SHARED_PREFIX='courses-missing-v1:';
 const SHARED_MIGRATED='courses-missing-ha-migrated-v1';
 const SHARED_QUEUE='courses-missing-ha-actions-v1';
+const SHARED_RECOVERED='courses-missing-ha-recovered-v466';
+const SHARED_STATUS_EVENT='courses:missing-ha-status';
+let sharedConnecting=null,sharedSubscribed=false;
+let sharedStatus={state:'waiting',message:'En attente de Home Assistant'};
+function setSharedStatus(state,message){
+  if(sharedStatus.state===state&&sharedStatus.message===message)return;
+  sharedStatus={state,message};
+  try{window.dispatchEvent(new CustomEvent(SHARED_STATUS_EVENT,{detail:{...sharedStatus}}))}catch(_){}
+}
+const getSharedStatus=()=>({...sharedStatus});
 let sharedEnabled=false,sharedSyncing=null,sharedDirty=false,applyingShared=false;
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const cleanText=(value,max=80)=>String(value||'').trim().replace(/\s+/g,' ').slice(0,max);
@@ -57,7 +67,7 @@ function counts(){
   return {products,dishes,total:products+dishes};
 }
 function emit(){
-  try{window.dispatchEvent(new CustomEvent(EVENT_NAME,{detail:counts()}))}catch(_){}
+  try{window.dispatchEvent(new CustomEvent(EVENT_NAME,{detail:{...counts(),remote:applyingShared}}))}catch(_){}
 }
 function writeList(key,items,limit,sanitizer){
   const previous=key===KEYS.products?readProducts():key===KEYS.dishes?readDishes():[];
@@ -152,7 +162,10 @@ function recordSharedAction({action,type,name}){
   if(!normalize(name))return;
   const actions=sharedActions().filter(entry=>sharedKey(entry.type,entry.name)!==key);
   actions.push({id:createId(),action,type,name:cleanText(name)});
-  if(writeJson(SHARED_QUEUE,actions))void requestSharedSync();
+  if(writeJson(SHARED_QUEUE,actions)){
+    setSharedStatus('waiting','Modifications en attente de synchronisation');
+    void requestSharedSync().catch(()=>{});
+  }
 }
 function recordSharedDiff(type,before,after){
   const old=new Map(before.map(item=>[normalize(item.name),item]));
@@ -215,22 +228,32 @@ function applySharedRows(rows){
     writeJson(KEYS.productImageHints,hints);
   }finally{applyingShared=false}
 }
+async function recoverLocalRequests(){
+  // La migration v465 a pu être marquée alors que le transfert était incomplet.
+  const local=[...readProducts().map(item=>({type:'product',item})),
+    ...readDishes().map(item=>({type:'dish',item}))];
+  const rows=await getSharedRows();
+  for(const {type,item} of local){
+    if(!sharedConnected())throw new Error('Connexion interrompue pendant le transfert');
+    await putShared(type,item,rows,{migration:true});
+  }
+  // Valider par une nouvelle lecture distante avant la fusion locale.
+  const confirmed=await getSharedRows();
+  const keys=new Set(confirmed.map(row=>sharedKey(row.type,row.item.name)));
+  if(local.some(({type,item})=>!keys.has(sharedKey(type,item.name)))){
+    throw new Error('Transfert non confirmé : demandes locales conservées');
+  }
+  if(!sharedConnected())throw new Error('Connexion interrompue pendant la vérification');
+  if(!writeJson(SHARED_RECOVERED,true)||!writeJson(SHARED_MIGRATED,true)){
+    throw new Error('Validation locale impossible : demandes conservées');
+  }
+  return confirmed;
+}
 async function performSharedSync(){
   if(!sharedConnected())return;
+  setSharedStatus('syncing','Synchronisation des demandes…');
   let rows=await getSharedRows();
-  if(!readJson(SHARED_MIGRATED,false)){
-    // Chaque téléphone apporte ses demandes locales à la première connexion.
-    const originals=[...readProducts().map(item=>({type:'product',item})),...readDishes().map(item=>({type:'dish',item}))];
-    for(const {type,item} of originals){
-      if(!sharedConnected())return;
-      await putShared(type,item,rows,{migration:true});
-    }
-    rows=await getSharedRows();
-    if(!sharedConnected())return;
-    if(!writeJson(SHARED_MIGRATED,true))throw new Error('Migration locale non enregistrée');
-    applySharedRows(rows);
-    return;
-  }
+  if(!readJson(SHARED_RECOVERED,false))rows=await recoverLocalRequests();
   for(const operation of sharedActions()){
     if(!sharedConnected())return;
     const existing=rows.filter(row=>sharedKey(row.type,row.item.name)===sharedKey(operation.type,operation.name));
@@ -246,7 +269,11 @@ async function performSharedSync(){
     writeJson(SHARED_QUEUE,sharedActions().filter(entry=>entry.id!==operation.id));
     rows=await getSharedRows();
   }
-  if(!sharedActions().length)applySharedRows(rows);
+  if(!sharedConnected())return;
+  if(!sharedActions().length){
+    applySharedRows(rows);
+    setSharedStatus('synced','Synchronisé avec Home Assistant');
+  }
 }
 function requestSharedSync(){
   sharedDirty=true;
@@ -260,30 +287,56 @@ function requestSharedSync(){
   sharedSyncing=task;
   task.catch(error=>{
     console.warn('courses-app: demandes Home Assistant',error);
+    setSharedStatus('error','Échec de synchronisation : '+String(error?.message||'Erreur Home Assistant').slice(0,150));
     try{window.dispatchEvent(new CustomEvent('courses:missing-sync-error',{detail:{message:error.message}}))}catch(_){}
   }).finally(()=>{
     if(sharedSyncing===task)sharedSyncing=null;
   });
   return task;
 }
-async function connectShared(){
-  const client=sharedClient();
-  sharedEnabled=false;
-  if(!client?.isConnected?.())return false;
-  const states=await client.getStates();
-  if(!states.some(row=>row.entity_id===SHARED_ENTITY&&row.state!=='unavailable'))return false;
-  await client.request({type:'subscribe_trigger',trigger:{platform:'state',entity_id:SHARED_ENTITY}});
-  sharedEnabled=true;
-  await requestSharedSync();
-  return true;
+async function connectShared({newConnection=false}={}){
+  if(sharedConnecting)return sharedConnecting;
+  const job=(async()=>{
+    const client=sharedClient();
+    if(newConnection){sharedEnabled=false;sharedSubscribed=false;}
+    if(!client?.isConnected?.()){
+      setSharedStatus('waiting','En attente de connexion Home Assistant');
+      return false;
+    }
+    if(!sharedEnabled){
+      setSharedStatus('syncing','Recherche de la liste Home Assistant…');
+      const states=await client.getStates();
+      if(!states.some(row=>row.entity_id===SHARED_ENTITY&&row.state!=='unavailable')){
+        setSharedStatus('missing','Liste Home Assistant introuvable : '+SHARED_ENTITY);
+        return false;
+      }
+      if(!sharedSubscribed){
+        if(typeof client.subscribeMissingTodo==='function'){
+          await client.subscribeMissingTodo(SHARED_ENTITY,()=>{if(sharedConnected())void requestSharedSync().catch(()=>{})});
+        }else{
+          await client.request({type:'subscribe_trigger',trigger:{platform:'state',entity_id:SHARED_ENTITY}});
+        }
+        sharedSubscribed=true;
+      }
+      sharedEnabled=true;
+    }
+    await requestSharedSync();
+    return true;
+  })();
+  sharedConnecting=job;
+  try{return await job}
+  catch(error){
+    setSharedStatus('error','Échec de synchronisation : '+String(error?.message||'Erreur Home Assistant').slice(0,150));
+    throw error;
+  }finally{if(sharedConnecting===job)sharedConnecting=null}
 }
-window.addEventListener?.('courses:missing-ha-updated',()=>{if(sharedConnected())void requestSharedSync()});
+window.addEventListener?.('courses:missing-ha-updated',()=>{if(sharedConnected())void requestSharedSync().catch(()=>{})});
 
 const api=Object.freeze({
   eventName:EVENT_NAME,
   productCategories:PRODUCT_CATEGORIES,
   productImageHintMax:PRODUCT_IMAGE_HINT_MAX,
-  normalize,createId,counts,connectShared,
+  normalize,createId,counts,connectShared,getSharedStatus,
   readProducts,writeProducts,addProduct,removeProduct,
   readDishes,writeDishes,addDish,removeDish,
   readAddedDishes,writeAddedDishes,rememberAddedDish,

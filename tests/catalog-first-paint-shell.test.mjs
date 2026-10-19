@@ -46,7 +46,7 @@ test('le bouton À racheter bientôt est seulement branché par son module propr
 
 test('app-ui est branché avant app.js pour enrichir la vraie liste vide sans rendu tardif',()=>{
   const appUiScript=index.indexOf('<script src="./app-ui.js?v=442" data-app-ui="script"></script>');
-  const appScript=index.indexOf('<script src="./app.js?v=465"></script>');
+  const appScript=index.indexOf('<script src="./app.js?v=466"></script>');
   assert.ok(appUiScript>=0&&appScript>appUiScript,'app-ui doit être chargé avant app.js');
   assert.match(appUi,/if\(!listEmptyStateConfirmed\)\{/);
   assert.match(appUi,/title==='Synchronisé'\|\|title==='Mode test'/);

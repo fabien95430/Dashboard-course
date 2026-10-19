@@ -70,3 +70,9 @@ Les demandes de produits et de plats manquants sont partagées via une **liste L
 Chaque iPhone conserve ses demandes précédentes jusqu'à la première connexion à cette liste, puis celles-ci sont fusionnées par type et nom normalisé sans effacer les demandes de l'autre téléphone. Après cette migration, Home Assistant est prioritaire ; les ajouts et suppressions sont transmis par le WebSocket partagé et les autres appareils sont actualisés sur `subscribe_trigger`, sans polling. Les éditions hors ligne sont mises en file localement jusqu'à la prochaine connexion. La catégorie et la précision d'image produit sont enregistrées dans la description de chaque item Local to-do. Les états d'intégration OpenAI et les préférences restent locaux.
 
 Si cette entité dédiée n'est pas configurée ou est indisponible, l'application conserve son fonctionnement local existant ; aucune demande n'est effacée, mais la synchronisation multiappareil n'est pas active. En mode test, aucune connexion Home Assistant n'est ouverte. OAuth, verrouillage, coffre chiffré, liste `Courses` et catalogue restent inchangés.
+
+## Récupération v466
+
+La v466 récupère les demandes encore stockées localement, y compris si la v465 avait indiqué que la migration était terminée. Elle ne confirme cette récupération qu'après une nouvelle lecture du stockage Home Assistant et la vérification de chaque demande attendue. En cas d'échec, aucune demande locale n'est effacée et le popup affiche un message explicite. Le popup permet aussi de redétecter la liste lors de son ouverture.
+
+L'application utilise un abonnement natif Home Assistant `todo/item/subscribe` sur son WebSocket existant. Aucun polling permanent ni nouveau serveur. La liste technique `todo.courses_demandes` n'est jamais choisie pour « Ma liste ».

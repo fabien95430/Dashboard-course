@@ -318,7 +318,7 @@ const MISSING_PRODUCT_CATEGORIES=MISSING_REQUESTS.productCategories;
 const COURSES_ENTITY='todo.courses';
 const URL_ENTITY='todo.url';
 function preferredTodoEntity(entities){
-  const list=Array.isArray(entities)?entities:[];
+  const list=(Array.isArray(entities)?entities:[]).filter(entry=>entry?.id!=='todo.courses_demandes');
   const explicit=String(localStorage.getItem(STORAGE.entityPreference)||'').trim();
   const legacy=String(localStorage.getItem(STORAGE.entity)||'').trim();
   const saved=explicit||legacy;
@@ -397,6 +397,7 @@ let state={
 };
 function syncMissingRequestsFromStore(){
   state.missingProducts=MISSING_REQUESTS.readProducts();
+  renderMissingProducts();
   renderSettingsPage();
 }
 window.addEventListener(MISSING_REQUESTS.eventName,syncMissingRequestsFromStore);
@@ -1547,7 +1548,7 @@ async function connectAuthorized(token,reuseKnownEntity=false){
   await subscribe();
   await refreshItems();
   // Réutilise le socket authentifié; la liste partagée est indépendante de Ma liste.
-  void MISSING_REQUESTS.connectShared().catch(error=>console.warn('courses-app: synchronisation demandes',error));
+  void MISSING_REQUESTS.connectShared({newConnection:true}).catch(error=>console.warn('courses-app: synchronisation demandes',error));
   armIdleLock();
 }
 async function connectFromRefresh(){
@@ -1704,11 +1705,27 @@ async function haClientRequest(payload){
   if(!haClientIsConnected())throw new Error('Connexion Home Assistant indisponible.');
   return request(payload);
 }
+const haTodoSubscriptions=new Map();
+function subscribeMissingTodo(entityId,onUpdate){
+  if(entityId!=='todo.courses_demandes'||typeof onUpdate!=='function')throw new Error('Abonnement demandes invalide');
+  if(!haClientIsConnected())throw new Error('Home Assistant indisponible');
+  return new Promise((resolve,reject)=>{
+    const id=state.seq++;
+    const timer=setTimeout(()=>{
+      state.pending.delete(id);haTodoSubscriptions.delete(id);
+      reject(new Error('Abonnement demandes expiré'));
+    },HA_TIMING.requestTimeoutMs);
+    state.pending.set(id,{resolve,reject,timer});
+    haTodoSubscriptions.set(id,onUpdate);
+    state.ws.send(JSON.stringify({id,type:'todo/item/subscribe',entity_id:entityId}));
+  });
+}
 const COURSES_HA_CLIENT=Object.freeze({
   request:payload=>haClientRequest(payload),
   callService:(domain,service,serviceData={})=>haClientRequest({type:'call_service',domain,service,service_data:serviceData}),
   getStates:()=>haClientRequest({type:'get_states'}),
-  isConnected:haClientIsConnected
+  isConnected:haClientIsConnected,
+  subscribeMissingTodo
 });
 Object.defineProperty(window,'COURSES_HA_CLIENT',{
   value:COURSES_HA_CLIENT,
@@ -1761,7 +1778,10 @@ function connectWs(token){
       if(msg.type==='auth_required'){ws.send(JSON.stringify({type:'auth',access_token:token}));return}
       if(msg.type==='auth_invalid'){clearTimeout(timeout);reject(authRejectedError('Autorisation Home Assistant invalide'));return}
       if(msg.type==='auth_ok'){authed=true;clearTimeout(timeout);resolve();return}
-      if(msg.type==='result'&&state.pending.has(msg.id)){const p=state.pending.get(msg.id);state.pending.delete(msg.id);clearTimeout(p.timer);msg.success?p.resolve(msg.result):p.reject(new Error(msg.error?.message||'Erreur Home Assistant'));return}
+      if(msg.type==='result'&&state.pending.has(msg.id)){const p=state.pending.get(msg.id);state.pending.delete(msg.id);clearTimeout(p.timer);if(!msg.success)haTodoSubscriptions.delete(msg.id);msg.success?p.resolve(msg.result):p.reject(new Error(msg.error?.message||'Erreur Home Assistant'));return}
+      if(msg.type==='event'&&haTodoSubscriptions.has(msg.id)){
+        try{haTodoSubscriptions.get(msg.id)(msg.event)}catch(error){console.warn('courses-app: événement demandes',error)}
+      }
       if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id===state.entity)scheduleListRefresh();
       if(msg.type==='event'&&msg.event?.variables?.trigger?.entity_id==='todo.courses_demandes'){
         window.dispatchEvent(new Event('courses:missing-ha-updated'));
@@ -1770,6 +1790,7 @@ function connectWs(token){
     ws.onerror=()=>{if(!authed){clearTimeout(timeout);reject(new Error('WebSocket Home Assistant indisponible'))}};
     ws.onclose=()=>{
       state.pending.forEach(p=>{clearTimeout(p.timer);p.reject(new Error('Connexion interrompue'))});state.pending.clear();
+      haTodoSubscriptions.clear();
       if(authed&&!state.intentionalClose&&!state.locked&&state.refreshToken){status('is-waiting','Reconnexion…','Home Assistant');scheduleReconnect()}
     };
   });
@@ -1779,7 +1800,7 @@ async function discoverEntities(){
   state.entity=URL_ENTITY||saved||COURSES_ENTITY;
   try{
     const states=await request({type:'get_states'});
-    state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')).map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
+    state.entities=states.filter(s=>String(s.entity_id||'').startsWith('todo.')&&s.entity_id!=='todo.courses_demandes').map(s=>({id:s.entity_id,name:s.attributes?.friendly_name||s.entity_id}));
     const preferred=preferredTodoEntity(state.entities);
     if(preferred){
       state.entity=preferred.id;
@@ -2148,6 +2169,7 @@ function renderMissingProducts(){
   }).join('');
 }
 function openMissingProducts(){
+  if(!state.locked&&!state.demo)void MISSING_REQUESTS.connectShared().catch(()=>{});
   state.missingProductCategory='';
   UI.missingProductName.value='';
   clearDialogFeedback(UI.missingProductsFeedback);

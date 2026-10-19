@@ -16,6 +16,11 @@ function phone(initial={}){
       if(payload.type==='todo/item/list')return {items:structuredClone(remote)};
       throw new Error(payload.type);
     },
+    async subscribeMissingTodo(entityId,listener){
+      assert.equal(entityId,'todo.courses_demandes');
+      this.listener=listener;
+      return {subscription:1};
+    },
     async callService(domain,action,data){
       assert.equal(domain,'todo');
       if(action==='add_item')remote.push({uid:String(nextId++),summary:data.item,description:data.description,status:'needs_action'});
@@ -28,7 +33,7 @@ function phone(initial={}){
         if(!row)throw new Error('unknown');
         row.description=data.description;
       }else throw new Error(action);
-      queueMicrotask(()=>actors.forEach(p=>p.window.dispatchEvent({type:'courses:missing-ha-updated'})));
+      queueMicrotask(()=>actors.forEach(p=>p.client.listener?.({items:structuredClone(remote)})));
     }
   };
   const listeners=new Map(),events=[];
@@ -78,4 +83,35 @@ test('une liste Home Assistant absente ne supprime aucune demande locale',async(
   assert.equal(await A.store.connectShared(),false);
   assert.equal(A.store.readDishes().length,1);
   assert.equal(remote.length,0);
+});
+
+test('v466 récupère 12 demandes malgré un ancien drapeau v465',async()=>{
+  remote.length=0;actors.length=0;nextId=1;
+  const dishes=Array.from({length:12},(_,i)=>({id:'dish'+i,name:'Plat familial '+i,category:'Famille'}));
+  const B=phone({'courses-missing-ha-migrated-v1':true,'courses-missing-dishes-v1':dishes});
+  assert.equal(await B.store.connectShared(),true);
+  assert.equal(remote.length,12);
+  assert.equal(B.store.readDishes().length,12);
+  assert.equal(JSON.parse(B.map.get('courses-missing-ha-recovered-v466')),true);
+  const A=phone();assert.equal(await A.store.connectShared(),true);
+  assert.equal(A.store.readDishes().length,12);
+});
+test('une écriture non confirmée conserve les demandes locales',async()=>{
+  remote.length=0;actors.length=0;nextId=1;
+  const B=phone({'courses-missing-products-v1':[{id:'safe',name:'Produit irremplaçable',category:'Maison'}]});
+  B.client.callService=async()=>{};
+  await assert.rejects(()=>B.store.connectShared(),/Transfert non confirmé/);
+  assert.equal(B.store.readProducts().length,1);
+  assert.notEqual(JSON.parse(B.map.get('courses-missing-ha-recovered-v466')||'false'),true);
+  assert.equal(B.store.getSharedStatus().state,'error');
+});
+test('une liste créée après ouverture est redétectée',async()=>{
+  remote.length=0;actors.length=0;nextId=1;
+  const B=phone({'courses-missing-products-v1':[{id:'ready',name:'Piles AAA',category:'Maison'}]});
+  B.client.getStates=async()=>[];
+  assert.equal(await B.store.connectShared(),false);
+  assert.equal(B.store.getSharedStatus().state,'missing');
+  B.client.getStates=async()=>[{entity_id:'todo.courses_demandes',state:'0'}];
+  assert.equal(await B.store.connectShared(),true);
+  assert.equal(remote.length,1);
 });
