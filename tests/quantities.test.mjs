@@ -60,12 +60,26 @@ test('les libellés audités décrivent le mode d’achat sans exposer les réf�
     'Thon en boîte':'Boîte','Haricots rouges':'Boîte','Pois chiches':'Boîte','Tomates pelées':'Boîte','Maïs en boîte':'Boîte','Lentilles':'Boîte',
     'Farine':'Paquet','Sucre':'Paquet','Sucre roux':'Paquet','Sucre glace':'Paquet','Maïzena':'Boîte','Vanille':'Sachet','Levure chimique':'Sachet','Pépites chocolat':'Sachet','Gélatine':'Paquet',
     'Spaghetti':'Paquet','Riz basmati':'Paquet','Nouilles chinoises':'Paquet',
-    'Crème liquide':'Brique','Œufs':'Boîte','Mozzarella':'Sachet','Parmesan':'Poids','Fromage râpé':'Sachet','Poulet':'Poids','Saumon':'Poids',
+    'Crème liquide':'Brique','Œufs':'Boîte','Mozzarella':'Sachet','Parmesan':'Poids','Fromage râpé':'Sachet','Poulet':'Poids','Saumon':'Pièce',
     'Pain de mie':'Paquet','Brioche':'Paquet','Wraps':'Paquet','Pains burger':'Paquet','Pâte brisée':'Pièce',
     'Fraises':'Barquette','Concombres':'Pièce','Épinards':'Sachet','Poireaux':'Botte','Champignons':'Barquette','Asperges':'Botte','Mâche':'Sachet','Roquette':'Sachet','Persil':'Botte',
     'Mayonnaise':'Pot','Moutarde':'Pot','Sauce tomate':'Pot','Pesto':'Pot','Sauce César':'Flacon','Huile d\'olive':'Bouteille','Miel':'Pot','Chocolat noir':'Tablette',
     'Curry':'Flacon','Paprika':'Flacon','Curcuma':'Flacon','Chili':'Flacon','Lait de coco':'Boîte','Harissa':'Tube','Soupes en brique':'Brique','Croûtons':'Sachet',
     'Vinaigre ménager':'Bouteille','Lessive capsules':'Boîte','Papier aluminium':'Rouleau','Dentifrice':'Tube','Gants ménage':'Paire','Baume lèvres':'Stick','Croquettes chat':'Sac'
+  };
+  for(const [name,label] of Object.entries(expected))assert.equal(api.getPurchaseLabel(name),label,name);
+});
+
+test('les fruits, viandes et poissons vendus à la pièce ont le bon libellé',()=>{
+  const api=context.window.COURSES_QUANTITIES;
+  const expected={
+    'Abricots':'Pièce','Bananes':'Pièce','Citrons':'Pièce','Clémentines':'Pièce','Kiwis':'Pièce','Nectarines':'Pièce',
+    'Oranges':'Pièce','Pêches':'Pièce','Poires':'Pièce','Pommes':'Pièce','Prunes':'Pièce','Raisin':'Poids',
+    'Côtes de porc':'Pièce','Escalopes de poulet':'Pièce','Filets de poulet':'Pièce','Merguez':'Pièce',
+    'Saucisses':'Pièce','Steaks hachés':'Pièce',
+    'Cabillaud':'Pièce','Saumon':'Pièce','Thon frais':'Pièce','Truite':'Pièce',
+    'Crevettes':'Poids','Moules':'Poids','Viande hachée':'Poids',
+    'Fraises':'Barquette','Saumon fumé':'Paquet','Surimi':'Paquet'
   };
   for(const [name,label] of Object.entries(expected))assert.equal(api.getPurchaseLabel(name),label,name);
 });

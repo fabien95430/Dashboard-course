@@ -75,7 +75,7 @@ const DISPLAY_MODE_BY_SUB=Object.freeze({
   'Surgelés':'Sachet',
   'Boulangerie':'Pièce',
   'Pâtes à tarte':'Pièce',
-  'Fruits classiques':'Poids',
+  'Fruits classiques':'Pièce',
   'Fruits rouges & exotiques':'Poids',
   'Légumes du quotidien':'Poids',
   'Légumes variés':'Poids',
@@ -106,6 +106,9 @@ const DISPLAY_MODE_BY_SUB=Object.freeze({
 });
 
 const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
+  'Raisin':'Poids',
+  'Côtes de porc':'Pièce','Escalopes de poulet':'Pièce','Filets de poulet':'Pièce','Merguez':'Pièce','Saucisses':'Pièce','Steaks hachés':'Pièce',
+  'Cabillaud':'Pièce','Saumon':'Pièce','Thon frais':'Pièce','Truite':'Pièce',
   'Crème fraîche':'Pot','Crème liquide':'Brique','Crème épaisse':'Pot','Œufs':'Boîte','Mascarpone':'Pot',
   'Beurre':'Plaquette','Camembert':'Pièce','Chèvre':'Pièce','Mozzarella':'Sachet','Raclette':'Barquette','Reblochon':'Pièce','Fromage râpé':'Sachet',
   'Saucisson':'Pièce','Chorizo':'Pièce','Pâté':'Barquette','Rillettes':'Pot',
