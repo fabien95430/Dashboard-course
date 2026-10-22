@@ -376,6 +376,7 @@ function purchaseLabel(name){
   const meta=PRODUCT_META.get(name);
   return DISPLAY_MODE_BY_SUB[meta?.sub]||'Unité';
 }
+function catalogDisplayLabel(name){return purchaseLabel(name)}
 function technicalMode(name){
   const explicit=TECHNICAL_MODE_BY_PRODUCT[name];
   if(explicit)return explicit;
@@ -615,8 +616,6 @@ function decorateProducts(){
   if(!products)return;
   products.querySelectorAll('.product[data-name]:not([hidden])').forEach(card=>{
     const name=String(card.dataset.name||'');
-    const variableStep=variablePurchaseStepFor(name);
-    const quantity=Math.max(0,Number(card.dataset.quantity)||0);
     const meta=PRODUCT_META.get(name);
     const detail=card.querySelector('.pcat');
     const subcategory=String(meta?.sub||meta?.category||'');
@@ -633,10 +632,9 @@ function decorateProducts(){
       reference.className='product-pack-badge';
       card.appendChild(reference);
     }
-    const measured=variableStep&&quantity>0?measuredQuantity(name,quantity):'';
-    const referenceText=measured||purchaseLabel(name);
+    const referenceText=catalogDisplayLabel(name);
     if(reference.textContent!==referenceText)reference.textContent=referenceText;
-    reference.title=measured?'Quantité dans Ma liste : '+measured:'Mode d’achat : '+purchaseLabel(name);
+    reference.title='Mode d’achat : '+referenceText;
   });
 }
 function decorateShoppingList(){
@@ -815,6 +813,7 @@ window.COURSES_QUANTITIES=Object.freeze({
   setRecipeNeeds,
   resetRecipeNeeds,
   getPurchaseLabel:purchaseLabel,
+  getCatalogDisplayLabel:catalogDisplayLabel,
   addSelected:addSelectedQuantities,
   setServings,
   bind

@@ -70,6 +70,14 @@ test('les libellés audités décrivent le mode d’achat sans exposer les réf�
   for(const [name,label] of Object.entries(expected))assert.equal(api.getPurchaseLabel(name),label,name);
 });
 
+test('le catalogue conserve le conditionnement même quand une quantité de recette est calculée',()=>{
+  const api=context.window.COURSES_QUANTITIES;
+  assert.equal(api.getCatalogDisplayLabel('Pommes'),'Pièce');
+  assert.equal(api.getCatalogDisplayLabel('Fraises'),'Barquette');
+  assert.equal(api.getRecipeUnit('Spaghetti'),'g');
+  assert.equal(api.getRecipeUnit('Citrons'),'piece');
+});
+
 test('les fruits, viandes et poissons vendus à la pièce ont le bon libellé',()=>{
   const api=context.window.COURSES_QUANTITIES;
   const expected={
