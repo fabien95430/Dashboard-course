@@ -4070,3 +4070,10 @@ body{
 .list-view .page-search svg{color:#073e2c!important;width:18px!important;height:18px!important;stroke-width:1.7!important}
 .list-view .page-search input{background:transparent!important}
 .list-view #listCount{font-size:9.5px!important;letter-spacing:1.4px!important;text-transform:uppercase!important;color:#073e2c!important;opacity:.55}
+
+/* v489 — Ma liste : boutons d'en-tête en pastilles voilées */
+.list-view .page-header-actions{gap:8px!important}
+.list-view .page-header-actions .icon-btn{width:38px!important;height:38px!important;padding:0!important;border:0!important;background:rgba(7,62,44,.055)!important;box-shadow:none!important;color:#073e2c!important;transition:background-color .16s ease,transform .16s ease}
+.list-view .page-header-actions .icon-btn svg{width:17px!important;height:17px!important;stroke-width:1.7!important}
+.list-view .page-header-actions .icon-btn:active,.list-view .page-header-actions .icon-btn[aria-expanded="true"]{background:rgba(7,62,44,.11)!important}
+.list-view .page-header-actions .icon-btn:active{transform:scale(.94)}
