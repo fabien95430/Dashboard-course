@@ -4044,3 +4044,21 @@ body{
 .dialog-feedback.is-visible,.courses-openai-feedback.is-visible{display:block;opacity:1;transform:none}
 .dialog-feedback.is-error,.courses-openai-feedback.is-error{background:#fff0ef;color:#b43a32}
 @media(prefers-reduced-motion:reduce){.dialog-feedback,.courses-openai-feedback{transition:none}}
+
+/* v486 — Ma liste : galerie éditoriale, lignes sans tuile et filets discrets */
+.list-view .list-row:not(.is-purchased):not(.is-deleting):not(.is-drag-preview){background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+.list-view .list-row{position:relative;margin:0!important;padding:6px 4px!important;grid-template-columns:36px 70px minmax(0,max-content) auto minmax(0,1fr) 58px!important}
+.list-view .list-row:not(.is-removing){min-height:84px!important;height:auto!important}
+.list-view .list-row:not(:last-child):not(:has(+.list-category-heading))::after{content:'';position:absolute;left:112px;right:6px;bottom:0;height:1px;background:linear-gradient(90deg,rgba(7,62,44,.13),rgba(7,62,44,.13) 70%,rgba(7,62,44,0));pointer-events:none}
+.list-view .list-row.is-purchased::after,.list-view .list-row.is-deleting::after,.list-view .list-row.is-drag-preview::after{display:none}
+.list-view .list-row.is-drag-preview{background:#fff!important;border-radius:22px!important}
+.list-view .list-icon{width:66px!important;height:66px!important;filter:drop-shadow(0 10px 12px rgba(43,61,50,.16))}
+.list-view .list-icon .sprite{width:64px!important;height:64px!important}
+.list-view .list-name{font-size:18px!important;font-weight:700!important;letter-spacing:-.45px!important;color:#073e2c!important}
+.list-view .list-row.is-purchased .list-name{color:#868e91!important}
+.list-view .list-row.is-deleting .list-name{color:#a73b42!important}
+.list-view .list-copy small{font-size:12px!important;color:#8a929b!important}
+.list-view .list-row:not(.is-purchased):not(.is-deleting) .purchase-check::before{width:20px!important;height:20px!important;border-width:1.25px!important;border-color:rgba(7,62,44,.45)!important}
+.list-view .list-row:not(.is-deleting) .list-qty{background:transparent!important;color:#073e2c!important;font-size:17px!important;font-weight:300!important;letter-spacing:-.3px}
+.list-view .list-row:not(.is-deleting) .list-row-more{color:rgba(7,62,44,.25)!important}
+.list-view .list-category-heading{padding:22px 4px 4px!important;margin:0!important;background:transparent!important;font-size:24px!important;font-weight:750!important;letter-spacing:-.6px!important;color:#073e2c!important;border-bottom:.5px solid rgba(7,62,44,.35)}
