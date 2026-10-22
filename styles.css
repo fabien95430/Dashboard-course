@@ -4061,4 +4061,5 @@ body{
 .list-view .list-row:not(.is-purchased):not(.is-deleting) .purchase-check::before{width:20px!important;height:20px!important;border-width:1.25px!important;border-color:rgba(7,62,44,.45)!important}
 .list-view .list-row:not(.is-deleting) .list-qty{background:transparent!important;color:#073e2c!important;font-size:17px!important;font-weight:300!important;letter-spacing:-.3px}
 .list-view .list-row:not(.is-deleting) .list-row-more{color:rgba(7,62,44,.25)!important}
-.list-view .list-category-heading{padding:22px 4px 4px!important;margin:0!important;background:transparent!important;font-size:24px!important;font-weight:750!important;letter-spacing:-.6px!important;color:#073e2c!important;border-bottom:.5px solid rgba(7,62,44,.35)}
+.list-view .list-category-heading{display:flex!important;align-items:center;gap:12px;padding:24px 4px 8px!important;margin:0!important;background:transparent!important;font-size:11px!important;font-weight:700!important;letter-spacing:1.8px!important;text-transform:uppercase!important;color:#073e2c!important;border-bottom:0!important}
+.list-view .list-category-heading::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(7,62,44,.22),rgba(7,62,44,0))}
