@@ -4063,3 +4063,10 @@ body{
 .list-view .list-row:not(.is-deleting) .list-row-more{color:rgba(7,62,44,.25)!important}
 .list-view .list-category-heading{display:flex!important;align-items:center;gap:12px;padding:24px 4px 8px!important;margin:0!important;background:transparent!important;font-size:11px!important;font-weight:700!important;letter-spacing:1.8px!important;text-transform:uppercase!important;color:#073e2c!important;border-bottom:0!important}
 .list-view .list-category-heading::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(7,62,44,.22),rgba(7,62,44,0))}
+
+/* v488 — Ma liste : recherche soulignée façon éditoriale */
+.list-view .page-search{height:46px!important;padding:0 2px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,rgba(7,62,44,.5),rgba(7,62,44,.06)) 0 100%/100% 1px no-repeat!important;transition:background-size .2s ease}
+.list-view .page-search:focus-within{background:linear-gradient(90deg,#073e2c,rgba(7,62,44,.25)) 0 100%/100% 1.5px no-repeat!important}
+.list-view .page-search svg{color:#073e2c!important;width:18px!important;height:18px!important;stroke-width:1.7!important}
+.list-view .page-search input{background:transparent!important}
+.list-view #listCount{font-size:9.5px!important;letter-spacing:1.4px!important;text-transform:uppercase!important;color:#073e2c!important;opacity:.55}
