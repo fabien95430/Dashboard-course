@@ -86,3 +86,13 @@ test('les trois badges de version partagent une géométrie unique sur iPhone',(
   assert.ok(sharedTitleRules.every(rule=>!/display:flex!important/.test(rule)&&!/align-items:flex-end!important/.test(rule)&&!/column-gap:5px!important/.test(rule)),'les h1 ne doivent plus porter le flex v448');
   assert.doesNotMatch(styles,/\.catalog-view \.page-version\s*\{/);
 });
+
+test('le Catalogue aligne sa recherche mobile sur Ma liste et espace les catégories',()=>{
+  const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
+  assert.match(styles,/\.list-view\{\s*grid-template-rows:82px 42px minmax\(0,1fr\)!important/);
+  assert.match(mobile,/grid-template-rows:82px 46px 54px 38px minmax\(0,1fr\)!important/);
+  assert.match(mobile,/html \.catalog-view>\.page-search\{\s*order:1!important;[\s\S]*?margin-left:13px!important;\s*margin-right:13px!important/);
+  assert.match(mobile,/html \.catalog-mode-switch\{\s*order:2!important;\s*margin-top:8px!important/);
+  assert.match(firstPaint,/html \.catalog-controls>\.categories,[\s\S]*?order:3!important/);
+  assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:2px!important/);
+});

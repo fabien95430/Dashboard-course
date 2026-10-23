@@ -134,13 +134,20 @@ html .catalog-view>#products.is-catalog-mode-hidden{
 
 @media(max-width:520px){
   html .catalog-view{
-    grid-template-rows:82px 46px 42px 38px minmax(0,1fr)!important;
+    grid-template-rows:82px 46px 54px 38px minmax(0,1fr)!important;
     gap:8px!important;
   }
+  /* Comme Ma liste : recherche directement sous l'en-tête.
+     Le sélecteur garde sa lentille mais passe sous la recherche. */
+  html .catalog-mode-switch{
+    order:2!important;
+    margin-top:8px!important;
+  }
   html .catalog-view>.page-search{
+    order:1!important;
     height:46px!important;
-    margin-left:1px!important;
-    margin-right:1px!important;
+    margin-left:13px!important;
+    margin-right:13px!important;
     grid-template-columns:24px minmax(0,1fr) auto!important;
     gap:8px!important;
     padding:0 2px!important;
