@@ -137,14 +137,9 @@ html .catalog-view>#products.is-catalog-mode-hidden{
     grid-template-rows:82px 46px 54px 38px minmax(0,1fr)!important;
     gap:8px!important;
   }
-  /* Comme Ma liste : recherche directement sous l'en-tête.
-     Le sélecteur garde sa lentille mais passe sous la recherche. */
-  html .catalog-mode-switch{
-    order:2!important;
-    margin-top:8px!important;
-  }
+  /* Produits / Plats précède la recherche ; 8px supplémentaires
+     dans sa ligne réservent 16px sous la recherche avant les catégories. */
   html .catalog-view>.page-search{
-    order:1!important;
     height:46px!important;
     margin-left:13px!important;
     margin-right:13px!important;

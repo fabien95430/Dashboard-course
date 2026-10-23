@@ -87,12 +87,13 @@ test('les trois badges de version partagent une géométrie unique sur iPhone',(
   assert.doesNotMatch(styles,/\.catalog-view \.page-version\s*\{/);
 });
 
-test('le Catalogue aligne sa recherche mobile sur Ma liste et espace les catégories',()=>{
+test('le sélecteur Produits Plats précède la recherche et conserve un espacement avant les catégories',()=>{
   const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
-  assert.match(styles,/\.list-view\{\s*grid-template-rows:82px 42px minmax\(0,1fr\)!important/);
+  assert.match(firstPaint,/html \.catalog-mode-switch\{[\s\S]*?order:1!important/);
+  assert.match(firstPaint,/html \.catalog-view>\.page-search\{order:2!important\}/);
+  assert.doesNotMatch(mobile,/order:1!important|order:2!important/,'les surcharges mobiles ne doivent plus inverser les éléments');
   assert.match(mobile,/grid-template-rows:82px 46px 54px 38px minmax\(0,1fr\)!important/);
-  assert.match(mobile,/html \.catalog-view>\.page-search\{\s*order:1!important;[\s\S]*?margin-left:13px!important;\s*margin-right:13px!important/);
-  assert.match(mobile,/html \.catalog-mode-switch\{\s*order:2!important;\s*margin-top:8px!important/);
+  assert.match(mobile,/html \.catalog-view>\.page-search\{[\s\S]*?height:46px!important;\s*margin-left:13px!important;\s*margin-right:13px!important/);
   assert.match(firstPaint,/html \.catalog-controls>\.categories,[\s\S]*?order:3!important/);
   assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:2px!important/);
 });
