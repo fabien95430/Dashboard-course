@@ -87,13 +87,16 @@ test('les trois badges de version partagent une géométrie unique sur iPhone',(
   assert.doesNotMatch(styles,/\.catalog-view \.page-version\s*\{/);
 });
 
-test('le sélecteur Produits Plats précède la recherche et conserve un espacement avant les catégories',()=>{
+test('sur iPhone les recherches de Ma liste et du Catalogue commencent à la même hauteur',()=>{
   const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
-  assert.match(firstPaint,/html \.catalog-mode-switch\{[\s\S]*?order:1!important/);
-  assert.match(firstPaint,/html \.catalog-view>\.page-search\{order:2!important\}/);
-  assert.doesNotMatch(mobile,/order:1!important|order:2!important/,'les surcharges mobiles ne doivent plus inverser les éléments');
-  assert.match(mobile,/grid-template-rows:82px 46px 54px 38px minmax\(0,1fr\)!important/);
-  assert.match(mobile,/html \.catalog-view>\.page-search\{[\s\S]*?height:46px!important;\s*margin-left:13px!important;\s*margin-right:13px!important/);
-  assert.match(firstPaint,/html \.catalog-controls>\.categories,[\s\S]*?order:3!important/);
+  assert.match(styles,/\.list-view\{\s*grid-template-rows:82px 42px minmax\(0,1fr\)!important/);
+  assert.match(styles,/\.list-view\{\s*gap:8px!important/);
+  assert.match(mobile,/grid-template-rows:82px 46px 46px minmax\(0,1fr\)!important;\s*gap:8px!important/);
+  assert.match(mobile,/html \.catalog-view>\.page-search\{\s*grid-row:2!important;\s*height:46px!important;\s*margin-left:13px!important;\s*margin-right:13px!important/);
+  assert.match(mobile,/html \.catalog-mode-switch\{\s*position:absolute!important;\s*top:45px!important;/);
+  assert.match(mobile,/html \.catalog-view>\.page-header\{\s*display:grid!important/);
+  assert.match(mobile,/html \.catalog-controls>\.categories,\s*html \.catalog-controls>\.dish-filters\{\s*grid-row:3!important;\s*align-self:end!important/);
+  assert.match(mobile,/html \.catalog-view>#products,\s*html \.catalog-view>\.dishes-grid\{grid-row:4!important\}/);
   assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:2px!important/);
+  assert.doesNotMatch(mobile,/order:1!important|order:2!important/,'pas d’inversion supplémentaire des onglets');
 });
