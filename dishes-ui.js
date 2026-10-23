@@ -715,7 +715,7 @@ function syncModeLens(animate=true){
   if(!modeSwitch||modeSwitch.dataset.catalogLiquidBound==='1')return;
   const active=modeSwitch.querySelector('.catalog-mode.is-active');
   if(!active||!active.offsetWidth)return;
-  const width=active.offsetWidth*.84;
+  const width=Math.max(48,Math.min(active.offsetWidth*.5,108));
   const x=active.offsetLeft+(active.offsetWidth-width)/2;
   clearTimeout(lensTimer);
   modeSwitch.classList.toggle('is-switching',animate);

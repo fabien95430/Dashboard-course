@@ -63,13 +63,15 @@ test('la grille Plats se prépare en arrière-plan avant le premier affichage',(
 
 test('la lentille Produits Plats garde la même géométrie avant et après le module liquid',()=>{
   const dishes=read('dishes-ui.js'),firstPaint=read('product-item-first-paint.css'),liquid=read('catalog-liquid.js');
-  assert.match(firstPaint,/--catalog-lens-x:calc\(3px \+ 9\.5238%\)/);
-  assert.match(firstPaint,/--catalog-lens-w:calc\(42% - 2\.52px\)/);
-  assert.match(liquid,/const lensW=liquid\.w\*0\.84;/);
+  assert.match(firstPaint,/--catalog-lens-x:calc\(25vw - 48px\)/);
+  assert.match(firstPaint,/--catalog-lens-w:84px/);
+  assert.match(liquid,/const lensW=Math\.max\(48,Math\.min\(liquid\.w\*0\.5,108\)\);/);
   const syncStart=dishes.indexOf('function syncModeLens(animate=true){');
   const syncEnd=dishes.indexOf('function renderDishFilters(){',syncStart);
   const sync=dishes.slice(syncStart,syncEnd);
   assert.match(sync,/modeSwitch\.dataset\.catalogLiquidBound==='1'/);
-  assert.match(sync,/const width=active\.offsetWidth\*\.84;/);
+  assert.match(sync,/const width=Math\.max\(48,Math\.min\(active\.offsetWidth\*\.5,108\)\);/);
   assert.match(sync,/active\.offsetLeft\+\(active\.offsetWidth-width\)\/2/);
+  assert.match(firstPaint,/height:2px!important/);
+  assert.match(firstPaint,/background:transparent!important/);
 });
