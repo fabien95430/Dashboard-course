@@ -4078,3 +4078,28 @@ body{
 .list-view .page-header-actions .icon-btn svg{width:17px!important;height:17px!important;stroke-width:1.7!important}
 .list-view .page-header-actions .icon-btn:active,.list-view .page-header-actions .icon-btn[aria-expanded="true"]{background:rgba(7,62,44,.11)!important}
 .list-view .page-header-actions .icon-btn:active{transform:scale(.94)}
+
+
+/* v494 — Catalogue éditorial harmonisé à Ma liste. */
+.catalog-view .page-search{height:46px!important;margin:0 1px!important;padding:0 2px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,rgba(7,62,44,.5),rgba(7,62,44,.06)) 0 100%/100% 1px no-repeat!important}
+.catalog-view .page-search:focus-within{background:linear-gradient(90deg,#073e2c,rgba(7,62,44,.25)) 0 100%/100% 1.5px no-repeat!important}
+.catalog-view .page-search svg{color:#073e2c!important;width:18px!important;height:18px!important;stroke-width:1.7!important}
+.catalog-view .page-search input{background:transparent!important}
+.catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
+.catalog-view .page-header-actions{gap:8px!important}
+.catalog-view .page-header-actions .icon-btn{width:38px!important;height:38px!important;padding:0!important;border:0!important;background:rgba(7,62,44,.055)!important;box-shadow:none!important;color:#073e2c!important;transition:background-color .16s ease,transform .16s ease}
+.catalog-view .page-header-actions .icon-btn svg{width:17px!important;height:17px!important;stroke-width:1.7!important}
+.catalog-view .page-header-actions .icon-btn:active{background:rgba(7,62,44,.11)!important;transform:scale(.94)}
+.catalog-view .cat{border-color:transparent!important;background:rgba(7,62,44,.045)!important;color:#456153!important;box-shadow:none!important}
+.catalog-view .cat.is-active{background:#0b5a38!important;color:#fff!important}
+.catalog-view .product{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:2px 3px 7px!important;grid-template-rows:114px minmax(0,1fr)!important}
+.catalog-view .product.is-selected{border:0!important;background:transparent!important;box-shadow:none!important}
+.catalog-view .products{grid-auto-rows:171px!important;gap:9px!important}
+.catalog-view .product .media{height:112px!important}
+.catalog-view .product .premium-sprite{width:calc(102px * var(--sprite-ratio,1))!important;height:102px!important}
+.catalog-view .product .product-copy{gap:3px!important;align-self:start!important}
+.catalog-view .product .pname{color:#073e2c!important;font-size:13px!important;font-weight:760!important}
+.catalog-view .product .pcat{color:#8a929b!important;padding-right:26px!important}
+.catalog-view .product .badge{top:auto!important;right:3px!important;bottom:7px!important;width:26px!important;height:26px!important;border:1px solid rgba(7,62,44,.15)!important;border-radius:50%!important;background:rgba(7,62,44,.06)!important;color:#073e2c!important;box-shadow:none!important;font-size:20px!important;font-weight:500!important}
+.catalog-view .product.is-selected .badge{border-color:transparent!important;background:#073e2c!important;color:#fff!important;font-size:13px!important;font-weight:750!important}
+@media(max-width:520px){.catalog-view .products{grid-auto-rows:151px!important;gap:8px!important}.catalog-view .product{grid-template-rows:97px minmax(0,1fr)!important}.catalog-view .product .media{height:95px!important}.catalog-view .product .premium-sprite{width:calc(88px * var(--sprite-ratio,1))!important;height:88px!important}.catalog-view .product .pname{font-size:12px!important}.catalog-view .product .pcat{font-size:9.5px!important}}
