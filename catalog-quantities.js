@@ -577,31 +577,31 @@ function ensureStyles(){
     #products .product .product-pack-badge{
       position:absolute!important;
       z-index:2!important;
-      top:8px!important;
-      left:8px!important;
+      top:6px!important;
+      left:6px!important;
       height:17px!important;
-      max-width:72px!important;
-      padding:0 2px!important;
+      max-width:45px!important;
+      padding:0 5px!important;
       display:flex!important;
       align-items:center!important;
-      justify-content:flex-start!important;
-      border:0!important;
-      border-radius:0!important;
-      background:transparent!important;
-      color:rgba(7,62,44,.58)!important;
-      box-shadow:none!important;
-      font-size:8.5px!important;
+      justify-content:center!important;
+      border:1px solid rgba(27,49,35,.08)!important;
+      border-radius:999px!important;
+      background:rgba(248,250,246,.92)!important;
+      color:#5f6e66!important;
+      box-shadow:0 2px 7px rgba(46,64,52,.08)!important;
+      font-size:8px!important;
       line-height:1!important;
-      font-weight:760!important;
-      letter-spacing:1px!important;
-      text-transform:uppercase!important;
+      font-weight:780!important;
+      letter-spacing:-.08px!important;
       white-space:nowrap!important;
       overflow:hidden!important;
       text-overflow:ellipsis!important;
       pointer-events:none!important;
     }
     #products .product.is-selected .product-pack-badge{
-      color:rgba(7,62,44,.72)!important;
+      background:rgba(255,255,255,.82)!important;
+      color:#365447!important;
     }
     #products .product .pcat{display:block!important}
     #dishDialog .dish-ingredient-name{display:flex!important;flex-direction:column!important;gap:2px!important}
