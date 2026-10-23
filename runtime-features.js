@@ -4,14 +4,14 @@
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
-    script.src='./missing-products-fixes.js?v=479';
+    script.src='./missing-products-fixes.js?v=493';
     script.defer=true;
     script.dataset.missingProductsFixes='1';
     document.head.appendChild(script);
   }
   if(!document.querySelector('script[data-missing-products-popup-ui]')){
     const script=document.createElement('script');
-    script.src='./missing-products-popup-ui.js?v=410';
+    script.src='./missing-products-popup-ui.js?v=493';
     script.defer=true;
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);

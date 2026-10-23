@@ -1,7 +1,6 @@
 (()=>{
 'use strict';
 
-const HOLD_MS=800;
 const SVG_PRODUCT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 20h17v31H12z" fill="#f7f2e8" stroke="#758575" stroke-width="2"/><path d="M15 16h11l3 4H12z" fill="#e8eee6" stroke="#758575" stroke-width="2"/><path d="M38 14h9v7h-9z" fill="#d7dfd4"/><path d="M35 20h15l2 6v25H33V26z" fill="#859583"/><path d="M38 28h9" stroke="#f4f1e9" stroke-width="2.5" stroke-linecap="round"/></svg>';
 const SVG_DISH='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M11 45h42" stroke="#ad791d" stroke-width="3.5" stroke-linecap="round"/><path d="M16 42c0-13 7-22 16-22s16 9 16 22z" fill="#d6a33d"/><circle cx="32" cy="17" r="3.5" fill="#ad791d"/><path d="M15 42h34" stroke="#9f6c16" stroke-width="3" stroke-linecap="round"/></svg>';
 const SVG_DESSERT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 31h22l-2.5 20h-17z" fill="#c9714f"/><path d="M18.5 30h27" stroke="#9f5237" stroke-width="3" stroke-linecap="round"/><path d="M20 29c1-6.2 5.8-10 12-10s11 3.8 12 10z" fill="#dd9777"/><circle cx="32" cy="15" r="3" fill="#a9513c"/></svg>';
@@ -11,8 +10,6 @@ const SVG_MENU_DELETE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7
 const SVG_MENU_MORE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.65" fill="currentColor"/><circle cx="12" cy="12" r="1.65" fill="currentColor"/><circle cx="19" cy="12" r="1.65" fill="currentColor"/></svg>';
 
 let openMenu=null;
-let holdTimer=0;
-let holdButton=null;
 let decorateFrame=0;
 
 function normalize(value){
@@ -34,7 +31,6 @@ function thumbSvg(type){
   return SVG_DISH;
 }
 function closeMenu(){
-  stopHold();
   if(openMenu){openMenu.remove();openMenu=null;}
   document.querySelectorAll('#missingProductsDialog .missing-row-more[aria-expanded="true"]').forEach(button=>button.setAttribute('aria-expanded','false'));
 }
@@ -65,17 +61,6 @@ function ensureCloseButton(dialog){
   header.appendChild(button);
   return button;
 }
-function stopHold(){
-  if(holdTimer){clearTimeout(holdTimer);holdTimer=0;}
-  if(holdButton){holdButton.classList.remove('is-holding');holdButton=null;}
-}
-function triggerOpenAi(row){
-  const magic=row.querySelector('[data-openai-missing-product],[data-openai-missing-dish]');
-  if(!magic||magic.disabled)return false;
-  navigator.vibrate?.([12,35,18]);
-  magic.click();
-  return true;
-}
 function positionMenu(menu,anchor){
   const rect=anchor.getBoundingClientRect();
   const dialog=document.getElementById('missingProductsDialog');
@@ -95,37 +80,6 @@ function positionMenu(menu,anchor){
   menu.classList.toggle('is-above',placeAbove);
   const top=placeAbove?above:Math.min(bottomBound-menu.offsetHeight,below);
   menu.style.top=Math.max(topBound,top)+'px';
-}
-function startHold(button,row){
-  if(button.disabled||button.classList.contains('is-disabled'))return;
-  stopHold();
-  holdButton=button;
-  button.classList.add('is-holding');
-  holdTimer=setTimeout(()=>{
-    holdTimer=0;
-    button.classList.remove('is-holding');
-    holdButton=null;
-    if(triggerOpenAi(row))closeMenu();
-  },HOLD_MS);
-}
-function bindHold(button,row){
-  button.addEventListener('pointerdown',event=>{
-    if(!event.isPrimary||event.button>0)return;
-    event.preventDefault();
-    startHold(button,row);
-  });
-  ['pointerup','pointercancel','pointerleave'].forEach(type=>button.addEventListener(type,stopHold));
-  button.addEventListener('contextmenu',event=>event.preventDefault());
-  button.addEventListener('click',event=>event.preventDefault());
-  button.addEventListener('keydown',event=>{
-    if(event.key!==' '&&event.key!=='Enter')return;
-    if(event.repeat)return;
-    event.preventDefault();
-    startHold(button,row);
-  });
-  button.addEventListener('keyup',event=>{
-    if(event.key===' '||event.key==='Enter'){event.preventDefault();stopHold();}
-  });
 }
 function openRowMenu(row,anchor){
   closeMenu();
@@ -342,13 +296,10 @@ function installStyle(){
     .missing-row-menu-item>span:last-child{position:relative;z-index:1}
     .missing-row-menu-item.is-danger,.missing-row-menu-item.is-danger .missing-menu-icon{color:#ff3b30}
     .missing-row-menu-item.is-disabled,.missing-row-menu-item:disabled{opacity:.38;pointer-events:none}
-    .missing-row-openai:before{content:"";position:absolute;inset:0;transform:scaleX(0);transform-origin:left center;background:rgba(35,144,90,.10);pointer-events:none}
-    .missing-row-openai.is-holding:before{animation:missingOpenAiHold ${HOLD_MS}ms linear forwards}
-    @keyframes missingOpenAiHold{to{transform:scaleX(1)}}
     @keyframes missingMenuIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
     @keyframes missingMenuInAbove{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
     @media(max-width:390px){#missingProductsDialog .missing-products-add #missingProductName{height:44px!important;font-size:14px!important}#missingProductsDialog .missing-products-add #addMissingProduct.primary{height:44px!important;min-width:84px!important;padding:0 12px!important;font-size:13px!important}#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr) 32px!important;gap:6px!important;padding:7px!important;min-height:62px!important}#missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px}#missingProductsDialog .missing-request-thumb svg{width:33px;height:33px}#missingProductsDialog .missing-row-more{width:32px;height:32px;min-width:32px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:70px!important;min-height:34px!important;padding-left:8px!important;padding-right:8px!important;font-size:10.5px!important}}
-    @media(prefers-reduced-motion:reduce){.missing-row-openai.is-holding:before{animation-duration:1ms}.missing-row-menu{animation:none}}
+    @media(prefers-reduced-motion:reduce){.missing-row-menu{animation:none}}
   `;
   document.head.appendChild(style);
 }

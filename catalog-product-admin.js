@@ -84,8 +84,6 @@ function sharedHaClient(){
   }
   return client;
 }
-function haRequest(payload){return sharedHaClient().request(payload)}
-function haCallService(domain,service,serviceData={}){return sharedHaClient().callService(domain,service,serviceData)}
 
 function base64UrlToBytes(value){
   const padding='='.repeat((4-value.length%4)%4);
