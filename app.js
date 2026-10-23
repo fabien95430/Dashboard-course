@@ -1446,6 +1446,8 @@ function armIdleLock(){
   if(state.demo||state.locked||!vaultRecord())return;
   state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),autoLockDelayMs());
 }
+let unlockVersionChecked=false;
+let unlockVersionCheckPromise=null;
 function showSecurity(mode,message=''){
   const overlay=UI.securityOverlay;
   state.securityMode=mode;
@@ -1471,8 +1473,10 @@ function showSecurity(mode,message=''){
   UI.securityError.textContent='';
   refreshVisualLock();
   setTimeout(()=>UI.securityPassword.focus(),80);
+  if(mode==='unlock')void checkForUpdateBeforeUnlock();
 }
 function hideSecurity(){
+  unlockVersionChecked=false;
   UI.securityOverlay.classList.remove('is-visible');
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
@@ -1614,6 +1618,7 @@ async function completeSecurityAction(){
   button.disabled=true;
   try{
     if(state.securityMode==='unlock'){
+      if(await unlockVersionCheckPromise)return;
       const payload=await decryptVault(vaultRecord(),password);
       clearUnlockGuard();
       state.haUrl=normalizeHaUrl(payload.ha_url);
@@ -2798,13 +2803,16 @@ function currentAppVersion(){
 }
 async function deployedAppVersion(){
   if(navigator.onLine===false)return 0;
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),4000);
   try{
-    const response=await fetch('./index.html?courses-version-check='+Date.now(),{cache:'no-store'});
+    const response=await fetch('./index.html?courses-version-check='+Date.now(),{cache:'no-store',signal:controller.signal});
     if(!response.ok)return 0;
     const html=await response.text();
     const versions=[...html.matchAll(/class=\"page-version\">v(\d+)/g)].map(match=>Number(match[1]));
     return versions.length?Math.max(...versions):0;
   }catch(_){return 0}
+  finally{clearTimeout(timeout)}
 }
 function waitForServiceWorkerActivation(worker,timeoutMs=15000){
   if(!worker||worker.state==='activated')return Promise.resolve(true);
@@ -2835,7 +2843,36 @@ async function installLatestAppVersion(){
   try{await registration.update()}catch(_){return false}
   const worker=registration.installing||registration.waiting;
   if(worker&&!await waitForServiceWorkerActivation(worker))return false;
-  return true;
+  try{
+    const cacheNames=await caches.keys();
+    return cacheNames.some(name=>name.startsWith('courses-app-v'+latest+'-'));
+  }catch(_){return false}
+}
+async function checkForUpdateBeforeUnlock(){
+  if(unlockVersionCheckPromise)return unlockVersionCheckPromise;
+  if(unlockVersionChecked||navigator.onLine===false)return false;
+  unlockVersionChecked=true;
+  UI.securitySubmit.disabled=true;
+  let reloading=false;
+  const check=(async()=>{
+    try{
+      if(await installLatestAppVersion()){
+        reloading=true;
+        location.reload();
+        return true;
+      }
+    }catch(error){
+      reloading=false;
+      console.warn('courses-app: mise à jour automatique',error);
+    }
+    return false;
+  })();
+  unlockVersionCheckPromise=check;
+  try{return await check}
+  finally{
+    unlockVersionCheckPromise=null;
+    if(!reloading&&state.securityMode==='unlock')UI.securitySubmit.disabled=false;
+  }
 }
 async function refreshFromHeader(button,checkUpdate=false){
   if(button?.classList.contains('is-refreshing'))return;
@@ -2996,6 +3033,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('online',()=>{
   if(state.demo)return;
+  if(state.locked&&state.securityMode==='unlock'){void checkForUpdateBeforeUnlock();return;}
   if(!state.locked&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN&&state.ws?.readyState!==WebSocket.CONNECTING)connectFromRefresh();
 });
 window.addEventListener('pagehide',()=>{
