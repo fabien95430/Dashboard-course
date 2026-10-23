@@ -4078,3 +4078,25 @@ body{
 .list-view .page-header-actions .icon-btn svg{width:17px!important;height:17px!important;stroke-width:1.7!important}
 .list-view .page-header-actions .icon-btn:active,.list-view .page-header-actions .icon-btn[aria-expanded="true"]{background:rgba(7,62,44,.11)!important}
 .list-view .page-header-actions .icon-btn:active{transform:scale(.94)}
+
+/* v491 — Catalogue harmonisé avec Ma liste : en-tête, catégories voilées et tuiles sans blanc pur */
+.catalog-view .page-header-actions{gap:8px!important}
+.catalog-view .page-header-actions .icon-btn{width:38px!important;height:38px!important;padding:0!important;border:0!important;background:rgba(7,62,44,.055)!important;box-shadow:none!important;color:#073e2c!important;transition:background-color .16s ease,transform .16s ease}
+.catalog-view .page-header-actions .icon-btn svg{width:17px!important;height:17px!important;stroke-width:1.7!important}
+.catalog-view .page-header-actions .icon-btn:active{background:rgba(7,62,44,.11)!important;transform:scale(.94)}
+.catalog-view .page-search{height:46px!important;padding:0 2px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,rgba(7,62,44,.5),rgba(7,62,44,.06)) 0 100%/100% 1px no-repeat!important}
+.catalog-view .page-search:focus-within{background:linear-gradient(90deg,#073e2c,rgba(7,62,44,.25)) 0 100%/100% 1.5px no-repeat!important}
+.catalog-view .page-search svg{color:#073e2c!important;width:18px!important;height:18px!important;stroke-width:1.7!important}
+.catalog-view .page-search input{background:transparent!important}
+.catalog-view #productCount,.catalog-view #dishCount{font-size:9.5px!important;letter-spacing:1.4px!important;text-transform:uppercase!important;color:#073e2c!important;opacity:.55}
+.catalog-view .cat{height:36px!important;padding:0 15px!important;background:rgba(7,62,44,.055)!important;border:0!important;box-shadow:none!important}
+.catalog-view .cat>span,.catalog-view .cat .cat-label{font-size:13px!important;color:#56645c!important;font-weight:650!important}
+.catalog-view .cat.is-active{background:#fff!important;box-shadow:0 1px 2px rgba(7,62,44,.10),0 4px 12px rgba(7,62,44,.08)!important}
+.catalog-view .cat.is-active>span,.catalog-view .cat.is-active .cat-label{color:#073e2c!important;font-weight:750!important}
+#products .product{background:linear-gradient(180deg,rgba(7,62,44,.035),rgba(7,62,44,.055))!important;border:0!important;box-shadow:none!important;border-radius:22px!important}
+#products .product.is-selected{background:rgba(7,62,44,.10)!important}
+#products .product .media{filter:drop-shadow(0 8px 10px rgba(43,61,50,.13))!important}
+#products .product .pname{color:#073e2c!important;font-weight:720!important;letter-spacing:-.2px}
+#products .product .pcat{color:#7f8b84!important}
+#products .product .badge{width:28px!important;height:28px!important;background:rgba(255,255,255,.9)!important;color:#073e2c!important;box-shadow:0 0 0 .5px rgba(7,62,44,.10),0 3px 8px rgba(7,62,44,.08)!important}
+#products .product.is-selected .badge{background:#073e2c!important;color:#fff!important;font-size:13px!important}

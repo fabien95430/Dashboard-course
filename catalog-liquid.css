@@ -251,3 +251,9 @@
     scroll-padding-bottom:calc(97px + env(safe-area-inset-bottom))!important;
   }
 }
+
+/* v491 — sélecteur Produits / Plats en segmenté voilé */
+.catalog-view .catalog-mode-switch{height:44px!important;padding:4px!important;background:rgba(7,62,44,.055)!important;border:0!important;box-shadow:none!important}
+.catalog-view .catalog-mode-lens{height:34px!important;background:#fff!important;border:0!important;box-shadow:0 1px 2px rgba(7,62,44,.10),0 4px 12px rgba(7,62,44,.08)!important}
+.catalog-view .catalog-mode{color:#6c7a72!important}
+.catalog-view .catalog-mode.is-active,.catalog-view .catalog-mode>.catalog-mode-lens-copy{color:#073e2c!important}

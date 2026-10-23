@@ -44,8 +44,8 @@
   const loadDishStyles=()=>{
     if(dishStylesReadyPromise)return dishStylesReadyPromise;
     dishStylesReadyPromise=Promise.all([
-      ensureStylesheet('link[data-catalog-dishes]','./dishes.css?v=4','catalogDishes'),
-      ensureStylesheet('link[data-catalog-liquid]','./catalog-liquid.css?v=5','catalogLiquid')
+      ensureStylesheet('link[data-catalog-dishes]','./dishes.css?v=5','catalogDishes'),
+      ensureStylesheet('link[data-catalog-liquid]','./catalog-liquid.css?v=6','catalogLiquid')
     ]).catch(error=>{
       dishStylesReadyPromise=null;
       throw error;
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=490';
+    images.src='./dish-local-images.js?v=491';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -115,7 +115,7 @@
     if(window.COURSES_QUANTITIES){loadDishes();return}
     if(document.querySelector('script[data-catalog-quantities]'))return;
     const quantities=document.createElement('script');
-    quantities.src='./catalog-quantities.js?v=490';
+    quantities.src='./catalog-quantities.js?v=491';
     quantities.async=false;
     quantities.dataset.catalogQuantities='script';
     quantities.addEventListener('load',loadDishes,{once:true});
