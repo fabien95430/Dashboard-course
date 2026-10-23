@@ -654,8 +654,6 @@ function toast(message){const el=$('#toast');el.textContent=message;el.classList
 function publishPurchaseSettled(name,quantity,queued=false){
   const item=String(name||'').trim();
   if(!item)return;
-  purchasedProgressGroups++;
-  updateListProgress();
   document.dispatchEvent(new CustomEvent('courses:purchase-settled',{detail:{
     name:item,
     quantity:Math.max(1,Number(quantity)||1),
@@ -917,39 +915,12 @@ function syncProductSelection(){
   });
   notifyProductsUpdated();
 }
-
-/* Progression de la session : Home Assistant conserve seulement les articles
-   en attente dans la vue, les achats sont confirmés par purchase-settled.
-   La recherche et le filtre ne doivent jamais fausser le dénominateur. */
-let purchasedProgressGroups=0;
-function listProgressState(purchased,groups){
-  const bought=Math.max(0,Math.trunc(Number(purchased)||0));
-  const remaining=groups.length;
-  const total=bought+remaining;
-  return {bought,remaining,total,percent:total?Math.round(bought*100/total):0};
-}
-function updateListProgress(groups=activeGroups()){
-  const progress=$('#listProgress');
-  if(!progress)return;
-  const values=listProgressState(purchasedProgressGroups,groups);
-  const visible=!state.locked&&!state.loading&&!state.error&&(state.demo||!!state.entity)&&values.total>0;
-  progress.hidden=!visible;
-  if(!visible)return;
-  $('#listProgressLabel').textContent=values.bought+' article'+(values.bought>1?'s':'')+' acheté'+(values.bought>1?'s':'');
-  $('#listProgressCount').textContent=values.bought+' / '+values.total;
-  $('#listProgressFill').style.width=values.percent+'%';
-  progress.setAttribute('aria-valuenow',String(values.bought));
-  progress.setAttribute('aria-valuemax',String(values.total));
-  progress.setAttribute('aria-valuetext',values.bought+' article'+(values.bought>1?'s':'')+' acheté'+(values.bought>1?'s':'')+' sur '+values.total);
-}
-
 function renderSelectionAndList(){
   syncProductSelection();
   renderList();
 }
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery);
-  updateListProgress(groups);
   emitListChangedIfNeeded(groups);
   const rows=sortedGroups(visibleListGroups(groups));
   const canReorder=rows.length>1;
