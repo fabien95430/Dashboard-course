@@ -196,6 +196,3 @@
     scroll-padding-bottom:calc(97px + env(safe-area-inset-bottom))!important;
   }
 }
-
-.catalog-view .dish-filter{background:rgba(7,62,44,.045)!important;border-color:transparent!important;color:#456153!important;box-shadow:none!important}
-.catalog-view .dish-filter.is-active{background:#0b5a38!important;color:#fff!important}
