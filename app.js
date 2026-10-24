@@ -1322,18 +1322,36 @@ const BOTTOM_NAV=window.COURSES_BOTTOM_NAV;
 if(!BOTTOM_NAV)throw new Error('Navigation liquide indisponible');
 
 let publishedView='';
+let catalogRenderFrame=0;
+function scheduleCatalogRender(){
+  // Garder la première frame disponible pour l'animation iOS.
+  catalogRenderFrame=requestAnimationFrame(()=>{
+    catalogRenderFrame=requestAnimationFrame(()=>{
+      catalogRenderFrame=0;
+      if(state.view==='catalog')renderProducts();
+    });
+  });
+}
 function showView(){
   if(state.view!=='list')setListFilterMenuOpen(false);
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
   $('#listView').classList.toggle('is-active',state.view==='list');
   $('#settingsView').classList.toggle('is-active',state.view==='settings');
   document.querySelectorAll('.tab').forEach(button=>button.classList.toggle('is-active',button.dataset.view===state.view));
-  if(publishedView!==state.view){
+  const viewChanged=publishedView!==state.view;
+  if(viewChanged){
+    if(catalogRenderFrame)cancelAnimationFrame(catalogRenderFrame);
+    catalogRenderFrame=0;
     publishedView=state.view;
-    if(state.view==='catalog'){renderCategories();renderProducts()}
-    document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));
   }
   BOTTOM_NAV.sync(true);
+  if(viewChanged){
+    if(state.view==='catalog'){
+      renderCategories();
+      scheduleCatalogRender();
+    }
+    document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));
+  }
 }
 function renderView(){
   showView();
