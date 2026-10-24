@@ -133,21 +133,23 @@ html .catalog-view>#products.is-catalog-mode-hidden{
 }
 
 @media(max-width:520px){
-  /* Même première ligne et même gouttière que Ma liste : recherche en ligne 2. */
+  /* En-tête de Ma liste inchangé. Le sélecteur a sa propre ligne :
+     plus de superposition avec le sous-titre ou la recherche. */
   html .catalog-view{
     position:relative!important;
-    grid-template-rows:82px 46px 46px minmax(0,1fr)!important;
-    gap:8px!important;
+    grid-template-rows:82px 36px 46px 42px minmax(0,1fr)!important;
+    gap:12px!important;
   }
-  /* Identique à Ma liste pour le titre, le sous-titre et les actions.
-     Les onglets sont centrés dans l'espace sous le sous-titre, sans
-     modifier la ligne de recherche ni les zones de défilement. */
   html .catalog-mode-switch{
-    position:absolute!important;
-    top:72px!important;
-    left:50%!important;
+    position:relative!important;
+    grid-row:2!important;
+    grid-column:1!important;
+    justify-self:center!important;
+    align-self:start!important;
+    top:auto!important;
+    left:auto!important;
     right:auto!important;
-    transform:translateX(-50%)!important;
+    transform:none!important;
     width:clamp(142px,44vw,184px)!important;
     height:32px!important;
     --catalog-lens-w:48px;
@@ -155,7 +157,7 @@ html .catalog-view>#products.is-catalog-mode-hidden{
   }
   html .catalog-mode{font-size:clamp(13px,3.7vw,16px)!important}
   html .catalog-view>.page-search{
-    grid-row:2!important;
+    grid-row:3!important;
     height:46px!important;
     margin-left:1px!important;
     margin-right:1px!important;
@@ -164,10 +166,10 @@ html .catalog-view>#products.is-catalog-mode-hidden{
     padding:0 2px!important;
     border-radius:0!important;
   }
-  /* 16px de respiration sous la recherche, sans ajouter de ligne vide. */
+  /* 16px entre la recherche et les catégories (12px + 4px). */
   html .catalog-controls>.categories,
   html .catalog-controls>.dish-filters{
-    grid-row:3!important;
+    grid-row:4!important;
     align-self:end!important;
     height:38px!important;
     margin-left:12px!important;
@@ -183,5 +185,5 @@ html .catalog-view>#products.is-catalog-mode-hidden{
   }
   html .catalog-controls>.categories .cat-label{font-size:13px!important}
   html .catalog-view>#products,
-  html .catalog-view>.dishes-grid{grid-row:4!important}
+  html .catalog-view>.dishes-grid{grid-row:5!important}
 }
