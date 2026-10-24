@@ -87,16 +87,19 @@ test('les trois badges de version partagent une géométrie unique sur iPhone',(
   assert.doesNotMatch(styles,/\.catalog-view \.page-version\s*\{/);
 });
 
-test('sur iPhone les recherches de Ma liste et du Catalogue commencent à la même hauteur',()=>{
+test('sur iPhone les titres, recherches et boutons du Catalogue reprennent la géométrie de Ma liste',()=>{
   const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
   assert.match(styles,/\.list-view\{\s*grid-template-rows:82px 42px minmax\(0,1fr\)!important/);
   assert.match(styles,/\.list-view\{\s*gap:8px!important/);
   assert.match(mobile,/grid-template-rows:82px 46px 46px minmax\(0,1fr\)!important;\s*gap:8px!important/);
-  assert.match(mobile,/html \.catalog-view>\.page-search\{\s*grid-row:2!important;\s*height:46px!important;\s*margin-left:13px!important;\s*margin-right:13px!important/);
-  assert.match(mobile,/html \.catalog-mode-switch\{\s*position:absolute!important;\s*top:45px!important;/);
-  assert.match(mobile,/html \.catalog-view>\.page-header\{\s*display:grid!important/);
+  assert.match(mobile,/html \.catalog-view>\.page-search\{\s*grid-row:2!important;\s*height:46px!important;\s*margin-left:1px!important;\s*margin-right:1px!important/);
+  assert.match(styles,/\.catalog-view \.page-header\{\s*margin-left:0!important;\s*margin-right:0!important/);
+  assert.match(styles,/\.list-view \.page-header-actions \.icon-btn,\.catalog-view \.page-header-actions \.icon-btn\{width:38px!important;height:38px!important/);
+  assert.match(styles,/\.list-view \.page-header-actions \.icon-btn svg,\.catalog-view \.page-header-actions \.icon-btn svg\{width:17px!important;height:17px!important/);
+  assert.doesNotMatch(mobile,/html \.catalog-view>\.page-header\{\s*display:grid!important/);
+  assert.match(mobile,/html \.catalog-mode-switch\{\s*position:absolute!important;\s*top:72px!important;\s*left:50%!important;\s*right:auto!important;\s*transform:translateX\(-50%\)!important/);
   assert.match(mobile,/html \.catalog-controls>\.categories,\s*html \.catalog-controls>\.dish-filters\{\s*grid-row:3!important;\s*align-self:end!important/);
   assert.match(mobile,/html \.catalog-view>#products,\s*html \.catalog-view>\.dishes-grid\{grid-row:4!important\}/);
   assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:2px!important/);
-  assert.doesNotMatch(mobile,/order:1!important|order:2!important/,'pas d’inversion supplémentaire des onglets');
+  assert.doesNotMatch(mobile,/order:1!important|order:2!important/,'pas de changement de hiérarchie Produits / Plats');
 });
