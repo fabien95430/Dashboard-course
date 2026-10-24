@@ -919,9 +919,46 @@ function renderSelectionAndList(){
   syncProductSelection();
   renderList();
 }
+/* Les articles achetés disparaissent de la liste HA. On conserve uniquement
+   le nombre coché pendant cette session, sans mémoriser les noms des produits. */
+let listProgressSession=null;
+function updateListProgress(groups=activeGroups()){
+  const el=$('#listProgress');
+  if(!el)return;
+  const scope=state.demo?'demo':state.entity||'';
+  if(!scope||state.loading||state.error){el.hidden=true;return}
+  const storageKey='courses-list-progress-v1:'+scope;
+  if(!listProgressSession||listProgressSession.scope!==scope){
+    let saved=null;
+    try{saved=JSON.parse(sessionStorage.getItem(storageKey)||'null')}catch(_){}
+    listProgressSession={scope,done:Math.max(0,Math.min(9999,Math.trunc(Number(saved?.done)||0))),remaining:Number.isInteger(saved?.remaining)?saved.remaining:null};
+  }
+  const remaining=groups.length;
+  // Une nouvelle liste après la fin des courses démarre à zéro.
+  if(listProgressSession.remaining===0&&remaining>0&&listProgressSession.done>0)listProgressSession.done=0;
+  listProgressSession.remaining=remaining;
+  const done=listProgressSession.done,total=done+remaining;
+  el.hidden=total===0;
+  if(!total)return;
+  const fill=$('#listProgressFill'),label=$('#listProgressCount');
+  if(fill)fill.style.width=(100*done/total)+'%';
+  if(label)label.textContent=done+' / '+total;
+  el.setAttribute('aria-valuemax',String(total));
+  el.setAttribute('aria-valuenow',String(done));
+  el.setAttribute('aria-valuetext',done+' article'+(done>1?'s':'')+' coché'+(done>1?'s':'')+' sur '+total);
+  try{sessionStorage.setItem(storageKey,JSON.stringify({done,remaining}))}catch(_){}
+}
+document.addEventListener('courses:purchase-settled',()=>{
+  const groups=activeGroups();
+  updateListProgress(groups);
+  if(!listProgressSession)return;
+  listProgressSession.done+=1;
+  updateListProgress(groups);
+});
 function renderList(){
   const groups=activeGroups(),needle=norm(state.listQuery);
   emitListChangedIfNeeded(groups);
+  updateListProgress(groups);
   const rows=sortedGroups(visibleListGroups(groups));
   const canReorder=rows.length>1;
   const el=$('#listItems');

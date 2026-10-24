@@ -140,3 +140,21 @@ test('sur iPhone la recherche de Ma liste commence exactement au même endroit q
   assert.match(styles,/\.app>\.list-view,\s*\.app>\.catalog-view,\s*\.app>\.settings-view\{[\s\S]*?margin-left:12px!important;\s*margin-right:12px!important/);
   assert.match(styles,/\.list-view \.page-search\{height:46px!important;[\s\S]*?background:linear-gradient/);
 });
+
+test('la progression hachurée de Ma liste reste au-dessus de la recherche sans modifier sa géométrie',()=>{
+  const index=read('index.html'),app=read('app.js');
+  assert.match(index,/<div id="listProgress" class="list-progress" role="progressbar"[^>]*hidden>/);
+  assert.match(index,/id="listProgressFill"/);
+  assert.match(index,/id="listProgressCount"/);
+  assert.match(styles,/\.list-progress\{display:none\}/);
+  assert.match(styles,/\.list-view>\.list-progress:not\(\[hidden\]\)\{\s*display:flex;\s*position:absolute;\s*top:106px;\s*left:1px;\s*right:1px;/);
+  assert.match(styles,/\.list-progress-track\{[\s\S]*?height:2px;/);
+  assert.match(styles,/\.list-progress-fill\{[\s\S]*?repeating-linear-gradient\(115deg/);
+  assert.match(styles,/\.list-view\{[\s\S]*?grid-template-rows:82px 98px minmax\(0,1fr\)!important/);
+  assert.match(app,/function updateListProgress\(groups=activeGroups\(\)\)/);
+  assert.match(app,/document\.addEventListener\('courses:purchase-settled'/);
+  assert.match(app,/listProgressSession\.done\+=1/);
+  assert.match(app,/if\(listProgressSession\.remaining===0&&remaining>0&&listProgressSession\.done>0\)listProgressSession\.done=0/);
+  assert.match(app,/const groups=activeGroups\(\),needle=norm\(state\.listQuery\);\s*emitListChangedIfNeeded\(groups\);\s*updateListProgress\(groups\);/);
+  assert.doesNotMatch(app,/setInterval\([^)]*updateListProgress/);
+});
