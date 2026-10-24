@@ -91,8 +91,8 @@ test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de s
   const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
   assert.match(styles,/\.list-view\{\s*grid-template-rows:82px 42px minmax\(0,1fr\)!important/);
   assert.match(styles,/\.list-view\{\s*gap:8px!important/);
-  assert.match(mobile,/grid-template-rows:82px 36px 46px 42px minmax\(0,1fr\)!important;\s*gap:12px!important/);
-  assert.match(mobile,/html \.catalog-view>\.page-search\{\s*grid-row:3!important;\s*height:46px!important;\s*margin-left:1px!important;\s*margin-right:1px!important/);
+  assert.match(mobile,/grid-template-rows:82px 42px 40px 42px minmax\(0,1fr\)!important;\s*gap:12px!important/);
+  assert.match(mobile,/html \.catalog-view>\.page-search\{\s*grid-row:3!important;\s*height:40px!important;\s*margin-left:1px!important;\s*margin-right:1px!important/);
   assert.match(styles,/\.catalog-view \.page-header\{\s*margin-left:12px!important;\s*margin-right:12px!important/);
   // Ma liste a une marge extérieure de 12px et une recherche à 1px.
   // Catalogue est pleine largeur : ses éléments d’en-tête doivent compenser ces 12px.
@@ -105,10 +105,15 @@ test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de s
   assert.doesNotMatch(mobile,/html \.catalog-view>\.page-header\{\s*display:grid!important/);
   assert.match(mobile,/html \.catalog-mode-switch\{\s*position:relative!important;\s*grid-row:2!important;\s*grid-column:1!important;\s*justify-self:center!important;\s*align-self:start!important;\s*top:auto!important;\s*left:auto!important;\s*right:auto!important;\s*transform:none!important/);
   assert.doesNotMatch(mobile,/html \.catalog-mode-switch\{[^}]*position:absolute!important/);
-  // 12px entre les lignes ; onglets de 32px dans une ligne de 36px :
-  // leur trait finit 16px avant le champ suivant. Catégories 38px
-  // alignées en bas de leur ligne de 42px : encore 16px sous la recherche.
-  const layout={header:82,tabRow:36,tab:32,search:46,categoryRow:42,category:38,gap:12};
+  // Onglets élargis et texte 18px ; recherche amincie à 40px.
+  // Le total des lignes reste constant, et l'espace entre les zones reste à 16px.
+  assert.match(mobile,/width:clamp\(220px,60vw,240px\)!important;\s*height:38px!important/);
+  assert.match(mobile,/html \.catalog-mode\{font-size:18px!important\}/);
+  assert.match(mobile,/--catalog-lens-w:56px;\s*--catalog-lens-x:calc\(25% - 28px\)/);
+  assert.match(styles,/\.catalog-view \.page-search\{height:46px!important;[\s\S]*?background:linear-gradient/,'la recherche reste transparente et soulignée');
+  assert.match(mobile,/html \.catalog-view>\.page-search\{[^}]*height:40px!important;[^}]*border-radius:0!important/);
+  const layout={header:82,tabRow:42,tab:38,search:40,categoryRow:42,category:38,gap:12};
+  assert.equal(layout.tabRow+layout.search,82,'le contenu descend seulement à l’intérieur de la même hauteur globale');
   assert.equal(layout.tabRow-layout.tab+layout.gap,16);
   assert.equal(layout.categoryRow-layout.category+layout.gap,16);
   assert.match(mobile,/html \.catalog-controls>\.categories,\s*html \.catalog-controls>\.dish-filters\{\s*grid-row:4!important;\s*align-self:end!important/);

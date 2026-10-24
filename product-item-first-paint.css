@@ -137,7 +137,7 @@ html .catalog-view>#products.is-catalog-mode-hidden{
      plus de superposition avec le sous-titre ou la recherche. */
   html .catalog-view{
     position:relative!important;
-    grid-template-rows:82px 36px 46px 42px minmax(0,1fr)!important;
+    grid-template-rows:82px 42px 40px 42px minmax(0,1fr)!important;
     gap:12px!important;
   }
   html .catalog-mode-switch{
@@ -150,15 +150,15 @@ html .catalog-view>#products.is-catalog-mode-hidden{
     left:auto!important;
     right:auto!important;
     transform:none!important;
-    width:clamp(142px,44vw,184px)!important;
-    height:32px!important;
-    --catalog-lens-w:48px;
-    --catalog-lens-x:calc(25% - 24px);
+    width:clamp(220px,60vw,240px)!important;
+    height:38px!important;
+    --catalog-lens-w:56px;
+    --catalog-lens-x:calc(25% - 28px);
   }
-  html .catalog-mode{font-size:clamp(13px,3.7vw,16px)!important}
+  html .catalog-mode{font-size:18px!important}
   html .catalog-view>.page-search{
     grid-row:3!important;
-    height:46px!important;
+    height:40px!important;
     margin-left:1px!important;
     margin-right:1px!important;
     grid-template-columns:24px minmax(0,1fr) auto!important;
