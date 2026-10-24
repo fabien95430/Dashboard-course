@@ -186,7 +186,8 @@ html,body{
 body{
   min-height:100dvh;
   overflow:hidden;
-  background:linear-gradient(180deg,#fbfbf7 0%,#f4f6ef 100%);
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(250,248,244,.38)),url("./terrazzo-background-v513.svg") 0 0 / 440px 580px repeat;
+  background-color:#f7f4ed;
 }
 button,input,select{color:inherit}
 button{-webkit-tap-highlight-color:transparent}
@@ -1405,7 +1406,7 @@ html,body{touch-action:pan-x pan-y}
 }
 
 /* iOS installed app: paint the document canvas under the home-indicator area. */
-html{background:#fff}
+html{background:#f7f4ed}
 html:has(#setup.is-visible),
 html:has(#securityOverlay.is-visible),
 body:has(#setup.is-visible),
