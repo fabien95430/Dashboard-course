@@ -2006,7 +2006,13 @@ body{
 /* ===== UI v108 — géométrie finale des en-têtes iPhone ===== */
 @media(max-width:520px){
   .list-view{
-    grid-template-rows:82px 42px minmax(0,1fr)!important;
+    /* 82px d'en-tête + 8px d'écart + 98px de piste :
+       la recherche de 40px commence à 148px, comme dans Catalogue. */
+    grid-template-rows:82px 98px minmax(0,1fr)!important;
+  }
+  html .list-view>.page-search{
+    height:40px!important;
+    align-self:end!important;
   }
   .catalog-view{
     grid-template-rows:82px 42px 42px minmax(0,1fr)!important;

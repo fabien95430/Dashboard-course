@@ -89,7 +89,7 @@ test('les trois badges de version partagent une géométrie unique sur iPhone',(
 
 test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de sa propre ligne',()=>{
   const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
-  assert.match(styles,/\.list-view\{\s*grid-template-rows:82px 42px minmax\(0,1fr\)!important/);
+  assert.match(styles,/\.list-view\{[\s\S]*?grid-template-rows:82px 98px minmax\(0,1fr\)!important/);
   assert.match(styles,/\.list-view\{\s*gap:8px!important/);
   assert.match(mobile,/grid-template-rows:82px 42px 40px 42px minmax\(0,1fr\)!important;\s*gap:12px!important/);
   assert.match(mobile,/html \.catalog-view>\.page-search\{\s*grid-row:3!important;\s*height:40px!important;\s*margin-left:1px!important;\s*margin-right:1px!important/);
@@ -120,4 +120,23 @@ test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de s
   assert.match(mobile,/html \.catalog-view>#products,\s*html \.catalog-view>\.dishes-grid\{grid-row:5!important\}/);
   assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:2px!important/);
   assert.doesNotMatch(mobile,/order:1!important|order:2!important/,'pas de changement de hiérarchie Produits / Plats');
+});
+
+test('sur iPhone la recherche de Ma liste commence exactement au même endroit que celle du Catalogue',()=>{
+  // Deux grilles différentes mais une position calculée identique : y = 148 px.
+  const list={header:82,gap:8,searchTrack:98,searchHeight:40,outerMargin:12,searchMargin:1};
+  const catalog={header:82,gap:12,tabTrack:42,searchHeight:40,outerMargin:0,searchMargin:13};
+  const listY=list.header+list.gap+list.searchTrack-list.searchHeight;
+  const catalogY=catalog.header+catalog.gap+catalog.tabTrack+catalog.gap;
+  assert.equal(listY,catalogY);
+  assert.equal(list.outerMargin+list.searchMargin,catalog.outerMargin+catalog.searchMargin);
+  assert.match(styles,/\.list-view\{[\s\S]*?grid-template-rows:82px 98px minmax\(0,1fr\)!important/);
+  assert.match(styles,/html \.list-view>\.page-search\{\s*height:40px!important;\s*align-self:end!important/);
+  assert.match(styles,/\.list-view\{\s*gap:8px!important/);
+  assert.match(styles,/\.catalog-view \.page-search\{height:46px!important;[\s\S]*?background:linear-gradient/);
+  assert.match(firstPaint,/html \.catalog-view\{\s*position:relative!important;\s*grid-template-rows:82px 42px 40px 42px minmax\(0,1fr\)!important;\s*gap:12px!important/);
+  assert.match(firstPaint,/html \.catalog-view>\.page-search\{\s*grid-row:3!important;\s*height:40px!important/);
+  assert.match(styles,/html \.app>\.catalog-view>\.page-search\{\s*margin-left:13px!important;\s*margin-right:13px!important/);
+  assert.match(styles,/\.app>\.list-view,\s*\.app>\.catalog-view,\s*\.app>\.settings-view\{[\s\S]*?margin-left:12px!important;\s*margin-right:12px!important/);
+  assert.match(styles,/\.list-view \.page-search\{height:46px!important;[\s\S]*?background:linear-gradient/);
 });
