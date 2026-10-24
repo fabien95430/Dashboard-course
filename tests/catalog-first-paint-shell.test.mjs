@@ -93,7 +93,13 @@ test('sur iPhone les titres, recherches et boutons du Catalogue reprennent la g�
   assert.match(styles,/\.list-view\{\s*gap:8px!important/);
   assert.match(mobile,/grid-template-rows:82px 46px 46px minmax\(0,1fr\)!important;\s*gap:8px!important/);
   assert.match(mobile,/html \.catalog-view>\.page-search\{\s*grid-row:2!important;\s*height:46px!important;\s*margin-left:1px!important;\s*margin-right:1px!important/);
-  assert.match(styles,/\.catalog-view \.page-header\{\s*margin-left:0!important;\s*margin-right:0!important/);
+  assert.match(styles,/\.catalog-view \.page-header\{\s*margin-left:12px!important;\s*margin-right:12px!important/);
+  // Ma liste a une marge extérieure de 12px et une recherche à 1px.
+  // Catalogue est pleine largeur : ses éléments d’en-tête doivent compenser ces 12px.
+  assert.match(styles,/\.app>\.list-view,\s*\.app>\.catalog-view,\s*\.app>\.settings-view\{[\s\S]*?margin-left:12px!important;\s*margin-right:12px!important/);
+  assert.match(styles,/\.app>\.catalog-view\{\s*margin-left:0!important;\s*margin-right:0!important/);
+  assert.match(styles,/html \.app>\.catalog-view>\.page-search\{\s*margin-left:13px!important;\s*margin-right:13px!important/);
+  assert.match(mobile,/html \.catalog-view>\.page-search\{[\s\S]*?margin-left:1px!important;\s*margin-right:1px!important/,'la règle spécifique doit primer sur le premier affichage');
   assert.match(styles,/\.list-view \.page-header-actions \.icon-btn,\.catalog-view \.page-header-actions \.icon-btn\{width:38px!important;height:38px!important/);
   assert.match(styles,/\.list-view \.page-header-actions \.icon-btn svg,\.catalog-view \.page-header-actions \.icon-btn svg\{width:17px!important;height:17px!important/);
   assert.doesNotMatch(mobile,/html \.catalog-view>\.page-header\{\s*display:grid!important/);
