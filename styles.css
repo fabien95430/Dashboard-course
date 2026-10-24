@@ -3849,9 +3849,14 @@ body{
     font-weight:850!important;
   }
 
+  .app>.tabs .tab>svg,
+  .app>.tabs .tab-lens-copy>svg{
+    stroke-width:1.9!important;
+    filter:none!important;
+  }
+
   .app>.tabs .tab.is-active>svg{
-    stroke-width:2.08!important;
-    filter:drop-shadow(0 1px 2px rgba(0,138,70,.12))!important;
+    transform:none!important;
   }
 
   .app>.tabs .tab-lens-copy{
@@ -3863,10 +3868,6 @@ body{
     text-shadow:0 1px 3px rgba(0,138,70,.10)!important;
   }
 
-  .app>.tabs .tab-lens-copy>svg{
-    stroke-width:2.08!important;
-    filter:drop-shadow(0 1px 2px rgba(0,138,70,.12))!important;
-  }
 }
 
 /* v166 — finalise les boutons/icônes des Réglages */
