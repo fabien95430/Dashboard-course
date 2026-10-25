@@ -38,6 +38,12 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — crèmes fraîches
+
+Pour les produits **« Crème épaisse »** et **« Crème fraîche »** du catalogue (catégorie **Frais → Laits & crèmes**), représenter **un pot de crème fraîche** avec son couvercle, identifiable comme un produit vendu en pot : **jamais une brique, une bouteille ou une gourde**. Le pot est l'unique conditionnement mis en scène, sur fond transparent, sans marque ni texte inventés.
+
+La **« Crème liquide »** est un produit distinct : conserver son conditionnement réel adapté (par exemple une brique), sans lui appliquer automatiquement la règle du pot. Pour les autres crèmes et produits frais, vérifier le conditionnement correspondant au nom exact du produit avant de générer l'image. Rejeter toute image dont l'emballage ne correspond pas au produit.
+
 ## Prompt prêt à réutiliser
 
 Utiliser ce modèle lorsque l’on demande la régénération d’un item :
