@@ -720,19 +720,17 @@ let productGridReady=false;
 let productEmptyState=null;
 function updateProductCardQuantity(card,name,quantity){
   const value=Math.max(0,Number(quantity)||0),active=value>0;
-  if(card.dataset.quantity!==String(value))card.dataset.quantity=String(value);
+  card.dataset.quantity=String(value);
   card.classList.toggle('is-selected',active);
   const badge=card.querySelector('.badge');
   if(badge){
-    const label='Ajouter une unité de '+name+'. Quantité '+value;
-    if(badge.textContent!==(active?String(value):'+'))badge.textContent=active?String(value):'+';
-    if(badge.getAttribute('aria-label')!==label)badge.setAttribute('aria-label',label);
+    badge.textContent=active?String(value):'+';
+    badge.setAttribute('aria-label','Ajouter une unité de '+name+'. Quantité '+value);
   }
   const media=card.querySelector('.media');
   if(media){
-    const label=active?'Retirer une unité de '+name+'. Quantité '+value:'Aucune unité de '+name+' à retirer';
-    if(media.disabled!==!active)media.disabled=!active;
-    if(media.getAttribute('aria-label')!==label)media.setAttribute('aria-label',label);
+    media.disabled=!active;
+    media.setAttribute('aria-label',active?'Retirer une unité de '+name+'. Quantité '+value:'Aucune unité de '+name+' à retirer');
   }
 }
 function productCard(product){
@@ -755,23 +753,14 @@ function productCard(product){
 function notifyProductsUpdated(){
   document.dispatchEvent(new CustomEvent('courses:products-updated'));
 }
-
-const PRODUCT_FIRST_BATCH=18;
-const PRODUCT_IDLE_BATCH=24;
-let productBuildHandle=0;
-let productBuildIdle=false;
-let productBuildGeneration=0;
-function cancelProductGridBuild(){
-  productBuildGeneration++;
-  if(productBuildHandle){
-    if(productBuildIdle)window.cancelIdleCallback?.(productBuildHandle);
-    else clearTimeout(productBuildHandle);
-  }
-  productBuildHandle=0;
-}
 function ensureProductGrid(el,quantities){
   if(productGridReady)return;
   const fragment=document.createDocumentFragment();
+  sortProductsAlpha(unique(ALL)).forEach(product=>{
+    const card=productCard(product);
+    updateProductCardQuantity(card,product.name,catalogQuantityForDisplay(product.name,quantities.get(norm(product.name))||0));
+    fragment.appendChild(card);
+  });
   productEmptyState=document.createElement('div');
   productEmptyState.className='empty is-wide';
   productEmptyState.textContent='Aucun produit ne correspond à cette recherche.';
@@ -780,41 +769,7 @@ function ensureProductGrid(el,quantities){
   el.replaceChildren(fragment);
   productGridReady=true;
 }
-function appendProductBatch(products,quantities,ranks){
-  const fragment=document.createDocumentFragment();
-  products.forEach(product=>{
-    const card=productCard(product),key=norm(product.name);
-    card.hidden=false;
-    card.style.order=String(ranks.get(key));
-    updateProductCardQuantity(card,product.name,catalogQuantityForDisplay(product.name,quantities.get(key)||0));
-    fragment.appendChild(card);
-  });
-  productEmptyState.before(fragment);
-}
-function scheduleRemainingProducts(remaining,ranks){
-  if(!remaining.length)return;
-  const generation=productBuildGeneration;
-  const schedule=()=>{
-    if(typeof window.requestIdleCallback==='function'){
-      productBuildIdle=true;
-      productBuildHandle=window.requestIdleCallback(step,{timeout:650});
-    }else{
-      productBuildIdle=false;
-      productBuildHandle=setTimeout(step,32);
-    }
-  };
-  const step=()=>{
-    productBuildHandle=0;
-    if(generation!==productBuildGeneration||state.view!=='catalog')return;
-    const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
-    appendProductBatch(remaining.splice(0,PRODUCT_IDLE_BATCH),quantities,ranks);
-    notifyProductsUpdated();
-    if(remaining.length)schedule();
-  };
-  schedule();
-}
 function syncProductGrid(products,quantities){
-  cancelProductGridBuild();
   const ranks=new Map(products.map((product,index)=>[norm(product.name),index]));
   productCardCache.forEach((card,key)=>{
     const rank=ranks.get(key),visible=rank!==undefined;
@@ -824,11 +779,6 @@ function syncProductGrid(products,quantities){
     const name=card.dataset.name||'';
     updateProductCardQuantity(card,name,catalogQuantityForDisplay(name,quantities.get(key)||0));
   });
-  const pending=products.filter(product=>!productCardCache.has(norm(product.name)));
-  if(pending.length){
-    appendProductBatch(pending.splice(0,PRODUCT_FIRST_BATCH),quantities,ranks);
-    scheduleRemainingProducts(pending,ranks);
-  }
   if(productEmptyState){
     productEmptyState.hidden=products.length!==0;
     productEmptyState.style.order=String(products.length);
@@ -846,7 +796,7 @@ function renderProducts(){
 }
 function setProductQuantity(name,quantity){
   const key=norm(name);
-  const card=productCardCache.get(key);
+  const card=[...document.querySelectorAll('#products .product')].find(entry=>norm(entry.dataset.name)===key);
   if(!card)return;
   updateProductCardQuantity(card,name,quantity);
   notifyProductsUpdated();
@@ -1407,16 +1357,6 @@ function renderView(){
   showView();
   renderList();renderSettingsPage();
 }
-document.addEventListener('courses:view-changed',event=>{
-  if(event.detail?.view!=='catalog')cancelProductGridBuild();
-});
-document.addEventListener('courses:catalog-mode-changed',event=>{
-  if(event.detail?.mode==='dishes'){cancelProductGridBuild();return;}
-  if(event.detail?.mode==='products'&&state.view==='catalog'){
-    if(catalogRenderFrame)cancelAnimationFrame(catalogRenderFrame);
-    scheduleCatalogRender();
-  }
-});
 function renderMissingRequestsConnectionStatus(detail=MISSING_REQUESTS.getSharedStatus?.()){
   const label=document.getElementById('missingSyncStatus');
   if(!label)return;

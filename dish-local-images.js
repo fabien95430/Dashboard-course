@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v517';
+const APP_VERSION='v518';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -70,13 +70,7 @@ function warmNextDishImage(){
   image.src=source;
 }
 function warmDishImages(){
-  const grid=document.getElementById('dishes');
-  if(!grid||grid.hidden)return false;
-  const names=[...grid.querySelectorAll('.dish-card')].filter(card=>{
-    const rect=card.getBoundingClientRect();
-    const height=window.innerHeight||document.documentElement.clientHeight;
-    return rect.bottom>=0&&rect.top<=height;
-  }).slice(0,8).map(card=>card.dataset.dish).filter(Boolean);
+  const names=Array.isArray(window.COURSES_DISH_NAMES)?window.COURSES_DISH_NAMES:[];
   if(!names.length)return false;
   const queued=new Set(warmQueue);
   for(const name of names){
@@ -149,10 +143,7 @@ function bind(){
   localizeDialog(document.getElementById('dishDialog'));
 }
 
-document.addEventListener('courses:dishes-rendered',()=>{
-  localizeCards(document.getElementById('dishes'));
-  warmDishImages();
-});
+document.addEventListener('courses:dishes-rendered',()=>localizeCards(document.getElementById('dishes')));
 document.addEventListener('courses:dish-sheet-opened',()=>localizeDialog(document.getElementById('dishDialog')));
 window.addEventListener('online',retryLocalImages,{passive:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});

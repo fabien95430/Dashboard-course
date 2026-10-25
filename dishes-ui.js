@@ -678,16 +678,6 @@ function validateDishes(){
   DISHES.forEach(dish=>dish.ingredients.forEach(name=>{if(!CATALOG_NAMES.has(name))missing.push(dish.name+': '+name)}));
   if(missing.length)console.warn('Plats: produits introuvables dans catalog.js',missing);
 }
-let dishModeRenderFrame=0;
-function scheduleDishModeRender(){
-  if(dishModeRenderFrame)cancelAnimationFrame(dishModeRenderFrame);
-  dishModeRenderFrame=requestAnimationFrame(()=>{
-    dishModeRenderFrame=requestAnimationFrame(()=>{
-      dishModeRenderFrame=0;
-      if(mode==='dishes')renderDishes();
-    });
-  });
-}
 function setMode(next,initial=false){
   if(next!=='products'&&next!=='dishes')return;
   mode=next;
@@ -719,10 +709,7 @@ function setMode(next,initial=false){
   });
   syncModeLens(!initial);
   renderDishFilters();
-  if(dishModeRenderFrame)cancelAnimationFrame(dishModeRenderFrame);
-  dishModeRenderFrame=0;
-  if(dishes)scheduleDishModeRender();
-  if(!initial)document.dispatchEvent(new CustomEvent('courses:catalog-mode-changed',{detail:{mode}}));
+  if(dishes)renderDishes();
 }
 function syncModeLens(animate=true){
   if(!modeSwitch||modeSwitch.dataset.catalogLiquidBound==='1')return;
