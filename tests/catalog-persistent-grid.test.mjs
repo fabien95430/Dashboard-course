@@ -13,6 +13,10 @@ test('la grille Produits est montée une fois puis filtrée sans détacher ses c
   assert.ok(ensureStart>=0&&syncStart>ensureStart&&renderStart>syncStart&&renderEnd>renderStart);
   const ensure=app.slice(ensureStart,syncStart),sync=app.slice(syncStart,renderStart),render=app.slice(renderStart,renderEnd);
   assert.match(ensure,/el\.replaceChildren\(fragment\)/);
+  assert.doesNotMatch(ensure,/sortProductsAlpha\(unique\(ALL\)\)\.forEach/);
+  assert.match(app,/const PRODUCT_FIRST_BATCH=18/);
+  assert.match(app,/const PRODUCT_IDLE_BATCH=24/);
+  assert.match(app,/requestIdleCallback\(step,\{timeout:650\}\)/);
   assert.match(sync,/card\.hidden=!visible/);
   assert.match(sync,/card\.style\.order=visible\?String\(rank\):''/);
   assert.doesNotMatch(render,/replaceChildren\(/);
