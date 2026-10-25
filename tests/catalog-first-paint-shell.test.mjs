@@ -175,28 +175,33 @@ test('la référence visuelle conserve les icônes du menu et la lentille native
   assert.ok(liquid.includes('.catalog-mode-lens{top:auto!important;bottom:2px!important;height:2px!important'));
 });
 
-test('la grille Catalogue mobile présente trois rangées entières au-dessus du menu sur iPhone 17 Pro',()=>{
+test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans bandeau',()=>{
   const style=read('styles.css');
-  const start=style.indexOf('.catalog-view>#products{');
-  assert.ok(start>=0,'règle de dimensionnement Catalogue absente');
+  const start=style.indexOf('--catalog-first-page-height:');
+  assert.ok(start>=0,'hauteur calculée de la première page absente');
   const rule=style.slice(start,style.indexOf('}',start)+1);
-  assert.ok(rule.includes('height:min(100%,calc(100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 334px))!important'));
-  assert.ok(rule.includes('grid-auto-rows:max(132px,calc((100% - 18px) / 3))!important'));
-  assert.ok(rule.includes('gap:9px!important'));
-  assert.ok(rule.includes('padding-bottom:6px!important'));
-  // 402 x 874 CSS px, safe areas iOS 62/34 ; barre 60px + 8px du bord.
-  const width=402,viewport=874,topInset=62,bottomInset=34;
-  const topTracks=82+42+40+42+4*12;
-  const gridHeight=viewport-topInset-bottomInset-topTracks-80;
-  const rowHeight=(gridHeight-1-6-2*9)/3;
-  const cardWidth=(width-2*19-2*9)/3;
-  const nextRowTop=1+3*rowHeight+3*9;
-  assert.equal(gridHeight,444);
-  assert.ok(rowHeight>=132&&rowHeight<=150);
-  assert.ok(cardWidth>=110&&cardWidth<=120);
-  assert.ok(nextRowTop>=gridHeight,'la quatrième ligne ne doit pas entrer dans la première vue');
-  const barTop=viewport-bottomInset-8-60;
-  assert.ok(topInset+topTracks+gridHeight<=barTop-10,'la barre iOS ne recouvre pas les produits');
-  assert.ok(style.includes('env(safe-area-inset-bottom)'));
+  assert.ok(style.includes('@media(max-width:520px) and (min-height:800px)'));
+  assert.ok(rule.includes('100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 300px'));
+  assert.ok(rule.includes('height:min(100%,var(--catalog-first-page-height))!important'));
+  assert.ok(rule.includes('grid-auto-rows:max(132px,calc((var(--catalog-first-page-height) - 25px) / 3))!important'));
+  assert.ok(rule.includes('padding:1px 12px 6px!important'));
+  assert.ok(style.includes('.catalog-view>#products .product{\n    grid-template-rows:94px minmax(0,1fr)!important'));
+  assert.ok(style.includes('.catalog-view>#products .product .media{\n    height:92px!important'));
+  assert.ok(!style.includes(' - 334px'),'ancien bandeau artificiel supprimé');
+  // 402 × 874 CSS px, safe areas 62/34, commandes supérieures 254px.
+  const viewportHeight=874,viewportWidth=402,top=62,bottom=34,chrome=254;
+  const visible=viewportHeight-top-bottom-300;
+  const row=(visible-1-6-2*9)/3;
+  const width=(viewportWidth-2*12-2*9)/3;
+  const thirdBottom=top+chrome+1+3*row+2*9;
+  const fourthTop=top+chrome+1+3*row+3*9;
+  assert.equal(visible,478);
+  assert.equal(row,151);
+  assert.equal(width,120);
+  assert.ok(thirdBottom<=top+chrome+visible-6);
+  assert.ok(fourthTop>top+chrome+visible);
+  assert.ok(row>132,'les tuiles sont réellement agrandies');
+  assert.ok(style.includes('overflow-y:auto;'),'défilement natif conservé');
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('product-item-first-paint.css?v=508'));
 });
