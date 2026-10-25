@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible du lot : **v547**, sur `main`. Les changements v540 à v546 concernaient la bannière citrons et son fondu, **sans nouveau lot d'images produits entre v545 et v547**.
+- Dernière version visible du lot : **v550**, sur `main`. Les versions v548 et v549 ont ajusté la bannière citrons et son cadrage ; ces éléments ne sont pas modifiés par ce lot.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **164 produits distincts** disposent d'un visuel remplacé au cours des huit publications détaillées ci-dessous ; **250 produits** n'ont pas encore été remplacés par ces lots. **Ces 250 ne sont pas tous nécessairement de mauvaise qualité**.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,13 Mio**.
-- **234 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **167 produits distincts** disposent d'un visuel remplacé au cours des neuf publications détaillées ci-dessous ; **247 produits** n'ont pas encore été remplacés par ces lots. **Ces 247 ne sont pas tous nécessairement de mauvaise qualité**.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,20 Mio**.
+- **232 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des huit publications de nouveaux visuels
+### Historique des neuf publications de nouveaux visuels
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -23,7 +23,8 @@
 | Lot 5 v539 | `cc80a4614ea14d88e625c787c57256c4e7696917` | 30 |
 | Lot v545 — 24 nouveaux WebP | `88465389b15eaa5c237fed273a324374ed556530` — PR #75 | 24 |
 | Lot v547 — 8 nouveaux WebP | `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` — PR #76 | 8 |
-| **Total** | | **164** |
+| Lot v550 — 3 nouveaux WebP | Publication à vérifier après la CI | 3 |
+| **Total** | | **167** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 156), ne pas additionner les compteurs.
 
@@ -79,26 +80,42 @@ Sélection volontairement inférieure à 30 : seuls les huit candidats disposant
 
 **Fruits & Légumes encore à traiter : Endives, Mâche, Olives fraîches.** Des candidats locaux Endives/Mâche ont été générés et inspectés mais ne sont pas intégrés à ce lot ; les seules sources tierces d'olives disponibles lors de ce contrôle les montraient dénoyautées, donc incorrectes. Aucun de ces trois fichiers anciens n'a été remplacé ni comptabilisé. Les futurs lots doivent les traiter prioritairement, sans inventer d'image ni agrandir une miniature existante.
 
+### Lot v550 — 3 nouveaux visuels à publier
+
+Après vérification des variantes, seulement **3 images** ont été retenues. Chaque fichier reste indépendant, isolé sur fond transparent, et conserve le slug attendu par `product-item-images.js`. Aucun produit déjà renouvelé n'a été repris.
+
+| Catégorie | Produit | Ancien (octets) | Nouveau (octets) |
+| --- | --- | ---: | ---: |
+| Fruits & Légumes | Olives fraîches | 4 628 | 51 220 |
+| Cuisine | Lasagnes | 4 428 | 9 630 |
+| Boulangerie | Pain aux céréales | 4 436 | 26 118 |
+
+**Total : 13 492 → 86 968 octets** (+73 476 octets). Deux sources : **Ingredient Atlas** (CC0 pour les olives entières, 512 × 512 px) et **Soft Studio Ingredients** (CC BY 4.0 pour les lasagnes et le pain, 320 × 320 px). Détails, liens et attributions : `docs/IMAGE_CREDITS_V550.md`.
+
+Les candidats précédents **Endives** et **Mâche** (320–400 px) sont conservés hors GitHub : le transfert et la comparaison intégrée doivent être vérifiés avant publication. Ils ne sont **pas comptés** comme remplacés. Les olives de la collection Soft Studio ont été rejetées car dénoyautées ; les olives retenues ici sont représentées entières, sans perforation. Aucun visuel de crèmes, épices ou sauces contrevenant à l'obligation du pot fermé n'est modifié.
+
+Version visible : **v550** ; service worker : `courses-app-v550-r1`, sans modification de la stratégie de cache visuel, du mode hors ligne, des animations ou de l'intégration Home Assistant. **Le commit de publication et les validations seront consignés après leur confirmation effective.**
+
 ### Situation par catégorie
 
-Comptage exact des noms des **164 images modifiées** croisés avec `catalog.js`.
+Comptage exact des noms des **167 images modifiées** croisés avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
-| Fruits & Légumes | 69 / 72 | 3 |
+| Fruits & Légumes | 70 / 72 | 2 |
 | Frais | 20 / 53 | 33 |
 | Viandes & poissons | 23 / 39 | 16 |
-| Cuisine | 36 / 71 | 35 |
-| Boulangerie | 6 / 13 | 7 |
+| Cuisine | 37 / 71 | 34 |
+| Boulangerie | 7 / 13 | 6 |
 | Petit-déjeuner | 3 / 24 | 21 |
 | Apéritif & snacks | 7 / 24 | 17 |
 | Boissons | 0 / 36 | 36 |
 | Maison | 0 / 50 | 50 |
 | Hygiène & soins | 0 / 25 | 25 |
 | Enfant | 0 / 7 | 7 |
-| **Total** | **164 / 414** | **250** |
+| **Total** | **167 / 414** | **247** |
 
-Dans **Fruits & Légumes**, il reste précisément **Endives, Mâche, Olives fraîches**. Il faut leur procurer un visuel *exact*, pas une image de produit voisin.
+Dans **Fruits & Légumes**, il reste précisément **Endives et Mâche**. Le visuel **Olives fraîches** (olives entières mélangées) est remplacé par ce lot. Il faut leur procurer un visuel *exact*, pas une image de produit voisin.
 
 ### Attribution et qualité
 
