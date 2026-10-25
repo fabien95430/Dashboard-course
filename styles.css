@@ -4168,7 +4168,7 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v532 — photo détourée citrons, fondue dans le décor, grille inchangée. */
+/* v535 — photo validée en fond, entre titre et recherche, grille inchangée. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
@@ -4178,7 +4178,7 @@ body{
     height:calc(env(safe-area-inset-top) + 190px);
     pointer-events:none;
     z-index:0;
-    background:url("./www/list-header-lemons-v532.webp") center top / 100% auto no-repeat;
+    background:url("./www/list-header-lemons-v535.webp") center top / 100% auto no-repeat;
   }
   .app>.list-view.is-active{position:relative;z-index:1}
   .list-view>.list-progress{display:none!important}
