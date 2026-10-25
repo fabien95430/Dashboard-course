@@ -4129,6 +4129,8 @@ body{
 .list-view .list-row:not(.is-purchased):not(.is-deleting):not(.is-drag-preview){background:transparent!important;border-color:transparent!important;box-shadow:none!important}
 .list-view .list-row{position:relative;margin:0!important;padding:6px 4px!important;grid-template-columns:36px 54px minmax(0,max-content) auto minmax(0,1fr) 58px!important}
 .list-view .list-row:not(.is-removing){min-height:68px!important;height:auto!important}
+/* Compacter seulement le tri par catégorie, sans réduire les commandes tactiles. */
+.list-view #listItems:has(>.list-category-heading) .list-row:not(.is-removing){min-height:62px!important}
 .list-view .list-row:not(:last-child):not(:has(+.list-category-heading))::after{content:'';position:absolute;left:107px;right:6px;bottom:0;height:1px;background:linear-gradient(90deg,rgba(7,62,44,.13),rgba(7,62,44,.13) 70%,rgba(7,62,44,0));pointer-events:none}
 .list-view .list-row.is-purchased::after,.list-view .list-row.is-deleting::after,.list-view .list-row.is-drag-preview::after{display:none}
 .list-view .list-row.is-drag-preview{background:#fff!important;border-radius:22px!important}
@@ -4141,7 +4143,7 @@ body{
 .list-view .list-row:not(.is-purchased):not(.is-deleting) .purchase-check::before{width:20px!important;height:20px!important;border-width:1.25px!important;border-color:rgba(7,62,44,.45)!important}
 .list-view .list-row:not(.is-deleting) .list-qty{background:transparent!important;color:#073e2c!important;font-size:17px!important;font-weight:300!important;letter-spacing:-.3px}
 .list-view .list-row:not(.is-deleting) .list-row-more{color:rgba(7,62,44,.25)!important}
-.list-view .list-category-heading{display:flex!important;align-items:center;gap:12px;padding:24px 4px 8px!important;margin:0!important;background:transparent!important;font-size:11px!important;font-weight:700!important;letter-spacing:1.8px!important;text-transform:uppercase!important;color:#073e2c!important;border-bottom:0!important}
+.list-view .list-category-heading{display:flex!important;align-items:center;gap:12px;padding:16px 4px 8px!important;margin:0!important;background:transparent!important;font-size:11px!important;font-weight:700!important;letter-spacing:1.8px!important;text-transform:uppercase!important;color:#073e2c!important;border-bottom:0!important}
 .list-view .list-category-heading::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(7,62,44,.22),rgba(7,62,44,0))}
 .list-view .list-category-heading:first-child::after{display:none}
 
