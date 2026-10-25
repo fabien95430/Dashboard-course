@@ -78,7 +78,7 @@ test('les trois badges de version partagent une géométrie unique sur iPhone',(
   assert.match(rowRule,/display:flex/);
   assert.match(rowRule,/align-items:flex-end/);
   assert.match(rowRule,/gap:5px/);
-  assert.match(styles,/\.page-title-row\{\s*height:32px;\s*\}/,'la ligne de titre mobile doit avoir une hauteur fixe');
+  assert.match(styles,/\.page-title-row\{\s*height:35px;\s*\}/,'la ligne de titre mobile doit laisser de la place aux descendantes');
   const badgeRules=[...styles.matchAll(/\.page-version\{([^}]*)\}/g)].map(match=>match[1]);
   assert.ok(badgeRules.some(rule=>/display:flex/.test(rule)&&/align-items:center/.test(rule)&&/justify-content:center/.test(rule)),'le badge doit utiliser une boîte commune centrée');
   assert.ok(badgeRules.some(rule=>/height:14px/.test(rule)&&/line-height:12px/.test(rule)),'le badge mobile doit garder une hauteur fixe identique');
@@ -216,7 +216,8 @@ test('le rail des catégories défile bord à bord et les cartes Produits resten
   assert.ok(mobile.includes('margin-left:12px!important'));
   assert.ok(styles.includes('.catalog-view .categories{\n    margin-left:0!important;\n    margin-right:0!important'));
   assert.ok(styles.includes('background:linear-gradient(160deg,rgba(255,254,251,.98),rgba(249,247,242,.95))'));
-  assert.ok(styles.includes('.product.is-selected{\n  background:linear-gradient(180deg,#efffe9,#dff9df)'));
+  assert.ok(styles.includes('.product.is-selected{\n  background:linear-gradient(155deg,#e4ede3,#e9f0e8)'));
+  assert.ok(styles.includes('border-color:#648773;\n  border-width:2px;'));
   assert.ok(styles.includes('background:#2c563c;\n  color:#fff;\n  box-shadow:0 4px 10px rgba(30,67,47,.18)'));
   assert.ok(styles.includes('.product.is-selected .badge{\n  font-size:15px;\n  background:#2c563c;'));
   assert.ok(styles.includes('.cat.is-active{\n  background:#2c563c;'));
@@ -238,8 +239,25 @@ test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans pe
   const dishesRule='.dishes-grid{margin-left:0!important;margin-right:0!important;padding:1px 19px calc(84px + env(safe-area-inset-bottom))!important}';
   assert.equal(dishes.split(dishesRule).length-1,2);
   assert.ok(dishes.includes('.dishes-grid{min-height:0;overflow-y:auto;'));
-  assert.ok(catalog.includes("'./dishes.css?v=526'"));
-  assert.ok(sw.includes('"./dishes.css?v=526"'));
+  assert.ok(catalog.includes("'./dishes.css?v=531'"));
+  assert.ok(sw.includes('"./dishes.css?v=531"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
+});
+
+test('sélection sauge visible et lettres descendantes non rognées sur les trois vues',()=>{
+  const styles=read('styles.css'),dishes=read('dishes.css'),index=read('index.html'),catalog=read('catalog.js'),sw=read('sw.js');
+  assert.ok(styles.includes('.product.is-selected{\n  background:linear-gradient(155deg,#e4ede3,#e9f0e8)'));
+  assert.ok(styles.includes('border-color:#648773;\n  border-width:2px;'));
+  assert.ok(styles.includes('box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 6px 18px rgba(47,77,55,.14)'));
+  assert.ok(styles.includes('font-size:14.5px!important;\n    line-height:1.22!important'));
+  assert.ok(styles.includes('font-size:17.5px!important;line-height:1.22!important'));
+  assert.ok(styles.includes('font-size:34px!important;\n    line-height:35px!important'));
+  assert.ok(styles.includes('.page-title-row{\n    height:35px;'));
+  assert.ok(dishes.includes('.dish-copy strong{color:#101418;font-size:12.7px;line-height:1.22;'));
+  assert.ok(catalog.includes("'./dishes.css?v=531'"));
+  assert.ok(sw.includes('"./dishes.css?v=531"'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('product-item-first-paint.css?v=523'));
+  assert.equal((index.match(/class="page-version">v531/g)||[]).length,3);
 });
