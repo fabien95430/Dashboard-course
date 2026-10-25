@@ -21,12 +21,12 @@
 | Lot 3 v534 | `795eed950efbf5bb6202f50b192c856a7fa5060b` | 30 |
 | Lot 4 v536 | `5d69ab4793a56a34bba2403bd05a41edd5c1321a` | 11 |
 | Lot 5 v539 | `cc80a4614ea14d88e625c787c57256c4e7696917` | 30 |
-| Lot v545 — 24 nouveaux WebP | Commit de publication v545 (voir l'historique Git ; SHA à consigner après publication) | 24 |
+| Lot v545 — 24 nouveaux WebP | `88465389b15eaa5c237fed273a324374ed556530` — PR #75 | 24 |
 | **Total** | | **156** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 156), ne pas additionner les compteurs.
 
-### Lot v545 — 24 images retenues
+### Lot v545 — 24 images publiées
 
 Après présélection de 30, seuls 24 visuels ont été jugés assez fidèles et meilleurs à 192 px ; les autres ont été écartés. Les 3 fruits/légumes encore à renouveler ne sont **pas comptabilisés** : l'identité exacte n'a pas été validée pour toutes les sources ; conserver les anciens fichiers, notamment les olives non dénoyautées.
 
@@ -104,4 +104,4 @@ Les lots v539 et v545 utilisent des WebP transparents ; v539 contient 30 fichier
 7. Valider chaque image : identité, dimensions, transparence, poids, cadrage et rendu à taille réelle ; comparer ancien/nouveau ; consigner la licence et son crédit. Remplacer les images uniquement si elles sont meilleures.
 8. Préparer **un seul commit atomique** pour un lot prêt, mettre à jour le versionnement/cache selon **les règles courantes d'AGENTS.md**, vérifier que `main` n'a pas bougé, lancer la validation complète, contrôler GitHub Pages, puis **actualiser ce document après la publication réelle**.
 
-**Lot v545 : publication conditionnée à une validation complète verte sur la branche de préparation, suivie de la vérification du commit sur `main`.**
+**Lot v545 publié et vérifié.** Commit : `88465389b15eaa5c237fed273a324374ed556530` ; PR #75 fusionnée ; [validation CI verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40236407821) ; [déploiement GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40236406903).
