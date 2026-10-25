@@ -4168,7 +4168,7 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v544 — fondu inférieur ajusté directement dans le WebP, sans changer la grille. */
+/* v546 — opacité du visuel restaurée, léger fondu intégré à son bord inférieur. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
@@ -4178,10 +4178,8 @@ body{
     height:calc(env(safe-area-inset-top) + 315px);
     pointer-events:none;
     z-index:0;
-    background:url("./www/list-header-citrons-v544.webp") right top / 106% auto no-repeat;
+    background:url("./www/list-header-citrons-v546.webp") right top / 106% auto no-repeat;
     opacity:.96;
-    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 88%,rgba(0,0,0,1) 94%,rgba(0,0,0,.98) 97%,rgba(0,0,0,.72) 100%);
-    mask-image:linear-gradient(to bottom,#000 0%,#000 88%,rgba(0,0,0,1) 94%,rgba(0,0,0,.98) 97%,rgba(0,0,0,.72) 100%);
   }
   .app>.list-view.is-active{position:relative;z-index:1}
   .list-view>.list-progress{display:none!important}
