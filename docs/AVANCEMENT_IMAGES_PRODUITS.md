@@ -23,7 +23,7 @@
 | Lot 5 v539 | `cc80a4614ea14d88e625c787c57256c4e7696917` | 30 |
 | Lot v545 — 24 nouveaux WebP | `88465389b15eaa5c237fed273a324374ed556530` — PR #75 | 24 |
 | Lot v547 — 8 nouveaux WebP | `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` — PR #76 | 8 |
-| Lot v550 — 3 nouveaux WebP | Publication à vérifier après la CI | 3 |
+| Lot v550 — 3 nouveaux WebP | `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — PR #77 | 3 |
 | **Total** | | **167** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 156), ne pas additionner les compteurs.
@@ -80,7 +80,7 @@ Sélection volontairement inférieure à 30 : seuls les huit candidats disposant
 
 **Fruits & Légumes encore à traiter : Endives, Mâche, Olives fraîches.** Des candidats locaux Endives/Mâche ont été générés et inspectés mais ne sont pas intégrés à ce lot ; les seules sources tierces d'olives disponibles lors de ce contrôle les montraient dénoyautées, donc incorrectes. Aucun de ces trois fichiers anciens n'a été remplacé ni comptabilisé. Les futurs lots doivent les traiter prioritairement, sans inventer d'image ni agrandir une miniature existante.
 
-### Lot v550 — 3 nouveaux visuels à publier
+### Lot v550 — 3 nouveaux visuels publiés
 
 Après vérification des variantes, seulement **3 images** ont été retenues. Chaque fichier reste indépendant, isolé sur fond transparent, et conserve le slug attendu par `product-item-images.js`. Aucun produit déjà renouvelé n'a été repris.
 
@@ -94,7 +94,7 @@ Après vérification des variantes, seulement **3 images** ont été retenues. C
 
 Les candidats précédents **Endives** et **Mâche** (320–400 px) sont conservés hors GitHub : le transfert et la comparaison intégrée doivent être vérifiés avant publication. Ils ne sont **pas comptés** comme remplacés. Les olives de la collection Soft Studio ont été rejetées car dénoyautées ; les olives retenues ici sont représentées entières, sans perforation. Aucun visuel de crèmes, épices ou sauces contrevenant à l'obligation du pot fermé n'est modifié.
 
-Version visible : **v550** ; service worker : `courses-app-v550-r1`, sans modification de la stratégie de cache visuel, du mode hors ligne, des animations ou de l'intégration Home Assistant. **Le commit de publication et les validations seront consignés après leur confirmation effective.**
+Version visible : **v550** ; service worker : `courses-app-v550-r1`, sans modification de la stratégie de cache visuel, du mode hors ligne, des animations ou de l'intégration Home Assistant. **Publié sur `main`.** Commit `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — [PR #77 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/77) — [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40239824242) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40239824063).
 
 ### Situation par catégorie
 
