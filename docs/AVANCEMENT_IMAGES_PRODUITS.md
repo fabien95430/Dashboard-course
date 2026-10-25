@@ -22,7 +22,7 @@
 | Lot 4 v536 | `5d69ab4793a56a34bba2403bd05a41edd5c1321a` | 11 |
 | Lot 5 v539 | `cc80a4614ea14d88e625c787c57256c4e7696917` | 30 |
 | Lot v545 — 24 nouveaux WebP | `88465389b15eaa5c237fed273a324374ed556530` — PR #75 | 24 |
-| Lot v547 — 8 nouveaux WebP | Publication conditionnée à validation | 8 |
+| Lot v547 — 8 nouveaux WebP | `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` — PR #76 | 8 |
 | **Total** | | **164** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 156), ne pas additionner les compteurs.
@@ -126,4 +126,4 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 
 **Lot v545 publié et vérifié.** Commit : `88465389b15eaa5c237fed273a324374ed556530` ; PR #75 fusionnée ; [validation CI verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40236407821) ; [déploiement GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40236406903).
 
-**Prépublication du lot v547 :** le SHA de publication et les liens des contrôles seront consignés après validation GitHub. Ne pas présenter le lot comme publié avant le commit visible sur `main` et la CI verte.
+**Lot v547 publié et vérifié.** Commit produit : `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` ; [PR #76 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/76) ; [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40238201170) ; [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40238200704).
