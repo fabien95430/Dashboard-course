@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible du lot : **v545**, sur `main`. Les changements v540 à v544 concernaient la bannière citrons et son fondu, **pas un nouveau lot d'images produits**.
+- Dernière version visible du lot : **v547**, sur `main`. Les changements v540 à v546 concernaient la bannière citrons et son fondu, **sans nouveau lot d'images produits entre v545 et v547**.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **156 produits distincts** disposent d'un visuel remplacé au cours des sept publications détaillées ci-dessous ; **258 produits** n'ont pas encore été remplacés par ces lots. **Ces 258 ne sont pas tous nécessairement de mauvaise qualité**.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,05 Mio**.
-- **242 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **164 produits distincts** disposent d'un visuel remplacé au cours des huit publications détaillées ci-dessous ; **250 produits** n'ont pas encore été remplacés par ces lots. **Ces 250 ne sont pas tous nécessairement de mauvaise qualité**.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,13 Mio**.
+- **234 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des sept publications de nouveaux visuels
+### Historique des huit publications de nouveaux visuels
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -22,7 +22,8 @@
 | Lot 4 v536 | `5d69ab4793a56a34bba2403bd05a41edd5c1321a` | 11 |
 | Lot 5 v539 | `cc80a4614ea14d88e625c787c57256c4e7696917` | 30 |
 | Lot v545 — 24 nouveaux WebP | `88465389b15eaa5c237fed273a324374ed556530` — PR #75 | 24 |
-| **Total** | | **156** |
+| Lot v547 — 8 nouveaux WebP | Publication conditionnée à validation | 8 |
+| **Total** | | **164** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 156), ne pas additionner les compteurs.
 
@@ -59,30 +60,49 @@ Crédits : `docs/IMAGE_CREDITS_V545.md`. Chaque fichier est un WebP indépendant
 | Cuisine | Nouilles chinoises | 5134 | 9170 |
 | Cuisine | Tagliatelles | 5450 | 13842 |
 
+### Lot v547 — 8 WebP sélectionnés
+
+Sélection volontairement inférieure à 30 : seuls les huit candidats disposant d'une correspondance produit contrôlée ont été retenus. Images WebP unitaires 320 × 320 px avec canal alpha, issues de Soft Studio Ingredients (CC BY 4.0), sans génération via l'API payante du projet. Correspondances et attribution détaillées dans `docs/IMAGE_CREDITS_V547.md`.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Frais | Fromage râpé | 4578 | 15242 |
+| Frais | Pâtes fraîches | 5018 | 13842 |
+| Boulangerie | Pains burger | 4946 | 16172 |
+| Boulangerie | Wraps | 3738 | 14296 |
+| Apéritif & snacks | Bretzels | 5000 | 20918 |
+| Apéritif & snacks | Noix de cajou | 4490 | 11176 |
+| Apéritif & snacks | Chocolat au lait | 3826 | 13346 |
+| Apéritif & snacks | Chocolat noir | 4038 | 17878 |
+
+**Total du lot : 35 634 → 122 870 octets**, soit +87 236 octets répartis entre huit visuels. Les fichiers de ces produits occupent au plus 20 918 octets chacun. Les slugs, la liste HA prioritaire et le cache visuel persistant restent inchangés.
+
+**Fruits & Légumes encore à traiter : Endives, Mâche, Olives fraîches.** Des candidats locaux Endives/Mâche ont été générés et inspectés mais ne sont pas intégrés à ce lot ; les seules sources tierces d'olives disponibles lors de ce contrôle les montraient dénoyautées, donc incorrectes. Aucun de ces trois fichiers anciens n'a été remplacé ni comptabilisé. Les futurs lots doivent les traiter prioritairement, sans inventer d'image ni agrandir une miniature existante.
+
 ### Situation par catégorie
 
-Comptage exact des noms des **156 images modifiées** croisés avec `catalog.js`.
+Comptage exact des noms des **164 images modifiées** croisés avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
 | Fruits & Légumes | 69 / 72 | 3 |
-| Frais | 18 / 53 | 35 |
+| Frais | 20 / 53 | 33 |
 | Viandes & poissons | 23 / 39 | 16 |
 | Cuisine | 36 / 71 | 35 |
-| Boulangerie | 4 / 13 | 9 |
+| Boulangerie | 6 / 13 | 7 |
 | Petit-déjeuner | 3 / 24 | 21 |
-| Apéritif & snacks | 3 / 24 | 21 |
+| Apéritif & snacks | 7 / 24 | 17 |
 | Boissons | 0 / 36 | 36 |
 | Maison | 0 / 50 | 50 |
 | Hygiène & soins | 0 / 25 | 25 |
 | Enfant | 0 / 7 | 7 |
-| **Total** | **156 / 414** | **258** |
+| **Total** | **164 / 414** | **250** |
 
 Dans **Fruits & Légumes**, il reste précisément **Endives, Mâche, Olives fraîches**. Il faut leur procurer un visuel *exact*, pas une image de produit voisin.
 
 ### Attribution et qualité
 
-Les lots v539 et v545 utilisent des WebP transparents ; v539 contient 30 fichiers **320 × 320 px**, environ **445 Kio au total**, provenant de **Soft Studio Ingredients by Alex Wang** (licence **CC BY 4.0**). L'attribution et les 30 correspondances sont déjà inscrites dans **`docs/IMAGE_CREDITS_V539.md`**. Préserver ce fichier et suivre l'attribution pour toute autre source sous licence similaire. Pour v545, les crédits et correspondances figurent dans `docs/IMAGE_CREDITS_V545.md`. Les visuels CC0 utilisés lors d'autres lots ne relèvent pas du même régime. Vérifier la cohérence des liserés clairs de Soft Studio avec le style réel du catalogue avant toute nouvelle génération.
+Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 fichiers **320 × 320 px**, environ **445 Kio au total**, provenant de **Soft Studio Ingredients by Alex Wang** (licence **CC BY 4.0**). L'attribution et les 30 correspondances sont déjà inscrites dans **`docs/IMAGE_CREDITS_V539.md`**. Préserver ce fichier et suivre l'attribution pour toute autre source sous licence similaire. Pour v545, les crédits et correspondances figurent dans `docs/IMAGE_CREDITS_V545.md`. Les visuels CC0 utilisés lors d'autres lots ne relèvent pas du même régime. Vérifier la cohérence des liserés clairs de Soft Studio avec le style réel du catalogue avant toute nouvelle génération.
 
 ## Blocage CI résolu — état vérifié sur main
 
@@ -105,3 +125,5 @@ Les lots v539 et v545 utilisent des WebP transparents ; v539 contient 30 fichier
 8. Préparer **un seul commit atomique** pour un lot prêt, mettre à jour le versionnement/cache selon **les règles courantes d'AGENTS.md**, vérifier que `main` n'a pas bougé, lancer la validation complète, contrôler GitHub Pages, puis **actualiser ce document après la publication réelle**.
 
 **Lot v545 publié et vérifié.** Commit : `88465389b15eaa5c237fed273a324374ed556530` ; PR #75 fusionnée ; [validation CI verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40236407821) ; [déploiement GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40236406903).
+
+**Prépublication du lot v547 :** le SHA de publication et les liens des contrôles seront consignés après validation GitHub. Ne pas présenter le lot comme publié avant le commit visible sur `main` et la CI verte.
