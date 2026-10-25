@@ -4168,17 +4168,17 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v538 — nouveau visuel détouré HD, bord haut et droit, feuille vers titre, grille inchangée. */
+/* v540 — citrons de la maquette validée, adoucis, grille et recherche inchangées. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
     position:fixed;
     inset:0 0 auto 0;
     width:100vw;
-    height:calc(env(safe-area-inset-top) + 190px);
+    height:calc(env(safe-area-inset-top) + 315px);
     pointer-events:none;
     z-index:0;
-    background:url("./www/list-header-botanical-v538.webp") center top / 100% auto no-repeat;
+    background:url("./www/list-header-citrons-v540.webp") right top / 106% auto no-repeat;
   }
   .app>.list-view.is-active{position:relative;z-index:1}
   .list-view>.list-progress{display:none!important}
