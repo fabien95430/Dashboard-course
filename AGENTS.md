@@ -25,7 +25,7 @@ En automatisation, regrouper les demandes compatibles dans un seul commit atomiq
 
 ## Version visible
 
-Les badges de version `.page-version` doivent rester affichés à côté des titres principaux `h1` de Ma liste, Catalogue et Réglages.
+Les trois marqueurs de version `.page-version` restent présents dans les en-têtes `h1` de Ma liste, Catalogue et Réglages pour les scripts et tests historiques ; seul le badge de Réglages doit être visible (les deux autres sont masqués par CSS).
 
 À chaque modification fonctionnelle, visuelle ou technique de l’application, incrémenter la version globale et afficher exactement la même version sur toutes les pages dans le même commit. Ne jamais laisser des numéros de version différents selon les vues.
 
