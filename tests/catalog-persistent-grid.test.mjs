@@ -72,6 +72,6 @@ test('la lentille Produits Plats garde la même géométrie avant et après le m
   assert.match(sync,/modeSwitch\.dataset\.catalogLiquidBound==='1'/);
   assert.match(sync,/const width=Math\.max\(48,Math\.min\(active\.offsetWidth\*\.5,108\)\);/);
   assert.match(sync,/active\.offsetLeft\+\(active\.offsetWidth-width\)\/2/);
-  assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:calc\(100% - 4px\)!important/);
-  assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?background:#2c563c!important/);
+  assert.match(firstPaint,/height:2px!important/);
+  assert.match(firstPaint,/background:transparent!important/);
 });

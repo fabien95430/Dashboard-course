@@ -1,11 +1,11 @@
 @import url("./dish-detail.css?v=6");
 
 /* v494 — trait actif uniquement, aucune capsule de fond. */
-.catalog-mode-lens{top:2px!important;bottom:auto!important;height:calc(100% - 4px)!important;border:0!important;border-radius:22px!important;background:#2c563c!important;box-shadow:0 3px 10px rgba(37,77,49,.13)!important;transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx))!important;transition:none!important}
+.catalog-mode-lens{top:auto!important;bottom:2px!important;height:2px!important;border:0!important;border-radius:1px!important;background:#073e2c!important;box-shadow:none!important;transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx))!important;transition:none!important}
 .catalog-mode>svg,.catalog-mode-fork{display:none!important}
 .catalog-mode{gap:0!important;touch-action:manipulation}
 .catalog-mode:active{transform:none!important}
-.catalog-mode.is-active,.catalog-mode.is-liquid-under{color:#fff!important}
+.catalog-mode.is-active,.catalog-mode.is-liquid-under{color:#073e2c!important}
 .catalog-mode>span{transition:color .16s ease}
 
 /* v179 — Nombre de personnes sur la ligne Ingrédients */
