@@ -4168,7 +4168,7 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v551 — détourage photographique naturel sans rectangle, cadrage préservé. */
+/* v552 — masque progressif depuis la photo originale, sans contours découpés, cadrage préservé. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
@@ -4178,7 +4178,7 @@ body{
     height:calc(env(safe-area-inset-top) + 315px);
     pointer-events:none;
     z-index:0;
-    background:url("./www/list-header-citrons-v551.webp") calc(100% + 36px) 24px / 106% auto no-repeat;
+    background:url("./www/list-header-citrons-v552.webp") calc(100% + 36px) 24px / 106% auto no-repeat;
     opacity:.96;
   }
   .app>.list-view.is-active{position:relative;z-index:1}
