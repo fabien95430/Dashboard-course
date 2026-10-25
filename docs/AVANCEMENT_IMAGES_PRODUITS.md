@@ -4,7 +4,7 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible observée : **v540**, sur `main`. Les derniers changements v540 concernent la bannière citrons et le précache, **pas un nouveau lot d'images produits**.
+- Dernière version visible vérifiée : **v542**, sur `main`. Les changements v540/v541/v542 concernent la bannière citrons, son opacité et son fondu, **pas un nouveau lot d'images produits**.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
 - **132 produits distincts** disposent d'un visuel remplacé au cours des six commits ci-dessous ; **282 produits** n'ont pas encore été remplacés par ces lots. **Ces 282 ne sont pas tous nécessairement de mauvaise qualité**.
 - La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 7,83 Mio**.
@@ -48,20 +48,19 @@ Dans **Fruits & Légumes**, il reste précisément **Endives, Mâche, Olives fra
 
 ### Attribution et qualité
 
-Le lot v539 utilise 30 WebP transparents **320 × 320 px**, environ **445 Kio au total**, provenant de **Soft Studio Ingredients by Alex Wang** (licence **CC BY 4.0**). L'attribution et les 30 correspondances sont déjà inscrites dans **`docs/IMAGE_CREDITS_V539.md`**. Préserver ce fichier et suivre l'attribution pour toute autre source sous licence similaire. Les visuels CC0 utilisés lors d'autres lots ne relèvent pas du même régime. Vérifier la cohérence des liserés clairs de Soft Studio avec le style réel du catalogue avant toute nouvelle généralisation.
+Le lot v539 utilise 30 WebP transparents **320 × 320 px**, environ **445 Kio au total**, provenant de **Soft Studio Ingredients by Alex Wang** (licence **CC BY 4.0**). L'attribution et les 30 correspondances sont déjà inscrites dans **`docs/IMAGE_CREDITS_V539.md`**. Préserver ce fichier et suivre l'attribution pour toute autre source sous licence similaire. Les visuels CC0 utilisés lors d'autres lots ne relèvent pas du même régime. Vérifier la cohérence des liserés clairs de Soft Studio avec le style réel du catalogue avant toute nouvelle génér## Blocage CI résolu — état vérifié sur main
 
-## Blocage technique à résoudre avant le prochain lot
-
-Après v540, une modification supplémentaire de `sw.js` est intervenue au commit **`f2e2b432a467a4171935e52feee07d85e21401dc`**. Le déploiement GitHub Pages a réussi mais **la CI de validation échoue encore : 234 tests réussis, 1 échec**.
-
-Workflow concerné : https://github.com/fabien95430/Dashboard-course/actions/runs/40226162631
-
-Échec restant : `la version globale visible, le cache et les visuels restent alignés`, dans `tests/list-render-version.test.mjs`. Les logs montrent une assertion qui attend littéralement `const CACHE='courses-app-v540-r1';` tandis que le service worker a été incrémenté en **`r2`** pour corriger le précache. **Diagnostiquer le contrat réel**, puis corriger la cohérence entre cache, code et tests **sans supprimer ou neutraliser les assertions** et sans revenir inutilement à un cache périmé. `bash scripts/validate_repo.sh` et le workflow GitHub `validation` doivent devenir verts **avant une prochaine intégration d'images**. Une validation Pages verte ne suffit pas.
+- Ancien incident (v540) : le test `tests/list-render-version.test.mjs` exigeait le suffixe `r1` de façon fixe, tandis que `sw.js` était à `courses-app-v540-r2`. La validation avait 234 réussites et un échec.
+- Le commit v541 `fbe380fb1efee1439564fc4c57c3d3a953752b15` a rétabli la cohérence globale, sans lot de visuels produits.
+- Correctif permanent du test publié sur `main` : `ba40473a7ddeb21d62f69f30e9f1217224b0a016` (PR #74 fusionnée). L'assertion contrôle l'unicité de `CACHE`, l'alignement de version et la révision entière positive, sans imposer artificiellement `r1`. Aucune modification de `sw.js`, de l'interface ou de la sécurité dans ce correctif.
+- Version `v542` (`0d463f4261f5e74e512385a42e00b22be6e8eb8f`) : seuls le fondu décoratif, le versionnement et le précache ont changé, **pas les images produits**. Validation GitHub et GitHub Pages sont toutes deux vertes sur ce commit.
+- Inventaire inchangé : **132 / 414 produits renouvelés**, **32 WebP lourds comprimés**, **420 fichiers WebP**, **aucun > 100 Kio**. Aucun nouveau visuel produit n'a été publié avec cette reprise CI.
+- Préparation hors dépôt : une image candidate **Endives** en WebP transparent 400 × 400 px, 17 090 octets, a été réalisée, mais **n'est pas publiée ni comptabilisée**. Les trois produits à évaluer dans Fruits & Légumes restent Endives, Mâche, Olives fraîches. Tout rendu incorrect ou tout contrôle non terminé doit être rejeté.
 
 ## Reprise du chantier
 
 1. **Commencer par `main` actuel** : lire `AGENTS.md`, `catalog.js`, `product-item-images.js`, `docs/IMAGES_ITEMS.md`, `docs/IMAGE_CREDITS_V539.md`, `sw.js`, la suite `tests/` et cette note ; vérifier les versions réelles et la dernière CI.
-2. **Résoudre le blocage CI** décrit ci-dessus sans dégrader la sécurité, le précache ou les révisions indépendantes. Si d'autres commits arrivent, diagnostiquer le nouvel état et ne pas appliquer de correctif obsolète.
+2. **Vérifier que la validation GitHub reste verte** et que les révisions indépendantes du cache demeurent cohérentes. Si d'autres commits arrivent, diagnostiquer le nouvel état et ne pas appliquer de correctif obsolète.
 3. Examiner d'abord les **3 Fruits & Légumes restants**, puis **Frais**, **Viandes & poissons**, **Cuisine**, puis les autres catégories. Prioriser le manque de netteté réel plutôt que le seul poids.
 4. Préparer des lots **de 30 maximum**, seulement avec des correspondances exactes et des visuels contrôlés : **un produit = un fichier WebP**, fond transparent, produit centré, isolé, rendu semi-réaliste premium cohérent avec les cartes existantes ; lisibilité à **192 × 192 px**, source idéalement **320 à 512 px**, cible généralement **15–60 Kio**, plafond pratique **100 Kio**. **Ne jamais agrandir artificiellement** les anciennes miniatures 84 × 84, inventer une marque, substituer un autre produit ou réutiliser des planches d'images.
 5. Conserver noms et slug attendus `www/Items/<slug>.webp`, catalogue `catalog.js`, liste HA `Courses` prioritaire, synchronisation WebSocket événementielle, OAuth, coffre chiffré, verrouillage, biométrie, iOS safe areas, fonctionnement offline et architecture HTML/CSS/JS statique + GitHub Pages + HA. **Pas de framework, backend, polling ni API OpenAI payante du projet.**
