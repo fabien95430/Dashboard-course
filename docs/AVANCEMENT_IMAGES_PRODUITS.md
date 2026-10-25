@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible du lot : **v550**, sur `main`. Les versions v548 et v549 ont ajusté la bannière citrons et son cadrage ; ces éléments ne sont pas modifiés par ce lot.
+- Dernière version visible prévue pour le lot : **v553**, sur `main`. La bannière citrons et ses changements jusqu'en v552 restent intacts : aucun CSS, décor ni animation modifié pour ce lot.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **167 produits distincts** disposent d'un visuel remplacé au cours des neuf publications détaillées ci-dessous ; **247 produits** n'ont pas encore été remplacés par ces lots. **Ces 247 ne sont pas tous nécessairement de mauvaise qualité**.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,20 Mio**.
-- **232 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **197 produits distincts** disposeront d'un visuel remplacé après la publication du dixième lot détaillé ci-dessous ; **217 produits** n'auront pas encore été remplacés par ces lots. **Ces 217 ne sont pas tous nécessairement de mauvaise qualité**.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,67 Mio**.
+- **208 images pèseront moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des neuf publications de nouveaux visuels
+### Historique des dix lots de nouveaux visuels
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -24,9 +24,10 @@
 | Lot v545 — 24 nouveaux WebP | `88465389b15eaa5c237fed273a324374ed556530` — PR #75 | 24 |
 | Lot v547 — 8 nouveaux WebP | `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` — PR #76 | 8 |
 | Lot v550 — 3 nouveaux WebP | `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — PR #77 | 3 |
-| **Total** | | **167** |
+| Lot v553 — 30 WebP | Commit de publication à vérifier après validation | 30 |
+| **Total** | | **197** |
 
-**Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 156), ne pas additionner les compteurs.
+**Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 197), ne pas additionner les compteurs.
 
 ### Lot v545 — 24 images publiées
 
@@ -96,14 +97,55 @@ Les candidats précédents **Endives** et **Mâche** (320–400 px) sont conserv
 
 Version visible : **v550** ; service worker : `courses-app-v550-r1`, sans modification de la stratégie de cache visuel, du mode hors ligne, des animations ou de l'intégration Home Assistant. **Publié sur `main`.** Commit `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — [PR #77 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/77) — [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40239824242) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40239824063).
 
+### Lot v553 — 30 visuels produits contrôlés
+
+- **30 remplacements indépendants :** 2 Fruits & Légumes et 28 Frais. Aucun produit déjà remplacé dans les lots antérieurs n'est repris.
+- Les WebP sont centrés et transparents : **Endives et Mâche 400 × 400 px**, les 28 autres **320 × 320 px** ; tous ont été inspectés à la taille de rendu 192 px. Suppression des artefacts de fond et contrôle des marges alpha. Les crèmes et produits en pot sont représentés avec couvercle fermé ; les quatre variantes de lait ont un bouchon distinct.
+- **Poids de ce lot avant/après : 116 466 → 602 884 octets** (+486 418 octets) ; maximum individuel **39 110 octets**, aucun WebP au-delà de 100 Ko. Total du répertoire après le lot : **9 085 954 octets** (environ 8,67 Mio).
+- Visuels générés sans appel à l'API payante du projet ; voir `docs/IMAGE_CREDITS_V553.md`. Aucun sprite/atlas chargé, aucun backend ou polling ; `product-item-images.js` et le cache visuel persistant sont inchangés.
+- **Publication :** la validation complète sur la branche de préparation et les contrôles sur `main` doivent être verts avant d'annoncer le lot terminé. Le SHA final sera ajouté au suivi après publication effective.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Fruits & Légumes | Endives | 4104 | 17090 |
+| Fruits & Légumes | Mâche | 5026 | 27834 |
+| Frais | Camembert | 4206 | 25692 |
+| Frais | Comté | 4278 | 20280 |
+| Frais | Raclette | 3558 | 15862 |
+| Frais | Reblochon | 3756 | 24000 |
+| Frais | Crème épaisse | 3016 | 10750 |
+| Frais | Crème fraîche | 2882 | 11174 |
+| Frais | Lait demi-écrémé | 2156 | 8592 |
+| Frais | Lait écrémé | 2124 | 8236 |
+| Frais | Lait entier | 2102 | 7704 |
+| Frais | Lait sans lactose | 2050 | 7462 |
+| Frais | Mascarpone | 3532 | 9762 |
+| Frais | Frites surgelées | 5036 | 31274 |
+| Frais | Glace chocolat | 4682 | 31400 |
+| Frais | Haricots verts surgelés | 5300 | 33928 |
+| Frais | Légumes surgelés | 5372 | 36398 |
+| Frais | Petits pois surgelés | 4724 | 29906 |
+| Frais | Pizza surgelée | 4526 | 39110 |
+| Frais | Sorbet | 4616 | 30414 |
+| Frais | Pizza fraîche | 4382 | 29830 |
+| Frais | Quiche | 4092 | 28530 |
+| Frais | Crème dessert chocolat | 3876 | 13882 |
+| Frais | Crème dessert vanille | 4546 | 13132 |
+| Frais | Flan | 3224 | 14846 |
+| Frais | Petits-suisses | 3252 | 11878 |
+| Frais | Riz au lait | 4540 | 21968 |
+| Frais | Skyr | 3260 | 10076 |
+| Frais | Yaourts fruits | 4060 | 18364 |
+| Frais | Yaourts vanille | 4188 | 13510 |
+
 ### Situation par catégorie
 
-Comptage exact des noms des **167 images modifiées** croisés avec `catalog.js`.
+Comptage des noms des **197 images modifiées** après publication de v553, croisés avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
-| Fruits & Légumes | 70 / 72 | 2 |
-| Frais | 20 / 53 | 33 |
+| Fruits & Légumes | 72 / 72 | 0 |
+| Frais | 48 / 53 | 5 |
 | Viandes & poissons | 23 / 39 | 16 |
 | Cuisine | 37 / 71 | 34 |
 | Boulangerie | 7 / 13 | 6 |
@@ -113,9 +155,9 @@ Comptage exact des noms des **167 images modifiées** croisés avec `catalog.js`
 | Maison | 0 / 50 | 50 |
 | Hygiène & soins | 0 / 25 | 25 |
 | Enfant | 0 / 7 | 7 |
-| **Total** | **167 / 414** | **247** |
+| **Total** | **197 / 414** | **217** |
 
-Dans **Fruits & Légumes**, il reste précisément **Endives et Mâche**. Le visuel **Olives fraîches** (olives entières mélangées) est remplacé par ce lot. Il faut leur procurer un visuel *exact*, pas une image de produit voisin.
+**Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les cinq produits Frais non encore renouvelés sont Cheddar, Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; conserver les visuels corrects tant qu'un remplacement réellement meilleur n'est pas disponible.
 
 ### Attribution et qualité
 
