@@ -4,11 +4,11 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible prévue pour le lot : **v553**, sur `main`. La bannière citrons et ses changements jusqu'en v552 restent intacts : aucun CSS, décor ni animation modifié pour ce lot.
+- Dernière version visible publiée : **v553**, sur `main`. La bannière citrons et ses changements jusqu'en v552 restent intacts : aucun CSS, décor ni animation modifié pour ce lot.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **197 produits distincts** disposeront d'un visuel remplacé après la publication du dixième lot détaillé ci-dessous ; **217 produits** n'auront pas encore été remplacés par ces lots. **Ces 217 ne sont pas tous nécessairement de mauvaise qualité**.
+- **197 produits distincts** disposent d'un visuel remplacé depuis la publication du dixième lot détaillé ci-dessous ; **217 produits** n'ont pas encore été remplacés par ces lots. **Ces 217 ne sont pas tous nécessairement de mauvaise qualité**.
 - La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,67 Mio**.
-- **208 images pèseront moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **208 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
 ### Historique des dix lots de nouveaux visuels
@@ -24,7 +24,7 @@
 | Lot v545 — 24 nouveaux WebP | `88465389b15eaa5c237fed273a324374ed556530` — PR #75 | 24 |
 | Lot v547 — 8 nouveaux WebP | `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` — PR #76 | 8 |
 | Lot v550 — 3 nouveaux WebP | `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — PR #77 | 3 |
-| Lot v553 — 30 WebP | Commit de publication à vérifier après validation | 30 |
+| Lot v553 — 30 WebP | `c8bf020acb92cc6fb8ec3486584735ccdc33f00e` — PR #78 | 30 |
 | **Total** | | **197** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 197), ne pas additionner les compteurs.
@@ -93,17 +93,17 @@ Après vérification des variantes, seulement **3 images** ont été retenues. C
 
 **Total : 13 492 → 86 968 octets** (+73 476 octets). Deux sources : **Ingredient Atlas** (CC0 pour les olives entières, 512 × 512 px) et **Soft Studio Ingredients** (CC BY 4.0 pour les lasagnes et le pain, 320 × 320 px). Détails, liens et attributions : `docs/IMAGE_CREDITS_V550.md`.
 
-Les candidats précédents **Endives** et **Mâche** (320–400 px) sont conservés hors GitHub : le transfert et la comparaison intégrée doivent être vérifiés avant publication. Ils ne sont **pas comptés** comme remplacés. Les olives de la collection Soft Studio ont été rejetées car dénoyautées ; les olives retenues ici sont représentées entières, sans perforation. Aucun visuel de crèmes, épices ou sauces contrevenant à l'obligation du pot fermé n'est modifié.
+**État historique au lot v550 :** les candidats Endives et Mâche n'étaient pas encore publiés ni comptabilisés. Ils ont été remplacés et comptabilisés ultérieurement, au lot v553. Les olives de la collection Soft Studio ont été rejetées car dénoyautées ; les olives retenues ici sont représentées entières, sans perforation. Aucun visuel de crèmes, épices ou sauces contrevenant à l'obligation du pot fermé n'est modifié.
 
 Version visible : **v550** ; service worker : `courses-app-v550-r1`, sans modification de la stratégie de cache visuel, du mode hors ligne, des animations ou de l'intégration Home Assistant. **Publié sur `main`.** Commit `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — [PR #77 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/77) — [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40239824242) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40239824063).
 
-### Lot v553 — 30 visuels produits contrôlés
+### Lot v553 — 30 visuels produits publiés
 
 - **30 remplacements indépendants :** 2 Fruits & Légumes et 28 Frais. Aucun produit déjà remplacé dans les lots antérieurs n'est repris.
 - Les WebP sont centrés et transparents : **Endives et Mâche 400 × 400 px**, les 28 autres **320 × 320 px** ; tous ont été inspectés à la taille de rendu 192 px. Suppression des artefacts de fond et contrôle des marges alpha. Les crèmes et produits en pot sont représentés avec couvercle fermé ; les quatre variantes de lait ont un bouchon distinct.
 - **Poids de ce lot avant/après : 116 466 → 602 884 octets** (+486 418 octets) ; maximum individuel **39 110 octets**, aucun WebP au-delà de 100 Ko. Total du répertoire après le lot : **9 085 954 octets** (environ 8,67 Mio).
 - Visuels générés sans appel à l'API payante du projet ; voir `docs/IMAGE_CREDITS_V553.md`. Aucun sprite/atlas chargé, aucun backend ou polling ; `product-item-images.js` et le cache visuel persistant sont inchangés.
-- **Publication :** la validation complète sur la branche de préparation et les contrôles sur `main` doivent être verts avant d'annoncer le lot terminé. Le SHA final sera ajouté au suivi après publication effective.
+- **Publication vérifiée :** commit `c8bf020acb92cc6fb8ec3486584735ccdc33f00e` publié sur `main`, [PR #78 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/78), [CI verte sur PR](https://github.com/fabien95430/Dashboard-course/actions/runs/40243773230), [CI verte sur `main`](https://github.com/fabien95430/Dashboard-course/actions/runs/40243846948), [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40243847004).
 
 | Catégorie | Produit | Avant (octets) | Après (octets) |
 | --- | --- | ---: | ---: |
@@ -140,7 +140,7 @@ Version visible : **v550** ; service worker : `courses-app-v550-r1`, sans modifi
 
 ### Situation par catégorie
 
-Comptage des noms des **197 images modifiées** après publication de v553, croisés avec `catalog.js`.
+Comptage des noms des **197 images modifiées** vérifiés sur `main` après publication de v553, croisés avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
