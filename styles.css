@@ -595,7 +595,7 @@ svg{display:block}
   min-width:0;
   border:1px solid rgba(33,55,40,.035);
   border-radius:22px;
-  background:linear-gradient(155deg,rgba(248,245,236,.90),rgba(235,240,232,.85));
+  background:linear-gradient(160deg,rgba(255,254,251,.98),rgba(249,247,242,.95));
   color:#11161a;
   box-shadow:0 7px 22px rgba(57,75,62,.065);
   display:grid;
@@ -661,16 +661,16 @@ svg{display:block}
   border-radius:50%;
   display:grid;
   place-items:center;
-  background:#238d4e;
+  background:#2c563c;
   color:#fff;
-  box-shadow:0 4px 10px rgba(19,118,62,.18);
+  box-shadow:0 4px 10px rgba(30,67,47,.18);
   font-size:22px;
   line-height:1;
   font-weight:500;
 }
 .product.is-selected .badge{
   font-size:15px;
-  background:#168647;
+  background:#2c563c;
 }
 
 /* RÉGLAGES */

@@ -206,7 +206,7 @@ test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans 
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
 });
 
-test('le rail des catégories défile bord à bord et les cartes Produits restent ivoire sauge',()=>{
+test('le rail des catégories défile bord à bord et les cartes Produits restent ivoire clair et les boutons + vert forêt',()=>{
   const firstPaint=read('product-item-first-paint.css');
   const styles=read('styles.css');
   const index=read('index.html');
@@ -215,8 +215,13 @@ test('le rail des catégories défile bord à bord et les cartes Produits resten
   assert.ok(mobile.includes('html .catalog-controls>.categories .cat:first-child,\n  html .catalog-controls>.dish-filters .dish-filter:first-child'));
   assert.ok(mobile.includes('margin-left:12px!important'));
   assert.ok(styles.includes('.catalog-view .categories{\n    margin-left:0!important;\n    margin-right:0!important'));
-  assert.ok(styles.includes('background:linear-gradient(155deg,rgba(248,245,236,.90),rgba(235,240,232,.85))'));
+  assert.ok(styles.includes('background:linear-gradient(160deg,rgba(255,254,251,.98),rgba(249,247,242,.95))'));
   assert.ok(styles.includes('.product.is-selected{\n  background:linear-gradient(180deg,#efffe9,#dff9df)'));
+  assert.ok(styles.includes('background:#2c563c;\n  color:#fff;\n  box-shadow:0 4px 10px rgba(30,67,47,.18)'));
+  assert.ok(styles.includes('.product.is-selected .badge{\n  font-size:15px;\n  background:#2c563c;'));
+  assert.ok(styles.includes('.cat.is-active{\n  background:#2c563c;'));
+  assert.ok(!styles.includes('background:#238d4e;'));
+  assert.ok(!styles.includes('background:#168647;'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
   assert.ok(index.includes('catalog-liquid.js?v=494')||read('sw.js').includes('catalog-liquid.js?v=494'));
 });
