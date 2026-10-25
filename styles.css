@@ -4168,7 +4168,7 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v541 — opacité et fondu bas des citrons uniquement, grille et recherche inchangées. */
+/* v542 — fondu inférieur des citrons plus discret, sans changer le cadrage ni les positions. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
@@ -4180,8 +4180,8 @@ body{
     z-index:0;
     background:url("./www/list-header-citrons-v540.webp") right top / 106% auto no-repeat;
     opacity:.96;
-    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 76%,rgba(0,0,0,.88) 85%,rgba(0,0,0,.4) 94%,transparent 100%);
-    mask-image:linear-gradient(to bottom,#000 0%,#000 76%,rgba(0,0,0,.88) 85%,rgba(0,0,0,.4) 94%,transparent 100%);
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 80%,rgba(0,0,0,.98) 88%,rgba(0,0,0,.85) 96%,rgba(0,0,0,.35) 100%);
+    mask-image:linear-gradient(to bottom,#000 0%,#000 80%,rgba(0,0,0,.98) 88%,rgba(0,0,0,.85) 96%,rgba(0,0,0,.35) 100%);
   }
   .app>.list-view.is-active{position:relative;z-index:1}
   .list-view>.list-progress{display:none!important}
