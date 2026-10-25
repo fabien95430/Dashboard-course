@@ -595,7 +595,7 @@ svg{display:block}
   min-width:0;
   border:1px solid rgba(33,55,40,.035);
   border-radius:22px;
-  background:rgba(255,255,255,.95);
+  background:linear-gradient(155deg,rgba(248,245,236,.90),rgba(235,240,232,.85));
   color:#11161a;
   box-shadow:0 7px 22px rgba(57,75,62,.065);
   display:grid;
@@ -2195,8 +2195,8 @@ body{
     margin-right:13px!important;
   }
   .catalog-view .categories{
-    margin-left:12px!important;
-    margin-right:12px!important;
+    margin-left:0!important;
+    margin-right:0!important;
   }
 
   .catalog-view .products{

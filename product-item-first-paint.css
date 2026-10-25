@@ -172,10 +172,15 @@ html .catalog-view>#products.is-catalog-mode-hidden{
     grid-row:4!important;
     align-self:end!important;
     height:38px!important;
-    margin-left:12px!important;
-    margin-right:12px!important;
+    margin-left:0!important;
+    margin-right:0!important;
     gap:7px!important;
     padding:0!important;
+  }
+  /* Le rail déborde jusqu'aux bords, seul le premier filtre reste aligné. */
+  html .catalog-controls>.categories .cat:first-child,
+  html .catalog-controls>.dish-filters .dish-filter:first-child{
+    margin-left:12px!important;
   }
   html .catalog-controls>.categories .cat{
     height:38px!important;

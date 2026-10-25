@@ -203,5 +203,20 @@ test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans 
   assert.ok(row>132,'les tuiles sont réellement agrandies');
   assert.ok(style.includes('overflow-y:auto;'),'défilement natif conservé');
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
-  assert.ok(index.includes('product-item-first-paint.css?v=508'));
+  assert.ok(index.includes('product-item-first-paint.css?v=523'));
+});
+
+test('le rail des catégories défile bord à bord et les cartes Produits restent ivoire sauge',()=>{
+  const firstPaint=read('product-item-first-paint.css');
+  const styles=read('styles.css');
+  const index=read('index.html');
+  const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
+  assert.ok(mobile.includes('margin-left:0!important;\n    margin-right:0!important;\n    gap:7px!important'));
+  assert.ok(mobile.includes('html .catalog-controls>.categories .cat:first-child,\n  html .catalog-controls>.dish-filters .dish-filter:first-child'));
+  assert.ok(mobile.includes('margin-left:12px!important'));
+  assert.ok(styles.includes('.catalog-view .categories{\n    margin-left:0!important;\n    margin-right:0!important'));
+  assert.ok(styles.includes('background:linear-gradient(155deg,rgba(248,245,236,.90),rgba(235,240,232,.85))'));
+  assert.ok(styles.includes('.product.is-selected{\n  background:linear-gradient(180deg,#efffe9,#dff9df)'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('catalog-liquid.js?v=494')||read('sw.js').includes('catalog-liquid.js?v=494'));
 });
