@@ -1726,6 +1726,16 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     grid-auto-rows:132px!important;
     gap:7px!important;
   }
+  /* Catalogue iPhone portrait : trois rangées entières avant la barre flottante.
+     334px = 82 + 42 + 40 + 42 + (4 * 12) de commandes + 80px de
+     réserve pour la barre de 60px, son écart et la respiration finale. */
+  .catalog-view>#products{
+    height:min(100%,calc(100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 334px))!important;
+    grid-auto-rows:max(132px,calc((100% - 18px) / 3))!important;
+    gap:9px!important;
+    padding-bottom:6px!important;
+    scroll-padding-bottom:6px;
+  }
   .product{
     grid-template-rows:82px minmax(0,1fr)!important;
     padding:6px 6px 8px!important;

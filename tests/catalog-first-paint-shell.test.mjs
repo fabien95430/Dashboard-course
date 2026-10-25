@@ -174,3 +174,29 @@ test('la référence visuelle conserve les icônes du menu et la lentille native
   assert.ok(styles.includes('background:#2c563c;'));
   assert.ok(liquid.includes('.catalog-mode-lens{top:auto!important;bottom:2px!important;height:2px!important'));
 });
+
+test('la grille Catalogue mobile présente trois rangées entières au-dessus du menu sur iPhone 17 Pro',()=>{
+  const style=read('styles.css');
+  const start=style.indexOf('.catalog-view>#products{');
+  assert.ok(start>=0,'règle de dimensionnement Catalogue absente');
+  const rule=style.slice(start,style.indexOf('}',start)+1);
+  assert.ok(rule.includes('height:min(100%,calc(100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 334px))!important'));
+  assert.ok(rule.includes('grid-auto-rows:max(132px,calc((100% - 18px) / 3))!important'));
+  assert.ok(rule.includes('gap:9px!important'));
+  assert.ok(rule.includes('padding-bottom:6px!important'));
+  // 402 x 874 CSS px, safe areas iOS 62/34 ; barre 60px + 8px du bord.
+  const width=402,viewport=874,topInset=62,bottomInset=34;
+  const topTracks=82+42+40+42+4*12;
+  const gridHeight=viewport-topInset-bottomInset-topTracks-80;
+  const rowHeight=(gridHeight-1-6-2*9)/3;
+  const cardWidth=(width-2*19-2*9)/3;
+  const nextRowTop=1+3*rowHeight+3*9;
+  assert.equal(gridHeight,444);
+  assert.ok(rowHeight>=132&&rowHeight<=150);
+  assert.ok(cardWidth>=110&&cardWidth<=120);
+  assert.ok(nextRowTop>=gridHeight,'la quatrième ligne ne doit pas entrer dans la première vue');
+  const barTop=viewport-bottomInset-8-60;
+  assert.ok(topInset+topTracks+gridHeight<=barTop-10,'la barre iOS ne recouvre pas les produits');
+  assert.ok(style.includes('env(safe-area-inset-bottom)'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+});
