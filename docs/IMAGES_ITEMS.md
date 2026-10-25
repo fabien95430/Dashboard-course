@@ -50,6 +50,16 @@ Pour les **épices et assaisonnements secs** de `catalog.js`, notamment **Curcum
 
 Le pot doit être **isolé, centré, sur fond transparent**, dans le style 3D semi-réaliste premium des autres visuels, **sans marque ni texte inventés**. Vérifier le nom exact du produit avant d'appliquer cette règle : ne pas transformer un plat ou une préparation portant un nom d'épice (par exemple « Chili ») en pot à épices sans confirmer qu'il s'agit réellement de l'épice.
 
+## Conditionnement fidèle — sauces et préparations à tartiner
+
+Pour **toutes les sauces** présentes dans `catalog.js`, imposer un **pot ou bocal rigide avec couvercle**, adapté à la texture du produit : **Sauce barbecue, Sauce burger, Sauce César, Sauce soja, Sauce tomate, Ketchup, Mayonnaise, Moutarde, Pesto, Tabasco et Coulis de fruit**. Étendre cette présentation aux préparations apparentées vendues en pot, comme **Harissa, Guacamole, Houmous et Tapenade**. Même les sauces habituellement commercialisées en flacon doivent être illustrées **en pot**, conformément à la direction visuelle choisie pour le catalogue. **Pas de bouteille, tube, brique, sachet ou sauce déposée seule dans une coupelle.**
+
+Cette consigne concerne les sauces et les préparations assimilées, **pas les huiles ni les vinaigres** : conserver pour ces derniers un conditionnement adapté à leur nature, sauf instruction ultérieure spécifique.
+
+## Cohérence de tous les pots
+
+Pour **tous les produits dont le conditionnement imposé est un pot** (crèmes épaisses, crème fraîche, épices, sauces et préparations assimilées), représenter **un seul pot fermé**, isolé et centré, avec un **couvercle clairement visible**. Conserver un style **3D semi-réaliste premium homogène**, des proportions réalistes, une marge transparente régulière et une lisibilité nette à **192 × 192 px**. Adapter la forme, le matériau et la visibilité du contenu au produit : le pot de crème, le pot d'épices et le pot de sauce ne doivent pas être artificiellement identiques. Aucune marque, étiquette à texte inventé, décor, cuillère, support ni collage. Rejeter tout visuel qui ne respecte pas le bon pot ou le contenu exact du produit.
+
 ## Prompt prêt à réutiliser
 
 Utiliser ce modèle lorsque l’on demande la régénération d’un item :
