@@ -44,6 +44,12 @@ Pour les produits **« Crème épaisse »** et **« Crème fraîche »** du cata
 
 La **« Crème liquide »** est un produit distinct : conserver son conditionnement réel adapté (par exemple une brique), sans lui appliquer automatiquement la règle du pot. Pour les autres crèmes et produits frais, vérifier le conditionnement correspondant au nom exact du produit avant de générer l'image. Rejeter toute image dont l'emballage ne correspond pas au produit.
 
+## Conditionnement fidèle — épices
+
+Pour les **épices et assaisonnements secs** de `catalog.js`, notamment **Curcuma, Curry, Paprika et Poivre**, représenter **un petit pot à épices rigide avec son couvercle** (bocal ou flacon à épices) : **pas de sachet souple, de paquet cartonné, de brique, de cuillère ni de tas d'épices en vrac**. Lorsque le **Sel** est représenté comme un assaisonnement sec, privilégier également un pot adapté. Le contenu, sa couleur et sa texture doivent correspondre exactement au produit.
+
+Le pot doit être **isolé, centré, sur fond transparent**, dans le style 3D semi-réaliste premium des autres visuels, **sans marque ni texte inventés**. Vérifier le nom exact du produit avant d'appliquer cette règle : ne pas transformer un plat ou une préparation portant un nom d'épice (par exemple « Chili ») en pot à épices sans confirmer qu'il s'agit réellement de l'épice.
+
 ## Prompt prêt à réutiliser
 
 Utiliser ce modèle lorsque l’on demande la régénération d’un item :
