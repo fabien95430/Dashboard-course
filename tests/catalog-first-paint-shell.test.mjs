@@ -259,5 +259,8 @@ test('sélection sauge visible et lettres descendantes non rognées sur les troi
   assert.ok(sw.includes('"./dishes.css?v=531"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
-  assert.equal((index.match(/class="page-version">v531/g)||[]).length,3);
+  const localImages=read('dish-local-images.js');
+  const version=localImages.match(/const APP_VERSION='(v\d+)'/)?.[1];
+  assert.ok(version,'version applicative introuvable');
+  assert.deepEqual([...index.matchAll(/class="page-version">(v\d+)<\/span>/g)].map(match=>match[1]),Array(3).fill(version));
 });
