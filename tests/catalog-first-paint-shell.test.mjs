@@ -46,8 +46,7 @@ test('le bouton À racheter bientôt est seulement branché par son module propr
 
 test('app-ui est branché avant app.js pour enrichir la vraie liste vide sans rendu tardif',()=>{
   const appUiScript=index.indexOf('<script src="./app-ui.js?v=442" data-app-ui="script"></script>');
-  const appVersion=index.match(/class="page-version">v(\d+)/)?.[1];
-  const appScript=index.indexOf('<script src="./app.js?v='+appVersion+'"></script>');
+  const appScript=index.search(/<script src="\.\/app\.js\?v=\d+"><\/script>/);
   assert.ok(appUiScript>=0&&appScript>appUiScript,'app-ui doit être chargé avant app.js');
   assert.match(appUi,/if\(!listEmptyStateConfirmed\)\{/);
   assert.match(appUi,/title==='Synchronisé'\|\|title==='Mode test'/);
@@ -71,7 +70,7 @@ test('les badges de version sont à côté des h1 dans une ligne de titre commun
   assert.ok(!appUi.includes('appendChild(badge)'));
 });
 
-test('les trois badges de version partagent une géométrie unique sur iPhone',()=>{
+test('les titres gardent leur géométrie et seul Réglages affiche le badge de version',()=>{
   const rows=[...index.matchAll(/<div class="page-title-row">\s*<h1>(Ma liste|Catalogue|Réglages)<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>/g)];
   assert.equal(rows.length,3,'les trois vues doivent utiliser exactement la même structure titre + badge');
   const rowRule=styles.match(/\.page-title-row\{([^}]*)\}/)?.[1]||'';
@@ -85,7 +84,8 @@ test('les trois badges de version partagent une géométrie unique sur iPhone',(
   assert.ok(badgeRules.every(rule=>!/vertical-align/.test(rule)),'les anciens vertical-align v447 doivent être supprimés');
   const sharedTitleRules=[...styles.matchAll(/\.list-view \.page-header h1,\s*\.catalog-view \.page-header h1,\s*\.settings-view \.page-header h1\{([^}]*)\}/g)].map(match=>match[1]);
   assert.ok(sharedTitleRules.every(rule=>!/display:flex!important/.test(rule)&&!/align-items:flex-end!important/.test(rule)&&!/column-gap:5px!important/.test(rule)),'les h1 ne doivent plus porter le flex v448');
-  assert.doesNotMatch(styles,/\.catalog-view \.page-version\s*\{/);
+  assert.match(styles,/\.list-view \.page-version,\.catalog-view \.page-version\{display:none!important\}/,'les badges de Ma liste et Catalogue doivent être masqués');
+  assert.doesNotMatch(styles,/\.settings-view \.page-version\s*\{[^}]*display\s*:\s*none/,'le badge de Réglages reste visible');
 });
 
 test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de sa propre ligne',()=>{

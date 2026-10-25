@@ -25,8 +25,9 @@ test('le module de navigation reste découplé de l état métier',()=>{
 
 test('le module est chargé avant app.js et précaché avec sa propre révision',()=>{
   const navIndex=index.indexOf('./bottom-nav-liquid.js?v=414');
-  const appVersion=index.match(/class="page-version">v(\d+)/)?.[1];
-  const appIndex=index.indexOf('./app.js?v='+appVersion);
+  const appScript=index.match(/<script src="(\.\/app\.js\?v=\d+)"><\/script>/)?.[1]||'';
+  const appIndex=appScript?index.indexOf(appScript):-1;
   assert.ok(navIndex>=0&&appIndex>navIndex);
   assert.match(sw,/\.\/bottom-nav-liquid\.js\?v=414/);
+  assert.ok(sw.includes('"'+appScript+'"'),'le shell précache la révision réellement chargée de app.js');
 });
