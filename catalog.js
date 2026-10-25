@@ -44,7 +44,7 @@
   const loadDishStyles=()=>{
     if(dishStylesReadyPromise)return dishStylesReadyPromise;
     dishStylesReadyPromise=Promise.all([
-      ensureStylesheet('link[data-catalog-dishes]','./dishes.css?v=4','catalogDishes'),
+      ensureStylesheet('link[data-catalog-dishes]','./dishes.css?v=526','catalogDishes'),
       ensureStylesheet('link[data-catalog-liquid]','./catalog-liquid.css?v=496','catalogLiquid')
     ]).catch(error=>{
       dishStylesReadyPromise=null;
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=525';
+    images.src='./dish-local-images.js?v=526';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});

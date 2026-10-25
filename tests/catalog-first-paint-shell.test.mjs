@@ -182,9 +182,9 @@ test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans 
   const rule=style.slice(start,style.indexOf('}',start)+1);
   assert.ok(style.includes('@media(max-width:520px) and (min-height:800px)'));
   assert.ok(rule.includes('100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 300px'));
-  assert.ok(rule.includes('height:min(100%,var(--catalog-first-page-height))!important'));
+  assert.ok(!rule.includes('height:min('),'le conteneur ne doit plus se terminer au-dessus de la barre');
   assert.ok(rule.includes('grid-auto-rows:max(132px,calc((var(--catalog-first-page-height) - 25px) / 3))!important'));
-  assert.ok(rule.includes('padding:1px 12px 6px!important'));
+  assert.ok(rule.includes('padding:1px 12px calc(84px + env(safe-area-inset-bottom))!important'));
   assert.ok(style.includes('.catalog-view>#products .product{\n    grid-template-rows:94px minmax(0,1fr)!important'));
   assert.ok(style.includes('.catalog-view>#products .product .media{\n    height:92px!important'));
   assert.ok(!style.includes(' - 334px'),'ancien bandeau artificiel supprimé');
@@ -224,4 +224,22 @@ test('le rail des catégories défile bord à bord et les cartes Produits resten
   assert.ok(!styles.includes('background:#168647;'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
   assert.ok(index.includes('catalog-liquid.js?v=494')||read('sw.js').includes('catalog-liquid.js?v=494'));
+});
+
+test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans perdre les dernières cartes',()=>{
+  const styles=read('styles.css'),dishes=read('dishes.css'),catalog=read('catalog.js'),sw=read('sw.js');
+  const start=styles.indexOf('.catalog-view>#products{');
+  const productRule=styles.slice(start,styles.indexOf('}',start)+1);
+  assert.ok(start>=0);
+  assert.ok(!productRule.includes('height:min('));
+  assert.ok(productRule.includes('grid-auto-rows:max(132px,calc((var(--catalog-first-page-height) - 25px) / 3))!important'));
+  assert.ok(productRule.includes('padding:1px 12px calc(84px + env(safe-area-inset-bottom))!important'));
+  assert.ok(styles.includes('.app>.tabs{\n    position:fixed!important;\n    z-index:40!important'));
+  const dishesRule='.dishes-grid{margin-left:0!important;margin-right:0!important;padding:1px 19px calc(84px + env(safe-area-inset-bottom))!important}';
+  assert.equal(dishes.split(dishesRule).length-1,2);
+  assert.ok(dishes.includes('.dishes-grid{min-height:0;overflow-y:auto;'));
+  assert.ok(catalog.includes("'./dishes.css?v=526'"));
+  assert.ok(sw.includes('"./dishes.css?v=526"'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('product-item-first-paint.css?v=523'));
 });

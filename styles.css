@@ -2075,18 +2075,16 @@ body{
   }
 }
 
-/* v522 — Catalogue iPhone portrait : la grille et les cartes remplissent
-   ensemble la première page (3 × 3), sans masque ni bandeau ajouté.
-   300px = 254px de commandes supérieures + 46px jusqu'à la barre iOS.
-   La grille reste scrollable pour tous les autres produits. */
+/* Catalogue iPhone portrait : 3 rangées dimensionnées pour le premier écran.
+   Le conteneur garde la hauteur naturelle de la vue et défile sous la barre
+   flottante, avec une réserve au bas pour atteindre les derniers produits. */
 @media(max-width:520px) and (min-height:800px){
   .catalog-view>#products{
     --catalog-first-page-height:calc(100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 300px);
-    height:min(100%,var(--catalog-first-page-height))!important;
     grid-auto-rows:max(132px,calc((var(--catalog-first-page-height) - 25px) / 3))!important;
     gap:9px!important;
-    padding:1px 12px 6px!important;
-    scroll-padding-bottom:6px;
+    padding:1px 12px calc(84px + env(safe-area-inset-bottom))!important;
+    scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom));
   }
   .catalog-view>#products .product{
     grid-template-rows:94px minmax(0,1fr)!important;
