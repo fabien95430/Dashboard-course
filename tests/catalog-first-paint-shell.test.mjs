@@ -110,7 +110,7 @@ test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de s
   // Le total des lignes reste constant, et l'espace entre les zones reste à 16px.
   assert.match(mobile,/width:clamp\(220px,60vw,240px\)!important;\s*height:38px!important/);
   assert.match(mobile,/html \.catalog-mode\{font-size:18px!important\}/);
-  assert.match(mobile,/--catalog-lens-w:56px;\s*--catalog-lens-x:calc\(25% - 28px\)/);
+  assert.match(mobile,/--catalog-lens-w:calc\(50% - 2px\);\s*--catalog-lens-x:2px/);
   assert.match(styles,/\.catalog-view \.page-search\{height:46px!important;[\s\S]*?background:linear-gradient/,'la recherche reste transparente et soulignée');
   assert.match(mobile,/html \.catalog-view>\.page-search\{[^}]*height:40px!important;[^}]*border-radius:0!important/);
   const layout={header:82,tabRow:42,tab:38,search:40,categoryRow:42,category:38,gap:12};
@@ -119,7 +119,7 @@ test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de s
   assert.equal(layout.categoryRow-layout.category+layout.gap,16);
   assert.match(mobile,/html \.catalog-controls>\.categories,\s*html \.catalog-controls>\.dish-filters\{\s*grid-row:4!important;\s*align-self:end!important/);
   assert.match(mobile,/html \.catalog-view>#products,\s*html \.catalog-view>\.dishes-grid\{grid-row:5!important\}/);
-  assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:2px!important/);
+  assert.match(firstPaint,/html \.catalog-mode-lens\{[\s\S]*?height:calc\(100% - 4px\)!important/);
   assert.doesNotMatch(mobile,/order:1!important|order:2!important/,'pas de changement de hiérarchie Produits / Plats');
 });
 
@@ -158,4 +158,19 @@ test('la progression hachurée de Ma liste reste au-dessus de la recherche sans 
   assert.match(app,/if\(listProgressSession\.remaining===0&&remaining>0&&listProgressSession\.done>0\)listProgressSession\.done=0/);
   assert.match(app,/const groups=activeGroups\(\),needle=norm\(state\.listQuery\);\s*emitListChangedIfNeeded\(groups\);\s*updateListProgress\(groups\);/);
   assert.doesNotMatch(app,/setInterval\([^)]*updateListProgress/);
+});
+
+
+test('la référence visuelle conserve les icônes du menu et la lentille native',()=>{
+  const index=read('index.html');
+  const liquid=read('catalog-liquid.css');
+  assert.ok(index.includes('<symbol id="i-nav-list"'));
+  assert.ok(index.includes('<symbol id="i-nav-grid"'));
+  assert.ok(index.includes('<svg><use href="#i-nav-list"></use></svg><span>Ma liste</span>'));
+  assert.ok(index.includes('<svg><use href="#i-nav-grid"></use></svg><span>Catalogue</span>'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(styles.includes('font-family:"Baskerville","Iowan Old Style",Georgia,serif'));
+  assert.ok(styles.includes('background:rgba(214,226,213,.73)'));
+  assert.ok(styles.includes('background:#2c563c;'));
+  assert.ok(liquid.includes('.catalog-mode-lens{top:2px!important;bottom:auto!important;height:calc(100% - 4px)!important'));
 });

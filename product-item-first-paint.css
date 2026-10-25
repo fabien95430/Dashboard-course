@@ -48,29 +48,29 @@ html .catalog-mode-switch{
   padding:0!important;
   display:grid!important;
   grid-template-columns:1fr 1fr!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
+  border:1px solid rgba(255,255,255,.62)!important;
+  border-radius:24px!important;
+  background:rgba(247,246,241,.82)!important;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.65)!important;
   overflow:hidden!important;
   isolation:isolate!important;
 }
 html .catalog-mode-lens{
   position:absolute!important;
   z-index:0!important;
-  top:auto!important;
-  bottom:2px!important;
+  top:2px!important;
+  bottom:auto!important;
   left:0!important;
   width:var(--catalog-lens-w)!important;
-  height:2px!important;
+  height:calc(100% - 4px)!important;
   border:0!important;
-  border-radius:1px!important;
+  border-radius:22px!important;
   pointer-events:none!important;
   transform-origin:center!important;
   transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx))!important;
   transition:none!important;
-  background:#073e2c!important;
-  box-shadow:none!important;
+  background:#2c563c!important;
+  box-shadow:0 3px 10px rgba(37,77,49,.13)!important;
   will-change:transform,width!important;
 }
 html .catalog-mode{
@@ -80,7 +80,7 @@ html .catalog-mode{
   border:0!important;
   border-radius:0!important;
   background:transparent!important;
-  color:#87928b!important;
+  color:#35483b!important;
   display:flex!important;
   align-items:center!important;
   justify-content:center!important;
@@ -89,8 +89,8 @@ html .catalog-mode{
   font-weight:600!important;
   touch-action:manipulation;
 }
-html .catalog-mode.is-active{color:#073e2c!important;touch-action:none}
-html .catalog-mode.is-active>span:last-child{font-weight:760!important}
+html .catalog-mode.is-active{color:#fff!important;touch-action:none}
+html .catalog-mode.is-active>span:last-child{font-weight:550!important}
 html .catalog-mode>svg,
 html .catalog-mode-fork{display:none!important}
 html .catalog-view>.page-search{order:2!important}
@@ -152,8 +152,8 @@ html .catalog-view>#products.is-catalog-mode-hidden{
     transform:none!important;
     width:clamp(220px,60vw,240px)!important;
     height:38px!important;
-    --catalog-lens-w:56px;
-    --catalog-lens-x:calc(25% - 28px);
+    --catalog-lens-w:calc(50% - 2px);
+    --catalog-lens-x:2px;
   }
   html .catalog-mode{font-size:18px!important}
   html .catalog-view>.page-search{
