@@ -186,8 +186,10 @@ html,body{
 body{
   min-height:100dvh;
   overflow:hidden;
-  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(250,248,244,.38)),url("./terrazzo-background-v513.svg") 0 0 / 440px 580px repeat;
-  background-color:#f7f4ed;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.10)),
+    url("./mineral-light-background-v514.svg") center center / cover no-repeat;
+  background-color:#f8f7f3;
 }
 button,input,select{color:inherit}
 button{-webkit-tap-highlight-color:transparent}
@@ -1406,7 +1408,7 @@ html,body{touch-action:pan-x pan-y}
 }
 
 /* iOS installed app: paint the document canvas under the home-indicator area. */
-html{background:#f7f4ed}
+html{background:#f8f7f3}
 html:has(#setup.is-visible),
 html:has(#securityOverlay.is-visible),
 body:has(#setup.is-visible),

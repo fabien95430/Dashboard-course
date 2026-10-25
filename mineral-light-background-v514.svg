@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1480" viewBox="0 0 720 1480">
+<defs>
+<linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fbfaf7"/><stop offset=".58" stop-color="#f7f6f2"/><stop offset="1" stop-color="#f3f2ed"/></linearGradient>
+<radialGradient id="sand"><stop stop-color="#ded7c9" stop-opacity=".19"/><stop offset="1" stop-color="#ded7c9" stop-opacity="0"/></radialGradient>
+<radialGradient id="sage"><stop stop-color="#d6ddd4" stop-opacity=".15"/><stop offset="1" stop-color="#d6ddd4" stop-opacity="0"/></radialGradient>
+<radialGradient id="pearl"><stop stop-color="#ffffff" stop-opacity=".4"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="720" height="1480" fill="url(#base)"/>
+<ellipse cx="-75" cy="250" rx="355" ry="440" fill="url(#sand)"/>
+<ellipse cx="730" cy="710" rx="370" ry="540" fill="url(#sage)"/>
+<ellipse cx="120" cy="1370" rx="440" ry="470" fill="url(#sand)"/>
+<ellipse cx="350" cy="475" rx="340" ry="560" fill="url(#pearl)"/>
+<g fill="none" stroke="#c5c0b5" stroke-linecap="round" stroke-linejoin="round" opacity=".15">
+<path d="M-80 160 C65 188 88 118 175 144 S350 196 443 127 612 60 760 105" stroke-width="1"/>
+<path d="M-75 173 C64 199 97 130 187 160 S359 211 450 143 621 73 761 119" stroke-width=".55" opacity=".55"/>
+<path d="M-30 460 C102 443 135 502 230 484 S410 400 499 433 650 533 749 510" stroke-width=".9" opacity=".55"/>
+<path d="M-70 834 C64 872 118 824 222 849 S385 912 481 865 638 804 757 852" stroke-width="1.1" opacity=".58"/>
+<path d="M-55 842 C80 885 118 839 216 862 S383 927 477 877 643 823 753 869" stroke-width=".7" opacity=".34"/>
+<path d="M-32 1229 C94 1151 155 1197 216 1242 S371 1307 449 1270 614 1139 760 1200" stroke-width="1.3" opacity=".62"/>
+<path d="M-49 1242 C76 1168 150 1212 216 1256 S370 1321 458 1282 615 1155 755 1216" stroke-width=".5" opacity=".45"/>
+</g>
+<g fill="none" stroke="#d6d0c3" stroke-linecap="round" opacity=".18">
+<path d="M670 -75 C618 128 706 184 624 329 S558 560 699 610" stroke-width="1.1"/>
+<path d="M688 -60 C632 139 720 197 641 343 S575 557 715 615" stroke-width=".7" opacity=".45"/>
+<path d="M22 640 C132 660 96 760 38 847 S-10 1017 99 1117" stroke-width="1"/>
+<path d="M35 659 C142 677 112 773 56 855 S6 1007 114 1109" stroke-width=".5" opacity=".44"/>
+</g>
+</svg>
