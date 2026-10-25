@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1480" viewBox="0 0 720 1480">
+<defs>
+<linearGradient id="paper" x1=".1" y1="0" x2=".8" y2="1"><stop stop-color="#fbf9f5"/><stop offset=".35" stop-color="#f4f0e8"/><stop offset=".75" stop-color="#f9f7f2"/><stop offset="1" stop-color="#ece8dc"/></linearGradient>
+<radialGradient id="cloudWarm"><stop stop-color="#d7c5ad" stop-opacity=".22"/><stop offset="1" stop-color="#ebdfce" stop-opacity="0"/></radialGradient>
+<filter id="fracture" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".026 .019" numOctaves="2" seed="13" result="v"/><feDisplacementMap in="SourceGraphic" in2="v" scale="38" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs>
+<rect width="720" height="1480" fill="url(#paper)"/>
+<ellipse cx="470" cy="400" rx="430" ry="435" fill="url(#cloudWarm)"/>
+<ellipse cx="170" cy="900" rx="400" ry="500" fill="url(#cloudWarm)"/>
+<ellipse cx="605" cy="1240" rx="420" ry="400" fill="url(#cloudWarm)"/>
+<g filter="url(#fracture)">
+<path d="M-58 340 C64 348 88 451 159 486 C206 513 201 553 299 578 C329 587 372 618 380 666 C323 660 247 672 203 645 C151 608 112 590 54 550 C4 517 -26 460 -58 449Z" fill="#9fad9d" opacity=".26"/>
+<path d="M-40 360 C71 364 91 454 157 496 C196 524 235 565 316 600 C350 613 353 631 377 653 C319 636 255 635 210 624 C140 595 106 544 37 506Z" fill="#879e8d" opacity=".21"/>
+<path d="M-60 348 C71 390 97 450 177 502 C218 546 246 565 313 603" stroke="#799181" stroke-opacity=".43" stroke-width="3" fill="none"/>
+<path d="M-54 356 C70 404 90 461 163 519 S274 585 335 625" stroke="#d3c4aa" stroke-opacity=".50" stroke-width="2.1" fill="none"/>
+<path d="M22 423 C98 460 102 512 156 539" stroke="#758b7f" stroke-opacity=".37" stroke-width="2" fill="none"/>
+<path d="M127 467 C168 473 210 528 211 570" stroke="#6f887b" stroke-opacity=".26" stroke-width="1.2" fill="none"/>
+<path d="M800 840 C729 855 686 908 639 949 C584 991 554 1012 505 1048 C477 1067 416 1115 378 1150 C444 1188 490 1177 562 1137 C634 1094 701 1073 772 1083 Z" fill="#aab8a6" opacity=".30"/>
+<path d="M784 876 C700 889 671 943 625 971 S541 1043 487 1090 C446 1122 409 1128 389 1142 C466 1164 516 1143 575 1097 C653 1047 715 1042 766 1035Z" fill="#8ca18e" opacity=".21"/>
+<path d="M783 864 C713 897 665 937 627 976 S542 1045 490 1081 432 1115 387 1145" stroke="#678575" stroke-opacity=".45" stroke-width="3.3" fill="none"/>
+<path d="M787 874 C715 916 675 945 635 985 S542 1058 499 1095 423 1133 400 1163" stroke="#c6b69a" stroke-opacity=".40" stroke-width="2" fill="none"/>
+<path d="M633 960 C607 936 560 958 532 976" stroke="#91a693" stroke-width="1.8" stroke-opacity=".37" fill="none"/>
+<path d="M543 1050 C548 1091 495 1130 457 1148" stroke="#768e7d" stroke-width="1.5" stroke-opacity=".38" fill="none"/>
+<path d="M455 -55 C447 41 492 58 512 97 S578 169 593 225 C573 193 529 175 492 135 S423 80 405 15Z" fill="#aab6a5" opacity=".19"/>
+<path d="M444 -32 C450 50 500 89 518 113 C547 149 557 182 603 220" stroke="#829a87" stroke-width="1.9" stroke-opacity=".35" fill="none"/>
+</g>
+<g fill="none" stroke-linecap="round">
+<path d="M2 173 C116 196 168 123 249 164 S386 239 455 209 C504 186 542 154 626 169" stroke="#c1b8a8" stroke-width="1.3" opacity=".34"/>
+<path d="M7 183 C117 204 172 135 252 175 S385 249 456 219" stroke="#9dab99" stroke-width=".7" opacity=".32"/>
+<path d="M18 809 C83 850 167 829 237 788 S389 767 462 811" stroke="#bba992" stroke-width="1.5" opacity=".30"/>
+<path d="M5 821 C88 856 170 841 245 798 S392 775 471 822" stroke="#8ea493" stroke-width="1.3" opacity=".17"/>
+<path d="M30 1339 C141 1291 224 1312 294 1362 S426 1400 507 1367 649 1291 737 1323" stroke="#bfae98" stroke-width="1.5" opacity=".26"/>
+</g>
+</svg>
