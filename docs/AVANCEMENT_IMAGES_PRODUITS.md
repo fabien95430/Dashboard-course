@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v565**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
+- Dernière version visible **publiée : v566**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **265 produits distincts** sont désormais renouvelés après publication de v565 ; **149 produits** ne sont pas encore renouvelés (dont plusieurs visuels déjà évalués et conservés). Les autres visuels ne nécessitent pas tous d'être changés.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **9 421 380 octets (8,99 Mio)** (avant : 8,71 Mio).
-- **170 images pèsent moins de 10 Kio après v565**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **270 produits distincts** sont désormais renouvelés après publication de v566 ; **144 produits** ne sont pas encore renouvelés (dont plusieurs visuels déjà évalués et conservés). Les autres visuels ne nécessitent pas tous d'être changés.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **9 459 566 octets (9,02 Mio)** (avant : 8,71 Mio).
+- **168 images pèsent moins de 10 Kio après v566**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des vingt et un lots publiés
+### Historique des vingt-deux lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -36,7 +36,8 @@
 | Lot v563 — 6 WebP | `2c07dad2e784e07167c485ee085c59f877fb02a6` — PR #87 | 6 |
 | Lot v564 — 4 WebP | `94708078e44389f8eca989d4792d0a1681ea63ca` — PR #88 | 4 |
 | Lot v565 — 6 WebP | `d0825a731f53e663752133b6396c18b672da8237` — PR #90 | 6 |
-| **Total** | | **265** |
+| Lot v566 — 5 WebP | `9921fcccf322a24458699cca81b151c32745c4a9` — PR #91 | 5 |
+| **Total** | | **270** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -363,9 +364,9 @@ Les six images sont des rendus originaux créés dans ChatGPT pour *Application 
 
 **Périmètre strict :** uniquement les six `www/Items/*.webp`, les marqueurs globaux v565 dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, la note de suivi et les crédits. Aucun changement de `product-item-images.js`, de stratégie de chargement, cache visuel, fonctionnement hors ligne, architecture statique, Home Assistant, WebSocket, OAuth, coffre chiffré, biométrie, mode test, CSS, bannière citrons, iOS, navigation ni liste `Courses`.
 
-### Lot v566 — cinq WebP préparés pour validation, non publiés à ce stade
+### Lot v566 — cinq WebP publiés et validés
 
-**Ne pas considérer cette section comme une publication effective avant fusion et validations sur `main`.** Les totaux et la version publiés en tête de document demeurent ceux de v565 tant que la validation complète et le déploiement Pages de v566 ne sont pas confirmés.
+**Publié sur `main` :** [commit `9921fcccf322a24458699cca81b151c32745c4a9`](https://github.com/fabien95430/Dashboard-course/commit/9921fcccf322a24458699cca81b151c32745c4a9), [PR #91 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/91), [CI PR verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40392428350), [CI complète sur `main` verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40392546801) et [déploiement GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40392546763). Les cinq empreintes Git correspondent aux WebP préparés.
 
 | Catégorie | Produit | Avant (octets) | Après (octets) |
 | --- | --- | ---: | ---: |
@@ -384,7 +385,7 @@ Les six images sont des rendus originaux créés dans ChatGPT pour *Application 
 
 ### Situation par catégorie
 
-Comptage des **265 produits renouvelés** vérifié après publication sur `main` de v565, croisé avec `catalog.js`.
+Comptage des **270 produits renouvelés** vérifié après publication sur `main` de v566, croisé avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
@@ -396,16 +397,16 @@ Comptage des **265 produits renouvelés** vérifié après publication sur `main
 | Petit-déjeuner | 7 / 24 | 17 |
 | Apéritif & snacks | 16 / 24 | 8 |
 | Boissons | 18 / 36 | 18 |
-| Maison | 3 / 50 | 47 |
+| Maison | 5 / 50 | 45 |
 | Hygiène & soins | 9 / 25 | 16 |
-| Enfant | 0 / 7 | 7 |
-| **Total** | **265 / 414** | **149** |
+| Enfant | 3 / 7 | 4 |
+| **Total** | **270 / 414** | **144** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
-### Audit des visuels conservés — 26 octobre 2026 (sans remplacement)
+### Audit des visuels conservés — 26 octobre 2026 (historique antérieur à v566)
 
-**Cet audit ne modifie aucune image et ne change pas la version v564.** Les 259 produits renouvelés restent comptés séparément. L'analyse comparative supplémentaire porte sur **20 produits non renouvelés**, dont les conditionnements actuels restent fidèles ; les nouveaux candidats trouvés n'offraient pas de meilleure correspondance. Un visuel conservé peut toujours être amélioré plus tard si sa netteté à 192 px est objectivement meilleure.
+**À la date de cet audit, avant v566**, 20 produits non renouvelés avaient été jugés suffisamment fidèles. Ce résultat historique ne constitue pas un statut permanent : quatre de ces produits sont désormais renouvelés en v566 après réception de fichiers de meilleure définition. L'audit de v564 n'avait modifié aucune image, ni la version applicative. Leurs anciens conditionnements étaient fidèles, même si leur qualité visuelle pouvait ensuite être améliorée.
 
 | Catégorie | Produit(s) examinés et conservés | Comparaison et motif |
 | --- | --- | --- |
@@ -420,7 +421,9 @@ Les visuels `Gel hydroalcoolique` et `Coton` ont aussi été contrôlés : leurs
 
 **Progression de l'évaluation :** au moins 259 produits renouvelés + 20 autres produits distincts vérifiés et conservés dans cette passe = **279/414 avec une décision documentée**, sans changer le comptage de remplacements (**259/414**). Cela n'implique ni 279 nouveaux fichiers ni que les 135 autres produits soient tous mauvais.
 
-**Après publication v565 :** les six renouvellements Hygiène & soins s'ajoutent aux 259 remplacements précédents, sans recouvrir les 20 produits conservés par l'audit. Soit **265 produits renouvelés** et au moins **285 produits distincts dotés d'une décision documentée** (les 265 renouvelés + ces 20 conservés), parmi les 414 produits du catalogue. Les **149 non renouvelés** incluent encore des visuels satisfaisants ; ils ne sont pas tous des remplacements à effectuer.
+**Après publication v565 (historique) :** les six renouvellements Hygiène & soins s'ajoutaient aux 259 remplacements précédents, sans recouvrir les 20 produits conservés par l'audit. Le bilan était 265 renouvelés + 20 conservés = 285 distincts évalués.
+
+**Après publication v566 :** cinq nouveaux remplacements (Couches, Lingettes bébé, Petits pots, Lessive capsules, Papier aluminium). Parmi eux, **quatre** figuraient dans les 20 références auparavant conservées (toutes sauf Couches) et sont désormais comptées uniquement comme renouvelées. Il reste donc **16 références conservées**, distinctes des **270 renouvelées**. Au moins **286 produits distincts ont une décision documentée** ; les **144 non renouvelés** ne sont pas tous à remplacer.
 
 ### Attribution et qualité
 
@@ -469,3 +472,5 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Lot v564 publié et vérifié :** [commit `94708078e44389f8eca989d4792d0a1681ea63ca`](https://github.com/fabien95430/Dashboard-course/commit/94708078e44389f8eca989d4792d0a1681ea63ca) — [PR #88 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/88) — [CI complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40374530296) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40374529801). Quatre WebP : 70 424 → 69 106 octets (−1 318 octets), 259/414 renouvelés et 155 non renouvelés. Voir les crédits et SHA unitaires : `docs/IMAGE_CREDITS_V564.md`.
 
 **Lot v565 publié et vérifié :** [commit `d0825a731f53e663752133b6396c18b672da8237`](https://github.com/fabien95430/Dashboard-course/commit/d0825a731f53e663752133b6396c18b672da8237) — [PR #90 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/90) — [CI complète réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40384309361) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40384308606). Six images Hygiène & soins : 15 032 → 74 466 octets ; 265/414 renouvelés, 149 non renouvelés. Poids du répertoire : 9 421 380 octets, 420 WebP, zéro fichier de plus de 100 Kio. Crédits : `docs/IMAGE_CREDITS_V565.md`.
+
+**Lot v566 publié et vérifié :** [commit `9921fcccf322a24458699cca81b151c32745c4a9`](https://github.com/fabien95430/Dashboard-course/commit/9921fcccf322a24458699cca81b151c32745c4a9), [PR #91](https://github.com/fabien95430/Dashboard-course/pull/91), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40392546801), [Pages réussies](https://github.com/fabien95430/Dashboard-course/actions/runs/40392546763). Cinq WebP : 18 090 → 56 276 octets, 270/414 renouvelés, 144 non renouvelés, 420 fichiers WebP, total 9 459 566 octets. Crédits : `docs/IMAGE_CREDITS_V566.md`.
