@@ -240,6 +240,17 @@ svg{display:block}
   overflow:hidden;
 }
 .view.is-active{display:grid}
+.app>.view{grid-row:1;grid-column:1}
+/* v574 — Catalogue gardé en mémoire hors écran : son style et sa mise en page
+   ne sont plus recalculés à chaque retour. Repli display:none sans support. */
+@supports (content-visibility:hidden){
+  .app>#catalogView:not(.is-active){
+    display:grid;
+    content-visibility:hidden;
+    visibility:hidden;
+    pointer-events:none;
+  }
+}
 
 /* En-têtes */
 .page-header{

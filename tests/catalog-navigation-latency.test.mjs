@@ -79,3 +79,13 @@ test('la navigation libère les travaux différés à l arrêt de la pastille',(
   assert.match(nav,/settleTimer=setTimeout\(flushSettled,\d+\)/,'un filet de sécurité libère toujours les travaux');
   assert.match(images,/nav\.afterSettle\(scheduleDecorateProducts\)/);
 });
+
+test('le Catalogue masqué garde sa mise en page sans être affiché ni cliquable',()=>{
+  const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.match(styles,/\.app>\.view\{grid-row:1;grid-column:1\}/,'les vues partagent la même cellule');
+  const rule=styles.match(/@supports \(content-visibility:hidden\)\{\s*\.app>#catalogView:not\(\.is-active\)\{([^}]*)\}/)?.[1]||'';
+  assert.match(rule,/display:grid/);
+  assert.match(rule,/content-visibility:hidden/);
+  assert.match(rule,/visibility:hidden/);
+  assert.match(rule,/pointer-events:none/);
+});
