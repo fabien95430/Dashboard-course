@@ -529,8 +529,9 @@ function premiumProductVisual(product, compact = false) {
 function sprite(product,compact=false){
   const fallback=premiumProductVisual(product,compact);
   const source=productImageSource(product?.name);
+  const scaleStyle=window.COURSES_PRODUCT_IMAGES?.visualScaleStyle?.(source)||'';
   return '<span class="sprite premium-sprite is-single-product-image '+(compact?'is-compact':'')+'" aria-hidden="true">'+
-    '<img src="'+source+'" alt="" loading="'+(compact?'eager':'lazy')+'" fetchpriority="'+(compact?'high':'auto')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+
+    '<img '+(scaleStyle?'style="'+scaleStyle+'" ':'')+'src="'+source+'" alt="" loading="'+(compact?'eager':'lazy')+'" fetchpriority="'+(compact?'high':'auto')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
   '</span>';
 }

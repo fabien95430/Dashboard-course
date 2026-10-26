@@ -19,6 +19,8 @@ let warmCycleRequested=false;
 const warmedSources=new Set();
 const visualScaleCache=new Map();
 const PRODUCT_WARM_VERSION_KEY='courses-product-images-warm-version-v1';
+const VISUAL_SCALE_KEY='courses-product-visual-scale-v1';
+let visualScaleSaveTimer=0;
 
 const slugify=value=>String(value||'')
   .toLowerCase()
@@ -72,6 +74,7 @@ function warmProductImagesStep(){
       scheduleProductWarmup();
       markWarmCycleComplete();
     };
+    image.addEventListener('load',()=>{if(!visualScaleCache.has(source))measureVisualScale(image,source)},{once:true});
     image.addEventListener('load',done,{once:true});
     image.addEventListener('error',done,{once:true});
     image.src=source;
@@ -107,7 +110,34 @@ function warmProductImages(){
   queueProductWarmup();
   return true;
 }
-window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages});
+function loadVisualScaleCache(){
+  try{
+    const stored=JSON.parse(localStorage.getItem(VISUAL_SCALE_KEY)||'null');
+    if(!stored||stored.version!==currentAppVersion()||!stored.items||typeof stored.items!=='object')return;
+    Object.entries(stored.items).forEach(([source,values])=>{
+      if(Array.isArray(values)&&values.length===3&&values.every(Number.isFinite)){
+        visualScaleCache.set(source,{scale:values[0],shiftX:values[1],shiftY:values[2]});
+      }
+    });
+  }catch(_){}
+}
+function saveVisualScaleCacheSoon(){
+  if(visualScaleSaveTimer)return;
+  visualScaleSaveTimer=setTimeout(()=>{
+    visualScaleSaveTimer=0;
+    const version=currentAppVersion();
+    if(!version)return;
+    const items={};
+    visualScaleCache.forEach((metrics,source)=>{items[source]=[metrics.scale,metrics.shiftX,metrics.shiftY]});
+    try{localStorage.setItem(VISUAL_SCALE_KEY,JSON.stringify({version,items}))}catch(_){}
+  },1500);
+}
+function visualScaleStyle(source){
+  const metrics=visualScaleCache.get(source);
+  return metrics?'--single-product-scale:'+metrics.scale+';--single-product-shift-x:'+metrics.shiftX+'%;--single-product-shift-y:'+metrics.shiftY+'%':'';
+}
+loadVisualScaleCache();
+window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages,visualScaleStyle});
 function ensureStyles(){
   if(document.getElementById('courses-product-item-images-style'))return;
   const style=document.createElement('style');
@@ -183,20 +213,12 @@ function bindProductImageSettle(image){
   image.addEventListener('load',scheduleProductImagesIdleCheck);
   image.addEventListener('error',scheduleProductImagesIdleCheck);
 }
-function applyVisualScale(image,source){
-  if(!image||!source)return;
-  const cached=visualScaleCache.get(source);
-  if(cached){
-    image.style.setProperty('--single-product-scale',String(cached.scale));
-    image.style.setProperty('--single-product-shift-x',cached.shiftX+'%');
-    image.style.setProperty('--single-product-shift-y',cached.shiftY+'%');
-    return;
-  }
+function measureVisualScale(image,source){
   try{
     const size=96,canvas=document.createElement('canvas');
     canvas.width=size;canvas.height=size;
     const context=canvas.getContext('2d',{willReadFrequently:true});
-    if(!context)return;
+    if(!context)return null;
     context.clearRect(0,0,size,size);
     context.drawImage(image,0,0,size,size);
     const pixels=context.getImageData(0,0,size,size).data;
@@ -205,7 +227,7 @@ function applyVisualScale(image,source){
       if(pixels[(y*size+x)*4+3]<24)continue;
       if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
     }
-    if(maxX<minX||maxY<minY)return;
+    if(maxX<minX||maxY<minY)return null;
     const occupancy=Math.max((maxX-minX+1)/size,(maxY-minY+1)/size);
     const scale=Math.max(.94,Math.min(1.45,.90/Math.max(.01,occupancy)));
     const centerX=(minX+maxX+1)/(2*size);
@@ -218,14 +240,21 @@ function applyVisualScale(image,source){
       shiftY:Math.round(shiftY*10)/10,
     };
     visualScaleCache.set(source,metrics);
-    image.style.setProperty('--single-product-scale',String(metrics.scale));
-    image.style.setProperty('--single-product-shift-x',metrics.shiftX+'%');
-    image.style.setProperty('--single-product-shift-y',metrics.shiftY+'%');
-  }catch(_){}
+    saveVisualScaleCacheSoon();
+    return metrics;
+  }catch(_){return null}
+}
+function applyVisualScale(image,source){
+  if(!image||!source)return;
+  const metrics=visualScaleCache.get(source)||measureVisualScale(image,source);
+  if(!metrics)return;
+  image.style.setProperty('--single-product-scale',String(metrics.scale));
+  image.style.setProperty('--single-product-shift-x',metrics.shiftX+'%');
+  image.style.setProperty('--single-product-shift-y',metrics.shiftY+'%');
 }
 function onSingleProductImageLoaded(image,source){
   image.closest('.premium-sprite')?.classList.remove('is-fallback');
-  requestAnimationFrame(()=>applyVisualScale(image,source));
+  applyVisualScale(image,source);
 }
 function decorateFallback(card,name,source,eager=false){
   const fallback=card.querySelector('.product-svg');
@@ -240,6 +269,7 @@ function decorateFallback(card,name,source,eager=false){
   bindProductImageSettle(image);
   image.addEventListener('load',()=>{
     if(!fallback.isConnected)return;
+    applyVisualScale(image,source);
     const sprite=document.createElement('span');
     sprite.className='premium-sprite is-single-product-image'+(compact?' is-compact':'');
     sprite.appendChild(image);
