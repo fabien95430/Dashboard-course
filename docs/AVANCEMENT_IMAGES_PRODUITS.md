@@ -552,3 +552,24 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Candidats rejetés :** la planche de ménage à fond et halos non conformes ; la pâte feuilletée cuite proposée au lieu de pâte crue ; la saucisse fumée à la place de merguez crue ; toute source moins précise ou d'un autre produit. Les anciennes images fidèles restent en place. **Résultat réel publié : 281 renouvelés, 133 non renouvelés, au moins 18 évalués et conservés distincts**, soit au moins 299 produits avec une décision de renouvellement/conservation. Le répertoire compte **414 WebP, 9 621 732 octets**. **Quatre nouveaux WebP, zéro candidat incorrect publié** ; les rejets sont documentés ci-dessus. Restent prioritaires : Maison, Hygiène & soins, Petit-déjeuner, Boissons et les références Viandes & poissons dont les variantes doivent être exactes.
 
 **Périmètre** : quatre WebP, marqueurs v578 cohérents dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, ce suivi et crédits. Aucun CSS, navigation, taille/position des tuiles, bannière citrons, sécurité, HA, OAuth, WebSocket, coffre, verrouillage, biométrie, mode test ni logique de cache visuel modifiés.
+
+
+### Lot v582 — 8 images préparées (publication et validations en attente)
+
+**Base :** `97149bcb7843f4eeb06b24f8fad729a15455cec7` (v581). Les huit originaux ont été inspectés, ainsi que les nouveaux candidats isolés sur fond transparent. Sept WebP ont été créés dans ChatGPT avec sortie indépendante, un huitième est une source EBf Studio CC0. Les images existantes déjà renouvelées depuis v528 à v578 ne sont pas reprises. Crédits individuels et empreintes : `docs/IMAGE_CREDITS_V581.md`.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Petit-déjeuner | Café moulu | 4216 | 36088 |
+| Cuisine | Pépites chocolat | 4574 | 22184 |
+| Apéritif & snacks | Brownies | 4344 | 41670 |
+| Viandes & poissons | Merguez | 3994 | 28648 |
+| Apéritif & snacks | Madeleines | 3824 | 26222 |
+| Apéritif & snacks | Crêpes | 4178 | 24638 |
+| Boulangerie | Pains hot-dog | 3500 | 19134 |
+| Cuisine | Chili | 59028 | 9000 |
+| **Total** | **8 WebP** | **87658** | **207584** |
+
+**Différence : +119926 octets.** Chaque WebP autonome est 256 ou 384 px, possède de l'alpha réel et pèse au plus 41 670 octets ; aucun suréchantillonnage d'anciens petits visuels. Aperçus contrôlés à 192 px en fonds clair et sombre. Merguez est représentée crue, sans cuisson ; Chili reste un piment rouge. Les mauvaises variantes ou candidats à fond opaque ont été rejetés. Pas d'API OpenAI payante ni de modification CSS, tuiles, bannière, transitions, safe areas iOS, chargement visuel, Home Assistant, liste `Courses`, WebSocket, OAuth, coffre, biométrie ou mode test.
+
+**Statut : PR à valider, NON ENCORE PUBLIÉ AU MOMENT DE LA PRÉPARATION.** En attendant une fusion réelle et les validations finales, le décompte publié reste **281/414 renouvelés**, **133 non renouvelés**, avec au moins **18 évalués et conservés** distincts. Si la publication aboutit, les totaux deviendront **289 renouvelés**, **125 non renouvelés**, **307 décisions documentées** (18 conservés distincts). Le suivi doit être actualisé seulement après confirmation du SHA réel de `main`, de la CI et de Pages.
