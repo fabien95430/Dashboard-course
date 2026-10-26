@@ -4,11 +4,11 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v569**, sur `main` au contrôle du 26 octobre 2026. La PR images v568 est bien fusionnée et les six WebP sont conservés par le commit v569 ; validation complète et GitHub Pages de v569 verts. Les six WebP ne modifient ni la bannière citrons, ni les animations, ni les safe areas iOS.
-- `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
+- Dernière version applicative vérifiée **v572** sur main au SHA a2d1f42721025a6c199cf2d965ce3644a92eee6a, avec CI et GitHub Pages réussis. Dernier lot d'images produits publié : **v568** (PR #93, six WebP), conservé par les versions suivantes. Aucun nouveau visuel n'a été publié lors de l'audit Maison ci-dessous.
+- `catalog.js` contient **414 produits** ; `www/Items/` contient désormais **414 WebP**, un par produit et sans fichier manquant. Les six images supplémentaires de l'ancien comptage étaient des fichiers orphelins hors catalogue, supprimés lors des travaux ultérieurs.
 - **277 produits distincts** sont désormais renouvelés après publication du lot v568 ; **137 produits** ne sont pas encore renouvelés (dont plusieurs visuels déjà évalués et conservés). Ne pas les remplacer artificiellement si les images restent satisfaisantes.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après v568 : **9 617 548 octets (9,17 Mio)** (avant v568 : 9 473 056 octets).
-- **161 images pèsent moins de 10 Kio après v568**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- La **compression v537** a ramené 32 fichiers historiquement volumineux de 11,88 Mio à 1,18 Mio. À l'inventaire v572, il y a **0 fichier supérieur à 100 Kio (102 400 octets)**, mais **1 supérieur au plafond strict de 100 000 octets : romarin-frais.webp, 100 866 octets**. Sa compression future ne doit pas être comptée artificiellement comme nouveau remplacement. Poids courant de `www/Items/` : **9 591 672 octets pour 414 fichiers** (l'inventaire historique v568, avant suppression de six orphelins, était 9 617 548 octets pour 420).
+- **155 images pèsent moins de 10 Kio** dans l'inventaire v572. C'est un critère de tri, pas une preuve de manque de netteté. Vérifier les dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
 ### Historique des vingt-quatre lots publiés
@@ -512,3 +512,25 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Écarts de sélection :** Rosette déjà renouvelée en v567 (conservée) ; Merguez écartée en raison d'une variante visuelle non certifiée crue ; Coulis de fruit toujours reporté, car les propositions ressemblent à une confiture. Les autres alternatives incorrectes (viande cuite, mauvaise espèce, produit différent) restent rejetées. Aucun autre produit déjà renouvelé n'est écrasé.
 
 **Périmètre publié en v568 :** uniquement les six `www/Items/*.webp`, le versionnement et cache dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, et la documentation. Aucune modification des mécanismes de chargement visuel, de cache persistant, de l'interface, de Home Assistant, OAuth, WebSocket, coffre, biométrie, mode test et safe areas. Le commit v569 ultérieur modifie séparément le cadrage de produits : ce changement ne fait pas partie du lot images v568. **Bilan publié : 277/414 renouvelés, 137 non renouvelés, 16 anciens visuels évalués et conservés distincts, soit au moins 293 produits avec décision documentaire.** Fichiers WebP : 420 ; poids total 9 617 548 octets ; 0 fichier > 100 Kio.
+
+### Audit Maison — passe complète des 45 visuels non renouvelés
+
+**État avant toute nouvelle publication :** version applicative v572, SHA a2d1f42721025a6c199cf2d965ce3644a92eee6a, CI 40410333065 réussie, Pages 40410332283 réussi. La catégorie Maison contient 50 produits, dont 5 déjà renouvelés dans les lots antérieurs (Éponges, Film alimentaire, Gants ménage, Lessive capsules, Papier aluminium). Les **45 autres anciens visuels ont été examinés individuellement**. Il s'agit d'un audit, **pas d'un lot v573 publié**.
+
+**Deux candidats préparés, NON PUBLIÉS :** Essuie-tout et Papier toilette, images originales créées dans ChatGPT sans appel à l'API OpenAI payante du projet, et encodées en WebP autonomes 384 × 384 px sur fond alpha transparent. Aperçus locaux sur fond sauge à 192 px vérifiés. Les fichiers préparés ne sont pas encore dans Git, et leur rendu sur un véritable iPhone ainsi que la CI d'un futur lot restent à vérifier.
+
+| Produit | Ancien fichier | Candidat local | Statut |
+| --- | ---: | ---: | --- |
+| Essuie-tout | 2 552 octets | 10 154 octets | Préparé, non publié |
+| Papier toilette | 3 236 octets | 13 554 octets | Préparé, non publié |
+| Total potentiel | 5 788 octets | 23 708 octets | Aucun remplacement sur main |
+
+**Déjà suffisamment net et fidèle (deux conservations supplémentaires)** : Papier cadeau (rouleau illustré fidèle, 24 190 octets) et Lave-glace (bidon bleu net, 24 392 octets). Ces fichiers ne sont ni remplacés ni comptés comme renouvelés. **Les 41 autres anciens visuels inspectés restent inchangés**, notamment ceux qui possèdent déjà le bon conditionnement mais demandent une meilleure source avant publication : les rouleaux de sacs-poubelle 30L/50L ne sont pas des sacs remplis, les tablettes lave-vaisselle restent des tablettes, les lingettes ménagères ne deviennent pas des lingettes médicales et les chiffons doivent rester des textiles. L'absence de remplacement ne signifie pas automatiquement que ces 41 vignettes sont de qualité finale satisfaisante.
+
+**Pistes rejetées** : une nouvelle planche de dix produits ménage produite dans ChatGPT n'est pas conforme (artefacts, bruit de fond, halos et transparence incertaine) ; aucune extraction ni publication de ces dix visuels n'est autorisée. Les alternatives sous licences tierces ne sont pas intégrées sans vérification individuelle de fidélité et d'alpha.
+
+**Liste complète des 43 produits contrôlés autres que les deux candidats** : Bicarbonate, Désinfectant, Détartrant, Éponges magiques, Javel, Lingettes ménage, Nettoyant multi-usages, Nettoyant salle de bain, Nettoyant sol, Nettoyant vitres, Nettoyant WC, Vinaigre ménager, Pile AAA, Piles AA, Adoucissant, Amidon, Désodorisant textile, Détachant, Filet de lavage, Lessive liquide, Lessive poudre, Lingettes anti-décoloration, Nettoyant machine à laver, Pinces à linge, Sacs linge délicat, Mouchoirs, Papier cadeau, Papier cuisson, Sacs congélation, Sacs poubelle 30L, Sacs poubelle 50L, Sacs zip, Serviettes papier, Essuie-verres, Grattoirs, Liquide rinçage, Liquide vaisselle, Nettoyant lave-vaisselle, Produit inox, Sel lave-vaisselle, Tablettes lave-vaisselle, Torchons et Lave-glace.
+
+**Comptage sans double compte** : les 16 anciens produits évalués et conservés dans l'audit précédent restent distincts des 277 renouvelés ; Papier cadeau et Lave-glace ajoutent 2 décisions de conservation indépendantes. Il existe donc **au moins 18 évalués et conservés distincts**, soit **au moins 295 produits ayant une décision définitive documentée (277 renouvelés + 18 conservés)**. Les autres vignettes auditées mais non remplacées peuvent rester en attente d'amélioration et ne sont pas comptées comme des renouvellements.
+
+**Écart d'inventaire expliqué** : les six anciens WebP orphelins supprimés entre v569 et v572 sont croquettes-chat.webp, croquettes-chien.webp, friandises-animaux.webp, litiere-chat.webp, patee-chat.webp et sacs-dejections.webp. Tous étaient hors du catalogue actuel. Le compteur correct est désormais **414 WebP pour 414 produits**, poids total **9 591 672 octets**, zéro produit sans fichier, un fichier > 100 000 octets et aucun > 102 400 octets. Le bilan des renouvellements reste **277/414**, avec **137 non renouvelés**. Ce suivi documentaire ne nécessite aucun incrément de version.
