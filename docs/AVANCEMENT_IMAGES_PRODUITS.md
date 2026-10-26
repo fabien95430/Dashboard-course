@@ -286,6 +286,20 @@ Les images réparent les écarts constatés : deux sauces en **coupelle ouverte*
 
 **Invariants :** un seul commit fonctionnel par lot avec les six WebP, versions v561 synchronisées dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, cette note et les crédits. Aucun changement à `catalog.js` comme source des noms et catégories, au code de chargement des images, aux tuiles, à la bannière citrons, aux animations, à la navigation et aux safe areas iOS, à Home Assistant, au WebSocket, à OAuth, au coffre chiffré, au verrouillage, à la biométrie ni au mode test.
 
+### Lot v562 — un WebP candidat : Paprika (validation PR, non publié)
+
+**Statut à ce stade : préparé sur une branche de validation, pas encore publié.** Les compteurs du document restent ceux de v561 tant que le commit de publication, la CI et GitHub Pages ne sont pas vérifiés.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Cuisine | Paprika | 60568 | 15108 |
+
+Le paprika était illustré par une coupelle ouverte de poudre ; le nouveau fichier contient un **bocal en verre rigide et fermé**, avec couvercle visible, rempli d'épice rouge-orangé, sans étiquette inventée, sur alpha réellement transparent. Source [SwisserDev fivem-icons-photoreal / spice_jar_paprika.webp](https://github.com/SwisserDev/fivem-icons-photoreal/blob/0f2fd1a5389e52c4276a8826cc13c2a0a90e836d/webp-256/cooking_ingredients/spice_jar_paprika.webp), licence CC0 1.0. Source et destination partagent **exactement le même blob Git `4190d8183a473af861da3d60b71da5d838dea000`**. WebP natif 256 × 256 px, bloc VP8X avec alpha, sans upscaling, 15 108 octets. Crédits détaillés : `docs/IMAGE_CREDITS_V562.md`.
+
+**Comparaisons et rejets :** les 6 sauces v561 sont déjà publiées et ne sont pas retraitées. Sont conservés ou rejetés après inspection : Curry (candidats en poudre libre), Poivre (moulin en bois au lieu d'un bocal fermé), Sel (boîte non conforme), Lingettes ménage (source de lingettes médicales, variante incertaine), Miel (pot ouvert avec accessoire), Chocolat en poudre (boîte ouverte), Chips (sachet générique ne permettant pas l'identification), Sacs poubelle (sac plein au lieu du produit vendu roulé), Granola (source de fruits secs), Gants ménage, Film alimentaire, Gel hydroalcoolique et Coton (images déjà identiques aux sources), Maquereaux, Bœuf et Confiture fraise (images actuelles plus fidèles). Aucun remplissage artificiel du lot.
+
+**Périmètre :** un seul WebP, `index.html`, `sw.js`, `catalog.js`, `dish-local-images.js`, cette note et les crédits. Aucun changement de styles, tuiles, bannière citrons, animations, cache visuel persistant, stratégie hors ligne, Home Assistant, OAuth, WebSocket, coffre, verrouillage, biométrie, mode test ou safe areas iOS.
+
 ### Situation par catégorie
 
 Comptage des **248 produits renouvelés** vérifié après publication sur `main` de v561, croisé avec `catalog.js`.
