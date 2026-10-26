@@ -363,6 +363,23 @@ Comptage des **259 produits renouvelés** vérifié après publication sur `main
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
+### Audit des visuels conservés — 26 octobre 2026 (sans remplacement)
+
+**Cet audit ne modifie aucune image et ne change pas la version v564.** Les 259 produits renouvelés restent comptés séparément. L'analyse comparative supplémentaire porte sur **20 produits non renouvelés**, dont les conditionnements actuels restent fidèles ; les nouveaux candidats trouvés n'offraient pas de meilleure correspondance. Un visuel conservé peut toujours être amélioré plus tard si sa netteté à 192 px est objectivement meilleure.
+
+| Catégorie | Produit(s) examinés et conservés | Comparaison et motif |
+| --- | --- | --- |
+| Hygiène & soins | Disques coton, Pansements, Antiseptique, Baume lèvres, Mouchoirs poche, Papier toilette humide | Conserver disques plutôt que boules de coton, pansements adhésifs plutôt que bande, flacon antiseptique plutôt qu'écouvillon, baume en stick plutôt que gel, et vrais paquets de mouchoirs |
+| Enfant | Compotes bébé, Lingettes bébé, Sacs à couches, Petits pots, Lait infantile | Conserver gourde de compote, sachet de lingettes, sac pour couches, petit pot et boîte de lait ; les propositions de boissons à paille ou de sacs poubelle pleins ne correspondent pas |
+| Maison | Lessive capsules, Nettoyant WC, Nettoyant vitres, Nettoyant salle de bain, Détartrant, Sacs poubelle 30L, Sacs poubelle 50L, Papier aluminium, Essuie-verres | Conserver les bons emballages et rouleaux : un sac-poubelle plein, des blocs métalliques et un textile différent ne remplacent pas les produits vendus |
+| **Total** | **20 références distinctes vérifiées, conservées sans remplacement** | **Aucun nouveau WebP publié dans cet audit** |
+
+Les visuels `Gel hydroalcoolique` et `Coton` ont aussi été contrôlés : leurs sources alternatives sont exactement les fichiers déjà renouvelés en v557, donc **ils ne figurent pas parmi ces 20 produits**. Ce contrôle maintient l'absence de double comptage.
+
+**En attente / rejeté :** le `Coulis de fruit` reste à remplacer car l'ancienne image est en bouteille ; le pot rouge candidat préparé précédemment est **écarté**, car il reste visuellement trop semblable à une confiture pour garantir l'identité du produit. `Shampoing`, `Après-shampoing`, `Gel douche`, `Savon mains`, `Dentifrice` et `Mousse à raser` ont de petites vignettes : rechercher un visuel plus net et fidèle sous licence vérifiable, sans agrandissement artificiel.
+
+**Progression de l'évaluation :** au moins 259 produits renouvelés + 20 autres produits distincts vérifiés et conservés dans cette passe = **279/414 avec une décision documentée**, sans changer le comptage de remplacements (**259/414**). Cela n'implique ni 279 nouveaux fichiers ni que les 135 autres produits soient tous mauvais.
+
 ### Attribution et qualité
 
 Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 fichiers **320 × 320 px**, environ **445 Kio au total**, provenant de **Soft Studio Ingredients by Alex Wang** (licence **CC BY 4.0**). L'attribution et les 30 correspondances sont déjà inscrites dans **`docs/IMAGE_CREDITS_V539.md`**. Préserver ce fichier et suivre l'attribution pour toute autre source sous licence similaire. Pour v545, les crédits et correspondances figurent dans `docs/IMAGE_CREDITS_V545.md`. Les visuels CC0 utilisés lors d'autres lots ne relèvent pas du même régime. Vérifier la cohérence des liserés clairs de Soft Studio avec le style réel du catalogue avant toute nouvelle génération.
