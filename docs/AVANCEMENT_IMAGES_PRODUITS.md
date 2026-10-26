@@ -552,3 +552,21 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Candidats rejetés :** la planche de ménage à fond et halos non conformes ; la pâte feuilletée cuite proposée au lieu de pâte crue ; la saucisse fumée à la place de merguez crue ; toute source moins précise ou d'un autre produit. Les anciennes images fidèles restent en place. **Résultat réel publié : 281 renouvelés, 133 non renouvelés, au moins 18 évalués et conservés distincts**, soit au moins 299 produits avec une décision de renouvellement/conservation. Le répertoire compte **414 WebP, 9 621 732 octets**. **Quatre nouveaux WebP, zéro candidat incorrect publié** ; les rejets sont documentés ci-dessus. Restent prioritaires : Maison, Hygiène & soins, Petit-déjeuner, Boissons et les références Viandes & poissons dont les variantes doivent être exactes.
 
 **Périmètre** : quatre WebP, marqueurs v578 cohérents dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, ce suivi et crédits. Aucun CSS, navigation, taille/position des tuiles, bannière citrons, sécurité, HA, OAuth, WebSocket, coffre, verrouillage, biométrie, mode test ni logique de cache visuel modifiés.
+
+
+### Lot v582 — sept WebP préparés (validation PR en attente)
+
+**Base source :** `97149bcb7843f4eeb06b24f8fad729a15455cec7`, version v581. Aucun résultat de CI ni de GitHub Pages post-publication n'est encore affirmé. Les sept images remplacent seulement les anciens produits correspondants ; les visuels déjà renouvelés ou évalués et conservés ne changent pas.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Petit-déjeuner | Café moulu | 4216 | 36088 |
+| Cuisine | Pépites chocolat | 4574 | 22184 |
+| Apéritif & snacks | Brownies | 4344 | 41670 |
+| Viandes & poissons | Merguez | 3994 | 28648 |
+| Apéritif & snacks | Madeleines | 3824 | 26222 |
+| Apéritif & snacks | Crêpes | 4178 | 24638 |
+| Boulangerie | Pains hot-dog | 3500 | 19134 |
+| **Total** | **7 produits** | **28630** | **198584** |
+
+**Bilan conditionnel à la fusion :** 288/414 produits renouvelés ; 126 non renouvelés ; au moins 18 évalués et conservés distincts, soit au moins 306 décisions documentées. Poids attendu du dossier : **9791686 octets** pour 414 WebP. Les sept objets ont été identifiés dans les catégories de `catalog.js` et contrôlés visuellement à 192 px. Sources, SHA et contrôle alpha : `docs/IMAGE_CREDITS_V582.md`. Merguez crues et produits exacts. Rejets : sources de vinaigres avec accessoires, confiture sans couvercle, pâte feuilletée cuite, planches composites et Chili sans amélioration certaine. Le strict plafond de 100 000 octets n'est encore dépassé que par `romarin-frais.webp` (100 866 octets) ; simple optimisation à documenter séparément, pas nouveau remplacement.
