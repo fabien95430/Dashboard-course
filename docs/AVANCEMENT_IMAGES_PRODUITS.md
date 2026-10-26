@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **en préparation : v557** (base `main` v556). Aucune publication v557 à annoncer avant la CI complète verte et l'avance effective de `main`. Le CSS, la bannière citrons, les animations et les safe areas iOS restent inchangés.
+- Dernière version visible **publiée : v557**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **211 produits distincts** sont déjà renouvelés sur v556. Le lot v557 propose **21 remplacements supplémentaires**, portant le total **à 232 / 414 uniquement après publication**, avec **182 produits restants à évaluer**. Les autres visuels ne nécessitent pas tous d'être changés.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après le lot proposé : **environ 8,92 Mio** (avant : 8,71 Mio).
-- **184 images pèseront moins de 10 Kio après v557**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **232 produits distincts** sont désormais renouvelés après publication de v557 ; **182 produits** restent à évaluer. Les autres visuels ne nécessitent pas tous d'être changés.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **environ 8,92 Mio** (avant : 8,71 Mio).
+- **184 images pèsent moins de 10 Kio après v557**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des lots (v557 en validation)
+### Historique des treize lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -27,8 +27,8 @@
 | Lot v553 — 30 WebP | `c8bf020acb92cc6fb8ec3486584735ccdc33f00e` — PR #78 | 30 |
 | Lot v555 — 11 WebP | `3e9c62dd89eae84b325c164a1bd27422d51159d1` — PR #79 | 11 |
 | Lot v556 — 3 WebP | `829c41911f769233429d6826658924c66a6b231e` — PR #80 | 3 |
-| Lot v557 — 21 WebP en validation | Commit de publication à compléter après CI | 21 |
-| **Total projeté** | | **232** |
+| Lot v557 — 21 WebP | `a6e9fa8b70c43c3c382fdbf0a41103da7ffdcc69` — PR #81 | 21 |
+| **Total** | | **232** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -177,7 +177,7 @@ Trois correspondances exactes validées dans le catalogue : une conserve de grai
 
 **Périmètre technique :** version globale `v556`, cache service worker `courses-app-v556-r1`, trois fichiers WebP, le suivi et les crédits. Aucune modification de styles, navigation, bannière citrons, Home Assistant, WebSocket, OAuth, coffre ou biométrie. Commit : `829c41911f769233429d6826658924c66a6b231e`, [PR #80 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/80), [validation complète sur `main` verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40249012283) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40249012186).
 
-### Lot v557 — 21 WebP candidats
+### Lot v557 — 21 WebP publiés
 
 Sélection stricte : les produits déjà satisfaisants sont conservés, et **aucune image n'est ajoutée uniquement pour remplir 30 places**. Les 21 candidats sont issus des [visuels Photoreal de SwisserDev](https://github.com/SwisserDev/fivem-icons-photoreal), disponibles en **CC0 1.0**. Leurs WebP natifs 256 × 256 px, avec transparence, sont lisibles à 192 px et ont été conservés sans agrandissement ni transformation. Chaque fichier pèse moins de 27 Ko. Toutes les correspondances sources, tailles et licences sont consignées dans `docs/IMAGE_CREDITS_V557.md`.
 
@@ -211,7 +211,7 @@ Les trois produits Frais **Mozzarella râpée, Philadelphia et Pâte à pizza**,
 
 ### Situation par catégorie
 
-Comptage **projeté de 232 produits renouvelés** après validation et publication de v557, croisé avec `catalog.js`. Le total publié demeure 211 tant que `main` n'a pas été avancé.
+Comptage des **232 produits renouvelés** vérifié après publication sur `main` de v557, croisé avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
@@ -226,7 +226,7 @@ Comptage **projeté de 232 produits renouvelés** après validation et publicati
 | Maison | 2 / 50 | 48 |
 | Hygiène & soins | 2 / 25 | 23 |
 | Enfant | 0 / 7 | 7 |
-| **Total projeté** | **232 / 414** | **182** |
+| **Total** | **232 / 414** | **182** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
@@ -259,3 +259,5 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Lot v547 publié et vérifié.** Commit produit : `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` ; [PR #76 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/76) ; [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40238201170) ; [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40238200704).
 
 **Lot v555 publié et vérifié :** commit `3e9c62dd89eae84b325c164a1bd27422d51159d1` — [PR #79 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/79) — [CI complète verte sur main](https://github.com/fabien95430/Dashboard-course/actions/runs/40247926690) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40247926222). Les 11 poids avant/après et l'attribution figurent plus haut et dans `docs/IMAGE_CREDITS_V555.md`.
+
+**Lot v557 publié et contrôlé :** commit `a6e9fa8b70c43c3c382fdbf0a41103da7ffdcc69` — [PR #81 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/81) — [validation complète verte sur `main`](https://github.com/fabien95430/Dashboard-course/actions/runs/40283171384) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40283170880). Les 21 sources et leurs licences CC0 sont détaillées dans `docs/IMAGE_CREDITS_V557.md`.
