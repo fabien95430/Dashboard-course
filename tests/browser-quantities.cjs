@@ -53,6 +53,9 @@ const server=http.createServer((req,res)=>{
         await page.goto(origin);
         await page.locator('#demoBtn').click();
         await page.locator('.tab[data-view="catalog"]').click();
+        // Le serveur de test est en HTTP/1.1 (6 connexions) : les 414 visuels produits chargés
+        // d'emblée retardent les modules du Catalogue ; on attend que le sélecteur Plats soit branché.
+        await page.waitForFunction(()=>window.COURSES_DISH_NAMES&&document.querySelector('.dish-filters'));
         await page.locator('.catalog-mode[data-mode="dishes"]').click();
         await page.locator('.dish-card[data-dish='+JSON.stringify(scenario.dish)+']').click();
         const input=page.locator('.dish-servings-value');

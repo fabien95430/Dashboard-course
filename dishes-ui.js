@@ -111,7 +111,10 @@ const DISH_SPECIAL_SLUGS=Object.freeze({
 const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poulet légumes','Gratin pommes de terre','Pâtes jambon','Purée carotte poulet','Risotto poulet','Saumon brocoli','Steak frites','Velouté carottes','Crème brûlée','Riz au lait']);
 const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const ingredientImageSource=name=>'./www/Items/'+dishSlug(name)+'.webp';
-const dishPhotoUrl=name=>'./www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name))+'.png';
+const dishFileName=name=>(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name));
+const dishPhotoUrl=name=>'./www/Plats/'+dishFileName(name)+'.png';
+// Vignette légère des cartes (720 px WebP) : prête à s'afficher sans décodage lourd.
+const dishCardPhotoUrl=name=>'./www/Plats/cartes/'+dishFileName(name)+'.webp';
 
 let mode='products';
 let filter='Tous';
@@ -233,25 +236,20 @@ function useDishImage(image,name){
   image.dataset.dishImage=name;
   image.src=dishPhotoUrl(name);
 }
-function bindDishImageFallback(image){
+function bindDishImageFallback(image,name=''){
   if(!image||image.dataset.dishImageFallbackBound==='1')return;
   image.dataset.dishImageFallbackBound='1';
   image.addEventListener('error',()=>{
-    if(image.getAttribute('src')===DISH_PLACEHOLDER)return;
+    const current=image.getAttribute('src')||'';
+    if(current===DISH_PLACEHOLDER)return;
+    // Vignette absente (plat ajouté sans vignette) : photo d'origine, puis visuel de secours.
+    if(name&&current===dishCardPhotoUrl(name)){
+      image.dataset.dishCardFallback='1';
+      image.src=dishPhotoUrl(name);
+      return;
+    }
     image.src=DISH_PLACEHOLDER;
   });
-}
-// Photo de plat révélée une fois décodée, en fondu, au lieu d'un affichage par morceaux.
-function revealDishImageWhenReady(image){
-  if(!image||image.complete||image.dataset.revealBound==='1')return;
-  image.dataset.revealBound='1';
-  image.classList.add('is-image-pending');
-  const reveal=()=>image.classList.remove('is-image-pending');
-  image.addEventListener('load',()=>{
-    const decoded=typeof image.decode==='function'?image.decode():Promise.resolve();
-    decoded.catch(()=>{}).then(reveal);
-  },{once:true});
-  image.addEventListener('error',reveal,{once:true});
 }
 function buildUi(){
   catalogView=document.getElementById('catalogView');
@@ -771,13 +769,12 @@ function dishCard(dish){
   card.setAttribute('role','button');
   card.setAttribute('aria-label','Voir les ingrédients de '+dish.name);
   card.innerHTML=
-    '<div class="dish-visual"><img src="'+dishPhotoUrl(dish.name)+'" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>'+ 
+    '<div class="dish-visual"><img src="'+dishCardPhotoUrl(dish.name)+'" alt="" loading="eager" decoding="sync" referrerpolicy="no-referrer"></div>'+ 
     '<button type="button" class="dish-favorite" aria-label="Ajouter aux favoris" aria-pressed="false">♡</button>'+ 
     '<div class="dish-copy"><strong>'+escapeHtml(dish.name)+'</strong><small>'+dish.ingredients.length+' ingrédients</small></div>'+ 
     '<span class="dish-add" aria-hidden="true">+</span>';
   const cardImage=card.querySelector('.dish-visual img');
-  bindDishImageFallback(cardImage);
-  revealDishImageWhenReady(cardImage);
+  bindDishImageFallback(cardImage,dish.name);
   const favoriteButton=card.querySelector('.dish-favorite');
   favoriteButton.addEventListener('click',event=>{event.stopPropagation();toggleFavorite(dish.name)});
   card.addEventListener('click',event=>{if(!event.target.closest('.dish-favorite'))openDishSheet(dish)});

@@ -94,3 +94,10 @@ Une image n'est validée que si toutes ces conditions sont vraies :
 ## Garde-fous d'intégration
 
 Cette documentation concerne uniquement la génération et l'intégration visuelle des plats. Elle ne doit pas entraîner de modification de l'architecture, de Home Assistant, OAuth, WebSocket, du coffre chiffré, du verrouillage, de la biométrie ou des mécanismes de sécurité. `catalog.js` reste la source du catalogue et les conventions actuelles du dépôt doivent être relues au moment d'une intégration réelle.
+
+## Vignette de carte
+
+- La carte du Catalogue affiche `www/Plats/cartes/<même nom>.webp` (720 px de large), la fiche du plat garde la photo `.png` d'origine.
+- Après l'ajout ou le remplacement d'une photo, lancer `python3 scripts/make_dish_cards.py` (ajoutez `--force` pour régénérer une vignette existante) et committer la vignette avec la photo.
+- Sans vignette, la carte reprend automatiquement la photo `.png` : rien ne casse, mais l'affichage est plus lent.
+

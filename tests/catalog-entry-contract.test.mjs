@@ -17,7 +17,8 @@ test('Catalogue entre toujours sur Produits et Plats reste une action explicite'
 
 test('Ma liste garde la priorité et le Catalogue caché nest plus construit',()=>{
   const app=read('app.js');
-  assert.match(app,/loading="'\+\(compact\?'eager':'lazy'\)\+'/);
+  // Les visuels produits viennent du cache persistant : chargés tout de suite et décodés avant affichage.
+  assert.match(app,/loading="eager" fetchpriority="'\+\(compact\?'high':'auto'\)\+'" decoding="sync"/);
   assert.match(app,/function renderCategories\(\)[\s\S]*catalogView[^\n]*is-active[^\n]*return/);
   assert.match(app,/function renderProducts\(\)[\s\S]*catalogView[^\n]*is-active[^\n]*return/);
   assert.match(app,/if\(state\.view==='catalog'\)\{[\s\S]*renderCategories\(\);[\s\S]*scheduleCatalogRender\(\);/);
@@ -27,9 +28,11 @@ test('Ma liste garde la priorité et le Catalogue caché nest plus construit',()
 
 test('les images produits respectent la visibilité et ne possèdent plus ladministration',()=>{
   const images=read('product-item-images.js');
-  assert.match(images,/function imageLoading\(source,eager=false\)\{\s*return eager\|\|warmedSources\.has\(source\)\?'eager':'lazy';/);
+  assert.match(images,/function imageLoading\(\)\{\s*return 'eager';/);
   assert.match(images,/image\.loading=imageLoading\(source,eager\)/);
-  assert.match(images,/promoteWarmedImages\(source\);/);
+  assert.match(images,/if\(image\.decoding!=='sync'\)image\.decoding='sync';/);
+  assert.match(images,/if\(card&&!productCardVisible\(card\)\)\{\s*pendingVisualMeasures\.set\(image,source\);/,'les cartes hors écran sont mesurées plus tard');
+  assert.doesNotMatch(images,/promoteWarmedImages|stored\.version!==currentAppVersion\(\)/);
   assert.match(images,/catalogView[^\n]*is-active[^\n]*return/);
   assert.match(images,/courses:view-changed/);
   assert.doesNotMatch(images,/decorateAll/);

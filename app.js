@@ -527,7 +527,7 @@ function sprite(product,compact=false){
   const source=productImageSource(product?.name);
   const scaleStyle=window.COURSES_PRODUCT_IMAGES?.visualScaleStyle?.(source)||'';
   return '<span class="sprite premium-sprite is-single-product-image '+(compact?'is-compact':'')+'" aria-hidden="true">'+
-    '<img '+(scaleStyle?'style="'+scaleStyle+'" ':'')+'src="'+source+'" alt="" loading="'+(compact?'eager':'lazy')+'" fetchpriority="'+(compact?'high':'auto')+'" decoding="async" draggable="false" data-single-product-source="'+source+'">'+
+    '<img '+(scaleStyle?'style="'+scaleStyle+'" ':'')+'src="'+source+'" alt="" loading="eager" fetchpriority="'+(compact?'high':'auto')+'" decoding="sync" draggable="false" data-single-product-source="'+source+'">'+
     '<span class="sprite-fallback">'+fallback+'</span>'+
   '</span>';
 }
@@ -542,20 +542,6 @@ function bindProductImageFallbacks(root){
     image.addEventListener('error',fallback,{once:true});
     if(image.complete&&image.naturalWidth===0)fallback();
   });
-}
-
-// Catalogue : l'image n'apparaît qu'une fois chargée et décodée, en fondu, au lieu d'une
-// carte vide qui se remplit d'un coup ou par morceaux.
-function revealProductImageWhenReady(image){
-  if(!image||image.complete||image.dataset.revealBound==='1')return;
-  image.dataset.revealBound='1';
-  image.classList.add('is-image-pending');
-  const reveal=()=>image.classList.remove('is-image-pending');
-  image.addEventListener('load',()=>{
-    const decoded=typeof image.decode==='function'?image.decode():Promise.resolve();
-    decoded.catch(()=>{}).then(reveal);
-  },{once:true});
-  image.addEventListener('error',reveal,{once:true});
 }
 
 function usageSave(){saveJson(STORAGE.usage,state.usage)}
@@ -738,7 +724,6 @@ function productCard(product){
     '<button type="button" class="media">'+sprite(product)+'</button>'+
     '<span class="product-copy"><span class="pname">'+esc(productDisplayName(product.name))+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>';
   bindProductImageFallbacks(card);
-  revealProductImageWhenReady(card.querySelector('.premium-sprite>img'));
   const add=card.querySelector('.badge');if(add)add.onclick=()=>queueCatalogQuantityChange(product.name,1);
   const remove=card.querySelector('.media');if(remove)remove.onclick=()=>queueCatalogQuantityChange(product.name,-1);
   productCardCache.set(key,card);
@@ -3079,6 +3064,8 @@ window.addEventListener('pageshow',()=>{
 
 ['gesturestart','gesturechange','gestureend'].forEach(name=>document.addEventListener(name,event=>event.preventDefault(),{passive:false}));
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{}));
+// Demande au navigateur de ne pas purger le cache des visuels (accordé d'office à l'app installée sur iPhone).
+if(navigator.storage?.persist)window.addEventListener('load',()=>{navigator.storage.persisted?.().then(done=>done||navigator.storage.persist()).catch(()=>{})},{once:true});
 bindUiEvents();
 renderView();init();
 })();
