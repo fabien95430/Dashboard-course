@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible en préparation : **v556** (publication uniquement après CI verte). La dernière version déjà vérifiée reste v555. Les fichiers CSS, la bannière citrons, les animations et les safe areas iOS de v554 sont conservés sans changement.
+- Dernière version visible **publiée : v556**, sur `main`. La validation GitHub et GitHub Pages du lot sont vertes. Les fichiers CSS, la bannière citrons, les animations et les safe areas iOS de v554 sont conservés sans changement.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **211 produits distincts** auraient reçu un nouveau visuel après publication de v556 ; **203 produits** resteraient à évaluer. Les compteurs v556 ne sont définitifs qu'après CI verte et commit confirmé sur `main`.
+- **211 produits distincts** disposent d'un visuel remplacé après publication de v556 ; **203 produits** restent à évaluer. Certains visuels existants sont déjà satisfaisants et ne nécessitent pas de remplacement.
 - La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,71 Mio**.
-- **199 images pèseront moins de 10 Kio après v556**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **199 images pèsent moins de 10 Kio après v556**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des onze lots publiés et du lot v556 à valider
+### Historique des douze lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -26,8 +26,8 @@
 | Lot v550 — 3 nouveaux WebP | `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — PR #77 | 3 |
 | Lot v553 — 30 WebP | `c8bf020acb92cc6fb8ec3486584735ccdc33f00e` — PR #78 | 30 |
 | Lot v555 — 11 WebP | `3e9c62dd89eae84b325c164a1bd27422d51159d1` — PR #79 | 11 |
-| Lot v556 — 3 WebP | Commit à ajouter une fois publié | 3 |
-| **Total après validation v556** | | **211** |
+| Lot v556 — 3 WebP | `829c41911f769233429d6826658924c66a6b231e` — PR #80 | 3 |
+| **Total** | | **211** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 208), ne pas additionner les compteurs.
 
@@ -162,7 +162,7 @@ Sélection de 11 correspondances conformes parmi les produits non renouvelés : 
 
 Les quatre autres produits Frais non remplacés sont conservés : leur visuel actuel est déjà plus fidèle que les sources externes examinées. Les crèmes, épices et sauces nécessitant des pots fermés ne font l'objet d'aucune substitution incorrecte. Aucun changement CSS, bannière citrons, Home Assistant, OAuth, WebSocket, coffre, biométrie, verrouillage ni logique de cache hors ligne. Le cache du service worker et les marqueurs de version passent ensemble à v555, sans modifier la stratégie de cache.
 
-### Lot v556 — trois nouveaux visuels préparés
+### Lot v556 — trois nouveaux visuels publiés
 
 Trois correspondances exactes validées dans le catalogue : une conserve de grains de maïs, de la polenta sèche (semoule de maïs), et des grains de café torréfiés. Des produits déjà corrects, y compris les quatre derniers visuels Frais et les sauces soumises à la règle des pots fermés, sont conservés sans changement. Les fichiers de cette série sont indépendants et gardent leur slug. Les versions sources 256 px sont conservées telles quelles (pas d'agrandissement artificiel) et restent lisibles à 192 px.
 
@@ -174,11 +174,11 @@ Trois correspondances exactes validées dans le catalogue : une conserve de grai
 
 **Total : 13 266 → 53 462 octets (+40 196 octets)**. Tous les fichiers sont transparents, inférieurs à 60 Ko, sans collage ni nom de marque ajouté. Attribution et liens exacts : `docs/IMAGE_CREDITS_V556.md`.
 
-**Périmètre technique :** version globale `v556`, cache service worker `courses-app-v556-r1`, trois fichiers WebP, le suivi et les crédits. Aucune modification de styles, navigation, bannière citrons, Home Assistant, WebSocket, OAuth, coffre ou biométrie. Le commit final et les résultats CI/Pages seront consignés après vérification.
+**Périmètre technique :** version globale `v556`, cache service worker `courses-app-v556-r1`, trois fichiers WebP, le suivi et les crédits. Aucune modification de styles, navigation, bannière citrons, Home Assistant, WebSocket, OAuth, coffre ou biométrie. Commit : `829c41911f769233429d6826658924c66a6b231e`, [PR #80 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/80), [validation complète sur `main` verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40249012283) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40249012186).
 
 ### Situation par catégorie
 
-Comptage prévisionnel des **211 produits renouvelés** (208 déjà vérifiés sur `main` en v555, et 3 supplémentaires en v556), croisé avec `catalog.js`.
+Comptage de **211 produits renouvelés** vérifié sur `main` après publication du lot v556, croisé avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
@@ -193,7 +193,7 @@ Comptage prévisionnel des **211 produits renouvelés** (208 déjà vérifiés s
 | Maison | 0 / 50 | 50 |
 | Hygiène & soins | 0 / 25 | 25 |
 | Enfant | 0 / 7 | 7 |
-| **Total après v556** | **211 / 414** | **203** |
+| **Total** | **211 / 414** | **203** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
