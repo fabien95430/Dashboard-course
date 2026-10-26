@@ -544,6 +544,20 @@ function bindProductImageFallbacks(root){
   });
 }
 
+// Catalogue : l'image n'apparaît qu'une fois chargée et décodée, en fondu, au lieu d'une
+// carte vide qui se remplit d'un coup ou par morceaux.
+function revealProductImageWhenReady(image){
+  if(!image||image.complete||image.dataset.revealBound==='1')return;
+  image.dataset.revealBound='1';
+  image.classList.add('is-image-pending');
+  const reveal=()=>image.classList.remove('is-image-pending');
+  image.addEventListener('load',()=>{
+    const decoded=typeof image.decode==='function'?image.decode():Promise.resolve();
+    decoded.catch(()=>{}).then(reveal);
+  },{once:true});
+  image.addEventListener('error',reveal,{once:true});
+}
+
 function usageSave(){saveJson(STORAGE.usage,state.usage)}
 function recordUsage(name){const key=norm(name);const old=state.usage[key]||{count:0,lastAt:0};state.usage[key]={count:Number(old.count||0)+1,lastAt:Date.now()};usageSave()}
 function favorites(){
@@ -724,6 +738,7 @@ function productCard(product){
     '<button type="button" class="media">'+sprite(product)+'</button>'+
     '<span class="product-copy"><span class="pname">'+esc(productDisplayName(product.name))+'</span><small class="pcat">'+esc(product.sub||product.category)+'</small></span>';
   bindProductImageFallbacks(card);
+  revealProductImageWhenReady(card.querySelector('.premium-sprite>img'));
   const add=card.querySelector('.badge');if(add)add.onclick=()=>queueCatalogQuantityChange(product.name,1);
   const remove=card.querySelector('.media');if(remove)remove.onclick=()=>queueCatalogQuantityChange(product.name,-1);
   productCardCache.set(key,card);

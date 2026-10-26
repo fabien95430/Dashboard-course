@@ -126,6 +126,10 @@
   height:100%;
 }
 .premium-sprite.is-fallback>img{display:none}
+/* v581 — images du Catalogue et des plats : fondu une fois décodées (voir revealProductImageWhenReady). */
+.products .premium-sprite>img,.dish-visual img{transition:opacity .18s ease}
+.products .premium-sprite>img.is-image-pending,.dish-visual img.is-image-pending{opacity:0!important}
+@media(prefers-reduced-motion:reduce){.products .premium-sprite>img,.dish-visual img{transition:none}}
 .premium-sprite.is-fallback>.sprite-fallback{
   display:grid;
   place-items:center;

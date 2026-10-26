@@ -241,6 +241,18 @@ function bindDishImageFallback(image){
     image.src=DISH_PLACEHOLDER;
   });
 }
+// Photo de plat révélée une fois décodée, en fondu, au lieu d'un affichage par morceaux.
+function revealDishImageWhenReady(image){
+  if(!image||image.complete||image.dataset.revealBound==='1')return;
+  image.dataset.revealBound='1';
+  image.classList.add('is-image-pending');
+  const reveal=()=>image.classList.remove('is-image-pending');
+  image.addEventListener('load',()=>{
+    const decoded=typeof image.decode==='function'?image.decode():Promise.resolve();
+    decoded.catch(()=>{}).then(reveal);
+  },{once:true});
+  image.addEventListener('error',reveal,{once:true});
+}
 function buildUi(){
   catalogView=document.getElementById('catalogView');
   searchInput=document.getElementById('productSearch');
@@ -765,6 +777,7 @@ function dishCard(dish){
     '<span class="dish-add" aria-hidden="true">+</span>';
   const cardImage=card.querySelector('.dish-visual img');
   bindDishImageFallback(cardImage);
+  revealDishImageWhenReady(cardImage);
   const favoriteButton=card.querySelector('.dish-favorite');
   favoriteButton.addEventListener('click',event=>{event.stopPropagation();toggleFavorite(dish.name)});
   card.addEventListener('click',event=>{if(!event.target.closest('.dish-favorite'))openDishSheet(dish)});
