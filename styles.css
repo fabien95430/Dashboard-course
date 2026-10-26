@@ -3846,6 +3846,9 @@ body{
 .list-view .list-row-delete:active{background:rgba(244,205,210,.60)}
 .list-view .list-row-delete:focus-visible{outline:2px solid #cf4050;outline-offset:-3px}
 @media(prefers-reduced-motion:reduce){.list-view .list-row,.list-view .list-row-delete{transition:none}}
+/* v585 — Suppression : la ligne sort vers la gauche, dans le sens du swipe, puis l'espace se referme depuis sa hauteur réelle. */
+.list-view .list-row.is-deleting.is-removing{transform:translate3d(-40%,0,0)!important;opacity:0!important;transition:transform .26s cubic-bezier(.4,0,.2,1),opacity .2s ease,max-height .24s cubic-bezier(.4,0,.2,1) .12s,min-height .24s cubic-bezier(.4,0,.2,1) .12s,padding .24s ease .12s!important}
+@media(prefers-reduced-motion:reduce){.list-view .list-row.is-deleting.is-removing{transition:none!important}}
 
 /* v488 — Ma liste : recherche soulignée façon éditoriale */
 .list-view .page-search{height:46px!important;padding:0 2px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,rgba(7,62,44,.5),rgba(7,62,44,.06)) 0 100%/100% 1px no-repeat!important;transition:background-size .2s ease}

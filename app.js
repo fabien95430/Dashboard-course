@@ -2671,8 +2671,10 @@ removeGroup=async function(name,row=null,intent='purchase'){
     const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
     navigator.vibrate?.(7);
     await new Promise(resolve=>setTimeout(resolve,180));
+    row.style.maxHeight=row.offsetHeight+'px';
+    void row.offsetHeight;
     row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,180));
+    await new Promise(resolve=>setTimeout(resolve,380));
   }
 
   state.pendingRemoval.add(key);
