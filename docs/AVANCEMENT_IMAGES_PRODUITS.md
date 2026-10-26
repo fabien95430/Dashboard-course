@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v557**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
+- Dernière version visible **publiée : v558**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **232 produits distincts** sont désormais renouvelés après publication de v557 ; **182 produits** restent à évaluer. Les autres visuels ne nécessitent pas tous d'être changés.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **environ 8,92 Mio** (avant : 8,71 Mio).
-- **184 images pèsent moins de 10 Kio après v557**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **235 produits distincts** sont désormais renouvelés après publication de v558 ; **179 produits** restent à évaluer. Les autres visuels ne nécessitent pas tous d'être changés.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **environ 8,94 Mio** (avant : 8,71 Mio).
+- **184 images pèsent moins de 10 Kio après v558**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des treize lots publiés
+### Historique des quatorze lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -28,7 +28,8 @@
 | Lot v555 — 11 WebP | `3e9c62dd89eae84b325c164a1bd27422d51159d1` — PR #79 | 11 |
 | Lot v556 — 3 WebP | `829c41911f769233429d6826658924c66a6b231e` — PR #80 | 3 |
 | Lot v557 — 21 WebP | `a6e9fa8b70c43c3c382fdbf0a41103da7ffdcc69` — PR #81 | 21 |
-| **Total** | | **232** |
+| Lot v558 — 3 WebP | `fe533ce5b225f62968824d24e9e0faec6600055c` — PR #82 | 3 |
+| **Total** | | **235** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -209,11 +210,11 @@ Poids total du lot : **73 110 → 293 408 octets** (différence : +220 298 octet
 
 Les trois produits Frais **Mozzarella râpée, Philadelphia et Pâte à pizza**, ainsi que **Cornichon**, conservent leur image précédente, jugée plus fidèle que les candidats disponibles. Les crèmes, épices et sauces devant être représentées en pots fermés ne reçoivent aucun visuel non conforme : ici, seuls **Mayonnaise** et **Sauce tomate** reçoivent un bocal avec couvercle. Les contrôles mobile, offline, sécurité et Home Assistant restent obligatoires avant publication.
 
-### Lot v558 — 3 WebP candidats validés graphiquement, CI en attente
+### Lot v558 — 3 WebP publiés et validés
 
-**État avant fusion : préparé, non publié.** Le bilan publié reste celui de v557 (232 / 414). Ce chapitre sera complété uniquement après publication effective et vérification de la CI et de GitHub Pages.
+**Publié sur `main` :** commit `fe533ce5b225f62968824d24e9e0faec6600055c` via [PR #82 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/82). [CI complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40294139488) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40294139097). CI préalable sur PR également [verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40294031103). Aucun nouveau commit d'image redondant après fusion.
 
-Trois produits de petit format natif ancien sont proposés en WebP transparent natif **256 × 256 px**, avec bloc alpha (ALPH), sans suréchantillonnage : leurs noms de fichiers correspondent aux slugs existants. Source : images photoréalistes SwisserDev sous **CC0 1.0**, liens et crédits dans `docs/IMAGE_CREDITS_V558.md`. Aucun appel API OpenAI payant.
+Trois produits à ancienne vignette de petit format ont été remplacés par des WebP transparents natif **256 × 256 px**, avec bloc alpha (ALPH), sans suréchantillonnage : leurs noms de fichiers correspondent aux slugs existants. Source : images photoréalistes SwisserDev sous **CC0 1.0**, liens et crédits dans `docs/IMAGE_CREDITS_V558.md`. Aucun appel API OpenAI payant.
 
 | Catégorie | Produit | Avant (octets) | Après (octets) |
 | --- | --- | ---: | ---: |
@@ -221,13 +222,13 @@ Trois produits de petit format natif ancien sont proposés en WebP transparent n
 | Boissons | Boisson énergétique | 2270 | 8902 |
 | Hygiène & soins | Thermomètre piles | 2404 | 8700 |
 
-**Total : 7 454 → 27 396 octets** (+19 942), soit moins de 27 Ko pour trois images ; chacune pèse moins de 10 Ko. La petite taille initiale et le rendu à 192 px motivent les remplacements, et les trois produits restent de la même variante. Les sources inadaptées (mauvaise variante, sauces non en pot fermé, image à fond blanc non transparent) ou de qualité inférieure ont été rejetées et les fichiers concernés sont inchangés.
+**Total : 7 454 → 27 396 octets** (+19 942), soit moins de 27 Ko pour trois images ; chacune pèse moins de 10 Ko. La petite taille initiale et le rendu à 192 px motivent les remplacements, et les trois produits restent de la même variante. Les sources inadaptées (mauvaise variante, sauces non en pot fermé, image à fond blanc non transparent) ou de qualité inférieure ont été rejetées et les fichiers concernés sont inchangés. **Sélection : 43 produits distincts comparés visuellement, 3 retenus et 40 rejetés** ; causes principales : variante incorrecte, conditionnement ou couvercle non conformes, fond opaque, détails superflus, ou image déjà suffisamment nette.
 
-**Périmètre de la proposition :** trois WebP, la version v558 cohérente dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, et la documentation seulement. La stratégie de cache WebP, le SVG de secours et toutes les fonctions Home Assistant, sécurité, interface, animations et iOS sont inchangés.
+**Périmètre publié :** trois WebP, la version v558 cohérente dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, et la documentation seulement. La stratégie de cache WebP, le SVG de secours et toutes les fonctions Home Assistant, sécurité, interface, animations et iOS sont inchangés.
 
 ### Situation par catégorie
 
-Comptage des **232 produits renouvelés** vérifié après publication sur `main` de v557, croisé avec `catalog.js`.
+Comptage des **235 produits renouvelés** vérifié après publication sur `main` de v558, croisé avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
@@ -238,11 +239,11 @@ Comptage des **232 produits renouvelés** vérifié après publication sur `main
 | Boulangerie | 9 / 13 | 4 |
 | Petit-déjeuner | 5 / 24 | 19 |
 | Apéritif & snacks | 12 / 24 | 12 |
-| Boissons | 15 / 36 | 21 |
+| Boissons | 17 / 36 | 19 |
 | Maison | 2 / 50 | 48 |
-| Hygiène & soins | 2 / 25 | 23 |
+| Hygiène & soins | 3 / 25 | 22 |
 | Enfant | 0 / 7 | 7 |
-| **Total** | **232 / 414** | **182** |
+| **Total** | **235 / 414** | **179** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
@@ -277,3 +278,5 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Lot v555 publié et vérifié :** commit `3e9c62dd89eae84b325c164a1bd27422d51159d1` — [PR #79 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/79) — [CI complète verte sur main](https://github.com/fabien95430/Dashboard-course/actions/runs/40247926690) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40247926222). Les 11 poids avant/après et l'attribution figurent plus haut et dans `docs/IMAGE_CREDITS_V555.md`.
 
 **Lot v557 publié et contrôlé :** commit `a6e9fa8b70c43c3c382fdbf0a41103da7ffdcc69` — [PR #81 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/81) — [validation complète verte sur `main`](https://github.com/fabien95430/Dashboard-course/actions/runs/40283171384) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40283170880). Les 21 sources et leurs licences CC0 sont détaillées dans `docs/IMAGE_CREDITS_V557.md`.
+
+**Lot v558 publié et vérifié :** commit [`fe533ce5b225f62968824d24e9e0faec6600055c`](https://github.com/fabien95430/Dashboard-course/commit/fe533ce5b225f62968824d24e9e0faec6600055c) — [PR #82 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/82) — [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40294139488) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40294139097). Trois images CC0 au total : 7 454 → 27 396 octets, 235/414 renouvelés, 179 restant à évaluer.
