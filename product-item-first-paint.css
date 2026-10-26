@@ -31,8 +31,9 @@ html .catalog-view{
 html .catalog-view>.page-header{order:0!important}
 html .catalog-view>.catalog-controls{display:contents!important}
 html .catalog-mode-switch{
-  --catalog-lens-x:calc(25vw - 48px);
-  --catalog-lens-w:84px;
+  /* Grand écran : trait final (108 px) centré sous Produits dès la première image. */
+  --catalog-lens-x:calc((min(100vw,560px) - 24px) / 4 - 54px);
+  --catalog-lens-w:108px;
   --catalog-liquid-sx:1;
   --catalog-liquid-sy:1;
   --catalog-liquid-lift:0;
@@ -152,8 +153,9 @@ html .catalog-view>#products.is-catalog-mode-hidden{
     transform:none!important;
     width:clamp(220px,60vw,240px)!important;
     height:38px!important;
-    --catalog-lens-w:56px;
-    --catalog-lens-x:calc(25% - 28px);
+    /* Trait final dès la première image : moitié de l'onglet, centré (comme catalog-liquid.js). */
+    --catalog-lens-w:calc(clamp(220px,60vw,240px) / 4);
+    --catalog-lens-x:calc(clamp(220px,60vw,240px) / 8);
   }
   html .catalog-mode{font-size:18px!important}
   html .catalog-view>.page-search{

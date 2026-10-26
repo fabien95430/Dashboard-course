@@ -116,7 +116,10 @@ test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de s
   // Le total des lignes reste constant, et l'espace entre les zones reste à 16px.
   assert.match(mobile,/width:clamp\(220px,60vw,240px\)!important;\s*height:38px!important/);
   assert.match(mobile,/html \.catalog-mode\{font-size:18px!important\}/);
-  assert.match(mobile,/--catalog-lens-w:56px;\s*--catalog-lens-x:calc\(25% - 28px\)/);
+  // Le trait de Produits a sa géométrie finale (catalog-liquid.js) dès la première image :
+  // moitié de l'onglet, centrée. Un pourcentage dans translate3d serait relatif au trait lui-même.
+  assert.match(mobile,/--catalog-lens-w:calc\(clamp\(220px,60vw,240px\) \/ 4\);\s*--catalog-lens-x:calc\(clamp\(220px,60vw,240px\) \/ 8\)/);
+  assert.doesNotMatch(firstPaint,/--catalog-lens-x:calc\([^)]*%/,'aucun pourcentage dans la position du trait');
   assert.match(styles,/\.catalog-view \.page-search\{height:46px!important;[\s\S]*?background:linear-gradient/,'la recherche reste transparente et soulignée');
   assert.match(mobile,/html \.catalog-view>\.page-search\{[^}]*height:40px!important;[^}]*border-radius:0!important/);
   const layout={header:82,tabRow:42,tab:38,search:40,categoryRow:42,category:38,gap:12};
@@ -209,7 +212,7 @@ test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans 
   assert.ok(row>132,'les tuiles sont réellement agrandies');
   assert.ok(style.includes('overflow-y:auto;'),'défilement natif conservé');
   assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
-  assert.ok(index.includes('product-item-first-paint.css?v=579'));
+  assert.ok(index.includes('product-item-first-paint.css?v=580'));
 });
 
 test('le rail des catégories défile bord à bord et les cartes Produits restent ivoire clair et les boutons + vert forêt',()=>{
@@ -248,7 +251,7 @@ test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans pe
   assert.ok(catalog.includes("'./dishes.css?v=532'"));
   assert.ok(sw.includes('"./dishes.css?v=532"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
-  assert.ok(index.includes('product-item-first-paint.css?v=579'));
+  assert.ok(index.includes('product-item-first-paint.css?v=580'));
 });
 
 test('sélection sauge visible et lettres descendantes non rognées sur les trois vues',()=>{
@@ -264,7 +267,7 @@ test('sélection sauge visible et lettres descendantes non rognées sur les troi
   assert.ok(catalog.includes("'./dishes.css?v=532'"));
   assert.ok(sw.includes('"./dishes.css?v=532"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
-  assert.ok(index.includes('product-item-first-paint.css?v=579'));
+  assert.ok(index.includes('product-item-first-paint.css?v=580'));
   const localImages=read('dish-local-images.js');
   const version=localImages.match(/const APP_VERSION='(v\d+)'/)?.[1];
   assert.ok(version,'version applicative introuvable');
