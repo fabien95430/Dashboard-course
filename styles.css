@@ -219,6 +219,8 @@ svg{display:block}
 .app.is-locked{
   filter:none;
   pointer-events:none;
+  visibility:hidden;
+  transition:visibility 0s linear .3s;
 }
 .status{
   position:fixed!important;
