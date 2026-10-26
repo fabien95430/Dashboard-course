@@ -534,3 +534,20 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Comptage sans double compte** : les 16 anciens produits évalués et conservés dans l'audit précédent restent distincts des 277 renouvelés ; Papier cadeau et Lave-glace ajoutent 2 décisions de conservation indépendantes. Il existe donc **au moins 18 évalués et conservés distincts**, soit **au moins 295 produits ayant une décision définitive documentée (277 renouvelés + 18 conservés)**. Les autres vignettes auditées mais non remplacées peuvent rester en attente d'amélioration et ne sont pas comptées comme des renouvellements.
 
 **Écart d'inventaire expliqué** : les six anciens WebP orphelins supprimés entre v569 et v572 sont croquettes-chat.webp, croquettes-chien.webp, friandises-animaux.webp, litiere-chat.webp, patee-chat.webp et sacs-dejections.webp. Tous étaient hors du catalogue actuel. Le compteur correct est désormais **414 WebP pour 414 produits**, poids total **9 591 672 octets**, zéro produit sans fichier, un fichier > 100 000 octets et aucun > 102 400 octets. Le bilan des renouvellements reste **277/414**, avec **137 non renouvelés**. Ce suivi documentaire ne nécessite aucun incrément de version.
+
+
+### Lot v578 — 4 visuels préparés, NON encore publiés à la création de la PR
+
+**Base de travail :** `fc7f6074622a11769af1392ee97eeb979d168b6b`. Quatre remplacements sélectionnés pour l'identité exacte et la qualité à 192 px, sans toucher aux images déjà renouvelées. Sources, licences, tailles et SHA : `docs/IMAGE_CREDITS_V578.md`. Dinde représentée **crue** et levure boulangère **fraîche**, sans substitution de variante ; Essuie-tout et Papier toilette sont deux rouleaux distincts. Aucun recours à l'API OpenAI payante.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Maison | Essuie-tout | 2552 | 10154 |
+| Maison | Papier toilette | 3236 | 13554 |
+| Viandes & poissons | Dinde | 3648 | 9400 |
+| Cuisine | Levure boulangère | 3152 | 9540 |
+| **Total** | **4 WebP** | **12 588** | **42 648** |
+
+**Candidats rejetés :** la planche de ménage à fond et halos non conformes ; la pâte feuilletée cuite proposée au lieu de pâte crue ; la saucisse fumée à la place de merguez crue ; toute source moins précise ou d'un autre produit. Les anciennes images fidèles restent en place. **Avant fusion** : 277 renouvelés, 137 non renouvelés, au moins 18 évalués et conservés distincts. **Seulement après fusion validée** : 281 renouvelés, 133 non renouvelés, 414 WebP, poids du dossier calculé à **9 621 732 octets**. Aucun chiffre prévisionnel ne doit être annoncé comme publié avant vérification réelle.
+
+**Périmètre** : quatre WebP, marqueurs v578 cohérents dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, ce suivi et crédits. Aucun CSS, navigation, taille/position des tuiles, bannière citrons, sécurité, HA, OAuth, WebSocket, coffre, verrouillage, biométrie, mode test ni logique de cache visuel modifiés.
