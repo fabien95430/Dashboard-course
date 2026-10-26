@@ -4,11 +4,11 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v569**, sur `main` au contrôle du 26 octobre 2026. La PR images v568 est bien fusionnée et les six WebP sont conservés par le commit v569 ; validation complète et GitHub Pages de v569 verts. Les six WebP ne modifient ni la bannière citrons, ni les animations, ni les safe areas iOS.
-- `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
+- Version applicative lors du contrôle préparatoire de v572 : **v571**, sur `main` au 26 octobre 2026. La PR images v568 est bien fusionnée et les six WebP sont conservés par le commit v569 ; validation complète et GitHub Pages de v569 verts. Les six WebP ne modifient ni la bannière citrons, ni les animations, ni les safe areas iOS.
+- `catalog.js` contient **414 produits** ; `www/Items/` contient **414 images** depuis le nettoyage v571 (six visuels orphelins supprimés).
 - **277 produits distincts** sont désormais renouvelés après publication du lot v568 ; **137 produits** ne sont pas encore renouvelés (dont plusieurs visuels déjà évalués et conservés). Ne pas les remplacer artificiellement si les images restent satisfaisantes.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après v568 : **9 617 548 octets (9,17 Mio)** (avant v568 : 9 473 056 octets).
-- **161 images pèsent moins de 10 Kio après v568**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après nettoyage v571 : **9 591 672 octets** (après v568, avant suppression des six orphelins : 9 617 548 octets) (avant v568 : 9 473 056 octets).
+- **155 images pèsent moins de 10 Kio après le nettoyage v571**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
 ### Historique des vingt-quatre lots publiés
@@ -512,3 +512,20 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Écarts de sélection :** Rosette déjà renouvelée en v567 (conservée) ; Merguez écartée en raison d'une variante visuelle non certifiée crue ; Coulis de fruit toujours reporté, car les propositions ressemblent à une confiture. Les autres alternatives incorrectes (viande cuite, mauvaise espèce, produit différent) restent rejetées. Aucun autre produit déjà renouvelé n'est écrasé.
 
 **Périmètre publié en v568 :** uniquement les six `www/Items/*.webp`, le versionnement et cache dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, et la documentation. Aucune modification des mécanismes de chargement visuel, de cache persistant, de l'interface, de Home Assistant, OAuth, WebSocket, coffre, biométrie, mode test et safe areas. Le commit v569 ultérieur modifie séparément le cadrage de produits : ce changement ne fait pas partie du lot images v568. **Bilan publié : 277/414 renouvelés, 137 non renouvelés, 16 anciens visuels évalués et conservés distincts, soit au moins 293 produits avec décision documentaire.** Fichiers WebP : 420 ; poids total 9 617 548 octets ; 0 fichier > 100 Kio.
+
+
+### Lot v572 — Essuie-tout, candidat intégré sur branche de vérification
+
+**Base de préparation :** `main` au SHA `d3fa1d65da98393bf4c116db210d08125f79310b` (v571). Une seule image améliorée a été retenue ; les autres sources examinées n'étaient pas fidèles et aucun lot de 30 n'a été constitué artificiellement.
+
+| Catégorie | Produit | Avant (octets) | Nouveau (octets) |
+| --- | --- | ---: | ---: |
+| Maison | Essuie-tout | 2552 | 10154 |
+
+**Poids ciblé :** 2 552 → 10 154 octets (+7 602). WebP individuel 384 × 384, source originale ChatGPT, fond alpha réel, quatre coins transparents, lisibilité à 192 px. Empreinte Git `3baa67259036c3f1f3a4a53a23e856526a6166ea`. Source et attribution : `docs/IMAGE_CREDITS_V572.md`. Aucun appel à l'API OpenAI payante.
+
+**Décisions conservatoires supplémentaires :** Pâte feuilletée (illustration actuelle correcte de pâte crue ; source proposée cuite rejetée), Dinde (actuelle crue, source cuite rejetée), Sirop d'érable (flacon actuel seul plus fidèle qu'une composition décorée), Café moulu (pot actuel fidèle, alternative mélangeant grains et mouture rejetée). Aucun de ces quatre produits n'est comptabilisé comme remplacé. Merguez et Coulis de fruit restent en attente d'une source strictement conforme.
+
+**Statut au moment du commit de préparation :** intégration candidate sur branche, validation CI/Pages et SHA à confirmer après publication ; ne pas en déduire une publication immédiate. Si fusionné, le total passe à **278 renouvelés sur 414**, soit **136 non renouvelés** ; le répertoire atteint **9 599 274 octets**, sur 414 WebP.
+
+**Contrôle du seuil décimal :** `romarin-frais.webp` existant pèse **100 866 octets**, soit moins de 100 Kio mais plus de 100 000 octets. Écart identifié, aucun nouveau remplacement non justifié.
