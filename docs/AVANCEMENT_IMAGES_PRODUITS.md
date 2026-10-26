@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v555**, sur `main`. Les fichiers CSS, la bannière citrons, les animations et les safe areas iOS de v554 sont conservés sans changement.
+- Dernière version visible en préparation : **v556** (publication uniquement après CI verte). La dernière version déjà vérifiée reste v555. Les fichiers CSS, la bannière citrons, les animations et les safe areas iOS de v554 sont conservés sans changement.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **208 produits distincts** disposent d'un visuel remplacé après publication de v555 ; **206 produits** restent à évaluer. Ces 206 ne sont pas tous nécessairement de mauvaise qualité.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,67 Mio**.
-- **202 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **211 produits distincts** auraient reçu un nouveau visuel après publication de v556 ; **203 produits** resteraient à évaluer. Les compteurs v556 ne sont définitifs qu'après CI verte et commit confirmé sur `main`.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,71 Mio**.
+- **199 images pèseront moins de 10 Kio après v556**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des onze lots publiés
+### Historique des onze lots publiés et du lot v556 à valider
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -26,7 +26,8 @@
 | Lot v550 — 3 nouveaux WebP | `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — PR #77 | 3 |
 | Lot v553 — 30 WebP | `c8bf020acb92cc6fb8ec3486584735ccdc33f00e` — PR #78 | 30 |
 | Lot v555 — 11 WebP | `3e9c62dd89eae84b325c164a1bd27422d51159d1` — PR #79 | 11 |
-| **Total** | | **208** |
+| Lot v556 — 3 WebP | Commit à ajouter une fois publié | 3 |
+| **Total après validation v556** | | **211** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 208), ne pas additionner les compteurs.
 
@@ -161,24 +162,38 @@ Sélection de 11 correspondances conformes parmi les produits non renouvelés : 
 
 Les quatre autres produits Frais non remplacés sont conservés : leur visuel actuel est déjà plus fidèle que les sources externes examinées. Les crèmes, épices et sauces nécessitant des pots fermés ne font l'objet d'aucune substitution incorrecte. Aucun changement CSS, bannière citrons, Home Assistant, OAuth, WebSocket, coffre, biométrie, verrouillage ni logique de cache hors ligne. Le cache du service worker et les marqueurs de version passent ensemble à v555, sans modifier la stratégie de cache.
 
+### Lot v556 — trois nouveaux visuels préparés
+
+Trois correspondances exactes validées dans le catalogue : une conserve de grains de maïs, de la polenta sèche (semoule de maïs), et des grains de café torréfiés. Des produits déjà corrects, y compris les quatre derniers visuels Frais et les sauces soumises à la règle des pots fermés, sont conservés sans changement. Les fichiers de cette série sont indépendants et gardent leur slug. Les versions sources 256 px sont conservées telles quelles (pas d'agrandissement artificiel) et restent lisibles à 192 px.
+
+| Catégorie | Produit | Ancien (octets) | Nouveau (octets) | Source |
+| --- | --- | ---: | ---: | --- |
+| Cuisine | Maïs en boîte | 4582 | 16442 | RedM Icons Photoreal, CC0 |
+| Cuisine | Polenta | 4266 | 16958 | Soft Studio Ingredients, CC BY 4.0 |
+| Petit-déjeuner | Café en grains | 4418 | 20062 | RedM Icons Photoreal, CC0 |
+
+**Total : 13 266 → 53 462 octets (+40 196 octets)**. Tous les fichiers sont transparents, inférieurs à 60 Ko, sans collage ni nom de marque ajouté. Attribution et liens exacts : `docs/IMAGE_CREDITS_V556.md`.
+
+**Périmètre technique :** version globale `v556`, cache service worker `courses-app-v556-r1`, trois fichiers WebP, le suivi et les crédits. Aucune modification de styles, navigation, bannière citrons, Home Assistant, WebSocket, OAuth, coffre ou biométrie. Le commit final et les résultats CI/Pages seront consignés après vérification.
+
 ### Situation par catégorie
 
-Comptage des **208 images remplacées** vérifié sur `main` après publication de v555, croisé avec `catalog.js`.
+Comptage prévisionnel des **211 produits renouvelés** (208 déjà vérifiés sur `main` en v555, et 3 supplémentaires en v556), croisé avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
 | Fruits & Légumes | 72 / 72 | 0 |
 | Frais | 49 / 53 | 4 |
 | Viandes & poissons | 23 / 39 | 16 |
-| Cuisine | 38 / 71 | 33 |
+| Cuisine | 40 / 71 | 31 |
 | Boulangerie | 8 / 13 | 5 |
-| Petit-déjeuner | 3 / 24 | 21 |
+| Petit-déjeuner | 4 / 24 | 20 |
 | Apéritif & snacks | 9 / 24 | 15 |
 | Boissons | 6 / 36 | 30 |
 | Maison | 0 / 50 | 50 |
 | Hygiène & soins | 0 / 25 | 25 |
 | Enfant | 0 / 7 | 7 |
-| **Total** | **208 / 414** | **206** |
+| **Total après v556** | **211 / 414** | **203** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
