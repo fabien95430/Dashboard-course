@@ -5,7 +5,7 @@ const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
 const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
 test('achat et suppression utilisent des intentions distinctes',()=>{
   assert.match(app,/removeGroup\(button\.dataset\.name\|\|'',row,'purchase'\)/);
-  assert.match(app,/removeGroup\(name,row,'delete'\)/);
+  assert.match(app,/removeGroup\(row\.dataset\.name\|\|'',row,'delete'\)/);
   assert.match(app,/async function removeGroup\(name,row=null,intent='purchase'\)/);
   assert.match(app,/removeGroup=async function\(name,row=null,intent='purchase'\)/);
   assert.match(app,/successMessage=isPurchase\?item\+' acheté':item\+' supprimé de Ma liste'/);

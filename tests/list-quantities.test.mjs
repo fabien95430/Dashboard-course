@@ -129,24 +129,49 @@ test('les rafales multi-produits diffèrent les refresh intermédiaires et garde
   assert.match(ops,/if\(deferRefresh&&group\.uids\.filter\(Boolean\)\.length<group\.count\)/);
 });
 
-test('le menu trois points adopte un glass iOS plus compact et fondu sans changer les actions',()=>{
-  const helperStart=source.indexOf('async function changeListRowMenuQuantity(name,delta){');
-  const menuStart=source.indexOf('function openListRowMenu(row,anchor){',helperStart);
-  const menuEnd=source.indexOf('function bindListReorder(root){',menuStart);
-  assert.ok(helperStart>=0&&menuStart>helperStart&&menuEnd>menuStart,'menu d actions introuvable');
-  const helper=source.slice(helperStart,menuStart),menu=source.slice(menuStart,menuEnd);
-  assert.match(helper,/await incrementProduct\(item\)/);
-  assert.match(helper,/await decrementProduct\(item\)/);
-  assert.match(menu,/list-row-menu-product-icon/);
-  assert.match(menu,/quantityLabel\.textContent='Quantité'/);
-  assert.match(menu,/changeListRowMenuQuantity\(name,-1\)/);
-  assert.match(menu,/changeListRowMenuQuantity\(name,1\)/);
-  assert.match(menu,/remove\.textContent='Supprimer de Ma liste'/);
-  assert.match(menu,/removeGroup\(name,row,'delete'\)/);
-  assert.match(menu,/Math\.min\(252,window\.innerWidth-margin\*2\)/);
-  assert.match(styles,/\.list-row-menu\{[^}]*padding:11px[^}]*border-radius:23px[^}]*backdrop-filter:blur\(34px\) saturate\(150%\)/s);
-  assert.match(styles,/\.list-row-menu-product-icon\{[^}]*border:0[^}]*background:transparent[^}]*box-shadow:none/s);
-  assert.match(styles,/\.list-row-menu-head\{[^}]*grid-template-columns:40px minmax\(0,1fr\) 30px/s);
-  assert.match(styles,/\.list-row-menu-quantity\{[^}]*border-radius:999px[^}]*backdrop-filter:blur\(18px\) saturate\(135%\)/s);
-  assert.match(styles,/\.list-row-menu-delete\{[^}]*height:46px[^}]*border-radius:15px/s);
+test('les trois points et un glissement révèlent uniquement la corbeille dans la ligne',()=>{
+  const start=source.indexOf('let listRowMenu=null;');
+  const end=source.indexOf('function bindListReorder(root){',start);
+  assert.ok(start>=0&&end>start,'commande de suppression introuvable');
+  const menu=source.slice(start,end);
+  const render=source.slice(source.indexOf('function renderList(){'),source.indexOf('function updateListReorderAvailability(root){'));
+  const bind=source.slice(end,source.indexOf('function undoPurchase(name,row){',end));
+  assert.ok(render.includes('class="list-row-delete"'));
+  assert.ok(render.includes('aria-hidden="true" tabindex="-1" disabled'));
+  assert.ok(menu.includes("row.classList.add('is-actions-open')"));
+  assert.ok(menu.includes('remove.disabled=false'));
+  assert.ok(menu.includes('remove.tabIndex=0'));
+  assert.ok(menu.includes("remove.setAttribute('aria-hidden','true')"));
+  assert.ok(!menu.includes('changeListRowMenuQuantity'));
+  assert.ok(!menu.includes('document.body.appendChild'));
+  assert.ok(bind.includes('Math.abs(dx)>26&&Math.abs(dx)>Math.abs(dy)*1.4'));
+  assert.ok(bind.includes("void removeGroup(row.dataset.name||'',row,'delete')"));
+  assert.ok(styles.includes('.list-view .list-row.is-actions-open{padding-right:66px!important}'));
+  assert.ok(styles.includes('.list-view .list-row-delete{'));
+  assert.ok(!styles.includes('.list-row-menu{'));
+});
+test('la corbeille cachée reste inaccessible au clavier et devient accessible à la demande',()=>{
+  const start=source.indexOf('let listRowMenu=null;');
+  const end=source.indexOf('function bindListReorder(root){',start);
+  const active=new Set(),attrs=new Map();
+  const remove={
+    disabled:true,tabIndex:-1,
+    setAttribute(key,value){attrs.set(key,value)},
+    removeAttribute(key){attrs.delete(key)}
+  };
+  const anchor={setAttribute(key,value){attrs.set('anchor-'+key,value)}};
+  const row={dataset:{name:'Cornichon'},classList:{add:value=>active.add(value),remove:value=>active.delete(value)},querySelector:()=>remove};
+  const context={state:{productBusy:new Set()},norm:value=>value.toLowerCase()};
+  vm.runInNewContext(source.slice(start,end)+';globalThis.actions={openListRowMenu,closeListRowMenu};',context);
+  context.actions.openListRowMenu(row,anchor);
+  assert.equal(active.has('is-actions-open'),true);
+  assert.equal(remove.disabled,false);
+  assert.equal(remove.tabIndex,0);
+  assert.equal(attrs.get('anchor-aria-expanded'),'true');
+  context.actions.openListRowMenu(row,anchor);
+  assert.equal(active.has('is-actions-open'),false);
+  assert.equal(remove.disabled,true);
+  assert.equal(remove.tabIndex,-1);
+  assert.equal(attrs.get('aria-hidden'),'true');
+  assert.equal(attrs.get('anchor-aria-expanded'),'false');
 });

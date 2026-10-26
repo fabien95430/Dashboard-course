@@ -959,12 +959,14 @@ function renderList(){
   if(!el)return;
   const count=$('#listCount');if(count)count.textContent=rows.length+' article'+(rows.length>1?'s':'');
   if(state.loading&&!groups.length){
+    closeListRowMenu();
     listRenderStructureSignature='';
     el.innerHTML='<div class="empty"><span class="spinner"></span>Synchronisation…</div>';
     notifyListRendered();
     return;
   }
   if(!rows.length){
+    closeListRowMenu();
     listRenderStructureSignature='';
     const message=needle?'Aucun article trouvé.':(state.listCategoryFilter!=='Toutes'?'Aucun article dans cette catégorie.':(state.error?'Liste indisponible.':'La liste est vide.'));
     el.innerHTML='<div class="empty">'+message+'</div>';
@@ -974,6 +976,7 @@ function renderList(){
   const showCategorySections=state.preferences.listSort==='category';
   const structureSignature=listStructureSignature(rows,showCategorySections);
   if(patchRenderedListRows(el,rows,structureSignature))return;
+  closeListRowMenu();
   let previousCategory='';
   el.innerHTML=rows.map(group=>{
     const key=norm(group.summary),product=catalogProductFor(group.summary),busy=state.productBusy.has(key);
@@ -991,7 +994,8 @@ function renderList(){
       '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong>'+itemDetail+'</span>'+
       quantity+
       '<button class="undo-purchase" type="button" data-name="'+esc(group.summary)+'" hidden>Annuler</button>'+
-      '<button class="row-grip list-row-more" type="button" data-name="'+esc(group.summary)+'" aria-label="Actions pour '+esc(group.summary)+'" aria-haspopup="menu">•••</button>'+
+      '<button class="row-grip list-row-more" type="button" data-name="'+esc(group.summary)+'" aria-label="Afficher la suppression de '+esc(group.summary)+'" aria-expanded="false">•••</button>'+
+       '<button class="list-row-delete" type="button" aria-label="Supprimer '+esc(group.summary)+' de Ma liste" aria-hidden="true" tabindex="-1" disabled><svg aria-hidden="true"><use href="#i-trash"></use></svg></button>'+
     '</div>';
   }).join('');
   listRenderStructureSignature=structureSignature;
@@ -999,6 +1003,7 @@ function renderList(){
   el.querySelectorAll('.purchase-check').forEach(button=>button.onclick=event=>{
     event.stopPropagation();
     const row=button.closest('.list-row');
+    closeListRowMenu();
     removeGroup(button.dataset.name||'',row,'purchase');
   });
   el.querySelectorAll('.undo-purchase').forEach(button=>button.onclick=event=>{
@@ -1137,101 +1142,29 @@ async function persistListReorder(root,movedKey){
 let listRowMenu=null;
 function closeListRowMenu(){
   if(!listRowMenu)return;
-  listRowMenu.anchor?.setAttribute('aria-expanded','false');
-  listRowMenu.menu.remove();
+  const {row,anchor}=listRowMenu;
+  row.classList.remove('is-actions-open');
+  anchor?.setAttribute('aria-expanded','false');
+  const remove=row.querySelector('.list-row-delete');
+  if(remove){
+    remove.disabled=true;
+    remove.tabIndex=-1;
+    remove.setAttribute('aria-hidden','true');
+  }
   listRowMenu=null;
 }
-async function changeListRowMenuQuantity(name,delta){
-  const item=String(name||'').trim();
-  if(!item||!listRowMenu)return;
-  const key=norm(item);
-  listRowMenu.menu.classList.add('is-busy');
-  listRowMenu.menu.querySelectorAll('button').forEach(button=>button.disabled=true);
-  try{
-    if(delta>0)await incrementProduct(item);
-    else await decrementProduct(item);
-  }finally{
-    const nextRow=[...document.querySelectorAll('#listItems .list-row')].find(entry=>norm(entry.dataset.name)===key);
-    const nextAnchor=nextRow?.querySelector('.list-row-more');
-    if(nextRow&&nextAnchor&&productQuantity(item)>0)openListRowMenu(nextRow,nextAnchor);
-    else closeListRowMenu();
-  }
-}
 function openListRowMenu(row,anchor){
+  if(!row||state.productBusy.has(norm(row.dataset.name||'')))return;
+  if(listRowMenu?.row===row){closeListRowMenu();return}
   closeListRowMenu();
-  const name=row.dataset.name||'';
-  const group=activeGroups().find(entry=>norm(entry.summary)===norm(name));
-  if(!group)return;
-  const product=catalogProductFor(name);
-  const detail=[product?.category,product?.sub].filter((value,index,array)=>value&&array.indexOf(value)===index).join(' · ')||'Article';
-  const menu=document.createElement('div');
-  menu.className='list-row-menu';
-  menu.setAttribute('role','menu');
-  menu.setAttribute('aria-label','Actions pour '+name);
-
-  const header=document.createElement('div');
-  header.className='list-row-menu-head';
-  const visual=document.createElement('span');
-  visual.className='list-row-menu-product-icon';
-  visual.innerHTML=product?sprite(product,true):'<span class="unknown">•</span>';
-  const copy=document.createElement('span');
-  copy.className='list-row-menu-copy';
-  const title=document.createElement('strong');
-  title.textContent=name;
-  const subtitle=document.createElement('small');
-  subtitle.textContent=detail;
-  copy.append(title,subtitle);
-  const close=document.createElement('button');
-  close.type='button';
-  close.className='list-row-menu-close';
-  close.setAttribute('aria-label','Fermer le menu');
-  close.textContent='×';
-  close.onclick=event=>{event.stopPropagation();closeListRowMenu()};
-  header.append(visual,copy,close);
-
-  const quantityLabel=document.createElement('span');
-  quantityLabel.className='list-row-menu-quantity-label';
-  quantityLabel.textContent='Quantité';
-  const quantity=document.createElement('div');
-  quantity.className='list-row-menu-quantity';
-  quantity.setAttribute('aria-label','Quantité de '+name);
-  const decrement=document.createElement('button');
-  decrement.type='button';
-  decrement.className='list-row-menu-decrement';
-  decrement.setAttribute('role','menuitem');
-  decrement.setAttribute('aria-label','Retirer une unité de '+name);
-  decrement.textContent='−';
-  const value=document.createElement('strong');
-  value.className='list-row-menu-value';
-  value.textContent=String(group.count);
-  value.setAttribute('aria-live','polite');
-  const increment=document.createElement('button');
-  increment.type='button';
-  increment.className='list-row-menu-increment';
-  increment.setAttribute('role','menuitem');
-  increment.setAttribute('aria-label','Ajouter une unité de '+name);
-  increment.textContent='+';
-  decrement.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,-1)};
-  increment.onclick=event=>{event.stopPropagation();void changeListRowMenuQuantity(name,1)};
-  quantity.append(decrement,value,increment);
-
-  const remove=document.createElement('button');
-  remove.type='button';
-  remove.className='list-row-menu-delete';
-  remove.setAttribute('role','menuitem');
-  remove.textContent='Supprimer de Ma liste';
-  remove.onclick=event=>{event.stopPropagation();closeListRowMenu();removeGroup(name,row,'delete')};
-  menu.append(header,quantityLabel,quantity,remove);
-  document.body.appendChild(menu);
-
-  const margin=14,rect=anchor.getBoundingClientRect(),width=Math.min(252,window.innerWidth-margin*2);
-  menu.style.width=width+'px';
-  const left=Math.max(margin,Math.min(window.innerWidth-width-margin,rect.right-width));
-  const below=rect.bottom+6,above=rect.top-menu.offsetHeight-6;
-  const top=below+menu.offsetHeight<=window.innerHeight-margin?below:Math.max(margin,above);
-  menu.style.left=left+'px';menu.style.top=top+'px';
-  anchor.setAttribute('aria-expanded','true');
-  listRowMenu={menu,anchor};
+  const remove=row.querySelector('.list-row-delete');
+  if(!remove)return;
+  row.classList.add('is-actions-open');
+  anchor?.setAttribute('aria-expanded','true');
+  remove.disabled=false;
+  remove.tabIndex=0;
+  remove.removeAttribute('aria-hidden');
+  listRowMenu={row,anchor};
 }
 function bindListReorder(root){
   root.querySelectorAll('.list-row').forEach(row=>{
@@ -1249,16 +1182,30 @@ function bindListReorder(root){
         navigator.vibrate?.(4);persistListReorder(root,row.dataset.key||'');
       });
     }
+    const remove=row.querySelector('.list-row-delete');
+    if(remove)remove.onclick=event=>{
+      event.stopPropagation();
+      closeListRowMenu();
+      void removeGroup(row.dataset.name||'',row,'delete');
+    };
     row.addEventListener('pointerdown',event=>{
       if(event.button!==undefined&&event.button!==0)return;
       if(event.target.closest('button'))return;
+      if(state.productBusy.has(row.dataset.key||''))return;
       const unavailable=listReorderUnavailableMessage(root,row);
-      if(unavailable)return;
       const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
-      let timer=setTimeout(()=>beginDrag(event),150);
+      let timer=unavailable?null:setTimeout(()=>beginDrag(event),150);
       const preMove=moveEvent=>{
         if(moveEvent.pointerId!==pointerId)return;
-        if(Math.hypot(moveEvent.clientX-startX,moveEvent.clientY-startY)>12){clearTimeout(timer);cleanupPre()}
+        const dx=moveEvent.clientX-startX,dy=moveEvent.clientY-startY;
+        if(Math.abs(dx)>26&&Math.abs(dx)>Math.abs(dy)*1.4){
+          clearTimeout(timer);cleanupPre();
+          if(dx<0)openListRowMenu(row,row.querySelector('.list-row-more'));
+          else if(listRowMenu?.row===row)closeListRowMenu();
+          return;
+        }
+        if(Math.abs(dx)>12)clearTimeout(timer);
+        if(Math.abs(dy)>12&&Math.abs(dy)>=Math.abs(dx)){clearTimeout(timer);cleanupPre()}
       };
       const preEnd=endEvent=>{if(endEvent.pointerId!==pointerId)return;clearTimeout(timer);cleanupPre()};
       const cleanupPre=()=>{document.removeEventListener('pointermove',preMove,true);document.removeEventListener('pointerup',preEnd,true);document.removeEventListener('pointercancel',preEnd,true)};
@@ -1295,7 +1242,7 @@ function bindListReorder(root){
     });
   });
 }
-document.addEventListener('pointerdown',event=>{if(listRowMenu&&!listRowMenu.menu.contains(event.target)&&event.target!==listRowMenu.anchor)closeListRowMenu()});
+document.addEventListener('pointerdown',event=>{if(listRowMenu&&!listRowMenu.row.contains(event.target))closeListRowMenu()});
 
 function undoPurchase(name,row){
   const key=norm(name),token=state.purchaseUndo.get(key);
@@ -1342,6 +1289,7 @@ function showView(){
   document.querySelectorAll('.tab').forEach(button=>button.classList.toggle('is-active',button.dataset.view===state.view));
   const viewChanged=publishedView!==state.view;
   if(viewChanged){
+    closeListRowMenu();
     if(catalogRenderFrame)cancelAnimationFrame(catalogRenderFrame);
     catalogRenderFrame=0;
     cancelCatalogRenderAfterNav?.();
