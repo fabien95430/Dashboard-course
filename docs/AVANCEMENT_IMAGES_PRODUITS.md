@@ -226,6 +226,25 @@ Trois produits à ancienne vignette de petit format ont été remplacés par des
 
 **Périmètre publié :** trois WebP, la version v558 cohérente dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, et la documentation seulement. La stratégie de cache WebP, le SVG de secours et toutes les fonctions Home Assistant, sécurité, interface, animations et iOS sont inchangés.
 
+### Lot v559 — 6 images préparées (validation préalable obligatoire)
+
+**Non encore publié au stade de cette section.** Les chiffres en tête de document restent ceux de v558. Après fusion, ne changer les totaux qu'avec le SHA exact du commit sur `main`, la CI et GitHub Pages confirmés.
+
+Six anciennes vignettes de petite dimension ont été comparées aux sources exactes avec affichage à 192 px. Cinq visuels proviennent de **Soft Studio Ingredients by Alex Wang** sous licence **CC BY 4.0**, et un de **SwisserDev — fivem-icons-photoreal** en **CC0 1.0**. Chaque source est un WebP indépendant, natif, transparent (bloc ALPH), **320 × 320 px** pour Soft Studio et **256 × 256 px** pour l'éponge, sans redimensionnement ni API OpenAI payante. Slugs inchangés. Attribution détaillée dans `docs/IMAGE_CREDITS_V559.md`.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Viandes & poissons | Jambon blanc | 3864 | 19536 |
+| Apéritif & snacks | Biscuits beurre | 4908 | 20506 |
+| Apéritif & snacks | Biscuits chocolat | 4038 | 24932 |
+| Petit-déjeuner | Muesli | 4662 | 20474 |
+| Maison | Éponges | 4588 | 15650 |
+| Boissons | Jus d'ananas | 3648 | 16518 |
+
+**Total : 25 708 → 117 616 octets** (+91 908 octets). Poids individuel maximal 24 932 octets, 0 dépassement du seuil de 100 Ko. Aucun produit déjà renouvelé dans les lots v528 à v558 n'est repris. Les candidats rejetés après comparaison restent inchangés : mauvaise variante (viande cuite à la place de viande crue, pâtisserie différente), pots de sauces non fermés, fond opaque, présence d'éléments non pertinents, images actuelles déjà satisfaisantes. Le curcuma est resté hors de ce lot tant que le visuel généré n'est pas transférable et validé sur GitHub.
+
+**Périmètre limité** : six WebP, `index.html`, `sw.js`, `catalog.js`, `dish-local-images.js`, documentation et attribution. Les styles, la bannière citrons, les animations, les safe areas iOS, Ma liste, le catalogue métier, Home Assistant, OAuth, WebSocket, coffre chiffré, verrouillage, biométrie, mode test et stratégie de chargement/cache sont inchangés.
+
 ### Situation par catégorie
 
 Comptage des **235 produits renouvelés** vérifié après publication sur `main` de v558, croisé avec `catalog.js`.
