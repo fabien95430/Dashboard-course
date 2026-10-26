@@ -363,6 +363,25 @@ Les six images sont des rendus originaux créés dans ChatGPT pour *Application 
 
 **Périmètre strict :** uniquement les six `www/Items/*.webp`, les marqueurs globaux v565 dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, la note de suivi et les crédits. Aucun changement de `product-item-images.js`, de stratégie de chargement, cache visuel, fonctionnement hors ligne, architecture statique, Home Assistant, WebSocket, OAuth, coffre chiffré, biométrie, mode test, CSS, bannière citrons, iOS, navigation ni liste `Courses`.
 
+### Lot v566 — cinq WebP préparés pour validation, non publiés à ce stade
+
+**Ne pas considérer cette section comme une publication effective avant fusion et validations sur `main`.** Les totaux et la version publiés en tête de document demeurent ceux de v565 tant que la validation complète et le déploiement Pages de v566 ne sont pas confirmés.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Enfant | Couches | 4104 | 11384 |
+| Enfant | Lingettes bébé | 3176 | 9236 |
+| Enfant | Petits pots | 3170 | 9036 |
+| Maison | Lessive capsules | 4650 | 20188 |
+| Maison | Papier aluminium | 2990 | 6432 |
+| **Total** | **5 produits** | **18090** | **56276** |
+
+**Poids net : +38186 octets** pour cinq WebP de 320 à 384 px. Les originaux étaient des miniatures de très faible définition. Les nouvelles versions représentent chacune un unique produit distinct et isolé, sans texte ni marque inventée, sur fond WebP alpha transparent. Examen en situation à 192 px, contrôle des cinq empreintes Git, couleurs et géométrie. Source originale créée dans ChatGPT, sans appel à l'API OpenAI payante ; provenance et empreintes dans `docs/IMAGE_CREDITS_V566.md`.
+
+**Candidats rejetés ou conservés :** essuie-tout (l'objet argenté ressemblait à un rouleau d'aluminium, pas de papier absorbant), coulis de fruit (trop proche de la confiture), substituts de viandes cuites ou mauvaises variantes, et sources identiques aux WebP déjà présents. Ne jamais gonfler artificiellement le nombre de remplacements.
+
+**Modifications limitées aux cinq fichiers WebP**, quatre fichiers de cohérence de version `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, cette documentation et les crédits. Aucun CSS, placement des tuiles, bannière citrons, Home Assistant, priorité `Courses`, OAuth, WebSocket, coffre chiffré, biométrie, mode test ni stratégie de cache visuel modifiés.
+
 ### Situation par catégorie
 
 Comptage des **265 produits renouvelés** vérifié après publication sur `main` de v565, croisé avec `catalog.js`.
