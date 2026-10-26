@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version applicative vérifiée **v572** sur main au SHA a2d1f42721025a6c199cf2d965ce3644a92eee6a, avec CI et GitHub Pages réussis. Dernier lot d'images produits publié : **v568** (PR #93, six WebP), conservé par les versions suivantes. Aucun nouveau visuel n'a été publié lors de l'audit Maison ci-dessous.
+- Dernière version visible **v578** publiée sur `main`, commit [`8df80edc07d6ee52de84648ba16224bbf67a97bf`](https://github.com/fabien95430/Dashboard-course/commit/8df80edc07d6ee52de84648ba16224bbf67a97bf), [PR #94 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/94). [CI `main` réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40415363854) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40415362833). Aucun changement des CSS, de la bannière, de la sécurité, de Home Assistant ou des safe areas iOS dans ce lot images.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient désormais **414 WebP**, un par produit et sans fichier manquant. Les six images supplémentaires de l'ancien comptage étaient des fichiers orphelins hors catalogue, supprimés lors des travaux ultérieurs.
-- **277 produits distincts** sont désormais renouvelés après publication du lot v568 ; **137 produits** ne sont pas encore renouvelés (dont plusieurs visuels déjà évalués et conservés). Ne pas les remplacer artificiellement si les images restent satisfaisantes.
-- La **compression v537** a ramené 32 fichiers historiquement volumineux de 11,88 Mio à 1,18 Mio. À l'inventaire v572, il y a **0 fichier supérieur à 100 Kio (102 400 octets)**, mais **1 supérieur au plafond strict de 100 000 octets : romarin-frais.webp, 100 866 octets**. Sa compression future ne doit pas être comptée artificiellement comme nouveau remplacement. Poids courant de `www/Items/` : **9 591 672 octets pour 414 fichiers** (l'inventaire historique v568, avant suppression de six orphelins, était 9 617 548 octets pour 420).
-- **155 images pèsent moins de 10 Kio** dans l'inventaire v572. C'est un critère de tri, pas une preuve de manque de netteté. Vérifier les dimensions et l'affichage avant remplacement.
+- **281 produits distincts** sont maintenant renouvelés après v578 ; **133 produits** restent non renouvelés, dont **au moins 18 distincts évalués et conservés**. Les 4 nouveaux remplacements ne recouvrent aucun des 277 anciens. Au moins **299 produits** ont une décision publiée de renouvellement ou de conservation, sans comptabiliser les simples comparaisons comme renouvellements.
+- La **compression v537** a ramené 32 fichiers historiquement volumineux de 11,88 Mio à 1,18 Mio. À l'inventaire v572, il y a **0 fichier supérieur à 100 Kio (102 400 octets)**, mais **1 supérieur au plafond strict de 100 000 octets : romarin-frais.webp, 100 866 octets**. Sa compression future ne doit pas être comptée artificiellement comme nouveau remplacement. Poids du répertoire `www/Items/` **après v578 : 9 621 732 octets pour 414 fichiers** ; aucun produit sans WebP. L'inventaire v568 historique (avant suppression de six orphelins) était de 9 617 548 octets pour 420 fichiers.
+- **154 images pèsent moins de 10 Kio** dans l'inventaire v578 (mesure réelle sur `main`). C'est un critère de tri, pas une preuve de manque de netteté. Vérifier les dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des vingt-quatre lots publiés
+### Historique des vingt-cinq lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -39,7 +39,8 @@
 | Lot v566 — 5 WebP | `9921fcccf322a24458699cca81b151c32745c4a9` — PR #91 | 5 |
 | Lot v567 — 1 WebP | `f1731720ff01e8cf7b08dc3674147ca7de083173` — PR #92 | 1 |
 | Lot v568 — 6 WebP | `ea27ec82e59edb7c297af6d99daa02b815fe750c` — PR #93 | 6 |
-| **Total** | | **277** |
+| Lot v578 — 4 WebP | `8df80edc07d6ee52de84648ba16224bbf67a97bf` — PR #94 | 4 |
+| **Total** | | **281** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -536,9 +537,9 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Écart d'inventaire expliqué** : les six anciens WebP orphelins supprimés entre v569 et v572 sont croquettes-chat.webp, croquettes-chien.webp, friandises-animaux.webp, litiere-chat.webp, patee-chat.webp et sacs-dejections.webp. Tous étaient hors du catalogue actuel. Le compteur correct est désormais **414 WebP pour 414 produits**, poids total **9 591 672 octets**, zéro produit sans fichier, un fichier > 100 000 octets et aucun > 102 400 octets. Le bilan des renouvellements reste **277/414**, avec **137 non renouvelés**. Ce suivi documentaire ne nécessite aucun incrément de version.
 
 
-### Lot v578 — 4 visuels préparés, NON encore publiés à la création de la PR
+### Lot v578 — 4 visuels publiés, contrôlés et validés sur `main`
 
-**Base de travail :** `fc7f6074622a11769af1392ee97eeb979d168b6b`. Quatre remplacements sélectionnés pour l'identité exacte et la qualité à 192 px, sans toucher aux images déjà renouvelées. Sources, licences, tailles et SHA : `docs/IMAGE_CREDITS_V578.md`. Dinde représentée **crue** et levure boulangère **fraîche**, sans substitution de variante ; Essuie-tout et Papier toilette sont deux rouleaux distincts. Aucun recours à l'API OpenAI payante.
+**Publication confirmée :** [commit `8df80edc07d6ee52de84648ba16224bbf67a97bf`](https://github.com/fabien95430/Dashboard-course/commit/8df80edc07d6ee52de84648ba16224bbf67a97bf), [PR #94 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/94). [CI préalable PR verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40415243260), [CI `main` verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40415363854), [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40415362833). Empreintes Git des quatre WebP, dimensions, taille du dossier et SHA de `main` vérifiés. Base de travail : `fc7f6074622a11769af1392ee97eeb979d168b6b`. Quatre remplacements sélectionnés pour l'identité exacte et la qualité à 192 px, sans toucher aux images déjà renouvelées. Sources, licences, tailles et SHA : `docs/IMAGE_CREDITS_V578.md`. Dinde représentée **crue** et levure boulangère **fraîche**, sans substitution de variante ; Essuie-tout et Papier toilette sont deux rouleaux distincts. Aucun recours à l'API OpenAI payante.
 
 | Catégorie | Produit | Avant (octets) | Après (octets) |
 | --- | --- | ---: | ---: |
@@ -548,6 +549,6 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 | Cuisine | Levure boulangère | 3152 | 9540 |
 | **Total** | **4 WebP** | **12 588** | **42 648** |
 
-**Candidats rejetés :** la planche de ménage à fond et halos non conformes ; la pâte feuilletée cuite proposée au lieu de pâte crue ; la saucisse fumée à la place de merguez crue ; toute source moins précise ou d'un autre produit. Les anciennes images fidèles restent en place. **Avant fusion** : 277 renouvelés, 137 non renouvelés, au moins 18 évalués et conservés distincts. **Seulement après fusion validée** : 281 renouvelés, 133 non renouvelés, 414 WebP, poids du dossier calculé à **9 621 732 octets**. Aucun chiffre prévisionnel ne doit être annoncé comme publié avant vérification réelle.
+**Candidats rejetés :** la planche de ménage à fond et halos non conformes ; la pâte feuilletée cuite proposée au lieu de pâte crue ; la saucisse fumée à la place de merguez crue ; toute source moins précise ou d'un autre produit. Les anciennes images fidèles restent en place. **Résultat réel publié : 281 renouvelés, 133 non renouvelés, au moins 18 évalués et conservés distincts**, soit au moins 299 produits avec une décision de renouvellement/conservation. Le répertoire compte **414 WebP, 9 621 732 octets**. **Quatre nouveaux WebP, zéro candidat incorrect publié** ; les rejets sont documentés ci-dessus. Restent prioritaires : Maison, Hygiène & soins, Petit-déjeuner, Boissons et les références Viandes & poissons dont les variantes doivent être exactes.
 
 **Périmètre** : quatre WebP, marqueurs v578 cohérents dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, ce suivi et crédits. Aucun CSS, navigation, taille/position des tuiles, bannière citrons, sécurité, HA, OAuth, WebSocket, coffre, verrouillage, biométrie, mode test ni logique de cache visuel modifiés.

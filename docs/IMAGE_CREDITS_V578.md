@@ -1,6 +1,6 @@
-# Crédits visuels produits — lot v578 (préparation PR)
+# Crédits visuels produits — lot v578 publié
 
-**Statut initial : préparé sur branche, non publié sur main.** Quatre images WebP unitaires, canal alpha VP8X réel, un seul produit par visuel, aucun atlas, logo ou texte inventé, pas d'appel à l'API OpenAI payante du projet.
+**Publié sur `main` :** commit [`8df80edc`](https://github.com/fabien95430/Dashboard-course/commit/8df80edc07d6ee52de84648ba16224bbf67a97bf), [PR #94 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/94) ; [CI PR](https://github.com/fabien95430/Dashboard-course/actions/runs/40415243260), [CI main](https://github.com/fabien95430/Dashboard-course/actions/runs/40415363854) et [Pages](https://github.com/fabien95430/Dashboard-course/actions/runs/40415362833) réussies. Empreintes des quatre fichiers vérifiées sur le vrai `main`. Quatre images WebP unitaires, canal alpha VP8X réel, un seul produit par visuel, aucun atlas, logo ou texte inventé, pas d'appel à l'API OpenAI payante du projet.
 
 | Catégorie | Produit | Fichier | Avant (o) | Après (o) | Dimensions | Git blob SHA |
 | --- | --- | --- | ---: | ---: | --- | --- |
@@ -14,4 +14,4 @@
 
 **Dinde et Levure boulangère** : [EBf Studio Ingredient Icons](https://github.com/EBf-Studio/ingredient-icons), révision `091deff6956275dfcb10b150c864834c7417529e`, sources individuelles [en_turkey.webp](https://github.com/EBf-Studio/ingredient-icons/blob/091deff6956275dfcb10b150c864834c7417529e/icons/webp/256/en_turkey.webp) et [en_yeast.webp](https://github.com/EBf-Studio/ingredient-icons/blob/091deff6956275dfcb10b150c864834c7417529e/icons/webp/256/en_yeast.webp). **Illustrations CC0 1.0** sous [LICENSE-ICONS](https://github.com/EBf-Studio/ingredient-icons/blob/091deff6956275dfcb10b150c864834c7417529e/LICENSE-ICONS), distinct de MIT du code. Attribution volontaire : EBf Studio, sans partenariat. WebP natifs transparents 256 × 256 repris octet pour octet sans agrandissement. Les variantes sont la dinde crue et la levure fraîche en bloc, jamais la viande cuite ni une pâtisserie.
 
-**Contrôles** : quatre anciens WebP 84 × 84 px ; nouveaux WebP 256 ou 384 px avec transparence VP8X ; poids individuel sous 14 000 octets. Vérification dans les véritables tuiles iPhone et du mode hors ligne à confirmer dans l'environnement approprié, sans prétendre avoir effectué un essai matériel. CI PR à vérifier avant publication, Pages après fusion.
+**Contrôles** : quatre anciens WebP 84 × 84 px ; nouveaux WebP 256 ou 384 px avec transparence VP8X ; poids individuel sous 14 000 octets. Vérification dans les véritables tuiles iPhone et du mode hors ligne à confirmer dans l'environnement approprié, sans prétendre avoir effectué un essai matériel. CI sur PR et main réussies, Pages après fusion réussies.
