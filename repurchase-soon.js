@@ -147,8 +147,7 @@ function ensureStyles(){
 
 function ensureButton(){
   const button=document.getElementById('repurchaseSoonBtn');
-  const refresh=document.getElementById('catalogRefreshBtn');
-  if(!button||!refresh)return false;
+  if(!button)return false;
   if(button.dataset.repurchaseBound==='1')return true;
   button.dataset.repurchaseBound='1';
   button.addEventListener('click',openDialog);

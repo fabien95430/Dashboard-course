@@ -55,7 +55,7 @@
   const loadRepurchaseSoon=()=>{
     if(document.querySelector('script[data-repurchase-soon]'))return;
     const script=document.createElement('script');
-    script.src='./repurchase-soon.js?v=443';
+    script.src='./repurchase-soon.js?v=576';
     script.async=false;
     script.dataset.repurchaseSoon='script';
     document.body.appendChild(script);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=575';
+    images.src='./dish-local-images.js?v=576';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});

@@ -29,9 +29,13 @@ test('les libellés et actions de Ma liste et du Catalogue sont définitifs dès
   assert.match(index,/<div class="page-title-row">\s*<h1>Ma liste<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>\s*<p>Votre liste de courses<\/p>/);
   assert.match(index,/<div class="page-title-row">\s*<h1>Catalogue<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>\s*<p>Ajouter vos produits<\/p>/);
   const listHeader=index.slice(index.indexOf('<section id="listView"'),index.indexOf('</header>',index.indexOf('<section id="listView"')));
-  assert.ok(listHeader.indexOf('id="listFilterBtn"')<listHeader.indexOf('id="refreshBtn"'),'le filtre doit précéder le rafraîchissement sur Ma liste');
+  assert.ok(listHeader.includes('id="listFilterBtn"'),'le filtre reste sur Ma liste');
   const catalogHeader=index.slice(index.indexOf('<section id="catalogView"'),index.indexOf('</header>',index.indexOf('<section id="catalogView"')));
-  assert.ok(catalogHeader.indexOf('id="repurchaseSoonBtn"')<catalogHeader.indexOf('id="catalogRefreshBtn"'),'À racheter bientôt doit précéder le rafraîchissement du Catalogue');
+  assert.ok(catalogHeader.includes('id="repurchaseSoonBtn"'),'À racheter bientôt reste sur le Catalogue');
+  const settingsHeader=index.slice(index.indexOf('<section id="settingsView"'),index.indexOf('</header>',index.indexOf('<section id="settingsView"')));
+  assert.ok(settingsHeader.includes('<div class="page-header-actions">')&&settingsHeader.includes('id="refreshBtn"'),'le rafraîchissement est dans l en-tête de Réglages');
+  assert.equal(index.match(/id="refreshBtn"/g)?.length,1,'un seul bouton de rafraîchissement');
+  assert.doesNotMatch(listHeader+catalogHeader,/#i-refresh|catalogRefreshBtn/,'aucun rafraîchissement sur Ma liste ni le Catalogue');
   assert.match(firstPaint,/repurchase-header-button/);
   assert.doesNotMatch(firstPaint,/catalog-view \.page-version\{[\s\S]*?translateY\(/);
   assert.match(dishes,/dishes\?'Choisissez un plat à cuisiner ':'Ajouter vos produits '/);
@@ -101,8 +105,8 @@ test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de s
   assert.match(styles,/\.app>\.catalog-view\{\s*margin-left:0!important;\s*margin-right:0!important/);
   assert.match(styles,/html \.app>\.catalog-view>\.page-search\{\s*margin-left:13px!important;\s*margin-right:13px!important/);
   assert.match(mobile,/html \.catalog-view>\.page-search\{[\s\S]*?margin-left:1px!important;\s*margin-right:1px!important/,'la règle spécifique doit primer sur le premier affichage');
-  assert.match(styles,/\.list-view \.page-header-actions \.icon-btn,\.catalog-view \.page-header-actions \.icon-btn\{width:38px!important;height:38px!important/);
-  assert.match(styles,/\.list-view \.page-header-actions \.icon-btn svg,\.catalog-view \.page-header-actions \.icon-btn svg\{width:17px!important;height:17px!important/);
+  assert.match(styles,/\.list-view \.page-header-actions \.icon-btn,\.catalog-view \.page-header-actions \.icon-btn,\.settings-view \.page-header-actions \.icon-btn\{width:38px!important;height:38px!important/);
+  assert.match(styles,/\.list-view \.page-header-actions \.icon-btn svg,\.catalog-view \.page-header-actions \.icon-btn svg,\.settings-view \.page-header-actions \.icon-btn svg\{width:17px!important;height:17px!important/);
   assert.doesNotMatch(mobile,/html \.catalog-view>\.page-header\{\s*display:grid!important/);
   assert.match(mobile,/html \.catalog-mode-switch\{\s*position:relative!important;\s*grid-row:2!important;\s*grid-column:1!important;\s*justify-self:center!important;\s*align-self:start!important;\s*top:auto!important;\s*left:auto!important;\s*right:auto!important;\s*transform:none!important/);
   assert.doesNotMatch(mobile,/html \.catalog-mode-switch\{[^}]*position:absolute!important/);

@@ -16,7 +16,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-citrons-v552.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=575">
+  <link rel="stylesheet" href="./styles.css?v=576">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=523">
 </head>
 <body class="is-launching">
@@ -51,16 +51,13 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v575</span>
+            <span class="page-version">v576</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
         <div class="page-header-actions">
           <button id="listFilterBtn" class="icon-btn list-filter-btn" type="button" aria-label="Trier ou filtrer la liste" aria-expanded="false" aria-controls="listFilterMenu">
             <svg><use href="#i-filter"></use></svg>
-          </button>
-          <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir la liste">
-            <svg><use href="#i-refresh"></use></svg>
           </button>
         </div>
       </header>
@@ -118,7 +115,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v575</span>
+            <span class="page-version">v576</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -126,9 +123,6 @@
           <button id="repurchaseSoonBtn" class="icon-btn repurchase-header-button" type="button" aria-label="À racheter bientôt">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"></circle><path d="M12 7.7v4.8l3 1.8"></path></svg>
             <i class="repurchase-count" aria-hidden="true" hidden></i>
-          </button>
-          <button id="catalogRefreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir le catalogue">
-            <svg><use href="#i-refresh"></use></svg>
           </button>
         </div>
       </header>
@@ -157,9 +151,14 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v575</span>
+            <span class="page-version">v576</span>
           </div>
           <p>Personnalisez votre expérience</p>
+        </div>
+        <div class="page-header-actions">
+          <button id="refreshBtn" class="icon-btn" type="button" aria-label="Rafraîchir">
+            <svg><use href="#i-refresh"></use></svg>
+          </button>
         </div>
       </header>
 
@@ -472,13 +471,13 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=575"></script>
+  <script src="./catalog.js?v=576"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=467"></script>
   <script src="./courses-notifications.js?v=481"></script>
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=442" data-app-ui="script"></script>
-  <script src="./app.js?v=573"></script>
+  <script src="./app.js?v=576"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
   <script src="./settings-ui.js?v=482"></script>
   <script src="./error-center.js?v=411"></script>

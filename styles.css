@@ -4124,11 +4124,11 @@ body{
 .list-view #listCount{font-size:9.5px!important;letter-spacing:1.4px!important;text-transform:uppercase!important;color:#073e2c!important;opacity:.55}
 
 /* v489 — Ma liste : boutons d'en-tête en pastilles voilées */
-.list-view .page-header-actions,.catalog-view .page-header-actions{gap:8px!important}
-.list-view .page-header-actions .icon-btn,.catalog-view .page-header-actions .icon-btn{width:38px!important;height:38px!important;padding:0!important;border:0!important;background:rgba(7,62,44,.055)!important;box-shadow:none!important;color:#073e2c!important;transition:background-color .16s ease,transform .16s ease}
-.list-view .page-header-actions .icon-btn svg,.catalog-view .page-header-actions .icon-btn svg{width:17px!important;height:17px!important;stroke-width:1.7!important}
-.list-view .page-header-actions .icon-btn:active,.list-view .page-header-actions .icon-btn[aria-expanded="true"],.catalog-view .page-header-actions .icon-btn:active{background:rgba(7,62,44,.11)!important}
-.list-view .page-header-actions .icon-btn:active,.catalog-view .page-header-actions .icon-btn:active{transform:scale(.94)}
+.list-view .page-header-actions,.catalog-view .page-header-actions,.settings-view .page-header-actions{gap:8px!important}
+.list-view .page-header-actions .icon-btn,.catalog-view .page-header-actions .icon-btn,.settings-view .page-header-actions .icon-btn{width:38px!important;height:38px!important;padding:0!important;border:0!important;background:rgba(7,62,44,.055)!important;box-shadow:none!important;color:#073e2c!important;transition:background-color .16s ease,transform .16s ease}
+.list-view .page-header-actions .icon-btn svg,.catalog-view .page-header-actions .icon-btn svg,.settings-view .page-header-actions .icon-btn svg{width:17px!important;height:17px!important;stroke-width:1.7!important}
+.list-view .page-header-actions .icon-btn:active,.list-view .page-header-actions .icon-btn[aria-expanded="true"],.catalog-view .page-header-actions .icon-btn:active,.settings-view .page-header-actions .icon-btn:active{background:rgba(7,62,44,.11)!important}
+.list-view .page-header-actions .icon-btn:active,.catalog-view .page-header-actions .icon-btn:active,.settings-view .page-header-actions .icon-btn:active{transform:scale(.94)}
 
 /* v496 — Catalogue : recherche identique à Ma liste, sélecteur Produits / Plats conservé. */
 .catalog-view .page-search{height:46px!important;margin:0 1px!important;padding:0 2px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,rgba(7,62,44,.5),rgba(7,62,44,.06)) 0 100%/100% 1px no-repeat!important}

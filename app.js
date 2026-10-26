@@ -251,8 +251,7 @@ const UI = Object.freeze({
   refreshBtn: document.getElementById('refreshBtn'),
   listFilterBtn: document.getElementById('listFilterBtn'),
   listFilterMenu: document.getElementById('listFilterMenu'),
-  listFilterBackdrop: document.getElementById('listFilterBackdrop'),
-  catalogRefreshBtn: document.getElementById('catalogRefreshBtn')
+  listFilterBackdrop: document.getElementById('listFilterBackdrop')
 });
 const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const productSlug=value=>String(value||'')
@@ -3002,7 +3001,6 @@ function bindUiEvents(){
     navigator.vibrate?.(4);
   });
   $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
-  UI.catalogRefreshBtn.onclick=event=>refreshFromHeader(UI.catalogRefreshBtn,event.isTrusted);
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;
   if(UI.autoLockSelect)UI.autoLockSelect.onchange=()=>setAutoLockMinutes(UI.autoLockSelect.value);
