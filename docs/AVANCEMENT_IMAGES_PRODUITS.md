@@ -301,6 +301,27 @@ Le paprika était illustré par une coupelle ouverte de poudre ; le nouveau fich
 
 **Périmètre :** un seul WebP, `index.html`, `sw.js`, `catalog.js`, `dish-local-images.js`, cette note et les crédits. Aucun changement de styles, tuiles, bannière citrons, animations, cache visuel persistant, stratégie hors ligne, Home Assistant, OAuth, WebSocket, coffre, verrouillage, biométrie, mode test ou safe areas iOS.
 
+### Lot v563 — 6 images en validation (non publié à ce stade)
+
+**État de cette section lors de la préparation :** branche de validation, *non publié* ; le bilan effectivement publié en tête reste **249/414 v562**. Les chiffres ne seront mis à jour qu'une fois le SHA de fusion, la CI complète et GitHub Pages effectivement vérifiés.
+
+Six nouveaux visuels **un produit = un WebP individuel**, créés dans ChatGPT spécifiquement pour l'application le 26 octobre 2026, sans appel à l'API OpenAI payante du dépôt ni source tierce nécessitant attribution. Les objets ont été séparés en fichiers indépendants, sans collage, avec vrai alpha, bord transparent, **384 × 384 px**, rendu vérifié à **192 × 192 px** sur fond sage et couvercle fermé visible.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Cuisine | Curry | 84174 | 27016 |
+| Cuisine | Poivre | 48432 | 28874 |
+| Cuisine | Guacamole | 4616 | 26234 |
+| Apéritif & snacks | Houmous | 4440 | 22680 |
+| Apéritif & snacks | Tapenade | 4298 | 31540 |
+| Cuisine | Harissa | 3782 | 22388 |
+
+**Bilan : 149 742 → 158 732 octets (+8 990 octets)**, 6 fichiers inférieurs à 100 Ko, aucun duplicata d'un lot précédent. Les pots répondent aux consignes de `docs/IMAGES_ITEMS.md` : curry en poudre jaune en pot fermé, poivre en grains en bocal, guacamole vert, houmous beige, tapenade noire et harissa rouge épicée, tous isolés, sans marque, étiquette ni texte.
+
+**Sélection et rejets :** deux substitutions non fidèles rejetées (pot de paprika rouge pour le curry ; moulin à poivre en bois), tandis que les images existantes de mayonnaise et sauce tomate ont été conservées, étant déjà en bocaux fermés satisfaisants. Les autres produits ne sont ni modifiés ni comptés comme renouvelés artificiellement. Sources, traitement et empreintes : `docs/IMAGE_CREDITS_V563.md`.
+
+**Périmètre :** 6 WebP, versionnement global v563 dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, documentation et crédits uniquement. Aucun changement CSS, bannière citrons, mécanisme de chargement, caches visuels, accès hors ligne, Home Assistant, OAuth, WebSocket, coffre, verrouillage, biométrie ou mode test.
+
 ### Situation par catégorie
 
 Comptage des **249 produits renouvelés** vérifié après publication sur `main` de v562, croisé avec `catalog.js`.
