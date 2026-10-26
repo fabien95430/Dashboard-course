@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v556**, sur `main`. La validation GitHub et GitHub Pages du lot sont vertes. Les fichiers CSS, la bannière citrons, les animations et les safe areas iOS de v554 sont conservés sans changement.
+- Dernière version visible **en préparation : v557** (base `main` v556). Aucune publication v557 à annoncer avant la CI complète verte et l'avance effective de `main`. Le CSS, la bannière citrons, les animations et les safe areas iOS restent inchangés.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **211 produits distincts** disposent d'un visuel remplacé après publication de v556 ; **203 produits** restent à évaluer. Certains visuels existants sont déjà satisfaisants et ne nécessitent pas de remplacement.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,71 Mio**.
-- **199 images pèsent moins de 10 Kio après v556**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **211 produits distincts** sont déjà renouvelés sur v556. Le lot v557 propose **21 remplacements supplémentaires**, portant le total **à 232 / 414 uniquement après publication**, avec **182 produits restants à évaluer**. Les autres visuels ne nécessitent pas tous d'être changés.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après le lot proposé : **environ 8,92 Mio** (avant : 8,71 Mio).
+- **184 images pèseront moins de 10 Kio après v557**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des douze lots publiés
+### Historique des lots (v557 en validation)
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -27,9 +27,10 @@
 | Lot v553 — 30 WebP | `c8bf020acb92cc6fb8ec3486584735ccdc33f00e` — PR #78 | 30 |
 | Lot v555 — 11 WebP | `3e9c62dd89eae84b325c164a1bd27422d51159d1` — PR #79 | 11 |
 | Lot v556 — 3 WebP | `829c41911f769233429d6826658924c66a6b231e` — PR #80 | 3 |
-| **Total** | | **211** |
+| Lot v557 — 21 WebP en validation | Commit de publication à compléter après CI | 21 |
+| **Total projeté** | | **232** |
 
-**Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 208), ne pas additionner les compteurs.
+**Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
 ### Lot v545 — 24 images publiées
 
@@ -176,24 +177,56 @@ Trois correspondances exactes validées dans le catalogue : une conserve de grai
 
 **Périmètre technique :** version globale `v556`, cache service worker `courses-app-v556-r1`, trois fichiers WebP, le suivi et les crédits. Aucune modification de styles, navigation, bannière citrons, Home Assistant, WebSocket, OAuth, coffre ou biométrie. Commit : `829c41911f769233429d6826658924c66a6b231e`, [PR #80 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/80), [validation complète sur `main` verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40249012283) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40249012186).
 
+### Lot v557 — 21 WebP candidats
+
+Sélection stricte : les produits déjà satisfaisants sont conservés, et **aucune image n'est ajoutée uniquement pour remplir 30 places**. Les 21 candidats sont issus des [visuels Photoreal de SwisserDev](https://github.com/SwisserDev/fivem-icons-photoreal), disponibles en **CC0 1.0**. Leurs WebP natifs 256 × 256 px, avec transparence, sont lisibles à 192 px et ont été conservés sans agrandissement ni transformation. Chaque fichier pèse moins de 27 Ko. Toutes les correspondances sources, tailles et licences sont consignées dans `docs/IMAGE_CREDITS_V557.md`.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Cuisine | Concentré de tomate | 4298 | 13776 |
+| Cuisine | Mayonnaise | 2482 | 12240 |
+| Cuisine | Sauce tomate | 2332 | 13070 |
+| Boissons | Jus de pomme | 4016 | 9726 |
+| Boissons | Jus de raisin | 3854 | 9530 |
+| Boissons | Jus d'orange | 3042 | 11776 |
+| Boissons | Lait chocolaté | 2576 | 9024 |
+| Boissons | Thé glacé | 2742 | 15138 |
+| Boissons | Smoothie | 3762 | 10814 |
+| Boissons | Tonic | 2628 | 9348 |
+| Boissons | Citronnade | 2998 | 20546 |
+| Boissons | Champagne | 2528 | 7544 |
+| Boulangerie | Croissants | 4546 | 18762 |
+| Apéritif & snacks | Cookies | 4852 | 26688 |
+| Apéritif & snacks | Gaufres | 4910 | 18192 |
+| Apéritif & snacks | Barres céréales | 4222 | 15412 |
+| Hygiène & soins | Gel hydroalcoolique | 2690 | 9928 |
+| Hygiène & soins | Coton | 3282 | 14170 |
+| Maison | Gants ménage | 3938 | 18544 |
+| Maison | Film alimentaire | 2878 | 12882 |
+| Petit-déjeuner | Chocolat chaud | 4534 | 16298 |
+
+Poids total du lot : **73 110 → 293 408 octets** (différence : +220 298 octets), sans nouvelle requête réseau supplémentaire par produit. Le dossier `www/Items/` contient toujours **420 fichiers**. Aucun WebP ne dépasse 100 Ko. Les slugs existants et la fonction de résolution des images restent inchangés.
+
+Les trois produits Frais **Mozzarella râpée, Philadelphia et Pâte à pizza**, ainsi que **Cornichon**, conservent leur image précédente, jugée plus fidèle que les candidats disponibles. Les crèmes, épices et sauces devant être représentées en pots fermés ne reçoivent aucun visuel non conforme : ici, seuls **Mayonnaise** et **Sauce tomate** reçoivent un bocal avec couvercle. Les contrôles mobile, offline, sécurité et Home Assistant restent obligatoires avant publication.
+
 ### Situation par catégorie
 
-Comptage de **211 produits renouvelés** vérifié sur `main` après publication du lot v556, croisé avec `catalog.js`.
+Comptage **projeté de 232 produits renouvelés** après validation et publication de v557, croisé avec `catalog.js`. Le total publié demeure 211 tant que `main` n'a pas été avancé.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
 | Fruits & Légumes | 72 / 72 | 0 |
 | Frais | 49 / 53 | 4 |
 | Viandes & poissons | 23 / 39 | 16 |
-| Cuisine | 40 / 71 | 31 |
-| Boulangerie | 8 / 13 | 5 |
-| Petit-déjeuner | 4 / 24 | 20 |
-| Apéritif & snacks | 9 / 24 | 15 |
-| Boissons | 6 / 36 | 30 |
-| Maison | 0 / 50 | 50 |
-| Hygiène & soins | 0 / 25 | 25 |
+| Cuisine | 43 / 71 | 28 |
+| Boulangerie | 9 / 13 | 4 |
+| Petit-déjeuner | 5 / 24 | 19 |
+| Apéritif & snacks | 12 / 24 | 12 |
+| Boissons | 15 / 36 | 21 |
+| Maison | 2 / 50 | 48 |
+| Hygiène & soins | 2 / 25 | 23 |
 | Enfant | 0 / 7 | 7 |
-| **Total** | **211 / 414** | **203** |
+| **Total projeté** | **232 / 414** | **182** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
