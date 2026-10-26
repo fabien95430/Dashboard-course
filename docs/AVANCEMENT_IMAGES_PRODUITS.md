@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version préparée pour le lot d'images : **v555** (contrôle CI obligatoire avant publication). Le `main` de base est en v554 ; ses fichiers CSS, la bannière citrons, les animations et les safe areas iOS sont conservés sans changement.
+- Dernière version visible **publiée : v555**, sur `main`. Les fichiers CSS, la bannière citrons, les animations et les safe areas iOS de v554 sont conservés sans changement.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **208 produits distincts** disposeraient d'un visuel remplacé après publication du lot v555 ; **206 produits** resteraient à évaluer. Ces 206 ne sont pas tous nécessairement de mauvaise qualité. Ne compter le lot v555 qu'après réussite de la CI et présence du commit sur `main`.
+- **208 produits distincts** disposent d'un visuel remplacé après publication de v555 ; **206 produits** restent à évaluer. Ces 206 ne sont pas tous nécessairement de mauvaise qualité.
 - La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` : **environ 8,67 Mio**.
-- **202 images pèseront moins de 10 Kio après le lot v555**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **202 images pèsent moins de 10 Kio**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des lots de nouveaux visuels (v555 en validation)
+### Historique des onze lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -25,10 +25,10 @@
 | Lot v547 — 8 nouveaux WebP | `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` — PR #76 | 8 |
 | Lot v550 — 3 nouveaux WebP | `7fbad781e728543e3c8ee81df03fe1faf125b1b2` — PR #77 | 3 |
 | Lot v553 — 30 WebP | `c8bf020acb92cc6fb8ec3486584735ccdc33f00e` — PR #78 | 30 |
-| Lot v555 — 11 WebP (en validation) | Commit à renseigner après publication | 11 |
-| **Total après v555** | | **208** |
+| Lot v555 — 11 WebP | `3e9c62dd89eae84b325c164a1bd27422d51159d1` — PR #79 | 11 |
+| **Total** | | **208** |
 
-**Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 197), ne pas additionner les compteurs.
+**Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 208), ne pas additionner les compteurs.
 
 ### Lot v545 — 24 images publiées
 
@@ -139,7 +139,7 @@ Version visible : **v550** ; service worker : `courses-app-v550-r1`, sans modifi
 | Frais | Yaourts fruits | 4060 | 18364 |
 | Frais | Yaourts vanille | 4188 | 13510 |
 
-### Lot v555 — 11 visuels à valider avant publication
+### Lot v555 — 11 visuels publiés
 
 Sélection de 11 correspondances conformes parmi les produits non renouvelés : aucune image n'est remplacée juste pour atteindre le plafond de 30. Sources vérifiées : **Soft Studio Ingredients** (CC BY 4.0, WebP 320 × 320) et **RedM Icons Photoreal** (CC0, WebP natifs 256 × 256). Les fichiers natifs 256 px sont évalués pour l'affichage à 192 px et **ne sont pas artificiellement agrandis**. Chaque image reste sous 21 Ko, avec canal alpha et slug inchangé. Aucune utilisation de l'API OpenAI payante du projet.
 
@@ -163,7 +163,7 @@ Les quatre autres produits Frais non remplacés sont conservés : leur visuel ac
 
 ### Situation par catégorie
 
-Comptage projeté des **208 images remplacées** après le lot v555, croisé avec `catalog.js` ; ne pas annoncer ces valeurs comme publiées avant validation.
+Comptage des **208 images remplacées** vérifié sur `main` après publication de v555, croisé avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
@@ -178,9 +178,9 @@ Comptage projeté des **208 images remplacées** après le lot v555, croisé ave
 | Maison | 0 / 50 | 50 |
 | Hygiène & soins | 0 / 25 | 25 |
 | Enfant | 0 / 7 | 7 |
-| **Total après v555** | **208 / 414** | **206** |
+| **Total** | **208 / 414** | **206** |
 
-**Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés seraient Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
+**Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
 ### Attribution et qualité
 
@@ -193,7 +193,7 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 - Correctif permanent du test publié sur `main` : `ba40473a7ddeb21d62f69f30e9f1217224b0a016` (PR #74 fusionnée). L'assertion contrôle l'unicité de `CACHE`, l'alignement de version et la révision entière positive, sans imposer artificiellement `r1`. Aucune modification de `sw.js`, de l'interface ou de la sécurité dans ce correctif.
 - Version `v542` (`0d463f4261f5e74e512385a42e00b22be6e8eb8f`) : seuls le fondu décoratif, le versionnement et le précache ont changé, **pas les images produits**. Idem pour les versions jusqu'à v544 avant ce lot. Validation GitHub et GitHub Pages sont toutes deux vertes sur ce commit.
 - Inventaire à la fin de v542 : **132 / 414 produits renouvelés**, **32 WebP lourds comprimés**, **420 fichiers WebP**, **aucun > 100 Kio**. Les 24 remplacements v545 décrits plus haut interviennent ultérieurement.
-- Préparation hors dépôt : une image candidate **Endives** en WebP transparent 400 × 400 px, 17 090 octets, a été réalisée, mais **n'est pas publiée ni comptabilisée**. Les trois produits à évaluer dans Fruits & Légumes restent Endives, Mâche, Olives fraîches. Tout rendu incorrect ou tout contrôle non terminé doit être rejeté.
+- Historique : les candidats **Endives** et **Mâche**, encore hors dépôt lors de cette reprise v542, ont depuis été publiés dans le lot v553. **Fruits & Légumes est terminé (72 / 72).**
 
 ## Reprise du chantier
 
@@ -209,3 +209,5 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Lot v545 publié et vérifié.** Commit : `88465389b15eaa5c237fed273a324374ed556530` ; PR #75 fusionnée ; [validation CI verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40236407821) ; [déploiement GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40236406903).
 
 **Lot v547 publié et vérifié.** Commit produit : `3bed1dab866ec7966a56400afd74f8e8b8b5f01e` ; [PR #76 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/76) ; [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40238201170) ; [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40238200704).
+
+**Lot v555 publié et vérifié :** commit `3e9c62dd89eae84b325c164a1bd27422d51159d1` — [PR #79 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/79) — [CI complète verte sur main](https://github.com/fabien95430/Dashboard-course/actions/runs/40247926690) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40247926222). Les 11 poids avant/après et l'attribution figurent plus haut et dans `docs/IMAGE_CREDITS_V555.md`.
