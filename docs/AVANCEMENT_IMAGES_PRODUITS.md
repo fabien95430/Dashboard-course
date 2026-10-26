@@ -383,6 +383,21 @@ Les six images sont des rendus originaux créés dans ChatGPT pour *Application 
 
 **Modifications limitées aux cinq fichiers WebP**, quatre fichiers de cohérence de version `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, cette documentation et les crédits. Aucun CSS, placement des tuiles, bannière citrons, Home Assistant, priorité `Courses`, OAuth, WebSocket, coffre chiffré, biométrie, mode test ni stratégie de cache visuel modifiés.
 
+### Lot v567 — Rosette (préparé sur branche de validation)
+
+**Non publié à ce stade.** Le bilan `main` demeure **270/414** renouvelés en v566 jusqu'à fusion confirmée et validations CI/Pages. Ce lot ne comporte aucun autre remplacement et n'incrémente la version qu'une fois.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Viandes & poissons | Rosette | 5 006 | 18 496 |
+| **Total** | **1 WebP** | **5 006** | **18 496** |
+
+La vignette originale était très petite. La nouvelle source **EBf Studio Ingredient Icons**, `en_cured-sausage.webp`, montre un seul saucisson sec en boyau avec tranches visibles : une rosette clairement reconnaissable à **192 px**, sans marque, étiquette, décor ou texte. Format natif **256 × 256 px**, WebP avec canal alpha réellement présent et taille inférieure à 20 Ko. Licence des icônes **CC0 1.0** (distincte de la licence MIT du code source), liens et SHA documentés dans `docs/IMAGE_CREDITS_V567.md`.
+
+**Sélection conservatrice :** variantes rejetées : saucisse fumée générique pour Merguez ; viande hachée en vrac pour Steaks hachés ; porc entier pour Lardons et Rillettes ; oranges pour confiture de mirabelles ; lentilles brunes pour des lentilles corail ; visuels déjà plus nets ou identiques (moules, cabillaud, sardines, pain burger, gaufres, etc.). Une source qui représente une autre variante n'est jamais publiée pour atteindre un quota.
+
+**Invariants préservés :** le catalogue produit et ses slugs restent identiques ; aucun style, bannière, chargement d'images, cache visuel, backend, dépendance externe, Home Assistant, WebSocket, OAuth, coffre, verrouillage, biométrie ou logique offline modifié. Seuls un WebP, les quatre fichiers de versionnement et la documentation/crédits changent.
+
 ### Situation par catégorie
 
 Comptage des **270 produits renouvelés** vérifié après publication sur `main` de v566, croisé avec `catalog.js`.
