@@ -342,6 +342,26 @@ Six nouveaux visuels **un produit = un WebP individuel**, créés dans ChatGPT s
 
 **Portée :** quatre fichiers `www/Items/*.webp`, alignement de la version globale v564 dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, ainsi que le suivi et la provenance. Aucun changement aux styles, bannière citrons, position des tuiles, cache visuel persistant, stratégie hors ligne, priorité Home Assistant `Courses`, WebSocket, OAuth, coffre chiffré, biométrie, verrouillage ou mode test.
 
+### Lot v565 — six produits Hygiène & soins, validation PR
+
+**État sur la branche de validation : préparé, non publié.** Ne pas modifier le bilan publié (259 / 414 en v564) avant publication réelle, CI et Pages vérifiés. Les six produits figuraient parmi les **155 non renouvelés** ; aucun lot antérieur ne les a remplacés. Aucun des 20 produits récemment évalués et conservés n'est repris.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Hygiène & soins | Shampoing | 2252 | 15708 |
+| Hygiène & soins | Après-shampoing | 2240 | 9600 |
+| Hygiène & soins | Gel douche | 2856 | 16650 |
+| Hygiène & soins | Savon mains | 2788 | 12128 |
+| Hygiène & soins | Dentifrice | 2480 | 8896 |
+| Hygiène & soins | Mousse à raser | 2416 | 11484 |
+| **Total** | **6 fichiers** | **15 032** | **74 466** |
+
+Les six images sont des rendus originaux créés dans ChatGPT pour *Application Course* le 26 octobre 2026, puis isolés **un produit par WebP** depuis une source composite ; aucun atlas n'est livré ou chargé par l'application. Chaque image finale fait **384 × 384 px**, avec fond transparent réel (alpha 0–255), contours contrôlés sur un aperçu **192 × 192 px** sur fond sauge, marge régulière et taille comprise entre **8 896 et 16 650 octets**. Shampooing liquide en flacon-pompe ambré, après-shampoing en flacon-pompe crème, gel douche bleu-vert à bouchon, savon mains en flacon-pompe clair, dentifrice en tube et mousse à raser en aérosol bleu. Pas de marque ni texte inventé, pas d'agrandissement d'un ancien fichier flou, aucun recours à l'API OpenAI payante du dépôt.
+
+**Provenance, SHA blob et correspondance :** `docs/IMAGE_CREDITS_V565.md`. Les six binaires ont été transférés sur GitHub et leur empreinte Git vérifiée identique à la source. Les anciens visuels étaient de petites vignettes ; les six nouvelles sont jugées plus nettes et lisibles à 192 px. Les autres produits (dont le coulis de fruit, encore insuffisamment distinct d'une confiture) sont conservés ou rejetés, pas artificiellement comptabilisés.
+
+**Périmètre strict :** uniquement les six `www/Items/*.webp`, les marqueurs globaux v565 dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, la note de suivi et les crédits. Aucun changement de `product-item-images.js`, de stratégie de chargement, cache visuel, fonctionnement hors ligne, architecture statique, Home Assistant, WebSocket, OAuth, coffre chiffré, biométrie, mode test, CSS, bannière citrons, iOS, navigation ni liste `Courses`.
+
 ### Situation par catégorie
 
 Comptage des **259 produits renouvelés** vérifié après publication sur `main` de v564, croisé avec `catalog.js`.
