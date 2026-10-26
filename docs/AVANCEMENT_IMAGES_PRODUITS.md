@@ -492,3 +492,22 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Lot v566 publié et vérifié :** [commit `9921fcccf322a24458699cca81b151c32745c4a9`](https://github.com/fabien95430/Dashboard-course/commit/9921fcccf322a24458699cca81b151c32745c4a9), [PR #91](https://github.com/fabien95430/Dashboard-course/pull/91), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40392546801), [Pages réussies](https://github.com/fabien95430/Dashboard-course/actions/runs/40392546763). Cinq WebP : 18 090 → 56 276 octets, 270/414 renouvelés, 144 non renouvelés, 420 fichiers WebP, total 9 459 566 octets. Crédits : `docs/IMAGE_CREDITS_V566.md`.
 
 **Lot v567 publié et vérifié :** [commit `f1731720ff01e8cf7b08dc3674147ca7de083173`](https://github.com/fabien95430/Dashboard-course/commit/f1731720ff01e8cf7b08dc3674147ca7de083173) — [PR #92](https://github.com/fabien95430/Dashboard-course/pull/92) — [CI réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40395443868) — [Pages réussies](https://github.com/fabien95430/Dashboard-course/actions/runs/40395444944). Rosette 5 006 → 18 496 octets, 271/414 renouvelés, 143 non renouvelés. Crédits CC0 : `docs/IMAGE_CREDITS_V567.md`. Poids du répertoire : 9 473 056 octets, 420 WebP, zéro image au-delà de 100 Ko.
+
+
+### Lot v568 — six nouveaux WebP préparés (en validation, non encore publiés)
+
+Six produits **Viandes & poissons** non renouvelés en v567 ont été sélectionnés après inspection de leurs petites vignettes. Les six fichiers candidats sont présents dans l'arbre de la branche de validation ; ils ne doivent être comptés dans les totaux de `main` qu'après fusion et vérification du déploiement. Les poids et les SHA individuels sont documentés dans `docs/IMAGE_CREDITS_V568.md`.
+
+| Produit | Avant (octets) | Après (octets) |
+| --- | ---: | ---: |
+| Coppa | 4426 | 38554 |
+| Lardons | 5004 | 22132 |
+| Mortadelle | 3912 | 24224 |
+| Rillettes | 4932 | 29634 |
+| Surimi | 3954 | 22530 |
+| Steaks hachés | 5024 | 34670 |
+| **Total** | **27 252** | **171 744** |
+
+**Écarts de sélection :** Rosette déjà renouvelée en v567 (conservée) ; Merguez écartée en raison d'une variante visuelle non certifiée crue ; Coulis de fruit toujours reporté, car les propositions ressemblent à une confiture. Les autres alternatives incorrectes (viande cuite, mauvaise espèce, produit différent) restent rejetées. Aucun autre produit déjà renouvelé n'est écrasé.
+
+**Périmètre proposé :** uniquement les six `www/Items/*.webp`, les quatre points de cohérence v568 (`index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`) et la documentation. Pas de changement de CSS, d'interface, bannière, Home Assistant, chargement des images, cache persistant, sécurité, biométrie, mode test ou synchronisation. **Les comptes publiés restent 271/414 renouvelés et 143 non renouvelés tant que la fusion n'est pas prouvée.**
