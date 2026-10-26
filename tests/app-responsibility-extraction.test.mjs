@@ -17,17 +17,17 @@ test('P3 confie la navigation liquide à son module propriétaire',()=>{
 });
 
 test('le module de navigation reste découplé de l état métier',()=>{
-  assert.match(nav,/window\.COURSES_BOTTOM_NAV=Object\.freeze\(\{bind,sync,shouldIgnoreClick\}\)/);
+  assert.match(nav,/window\.COURSES_BOTTOM_NAV=Object\.freeze\(\{bind,sync,shouldIgnoreClick,afterSettle\}\)/);
   assert.match(nav,/function bind\(navigate\)/);
   assert.match(nav,/onNavigate\?\.\(target\.dataset\.view\|\|'list'\)/);
   assert.doesNotMatch(nav,/\bstate\.view\b|\bshowView\s*\(|COURSES_HA_CLIENT|WebSocket|MutationObserver/);
 });
 
 test('le module est chargé avant app.js et précaché avec sa propre révision',()=>{
-  const navIndex=index.indexOf('./bottom-nav-liquid.js?v=414');
+  const navIndex=index.indexOf('./bottom-nav-liquid.js?v=573');
   const appScript=index.match(/<script src="(\.\/app\.js\?v=\d+)"><\/script>/)?.[1]||'';
   const appIndex=appScript?index.indexOf(appScript):-1;
   assert.ok(navIndex>=0&&appIndex>navIndex);
-  assert.match(sw,/\.\/bottom-nav-liquid\.js\?v=414/);
+  assert.match(sw,/\.\/bottom-nav-liquid\.js\?v=573/);
   assert.ok(sw.includes('"'+appScript+'"'),'le shell précache la révision réellement chargée de app.js');
 });

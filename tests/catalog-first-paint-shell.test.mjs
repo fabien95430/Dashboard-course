@@ -168,7 +168,7 @@ test('la référence visuelle conserve les icônes du menu et la lentille native
   assert.ok(index.includes('<symbol id="i-nav-grid"'));
   assert.ok(index.includes('<svg><use href="#i-nav-list"></use></svg><span>Ma liste</span>'));
   assert.ok(index.includes('<svg><use href="#i-nav-grid"></use></svg><span>Catalogue</span>'));
-  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
   assert.ok(styles.includes('font-family:"Baskerville","Iowan Old Style",Georgia,serif'));
   assert.ok(styles.includes('background:rgba(214,226,213,.73)'));
   assert.ok(styles.includes('background:#2c563c;'));
@@ -202,7 +202,7 @@ test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans 
   assert.ok(fourthTop>top+chrome+visible);
   assert.ok(row>132,'les tuiles sont réellement agrandies');
   assert.ok(style.includes('overflow-y:auto;'),'défilement natif conservé');
-  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
 });
 
@@ -223,7 +223,7 @@ test('le rail des catégories défile bord à bord et les cartes Produits resten
   assert.ok(styles.includes('.cat.is-active{\n  background:#2c563c;'));
   assert.ok(!styles.includes('background:#238d4e;'));
   assert.ok(!styles.includes('background:#168647;'));
-  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
   assert.ok(index.includes('catalog-liquid.js?v=494')||read('sw.js').includes('catalog-liquid.js?v=494'));
 });
 
@@ -241,7 +241,7 @@ test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans pe
   assert.ok(dishes.includes('.dishes-grid{min-height:0;overflow-y:auto;'));
   assert.ok(catalog.includes("'./dishes.css?v=532'"));
   assert.ok(sw.includes('"./dishes.css?v=532"'));
-  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
 });
 
@@ -257,7 +257,7 @@ test('sélection sauge visible et lettres descendantes non rognées sur les troi
   assert.ok(dishes.includes('.dish-copy strong{color:#101418;font-size:12.7px;line-height:1.22;'));
   assert.ok(catalog.includes("'./dishes.css?v=532'"));
   assert.ok(sw.includes('"./dishes.css?v=532"'));
-  assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
+  assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
   const localImages=read('dish-local-images.js');
   const version=localImages.match(/const APP_VERSION='(v\d+)'/)?.[1];

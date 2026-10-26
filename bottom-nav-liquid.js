@@ -3,6 +3,28 @@
 
 const state={x:0,vx:0,tx:0,w:0,tw:0,vw:0,lift:0,vl:0,tl:0,last:0,ready:false,frame:0,scrub:null,justScrubbed:false};
 let onNavigate=null;
+const settleCallbacks=new Set();
+let settleFrame=0,settleTimer=0;
+
+function flushSettled(){
+  if(settleFrame)cancelAnimationFrame(settleFrame);
+  clearTimeout(settleTimer);
+  settleFrame=0;settleTimer=0;
+  const callbacks=[...settleCallbacks];
+  settleCallbacks.clear();
+  callbacks.forEach(callback=>{try{callback()}catch(error){setTimeout(()=>{throw error},0)}});
+}
+// Exécute un travail lourd une fois la pastille arrivée, pour ne pas figer sa course.
+function afterSettle(callback){
+  if(typeof callback!=='function')return ()=>{};
+  settleCallbacks.add(callback);
+  if(!state.frame&&!state.scrub){
+    if(!settleFrame)settleFrame=requestAnimationFrame(()=>{settleFrame=0;if(!state.frame&&!state.scrub)flushSettled()});
+  }
+  clearTimeout(settleTimer);
+  settleTimer=setTimeout(flushSettled,900);
+  return ()=>{settleCallbacks.delete(callback)};
+}
 
 function reduced(){
   return Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -207,6 +229,7 @@ function step(time){
     Object.assign(state,{x:state.tx,vx:0,w:state.tw,vw:0,lift:state.tl,vl:0});
     paint();
     markUnder(true);
+    flushSettled();
     return;
   }
   state.frame=requestAnimationFrame(step);
@@ -221,6 +244,7 @@ function sync(animate=true){
     Object.assign(state,{x:state.tx,vx:0,w:state.tw,vw:0,lift:0,vl:0,tl:0,last:0,ready:true,frame:0});
     paint();
     markUnder(true);
+    flushSettled();
     return;
   }
   if(Math.abs(state.tx-state.x)<0.25&&Math.abs(state.tw-state.w)<0.25)return;
@@ -292,5 +316,5 @@ function bind(navigate){
 }
 function shouldIgnoreClick(){return state.justScrubbed}
 
-window.COURSES_BOTTOM_NAV=Object.freeze({bind,sync,shouldIgnoreClick});
+window.COURSES_BOTTOM_NAV=Object.freeze({bind,sync,shouldIgnoreClick,afterSettle});
 })();

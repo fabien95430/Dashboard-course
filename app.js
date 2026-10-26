@@ -1327,7 +1327,16 @@ if(!BOTTOM_NAV)throw new Error('Navigation liquide indisponible');
 
 let publishedView='';
 let catalogRenderFrame=0;
+let cancelCatalogRenderAfterNav=null;
 function scheduleCatalogRender(){
+  if(productGridReady){
+    // Grille déjà affichée : laisser la pastille finir sa course avant la mise à jour.
+    cancelCatalogRenderAfterNav=BOTTOM_NAV.afterSettle(()=>{
+      cancelCatalogRenderAfterNav=null;
+      if(state.view==='catalog')renderProducts();
+    });
+    return;
+  }
   // Garder la première frame disponible pour l'animation iOS.
   catalogRenderFrame=requestAnimationFrame(()=>{
     catalogRenderFrame=requestAnimationFrame(()=>{
@@ -1346,6 +1355,8 @@ function showView(){
   if(viewChanged){
     if(catalogRenderFrame)cancelAnimationFrame(catalogRenderFrame);
     catalogRenderFrame=0;
+    cancelCatalogRenderAfterNav?.();
+    cancelCatalogRenderAfterNav=null;
     publishedView=state.view;
   }
   BOTTOM_NAV.sync(true);

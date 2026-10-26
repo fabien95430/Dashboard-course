@@ -328,7 +328,13 @@ function bindEvents(){
   eventsBound=true;
   document.addEventListener('courses:products-updated',scheduleDecorateProducts);
   document.addEventListener('courses:list-rendered',scheduleDecorateList);
-  document.addEventListener('courses:view-changed',event=>{if(event.detail?.view==='catalog')scheduleDecorateProducts()});
+  document.addEventListener('courses:view-changed',event=>{
+    if(event.detail?.view!=='catalog')return;
+    // Laisser la pastille de navigation finir sa course avant de parcourir la grille.
+    const nav=window.COURSES_BOTTOM_NAV;
+    if(typeof nav?.afterSettle==='function')nav.afterSettle(scheduleDecorateProducts);
+    else scheduleDecorateProducts();
+  });
   document.addEventListener('courses:catalog-products-ready',warmProductImages);
 }
 function bind(){
