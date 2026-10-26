@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **v578** publiée sur `main`, commit [`8df80edc07d6ee52de84648ba16224bbf67a97bf`](https://github.com/fabien95430/Dashboard-course/commit/8df80edc07d6ee52de84648ba16224bbf67a97bf), [PR #94 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/94). [CI `main` réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40415363854) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40415362833). Aucun changement des CSS, de la bannière, de la sécurité, de Home Assistant ou des safe areas iOS dans ce lot images.
+- Dernier lot d'images publié **v582** sur `main`, commit [`6c18a389cd3f5c9ad62793b3d7c69f5a6d20bd6f`](https://github.com/fabien95430/Dashboard-course/commit/6c18a389cd3f5c9ad62793b3d7c69f5a6d20bd6f), via [PR #95 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/95). [CI préalable PR réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40420931134), [CI `main` réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40421036581) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40421036129). Aucun changement de CSS, navigation, bannière, sécurité, Home Assistant ni safe areas iOS dans ce lot d'images.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient désormais **414 WebP**, un par produit et sans fichier manquant. Les six images supplémentaires de l'ancien comptage étaient des fichiers orphelins hors catalogue, supprimés lors des travaux ultérieurs.
-- **281 produits distincts** sont maintenant renouvelés après v578 ; **133 produits** restent non renouvelés, dont **au moins 18 distincts évalués et conservés**. Les 4 nouveaux remplacements ne recouvrent aucun des 277 anciens. Au moins **299 produits** ont une décision publiée de renouvellement ou de conservation, sans comptabiliser les simples comparaisons comme renouvellements.
-- La **compression v537** a ramené 32 fichiers historiquement volumineux de 11,88 Mio à 1,18 Mio. À l'inventaire v572, il y a **0 fichier supérieur à 100 Kio (102 400 octets)**, mais **1 supérieur au plafond strict de 100 000 octets : romarin-frais.webp, 100 866 octets**. Sa compression future ne doit pas être comptée artificiellement comme nouveau remplacement. Poids du répertoire `www/Items/` **après v578 : 9 621 732 octets pour 414 fichiers** ; aucun produit sans WebP. L'inventaire v568 historique (avant suppression de six orphelins) était de 9 617 548 octets pour 420 fichiers.
-- **154 images pèsent moins de 10 Kio** dans l'inventaire v578 (mesure réelle sur `main`). C'est un critère de tri, pas une preuve de manque de netteté. Vérifier les dimensions et l'affichage avant remplacement.
+- **289 produits distincts** sont renouvelés après le lot v582 ; **125** produits restent non renouvelés, dont **au moins 18 distincts évalués et conservés**. Les huit nouveaux remplacements sont distincts des 281 anciens. **Au moins 307 produits** ont une décision de renouvellement ou de conservation documentée, sans confondre image évaluée et image remplacée.
+- La **compression v537** concernait 32 fichiers historiquement volumineux. À l'inventaire du lot v582, il reste **0 fichier supérieur à 100 Kio (102 400 octets)** ; un seul dépasse le plafond strict de **100 000 octets** : `romarin-frais.webp` (100 866 octets). Son éventuelle compression n'est pas un renouvellement. Poids réel de `www/Items/` après v582 : **9 741 656 octets pour 414 WebP** (avant 9 621 732 octets). Aucun slug du catalogue ne manque.
+- **148 images pèsent moins de 10 Kio** après v582 (comparaison de l'inventaire : sept anciens fichiers de moins de 10 Kio remplacés par des fichiers supérieurs, et Chili passe de 59 028 à 8 998 octets). Cette taille est un critère de tri, pas une preuve de manque de netteté.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des vingt-cinq lots publiés
+### Historique des vingt-six lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -40,7 +40,8 @@
 | Lot v567 — 1 WebP | `f1731720ff01e8cf7b08dc3674147ca7de083173` — PR #92 | 1 |
 | Lot v568 — 6 WebP | `ea27ec82e59edb7c297af6d99daa02b815fe750c` — PR #93 | 6 |
 | Lot v578 — 4 WebP | `8df80edc07d6ee52de84648ba16224bbf67a97bf` — PR #94 | 4 |
-| **Total** | | **281** |
+| Lot v582 — 8 WebP | `6c18a389cd3f5c9ad62793b3d7c69f5a6d20bd6f` — PR #95 | 8 |
+| **Total** | | **289** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -554,9 +555,10 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Périmètre** : quatre WebP, marqueurs v578 cohérents dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, ce suivi et crédits. Aucun CSS, navigation, taille/position des tuiles, bannière citrons, sécurité, HA, OAuth, WebSocket, coffre, verrouillage, biométrie, mode test ni logique de cache visuel modifiés.
 
 
-### Lot v582 — 8 images préparées (publication et validations en attente)
 
-**Base :** `97149bcb7843f4eeb06b24f8fad729a15455cec7` (v581). Les huit originaux ont été inspectés, ainsi que les nouveaux candidats isolés sur fond transparent. Sept WebP ont été créés dans ChatGPT avec sortie indépendante, un huitième est une source EBf Studio CC0. Les images existantes déjà renouvelées depuis v528 à v578 ne sont pas reprises. Crédits individuels et empreintes : `docs/IMAGE_CREDITS_V581.md`.
+### Lot v582 — 8 nouveaux WebP publiés et vérifiés
+
+**Publié sur `main` :** commit [`6c18a389cd3f5c9ad62793b3d7c69f5a6d20bd6f`](https://github.com/fabien95430/Dashboard-course/commit/6c18a389cd3f5c9ad62793b3d7c69f5a6d20bd6f), [PR #95 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/95), [validation préalable PR verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40420931134), [CI complète sur `main` verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40421036581), [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40421036129). Base de préparation initiale v580, puis **rebase obligatoire sur v581** `97149bcb7843f4eeb06b24f8fad729a15455cec7` lorsque `main` a avancé ; la nouvelle logique de fondu des images introduite séparément en v581 a été intégralement conservée. Dernière version du lot : **v582**.
 
 | Catégorie | Produit | Avant (octets) | Après (octets) |
 | --- | --- | ---: | ---: |
@@ -567,9 +569,13 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 | Apéritif & snacks | Madeleines | 3824 | 26222 |
 | Apéritif & snacks | Crêpes | 4178 | 24638 |
 | Boulangerie | Pains hot-dog | 3500 | 19134 |
-| Cuisine | Chili | 59028 | 9000 |
-| **Total** | **8 WebP** | **87658** | **207584** |
+| Cuisine | Chili | 59028 | 8998 |
+| **Total** | **8 WebP** | **87 658** | **207 582** |
 
-**Différence : +119926 octets.** Chaque WebP autonome est 256 ou 384 px, possède de l'alpha réel et pèse au plus 41 670 octets ; aucun suréchantillonnage d'anciens petits visuels. Aperçus contrôlés à 192 px en fonds clair et sombre. Merguez est représentée crue, sans cuisson ; Chili reste un piment rouge. Les mauvaises variantes ou candidats à fond opaque ont été rejetés. Pas d'API OpenAI payante ni de modification CSS, tuiles, bannière, transitions, safe areas iOS, chargement visuel, Home Assistant, liste `Courses`, WebSocket, OAuth, coffre, biométrie ou mode test.
+**Variation du lot : +119 924 octets.** Les huit fichiers sont des WebP **unitaires** 256 ou 384 px, avec canal alpha et marges vérifiés, au plus 41 670 octets. Les sept créations originales ChatGPT ont été redimensionnées à la baisse depuis 1254 px, recadrées individuellement et inspectées à 192 px sur fonds clair et sombre. Le Chili provient d'[EBf Studio Ingredient Icons](https://github.com/EBf-Studio/ingredient-icons), **CC0 1.0 pour les icônes** : son blob Git natif est `32f4b607dc0ba3b80b2d99206fa99648cf620b19` et sa taille réelle GitHub est **8 998 octets** (correction de deux octets par rapport au comptage préparatoire). Chaque blob final correspond exactement à la source transférée et a été contrôlé dans l'arbre `main`. Provenance, licence, correspondance, dimensions et empreintes de tous les produits : `docs/IMAGE_CREDITS_V582.md`.
 
-**Statut : PR à valider, NON ENCORE PUBLIÉ AU MOMENT DE LA PRÉPARATION.** En attendant une fusion réelle et les validations finales, le décompte publié reste **281/414 renouvelés**, **133 non renouvelés**, avec au moins **18 évalués et conservés** distincts. Si la publication aboutit, les totaux deviendront **289 renouvelés**, **125 non renouvelés**, **307 décisions documentées** (18 conservés distincts). Le suivi doit être actualisé seulement après confirmation du SHA réel de `main`, de la CI et de Pages.
+**Sélection et rejets :** huit produits anciennement non renouvelés, sans écraser d'autres renouvellements. Merguez reste **crue** et épicée sans traces de cuisson ; Chili est un piment rouge comme l'ancien visuel, jamais une sauce ou un plat. Les planches ménagères à fond opaque/halos, les pots de confiture ouverts, les vinaigres assortis d'accessoires, la pâte feuilletée cuite et les saucisses fumées génériques ont été rejetés. Les images déjà nettes et fidèles (notamment Granola, Sirop d'érable, Papier cadeau, Lave-glace et Pâte brisée) restent inchangées. Le test sur véritable appareil iPhone et Home Assistant n'a pas été effectué ; ne pas le confondre avec les contrôles d'image et la CI.
+
+**Périmètre strict** : 8 WebP de `www/Items/`, versionnage cohérent v582 dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, crédits et suivi uniquement. Ni les dimensions/emplacements de tuiles, ni le fond/les citrons, ni les animations, ni le cache visuel persistant et sa stratégie de chargement, ni Home Assistant, liste `Courses`, WebSocket, OAuth, coffre chiffré, verrouillage, biométrie, mode test ou safe areas ne sont modifiés.
+
+**Bilan publié après v582 : 289/414 renouvelés (69,8 %), 125 non renouvelés, au moins 18 évalués et conservés distincts, soit au moins 307 décisions documentées.** Les 414 images WebP sont toutes présentes, poids total 9 741 656 octets, aucun fichier au-dessus de 100 Kio. Priorités de poursuite : Maison, Hygiène & soins, Petit-déjeuner, Boissons, puis Viandes & poissons et Cuisine lorsque l'amélioration est certaine.

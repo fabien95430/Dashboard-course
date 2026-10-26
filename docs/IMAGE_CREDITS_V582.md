@@ -1,4 +1,4 @@
-# Crédits et conformité — lot d'images v582 (validation de PR en cours)
+# Crédits et conformité — lot d'images v582 (publié et vérifié)
 
 **Préparation :** 26 octobre 2026 sur `main` au SHA de départ `97149bcb7843f4eeb06b24f8fad729a15455cec7`. Huit WebP unitaires sous les slugs existants : aucune image ajoutée, aucun atlas, aucune API OpenAI payante du dépôt.
 
@@ -15,11 +15,11 @@
 | Apéritif & snacks | Madeleines | `www/Items/madeleines.webp` | 3824 | 26222 | 384 × 384 | `ea7eeb828e51e50cb39e005e76261cfab2000f96` |
 | Apéritif & snacks | Crêpes | `www/Items/crepes.webp` | 4178 | 24638 | 384 × 384 | `55c7a9a04c98b071326be8e3d9ccc3e7167e0239` |
 | Boulangerie | Pains hot-dog | `www/Items/pains-hot-dog.webp` | 3500 | 19134 | 384 × 384 | `686bc938c11db748e9e7f04a5ecc2de20ae27d80` |
-| Cuisine | Chili | `www/Items/chili.webp` | 59028 | 9000 | 256 × 256 | `32f4b607dc0ba3b80b2d99206fa99648cf620b19` |
-| **Total** | **8 produits** | | **87658** | **207584** | | |
+| Cuisine | Chili | `www/Items/chili.webp` | 59028 | 8998 | 256 × 256 | `32f4b607dc0ba3b80b2d99206fa99648cf620b19` |
+| **Total** | **8 produits** | | **87658** | **207582** | | |
 
-**Contrôles effectués en préparation :** même nom de produit dans `catalog.js`, ancien visuel examiné, correspondance exacte du nouveau visuel, un seul type d'objet, pas de découpe, transparence réelle, poids ≤ 60 Ko, aperçu à 192 px, somme et empreintes Git des blobs source/destination identiques. Pour Merguez, variante crue épicée sans trace de grillade ni cuisson ; pour Chili, piment rouge, **pas** un plat préparé. Le test en tuiles réelles Catalogue/Ma liste sur iPhone, la validation CI sur PR et le contrôle Pages restent à documenter avec leurs résultats réels après publication.
+**Contrôles effectués en préparation :** même nom de produit dans `catalog.js`, ancien visuel examiné, correspondance exacte du nouveau visuel, un seul type d'objet, pas de découpe, transparence réelle, poids ≤ 60 Ko, aperçu à 192 px, somme et empreintes Git des blobs source/destination identiques. Pour Merguez, variante crue épicée sans trace de grillade ni cuisson ; pour Chili, piment rouge, **pas** un plat préparé. La validation automatique CI sur PR et sur `main` est réussie et GitHub Pages a été déployé. Les tests sur un appareil iPhone physique et Home Assistant ne sont pas déclarés comme réalisés.
 
 **Rejets :** planches de produits ménagers et images avec fonds opaques/halos, sources de confitures ouvertes, vinaigres avec accessoires, pâte feuilletée cuite, saucisse fumée pour merguez et toutes sources de variante incorrecte. Les visuels déjà nets (dont Granola, Sirop d'érable, Papier cadeau, Lave-glace, Pâte brisée) sont conservés sans nouveau comptage.
 
-**Poids potentiel du lot :** 87658 → 207584 octets (variation +119926). La documentation d'achèvement de publication indiquera la PR, le SHA réel du commit sur `main`, la CI et le déploiement Pages, sans annoncer prématurément un succès.
+**Poids réel du lot :** 87 658 → 207 582 octets (variation +119 924). Publication : [commit `6c18a389`](https://github.com/fabien95430/Dashboard-course/commit/6c18a389cd3f5c9ad62793b3d7c69f5a6d20bd6f), [PR #95](https://github.com/fabien95430/Dashboard-course/pull/95), [CI PR](https://github.com/fabien95430/Dashboard-course/actions/runs/40420931134), [CI main](https://github.com/fabien95430/Dashboard-course/actions/runs/40421036581) et [Pages](https://github.com/fabien95430/Dashboard-course/actions/runs/40421036129), toutes réussies.
