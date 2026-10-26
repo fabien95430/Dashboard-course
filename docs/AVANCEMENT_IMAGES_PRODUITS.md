@@ -246,6 +246,21 @@ Six anciennes vignettes de petite dimension ont été comparées à des sources 
 
 **Périmètre limité** : six WebP, `index.html`, `sw.js`, `catalog.js`, `dish-local-images.js`, documentation et attribution. Les styles, la bannière citrons, les animations, les safe areas iOS, Ma liste, le catalogue métier, Home Assistant, OAuth, WebSocket, coffre chiffré, verrouillage, biométrie, mode test et stratégie de chargement/cache sont inchangés.
 
+### Lot v560 — curcuma en pot, branche de validation
+
+**État provisoire : non publié au moment de la préparation.** Les totaux publiés restent ceux de v559 jusqu'à la fusion et aux validations CI/Pages réelles.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Cuisine | Curcuma | 41 822 | 6 860 |
+| **Total** | **1 WebP** | **41 822** | **6 860** |
+
+Le visuel précédent montrait des **racines fraîches** et ne respectait pas le conditionnement obligatoire des épices. Le remplacement présente **un unique pot de curcuma moulu fermé**, couvercle métallique bien visible, sans marque ni texte, fond réellement transparent. WebP natif **256 × 256 px**, alpha RGBA vérifié, visualisation à 192 px et marge régulière. Source originale générée spécifiquement pour le projet par l'outil de génération d'images ChatGPT, puis compressée localement sans agrandissement, **sans appel à l'API OpenAI payante du projet**. SHA Git du blob de l'image : `7ed6915cc702a8a48d30e899f7fc2f279e0ffdb1`. Provenance : `docs/IMAGE_CREDITS_V560.md`.
+
+**43 produits distincts inspectés visuellement dans cette passe**, dont un remplacement justifié et 42 autres visuels ou propositions non retenus pour publication. Ils restent inchangés : images existantes assez fidèles, erreurs de forme ou de variante (compote bébé avec paille, viande crue remplacée par cuisson, limonade en carafe), sauces présentées en bouteille ou en coupelle au lieu de pots fermés, produits avec accessoires inutiles ou fond non transparent. En particulier, les sauces Burger, César, Ketchup et Barbecue ont des conditionnements à corriger dans de futurs lots avec des sources **exactes et fermées** ; aucun candidat approximatif n'est utilisé pour gonfler le lot. Les produits conservés ne sont pas comptés artificiellement comme renouvelés.
+
+**Périmètre technique :** le seul WebP `www/Items/curcuma.webp`, versions globales v560 dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, ce suivi et les crédits. Aucun changement CSS, chargement des images, stratégie hors ligne, Home Assistant, OAuth, WebSocket, coffre, sécurité, biométrie, mode test, bannière citrons ou safe areas.
+
 ### Situation par catégorie
 
 Comptage des **241 produits renouvelés** vérifié après publication sur `main` de v559, croisé avec `catalog.js`.
