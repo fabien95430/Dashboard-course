@@ -262,6 +262,29 @@ Le visuel précédent montrait des **racines fraîches** et ne respectait pas le
 
 **Périmètre technique :** le seul WebP `www/Items/curcuma.webp`, versions globales v560 dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, ce suivi et les crédits. Aucun changement CSS, chargement des images, stratégie hors ligne, Home Assistant, OAuth, WebSocket, coffre, sécurité, biométrie, mode test, bannière citrons ou safe areas.
 
+### Lot v561 — six sauces et condiments en pots fermés (validation PR)
+
+**État de cette section avant publication : six fichiers préparés sur branche ; pas encore publiés.** Les chiffres globaux au début de la note demeurent ceux des lots effectivement publiés, soit 242 produits renouvelés sur 414. Après validation, mettre à jour les valeurs, le SHA de fusion et les liens CI/Pages réellement confirmés sans modifier une deuxième fois la version applicative.
+
+Les images réparent les écarts constatés : deux sauces en **coupelle ouverte** (Burger et César), deux sauces en **flacon** (Ketchup et Barbecue), et deux pots anciens trop petits et peu nets (Moutarde et Pesto). Chaque fichier livré est un **WebP indépendant 256 × 256 px** montrant exactement un seul bocal fermé, couvercle doré visible, sans étiquette inventée, fond alpha transparent. Le cadrage a été comparé à **192 px** sur fond clair de tuile ; des images propres, nettes et fidèles ont été retenues, avec de la marge autour des pots.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Cuisine | Ketchup | 2480 | 8624 |
+| Cuisine | Sauce burger | 38382 | 7434 |
+| Cuisine | Sauce César | 34482 | 8760 |
+| Cuisine | Sauce barbecue | 2346 | 9618 |
+| Cuisine | Moutarde | 2820 | 10034 |
+| Cuisine | Pesto | 3456 | 12694 |
+
+**Total des six fichiers : 83 966 → 57 164 octets (−26 802 octets).** Aucun fichier ne dépasse 13 Ko ni le plafond de 100 Ko ; dimensions 256 px natives à partir des visuels de haute résolution originaux, sans agrandissement artificiel. Les empreintes des blobs créés sur GitHub correspondent **octet par octet** aux WebP locaux validés. Aucun des six slugs n'était déjà comptabilisé dans les 242 produits renouvelés des versions v528–v560 : après fusion, le total attendu est **248/414** (166 encore non renouvelés).
+
+**Origine :** visuels générés pour *Application Course* à l'aide de l'outil d'image de ChatGPT puis **isolés chacun dans son propre fichier**, avec suppression des pixels parasites à l'extérieur du pot et conversion WebP qualité 22. Il ne s'agit pas de sources tierces CC0 ou CC BY ; l'attribution et les empreintes sont consignées dans `docs/IMAGE_CREDITS_V561.md`. L'API OpenAI payante du projet n'a pas été utilisée.
+
+**Rejets / reports :** les propositions de pots pour guacamole, houmous, tapenade et harissa n'étaient pas fidèles à leurs produits et n'ont pas été intégrées. Les sources disponibles pour curry, paprika, poivre, sauce soja, Tabasco et coulis de fruit n'ont pas encore été jugées suffisamment conformes ; les anciennes images restent en place. Mayonnaise et sauce tomate étaient déjà correctement présentées en bocal et sont conservées. **12 produits examinés et non remplacés**, dont **10 candidats rejetés ou reportés** et **2 images conservées comme satisfaisantes**. Aucun remplissage artificiel pour atteindre 30.
+
+**Invariants :** un seul commit fonctionnel par lot avec les six WebP, versions v561 synchronisées dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, cette note et les crédits. Aucun changement à `catalog.js` comme source des noms et catégories, au code de chargement des images, aux tuiles, à la bannière citrons, aux animations, à la navigation et aux safe areas iOS, à Home Assistant, au WebSocket, à OAuth, au coffre chiffré, au verrouillage, à la biométrie ni au mode test.
+
 ### Situation par catégorie
 
 Comptage des **242 produits renouvelés** vérifié après publication sur `main` de v560, croisé avec `catalog.js`.
