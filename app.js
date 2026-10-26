@@ -1289,7 +1289,6 @@ function showView(){
   document.querySelectorAll('.tab').forEach(button=>button.classList.toggle('is-active',button.dataset.view===state.view));
   const viewChanged=publishedView!==state.view;
   if(viewChanged){
-    closeListRowMenu();
     if(catalogRenderFrame)cancelAnimationFrame(catalogRenderFrame);
     catalogRenderFrame=0;
     cancelCatalogRenderAfterNav?.();
@@ -2954,11 +2953,13 @@ function bindUiEvents(){
     if(BOTTOM_NAV.shouldIgnoreClick())return;
     const next=button.dataset.view||'list';
     if(next===state.view){BOTTOM_NAV.sync(false);return}
+    closeListRowMenu();
     state.view=next;
     navigator.vibrate?.(4);
     showView();
   });
   BOTTOM_NAV.bind(next=>{
+    closeListRowMenu();
     state.view=next;
     navigator.vibrate?.(4);
     showView();
