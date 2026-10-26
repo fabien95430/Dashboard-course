@@ -2753,22 +2753,6 @@ body{
   font-weight:820;
   letter-spacing:-.35px;
 }
-.list-filter-close{
-  flex:0 0 auto;
-  width:38px;
-  height:38px;
-  border:0;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  padding:0 0 2px;
-  background:#eef1ef;
-  color:#4b5550;
-  font-size:27px;
-  line-height:1;
-  font-weight:350;
-}
-.list-filter-close:active{transform:scale(.94)}
 .list-filter-sort-options{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -2969,16 +2953,6 @@ body{
   box-shadow:0 5px 13px rgba(36,142,79,.18);
 }
 .settings-count[hidden]{display:none}
-
-.missing-products-dialog{
-  width:min(calc(100% - 28px),430px);
-  max-height:calc(100dvh - max(28px,env(safe-area-inset-top)) - max(28px,env(safe-area-inset-bottom)));
-  overflow:auto;
-  overscroll-behavior:contain;
-  padding:20px;
-}
-.missing-products-dialog:focus,
-.missing-products-dialog:focus-visible{outline:none}
 .missing-products-header{
   display:flex;
   align-items:flex-start;
@@ -3214,7 +3188,6 @@ body{
   }
 }
 @media(max-width:390px){
-  .missing-products-dialog{padding:17px}
   .missing-products-add .primary{min-width:88px;padding:0 14px}
   .missing-category-panel{padding:11px}
   .missing-category-choice{font-size:11.5px}
@@ -3375,11 +3348,7 @@ body{
 }
 
 /* ===== UI v146 — backdrop Produits manquants sans blur ===== */
-.missing-products-dialog::backdrop{
-  background:rgba(28,38,31,.32)!important;
-  -webkit-backdrop-filter:none!important;
-  backdrop-filter:none!important;
-}
+
 
 /* v148 — lentille blanche discrète et navigation affinée */
 @media(max-width:520px){
@@ -3902,31 +3871,11 @@ body{
 }
 
 /* v166 — finalise les boutons/icônes des Réglages */
-.settings-title-line{
-  min-width:0;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.settings-title-line strong{
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
+
 
 /* Le compteur reste près du libellé, jamais collé à la flèche. */
 .settings-row.missing-products-settings-row{
   grid-template-columns:52px minmax(0,1fr) 24px;
-}
-.settings-title-line .settings-count{
-  flex:0 0 auto;
-  min-width:24px;
-  height:24px;
-  padding:0 6px;
-  border:0;
-  font-size:11px;
-  box-shadow:none;
 }
 
 /* Voyant Home Assistant simple : aucun halo ni élément parasite. */
@@ -3974,15 +3923,6 @@ body{
 @media(max-width:520px){
   .settings-row.missing-products-settings-row{
     grid-template-columns:44px minmax(0,1fr) 27px!important;
-  }
-  .settings-title-line{
-    gap:7px;
-  }
-  .settings-title-line .settings-count{
-    min-width:22px;
-    height:22px;
-    padding:0 6px;
-    font-size:10.5px;
   }
   #settingsConnectionBtn .settings-row-end{
     gap:12px;

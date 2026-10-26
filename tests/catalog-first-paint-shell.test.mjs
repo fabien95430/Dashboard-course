@@ -239,8 +239,8 @@ test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans pe
   const dishesRule='.dishes-grid{margin-left:0!important;margin-right:0!important;padding:1px 19px calc(84px + env(safe-area-inset-bottom))!important}';
   assert.equal(dishes.split(dishesRule).length-1,2);
   assert.ok(dishes.includes('.dishes-grid{min-height:0;overflow-y:auto;'));
-  assert.ok(catalog.includes("'./dishes.css?v=531'"));
-  assert.ok(sw.includes('"./dishes.css?v=531"'));
+  assert.ok(catalog.includes("'./dishes.css?v=532'"));
+  assert.ok(sw.includes('"./dishes.css?v=532"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
 });
@@ -255,8 +255,8 @@ test('sélection sauge visible et lettres descendantes non rognées sur les troi
   assert.ok(styles.includes('font-size:34px!important;\n    line-height:35px!important'));
   assert.ok(styles.includes('.page-title-row{\n    height:35px;'));
   assert.ok(dishes.includes('.dish-copy strong{color:#101418;font-size:12.7px;line-height:1.22;'));
-  assert.ok(catalog.includes("'./dishes.css?v=531'"));
-  assert.ok(sw.includes('"./dishes.css?v=531"'));
+  assert.ok(catalog.includes("'./dishes.css?v=532'"));
+  assert.ok(sw.includes('"./dishes.css?v=532"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=414'));
   assert.ok(index.includes('product-item-first-paint.css?v=523'));
   const localImages=read('dish-local-images.js');
