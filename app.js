@@ -248,10 +248,7 @@ const UI = Object.freeze({
   missingCategoryGrid: document.getElementById('missingCategoryGrid'),
   missingProductsList: document.getElementById('missingProductsList'),
   savePasswordChange: document.getElementById('savePasswordChange'),
-  refreshBtn: document.getElementById('refreshBtn'),
-  listFilterBtn: document.getElementById('listFilterBtn'),
-  listFilterMenu: document.getElementById('listFilterMenu'),
-  listFilterBackdrop: document.getElementById('listFilterBackdrop')
+  refreshBtn: document.getElementById('refreshBtn')
 });
 const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const productSlug=value=>String(value||'')
@@ -620,27 +617,6 @@ function visibleListGroups(groups=activeGroups()){
     if(category==='Toutes')return true;
     return catalogProductFor(group.summary)?.category===category;
   });
-}
-function renderListFilterMenuState(){
-  if(!UI.listFilterMenu)return;
-  UI.listFilterMenu.querySelectorAll('[data-list-sort]').forEach(button=>{
-    const selected=button.dataset.listSort===state.preferences.listSort;
-    button.classList.toggle('is-selected',selected);
-    button.setAttribute('aria-checked',String(selected));
-  });
-  UI.listFilterMenu.querySelectorAll('[data-list-category]').forEach(button=>{
-    const selected=button.dataset.listCategory===state.listCategoryFilter;
-    button.classList.toggle('is-selected',selected);
-    button.setAttribute('aria-checked',String(selected));
-  });
-}
-function setListFilterMenuOpen(open){
-  if(!UI.listFilterMenu||!UI.listFilterBackdrop||!UI.listFilterBtn)return;
-  const visible=!!open;
-  UI.listFilterMenu.hidden=!visible;
-  UI.listFilterBackdrop.hidden=!visible;
-  UI.listFilterBtn.setAttribute('aria-expanded',String(visible));
-  if(visible)renderListFilterMenuState();
 }
 function selectedSet(){return new Set(activeGroups().map(g=>norm(g.summary)))}
 
@@ -1345,7 +1321,6 @@ function scheduleCatalogRender(){
   });
 }
 function showView(){
-  if(state.view!=='list')setListFilterMenuOpen(false);
   $('#catalogView').classList.toggle('is-active',state.view==='catalog');
   $('#listView').classList.toggle('is-active',state.view==='list');
   $('#settingsView').classList.toggle('is-active',state.view==='settings');
@@ -2325,7 +2300,6 @@ function savePreferencesSettings(){
   UI.preferencesDialog.close();
   renderProducts();
   renderList();
-  renderListFilterMenuState();
   renderSettingsPage();
   toast('Préférences enregistrées');
 }
@@ -2977,29 +2951,6 @@ function bindUiEvents(){
     hideSetup();hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
   };
   UI.refreshBtn.onclick=event=>refreshFromHeader(UI.refreshBtn,event.isTrusted);
-  UI.listFilterBtn.onclick=event=>{
-    event.stopPropagation();
-    setListFilterMenuOpen(UI.listFilterMenu.hidden);
-  };
-  UI.listFilterBackdrop.onclick=()=>setListFilterMenuOpen(false);
-  UI.listFilterMenu.querySelectorAll('[data-list-sort]').forEach(button=>button.onclick=()=>{
-    const next=button.dataset.listSort;
-    if(!['added','category','alpha'].includes(next))return;
-    state.preferences={...state.preferences,listSort:next};
-    persistPreferences();
-    UI.preferencesListSort.value=next;
-    renderList();
-    renderListFilterMenuState();
-    navigator.vibrate?.(4);
-  });
-  UI.listFilterMenu.querySelectorAll('[data-list-category]').forEach(button=>button.onclick=()=>{
-    const next=button.dataset.listCategory||'Toutes';
-    if(!['Toutes','Frais','Fruits & Légumes','Épicerie','Boissons','Maison','Enfant'].includes(next))return;
-    state.listCategoryFilter=next;
-    renderList();
-    renderListFilterMenuState();
-    navigator.vibrate?.(4);
-  });
   $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;
@@ -3036,7 +2987,6 @@ function bindUiEvents(){
   $('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp(STATUS_TEXT.manualLockReason)};
   UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';clearTimeout(UI.productSearch._searchTimer);UI.productSearch._searchTimer=setTimeout(renderProducts,80)};
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
-  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!UI.listFilterMenu.hidden)setListFilterMenuOpen(false)});
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{
     if(BOTTOM_NAV.shouldIgnoreClick())return;
     const next=button.dataset.view||'list';

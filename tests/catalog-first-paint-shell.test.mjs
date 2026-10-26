@@ -29,7 +29,8 @@ test('les libellés et actions de Ma liste et du Catalogue sont définitifs dès
   assert.match(index,/<div class="page-title-row">\s*<h1>Ma liste<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>\s*<p>Votre liste de courses<\/p>/);
   assert.match(index,/<div class="page-title-row">\s*<h1>Catalogue<\/h1>\s*<span class="page-version">v\d+<\/span>\s*<\/div>\s*<p>Ajouter vos produits<\/p>/);
   const listHeader=index.slice(index.indexOf('<section id="listView"'),index.indexOf('</header>',index.indexOf('<section id="listView"')));
-  assert.ok(listHeader.includes('id="listFilterBtn"'),'le filtre reste sur Ma liste');
+  assert.doesNotMatch(listHeader,/page-header-actions|icon-btn/,'Ma liste n a plus de bouton dans son en-tête');
+  assert.doesNotMatch(index,/listFilterBtn|listFilterMenu|list-filter/,'le menu de filtre de Ma liste est retiré');
   const catalogHeader=index.slice(index.indexOf('<section id="catalogView"'),index.indexOf('</header>',index.indexOf('<section id="catalogView"')));
   assert.ok(catalogHeader.includes('id="repurchaseSoonBtn"'),'À racheter bientôt reste sur le Catalogue');
   const settingsHeader=index.slice(index.indexOf('<section id="settingsView"'),index.indexOf('</header>',index.indexOf('<section id="settingsView"')));

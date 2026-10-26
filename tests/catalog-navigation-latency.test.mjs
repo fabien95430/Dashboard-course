@@ -29,9 +29,9 @@ function harness(gridReady){
     afterSettle:fn=>{settles.add(fn);return ()=>settles.delete(fn);}
   };
   const factory=new Function('state','$','document','BOTTOM_NAV','requestAnimationFrame',
-    'cancelAnimationFrame','setListFilterMenuOpen','renderCategories','renderProducts',
+    'cancelAnimationFrame','renderCategories','renderProducts',
     'CustomEvent','productGridReady',app.slice(start,end)+'return showView;');
-  const showView=factory(state,selector=>elements[selector],document,BOTTOM_NAV,raf,caf,()=>{},
+  const showView=factory(state,selector=>elements[selector],document,BOTTOM_NAV,raf,caf,
     ()=>trace.push('categories'),()=>trace.push('products'),Event,gridReady);
   showView();
   trace.length=0;

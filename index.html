@@ -16,7 +16,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-citrons-v552.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=576">
+  <link rel="stylesheet" href="./styles.css?v=577">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=523">
 </head>
 <body class="is-launching">
@@ -34,7 +34,6 @@
     <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.1 8.2A7 7 0 0 1 18.8 7L20 12M4 12l1.2 5A7 7 0 0 0 18 15.8"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 10h18c0-2-3-3-3-10Z"/><path d="M10 21h4"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7.4A8 8 0 0 0 6.25 5.25L4 7.5"/><path d="M4 4v3.5h3.5"/><path d="M4 16.6a8 8 0 0 0 13.75 2.15L20 16.5"/><path d="M20 20v-3.5h-3.5"/></symbol>
-    <symbol id="i-filter" viewBox="0 0 24 24" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
     <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M7.2 5.5a8 8 0 1 0 9.6 0"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
@@ -51,52 +50,11 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v576</span>
+            <span class="page-version">v577</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
-        <div class="page-header-actions">
-          <button id="listFilterBtn" class="icon-btn list-filter-btn" type="button" aria-label="Trier ou filtrer la liste" aria-expanded="false" aria-controls="listFilterMenu">
-            <svg><use href="#i-filter"></use></svg>
-          </button>
-        </div>
       </header>
-
-      <div id="listFilterBackdrop" class="list-filter-backdrop" hidden></div>
-      <div id="listFilterMenu" class="list-filter-menu" role="dialog" aria-modal="true" aria-label="Trier et filtrer Ma liste" hidden>
-        <div class="list-filter-handle" aria-hidden="true"></div>
-        <div class="list-filter-sheet-head">
-          <strong>Trier la liste</strong>
-        </div>
-        <div class="list-filter-section list-filter-sort-options" role="radiogroup" aria-label="Trier la liste">
-          <button class="list-filter-option" type="button" data-list-sort="added" role="radio">
-            <svg class="list-filter-choice-icon"><use href="#i-list"></use></svg>
-            <span>Ordre d’ajout</span><i aria-hidden="true"></i>
-          </button>
-          <button class="list-filter-option" type="button" data-list-sort="alpha" role="radio">
-            <span>A - Z</span><i aria-hidden="true"></i>
-          </button>
-          <button class="list-filter-option" type="button" data-list-sort="category" role="radio">
-            <svg class="list-filter-choice-icon"><use href="#i-grid"></use></svg>
-            <span>Par catégorie</span><i aria-hidden="true"></i>
-          </button>
-        </div>
-        <div class="list-filter-section list-filter-categories" role="radiogroup" aria-label="Filtrer par catégorie">
-          <strong class="list-filter-title">Filtrer par catégorie</strong>
-          <button class="list-filter-option" type="button" data-list-category="Toutes" role="radio"><span>Toutes</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Apéritif &amp; snacks" role="radio"><span>Apéritif &amp; snacks</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Boissons" role="radio"><span>Boissons</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Boulangerie" role="radio"><span>Boulangerie</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Cuisine" role="radio"><span>Cuisine</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Enfant" role="radio"><span>Enfant</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Frais" role="radio"><span>Frais</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Fruits &amp; Légumes" role="radio"><span>Fruits &amp; Légumes</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Hygiène &amp; soins" role="radio"><span>Hygiène &amp; soins</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Maison" role="radio"><span>Maison</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Petit-déjeuner" role="radio"><span>Petit-déjeuner</span><i aria-hidden="true"></i></button>
-          <button class="list-filter-option" type="button" data-list-category="Viandes &amp; poissons" role="radio"><span>Viandes &amp; poissons</span><i aria-hidden="true"></i></button>
-        </div>
-      </div>
 
       <div id="listProgress" class="list-progress" role="progressbar" aria-label="Progression des courses" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0" hidden>
         <span class="list-progress-track" aria-hidden="true"><span id="listProgressFill" class="list-progress-fill"></span></span>
@@ -115,7 +73,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v576</span>
+            <span class="page-version">v577</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -151,7 +109,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v576</span>
+            <span class="page-version">v577</span>
           </div>
           <p>Personnalisez votre expérience</p>
         </div>
@@ -471,13 +429,13 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=576"></script>
+  <script src="./catalog.js?v=577"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=467"></script>
   <script src="./courses-notifications.js?v=481"></script>
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=442" data-app-ui="script"></script>
-  <script src="./app.js?v=576"></script>
+  <script src="./app.js?v=577"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
   <script src="./settings-ui.js?v=482"></script>
   <script src="./error-center.js?v=411"></script>
