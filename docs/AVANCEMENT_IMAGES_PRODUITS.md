@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v559**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
+- Dernière version visible **publiée : v560**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **241 produits distincts** sont désormais renouvelés après publication de v559 ; **173 produits** restent à évaluer. Les autres visuels ne nécessitent pas tous d'être changés.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **9 461 498 octets (9,02 Mio)** (avant : 8,71 Mio).
-- **178 images pèsent moins de 10 Kio après v559**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **242 produits distincts** sont désormais renouvelés après publication de v560 ; **172 produits** ne sont pas renouvelés (parmi eux, plusieurs visuels déjà évalués et conservés).. Les autres visuels ne nécessitent pas tous d'être changés.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **9 426 536 octets (8,99 Mio)** (avant : 8,71 Mio).
+- **179 images pèsent moins de 10 Kio après v560**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des quinze lots publiés
+### Historique des seize lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -30,7 +30,8 @@
 | Lot v557 — 21 WebP | `a6e9fa8b70c43c3c382fdbf0a41103da7ffdcc69` — PR #81 | 21 |
 | Lot v558 — 3 WebP | `fe533ce5b225f62968824d24e9e0faec6600055c` — PR #82 | 3 |
 | Lot v559 — 6 WebP | `7f21c78216588ed93349b4a9fa85aaeead814917` — PR #83 | 6 |
-| **Total** | | **241** |
+| Lot v560 — 1 WebP | `047f665b9848a478d51f28b8309843ad4c58a681` — PR #84 | 1 |
+| **Total** | | **242** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -246,9 +247,9 @@ Six anciennes vignettes de petite dimension ont été comparées à des sources 
 
 **Périmètre limité** : six WebP, `index.html`, `sw.js`, `catalog.js`, `dish-local-images.js`, documentation et attribution. Les styles, la bannière citrons, les animations, les safe areas iOS, Ma liste, le catalogue métier, Home Assistant, OAuth, WebSocket, coffre chiffré, verrouillage, biométrie, mode test et stratégie de chargement/cache sont inchangés.
 
-### Lot v560 — curcuma en pot, branche de validation
+### Lot v560 — curcuma en pot, publié et validé
 
-**État provisoire : non publié au moment de la préparation.** Les totaux publiés restent ceux de v559 jusqu'à la fusion et aux validations CI/Pages réelles.
+**Publié sur `main` :** [commit `047f665b9848a478d51f28b8309843ad4c58a681`](https://github.com/fabien95430/Dashboard-course/commit/047f665b9848a478d51f28b8309843ad4c58a681) via [PR #84](https://github.com/fabien95430/Dashboard-course/pull/84). [CI de la PR verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40317248019), [CI complète sur `main` verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40317324316), [déploiement GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40317324050). Contrôle de l'image sur l'arbre GitHub : blob SHA identique à la source validée, poids de 6 860 octets et total `www/Items/` à 9 426 536 octets.
 
 | Catégorie | Produit | Avant (octets) | Après (octets) |
 | --- | --- | ---: | ---: |
@@ -263,14 +264,14 @@ Le visuel précédent montrait des **racines fraîches** et ne respectait pas le
 
 ### Situation par catégorie
 
-Comptage des **241 produits renouvelés** vérifié après publication sur `main` de v559, croisé avec `catalog.js`.
+Comptage des **242 produits renouvelés** vérifié après publication sur `main` de v560, croisé avec `catalog.js`.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
 | Fruits & Légumes | 72 / 72 | 0 |
 | Frais | 49 / 53 | 4 |
 | Viandes & poissons | 24 / 39 | 15 |
-| Cuisine | 43 / 71 | 28 |
+| Cuisine | 44 / 71 | 27 |
 | Boulangerie | 9 / 13 | 4 |
 | Petit-déjeuner | 6 / 24 | 18 |
 | Apéritif & snacks | 14 / 24 | 10 |
@@ -278,7 +279,7 @@ Comptage des **241 produits renouvelés** vérifié après publication sur `main
 | Maison | 3 / 50 | 47 |
 | Hygiène & soins | 3 / 25 | 22 |
 | Enfant | 0 / 7 | 7 |
-| **Total** | **241 / 414** | **173** |
+| **Total** | **242 / 414** | **172** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
@@ -317,3 +318,5 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Lot v558 publié et vérifié :** commit [`fe533ce5b225f62968824d24e9e0faec6600055c`](https://github.com/fabien95430/Dashboard-course/commit/fe533ce5b225f62968824d24e9e0faec6600055c) — [PR #82 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/82) — [validation complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40294139488) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40294139097). Trois images CC0 au total : 7 454 → 27 396 octets, 235/414 renouvelés, 179 restant à évaluer.
 
 **Lot v559 publié et vérifié :** [commit `7f21c78216588ed93349b4a9fa85aaeead814917`](https://github.com/fabien95430/Dashboard-course/commit/7f21c78216588ed93349b4a9fa85aaeead814917) — [PR #83](https://github.com/fabien95430/Dashboard-course/pull/83) — [CI complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40300955029) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40300954773). 6 images WebP : 25 708 → 117 616 octets ; 241/414 renouvelés ; 173 à examiner.
+
+**Lot v560 publié et vérifié :** [commit `047f665b9848a478d51f28b8309843ad4c58a681`](https://github.com/fabien95430/Dashboard-course/commit/047f665b9848a478d51f28b8309843ad4c58a681) — [PR #84 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/84) — [CI complète verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40317324316) — [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40317324050). Une image curcuma : 41 822 → 6 860 octets ; 242/414 renouvelés ; 172 non renouvelés. Le bilan des 43 images inspectées et le détail du rejet des candidats insuffisants figurent plus haut.
