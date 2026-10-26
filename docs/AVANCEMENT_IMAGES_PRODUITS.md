@@ -4,14 +4,14 @@
 
 ## Réalisé et vérifié
 
-- Dernière version visible **publiée : v567**, sur `main`. Validation complète et déploiement GitHub Pages verts. Le CSS, la bannière citrons, les animations et les safe areas iOS de v556 sont conservés inchangés.
+- Dernière version visible **publiée : v569**, sur `main` au contrôle du 26 octobre 2026. La PR images v568 est bien fusionnée et les six WebP sont conservés par le commit v569 ; validation complète et GitHub Pages de v569 verts. Les six WebP ne modifient ni la bannière citrons, ni les animations, ni les safe areas iOS.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient **420 images**.
-- **271 produits distincts** sont désormais renouvelés après publication de v567 ; **143 produits** ne sont pas encore renouvelés (dont plusieurs visuels déjà évalués et conservés). Les autres visuels ne nécessitent pas tous d'être changés.
-- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après publication : **9 473 056 octets (9,03 Mio)** (avant : 8,71 Mio).
-- **167 images pèsent moins de 10 Kio après v567**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
+- **277 produits distincts** sont désormais renouvelés après publication du lot v568 ; **137 produits** ne sont pas encore renouvelés (dont plusieurs visuels déjà évalués et conservés). Ne pas les remplacer artificiellement si les images restent satisfaisantes.
+- La **compression v537** concerne **32 anciens fichiers de plus de 100 Kio**, ramenés de **11,88 Mio à 1,18 Mio** au total. Il reste **0 image produit de plus de 100 Kio**. Poids du répertoire `www/Items/` après v568 : **9 617 548 octets (9,17 Mio)** (avant v568 : 9 473 056 octets).
+- **161 images pèsent moins de 10 Kio après v568**, ce qui est un critère de tri, **pas** une preuve de manque de netteté. Vérifier leurs dimensions et l'affichage avant remplacement.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des vingt-trois lots publiés
+### Historique des vingt-quatre lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -38,7 +38,8 @@
 | Lot v565 — 6 WebP | `d0825a731f53e663752133b6396c18b672da8237` — PR #90 | 6 |
 | Lot v566 — 5 WebP | `9921fcccf322a24458699cca81b151c32745c4a9` — PR #91 | 5 |
 | Lot v567 — 1 WebP | `f1731720ff01e8cf7b08dc3674147ca7de083173` — PR #92 | 1 |
-| **Total** | | **271** |
+| Lot v568 — 6 WebP | `ea27ec82e59edb7c297af6d99daa02b815fe750c` — PR #93 | 6 |
+| **Total** | | **277** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -401,13 +402,13 @@ La vignette originale était très petite. La nouvelle source **EBf Studio Ingre
 
 ### Situation par catégorie
 
-Comptage des **271 produits renouvelés** vérifié après publication sur `main` de v567, croisé avec `catalog.js`.
+Comptage des **277 produits renouvelés** vérifié après fusion du lot v568 sur `main`, croisé avec `catalog.js` et les SHA des blobs Git. Le commit v569 postérieur conserve ces six images.
 
 | Catégorie | Déjà remplacés | Encore à évaluer |
 | --- | ---: | ---: |
 | Fruits & Légumes | 72 / 72 | 0 |
 | Frais | 49 / 53 | 4 |
-| Viandes & poissons | 25 / 39 | 14 |
+| Viandes & poissons | 31 / 39 | 8 |
 | Cuisine | 58 / 71 | 13 |
 | Boulangerie | 9 / 13 | 4 |
 | Petit-déjeuner | 7 / 24 | 17 |
@@ -416,7 +417,7 @@ Comptage des **271 produits renouvelés** vérifié après publication sur `main
 | Maison | 5 / 50 | 45 |
 | Hygiène & soins | 9 / 25 | 16 |
 | Enfant | 3 / 7 | 4 |
-| **Total** | **271 / 414** | **143** |
+| **Total** | **277 / 414** | **137** |
 
 **Fruits & Légumes est terminé : 72 / 72.** Endives et Mâche sont remplacés par deux fichiers WebP individuels conformes. Les quatre produits Frais non encore renouvelés sont Mozzarella râpée, Philadelphia, Pâte à pizza et Cornichon ; ils ont déjà des images adaptées et doivent être conservés tant qu'un remplacement réellement meilleur n'est pas disponible.
 
@@ -494,9 +495,9 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Lot v567 publié et vérifié :** [commit `f1731720ff01e8cf7b08dc3674147ca7de083173`](https://github.com/fabien95430/Dashboard-course/commit/f1731720ff01e8cf7b08dc3674147ca7de083173) — [PR #92](https://github.com/fabien95430/Dashboard-course/pull/92) — [CI réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40395443868) — [Pages réussies](https://github.com/fabien95430/Dashboard-course/actions/runs/40395444944). Rosette 5 006 → 18 496 octets, 271/414 renouvelés, 143 non renouvelés. Crédits CC0 : `docs/IMAGE_CREDITS_V567.md`. Poids du répertoire : 9 473 056 octets, 420 WebP, zéro image au-delà de 100 Ko.
 
 
-### Lot v568 — six nouveaux WebP préparés (en validation, non encore publiés)
+### Lot v568 — six nouveaux WebP publiés et contrôlés sur main
 
-Six produits **Viandes & poissons** non renouvelés en v567 ont été sélectionnés après inspection de leurs petites vignettes. Les six fichiers candidats sont présents dans l'arbre de la branche de validation ; ils ne doivent être comptés dans les totaux de `main` qu'après fusion et vérification du déploiement. Les poids et les SHA individuels sont documentés dans `docs/IMAGE_CREDITS_V568.md`.
+**Publié sur `main` :** [commit `ea27ec82e59edb7c297af6d99daa02b815fe750c`](https://github.com/fabien95430/Dashboard-course/commit/ea27ec82e59edb7c297af6d99daa02b815fe750c) via [PR #93 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/93). [CI PR verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40407376147) et [CI `main` v568 verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40407563409). Le déploiement Pages v568 a été **annulé**, car le commit fonctionnel v569 `858c6ccfdff00191e956321824dae50322f2ad21` est arrivé immédiatement après ; [CI v569 verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40407630722) et [GitHub Pages v569 réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40407631020), sur un commit descendant qui conserve les six WebP. **Ce n'est pas un succès Pages propre à v568** : le statut annulé reste consigné. Les six SHA individuels et poids ont été vérifiés dans le vrai `main` après fusion, et les images déjà renouvelées n'ont pas été écrasées.
 
 | Produit | Avant (octets) | Après (octets) |
 | --- | ---: | ---: |
@@ -510,4 +511,4 @@ Six produits **Viandes & poissons** non renouvelés en v567 ont été sélection
 
 **Écarts de sélection :** Rosette déjà renouvelée en v567 (conservée) ; Merguez écartée en raison d'une variante visuelle non certifiée crue ; Coulis de fruit toujours reporté, car les propositions ressemblent à une confiture. Les autres alternatives incorrectes (viande cuite, mauvaise espèce, produit différent) restent rejetées. Aucun autre produit déjà renouvelé n'est écrasé.
 
-**Périmètre proposé :** uniquement les six `www/Items/*.webp`, les quatre points de cohérence v568 (`index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`) et la documentation. Pas de changement de CSS, d'interface, bannière, Home Assistant, chargement des images, cache persistant, sécurité, biométrie, mode test ou synchronisation. **Les comptes publiés restent 271/414 renouvelés et 143 non renouvelés tant que la fusion n'est pas prouvée.**
+**Périmètre publié en v568 :** uniquement les six `www/Items/*.webp`, le versionnement et cache dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, et la documentation. Aucune modification des mécanismes de chargement visuel, de cache persistant, de l'interface, de Home Assistant, OAuth, WebSocket, coffre, biométrie, mode test et safe areas. Le commit v569 ultérieur modifie séparément le cadrage de produits : ce changement ne fait pas partie du lot images v568. **Bilan publié : 277/414 renouvelés, 137 non renouvelés, 16 anciens visuels évalués et conservés distincts, soit au moins 293 produits avec décision documentaire.** Fichiers WebP : 420 ; poids total 9 617 548 octets ; 0 fichier > 100 Kio.
