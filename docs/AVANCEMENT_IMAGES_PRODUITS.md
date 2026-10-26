@@ -323,6 +323,24 @@ Six nouveaux visuels **un produit = un WebP individuel**, créés dans ChatGPT s
 
 **Périmètre :** 6 WebP, versionnement global v563 dans `index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`, documentation et crédits uniquement. Aucun changement CSS, bannière citrons, mécanisme de chargement, caches visuels, accès hors ligne, Home Assistant, OAuth, WebSocket, coffre, verrouillage, biométrie ou mode test.
 
+### Lot v564 — quatre nouveaux WebP (validation avant publication)
+
+**État dans la branche de validation : préparé, pas encore publié.** Les chiffres globaux publiés restent ceux de v563 jusqu’à validation de la PR, fusion effective et contrôle CI/Pages de `main`.
+
+| Catégorie | Produit | Avant (octets) | Après (octets) |
+| --- | --- | ---: | ---: |
+| Cuisine | Sel | 34376 | 17922 |
+| Cuisine | Sauce soja | 30832 | 17078 |
+| Cuisine | Tabasco | 2160 | 16314 |
+| Petit-déjeuner | Pâte à tartiner | 3056 | 17792 |
+| **Total** | **4 WebP** | **70424** | **69106** |
+
+**Bilan du lot : 70 424 → 69 106 octets**, soit **1 318 octets économisés** ; aucune image ne dépasse 18 Ko, et aucun agrandissement artificiel d'une ancienne source n'est utilisé. Les quatre WebP originaux natifs sont des découpes individuelles d'illustrations créées spécifiquement dans ChatGPT pour le chantier, avec un seul pot isolé par fichier, fond alpha réel, couvercle clairement visible, et encodage final 384 × 384 px testé à 192 px sur fond sauge. Aucun visuel externe, aucun logo ou texte inventé, et aucune utilisation de l'API OpenAI payante du projet. Les crédits, poids et empreintes Git sont détaillés dans `docs/IMAGE_CREDITS_V564.md`.
+
+**Sélection :** onze visuels existants effectivement inspectés, quatre remplacements justifiés et sept visuels conservés ou candidats rejetés. Le coulis de fruit n'a pas reçu de nouveau visuel : la source proposée ressemblait trop à une sauce tomate et sa variante n'était pas prouvée. Le miel présentait encore un pot ouvert dans les propositions et exige un pot fermé. Les deux confitures, le café soluble, l'infusion menthe et la pile AAA sont déjà reconnaissables ou n'avaient pas de meilleur candidat. Ne pas les compter comme renouvelés.
+
+**Portée :** quatre fichiers `www/Items/*.webp`, alignement de la version globale v564 dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, ainsi que le suivi et la provenance. Aucun changement aux styles, bannière citrons, position des tuiles, cache visuel persistant, stratégie hors ligne, priorité Home Assistant `Courses`, WebSocket, OAuth, coffre chiffré, biométrie, verrouillage ou mode test.
+
 ### Situation par catégorie
 
 Comptage des **255 produits renouvelés** vérifié après publication sur `main` de v563, croisé avec `catalog.js`.
