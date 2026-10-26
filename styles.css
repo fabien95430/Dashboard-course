@@ -606,6 +606,8 @@ svg{display:block}
   padding:7px 7px 9px;
   overflow:hidden;
 }
+/* v572 — cartes hors écran ignorées au layout : bascule Ma liste/Catalogue sans latence */
+.products>.product{content-visibility:auto;contain-intrinsic-size:auto 164px}
 .product:active{transform:scale(.98)}
 .product.is-selected{
   background:linear-gradient(155deg,#e4ede3,#e9f0e8);
