@@ -229,10 +229,10 @@ test('les explications de popup restent courtes et essentielles',()=>{
   const repurchase=read('repurchase-soon.js');
   assert.match(index,/Connexion OAuth sécurisée\. L’autorisation reste chiffrée sur cet appareil\./);
   assert.match(index,/Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local\./);
-  assert.match(dishes,/Modifiez ingrédients et quantités pour 2 personnes\. Les portions s’adaptent automatiquement\./);
+  assert.match(dishes,/Modifiez ingrédients et quantités pour 2 personnes\./);
   assert.match(dishes,/À ajouter manuellement si besoin\./);
   assert.match(missing,/Ajoutez les produits ou plats absents du catalogue\./);
-  assert.match(settings,/Documentation, historique et informations de l’application\./);
+  assert.match(settings,/Documentation, historique et informations\./);
   assert.match(repurchase,/Suggestions selon vos habitudes\. Aucun ajout automatique\./);
   assert.match(repurchase,/Activez l’historique des achats dans Préférences\./);
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);

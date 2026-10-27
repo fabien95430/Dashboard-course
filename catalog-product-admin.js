@@ -162,7 +162,7 @@ function titleForMode(){
   const {title,intro}=panelElements();
   if(currentMode==='products'){
     if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management');else if(title)title.textContent='Catalogue produit';
-    if(intro)intro.textContent='Gérez les produits présents dans le catalogue de l’application.';
+    if(intro)intro.textContent='Gérez les produits du catalogue.';
   }else{
     if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue plats','management');else if(title)title.textContent='Catalogue plats';
     if(intro)intro.textContent='Gérez les plats et leurs recettes présents dans le catalogue.';

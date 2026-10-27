@@ -2205,6 +2205,7 @@ function clearPasswordChangeForm(){
   UI.confirmNewLocalPassword.value='';
   UI.changePasswordError.textContent='';
   UI.changePasswordPanel.hidden=true;
+  $('#changePasswordBtn').hidden=false;
 }
 function openConnectionSettings(){
   if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
@@ -2236,8 +2237,8 @@ async function saveConnectionSettings(){
     localStorage.setItem(STORAGE.entity,chosenEntity);
     localStorage.setItem(STORAGE.entityPreference,chosenEntity);
   }
-  UI.connectionDialog.close();
   if(changedUrl){
+    UI.connectionDialog.close();
     await revoke();
     state.haUrl=nextUrl;
     UI.haUrlInput.value=nextUrl;
@@ -2245,6 +2246,7 @@ async function saveConnectionSettings(){
   }else{
     if(changedEntity)await subscribe();
     await refreshItems();armIdleLock();
+    if(changedEntity)toast('Liste enregistrée');
   }
 }
 
@@ -2342,7 +2344,6 @@ function savePreferencesSettings(){
   smartFavorites:UI.preferencesSmartFavorites.checked
 });
   persistPreferences();
-  UI.preferencesDialog.close();
   renderProducts();
   renderList();
   renderSettingsPage();
@@ -3010,8 +3011,10 @@ function bindUiEvents(){
   bindDialogBackdropClose(UI.settingsDialog,clearPasswordChangeForm);
   $('#settingsLockBtn').onclick=()=>lockApp(STATUS_TEXT.manualLockReason);
   $('#settingsLogoutBtn').onclick=revoke;
-  $('#saveConnectionSettings').onclick=saveConnectionSettings;
-  $('#savePreferences').onclick=savePreferencesSettings;
+  /* Enregistrement immédiat : plus de bouton Enregistrer dans les popups Connexion et Préférences. */
+  UI.connectionHaUrl.onchange=saveConnectionSettings;
+  UI.connectionEntitySelect.onchange=saveConnectionSettings;
+  [UI.preferencesListSort,UI.preferencesStartView,UI.preferencesHideAdded,UI.preferencesSmartFavorites].forEach(control=>{control.onchange=savePreferencesSettings});
   $('#addMissingProduct').onclick=addMissingProduct;
   UI.missingProductName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addMissingProduct()}};
   UI.missingCategoryGrid.querySelectorAll('[data-missing-category]').forEach(button=>button.onclick=()=>setMissingProductCategory(button.dataset.missingCategory||''));
@@ -3026,12 +3029,12 @@ function bindUiEvents(){
     const opening=panel.hidden;
     if(!opening){clearPasswordChangeForm();return}
     panel.hidden=false;
+    $('#changePasswordBtn').hidden=true;
     clearDialogFeedback(UI.settingsDialogFeedback);
     UI.changePasswordError.textContent='';
   };
   UI.savePasswordChange.onclick=changeLocalPassword;
   UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
-  $('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp(STATUS_TEXT.manualLockReason)};
   UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';clearTimeout(UI.productSearch._searchTimer);UI.productSearch._searchTimer=setTimeout(renderProducts,80)};
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{

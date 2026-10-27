@@ -431,8 +431,8 @@ function bindDishEvents(){
   scheduleDish();
 }
 function bindHousehold(){
-  document.addEventListener('click',event=>{
-    if(!event.target?.closest?.('#savePreferences'))return;
+  document.addEventListener('change',event=>{
+    if(!event.target?.closest?.('#preferencesServings'))return;
     setTimeout(()=>{ensureModel();scheduleDish()},0);
   },true);
   window.addEventListener('storage',event=>{

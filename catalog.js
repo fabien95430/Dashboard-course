@@ -63,7 +63,7 @@
   const loadCatalogProductAdmin=()=>{
     if(document.querySelector('script[data-catalog-product-admin]'))return;
     const script=document.createElement('script');
-    script.src='./catalog-product-admin.js?v=494';
+    script.src='./catalog-product-admin.js?v=605';
     script.async=false;
     script.dataset.catalogProductAdmin='script';
     document.body.appendChild(script);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=604';
+    images.src='./dish-local-images.js?v=605';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -104,7 +104,7 @@
     loadDishStyles().then(()=>{
       if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
       const script=document.createElement('script');
-      script.src='./dishes-ui.js?v=590';
+      script.src='./dishes-ui.js?v=605';
       script.async=false;
       script.dataset.catalogDishes='script';
       script.addEventListener('load',loadLiquid,{once:true});

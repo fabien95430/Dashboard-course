@@ -208,8 +208,6 @@ function installStyle(){
   style.textContent=`
     #missingProductsDialog #missingProductsList[hidden],#missingProductsDialog #missingDishesList[hidden]{display:none!important}
     #missingProductsDialog .missing-products-header{position:relative!important;padding-right:0!important}
-    #missingProductsDialog .missing-products-header h3{font-size:22px!important;line-height:1.08!important;letter-spacing:-.35px!important;margin-bottom:0!important}
-    #missingProductsDialog .dialog-intro{font-size:13px!important;line-height:1.38!important;margin-top:7px!important}
     #missingProductsDialog .missing-products-add{gap:8px!important;margin-bottom:10px!important}
     #missingProductsDialog .missing-products-add #missingProductName{height:46px!important;border-radius:15px!important;padding:0 14px!important;font-size:15px!important}
     #missingProductsDialog .missing-products-add #addMissingProduct.primary{height:46px!important;min-width:92px!important;border-radius:15px!important;padding:0 15px!important;font-size:14px!important}

@@ -28,7 +28,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-citrons-v552.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=603">
+  <link rel="stylesheet" href="./styles.css?v=605">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=580">
 </head>
 <body class="is-launching">
@@ -62,7 +62,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v604</span>
+            <span class="page-version">v605</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -85,7 +85,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v604</span>
+            <span class="page-version">v605</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -121,7 +121,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v604</span>
+            <span class="page-version">v605</span>
           </div>
           <p>Personnalisez votre expérience</p>
         </div>
@@ -134,7 +134,7 @@
 
       <div class="settings-scroll">
         <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-home"></use></svg></span>Compte</h2>
+          <h2>Compte</h2>
           <div class="settings-card">
             <button id="settingsConnectionBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-home"></use></svg></span>
@@ -145,7 +145,7 @@
         </section>
 
         <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-shield"></use></svg></span>Sécurité</h2>
+          <h2>Sécurité</h2>
           <div class="settings-card">
             <button id="settingsSecurityBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-lock"></use></svg></span>
@@ -157,7 +157,7 @@
         </section>
 
         <section class="settings-section">
-          <h2><span class="section-icon"><svg><use href="#i-gear"></use></svg></span>Préférences</h2>
+          <h2>Préférences</h2>
           <div class="settings-card">
             <button id="settingsListBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
@@ -265,36 +265,30 @@
     <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-home"></use></svg></span><span class="settings-sheet-title">Connexion Home Assistant</span></h3>
     <p class="dialog-intro">Synchronisation sécurisée de vos courses.</p>
     <label class="field">
+      <span>Adresse Home Assistant</span>
+      <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
+    </label>
+    <label class="field connection-list-field">
       <span>Liste Home Assistant</span>
       <select id="connectionEntitySelect">
         <option value="" selected>Choisir une liste</option>
       </select>
+      <span id="connectionListSyncStatus" class="connection-list-status" role="status">Connexion…</span>
     </label>
-    <label class="field">
-      <span>Adresse Home Assistant</span>
-      <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
-    </label>
+    <h4 class="sheet-section-title">Synchronisation</h4>
     <div class="connection-sync-section" aria-label="État des synchronisations">
-      <h4>Synchronisation</h4>
-      <div class="connection-sync-line">
-        <span>Ma liste</span>
-        <span id="connectionListSyncStatus" role="status">Connexion…</span>
-      </div>
       <div class="connection-sync-line">
         <span>Produits &amp; plats manquants</span>
         <span id="missingSyncStatus" role="status" aria-live="polite">Vérification…</span>
       </div>
     </div>
     <p id="connectionDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
-    <div class="dialog-actions">
-      <button id="saveConnectionSettings" class="primary" type="button">Enregistrer</button>
-    </div>
   </dialog>
 
 
   <dialog id="preferencesDialog" class="dialog preferences-dialog settings-sheet" tabindex="-1">
     <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-gear"></use></svg></span><span class="settings-sheet-title">Préférences</span></h3>
-    <p class="dialog-intro">Personnalisez l’affichage et le comportement de l’application.</p>
+    <p class="dialog-intro">Personnalisez l’affichage et le comportement.</p>
 
     <label class="field">
       <span>Tri de Ma liste</span>
@@ -346,9 +340,6 @@
       </div>
       <p class="notifications-management-hint">Activez les notifications sur chaque iPhone pour recevoir les demandes et les résultats d’intégration.</p>
     </div>
-    <div class="dialog-actions">
-      <button id="savePreferences" class="primary" type="button">Enregistrer</button>
-    </div>
   </dialog>
 
   <dialog id="missingProductsDialog" class="dialog settings-sheet" tabindex="-1">
@@ -394,18 +385,17 @@
 
   <dialog id="settingsDialog" class="dialog security-settings-dialog settings-sheet" tabindex="-1">
     <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-lock"></use></svg></span><span class="settings-sheet-title">Mot de passe et verrouillage</span></h3>
-    <p class="dialog-intro">Protection locale de l’accès à vos courses sur cet appareil.</p>
+    <p class="dialog-intro">Protection locale de l’accès à vos courses.</p>
     <p id="settingsDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
 
+    <h4 class="sheet-section-title">Verrouillage</h4>
     <div class="security-settings-summary">
       <div class="security-setting-info">
-        <span class="security-setting-icon"><svg><use href="#i-shield"></use></svg></span>
-        <span class="security-setting-copy"><strong>Coffre local chiffré</strong><small>Actif sur cet appareil</small></span>
+        <span class="security-setting-copy"><strong>Coffre local chiffré</strong></span>
         <span class="security-setting-state">Actif</span>
       </div>
       <label class="security-setting-info security-setting-lock">
-        <span class="security-setting-icon"><svg><use href="#i-lock"></use></svg></span>
-        <span class="security-setting-copy"><strong>Verrouillage automatique</strong><small>Même délai en activité et en arrière-plan</small></span>
+        <span class="security-setting-copy"><strong>Verrouillage automatique</strong></span>
         <select id="autoLockSelect" class="security-lock-select" aria-label="Délai de verrouillage automatique">
           <option value="5">5 min</option>
           <option value="10">10 min</option>
@@ -415,9 +405,9 @@
       </label>
     </div>
 
+    <h4 class="sheet-section-title">Mot de passe</h4>
     <button id="changePasswordBtn" class="security-action-row" type="button">
-      <span class="security-setting-icon"><svg><use href="#i-lock"></use></svg></span>
-      <span class="security-setting-copy"><strong>Changer le mot de passe local</strong><small>Vérifie l’ancien mot de passe puis rechiffre le coffre</small></span>
+      <span class="security-setting-copy"><strong>Changer le mot de passe local</strong></span>
       <svg class="chevron"><use href="#i-chevron"></use></svg>
     </button>
 
@@ -438,19 +428,18 @@
       <button id="savePasswordChange" class="primary security-password-save" type="button">Changer le mot de passe</button>
     </div>
 
-    <button id="lockNowBtn" class="secondary security-lock-now" type="button">Verrouiller maintenant</button>
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=604"></script>
+  <script src="./catalog.js?v=605"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=467"></script>
   <script src="./courses-notifications.js?v=482"></script>
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=442" data-app-ui="script"></script>
-  <script src="./app.js?v=598"></script>
+  <script src="./app.js?v=605"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
-  <script src="./settings-ui.js?v=485"></script>
+  <script src="./settings-ui.js?v=605"></script>
   <script src="./error-center.js?v=412"></script>
 </body>
 </html>

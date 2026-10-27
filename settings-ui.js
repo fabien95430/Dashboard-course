@@ -42,8 +42,7 @@ function initPreferencesExtras(){
   clearLegacyCatalogMode();
   const dialog=document.getElementById('preferencesDialog');
   const startView=document.getElementById('preferencesStartView');
-  const saveButton=document.getElementById('savePreferences');
-  if(!dialog||!startView||!saveButton)return;
+  if(!dialog||!startView)return;
 
   let documentationButton=document.getElementById('preferencesDocumentation');
   if(!documentationButton){
@@ -53,7 +52,7 @@ function initPreferencesExtras(){
     documentationButton.className='secondary';
     documentationButton.textContent='Documentation';
     documentationButton.setAttribute('aria-label','Ouvrir la documentation PDF');
-    saveButton.before(documentationButton);
+    dialog.appendChild(documentationButton);
     documentationButton.addEventListener('click',()=>{
       const link=document.createElement('a');
       link.href=DOCUMENTATION_URL;
@@ -84,13 +83,13 @@ function initPreferencesExtras(){
   const syncSelects=()=>{servingsSelect.value=String(readPreferredServings())};
   dialog.addEventListener('close',syncSelects);
   document.getElementById('settingsPreferencesBtn')?.addEventListener('click',syncSelects);
-  saveButton.addEventListener('click',()=>{
+  servingsSelect.addEventListener('change',()=>{
     const nextServings=Number(servingsSelect.value);
     if(SERVING_OPTIONS.includes(nextServings)){
       persistPreferredServings(nextServings);
       syncDishServings(nextServings);
     }
-  },true);
+  });
 }
 
 if(document.readyState==='loading'){
@@ -253,8 +252,8 @@ function installPreferenceDialogAppearance(){
     #preferencesNotificationsPanel .notifications-management-actions{display:flex;gap:8px;flex-wrap:wrap}
     #preferencesNotificationsPanel .notifications-management-actions button{flex:1 1 130px;min-height:44px;border-radius:13px;padding:8px 12px;font-size:12px;font-weight:750}
     #preferencesNotificationsPanel .notifications-management-hint{margin:0;font-size:11px;line-height:1.5;color:#7d858d}
-    .connection-dialog .connection-sync-section{margin-top:17px;padding:12px 13px;border:1px solid #e5ede6;border-radius:16px;background:#f8faf7}
-    .connection-dialog .connection-sync-section h4{margin:0 0 9px;font-size:12px;color:#52675a;font-weight:800}
+    .connection-dialog .connection-sync-section{margin-top:0;padding:12px 13px;border:1px solid #e5ede6;border-radius:16px;background:#f8faf7}
+    .connection-dialog .sheet-section-title{margin:14px 0 7px;font-size:12px;color:#52675a;font-weight:800}
     .connection-dialog .connection-sync-line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 0;font-size:12px}
     .connection-dialog .connection-sync-line+.connection-sync-line{border-top:1px solid #e7eee8}
     .connection-dialog .connection-sync-line>span:first-child{flex:0 0 auto;font-weight:700;color:#26362c}
@@ -359,7 +358,7 @@ function initApplicationManagement(){
     [...content.children].forEach(node=>{if(node===title||node===intro||node===managementPanel)return;node.hidden=true});
     managementPanel.hidden=false;
     setTitle('Gestion de l’application','preferences');
-    if(intro)intro.textContent='Documentation, historique et informations de l’application.';
+    if(intro)intro.textContent='Documentation, historique et informations.';
     if(!dialog.open)dialog.showModal();
     document.dispatchEvent(new CustomEvent('courses:settings-management-opened'));
   }
@@ -404,7 +403,7 @@ function initAdministratorSettings(){
     adminSection=document.createElement('section');
     adminSection.id='settingsAdministratorSection';
     adminSection.className='settings-section';
-    adminSection.innerHTML='<h2><span class="section-icon"><svg><use href="#i-gear"></use></svg></span>Administrateur</h2><div class="settings-card"></div>';
+    adminSection.innerHTML='<h2>Administrateur</h2><div class="settings-card"></div>';
     preferencesSection.after(adminSection);
   }
   adminSection.querySelector('.settings-card')?.appendChild(managementButton);
