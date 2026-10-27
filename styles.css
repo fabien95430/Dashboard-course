@@ -603,6 +603,8 @@ svg{display:block}
   scrollbar-width:none;
 }
 .products::-webkit-scrollbar{display:none}
+/* v592 — cartes reposées après l'ouverture du Catalogue (voir app.js, armCatalogTail). */
+html #products .product.is-deferred{display:none!important}
 .product{
   position:relative;
   min-width:0;

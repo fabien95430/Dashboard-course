@@ -748,11 +748,13 @@ function ensureProductGrid(el,quantities){
 }
 function syncProductGrid(products,quantities){
   const ranks=new Map(products.map((product,index)=>[norm(product.name),index]));
+  const ranked=new Array(products.length);
   productCardCache.forEach((card,key)=>{
     const rank=ranks.get(key),visible=rank!==undefined;
     card.hidden=!visible;
     card.style.order=visible?String(rank):'';
     if(!visible)return;
+    ranked[rank]=card;
     const name=card.dataset.name||'';
     updateProductCardQuantity(card,name,catalogQuantityForDisplay(name,quantities.get(key)||0));
   });
@@ -760,7 +762,105 @@ function syncProductGrid(products,quantities){
     productEmptyState.hidden=products.length!==0;
     productEmptyState.style.order=String(products.length);
   }
+  catalogRankedCards=ranked.filter(Boolean);
+  if(catalogTailDeferred)applyCatalogTailDeferral();
 }
+/* v592 — ouverture du Catalogue : à la sortie de l'onglet, seules les premières cartes restent
+   posées dans la page. À l'ouverture, le navigateur ne met en page que ces cartes ; le reste de
+   la grille est reposé par petits lots sous l'écran, une fois la pastille arrivée. Aucune carte
+   visible ne change : l'ordre et le contenu sont ceux de la grille complète. */
+const CATALOG_HEAD_CARDS=24;
+const CATALOG_TAIL_CHUNK=24;
+let catalogRankedCards=[];
+let catalogTailDeferred=false;
+let catalogTailCursor=CATALOG_HEAD_CARDS;
+let catalogTailFrame=0;
+let catalogLastView='';
+function applyCatalogTailDeferral(){
+  const tail=new Set(catalogRankedCards.slice(CATALOG_HEAD_CARDS));
+  productCardCache.forEach(card=>{
+    const defer=tail.has(card);
+    if(card.classList.contains('is-deferred')!==defer)card.classList.toggle('is-deferred',defer);
+  });
+  catalogTailCursor=CATALOG_HEAD_CARDS;
+}
+function armCatalogTail(){
+  if(!productGridReady||catalogRankedCards.length<=CATALOG_HEAD_CARDS)return;
+  const scroller=document.getElementById('products');
+  // Un défilement déjà avancé garde la grille entière : sa position ne doit pas bouger.
+  if(!scroller||scroller.scrollTop>120)return;
+  catalogTailDeferred=true;
+  applyCatalogTailDeferral();
+}
+function revealCatalogTail(){
+  if(!catalogTailDeferred)return;
+  if(catalogTailFrame)cancelAnimationFrame(catalogTailFrame);
+  const step=()=>{
+    catalogTailFrame=0;
+    if(!catalogTailDeferred||state.view!=='catalog')return;
+    let revealed=0;
+    while(catalogTailCursor<catalogRankedCards.length&&revealed<CATALOG_TAIL_CHUNK){
+      catalogRankedCards[catalogTailCursor++].classList.remove('is-deferred');
+      revealed+=1;
+    }
+    if(catalogTailCursor<catalogRankedCards.length){
+      catalogTailFrame=requestAnimationFrame(step);
+      return;
+    }
+    catalogTailDeferred=false;
+    notifyProductsUpdated();
+  };
+  catalogTailFrame=requestAnimationFrame(step);
+}
+document.addEventListener('courses:view-changed',event=>{
+  const view=event.detail?.view;
+  const previous=catalogLastView;
+  catalogLastView=view;
+  if(view==='catalog'){
+    if(catalogTailDeferred)afterNavSettle(revealCatalogTail);
+  }else if(previous==='catalog'){
+    // Après l'arrivée de la pastille : ne rien ajouter à sa course.
+    afterNavSettle(()=>{if(catalogLastView!=='catalog')armCatalogTail()});
+  }
+});
+function afterNavSettle(callback){
+  const nav=window.COURSES_BOTTOM_NAV;
+  if(typeof nav?.afterSettle==='function')nav.afterSettle(callback);
+  else requestAnimationFrame(callback);
+}
+// Première ouverture : les cartes sont préparées au repos, par lots, bien avant le premier affichage.
+let catalogWarmStarted=false;
+function warmCatalogGrid(){
+  if(catalogWarmStarted||productGridReady)return;
+  catalogWarmStarted=true;
+  const products=sortProductsAlpha(unique(ALL));
+  let index=0;
+  const finish=()=>{
+    if(productGridReady)return;
+    const el=document.getElementById('products');
+    if(!el)return;
+    const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
+    ensureProductGrid(el,quantities);
+    syncProductGrid(visibleProducts(),quantities);
+    if(state.view!=='catalog')armCatalogTail();
+  };
+  const run=deadline=>{
+    const started=performance.now();
+    while(index<products.length&&(deadline?.timeRemaining?.()>6||performance.now()-started<8)){
+      productCard(products[index++]);
+    }
+    if(index<products.length){schedule();return}
+    // Le catalogue a pu être ouvert entre-temps : rien à refaire, la grille s'est construite seule.
+    finish();
+  };
+  const schedule=()=>{
+    if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:1500});
+    else setTimeout(run,60);
+  };
+  schedule();
+}
+document.addEventListener('courses:catalog-products-ready',warmCatalogGrid);
+if(window.COURSES_CATALOG_PRODUCTS_READY)warmCatalogGrid();
 function renderProducts(){
   const el=$('#products');
   if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
