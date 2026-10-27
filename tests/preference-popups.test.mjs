@@ -300,3 +300,22 @@ test('la colonne centrée ne réduit pas la coque bord à bord ni les zones de s
     assert.match(markup,new RegExp('id="'+id+'" class="[^"]*settings-sheet"'));
 });
 
+test('Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent leurs interactions',()=>{
+  const css=read('styles.css');
+  const admin=read('catalog-product-admin.js');
+  const errors=read('error-center.js');
+  assert.match(css,/#preferencesDialog \.courses-product-admin-modes::after,[\s\S]*?#preferencesDialog \.courses-error-tabs::after\{/);
+  assert.match(css,/#preferencesDialog \.courses-product-admin-modes > button\.is-active,[\s\S]*?background:transparent!important/);
+  assert.match(admin,/let modeTrack=null/);
+  assert.match(admin,/freshTrack\.replaceWith\(modeTrack\)/);
+  assert.match(admin,/COURSES_SEGMENTED_LIQUID\?\.bindSegment\(modeTrack/);
+  assert.match(errors,/let filterTrack=null/);
+  assert.match(errors,/freshTrack\.replaceWith\(filterTrack\)/);
+  assert.match(errors,/COURSES_SEGMENTED_LIQUID\?\.bindSegment\(filterTrack/);
+  assert.match(errors,/role="tablist" aria-label="Filtrer les messages d’erreur"/);
+  // Les validations des suppressions, les filtres et les actions HA restent propriétaires.
+  assert.match(admin,/data-confirm-delete/);
+  assert.match(errors,/data-error-filter/);
+  assert.match(errors,/data-error-action/);
+});
+

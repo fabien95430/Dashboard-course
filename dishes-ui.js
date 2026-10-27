@@ -722,7 +722,11 @@ function setMode(next,initial=false){
   if(dishes)renderDishes();
 }
 function syncModeLens(animate=true){
-  if(!modeSwitch||modeSwitch.dataset.catalogLiquidBound==='1')return;
+  if(!modeSwitch)return;
+  if(modeSwitch.dataset.catalogLiquidBound==='1'){
+    window.COURSES_SEGMENTED_LIQUID?.syncCatalog(animate);
+    return;
+  }
   const active=modeSwitch.querySelector('.catalog-mode.is-active');
   if(!active||!active.offsetWidth)return;
   const width=Math.max(48,Math.min(active.offsetWidth*.5,108));

@@ -4012,8 +4012,94 @@ body{
 .settings-sheet#connectionDialog .connection-sync-line{gap:12px}
 .settings-sheet#connectionDialog .connection-sync-line>span:first-child{flex:1 1 52%;min-width:0}
 .settings-sheet#connectionDialog .connection-sync-line>span:last-child{flex:0 1 48%;min-width:0}
-.settings-sheet .missing-mode-switch{background:rgba(51,104,69,.11)!important}
-.settings-sheet .missing-mode-lens{background:rgba(255,255,255,.85)!important}
+/* Réglages : même sélecteur, même trait et mêmes séparateurs que le Catalogue. */
+#missingProductsDialog .missing-mode-switch{
+  --catalog-lens-x:3px;--catalog-lens-w:calc(50% - 3px);--catalog-liquid-sx:1;
+  position:relative!important;display:grid!important;grid-template-columns:1fr 1fr!important;
+  width:72%!important;max-width:100%!important;height:46px!important;
+  margin:11px auto 15px!important;padding:3px!important;
+  border:1px solid rgba(27,49,35,.055)!important;border-radius:24px!important;
+  background:rgba(255,255,255,.94)!important;
+  box-shadow:0 6px 20px rgba(57,75,62,.055)!important;
+  overflow:hidden!important;isolation:isolate;touch-action:pan-y;
+}
+#missingProductsDialog .missing-mode-lens{
+  position:absolute!important;z-index:0!important;
+  top:auto!important;bottom:2px!important;left:0!important;
+  width:var(--catalog-lens-w)!important;height:2px!important;
+  border:0!important;border-radius:1px!important;background:#073e2c!important;box-shadow:none!important;
+  transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx))!important;
+  transition:none!important;pointer-events:none!important;
+}
+#missingProductsDialog .missing-mode-button{
+  position:relative!important;z-index:1!important;min-width:0!important;
+  border:0!important;border-radius:21px!important;background:transparent!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  color:#7b838c!important;font-size:14px!important;font-weight:720!important;
+  transform:none!important;touch-action:pan-y;
+}
+#missingProductsDialog .missing-mode-button.is-active,
+#missingProductsDialog .missing-mode-button.is-liquid-under{color:#073e2c!important}
+#missingProductsDialog .missing-mode-button:active{transform:none!important}
+#missingProductsDialog .missing-mode-button:focus-visible{outline:2px solid rgba(7,62,44,.24);outline-offset:-4px}
+#missingProductsDialog .missing-mode-button.is-active{font-weight:800!important}
+.settings-sheet .preference-toggle+.preference-toggle,
+.settings-sheet .security-setting-info+.security-setting-info,
+.settings-sheet .connection-sync-line+.connection-sync-line{
+  border-top:1px solid rgba(39,66,47,.09)!important;
+}
+.settings-sheet .courses-product-admin-row+.courses-product-admin-row,
+.settings-sheet .courses-error-card+.courses-error-card{
+  border-top-color:rgba(39,66,47,.09)!important;
+}
+@media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-button{transition:none!important}}
+
+/* Sous-vues de Gestion : même trait actif que le Catalogue, sans capsules concurrentes. */
+#preferencesDialog .courses-product-admin-modes,
+#preferencesDialog .courses-error-tabs{
+  --catalog-lens-x:3px;--catalog-lens-w:calc(50% - 3px);--catalog-liquid-sx:1;
+  position:relative!important;display:grid!important;grid-template-columns:1fr 1fr!important;
+  width:72%!important;max-width:100%!important;height:46px!important;
+  margin:12px auto 16px!important;padding:3px!important;gap:0!important;
+  border:1px solid rgba(27,49,35,.055)!important;border-radius:24px!important;
+  background:rgba(255,255,255,.94)!important;
+  box-shadow:0 6px 20px rgba(57,75,62,.055)!important;
+  isolation:isolate;overflow:hidden!important;touch-action:pan-y;
+}
+#preferencesDialog .courses-product-admin-modes::after,
+#preferencesDialog .courses-error-tabs::after{
+  content:"";position:absolute;left:0;bottom:2px;z-index:0;
+  width:var(--catalog-lens-w);height:2px;border-radius:1px;
+  background:#073e2c;
+  transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx));
+  pointer-events:none;
+}
+#preferencesDialog .courses-product-admin-modes > button,
+#preferencesDialog .courses-error-tabs > button{
+  position:relative;z-index:1;
+  min-width:0!important;min-height:0!important;height:100%!important;
+  border:0!important;border-radius:21px!important;
+  background:transparent!important;box-shadow:none!important;
+  color:#7b838c!important;font-size:13px!important;font-weight:720!important;
+  touch-action:pan-y;
+}
+#preferencesDialog .courses-product-admin-modes > button.is-active,
+#preferencesDialog .courses-error-tabs > button.is-active,
+#preferencesDialog .courses-product-admin-modes > button.is-liquid-under,
+#preferencesDialog .courses-error-tabs > button.is-liquid-under{
+  background:transparent!important;box-shadow:none!important;color:#073e2c!important;font-weight:800!important;
+}
+#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound])::after,
+#preferencesDialog .courses-error-tabs:not([data-segmented-liquid-bound])::after{display:none}
+#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound]) > button.is-active::after,
+#preferencesDialog .courses-error-tabs:not([data-segmented-liquid-bound]) > button.is-active::after{
+  content:"";position:absolute;bottom:2px;left:25%;width:50%;height:2px;background:#073e2c;border-radius:1px;
+}
+@media(prefers-reduced-motion:reduce){
+  #preferencesDialog .courses-product-admin-modes > button,
+  #preferencesDialog .courses-error-tabs > button{transition:none!important}
+}
+
 @media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{gap:11px!important;font-size:17px!important}.settings-sheet .settings-sheet-icon{width:44px;height:44px;flex-basis:44px}.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{padding-left:55px!important}}
 @media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;max-width:480px!important;max-inline-size:480px!important;margin:0 auto!important;bottom:18px!important;border-radius:32px!important;border-inline:1px solid rgba(255,255,255,.48)!important;height:min(78svh,720px)!important}}
 @media(prefers-reduced-motion:reduce){.settings-sheet[open]{animation:none!important}.settings-view .settings-row{transition:none!important}}

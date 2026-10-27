@@ -233,7 +233,8 @@ test('le rail des catégories défile bord à bord et les cartes Produits resten
   assert.ok(!styles.includes('background:#238d4e;'));
   assert.ok(!styles.includes('background:#168647;'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
-  assert.ok(index.includes('catalog-liquid.js?v=494')||read('sw.js').includes('catalog-liquid.js?v=494'));
+  const liquidRef=read('catalog.js').match(/\.\/catalog-liquid\.js\?v=\d+/)?.[0];
+  assert.ok(liquidRef&&read('sw.js').includes(liquidRef),'le sélecteur Liquid chargé reste précaché hors ligne');
 });
 
 test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans perdre les dernières cartes',()=>{

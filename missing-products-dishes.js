@@ -278,13 +278,6 @@ function initMissingProductsAndDishes(){
   style.id='missing-products-dishes-ui';
   style.textContent=`
     #missingProductsDialog .preference-dialog-scroll{overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch;touch-action:pan-y}
-    #missingProductsDialog .missing-mode-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;height:40px;margin:10px 0 9px;padding:4px;border-radius:20px;background:rgba(228,234,230,.78);overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
-    #missingProductsDialog .missing-mode-lens{position:absolute;z-index:0;left:4px;top:4px;width:calc(50% - 4px);height:32px;border-radius:17px;background:rgba(255,255,255,.98);box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 5px 13px rgba(42,49,45,.12);transform:translate3d(0,0,0);transition:transform .34s cubic-bezier(.22,.9,.28,1),border-radius .18s ease,box-shadow .18s ease;will-change:transform}
-    #missingProductsDialog .missing-mode-switch.is-dishes .missing-mode-lens{transform:translate3d(100%,0,0)}
-    #missingProductsDialog .missing-mode-switch.is-swapping .missing-mode-lens{border-radius:15px;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 7px 17px rgba(42,49,45,.16)}
-    #missingProductsDialog .missing-mode-button{position:relative;z-index:1;border:0;background:transparent;color:#758078;font-size:12.5px;font-weight:780;border-radius:17px;padding:0 12px;transition:color .2s ease,transform .2s cubic-bezier(.3,1.4,.5,1)}
-    #missingProductsDialog .missing-mode-button.is-active{color:#0b6f3e}
-    #missingProductsDialog .missing-mode-switch.is-swapping .missing-mode-button.is-active{transform:scale(1.025)}
     #missingProductsDialog .missing-image-hint-field{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;margin:0 0 8px;padding:5px 8px;border:1px solid rgba(35,144,90,.13);border-radius:14px;background:linear-gradient(145deg,rgba(246,251,248,.96),rgba(239,247,242,.82));box-shadow:inset 0 1px 0 rgba(255,255,255,.94)}
     #missingProductsDialog .missing-image-hint-field[hidden]{display:none!important}
     #missingProductsDialog .missing-image-hint-mark{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:rgba(35,144,90,.10);color:#17844d;font-size:14px;font-weight:850}
@@ -309,8 +302,7 @@ function initMissingProductsAndDishes(){
     #missingProductsDialog .missing-dish-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto}
     #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{border:0;border-radius:999px;min-height:40px;padding:0 14px;background:#e5f4e9;color:#0b7040;font-size:12px;font-weight:850;white-space:nowrap}
     #missingProductsDialog .missing-product-remove:disabled{opacity:.3}
-    @media(max-width:390px){#missingProductsDialog .missing-mode-switch{height:38px;margin:9px 0 8px}#missingProductsDialog .missing-mode-lens{height:30px}#missingProductsDialog .missing-image-hint-field{grid-template-columns:28px minmax(0,1fr) auto;gap:6px;padding:4px 7px}#missingProductsDialog .missing-image-hint-mark{width:28px;height:28px;border-radius:9px;font-size:13px}#missingProductsDialog #missingProductImageHint{height:30px;font-size:12px}#missingProductsDialog .missing-category-panel{gap:8px}#missingProductsDialog .missing-category-select{height:38px;font-size:12px}#missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:32px minmax(0,1fr) auto 40px!important;gap:6px!important}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{padding:0 11px!important;font-size:11px!important}}
-    @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-lens,#missingProductsDialog .missing-mode-button{transition:none!important}}
+    @media(max-width:390px){#missingProductsDialog .missing-image-hint-field{grid-template-columns:28px minmax(0,1fr) auto;gap:6px;padding:4px 7px}#missingProductsDialog .missing-image-hint-mark{width:28px;height:28px;border-radius:9px;font-size:13px}#missingProductsDialog #missingProductImageHint{height:30px;font-size:12px}#missingProductsDialog .missing-category-panel{gap:8px}#missingProductsDialog .missing-category-select{height:38px;font-size:12px}#missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:32px minmax(0,1fr) auto 40px!important;gap:6px!important}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{padding:0 11px!important;font-size:11px!important}}
   `;
   document.head.appendChild(style);
 
@@ -342,8 +334,6 @@ function initMissingProductsAndDishes(){
   let mode='products';
   let lastMode='products';
   let dishCategory='';
-  let swapTimer=0;
-  let pointerStart=null;
   let productEnhanceQueued=false;
   let knownProductIds=new Set(readProducts().map(item=>item.id));
   const completedThisSession=new Set();
@@ -388,7 +378,6 @@ function initMissingProductsAndDishes(){
   }
   function renderMode(){
     const dishesMode=mode==='dishes';
-    modeSwitch.classList.toggle('is-dishes',dishesMode);
     modeSwitch.querySelectorAll('[data-missing-mode]').forEach(button=>{
       const active=button.dataset.missingMode===mode;
       button.classList.toggle('is-active',active);
@@ -411,20 +400,15 @@ function initMissingProductsAndDishes(){
   }
   function setMode(next,{animate=true,clearInput=true}={}){
     if(next!=='products'&&next!=='dishes')return;
-    if(mode===next){renderMode();return}
+    if(mode===next){renderMode();window.COURSES_SEGMENTED_LIQUID?.syncMissing(false);return}
     mode=next;
     lastMode=next;
     if(clearInput){
       input.value='';
       imageHintInput.value='';
     }
-    if(animate&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
-      modeSwitch.classList.add('is-swapping');
-      clearTimeout(swapTimer);
-      swapTimer=setTimeout(()=>modeSwitch.classList.remove('is-swapping'),330);
-      navigator.vibrate?.(4);
-    }
     renderMode();
+    window.COURSES_SEGMENTED_LIQUID?.syncMissing(animate);
   }
   function saveProductImageHintDraft(){
     if(mode!=='products')return;
@@ -596,19 +580,6 @@ function removeDish(id){
     const button=event.target.closest('[data-missing-mode]');
     if(button)setMode(button.dataset.missingMode||'products');
   });
-  modeSwitch.addEventListener('pointerdown',event=>{
-    if(!event.isPrimary||event.button>0)return;
-    pointerStart={id:event.pointerId,x:event.clientX};
-  });
-  modeSwitch.addEventListener('pointerup',event=>{
-    if(!pointerStart||pointerStart.id!==event.pointerId)return;
-    const dx=event.clientX-pointerStart.x;
-    pointerStart=null;
-    if(Math.abs(dx)<28)return;
-    setMode(dx<0?'dishes':'products');
-  });
-  modeSwitch.addEventListener('pointercancel',()=>{pointerStart=null});
-
   categorySelect.addEventListener('change',()=>{
     const category=categorySelect.value||'';
     if(mode==='dishes'){

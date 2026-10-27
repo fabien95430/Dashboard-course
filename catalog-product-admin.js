@@ -8,6 +8,7 @@ const PENDING_KEY='courses-catalog-delete-pending-v2';
 const PENDING_TTL_MS=30*60*1000;
 const RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/actions/workflows/integrate-dish-openai.yml/runs?event=repository_dispatch&per_page=50';
 let currentMode='products';
+let modeTrack=null;
 let currentQuery='';
 let currentConfirm='';
 let dishRows=null;
@@ -190,6 +191,16 @@ function renderRows(rows,itemType){
       return '<article class="courses-product-admin-row" data-item="'+esc(item.name)+'"><div class="courses-product-admin-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.category)+' · '+esc(item.subgroup)+'</small></div>'+
         (pending?'<span class="courses-product-admin-pending">Suppression…</span>':'<button class="courses-product-admin-delete" type="button" aria-label="Supprimer '+esc(item.name)+'" data-delete-item="'+esc(item.name)+'" data-item-type="'+itemType+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8.5 0 .8 13h9.4l.8-13M10 11v5m4-5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>')+confirmMarkup(item,itemType)+'</article>';
     }).join('')||'<div class="courses-product-admin-empty">Aucun '+label+' ne correspond à cette recherche.</div>')+'</div><div class="courses-product-admin-feedback" role="status" aria-live="polite"></div>';
+  const freshTrack=panel.querySelector('.courses-product-admin-modes');
+  if(modeTrack&&freshTrack){
+    freshTrack.replaceWith(modeTrack);
+    modeTrack.querySelectorAll('[data-catalog-admin-mode]').forEach(button=>{
+      const active=button.dataset.catalogAdminMode===currentMode;
+      button.classList.toggle('is-active',active);
+      button.setAttribute('aria-selected',String(active));
+    });
+  }else modeTrack=freshTrack;
+  window.COURSES_SEGMENTED_LIQUID?.bindSegment(modeTrack,'.courses-product-admin-mode')?.sync(true);
 }
 async function render(){
   if(currentMode==='products'){renderRows(products(),'product');return}

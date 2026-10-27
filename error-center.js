@@ -7,6 +7,7 @@ const MAX_ENTRIES=80;
 const RESOLVED_TTL_MS=30*24*60*60*1000;
 const TRANSIENT_PREFIXES=Object.freeze(['resource:','javascript:','promise:','integration-local:','notifications:']);
 let currentFilter='active';
+let filterTrack=null;
 let uiBound=false;
 
 function scrub(value,max=900){
@@ -397,9 +398,20 @@ function renderPanel(entries=readEntries()){
   }).join('');
   panel.innerHTML=
     '<div class="courses-error-summary"><div><strong>État de l’application</strong><small>'+active.length+' anomalie'+(active.length>1?'s':'')+' active'+(active.length>1?'s':'')+'</small></div><span class="courses-error-count">'+active.length+'</span></div>'+
-    '<div class="courses-error-tabs"><button type="button" data-error-filter="active" class="'+(currentFilter==='active'?'is-active':'')+'">À traiter ('+active.length+')</button><button type="button" data-error-filter="resolved" class="'+(currentFilter==='resolved'?'is-active':'')+'">Résolues ('+resolved.length+')</button></div>'+
+    '<div class="courses-error-tabs" role="tablist" aria-label="Filtrer les messages d’erreur"><button type="button" role="tab" aria-selected="'+(currentFilter==='active')+'" data-error-filter="active" class="'+(currentFilter==='active'?'is-active':'')+'">À traiter ('+active.length+')</button><button type="button" role="tab" aria-selected="'+(currentFilter==='resolved')+'" data-error-filter="resolved" class="'+(currentFilter==='resolved'?'is-active':'')+'">Résolues ('+resolved.length+')</button></div>'+
     '<div class="courses-error-list">'+(cards||'<div class="courses-error-empty"><strong>'+(currentFilter==='active'?'Aucune erreur active':'Aucune erreur résolue')+'</strong>'+(currentFilter==='active'?'L’application ne signale actuellement aucun problème nécessitant votre attention.':'Les problèmes corrigés apparaîtront ici pendant 30 jours.')+'</div>')+'</div>'+
     (resolved.length?'<button class="courses-error-clear" type="button">Effacer les erreurs résolues</button>':'');
+  const freshTrack=panel.querySelector('.courses-error-tabs');
+  if(filterTrack&&freshTrack){
+    freshTrack.replaceWith(filterTrack);
+    filterTrack.querySelectorAll('[data-error-filter]').forEach(button=>{
+      const isActive=button.dataset.errorFilter===currentFilter;
+      button.classList.toggle('is-active',isActive);
+      button.setAttribute('aria-selected',String(isActive));
+      button.textContent=button.dataset.errorFilter==='active'?'À traiter ('+active.length+')':'Résolues ('+resolved.length+')';
+    });
+  }else filterTrack=freshTrack;
+  window.COURSES_SEGMENTED_LIQUID?.bindSegment(filterTrack,'.courses-error-tabs button')?.sync(true);
 }
 function bindUi(){
   if(uiBound)return true;

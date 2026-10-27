@@ -63,7 +63,7 @@
   const loadCatalogProductAdmin=()=>{
     if(document.querySelector('script[data-catalog-product-admin]'))return;
     const script=document.createElement('script');
-    script.src='./catalog-product-admin.js?v=493';
+    script.src='./catalog-product-admin.js?v=494';
     script.async=false;
     script.dataset.catalogProductAdmin='script';
     document.body.appendChild(script);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=596';
+    images.src='./dish-local-images.js?v=597';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -93,7 +93,7 @@
   const loadLiquid=()=>{
     if(document.querySelector('script[data-catalog-liquid]')){loadDishLocalImages();return}
     const liquid=document.createElement('script');
-    liquid.src='./catalog-liquid.js?v=494';
+    liquid.src='./catalog-liquid.js?v=495';
     liquid.async=false;
     liquid.dataset.catalogLiquid='script';
     liquid.addEventListener('load',loadDishLocalImages,{once:true});
@@ -104,7 +104,7 @@
     loadDishStyles().then(()=>{
       if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
       const script=document.createElement('script');
-      script.src='./dishes-ui.js?v=589';
+      script.src='./dishes-ui.js?v=590';
       script.async=false;
       script.dataset.catalogDishes='script';
       script.addEventListener('load',loadLiquid,{once:true});
@@ -179,7 +179,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=588';
+    script.src='./runtime-features.js?v=589';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
