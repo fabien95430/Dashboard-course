@@ -3909,6 +3909,7 @@ body{
 /* La feuille est ancrée en bas, mesure 78 % du viewport utile et respecte les safe areas. */
 .settings-sheet{
   --sheet-muted:#77847b;
+  --sheet-inner-max:400px;
   position:fixed!important;inset:auto 0 0!important;left:0!important;right:0!important;margin:0!important;
   width:100vw!important;width:100dvw!important;max-width:none!important;max-inline-size:none!important;min-width:0!important;
   height:min(78svh,calc(100svh - max(24px,env(safe-area-inset-top)) - env(safe-area-inset-bottom)))!important;
@@ -3923,24 +3924,58 @@ body{
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
   -webkit-backdrop-filter:blur(28px) saturate(125%);backdrop-filter:blur(28px) saturate(125%);
 }
+/* Réglages : un seul axe centré pour les zones et les actions, coque toujours bord à bord. */
+.settings-sheet > *,
+.settings-sheet .preference-dialog-scroll{
+  box-sizing:border-box;
+  width:100%!important;
+  max-width:var(--sheet-inner-max)!important;
+  min-width:0;
+  margin-inline:auto!important;
+}
+.settings-sheet .preference-dialog-scroll > :is(.field,.preference-options,.dialog-actions,#preferencesApplicationManagement,#preferencesNotificationsPanel){
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+}
+.settings-sheet .dialog-actions{
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+}
+.settings-sheet .dialog-actions > button:only-child{
+  box-sizing:border-box;
+  width:100%!important;
+  min-width:0;
+  margin-inline:auto!important;
+}
+.settings-sheet.recipe-customization-dialog .dialog-actions > button{
+  flex:1 1 0;
+  min-width:0;
+  width:0;
+  margin:0!important;
+}
+.settings-sheet .security-lock-now{box-sizing:border-box;width:100%!important;margin-inline:auto!important}
 .settings-sheet::-webkit-scrollbar,.settings-sheet *::-webkit-scrollbar{display:none}
 .settings-sheet::before{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:4px;background:rgba(126,135,129,.51);pointer-events:none;z-index:2}
 .settings-sheet::backdrop{background:rgba(30,43,37,.35)!important;-webkit-backdrop-filter:blur(13px)!important;backdrop-filter:blur(13px)!important}
 .settings-sheet[open]{animation:settingsSheetIn .22s cubic-bezier(.2,.9,.3,1) both}
 @keyframes settingsSheetIn{from{opacity:.65;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{display:flex!important;align-items:center!important;gap:14px!important;min-height:48px!important;margin:0 0 5px!important;padding:0!important;color:#17271f!important;font-size:19px!important;font-weight:810!important;line-height:1.16!important;letter-spacing:-.45px!important}
-.settings-sheet .settings-sheet-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
-.settings-sheet .settings-sheet-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{display:flex!important;align-items:center!important;gap:14px!important;min-height:44px!important;margin:0 0 5px!important;padding:0!important;color:#17271f!important;font-size:19px!important;font-weight:770!important;line-height:1.16!important;letter-spacing:-.45px!important}
+.settings-sheet .settings-sheet-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.settings-sheet .settings-sheet-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
 .settings-sheet .settings-sheet-title{min-width:0;display:block}
-.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 0 22px 62px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:450!important;line-height:1.4!important;max-width:none!important}
+.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 auto 21px!important;padding-left:58px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:450!important;line-height:1.4!important;width:100%!important;max-width:var(--sheet-inner-max)!important}
 .settings-sheet .field>span,.settings-sheet .missing-category-heading strong,.settings-sheet .connection-sync-section h4{color:#65776b!important;font-size:11px!important;font-weight:770!important;letter-spacing:.06em!important}
 .settings-sheet .field input,.settings-sheet .field select,.settings-sheet .missing-products-add input,.settings-sheet .missing-category-select,.settings-sheet .recipe-customization-search,.settings-sheet .recipe-customization-ingredient-search,.settings-sheet .courses-product-admin-search{min-height:46px;border:1px solid rgba(59,83,65,.12)!important;border-radius:14px!important;background:rgba(255,255,255,.56)!important;color:#25392b!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.63)!important}
 .settings-sheet select{color:#263b2e!important}
-.settings-sheet .primary,.settings-sheet .dialog-actions .primary{min-height:46px!important;border:0!important;border-radius:15px!important;background:linear-gradient(150deg,#32664a,#214b36)!important;color:#fff!important;font-weight:760!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.17)!important}
-.settings-sheet .secondary,.settings-sheet .dialog-actions .secondary{min-height:44px!important;border:1px solid rgba(71,98,77,.14)!important;border-radius:15px!important;background:rgba(255,255,255,.46)!important;color:#385540!important;box-shadow:none!important}
-.settings-sheet .security-settings-summary,.settings-sheet .preference-options,.settings-sheet .connection-sync-section,.settings-sheet .missing-category-panel,.settings-sheet .change-password-panel{border:1px solid rgba(40,70,49,.10)!important;border-radius:19px!important;background:rgba(255,255,255,.43)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)!important}
+.settings-sheet .primary,.settings-sheet .dialog-actions .primary{min-height:47px!important;border:0!important;border-radius:15px!important;background:linear-gradient(150deg,#315d46,#284b39)!important;color:#fff!important;font-weight:750!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.17)!important}
+.settings-sheet .secondary,.settings-sheet .dialog-actions .secondary{min-height:44px!important;border:1px solid rgba(71,98,77,.11)!important;border-radius:15px!important;background:rgba(255,255,255,.35)!important;color:#385540!important;box-shadow:none!important}
+.settings-sheet .security-settings-summary,.settings-sheet .preference-options,.settings-sheet .connection-sync-section,.settings-sheet .missing-category-panel,.settings-sheet .change-password-panel{border:1px solid rgba(40,70,49,.075)!important;border-radius:18px!important;background:rgba(255,255,255,.36)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)!important}
 .settings-sheet .security-setting-info,.settings-sheet .security-action-row,.settings-sheet .preference-toggle{min-height:67px!important;gap:10px}
-.settings-sheet .security-action-row{background:rgba(255,255,255,.49)!important;border:1px solid rgba(40,70,49,.09)!important;border-radius:17px!important;margin-top:10px!important}
+.settings-sheet .security-action-row{background:rgba(255,255,255,.39)!important;border:1px solid rgba(40,70,49,.07)!important;border-radius:17px!important;margin-top:10px!important}
 .settings-sheet .security-setting-icon{width:38px!important;height:38px!important;border-radius:12px!important;background:rgba(217,232,215,.84)!important;color:#2b6246!important}
 .settings-sheet .security-setting-copy strong,.settings-sheet .preference-toggle-copy strong{color:#1b2d21!important;font-size:13px!important;font-weight:750!important}
 .settings-sheet .security-setting-copy small,.settings-sheet .preference-toggle-copy small{color:#7c8780!important;font-size:11px!important;line-height:1.32!important}
@@ -3979,7 +4014,7 @@ body{
 .settings-sheet#connectionDialog .connection-sync-line>span:last-child{flex:0 1 48%;min-width:0}
 .settings-sheet .missing-mode-switch{background:rgba(51,104,69,.11)!important}
 .settings-sheet .missing-mode-lens{background:rgba(255,255,255,.85)!important}
-@media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{gap:11px!important;font-size:17px!important}.settings-sheet .settings-sheet-icon{width:46px;height:46px;flex-basis:46px}.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin-left:57px!important}}
+@media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{gap:11px!important;font-size:17px!important}.settings-sheet .settings-sheet-icon{width:44px;height:44px;flex-basis:44px}.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{padding-left:55px!important}}
 @media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;max-width:480px!important;max-inline-size:480px!important;margin:0 auto!important;bottom:18px!important;border-radius:32px!important;border-inline:1px solid rgba(255,255,255,.48)!important;height:min(78svh,720px)!important}}
 @media(prefers-reduced-motion:reduce){.settings-sheet[open]{animation:none!important}.settings-view .settings-row{transition:none!important}}
 

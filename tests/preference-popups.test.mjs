@@ -277,3 +277,26 @@ test('le titre produits manquants conserve son icône et le style des actions es
   assert.match(notifications,/Notifications indisponibles : Service Worker non prêt/);
 });
 
+test('Réglages aligne les éléments internes sur une colonne centrale sobre',()=>{
+  const css=read('styles.css');
+  assert.match(css,/--sheet-inner-max:400px/);
+  assert.match(css,/\.settings-sheet > \*,\s*\.settings-sheet \.preference-dialog-scroll\{[^}]*width:100%!important;[^}]*max-width:var\(--sheet-inner-max\)!important;[^}]*margin-inline:auto!important/s);
+  assert.match(css,/\.settings-sheet \.preference-dialog-scroll > :is\(\.field,\.preference-options,\.dialog-actions,#preferencesApplicationManagement,#preferencesNotificationsPanel\)\{/);
+  assert.match(css,/\.settings-sheet \.dialog-actions\{\s*display:flex;\s*align-items:stretch;\s*justify-content:center;/);
+  assert.match(css,/\.settings-sheet \.dialog-actions > button:only-child\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/s);
+  assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions > button\{[^}]*flex:1 1 0;[^}]*min-width:0;/s);
+  assert.match(css,/\.settings-sheet \.security-lock-now\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/);
+  assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*padding-left:58px!important;[^}]*max-width:var\(--sheet-inner-max\)!important/);
+});
+
+test('la colonne centrée ne réduit pas la coque bord à bord ni les zones de saisie',()=>{
+  const css=read('styles.css'),ui=read('settings-ui.js'),markup=read('index.html');
+  assert.match(css,/width:100vw!important;width:100dvw!important;max-width:none!important/);
+  assert.match(css,/height:min\(78svh/);
+  assert.match(css,/@media\(min-width:650px\)\{\.settings-sheet\{[^}]*max-width:480px!important/);
+  assert.match(css,/\.settings-sheet:not\(\[open\]\)\{display:none!important\}/);
+  assert.match(ui,/function lockPreferenceDialog\(dialog\)[\s\S]*?const rect=dialog\.getBoundingClientRect\(\)/);
+  for(const id of ['connectionDialog','preferencesDialog','missingProductsDialog','settingsDialog'])
+    assert.match(markup,new RegExp('id="'+id+'" class="[^"]*settings-sheet"'));
+});
+
