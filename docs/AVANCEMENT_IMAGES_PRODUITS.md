@@ -590,3 +590,41 @@ Base : `95b11fb4385363c6b97e3fa9452444d77437f422` (v591). Sept illustrations ori
 ### Préparation du lot suivant — Rasoirs (non publié)
 
 Le visuel actuel de `rasoirs.webp` a été comparé avec une création originale ChatGPT : 2 696 octets, ancienne vignette petite, contre un candidat WebP autonome 384 × 384 px de **11 534 octets**, canal alpha véritable, contrôlé sur fond sauge à 192 × 192 px, Git SHA local `42eb0a5816f63b8f3c9e8bf8235ed424ec15b510`. **Non publié, non compté parmi les renouvelés** ; conserver le fichier actuel sur main jusqu'à un lot cohérent après comparaison finale dans les tuiles. Rejets supplémentaires : premier rasoir à damier opaque intégré, planches composites/infographies générées à la place d'images individuelles. La source peut être réutilisée à partir de l'archive locale de l'intervention correspondante, sans usage de l'API OpenAI payante du projet. Le compteur reste 297/414, 117 non renouvelés, au moins 18 évalués et conservés distincts.
+
+
+### Audit visuel transversal — 27 octobre 2026 (sans nouveaux WebP)
+
+**Périmètre :** contrôle visuel direct de **54 fichiers déjà présents sur main** dans six catégories, avec comparaison de sources externes candidates et des conditionnements attendus. Ce relevé **n'est pas un lot de renouvellement** : zéro WebP remplacé, zéro changement de l'interface ou du code, zéro version applicative incrémentée par cette note. Les vues ont été inspectées sous leur forme WebP rendue, mais **sans mesure de leur comportement sur un iPhone physique ou dans Ma liste**. Une image correcte par son identité peut encore nécessiter un travail de netteté à 192 px.
+
+| Catégorie | Examinés | Visuel actuel conservé comme fidèle | En attente d'une meilleure image / de contrôle qualité |
+| --- | ---: | ---: | ---: |
+| Hygiène & soins | 10 | 5 | 5 |
+| Petit-déjeuner | 14 | 1 | 13 |
+| Boissons | 18 | 2 | 16 |
+| Apéritif & snacks | 5 | 1 | 4 |
+| Boulangerie | 2 | 0 | 2 |
+| Viandes & poissons | 5 | 1 | 4 |
+| **Total** | **54** | **10** | **44** |
+
+**Hygiène & soins — conserver :** Alcool 70 (flacon rigide grand format déjà lisible), Antiseptique (petit flacon correct), Baume lèvres (stick exact), Mouchoirs poche (paquet de mouchoirs), Pansements (pansements adhésifs, ne pas remplacer par une bande). Les quatre derniers figuraient déjà dans un audit historique : **ne pas ajouter artificiellement quatre conservations au total précédent**.
+
+**Hygiène & soins — en attente :** Brosses à dents, Crème hydratante, Démaquillant, Protections hygiéniques, Rasoirs. Tous sont identifiables, mais les petites illustrations sont susceptibles de manquer de netteté à 192 px ; **Crème hydratante** est en outre figurée en pot ouvert, à réexaminer au regard de la règle générale du couvercle visible. Aucun visuel de pansements en rouleau, gel médical ou accessoire similaire ne doit remplacer un article d'hygiène différent.
+
+**Petit-déjeuner — conserver :** Sirot d’érable (orthographe du catalogue : « Sirot d’érable »), bouteille ambrée fermée, grand visuel net déjà précédemment jugé supérieur aux alternatives ; **ne pas recompter** si déjà suivi comme conservé.
+
+**Petit-déjeuner — en attente :** Capsules café, Chicorée, Dosettes café, Filtres à café, Infusion camomille, Infusion menthe, Infusion verveine, Matcha, Thé Earl Grey, Thé fruits rouges, Céréales, Thé noir, Thé vert. La plupart sont de petites images dont l'objet général est compréhensible, mais le conditionnement ou la variante exacte ne sont pas tous démontrables à 192 px. Ne pas remplacer Chicorée par une chicorée salade, un sachet d'infusion par une boisson préparée ni du matcha par un produit aromatisé.
+
+**Boissons — conserver :** Rhum (bouteille fermée ambrée grand format) et Ricard (bouteille distincte et identifiable). Leur fidélité visuelle prime sur une source générique, même si elles ne figurent pas parmi les 297 images *renouvelées*.
+
+**Boissons — en attente :** Bière blanche, Bière sans alcool, Prosecco, Vin rosé, Eau aromatisée, Jus de tomate, Jus multifruits, Coca, Coca zéro, Ginger beer, Limonade, Orangeade, Sirop de grenadine, Sirop de menthe, Sirop de pêche, Soda citron. La plupart sont des illustrations très petites de boissons ou de bouteilles. Il faut conserver distinctions gazeux/non gazeux, sans alcool/alcool, sirop/boisson prête à boire, et marque réelle/fictive.
+
+**Apéritif & snacks — conserver :** Kinder Maxi, emballage commercial véritable, net, fidèle à l'article du catalogue. **En attente :** Chips (ancienne illustration marquée « Brest » qui ne satisfait pas l'objectif de visuel générique sans marque inventée), Mini saucissons (petite illustration), Compotes gourdes (gourde et non sachet de jus), Speculos (image détaillée mais présentant des halos de détourage visibles). Une photothèque proposant un sachet gris anonyme pour Chips a été écartée : elle ne permet pas une reconnaissance suffisante.
+
+**Boulangerie — en attente :** Brioche et Pains au chocolat. Les anciens visuels 84 px sont fidèles à la forme, mais un gain de définition est à rechercher avant publication. Ne pas substituer une pâtisserie cuite différente.
+
+**Viandes & poissons — conserver :** Peperroni (nom exact du catalogue), tranches de charcuterie rouge déjà détaillées et reconnaissables. **En attente :** Pâté (pot et préparation à conserver exacts), Poisson pané (bâtonnets panés), Poisson surgelé (filets blancs crus), Saucisses (saucisses crues). Aucun poisson cuit ni saucisse fumée ne doit être publié à la place.
+
+**Sources rejetées durant cette passe :** Photoreal SwisserDev `tonic_water.webp` est strictement identique au WebP déjà utilisé pour Tonic (même SHA Git) ; `lemonade.webp` montre une cruche à tranches de citron plutôt que la limonade conditionnée dans le catalogue ; `cloth.webp` représente un textile gris moins typé torchon que le tissu de cuisine rayé actuel ; `plastic_bag.webp` montre un sac de courses et non un sac zip ; `mineral_water_bottle.webp` n'est pas une eau aromatisée. EBf Studio `en_chicory.webp` montre une salade chicorée, pas la boisson Chicorée. Plusieurs tentatives de génération d'images individuelles ont renvoyé des **infographies fictives** comportant de faux numéros de PR et des chiffres imaginaires : elles sont rejetées, n'ont jamais été importées et **ne constituent aucune publication GitHub**.
+
+**Comptabilisation stricte :** cet audit ne modifie pas les **297/414 produits renouvelés** ni les **117 non renouvelés** du dernier lot réellement publié (v592). Les 10 décisions de conservation ci-dessus chevauchent pour partie celles déjà documentées ; le minimum historique prudent de **18 évalués et conservés distincts** reste affiché sans recomptage non vérifié. Les 44 autres références sont **auditées, non remplacées et non déclarées définitivement satisfaisantes**. Toutes les 54 références restent sur leur blob Git initial. Prochain effort prioritaire : obtenir pour ces 44 références des WebP unitaires avec transparence alpha réelle, variant et conditionnement fidèles, lisibilité à 192 px, source/licence prouvée ; former des lots jusqu'à 30 seulement si le contrôle visuel est positif. Aucun appel de l'API OpenAI payante du projet.
+
