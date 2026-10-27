@@ -146,7 +146,8 @@ test('les trois points et un glissement révèlent uniquement la corbeille dans 
   assert.ok(!menu.includes('document.body.appendChild'));
   assert.ok(bind.includes('Math.abs(dx)>26&&Math.abs(dx)>Math.abs(dy)*1.4'));
   assert.ok(bind.includes("void removeGroup(row.dataset.name||'',row,'delete')"));
-  assert.ok(styles.includes('.list-view .list-row.is-actions-open{padding-right:66px!important}'));
+  assert.ok(!/\.list-row\.is-actions-open\{[^}]*padding/.test(styles),'la corbeille ne doit pas resserrer la ligne');
+  assert.ok(styles.includes('.list-view .list-row.is-actions-open .list-row-more{opacity:0!important;visibility:hidden;pointer-events:none}'));
   assert.ok(styles.includes('.list-view .list-row-delete{'));
   assert.ok(!styles.includes('.list-row-menu{'));
 });

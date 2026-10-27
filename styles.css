@@ -3817,9 +3817,9 @@ body{
 .list-view .list-category-heading::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(7,62,44,.22),rgba(7,62,44,0))}
 .list-view .list-category-heading:first-child::after{display:none}
 
-/* v583 — Corbeille discrète révélée dans la ligne, sans fenêtre flottante. */
+/* v583 — Corbeille discrète révélée dans la ligne, sans fenêtre flottante.
+   v587 — elle prend la place des 3 points, sans resserrer la ligne ni tronquer le nom. */
 .list-view .list-row{transition:opacity .24s ease,transform .24s ease,min-height .24s ease,max-height .24s ease,margin .24s ease,padding .2s ease,background .22s ease}
-.list-view .list-row.is-actions-open{padding-right:66px!important}
 .list-view .list-row-delete{
   position:absolute;
   top:50%;
