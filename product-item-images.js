@@ -133,48 +133,6 @@ function visualScaleStyle(source){
 }
 loadVisualScaleCache();
 window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages,visualScaleStyle});
-function ensureStyles(){
-  if(document.getElementById('courses-product-item-images-style'))return;
-  const style=document.createElement('style');
-  style.id='courses-product-item-images-style';
-  style.textContent=`
-    .catalog-view .product .badge{
-      width:27px!important;
-      height:27px!important;
-    }
-    .premium-sprite.is-single-product-image{
-      -webkit-clip-path:none!important;
-      clip-path:none!important;
-    }
-    .catalog-view .product .media .premium-sprite{
-      transform:translateY(9px)!important;
-    }
-    .catalog-view .product.has-single-product-image .media .premium-sprite.is-single-product-image{
-      transform:translateY(14px)!important;
-    }
-    .premium-sprite.is-single-product-image>img{
-      top:11%!important;
-      left:11%!important;
-      width:78%!important;
-      height:78%!important;
-      max-width:none!important;
-      max-height:none!important;
-      object-fit:contain!important;
-      object-position:center!important;
-      transform:translate(var(--single-product-shift-x,0%),calc(4px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
-      transform-origin:center!important;
-    }
-    .premium-sprite.is-single-product-image.is-compact>img{
-      transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
-    }
-    @media(max-width:520px){
-      .catalog-view .product .media{
-        padding-right:0!important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
 function productCardVisible(card){
   if(!card||card.hidden||products?.classList.contains('is-catalog-mode-hidden'))return false;
   const rect=card.getBoundingClientRect?.();
@@ -243,6 +201,15 @@ function setVisualScale(image,metrics){
   image.style.setProperty('--single-product-scale',String(metrics.scale));
   image.style.setProperty('--single-product-shift-x',metrics.shiftX+'%');
   image.style.setProperty('--single-product-shift-y',metrics.shiftY+'%');
+}
+// Cadrages déjà connus : appliqués sans attendre l'arrivée de la pastille ni l'ouverture du
+// Catalogue, pour que les images ne changent pas de taille après la première image affichée.
+function applyCachedVisualScales(){
+  products?.querySelectorAll('.premium-sprite.is-single-product-image>img[data-single-product-source]').forEach(image=>{
+    if(image.style.getPropertyValue('--single-product-scale'))return;
+    const cached=visualScaleCache.get(image.dataset.singleProductSource);
+    if(cached)setVisualScale(image,cached);
+  });
 }
 // Mesurer un cadrage décode l'image : seules les cartes visibles sont mesurées tout de suite,
 // les autres le sont par petits lots quand le navigateur est libre (aucun effet visible).
@@ -343,6 +310,7 @@ function scheduleDecorateProducts(){
   if(productRefreshFrame)return;
   productRefreshFrame=requestAnimationFrame(()=>{
     productRefreshFrame=0;
+    applyCachedVisualScales();
     decorateProducts();
   });
 }
@@ -360,6 +328,7 @@ function bindEvents(){
   document.addEventListener('courses:list-rendered',scheduleDecorateList);
   document.addEventListener('courses:view-changed',event=>{
     if(event.detail?.view!=='catalog')return;
+    applyCachedVisualScales();
     // Laisser la pastille de navigation finir sa course avant de parcourir la grille.
     const nav=window.COURSES_BOTTOM_NAV;
     if(typeof nav?.afterSettle==='function')nav.afterSettle(scheduleDecorateProducts);
@@ -371,8 +340,8 @@ function bind(){
   products=document.getElementById('products');
   listItems=document.getElementById('listItems');
   if(!products||!listItems)return false;
-  ensureStyles();
   bindEvents();
+  applyCachedVisualScales();
   decorateList();
   if(window.COURSES_CATALOG_PRODUCTS_READY)warmProductImages();
   return true;

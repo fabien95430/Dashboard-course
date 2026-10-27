@@ -12,7 +12,7 @@ test('le sélecteur Catalogue réutilise sa structure entre deux changements de 
   assert.match(app,/state\.productQuery='';/);
   assert.match(app,/UI\.productSearch\.value='';/);
   assert.match(app,/if\(el\.childElementCount!==CATALOG_CATEGORY_ORDER\.length\)/);
-  assert.match(app,/button\.onclick=\(\)=>selectCategory\(button\.dataset\.category\|\|'Toutes'\)/);
+  assert.match(app,/button\.onclick=\(\)=>selectCategory\(button\.dataset\.category\|\|DEFAULT_CATALOG_CATEGORY\)/);
   assert.match(app,/syncCategorySelection\(\);\n  renderProducts\(\);/);
   assert.doesNotMatch(app,/button\.onclick=\(\)=>\{state\.category=.*renderCategories\(\);renderProducts\(\)\}/);
   assert.doesNotMatch(app,/new MutationObserver/);

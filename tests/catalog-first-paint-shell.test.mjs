@@ -95,7 +95,7 @@ test('les titres gardent leur géométrie et seul Réglages affiche le badge de 
 
 test('sur iPhone les en-têtes restent alignés et Produits / Plats dispose de sa propre ligne',()=>{
   const mobile=firstPaint.slice(firstPaint.indexOf('@media(max-width:520px){'));
-  assert.match(mobile,/html \.catalog-controls>\.categories \.cat\[data-category="Toutes"\]\{min-width:0!important\}/,'« Tous » ne doit pas rétrécir quand dishes.css arrive');
+  assert.doesNotMatch(mobile,/data-category="Toutes"/,'la catégorie « Tous » du Catalogue n existe plus');
   assert.match(styles,/\.list-view\{[\s\S]*?grid-template-rows:82px 98px minmax\(0,1fr\)!important/);
   assert.match(styles,/\.list-view\{\s*gap:8px!important/);
   assert.match(mobile,/grid-template-rows:82px 42px 40px 42px minmax\(0,1fr\)!important;\s*gap:12px!important/);
@@ -212,7 +212,7 @@ test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans 
   assert.ok(row>132,'les tuiles sont réellement agrandies');
   assert.ok(style.includes('overflow-y:auto;'),'défilement natif conservé');
   assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
-  assert.ok(index.includes('product-item-first-paint.css?v=580'));
+  assert.ok(index.includes('product-item-first-paint.css?v=610'));
 });
 
 test('le rail des catégories défile bord à bord et les cartes Produits restent ivoire clair et les boutons + vert forêt',()=>{
@@ -252,7 +252,7 @@ test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans pe
   assert.ok(catalog.includes("'./dishes.css?v=532'"));
   assert.ok(sw.includes('"./dishes.css?v=532"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
-  assert.ok(index.includes('product-item-first-paint.css?v=580'));
+  assert.ok(index.includes('product-item-first-paint.css?v=610'));
 });
 
 test('sélection sauge visible et lettres descendantes non rognées sur les trois vues',()=>{
@@ -268,7 +268,7 @@ test('sélection sauge visible et lettres descendantes non rognées sur les troi
   assert.ok(catalog.includes("'./dishes.css?v=532'"));
   assert.ok(sw.includes('"./dishes.css?v=532"'));
   assert.ok(index.includes('bottom-nav-liquid.js?v=573'));
-  assert.ok(index.includes('product-item-first-paint.css?v=580'));
+  assert.ok(index.includes('product-item-first-paint.css?v=610'));
   const localImages=read('dish-local-images.js');
   const version=localImages.match(/const APP_VERSION='(v\d+)'/)?.[1];
   assert.ok(version,'version applicative introuvable');

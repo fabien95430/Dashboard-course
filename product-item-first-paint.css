@@ -191,8 +191,40 @@ html .catalog-view>#products.is-catalog-mode-hidden{
     border-radius:20px!important;
   }
   html .catalog-controls>.categories .cat-label{font-size:13px!important}
-  /* « Tous » a sa largeur finale dès la première image (règle reprise de dishes.css). */
-  html .catalog-controls>.categories .cat[data-category="Toutes"]{min-width:0!important}
   html .catalog-view>#products,
   html .catalog-view>.dishes-grid{grid-row:5!important}
+}
+
+/* Tuiles du Catalogue et vignettes : géométrie finale dès la première image, sans saut quand
+   product-item-images.js arrive (ces règles vivaient dans une feuille injectée après coup). */
+.catalog-view .product .badge{
+  width:27px!important;
+  height:27px!important;
+}
+.premium-sprite.is-single-product-image{
+  -webkit-clip-path:none!important;
+  clip-path:none!important;
+}
+.catalog-view .product .media .premium-sprite{
+  transform:translateY(14px)!important;
+}
+.premium-sprite.is-single-product-image>img{
+  top:11%!important;
+  left:11%!important;
+  width:78%!important;
+  height:78%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:translate(var(--single-product-shift-x,0%),calc(4px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
+  transform-origin:center!important;
+}
+.premium-sprite.is-single-product-image.is-compact>img{
+  transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1))!important;
+}
+@media(max-width:520px){
+  .catalog-view .product .media{
+    padding-right:0!important;
+  }
 }

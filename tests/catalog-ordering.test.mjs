@@ -6,9 +6,9 @@ const root=new URL('../',import.meta.url);
 const read=file=>readFileSync(new URL(file,root),'utf8');
 const norm=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 
-test('les catégories du catalogue gardent Tous en tête, Favoris à la fin et le reste en ordre alphabétique',()=>{
+test('les catégories du catalogue ne contiennent plus « Tous », gardent Favoris à la fin et le reste en ordre alphabétique',()=>{
   const app=read('app.js');
-  assert.match(app,/const CATALOG_CATEGORY_ORDER=\['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'\]/);
+  assert.match(app,/const CATALOG_CATEGORY_ORDER=\['Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'\]/);
   const requests=read('missing-requests-store.js');
 assert.match(requests,/const PRODUCT_CATEGORIES=Object\.freeze\(\['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons'\]\)/);
 assert.match(app,/const MISSING_PRODUCT_CATEGORIES=MISSING_REQUESTS\.productCategories;/);
@@ -27,10 +27,11 @@ test('chaque sous-catégorie de catalog.js est stockée en ordre alphabétique',
   }
 });
 
-test('Catalogue trie aussi visuellement Tous et les catégories normales de A à Z',()=>{
+test('Catalogue trie visuellement les catégories normales de A à Z, sans catégorie « Tous »',()=>{
   const app=read('app.js');
   assert.match(app,/const sortProductsAlpha=products=>\[\.\.\.products\]\.sort\(\(a,b\)=>a\.name\.localeCompare\(b\.name,'fr',\{sensitivity:'base'\}\)\)/);
-  assert.match(app,/state\.category==='Toutes'[\s\S]*?products=sortProductsAlpha\(unique\(ALL\)\)/);
+  assert.doesNotMatch(app,/state\.category==='Toutes'/);
+  assert.match(app,/const DEFAULT_CATALOG_CATEGORY=CATALOG_CATEGORY_ORDER\[0\];/);
   assert.match(app,/const subs=GROUPS\[state\.category\]\|\|\{\};[\s\S]*?products=sortProductsAlpha\(unique\(/);
 });
 

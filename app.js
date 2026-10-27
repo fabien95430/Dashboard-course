@@ -21,7 +21,8 @@ const CATEGORY_META = {
   'Viandes & poissons': { label:'Viandes & poissons' },
   'Favoris': { label:'Favoris' }
 };
-const CATALOG_CATEGORY_ORDER=['Toutes','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'];
+const CATALOG_CATEGORY_ORDER=['Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'];
+const DEFAULT_CATALOG_CATEGORY=CATALOG_CATEGORY_ORDER[0];
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
   "Lait sans lactose":"Lait s. lact.",
@@ -366,7 +367,7 @@ let state={
   items:[],
   loading:true,
   error:'',
-  category:'Toutes',
+  category:DEFAULT_CATALOG_CATEGORY,
   productQuery:'',
   listQuery:'',
   listCategoryFilter:'Toutes',
@@ -568,8 +569,6 @@ function visibleProducts(){
       tokens.forEach(t=>{if(name.split(' ').some(w=>w.startsWith(t)))score+=14;else if(name.includes(t))score+=8;else if(sub.includes(t))score+=3});
       return {product,score};
     }).filter(Boolean).sort((a,b)=>b.score-a.score||a.product.name.localeCompare(b.product.name,'fr')).map(x=>x.product);
-  }else if(state.category==='Toutes'){
-    products=sortProductsAlpha(unique(ALL));
   }else if(state.category==='Favoris'){
     products=favorites();
   }else{
@@ -603,8 +602,8 @@ function sortedGroups(groups){
     return rows.map((group,index)=>({group,index})).sort((a,b)=>{
       const productA=catalogProductFor(a.group.summary),productB=catalogProductFor(b.group.summary);
       const categoryA=CATALOG_CATEGORY_ORDER.indexOf(productA?.category),categoryB=CATALOG_CATEGORY_ORDER.indexOf(productB?.category);
-      const rankA=categoryA>0&&categoryA<CATALOG_CATEGORY_ORDER.length-1?categoryA:999;
-      const rankB=categoryB>0&&categoryB<CATALOG_CATEGORY_ORDER.length-1?categoryB:999;
+      const rankA=categoryA>=0&&categoryA<CATALOG_CATEGORY_ORDER.length-1?categoryA:999;
+      const rankB=categoryB>=0&&categoryB<CATALOG_CATEGORY_ORDER.length-1?categoryB:999;
       return rankA-rankB||a.index-b.index;
     }).map(entry=>entry.group);
   }
@@ -671,11 +670,11 @@ function syncCategorySelection(){
   const el=$('#categories');
   if(!el)return;
   el.querySelectorAll('.cat').forEach(button=>{
-    button.classList.toggle('is-active',(button.dataset.category||'Toutes')===state.category);
+    button.classList.toggle('is-active',(button.dataset.category||DEFAULT_CATALOG_CATEGORY)===state.category);
   });
 }
 function selectCategory(category){
-  const next=category||'Toutes';
+  const next=category||DEFAULT_CATALOG_CATEGORY;
   if(state.category===next&&!state.productQuery)return;
   state.category=next;
   state.productQuery='';
@@ -688,7 +687,7 @@ function renderCategories(){
   if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
   if(el.childElementCount!==CATALOG_CATEGORY_ORDER.length){
     el.innerHTML=CATALOG_CATEGORY_ORDER.map(category=>'<button type="button" class="cat" data-category="'+esc(category)+'"><span class="cat-label">'+esc(CATEGORY_META[category].label)+'</span></button>').join('');
-    el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>selectCategory(button.dataset.category||'Toutes'));
+    el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>selectCategory(button.dataset.category||DEFAULT_CATALOG_CATEGORY));
   }
   syncCategorySelection();
 }
@@ -844,6 +843,7 @@ function warmCatalogGrid(){
     const warmProducts=visibleProducts();
     syncProductGrid(warmProducts,quantities);
     updateProductCount(warmProducts);
+    notifyProductsUpdated();
     if(state.view!=='catalog')armCatalogTail();
   };
   const run=deadline=>{
