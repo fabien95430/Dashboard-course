@@ -3909,13 +3909,13 @@ body{
 /* La feuille est ancrée en bas, mesure 78 % du viewport utile et respecte les safe areas. */
 .settings-sheet{
   --sheet-muted:#77847b;
-  position:fixed!important;inset:auto 0 0!important;margin:0 auto!important;
-  width:min(100%,480px)!important;
+  position:fixed!important;inset:auto 0 0!important;left:0!important;right:0!important;margin:0!important;
+  width:100vw!important;width:100dvw!important;max-width:none!important;max-inline-size:none!important;min-width:0!important;
   height:min(78svh,calc(100svh - max(24px,env(safe-area-inset-top)) - env(safe-area-inset-bottom)))!important;
   max-height:calc(100svh - max(24px,env(safe-area-inset-top)))!important;
   box-sizing:border-box!important;
-  padding:50px 21px max(24px,env(safe-area-inset-bottom))!important;
-  border:1px solid rgba(255,255,255,.48)!important;border-bottom:0!important;
+  padding:43px 21px max(24px,env(safe-area-inset-bottom))!important;
+  border:1px solid rgba(255,255,255,.48)!important;border-inline:0!important;border-bottom:0!important;
   border-radius:32px 32px 0 0!important;
   background:radial-gradient(ellipse at 6% 16%,rgba(216,232,210,.44),transparent 43%),radial-gradient(ellipse at 90% 88%,rgba(238,215,190,.39),transparent 48%),linear-gradient(155deg,rgba(252,251,247,.99),rgba(244,241,234,.99))!important;
   color:#19291f!important;box-shadow:0 -14px 55px rgba(25,42,31,.16),inset 0 1px 0 rgba(255,255,255,.8)!important;
@@ -3924,15 +3924,15 @@ body{
   -webkit-backdrop-filter:blur(28px) saturate(125%);backdrop-filter:blur(28px) saturate(125%);
 }
 .settings-sheet::-webkit-scrollbar,.settings-sheet *::-webkit-scrollbar{display:none}
-.settings-sheet::before{content:"";position:absolute;top:14px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:4px;background:rgba(126,135,129,.51);pointer-events:none;z-index:2}
+.settings-sheet::before{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:4px;background:rgba(126,135,129,.51);pointer-events:none;z-index:2}
 .settings-sheet::backdrop{background:rgba(30,43,37,.35)!important;-webkit-backdrop-filter:blur(13px)!important;backdrop-filter:blur(13px)!important}
 .settings-sheet[open]{animation:settingsSheetIn .22s cubic-bezier(.2,.9,.3,1) both}
 @keyframes settingsSheetIn{from{opacity:.65;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{display:flex!important;align-items:center!important;gap:14px!important;min-height:52px!important;margin:0 0 3px!important;padding:0!important;color:#17271f!important;font-size:19px!important;font-weight:810!important;line-height:1.16!important;letter-spacing:-.45px!important}
-.settings-sheet .settings-sheet-icon{width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
-.settings-sheet .settings-sheet-icon svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{display:flex!important;align-items:center!important;gap:14px!important;min-height:48px!important;margin:0 0 5px!important;padding:0!important;color:#17271f!important;font-size:19px!important;font-weight:810!important;line-height:1.16!important;letter-spacing:-.45px!important}
+.settings-sheet .settings-sheet-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.settings-sheet .settings-sheet-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
 .settings-sheet .settings-sheet-title{min-width:0;display:block}
-.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 0 24px 66px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:450!important;line-height:1.4!important;max-width:none!important}
+.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 0 22px 62px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:450!important;line-height:1.4!important;max-width:none!important}
 .settings-sheet .field>span,.settings-sheet .missing-category-heading strong,.settings-sheet .connection-sync-section h4{color:#65776b!important;font-size:11px!important;font-weight:770!important;letter-spacing:.06em!important}
 .settings-sheet .field input,.settings-sheet .field select,.settings-sheet .missing-products-add input,.settings-sheet .missing-category-select,.settings-sheet .recipe-customization-search,.settings-sheet .recipe-customization-ingredient-search,.settings-sheet .courses-product-admin-search{min-height:46px;border:1px solid rgba(59,83,65,.12)!important;border-radius:14px!important;background:rgba(255,255,255,.56)!important;color:#25392b!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.63)!important}
 .settings-sheet select{color:#263b2e!important}
@@ -3965,10 +3965,22 @@ body{
 .settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .missing-dishes-list{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
 .settings-sheet.recipe-customization-dialog .recipe-customization-list{flex:1 1 auto!important;min-height:0!important;max-height:none!important}
 .settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto}
+/* Finitions Réglages : actions, lignes et états des feuilles iOS. */
+.settings-sheet#connectionDialog[open],.settings-sheet#settingsDialog[open]{display:flex!important;flex-direction:column!important}
+.settings-sheet#connectionDialog .dialog-actions{flex:0 0 auto;margin-top:auto!important;padding-top:18px}
+.settings-sheet#settingsDialog .security-lock-now{flex:0 0 auto;margin-top:auto!important}
+.settings-sheet#preferencesDialog .preference-dialog-scroll>.dialog-actions{position:sticky;z-index:2;bottom:0;margin-top:16px!important;padding:12px 0 2px;background:linear-gradient(180deg,rgba(247,246,240,0),rgba(247,246,240,.96) 30%)}
+.settings-sheet .security-action-row>.chevron,.settings-sheet .settings-sheet-icon svg{fill:none!important;stroke-linecap:round;stroke-linejoin:round}
+.settings-sheet .security-action-row>.chevron{stroke:currentColor!important}
+.settings-sheet .field input:focus-visible,.settings-sheet .field select:focus-visible,.settings-sheet .recipe-customization-search:focus-within,.settings-sheet .courses-product-admin-search:focus-within{outline:2px solid rgba(51,105,72,.23)!important;outline-offset:1px}
+.settings-sheet#missingProductsDialog .missing-products-header>div{width:100%;min-width:0}
+.settings-sheet#connectionDialog .connection-sync-line{gap:12px}
+.settings-sheet#connectionDialog .connection-sync-line>span:first-child{flex:1 1 52%;min-width:0}
+.settings-sheet#connectionDialog .connection-sync-line>span:last-child{flex:0 1 48%;min-width:0}
 .settings-sheet .missing-mode-switch{background:rgba(51,104,69,.11)!important}
 .settings-sheet .missing-mode-lens{background:rgba(255,255,255,.85)!important}
 @media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{gap:11px!important;font-size:17px!important}.settings-sheet .settings-sheet-icon{width:46px;height:46px;flex-basis:46px}.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin-left:57px!important}}
-@media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;bottom:18px!important;border-radius:32px!important;height:min(78svh,720px)!important}}
+@media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;max-width:480px!important;max-inline-size:480px!important;margin:0 auto!important;bottom:18px!important;border-radius:32px!important;border-inline:1px solid rgba(255,255,255,.48)!important;height:min(78svh,720px)!important}}
 @media(prefers-reduced-motion:reduce){.settings-sheet[open]{animation:none!important}.settings-view .settings-row{transition:none!important}}
 
 .settings-sheet:not([open]){display:none!important}

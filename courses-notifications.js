@@ -5,10 +5,12 @@ const VAPID_ENTITY='input_text.courses_vapid_public_key',MAX_DEVICES=12;
 const ha=()=>window.COURSES_HA_CLIENT,connected=()=>!!ha()?.isConnected?.();
 let task=null,status='À activer sur chaque iPhone';
 function setStatus(text){
-  status=text;
+  status=/Getting push subscription requires a service worker/i.test(String(text||''))
+    ?'Notifications indisponibles : Service Worker non prêt'
+    :String(text||'');
   for(const id of ['missingNotificationsStatus','notificationsManagementSummary']){
     const label=document.getElementById(id);
-    if(label)label.textContent=text;
+    if(label)label.textContent=status;
   }
 }
 function ownId(){

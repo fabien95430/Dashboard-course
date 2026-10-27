@@ -267,7 +267,7 @@ function initMissingProductsAndDishes(){
     if(title)title.textContent='Produits & plats manquants';
     if(subtitle)subtitle.textContent='Noter les produits et plats absents du catalogue';
   }
-  const dialogTitle=dialog.querySelector('.missing-products-header h3');
+  const dialogTitle=dialog.querySelector('.missing-products-header .settings-sheet-title');
   const dialogIntro=dialog.querySelector('.missing-products-header .dialog-intro');
   const categoryTitle=categoryHeading.querySelector('strong');
   if(dialogTitle)dialogTitle.textContent='Produits & plats manquants';

@@ -251,3 +251,29 @@ test('les sous-vues de Réglages sans flèche gardent leur navigation et leur fe
   assert.match(html,/id="settingsDialog" class="dialog security-settings-dialog settings-sheet"/);
   assert.match(css,/\.settings-sheet::before\{content:"";position:absolute/);
 });
+
+
+test('les feuilles de Réglages touchent les bords iPhone, sans toucher aux safe areas',()=>{
+  const css=read('styles.css');
+  const shell=css.slice(css.indexOf('.settings-sheet{'),css.indexOf('.settings-sheet::-webkit-scrollbar'));
+  assert.match(shell,/width:100vw!important;width:100dvw!important/);
+  assert.match(shell,/max-width:none!important;max-inline-size:none!important/);
+  assert.match(shell,/left:0!important;right:0!important;margin:0!important/);
+  assert.match(shell,/height:min\(78svh/);
+  assert.match(shell,/safe-area-inset-top/);
+  assert.match(shell,/safe-area-inset-bottom/);
+  assert.match(css,/@media\(min-width:650px\)\{\.settings-sheet\{[^}]*max-width:480px!important/);
+  assert.match(css,/\.settings-sheet#preferencesDialog \.preference-dialog-scroll>\.dialog-actions\{position:sticky/);
+  assert.match(css,/\.settings-sheet#connectionDialog \.dialog-actions\{flex:0 0 auto;margin-top:auto!important/);
+});
+
+test('le titre produits manquants conserve son icône et le style des actions est cohérent',()=>{
+  const source=read('missing-products-dishes.js'),modern=read('missing-products-modern.js');
+  const html=read('index.html'),notifications=read('courses-notifications.js');
+  assert.match(source,/dialog\.querySelector\('\.missing-products-header \.settings-sheet-title'\)/);
+  assert.doesNotMatch(source,/dialogTitle=dialog\.querySelector\('\.missing-products-header h3'\)/);
+  assert.match(html,/settings-sheet-title">Connexion Home Assistant<\/span><\/h3>\s*<p class="dialog-intro">/);
+  assert.match(modern,/background:linear-gradient\(160deg,#32664a,#214b36\)!important/);
+  assert.match(notifications,/Notifications indisponibles : Service Worker non prêt/);
+});
+
