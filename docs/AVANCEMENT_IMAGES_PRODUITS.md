@@ -860,3 +860,31 @@ Référence : `ab80641bb9faf975697917e2eb836e3113f01588` (version v598). Une **s
 | Série 4 | 19 | Maison: 2 ; Petit-déjeuner: 12 ; Viandes & poissons: 5 |
 
 **Contrôles / rejets complémentaires :** essais de génération encore composites (rejetés sans extraction) ; prototypes de nettoyants fabriqués localement trop illustrés par rapport au 3D semi-réaliste de l'application (rejetés, non publiés) ; source CC0 Alcool 70 insuffisamment probante sur la concentration et le gain à 192 px (en attente) ; Coca zéro et bière sans alcool doivent avoir leur variante attestée ; jus multifruits ne peut être remplacé par du jus d'orange. Aucune création payante via l'API OpenAI du projet. **Les séries ci-dessus représentent du suivi d'examen, et non plusieurs lots de remplacement publiés**. La priorité des remplacements prochains reste Maison, Boissons, Petit-déjeuner ; aucun autre candidat n'a été artificiellement accepté pour remplir un quota de 30.
+
+
+### Lot v602 — 13 images unitaires préparées (publication à confirmer)
+
+**Base Git vérifiée :** `main` `5d93e03da8a782190533c674c6de9d30cf438b46` (v601). Les 13 références distinctes ci-dessous ne sont pas des images déjà renouvelées, et les fichiers précédents restent archivés par Git. **7 Boissons et 6 Maison**, dont deux (Nettoyant WC et Nettoyant vitres) auparavant évalués et conservés, mais désormais pourvus de candidats nettement plus détaillés. Les images conservées ne sont pas retraitées en l'absence d'une amélioration visuelle démontrée.
+
+| Catégorie | Produit | Avant (o) | Après (o) |
+|---|---|---:|---:|
+| Boissons | Coca zéro | 2442 | 22866 |
+| Boissons | Bière sans alcool | 2028 | 15518 |
+| Boissons | Ginger beer | 2476 | 12378 |
+| Boissons | Limonade | 2346 | 13378 |
+| Boissons | Orangeade | 2566 | 14156 |
+| Boissons | Jus multifruits | 4114 | 20358 |
+| Boissons | Eau aromatisée | 2798 | 12070 |
+| Maison | Lessive liquide | 3022 | 16634 |
+| Maison | Javel | 2342 | 11890 |
+| Maison | Nettoyant vitres | 3282 | 16032 |
+| Maison | Adoucissant | 3008 | 12940 |
+| Maison | Nettoyant WC | 2290 | 14506 |
+| Maison | Nettoyant multi-usages | 3260 | 16876 |
+| **Total** | **13** | **35974** | **199602** |
+
+**Bilan prévu si publication confirmée :** 305 + 13 = **318/414 produits distincts renouvelés**, **96/414 non renouvelés** ; le minimum de conservations distinctes passe de 19 à **17** en retirant les deux produits explicitement conservés dans les audits antérieurs puis renouvelés ici, soit **au moins 335/414 décisions distinctes**. **414 WebP, 10277920 octets**, delta **+163628 octets**. Ces chiffres sont *prévisionnels* jusqu'à la confirmation des SHA réels sur main. Crédits, contrôle des sources, variantes et SHA : `docs/IMAGE_CREDITS_V602.md`.
+
+**Périmètre strict :** 13 `www/Items/*.webp`, `docs/AVANCEMENT_IMAGES_PRODUITS.md`, `docs/IMAGE_CREDITS_V602.md`, et marqueurs v602 nécessaires dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`. Aucune modification de `product-item-images.js`, `styles.css`, des tuiles, animations, safe areas, navigation, synchro WebSocket, liste HA Courses, OAuth, coffre, biométrie, mode test ou autre logique fonctionnelle. Pas de nouveau polling, backend, framework ou dépendance.
+
+**Statut présent : PRÉPARÉ, non encore PUBLIÉ** — vérifier `bash scripts/validate_repo.sh` et `node --test tests/*.test.mjs` par CI PR, puis commit réel sur main, CI main et déploiement GitHub Pages. Test matériel iPhone et réseau hors ligne réel non revendiqués.
