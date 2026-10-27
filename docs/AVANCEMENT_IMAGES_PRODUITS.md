@@ -11,7 +11,7 @@
 - Plusieurs anciennes vignettes restent sous 10 Kio ; le petit poids n'est pas une preuve de manque de netteté. Inventaire et contrôle individuels prioritaires avant toute modification.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
-### Historique des vingt-six lots publiés
+### Historique des lots publiés
 
 | Lot | Commit Git | Produits distincts |
 | --- | --- | ---: |
@@ -41,7 +41,8 @@
 | Lot v568 — 6 WebP | `ea27ec82e59edb7c297af6d99daa02b815fe750c` — PR #93 | 6 |
 | Lot v578 — 4 WebP | `8df80edc07d6ee52de84648ba16224bbf67a97bf` — PR #94 | 4 |
 | Lot v582 — 8 WebP | `6c18a389cd3f5c9ad62793b3d7c69f5a6d20bd6f` — PR #95 | 8 |
-| **Total** | | **289** |
+| Lot v592 — 8 WebP | `8f2264de4a9596649938103b9e9589110097d757` — PR #98 | 8 |
+| **Total** | | **297** |
 
 **Attention :** v537 optimise séparément 32 fichiers existants (dont certains figurent aussi parmi les 211), ne pas additionner les compteurs.
 
@@ -585,3 +586,7 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 Base : `95b11fb4385363c6b97e3fa9452444d77437f422` (v591). Sept illustrations originales ChatGPT et un WebP CC0 EBf Studio. Les huit anciens produits ont été examinés et remplacés dans la **PR #98 fusionnée**. Crédits, poids, dimensions et empreintes : `docs/IMAGE_CREDITS_V592.md`. Poids des huit fichiers 26654 → 138400 octets, variation +111746 octets. Le rendu à 192 px, la transparence réelle et les noms/variantes ont été contrôlés localement. Rejetés : baume lèvres à damier incorporé, planches composites de produits ménagers, alternative Romarin frais moins nette, sources représentant une autre variété ou présentation. Aucune image déjà renouvelée n'est remplacée sans gain. **Publié et confirmé : 297/414 renouvelés, 117 non renouvelés, au moins 18 évalués et conservés distincts.** Aucun changement de UI, HA, sécurité, style, coffre, biométrie ni chargement des images ; seuls les WebP, marqueurs nécessaires de version/cache, crédits et ce suivi sont modifiés.
 
 **Vérification finale v592** : commit réellement publié [`8f2264de`](https://github.com/fabien95430/Dashboard-course/commit/8f2264de4a9596649938103b9e9589110097d757), PR #98 fusionnée, [CI principale verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40429372119), [GitHub Pages vert](https://github.com/fabien95430/Dashboard-course/actions/runs/40429371932). Huit empreintes Git des WebP vérifiées. Nombre total 414 fichiers, 9 853 402 octets, aucun >100 Kio. **Référence du commit de documentation ultérieur : voir main.**
+
+### Préparation du lot suivant — Rasoirs (non publié)
+
+Le visuel actuel de `rasoirs.webp` a été comparé avec une création originale ChatGPT : 2 696 octets, ancienne vignette petite, contre un candidat WebP autonome 384 × 384 px de **11 534 octets**, canal alpha véritable, contrôlé sur fond sauge à 192 × 192 px, Git SHA local `42eb0a5816f63b8f3c9e8bf8235ed424ec15b510`. **Non publié, non compté parmi les renouvelés** ; conserver le fichier actuel sur main jusqu'à un lot cohérent après comparaison finale dans les tuiles. Rejets supplémentaires : premier rasoir à damier opaque intégré, planches composites/infographies générées à la place d'images individuelles. La source peut être réutilisée à partir de l'archive locale de l'intervention correspondante, sans usage de l'API OpenAI payante du projet. Le compteur reste 297/414, 117 non renouvelés, au moins 18 évalués et conservés distincts.
