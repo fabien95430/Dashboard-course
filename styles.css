@@ -3475,7 +3475,12 @@ body{
 
 @media(max-width:520px){
   .settings-scroll{
-    padding-top:18px!important;
+    /* 8 px de marge + 10 px de padding = les 18 px d'origine (rebond conservé). Au défilement, le
+       contenu est coupé 8 px sous le sous-titre et se fond sur 10 px au lieu de s'y coller. */
+    margin-top:8px!important;
+    padding-top:10px!important;
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10px);
+    mask-image:linear-gradient(to bottom,transparent 0,#000 10px);
   }
   .settings-section{
     margin-bottom:18px!important;
