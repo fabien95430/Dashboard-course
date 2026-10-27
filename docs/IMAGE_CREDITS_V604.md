@@ -16,3 +16,8 @@
 **Candidats REJETÉS ou conservés :** toutes les nouvelles planches composites ; variantes CC0 qui changent l’emballage ou la fonction (éponge jaune au lieu d’éponges magiques, bicarbonate en poudre renversée, antiseptique en pompe au lieu du flacon existant, thé servi dans un gobelet au lieu du bocal). Les images existantes plus fidèles restent inchangées. Aucun test matériel iPhone ou déconnexion HA réel n’est revendiqué.
 
 **Statut au stade PR :** préparé et contrôlé graphiquement. La publication ne sera confirmée qu’après succès CI PR, fusion sur `main`, CI main et GitHub Pages ; le SHA réel publié sera ajouté au suivi lorsque ces validations seront terminées.
+
+
+### Statut final GitHub confirmé — 27 octobre 2026
+
+**PUBLIÉ** : [PR #104 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/104), commit `a85c4b562e26247c2d754db33cdcb5e4d38dfc84` sur `main`. [CI de la PR réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40575861943), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40576042793) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40576042462). Vérification des trois empreintes WebP sur le véritable arbre Git : conforme au tableau ci-dessus. Les mentions « PRÉPARÉ » du suivi représentent l'état historique avant cette confirmation.
