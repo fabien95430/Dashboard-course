@@ -1,6 +1,6 @@
 # Crédits visuels produits — lot v606
 
-**Base :** `main` `71c0d1c4a2e621e4d4b3dd86aa4f8bb15752e184` (v605). **Statut : PRÉPARÉ, CI/Pages à confirmer.** Neuf images originales générées avec l’outil natif de création d’images ChatGPT, sans utiliser l'API payante configurée dans le projet. Les fichiers proviennent de générations unitaires, sans découpe de planche ; aucune source externe, marque, ou étiquette fictive.
+**Base :** `main` `71c0d1c4a2e621e4d4b3dd86aa4f8bb15752e184` (v605). **PUBLIÉ** sur `main` dans le commit `7d8e0ef9929a28e039dd2351129f8764122d9c3e` par [PR #105](https://github.com/fabien95430/Dashboard-course/pull/105) fusionnée. [CI PR réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40590383458), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40590484112) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40590483377). Neuf images originales générées avec l’outil natif de création d’images ChatGPT, sans utiliser l'API payante configurée dans le projet. Les fichiers proviennent de générations unitaires, sans découpe de planche ; aucune source externe, marque, ou étiquette fictive.
 
 | Catégorie | Produit | Fichier | Avant (octets) | Après (octets) | SHA Git du nouveau blob |
 |---|---|---|---:|---:|---|
@@ -22,3 +22,8 @@
 **REJETÉS :** les collages composites ; les sources alternatives à fond blanc opaque ou à mauvais conditionnement ; les images de nettoyant sol ayant une forme de bidon de lessive et de liquide vaisselle. Ces fichiers rejetés ne sont pas intégrés. Aucun produit déjà renouvelé n'est remplacé.
 
 **Validation :** `bash scripts/validate_repo.sh` et `node --test tests/*.test.mjs` en CI de PR avant fusion. Le statut de CI `main` et de GitHub Pages sera documenté après publication réelle. Ni essai iPhone physique ni simulation complète hors ligne ne sont revendiqués. Aucun changement de la logique Home Assistant, de la sécurité, de la navigation ou des tuiles.
+
+
+### Publication vérifiée
+
+9 WebP intégrés (414 fichiers au total). `www/Items/` sur `main` : **10 478 438 octets**, **330 renouvelés distincts / 414** et **84 non renouvelés**. Les SHA Git des neuf blobs ont été recontrôlés sur `main`. Aucun test physique iPhone ou Home Assistant réel revendiqué.
