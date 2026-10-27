@@ -842,3 +842,21 @@ Référence : `ab80641bb9faf975697917e2eb836e3113f01588` (version v598). Une **s
 **Base vérifiée :** `7c0464dbdda8ebcbffd8b61f498b1d1cd164d924` (v599), 414 produits, 303 distincts renouvelés, 111 non renouvelés. Visuels changés exclusivement : **Dosettes café** (2 990 → 42 080 o) et **Filtres à café** (2 848 → 14 734 o), catégorie Petit-déjeuner. **Total 5 838 → 56 814 o (+50 976)**, deux fichiers source originale ChatGPT indépendants, WebP 384 × 384 avec véritable alpha, rendu contrôlé à 192 px sur fonds blanc/sauge et sur bords. Les anciennes illustrations ont été comparées aux nouvelles. Voir `docs/IMAGE_CREDITS_V600.md` pour provenance et empreintes. Pas d'API OpenAI payante ; aucune source tierce dans ce lot.
 
 **Rejets :** plusieurs planches composites, variantes trop schématiques, autres conditionnements incorrects ; la piste Alcool 70 CC0 n'est pas comptée comme acceptée. Les deux fichiers restent **PRÉPARÉS** tant que leur commit, la CI et Pages ne sont pas vérifiés sur le véritable `main`. Après publication, objectif **305 renouvelés distincts / 109 non renouvelés / au moins 19 conservés**, 414 WebP et **10 114 292 octets**. Ne pas confondre ce bilan provisoire avec une publication vérifiée. Aucun changement des tuiles, CSS, navigation, cache visuel persistant, HA, WebSocket, OAuth, coffre, verrouillage, biométrie, safe areas ou mode test. Le test matériel iPhone et le test réseau hors ligne restent non effectués.
+
+
+### Vérification définitive de publication du lot v600 — 27 octobre 2026
+
+**PUBLIÉ ET REVÉRIFIÉ** : [PR #102](https://github.com/fabien95430/Dashboard-course/pull/102) fusionnée, commit main [`6eacf29f6b2e32e7d2e0bcc4bc447d0712a061d1`](https://github.com/fabien95430/Dashboard-course/commit/6eacf29f6b2e32e7d2e0bcc4bc447d0712a061d1), [CI PR réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40561162211), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40561348918), [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40561348588). Les blobs Git des deux WebP correspondent aux sources validées : Dosettes café `5662ec86a3fc95986fda9f92aba12697c6f2098a`, Filtres à café `0f0893101d3ed7f8fd8366ca51448af0e061f148`. **2 nouveaux renouvellements distincts effectivement publiés**, poids du lot **5 838 → 56 814 o** (+50 976). Répertoire actuel **414 WebP = 10 114 292 octets**. Version visible et cache **v600**. Aucun changement d'interface ni de logique HA/OAuth/WebSocket/coffre/biométrie. Test physique iPhone et réseau hors ligne réel non réalisés.
+
+**Compte corrigé après v600 : 305/414 renouvelés distincts, 109/414 non renouvelés, au moins 19 évalués et conservés distincts.** Les 111 lignes de l'inventaire de v599 ci-dessus sont un état **historique** ; Dosettes café et Filtres à café sont maintenant **PUBLIÉS** et ne doivent plus être comptés comme anciens non renouvelés. Les 109 autres ne sont pas 109 échecs automatiques : les visuels suffisamment fidèles restent maintenus jusqu'à preuve d'amélioration.
+
+**Organisation de l'inspection par séries plafonnées à 30 produits** (inventaire Git du main v600, sans prétendre à 30 nouveaux WebP par série) :
+
+| Série d'inspection | Références restantes | Répartition des catégories |
+|---|---:|---|
+| Série 1 | 30 | Apéritif & snacks: 2 ; Boissons: 17 ; Boulangerie: 1 ; Cuisine: 10 |
+| Série 2 | 30 | Cuisine: 4 ; Enfant: 4 ; Frais: 4 ; Hygiène & soins: 7 ; Maison: 11 |
+| Série 3 | 30 | Maison: 30 |
+| Série 4 | 19 | Maison: 2 ; Petit-déjeuner: 12 ; Viandes & poissons: 5 |
+
+**Contrôles / rejets complémentaires :** essais de génération encore composites (rejetés sans extraction) ; prototypes de nettoyants fabriqués localement trop illustrés par rapport au 3D semi-réaliste de l'application (rejetés, non publiés) ; source CC0 Alcool 70 insuffisamment probante sur la concentration et le gain à 192 px (en attente) ; Coca zéro et bière sans alcool doivent avoir leur variante attestée ; jus multifruits ne peut être remplacé par du jus d'orange. Aucune création payante via l'API OpenAI du projet. **Les séries ci-dessus représentent du suivi d'examen, et non plusieurs lots de remplacement publiés**. La priorité des remplacements prochains reste Maison, Boissons, Petit-déjeuner ; aucun autre candidat n'a été artificiellement accepté pour remplir un quota de 30.
