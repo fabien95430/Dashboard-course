@@ -142,7 +142,7 @@ function installPreferenceToggle(){
     row.className='preference-toggle';row.dataset.purchaseHistoryToggle='1';
     row.innerHTML='<span class="preference-toggle-copy"><strong>Historique des achats</strong><small>Adapte les recommandations à vos achats récents.</small></span><span class="preference-switch"><input id="preferencesPurchaseHistory" type="checkbox" aria-label="Historique des achats"><span aria-hidden="true"></span></span>';
     options.appendChild(row);input=row.querySelector('input');
-    input?.addEventListener('change',()=>setEnabled(input.checked));
+    input?.addEventListener('change',()=>{setEnabled(input.checked);document.dispatchEvent(new CustomEvent('courses:preferences-saved',{detail:{source:'purchase-history'}}))});
   }
   syncPreferenceToggle();return true;
 }
@@ -431,10 +431,7 @@ function bindDishEvents(){
   scheduleDish();
 }
 function bindHousehold(){
-  document.addEventListener('click',event=>{
-    if(!event.target?.closest?.('#savePreferences'))return;
-    setTimeout(()=>{ensureModel();scheduleDish()},0);
-  },true);
+  document.addEventListener('courses:preferences-saved',()=>{ensureModel();scheduleDish()});
   window.addEventListener('storage',event=>{
     if(!HOUSEHOLD_KEYS.includes(event.key))return;
     ensureModel();scheduleDish();

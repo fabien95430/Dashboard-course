@@ -19,6 +19,11 @@ test('Connexion Home Assistant présente les deux statuts sans toucher aux liste
  assert.match(connection,/id="connectionEntitySelect"/);
  assert.match(connection,/id="connectionListSyncStatus"/);
  assert.match(connection,/id="missingSyncStatus"/);
+ assert.doesNotMatch(connection,/<span>Ma liste<\/span>/);
+ assert.ok(connection.indexOf('id="connectionHaUrl"')<connection.indexOf('class="connection-entity-row"'),'adresse avant la liste');
+ assert.match(connection,/class="connection-entity-row">[\s\S]*?Liste Home Assistant[\s\S]*?id="connectionListSyncStatus"[\s\S]*?#i-chevron[\s\S]*?id="connectionEntitySelect"/);
+ assert.match(connection,/<h4 class="settings-sheet-section-title">Synchronisation<\/h4>\s*<div class="connection-sync-section"/);
+ assert.match(app,/MISSING_SYNC_SHORT_LABELS=Object\.freeze\(\{synced:'Synchronisé'/);
  assert.match(app,/function renderMissingRequestsConnectionStatus/);
  assert.match(app,/window\.addEventListener\('courses:missing-ha-status'/);
  assert.match(app,/MISSING_REQUESTS\.getSharedStatus\?\.\(\)/);

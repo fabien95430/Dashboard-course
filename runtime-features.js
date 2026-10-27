@@ -11,7 +11,7 @@ function installMissingProductsFixes(){
   }
   if(!document.querySelector('script[data-missing-products-popup-ui]')){
     const script=document.createElement('script');
-    script.src='./missing-products-popup-ui.js?v=494';
+    script.src='./missing-products-popup-ui.js?v=605';
     script.defer=true;
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);
@@ -28,7 +28,7 @@ function installProductItemImages(){
 function installPurchaseIntelligence(){
   if(document.querySelector('script[data-purchase-intelligence]'))return;
   const script=document.createElement('script');
-  script.src='./purchase-intelligence.js?v=409';
+  script.src='./purchase-intelligence.js?v=605';
   script.defer=true;
   script.dataset.purchaseIntelligence='1';
   document.head.appendChild(script);

@@ -179,7 +179,6 @@ const STATUS_TEXT=Object.freeze({
   lockedTitle:'Verrouillé',
   passwordRequired:'Mot de passe local requis',
   unlockRequired:'Déverrouillage requis',
-  manualLockReason:'Verrouillage manuel.',
   demoConnectHint:'Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.'
 });
 
@@ -220,6 +219,7 @@ const UI = Object.freeze({
   connectionDialog: document.getElementById('connectionDialog'),
   connectionDialogFeedback: document.getElementById('connectionDialogFeedback'),
   preferencesDialog: document.getElementById('preferencesDialog'),
+  preferencesDialogFeedback: document.getElementById('preferencesDialogFeedback'),
   setup: document.getElementById('setup'),
   securityOverlay: document.getElementById('securityOverlay'),
   setupError: document.getElementById('setupError'),
@@ -235,6 +235,7 @@ const UI = Object.freeze({
   currentLocalPassword: document.getElementById('currentLocalPassword'),
   newLocalPassword: document.getElementById('newLocalPassword'),
   changePasswordPanel: document.getElementById('changePasswordPanel'),
+  changePasswordBtn: document.getElementById('changePasswordBtn'),
   autoLockSelect: document.getElementById('autoLockSelect'),
   connectionHaUrl: document.getElementById('connectionHaUrl'),
   connectionEntitySelect: document.getElementById('connectionEntitySelect'),
@@ -1391,11 +1392,17 @@ function renderView(){
   showView();
   renderList();renderSettingsPage();
 }
+// Statut court sur une ligne ; le message complet reste lisible par VoiceOver et au survol.
+const MISSING_SYNC_SHORT_LABELS=Object.freeze({synced:'Synchronisé',syncing:'Synchronisation…',waiting:'En attente',missing:'Liste introuvable',error:'Erreur'});
 function renderMissingRequestsConnectionStatus(detail=MISSING_REQUESTS.getSharedStatus?.()){
   const label=document.getElementById('missingSyncStatus');
   if(!label)return;
-  label.dataset.state=detail?.state||'waiting';
-  label.textContent=detail?.message||'En attente de Home Assistant';
+  const stateName=detail?.state||'waiting';
+  const message=detail?.message||'En attente de Home Assistant';
+  label.dataset.state=stateName;
+  label.textContent=MISSING_SYNC_SHORT_LABELS[stateName]||message;
+  label.title=message;
+  label.setAttribute('aria-label',message);
 }
 window.addEventListener('courses:missing-ha-status',event=>{
   renderMissingRequestsConnectionStatus(event.detail);
@@ -2205,6 +2212,15 @@ function clearPasswordChangeForm(){
   UI.confirmNewLocalPassword.value='';
   UI.changePasswordError.textContent='';
   UI.changePasswordPanel.hidden=true;
+  UI.changePasswordBtn.hidden=false;
+  UI.changePasswordBtn.setAttribute('aria-expanded','false');
+}
+function openPasswordChangeForm(){
+  clearDialogFeedback(UI.settingsDialogFeedback);
+  UI.changePasswordError.textContent='';
+  UI.changePasswordBtn.hidden=true;
+  UI.changePasswordBtn.setAttribute('aria-expanded','true');
+  UI.changePasswordPanel.hidden=false;
 }
 function openConnectionSettings(){
   if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
@@ -2223,29 +2239,27 @@ function openConnectionSettings(){
   urlInput?.blur();
   showNeutralDialog(dialog);
 }
-async function saveConnectionSettings(){
-  const nextUrl=normalizeHaUrl(UI.connectionHaUrl.value);
+// Connexion Home Assistant : chaque champ est enregistré dès qu'il est validé, sans bouton.
+async function saveConnectionEntity(){
   const chosenEntity=UI.connectionEntitySelect.value;
-  const nextEntity=chosenEntity||state.entity;
+  if(!chosenEntity||chosenEntity===state.entity)return;
+  state.entity=chosenEntity;
+  localStorage.setItem(STORAGE.entity,chosenEntity);
+  localStorage.setItem(STORAGE.entityPreference,chosenEntity);
+  setDialogFeedback(UI.connectionDialogFeedback,'Enregistré');
+  await subscribe();
+  await refreshItems();armIdleLock();
+}
+async function saveConnectionUrl(){
+  const nextUrl=normalizeHaUrl(UI.connectionHaUrl.value);
   if(!nextUrl){setDialogFeedback(UI.connectionDialogFeedback,'Entre une adresse HTTPS Home Assistant valide.','error');return}
+  if(nextUrl===state.haUrl){UI.connectionHaUrl.value=nextUrl;return}
   clearDialogFeedback(UI.connectionDialogFeedback);
-  const changedUrl=nextUrl!==state.haUrl;
-  const changedEntity=!!chosenEntity&&chosenEntity!==state.entity;
-  if(chosenEntity){
-    state.entity=chosenEntity;
-    localStorage.setItem(STORAGE.entity,chosenEntity);
-    localStorage.setItem(STORAGE.entityPreference,chosenEntity);
-  }
   UI.connectionDialog.close();
-  if(changedUrl){
-    await revoke();
-    state.haUrl=nextUrl;
-    UI.haUrlInput.value=nextUrl;
-    UI.setupError.textContent='Adresse modifiée : reconnecte Home Assistant.';
-  }else{
-    if(changedEntity)await subscribe();
-    await refreshItems();armIdleLock();
-  }
+  await revoke();
+  state.haUrl=nextUrl;
+  UI.haUrlInput.value=nextUrl;
+  UI.setupError.textContent='Adresse modifiée : reconnecte Home Assistant.';
 }
 
 function missingCategoryLabel(category){
@@ -2342,11 +2356,10 @@ function savePreferencesSettings(){
   smartFavorites:UI.preferencesSmartFavorites.checked
 });
   persistPreferences();
-  UI.preferencesDialog.close();
   renderProducts();
   renderList();
   renderSettingsPage();
-  toast('Préférences enregistrées');
+  document.dispatchEvent(new CustomEvent('courses:preferences-saved',{detail:{source:'preferences'}}));
 }
 
 function openSettings(){
@@ -2362,7 +2375,7 @@ function setAutoLockMinutes(value){
   state.autoLockMinutes=next;
   localStorage.setItem(STORAGE.autoLockMinutes,String(next));
   armIdleLock();
-  setDialogFeedback(UI.settingsDialogFeedback,'Verrouillage après '+next+' min');
+  setDialogFeedback(UI.settingsDialogFeedback,'Enregistré');
 }
 async function changeLocalPassword(){
   const current=UI.currentLocalPassword.value;
@@ -3007,11 +3020,14 @@ function bindUiEvents(){
   bindDialogBackdropClose(UI.connectionDialog);
   bindDialogBackdropClose(UI.preferencesDialog);
   bindDialogBackdropClose(UI.missingProductsDialog);
-  bindDialogBackdropClose(UI.settingsDialog,clearPasswordChangeForm);
-  $('#settingsLockBtn').onclick=()=>lockApp(STATUS_TEXT.manualLockReason);
+  bindDialogBackdropClose(UI.settingsDialog);
+  UI.settingsDialog.addEventListener('close',clearPasswordChangeForm);
   $('#settingsLogoutBtn').onclick=revoke;
-  $('#saveConnectionSettings').onclick=saveConnectionSettings;
-  $('#savePreferences').onclick=savePreferencesSettings;
+  UI.connectionEntitySelect.onchange=()=>{void saveConnectionEntity()};
+  UI.connectionHaUrl.onchange=()=>{void saveConnectionUrl()};
+  UI.connectionHaUrl.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();UI.connectionHaUrl.blur()}};
+  for(const control of [UI.preferencesListSort,UI.preferencesStartView,UI.preferencesHideAdded,UI.preferencesSmartFavorites])control.onchange=savePreferencesSettings;
+  document.addEventListener('courses:preferences-saved',()=>setDialogFeedback(UI.preferencesDialogFeedback,'Enregistré'));
   $('#addMissingProduct').onclick=addMissingProduct;
   UI.missingProductName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addMissingProduct()}};
   UI.missingCategoryGrid.querySelectorAll('[data-missing-category]').forEach(button=>button.onclick=()=>setMissingProductCategory(button.dataset.missingCategory||''));
@@ -3021,17 +3037,9 @@ function bindUiEvents(){
     event.stopPropagation();
     removeMissingProduct(button.dataset.removeMissing||'');
   };
-  $('#changePasswordBtn').onclick=()=>{
-    const panel=UI.changePasswordPanel;
-    const opening=panel.hidden;
-    if(!opening){clearPasswordChangeForm();return}
-    panel.hidden=false;
-    clearDialogFeedback(UI.settingsDialogFeedback);
-    UI.changePasswordError.textContent='';
-  };
+  UI.changePasswordBtn.onclick=openPasswordChangeForm;
   UI.savePasswordChange.onclick=changeLocalPassword;
   UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
-  $('#lockNowBtn').onclick=()=>{clearPasswordChangeForm();UI.settingsDialog.close();lockApp(STATUS_TEXT.manualLockReason)};
   UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';clearTimeout(UI.productSearch._searchTimer);UI.productSearch._searchTimer=setTimeout(renderProducts,80)};
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{

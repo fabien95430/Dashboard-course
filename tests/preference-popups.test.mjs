@@ -49,7 +49,7 @@ test('le choix d une catégorie produit ne déclenche pas un clic synthétique q
 test('supprimer un produit manquant garde le popup ouvert',()=>{
   const source=read('app.js');
   const start=source.indexOf('UI.missingProductsList.onclick=event=>{');
-  const end=source.indexOf("$('#changePasswordBtn')",start);
+  const end=source.indexOf('UI.changePasswordBtn.onclick',start);
   assert.ok(start>=0&&end>start,'gestionnaire de suppression introuvable');
   const handler=source.slice(start,end);
   assert.match(handler,/const button=event\.target\.closest\('\[data-remove-missing\]'\);/);
@@ -170,7 +170,12 @@ test('les validations restent dans leur popup tant que celui-ci reste ouvert',()
   assert.match(add,/setDialogFeedback\(UI\.missingProductsFeedback,'Ce produit est déjà noté','error'\)/);
   assert.match(add,/setDialogFeedback\(UI\.missingProductsFeedback,'Produit ajouté'\)/);
   assert.doesNotMatch(add,/\btoast\(/);
-  assert.match(app,/setDialogFeedback\(UI\.settingsDialogFeedback,'Verrouillage après '\+next\+' min'\)/);
+  const lockStart=app.indexOf('function setAutoLockMinutes(value)');
+  const lockEnd=app.indexOf('async function changeLocalPassword()',lockStart);
+  assert.match(app.slice(lockStart,lockEnd),/setDialogFeedback\(UI\.settingsDialogFeedback,'Enregistré'\)/);
+  assert.match(app,/preferencesDialogFeedback: document\.getElementById\('preferencesDialogFeedback'\)/);
+  assert.match(app,/document\.addEventListener\('courses:preferences-saved',\(\)=>setDialogFeedback\(UI\.preferencesDialogFeedback,'Enregistré'\)\)/);
+  assert.match(app,/async function saveConnectionEntity\(\)\{[\s\S]*?setDialogFeedback\(UI\.connectionDialogFeedback,'Enregistré'\)/);
   assert.match(app,/setDialogFeedback\(UI\.settingsDialogFeedback,'Mot de passe modifié'\)/);
   const resetStart=dishes.indexOf('function resetRecipeCustomizationDraft()');
   const resetEnd=dishes.indexOf('function recipeCustomizationMatchesBase()',resetStart);
@@ -229,7 +234,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
   const repurchase=read('repurchase-soon.js');
   assert.match(index,/Connexion OAuth sécurisée\. L’autorisation reste chiffrée sur cet appareil\./);
   assert.match(index,/Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local\./);
-  assert.match(dishes,/Modifiez ingrédients et quantités pour 2 personnes\. Les portions s’adaptent automatiquement\./);
+  assert.match(dishes,/<p class="dialog-intro">Ingrédients et quantités pour 2 personnes\.<\/p>/);
   assert.match(dishes,/À ajouter manuellement si besoin\./);
   assert.match(missing,/Ajoutez les produits ou plats absents du catalogue\./);
   assert.match(settings,/Documentation, historique et informations de l’application\./);
@@ -263,8 +268,7 @@ test('les feuilles de Réglages touchent les bords iPhone, sans toucher aux safe
   assert.match(shell,/safe-area-inset-top/);
   assert.match(shell,/safe-area-inset-bottom/);
   assert.match(css,/@media\(min-width:650px\)\{\.settings-sheet\{[^}]*max-width:480px!important/);
-  assert.match(css,/\.settings-sheet#preferencesDialog \.preference-dialog-scroll>\.dialog-actions\{position:sticky/);
-  assert.match(css,/\.settings-sheet#connectionDialog \.dialog-actions\{flex:0 0 auto;margin-top:auto!important/);
+  assert.match(css,/\.settings-sheet :is\(#connectionDialogFeedback,#preferencesDialogFeedback,#settingsDialogFeedback\)\{position:absolute!important;[^}]*bottom:max\(24px,env\(safe-area-inset-bottom\)\)/);
 });
 
 test('le titre produits manquants conserve son icône et le style des actions est cohérent',()=>{
@@ -285,8 +289,9 @@ test('Réglages aligne les éléments internes sur une colonne centrale sobre',(
   assert.match(css,/\.settings-sheet \.dialog-actions\{\s*display:flex;\s*align-items:stretch;\s*justify-content:center;/);
   assert.match(css,/\.settings-sheet \.dialog-actions > button:only-child\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/s);
   assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions > button\{[^}]*flex:1 1 0;[^}]*min-width:0;/s);
-  assert.match(css,/\.settings-sheet \.security-lock-now\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/);
-  assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*padding-left:58px!important;[^}]*max-width:var\(--sheet-inner-max\)!important/);
+  assert.match(css,/\.settings-sheet h3,\.settings-sheet \.preference-dialog-scroll>h3\{[^}]*max-width:var\(--sheet-inner-max\)!important;[^}]*margin:0 auto!important;[^}]*padding:0 0 0 58px!important;[^}]*font-size:20px!important;[^}]*font-weight:600!important;[^}]*line-height:24px!important;[^}]*white-space:nowrap!important/);
+  assert.match(css,/\.settings-sheet \.settings-sheet-icon\{position:absolute;left:0;top:0;width:44px;height:44px;/);
+  assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*margin:2px auto 21px!important;[^}]*padding-left:58px!important;[^}]*line-height:18px!important;[^}]*max-width:var\(--sheet-inner-max\)!important;[^}]*white-space:nowrap!important/);
 });
 
 test('la colonne centrée ne réduit pas la coque bord à bord ni les zones de saisie',()=>{
@@ -319,3 +324,82 @@ test('Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent
   assert.match(errors,/data-error-action/);
 });
 
+
+test('Connexion, Préférences et Sécurité enregistrent immédiatement, sans bouton Enregistrer',()=>{
+  const html=read('index.html'),app=read('app.js'),settings=read('settings-ui.js'),history=read('purchase-intelligence.js');
+  for(const id of ['connectionDialog','preferencesDialog','settingsDialog']){
+    const start=html.indexOf('<dialog id="'+id+'"');
+    const dialog=html.slice(start,html.indexOf('</dialog>',start));
+    assert.ok(start>=0,id+' introuvable');
+    assert.doesNotMatch(dialog,/Enregistrer|class="dialog-actions"/,id+' ne doit plus avoir de bouton Enregistrer');
+  }
+  assert.doesNotMatch(app,/savePreferences'|saveConnectionSettings/);
+  assert.match(app,/UI\.connectionEntitySelect\.onchange=\(\)=>\{void saveConnectionEntity\(\)\}/);
+  assert.match(app,/UI\.connectionHaUrl\.onchange=\(\)=>\{void saveConnectionUrl\(\)\}/);
+  assert.match(app,/for\(const control of \[UI\.preferencesListSort,UI\.preferencesStartView,UI\.preferencesHideAdded,UI\.preferencesSmartFavorites\]\)control\.onchange=savePreferencesSettings;/);
+  const prefStart=app.indexOf('function savePreferencesSettings()');
+  const prefs=app.slice(prefStart,app.indexOf('function openSettings()',prefStart));
+  assert.doesNotMatch(prefs,/\.close\(\)/,'les préférences restent ouvertes après enregistrement');
+  assert.match(prefs,/courses:preferences-saved/);
+  assert.match(settings,/servingsSelect\.addEventListener\('change',[\s\S]*?persistPreferredServings\(nextServings\);[\s\S]*?courses:preferences-saved/);
+  assert.match(history,/document\.addEventListener\('courses:preferences-saved',\(\)=>\{ensureModel\(\);scheduleDish\(\)\}\)/);
+  assert.doesNotMatch(history,/#savePreferences/);
+});
+
+test('l adresse invalide ou inchangée ne déconnecte jamais Home Assistant',async()=>{
+  const app=read('app.js');
+  const start=app.indexOf('async function saveConnectionUrl()');
+  const body=app.slice(start,app.indexOf('\n}\n',start)+3);
+  const calls=[];const feedback=[];
+  const ui={connectionHaUrl:{value:''},connectionDialog:{close(){calls.push('close')}},haUrlInput:{value:''},setupError:{textContent:''},connectionDialogFeedback:{}};
+  const state={haUrl:'https://ha.example.com'};
+  const run=new Function('UI','state','normalizeHaUrl','setDialogFeedback','clearDialogFeedback','revoke',body+'return saveConnectionUrl;')(
+    ui,state,value=>/^https:\/\//.test(value)?value:'',(target,message,kind)=>feedback.push(kind||'success'),()=>{},async()=>{calls.push('revoke')}
+  );
+  ui.connectionHaUrl.value='pas une adresse';await run();
+  assert.deepEqual(calls,[]);assert.deepEqual(feedback,['error']);
+  ui.connectionHaUrl.value='https://ha.example.com';await run();
+  assert.deepEqual(calls,[]);
+  ui.connectionHaUrl.value='https://autre.example.com';await run();
+  assert.deepEqual(calls,['close','revoke']);
+  assert.equal(state.haUrl,'https://autre.example.com');
+});
+
+test('le formulaire de mot de passe remplace la tuile puis revient à l état initial',()=>{
+  const app=read('app.js'),html=read('index.html');
+  const start=app.indexOf('function clearPasswordChangeForm(){');
+  const body=app.slice(start,app.indexOf('function openConnectionSettings()',start));
+  const attr={};
+  const ui={currentLocalPassword:{value:'a'},newLocalPassword:{value:'b'},confirmNewLocalPassword:{value:'c'},changePasswordError:{textContent:'x'},changePasswordPanel:{hidden:true},changePasswordBtn:{hidden:false,setAttribute(k,v){attr[k]=v}},settingsDialogFeedback:{}};
+  const [clear,open]=new Function('UI','clearDialogFeedback',body+'return [clearPasswordChangeForm,openPasswordChangeForm];')(ui,()=>{});
+  open();
+  assert.equal(ui.changePasswordBtn.hidden,true);
+  assert.equal(ui.changePasswordPanel.hidden,false);
+  assert.equal(attr['aria-expanded'],'true');
+  clear();
+  assert.equal(ui.changePasswordBtn.hidden,false);
+  assert.equal(ui.changePasswordPanel.hidden,true);
+  assert.equal(attr['aria-expanded'],'false');
+  assert.equal(ui.currentLocalPassword.value+ui.newLocalPassword.value+ui.confirmNewLocalPassword.value,'');
+  assert.match(app,/UI\.settingsDialog\.addEventListener\('close',clearPasswordChangeForm\)/);
+  const change=app.slice(app.indexOf('async function changeLocalPassword()'),app.indexOf('const OFFLINE_STORAGE_VERSION'));
+  assert.ok(change.indexOf('clearPasswordChangeForm()')<change.indexOf("'Mot de passe modifié'"),'le succès referme le formulaire');
+  assert.match(html,/<h4 class="settings-sheet-section-title">Verrouillage<\/h4>/);
+  assert.match(html,/<h4 class="settings-sheet-section-title">Mot de passe<\/h4>/);
+});
+
+test('le verrouillage manuel est retiré, le verrouillage automatique reste en place',()=>{
+  const app=read('app.js'),html=read('index.html'),css=read('styles.css');
+  assert.doesNotMatch(html+app+css,/lockNowBtn|settingsLockBtn|security-lock-now|manualLockReason/);
+  assert.match(app,/UI\.autoLockSelect\.onchange=\(\)=>setAutoLockMinutes\(UI\.autoLockSelect\.value\)/);
+  assert.match(app,/lockApp\('Verrouillage automatique après inactivité\.'\)/);
+  assert.match(app,/lockApp\('Verrouillage après passage en arrière-plan\.'\)/);
+});
+
+test('l écran Réglages reprend la tuile produit et retire les icônes des titres de section',()=>{
+  const html=read('index.html'),css=read('styles.css'),settings=read('settings-ui.js');
+  assert.match(css,/\.settings-view \.settings-card\{[^}]*border:1px solid rgba\(33,55,40,\.035\)!important;[^}]*background:linear-gradient\(160deg,rgba\(255,254,251,\.98\),rgba\(249,247,242,\.95\)\)!important;[^}]*box-shadow:0 3px 9px rgba\(57,75,62,\.07\)!important/);
+  assert.doesNotMatch(html+settings+css,/section-icon/);
+  assert.match(settings,/adminSection\.innerHTML='<h2>Administrateur<\/h2>/);
+  assert.match(css,/--sheet-inner-max:400px;\n  font-family:"Baskerville","Iowan Old Style",Georgia,serif;/);
+});

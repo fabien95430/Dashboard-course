@@ -713,22 +713,6 @@ html #products .product.is-deferred{display:none!important}
   font-size:18px;
   font-weight:820;
 }
-.section-icon{
-  width:31px;
-  height:31px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  background:#e9f4e8;
-  color:#0c7040;
-}
-.section-icon svg{
-  width:18px;
-  height:18px;
-  fill:none;
-  stroke:currentColor;
-  stroke-width:2;
-}
 .settings-card{
   overflow:hidden;
   border:1px solid rgba(33,55,40,.035);
@@ -1778,14 +1762,6 @@ body.is-launching #securityOverlay.is-visible .security-benefits{
     gap:7px!important;
     font-size:15px!important;
   }
-  .section-icon{
-    width:27px!important;
-    height:27px!important;
-  }
-  .section-icon svg{
-    width:16px!important;
-    height:16px!important;
-  }
   .settings-card{
     border-radius:18px!important;
   }
@@ -2183,9 +2159,6 @@ body{
   outline:0!important;
   font-size:15px!important;
 }
-.connection-dialog .dialog-actions{
-  margin-top:20px!important;
-}
 .connection-dialog::backdrop{
   background:rgba(28,38,31,.28)!important;
   -webkit-backdrop-filter:blur(8px);
@@ -2434,13 +2407,6 @@ body{
   height:44px;
   margin-top:4px;
   border-radius:13px;
-}
-.security-lock-now{
-  height:46px;
-  margin-top:12px;
-}
-.security-settings-dialog>.dialog-actions{
-  margin-top:10px;
 }
 @media(max-width:390px){
   .security-settings-dialog{padding:17px}
@@ -3358,19 +3324,6 @@ body{
 .settings-section h2{
   margin-bottom:11px;
 }
-.section-icon{
-  width:34px;
-  height:34px;
-  border-radius:11px;
-  border:1px solid rgba(18,112,64,.08);
-  background:linear-gradient(180deg,#eef8ef,#e5f3e7);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
-}
-.section-icon svg{
-  width:19px;
-  height:19px;
-  stroke-width:1.9;
-}
 
 .settings-card{
   display:grid;
@@ -3479,15 +3432,6 @@ body{
   .settings-section h2{
     margin:0 0 9px 6px!important;
     gap:8px!important;
-  }
-  .section-icon{
-    width:30px!important;
-    height:30px!important;
-    border-radius:10px!important;
-  }
-  .section-icon svg{
-    width:17px!important;
-    height:17px!important;
   }
   .settings-card{
     gap:8px!important;
@@ -3892,9 +3836,7 @@ body{
 .settings-view .settings-scroll{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
 .settings-view .settings-section{margin-bottom:21px!important}
 .settings-view .settings-section h2{margin:0 0 9px 8px!important;color:#64766b!important;gap:8px!important;font-size:11px!important;font-weight:780!important;letter-spacing:.12em!important;text-transform:uppercase}
-.settings-view .section-icon{width:26px!important;height:26px!important;border:0!important;border-radius:9px!important;background:rgba(50,108,69,.08)!important;color:#315e45!important;box-shadow:none!important}
-.settings-view .section-icon svg{width:15px!important;height:15px!important;stroke-width:1.75!important}
-.settings-view .settings-card{display:grid!important;gap:0!important;overflow:hidden!important;border:1px solid rgba(34,71,48,.07)!important;border-radius:21px!important;background:linear-gradient(155deg,rgba(255,255,255,.78),rgba(246,248,244,.64))!important;box-shadow:0 9px 24px rgba(35,60,43,.048)!important}
+.settings-view .settings-card{display:grid!important;gap:0!important;overflow:hidden!important;border:1px solid rgba(33,55,40,.035)!important;border-radius:21px!important;background:linear-gradient(160deg,rgba(255,254,251,.98),rgba(249,247,242,.95))!important;box-shadow:0 3px 9px rgba(57,75,62,.07)!important}
 .settings-view .settings-row,.settings-view .settings-row:last-child{min-height:70px!important;grid-template-columns:43px minmax(0,1fr) auto!important;gap:12px!important;padding:10px 12px!important;border:0!important;border-bottom:1px solid rgba(47,79,58,.085)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transition:background .15s ease,transform .12s ease!important}
 .settings-view .settings-row:last-child{border-bottom:0!important}
 .settings-view .settings-row:active{background:rgba(51,106,66,.07)!important;transform:scale(.993)!important}
@@ -3912,6 +3854,7 @@ body{
 .settings-sheet{
   --sheet-muted:#77847b;
   --sheet-inner-max:400px;
+  font-family:"Baskerville","Iowan Old Style",Georgia,serif;
   position:fixed!important;inset:auto 0 0!important;left:0!important;right:0!important;margin:0!important;
   width:100vw!important;width:100dvw!important;max-width:none!important;max-inline-size:none!important;min-width:0!important;
   height:min(78svh,calc(100svh - max(24px,env(safe-area-inset-top)) - env(safe-area-inset-bottom)))!important;
@@ -3959,18 +3902,18 @@ body{
   width:0;
   margin:0!important;
 }
-.settings-sheet .security-lock-now{box-sizing:border-box;width:100%!important;margin-inline:auto!important}
 .settings-sheet::-webkit-scrollbar,.settings-sheet *::-webkit-scrollbar{display:none}
 .settings-sheet::before{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:4px;background:rgba(126,135,129,.51);pointer-events:none;z-index:2}
 .settings-sheet::backdrop{background:rgba(30,43,37,.35)!important;-webkit-backdrop-filter:blur(13px)!important;backdrop-filter:blur(13px)!important}
 .settings-sheet[open]{animation:settingsSheetIn .22s cubic-bezier(.2,.9,.3,1) both}
 @keyframes settingsSheetIn{from{opacity:.65;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{display:flex!important;align-items:center!important;gap:14px!important;min-height:44px!important;margin:0 0 5px!important;padding:0!important;color:#17271f!important;font-size:19px!important;font-weight:770!important;line-height:1.16!important;letter-spacing:-.45px!important}
-.settings-sheet .settings-sheet-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+/* En-tête : icône 44 px calée sur titre (24 px) + écart (2 px) + sous-titre (18 px), titre et sous-titre sur le même axe. */
+.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{position:relative!important;display:block!important;box-sizing:border-box!important;width:100%!important;max-width:var(--sheet-inner-max)!important;min-height:0!important;margin:0 auto!important;padding:0 0 0 58px!important;color:#263f30!important;font-size:20px!important;font-weight:600!important;line-height:24px!important;letter-spacing:-.3px!important;white-space:nowrap!important}
+.settings-sheet .settings-sheet-icon{position:absolute;left:0;top:0;width:44px;height:44px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
 .settings-sheet .settings-sheet-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
-.settings-sheet .settings-sheet-title{min-width:0;display:block}
-.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 auto 21px!important;padding-left:58px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:450!important;line-height:1.4!important;width:100%!important;max-width:var(--sheet-inner-max)!important}
-.settings-sheet .field>span,.settings-sheet .missing-category-heading strong,.settings-sheet .connection-sync-section h4{color:#65776b!important;font-size:11px!important;font-weight:770!important;letter-spacing:.06em!important}
+.settings-sheet .settings-sheet-title{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{box-sizing:border-box!important;margin:2px auto 21px!important;padding-left:58px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:400!important;line-height:18px!important;width:100%!important;max-width:var(--sheet-inner-max)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.settings-sheet .field>span,.settings-sheet .missing-category-heading strong,.settings-sheet .settings-sheet-section-title{color:#65776b!important;font-size:11px!important;font-weight:770!important;letter-spacing:.06em!important}
 .settings-sheet .field input,.settings-sheet .field select,.settings-sheet .missing-products-add input,.settings-sheet .missing-category-select,.settings-sheet .recipe-customization-search,.settings-sheet .recipe-customization-ingredient-search,.settings-sheet .courses-product-admin-search{min-height:46px;border:1px solid rgba(59,83,65,.12)!important;border-radius:14px!important;background:rgba(255,255,255,.56)!important;color:#25392b!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.63)!important}
 .settings-sheet select{color:#263b2e!important}
 .settings-sheet .primary,.settings-sheet .dialog-actions .primary{min-height:47px!important;border:0!important;border-radius:15px!important;background:linear-gradient(150deg,#315d46,#284b39)!important;color:#fff!important;font-weight:750!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.17)!important}
@@ -3981,7 +3924,7 @@ body{
 .settings-sheet .security-setting-icon{width:38px!important;height:38px!important;border-radius:12px!important;background:rgba(217,232,215,.84)!important;color:#2b6246!important}
 .settings-sheet .security-setting-copy strong,.settings-sheet .preference-toggle-copy strong{color:#1b2d21!important;font-size:13px!important;font-weight:750!important}
 .settings-sheet .security-setting-copy small,.settings-sheet .preference-toggle-copy small{color:#7c8780!important;font-size:11px!important;line-height:1.32!important}
-.settings-sheet .security-lock-select{border:1px solid rgba(59,83,65,.12)!important;border-radius:12px!important;background:rgba(255,255,255,.61)!important}
+.settings-sheet .security-lock-select{-webkit-appearance:none;appearance:none;min-width:84px!important;height:34px!important;padding:0 30px 0 12px!important;border:1px solid rgba(59,83,65,.12)!important;border-radius:12px!important;background:rgba(255,255,255,.61) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%237c8780' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 4.5 3 3 3-3'/%3E%3C/svg%3E") no-repeat right 11px center/12px 12px!important;color:#1b2d21!important;font-size:13.5px!important;font-weight:400!important;line-height:34px!important}
 .settings-sheet .preference-switch input:checked+span{background:#32704d!important}
 .settings-sheet .chevron{width:17px!important;height:17px!important;color:#8e9990!important;stroke-width:1.7!important}
 .settings-sheet .dialog-actions{margin-top:19px}
@@ -3995,7 +3938,6 @@ body{
 .settings-sheet .recipe-customization-add-button{border-color:rgba(51,108,63,.19)!important;background:rgba(237,247,234,.57)!important;color:#296043!important}
 .settings-sheet .missing-product-row{background:rgba(255,255,255,.50)!important;border-color:rgba(40,70,49,.085)!important;box-shadow:none!important}
 .settings-sheet#missingProductsDialog .missing-products-header{padding-right:0!important;flex:0 0 auto}
-.settings-sheet#missingProductsDialog .missing-products-header h3{font-size:19px!important;line-height:1.16!important;font-weight:810!important;letter-spacing:-.45px!important}
 .settings-sheet#missingProductsDialog .missing-products-add input,.settings-sheet#missingProductsDialog .missing-products-add button{height:46px!important;min-height:46px!important;font-size:14px!important}
 .settings-sheet#preferencesDialog[open],.settings-sheet#missingProductsDialog[open],.settings-sheet.recipe-customization-dialog[open]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
 .settings-sheet#preferencesDialog .preference-dialog-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
@@ -4004,16 +3946,37 @@ body{
 .settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto}
 /* Finitions Réglages : actions, lignes et états des feuilles iOS. */
 .settings-sheet#connectionDialog[open],.settings-sheet#settingsDialog[open]{display:flex!important;flex-direction:column!important}
-.settings-sheet#connectionDialog .dialog-actions{flex:0 0 auto;margin-top:auto!important;padding-top:18px}
-.settings-sheet#settingsDialog .security-lock-now{flex:0 0 auto;margin-top:auto!important}
-.settings-sheet#preferencesDialog .preference-dialog-scroll>.dialog-actions{position:sticky;z-index:2;bottom:0;margin-top:16px!important;padding:12px 0 2px;background:linear-gradient(180deg,rgba(247,246,240,0),rgba(247,246,240,.96) 30%)}
 .settings-sheet .security-action-row>.chevron,.settings-sheet .settings-sheet-icon svg{fill:none!important;stroke-linecap:round;stroke-linejoin:round}
 .settings-sheet .security-action-row>.chevron{stroke:currentColor!important}
 .settings-sheet .field input:focus-visible,.settings-sheet .field select:focus-visible,.settings-sheet .recipe-customization-search:focus-within,.settings-sheet .courses-product-admin-search:focus-within{outline:2px solid rgba(51,105,72,.23)!important;outline-offset:1px}
 .settings-sheet#missingProductsDialog .missing-products-header>div{width:100%;min-width:0}
-.settings-sheet#connectionDialog .connection-sync-line{gap:12px}
-.settings-sheet#connectionDialog .connection-sync-line>span:first-child{flex:1 1 52%;min-width:0}
-.settings-sheet#connectionDialog .connection-sync-line>span:last-child{flex:0 1 48%;min-width:0}
+/* Réglages v605 : titres de section, tuiles d'une ligne et enregistrement immédiat. */
+.settings-sheet .settings-sheet-section-title{display:block;margin:20px auto 7px!important;padding:0!important}
+.settings-sheet :is(.dialog-intro,.dialog-feedback)+.settings-sheet-section-title{margin-top:0!important}
+.settings-sheet#connectionDialog .connection-entity-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto 17px;align-items:center;gap:8px;box-sizing:border-box;min-height:52px;margin-top:12px!important;padding:0 14px 0 16px;border:1px solid rgba(40,70,49,.075);border-radius:18px;background:rgba(255,255,255,.36);box-shadow:inset 0 1px 0 rgba(255,255,255,.4);cursor:pointer}
+.settings-sheet#connectionDialog .connection-entity-row:focus-within{outline:2px solid rgba(51,105,72,.23);outline-offset:1px}
+.settings-sheet#connectionDialog .connection-entity-label,.settings-sheet#connectionDialog .connection-sync-line>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1b2d21;font-size:15px;font-weight:400;line-height:20px}
+.settings-sheet#connectionDialog .connection-entity-state,.settings-sheet#connectionDialog .connection-sync-line>span:last-child{flex:0 0 auto;white-space:nowrap;color:#748076;font-size:13.5px;font-weight:400;line-height:20px}
+.settings-sheet#connectionDialog :is(.connection-entity-state,.connection-sync-line>span:last-child)[data-state="synced"]{color:#1f7a4a}
+.settings-sheet#connectionDialog .connection-sync-line>span:last-child:is([data-state="error"],[data-state="missing"]){color:#b6652c}
+.settings-sheet#connectionDialog .connection-entity-row .chevron{display:block;justify-self:end;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.settings-sheet#connectionDialog .connection-entity-row select{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;opacity:0!important;font-size:16px!important;cursor:pointer;-webkit-appearance:none;appearance:none}
+.settings-sheet#connectionDialog .connection-sync-section{padding:0 14px 0 16px}
+.settings-sheet#connectionDialog .connection-sync-line{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:0}
+.settings-sheet#settingsDialog .security-settings-summary{margin-top:0}
+.settings-sheet#settingsDialog :is(.security-setting-info,.security-action-row){grid-template-columns:minmax(0,1fr) auto!important;min-height:52px!important;padding:0 14px 0 16px!important}
+.settings-sheet#settingsDialog .security-action-row{margin-top:0!important}
+.settings-sheet#settingsDialog .security-action-row[hidden]{display:none!important}
+.settings-sheet#settingsDialog .security-setting-copy strong{font-size:15px!important;font-weight:400!important;line-height:20px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settings-sheet#settingsDialog .change-password-panel{margin-top:0;padding:2px 14px 14px}
+.settings-sheet#settingsDialog .change-password-panel .field{margin-top:9px}
+.settings-sheet#settingsDialog .change-password-panel .field>span{margin-bottom:4px}
+.settings-sheet#settingsDialog .change-password-panel .field input{height:42px;min-height:42px}
+.settings-sheet#settingsDialog .change-password-panel .setup-error{min-height:0;margin-top:6px}
+.settings-sheet#settingsDialog .change-password-panel .setup-error:empty{display:none}
+.settings-sheet#settingsDialog .security-password-save{height:44px!important;min-height:44px!important;margin-top:12px}
+/* Retour « Enregistré » flottant en bas de la feuille : aucun décalage du contenu. */
+.settings-sheet :is(#connectionDialogFeedback,#preferencesDialogFeedback,#settingsDialogFeedback){position:absolute!important;left:21px;right:21px;bottom:max(24px,env(safe-area-inset-bottom));z-index:3;box-sizing:border-box;width:fit-content!important;max-width:calc(100% - 42px)!important;margin:0 auto!important;padding:9px 16px;border-radius:999px;box-shadow:0 6px 18px rgba(31,55,40,.12)}
 /* Réglages : même sélecteur, même trait et mêmes séparateurs que le Catalogue. */
 #missingProductsDialog .missing-mode-switch{
   --catalog-lens-x:3px;--catalog-lens-w:calc(50% - 3px);--catalog-liquid-sx:1;
@@ -4102,7 +4065,7 @@ body{
   #preferencesDialog .courses-error-tabs > button{transition:none!important}
 }
 
-@media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{gap:11px!important;font-size:17px!important}.settings-sheet .settings-sheet-icon{width:44px;height:44px;flex-basis:44px}.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{padding-left:55px!important}}
+@media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}}
 @media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;max-width:480px!important;max-inline-size:480px!important;margin:0 auto!important;bottom:18px!important;border-radius:32px!important;border-inline:1px solid rgba(255,255,255,.48)!important;height:min(78svh,720px)!important}}
 @media(prefers-reduced-motion:reduce){.settings-sheet[open]{animation:none!important}.settings-view .settings-row{transition:none!important}}
 
