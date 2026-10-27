@@ -26,3 +26,8 @@
 **Candidats écartés :** images composites réapparues lors des essais supplémentaires ; faux damiers/opacité non transparente ; savon ou nettoyant au conditionnement incertain ; sources CC0 sans preuve suffisante de la variante alcoolisée/non alcoolisée ; remplacement de jus multifruits par jus d'orange. Elles ne sont pas intégrées et ne gonflent pas le lot.
 
 **Statut : PRÉPARÉ** — publication, SHA du commit, CI et GitHub Pages à confirmer ultérieurement dans `docs/AVANCEMENT_IMAGES_PRODUITS.md` sans inventer de résultat.
+
+
+### Résultat public confirmé — 27 octobre 2026
+
+**PUBLIÉ :** SHA de fusion `c26a5a5a932a45229cf4ee2a086d9aa3db10eb39` ([PR #103](https://github.com/fabien95430/Dashboard-course/pull/103)). [CI de la PR](https://github.com/fabien95430/Dashboard-course/actions/runs/40565148602), [CI de main](https://github.com/fabien95430/Dashboard-course/actions/runs/40565539484) et [GitHub Pages](https://github.com/fabien95430/Dashboard-course/actions/runs/40565533963) : toutes **success**. Version `v602`, 13 visuels publiés, 318 produits renouvelés distincts / 414, 96 non renouvelés, au moins 17 conservés avec décision documentée. Les mentions « PRÉPARÉ » ci-dessus décrivent l'état de la préparation antérieure et ne remplacent pas ce statut final vérifié.
