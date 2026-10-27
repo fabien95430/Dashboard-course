@@ -692,3 +692,10 @@ Les rubriques à zéro peuvent encore contenir des produits **non renouvelés** 
 
 **Résultat réel de cet audit :** **0 image publiée**, **0 fichier applicatif modifié**, aucun changement de version/cache demandé. **305/414 renouvelés, 109 non renouvelés, au moins 19 évalués et conservés distincts, au moins 324 produits avec décision de remplacement/conservation.** Les candidats invalides sont explicitement rejetés pour respecter cru/cuit, variété, conditionnement, fond transparent et fidélité à 192 px. Le vrai rendu sur iPhone et Home Assistant reste non testé. Les priorités sont les anciens petits visuels de Maison, Boissons, Petit-déjeuner, Hygiène & soins et Viandes & poissons ; aucune API OpenAI payante du projet utilisée.
 
+
+ 
+### Lot v596 — 2 candidats unitaires sélectionnés, publication encore en attente
+ 
+**Référence :** `bf567cf0bdde6ee9abd0ea617de75bdc102249e7` (v595). Deux anciens produits non renouvelés : **Coca** (Boissons, 2488 → 8098 octets) et **Vinaigre de vin** (Cuisine, 2780 → 8936 octets). Poids total **5268 → 17034 octets** (+11766). Sources CC0 et Git blob vérifiés, 256 × 256 px natifs, VP8X/ALPH, noms et variantes comparés. Crédits exhaustifs dans `docs/IMAGE_CREDITS_V596.md`. Aucun autre produit modifié, aucune image existante déjà renouvelée redéployée. Choix de deux fichiers seulement faute d'autres correspondances fiables : pas de remplissage artificiel avec une variante incorrecte. Les sources refusées et leurs motifs figurent dans les crédits.
+ 
+**NON PUBLIÉ au moment de ce pré-suivi :** PR/CI/main/Pages encore à contrôler. Le bilan publié de référence reste **305/414 renouvelés, 109 non renouvelés et au moins 19 conservés distincts**. Bilan prévisionnel **307/414 renouvelés et 107 non renouvelés** seulement après contrôle du commit publié. Périmètre de code limité aux marqueurs v596 de `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js` ; pas de changement de logique, CSS, tuiles, HA, WebSocket, OAuth, coffre, verrouillage, biométrie ou safe areas.

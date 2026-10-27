@@ -1,0 +1,17 @@
+# Crédits visuels produits — lot v596 (préparé sur branche, non encore fusionné)
+ 
+**Base examinée :** `main` `bf567cf0bdde6ee9abd0ea617de75bdc102249e7`, version v595. Deux sources CC0 externes déjà disponibles en WebP natif 256 × 256 px, recopiées octet pour octet sans traitement, sans agrandissement et sans appel à l'API OpenAI payante du projet.
+ 
+| Catégorie | Produit | Avant | Après | Origine / WebP source | Git blob SHA | Licence |
+|---|---|---:|---:|---|---|---|
+| Boissons | Coca | 2488 | 8098 | [SwisserDev soda_bottle.webp](https://github.com/SwisserDev/fivem-icons-photoreal/blob/0f2fd1a5389e52c4276a8826cc13c2a0a90e836d/webp-256/drink/soda_bottle.webp) | `b952fd1df813854f99745bef54ad151539cfc80e` | [CC0 1.0](https://github.com/SwisserDev/fivem-icons-photoreal/blob/0f2fd1a5389e52c4276a8826cc13c2a0a90e836d/LICENSE) |
+| Cuisine | Vinaigre de vin | 2780 | 8936 | [EBf Studio en_vinegar.webp](https://github.com/EBf-Studio/ingredient-icons/blob/091deff6956275dfcb10b150c864834c7417529e/icons/webp/256/en_vinegar.webp) | `0123592060e8ef6e07a2410715e00683c8a032a5` | [CC0 1.0](https://github.com/EBf-Studio/ingredient-icons/blob/091deff6956275dfcb10b150c864834c7417529e/LICENSE-ICONS) |
+| **Total** | **2** | **5268** | **17034** | | | |
+ 
+**Validation de sélection :** Coca = cola foncé dans une bouteille fermée, capsule rouge et sans logo fictif ; le produit catalogue correspond à un cola ordinaire, distinct de Coca zéro (ancien WebP conservé, bouchon noir). Vinaigre de vin = vinaigre rouge translucide, bouteille/carafe unique en verre à bouchon fermé, sans raisins ni accessoires : l'ancien liquide était également rouge. Source EBf nommée « en_vinegar » sans mention explicite du vin ; l'identité visuelle repose donc sur le vinaigre rouge et **ne garantit pas l'origine œnologique sur la seule image**. En cas de besoin d'une variante de vin certifiée par la source, conserver l'ancien visuel plutôt que substituer.
+ 
+Les deux sources contiennent RIFF WEBP, chunk VP8X avec indicateur alpha, bloc ALPH natif et chunk VP8 ; dimensions vérifiées 256 × 256 px. Taille inférieure à 100 000 octets. Aucun SVG, sprite ou atlas. Attribution volontaire SwisserDev et EBf Studio, sans partenariat ni licence exclusive.
+ 
+**Candidats rejetés pendant les comparaisons :** `ginger_ale.webp` n'est pas `Ginger beer`; `lemonade.webp` représente une cruche plutôt qu'une limonade emballée ; `food/raw_fish.webp` un poisson entier plutôt que des filets de poisson surgelé ; `images/sausage.webp` contient des marques de cuisson incompatibles avec Saucisses crues ; `en_coconut-milk.webp` et `images/coconut-milk.webp` introduisent accessoires et un contenant différent du lait de coco en boîte ; `sponge_block.webp` est une éponge jaune et pas Éponges magiques blanches ; `en_breadcrumbs.webp` est de la chapelure et non des croûtons. Les autres 107 références non renouvelées restent en attente ou conservées. Aucune comparaison iPhone physique/HA n'est revendiquée.
+ 
+**Publication :** en attente de CI sur PR, fusion et Pages. Ne pas présenter ce fichier comme une publication tant que le SHA du nouveau main et les Actions ne sont pas vérifiés.
