@@ -1,6 +1,6 @@
-# Crédits visuels — lot v592 (préparé pour validation CI avant fusion)
+# Crédits visuels — lot v592 (publié, vérifié sur main)
 
-Base inspectée : `main` `95b11fb4385363c6b97e3fa9452444d77437f422` (v591). Ce document devient une confirmation de publication uniquement après vérification réelle sur `main`, de la CI et de Pages. PR, commit fusionné et runs à reporter dans le suivi après publication.
+Base inspectée : `main` `95b11fb4385363c6b97e3fa9452444d77437f422` (v591). Publié : [commit `8f2264de`](https://github.com/fabien95430/Dashboard-course/commit/8f2264de4a9596649938103b9e9589110097d757), [PR #98](https://github.com/fabien95430/Dashboard-course/pull/98), [CI PR](https://github.com/fabien95430/Dashboard-course/actions/runs/40429257829), [CI sur main](https://github.com/fabien95430/Dashboard-course/actions/runs/40429372119) et [GitHub Pages](https://github.com/fabien95430/Dashboard-course/actions/runs/40429371932), toutes vertes. Empreintes des huit WebP et poids global confirmés sur main.
 
 Sept créations visuelles individuelles produites avec le générateur d'images ChatGPT, sans usage de l'API OpenAI payante du projet ni de sources tierces. Sources PNG originales recadrées vers des WebP transparents 384 × 384 px avec nettoyage des pixels alpha isolés ; rendu examiné sur fond sauge à 192 px. Aucun texte, logo ou marque inventée. Les conditionnements correspondent aux anciennes références ; il ne s'agit pas d'un agrandissement des anciennes icônes.
 
