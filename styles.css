@@ -3842,12 +3842,13 @@ body{
 }
 .list-view .list-row-delete svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .list-view .list-row.is-actions-open .list-row-delete{opacity:1;visibility:visible;pointer-events:auto;transform:translate3d(0,-50%,0)}
-.list-view .list-row.is-actions-open .list-row-more{color:rgba(7,62,44,.50)!important}
+.list-view .list-row-more{transition:opacity .18s ease,visibility .18s}
+.list-view .list-row.is-actions-open .list-row-more{opacity:0!important;visibility:hidden;pointer-events:none}
 .list-view .list-row-delete:active{background:rgba(244,205,210,.60)}
 .list-view .list-row-delete:focus-visible{outline:2px solid #cf4050;outline-offset:-3px}
-@media(prefers-reduced-motion:reduce){.list-view .list-row,.list-view .list-row-delete{transition:none}}
-/* v585 — Suppression : la ligne sort vers la gauche, dans le sens du swipe, puis l'espace se referme depuis sa hauteur réelle. */
-.list-view .list-row.is-deleting.is-removing{transform:translate3d(-40%,0,0)!important;opacity:0!important;transition:transform .26s cubic-bezier(.4,0,.2,1),opacity .2s ease,max-height .24s cubic-bezier(.4,0,.2,1) .12s,min-height .24s cubic-bezier(.4,0,.2,1) .12s,padding .24s ease .12s!important}
+@media(prefers-reduced-motion:reduce){.list-view .list-row,.list-view .list-row-delete,.list-view .list-row-more{transition:none}}
+/* v586 — Suppression : la ligne sort vers la gauche, dans le sens du swipe, puis l'espace se referme depuis sa hauteur réelle. */
+.list-view .list-row.is-deleting.is-removing{transform:translate3d(-40%,0,0)!important;opacity:0!important;transition:transform .38s cubic-bezier(.4,0,.2,1),opacity .3s ease,max-height .34s cubic-bezier(.4,0,.2,1) .2s,min-height .34s cubic-bezier(.4,0,.2,1) .2s,padding .34s ease .2s!important}
 @media(prefers-reduced-motion:reduce){.list-view .list-row.is-deleting.is-removing{transition:none!important}}
 
 /* v488 — Ma liste : recherche soulignée façon éditoriale */
