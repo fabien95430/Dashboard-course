@@ -612,7 +612,7 @@ html #products .product.is-deferred{display:none!important}
   border-radius:22px;
   background:linear-gradient(160deg,rgba(255,254,251,.98),rgba(249,247,242,.95));
   color:#11161a;
-  box-shadow:0 7px 22px rgba(57,75,62,.065);
+  box-shadow:0 3px 9px rgba(57,75,62,.07);
   display:grid;
   grid-template-rows:104px minmax(0,1fr);
   align-items:start;
@@ -2618,8 +2618,8 @@ body{
   box-shadow:
     0 -10px 28px rgba(37,73,49,.07),
     inset 0 1px 0 rgba(255,255,255,.95)!important;
-  -webkit-backdrop-filter:blur(22px) saturate(1.12);
-  backdrop-filter:blur(22px) saturate(1.12);
+  -webkit-backdrop-filter:blur(10px) saturate(1.12);
+  backdrop-filter:blur(10px) saturate(1.12);
 }
 .tabs::before{
   border-color:rgba(19,151,73,calc(.42 + var(--nav-liquid-lift) * .20));
