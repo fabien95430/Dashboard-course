@@ -835,3 +835,10 @@ Référence : `ab80641bb9faf975697917e2eb836e3113f01588` (version v598). Une **s
 | Viandes & poissons | Saucisses | `saucisses.webp` | 3582 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
 
 **Périmètre de ce complément documentaire :** aucun WebP, aucun code, aucun CSS, aucun test ni version applicative modifié. Priorité des prochains essais : Petit-déjeuner, Maison et Boissons, avec fond alpha réel, emballage/variante exacte, visuel unitaire et comparaison sur fonds blanc/sauge à 192 px ; publication seulement après validation technique et graphique complète. Les 111 anciens visuels ont été revus, sans revendiquer 111 nouveaux remplacements ni 111 conservations définitives.
+
+
+### Lot v600 — 2 remplacements validés, publication CI/Pages à vérifier après fusion
+
+**Base vérifiée :** `7c0464dbdda8ebcbffd8b61f498b1d1cd164d924` (v599), 414 produits, 303 distincts renouvelés, 111 non renouvelés. Visuels changés exclusivement : **Dosettes café** (2 990 → 42 080 o) et **Filtres à café** (2 848 → 14 734 o), catégorie Petit-déjeuner. **Total 5 838 → 56 814 o (+50 976)**, deux fichiers source originale ChatGPT indépendants, WebP 384 × 384 avec véritable alpha, rendu contrôlé à 192 px sur fonds blanc/sauge et sur bords. Les anciennes illustrations ont été comparées aux nouvelles. Voir `docs/IMAGE_CREDITS_V600.md` pour provenance et empreintes. Pas d'API OpenAI payante ; aucune source tierce dans ce lot.
+
+**Rejets :** plusieurs planches composites, variantes trop schématiques, autres conditionnements incorrects ; la piste Alcool 70 CC0 n'est pas comptée comme acceptée. Les deux fichiers restent **PRÉPARÉS** tant que leur commit, la CI et Pages ne sont pas vérifiés sur le véritable `main`. Après publication, objectif **305 renouvelés distincts / 109 non renouvelés / au moins 19 conservés**, 414 WebP et **10 114 292 octets**. Ne pas confondre ce bilan provisoire avec une publication vérifiée. Aucun changement des tuiles, CSS, navigation, cache visuel persistant, HA, WebSocket, OAuth, coffre, verrouillage, biométrie, safe areas ou mode test. Le test matériel iPhone et le test réseau hors ligne restent non effectués.
