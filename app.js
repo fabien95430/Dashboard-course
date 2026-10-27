@@ -650,10 +650,8 @@ function setDialogFeedback(target,message,kind='success'){
   target.classList.add('is-visible');
   target._t=setTimeout(()=>clearDialogFeedback(target),3000);
 }
-// Le délai protège le zoom système d'un vrai lancement ; un rechargement (mise à jour) n'en a pas.
-const launchNavigation=performance.getEntriesByType?.('navigation')?.[0]?.type;
-if(launchNavigation==='reload')document.body.classList.remove('is-launching');
-else requestAnimationFrame(()=>setTimeout(()=>document.body.classList.remove('is-launching'),180));
+// v589 — le zoom système d'iOS est terminé avant le premier rendu : fond et interface s'affichent ensemble.
+document.body.classList.remove('is-launching');
 function refreshVisualLock(){
   const blocked=UI.setup.classList.contains('is-visible')||UI.securityOverlay.classList.contains('is-visible');
   const app=$('#app'),changed=app.classList.contains('is-locked')!==blocked;
