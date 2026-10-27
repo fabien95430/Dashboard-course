@@ -841,7 +841,9 @@ function warmCatalogGrid(){
     if(!el)return;
     const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
     ensureProductGrid(el,quantities);
-    syncProductGrid(visibleProducts(),quantities);
+    const warmProducts=visibleProducts();
+    syncProductGrid(warmProducts,quantities);
+    updateProductCount(warmProducts);
     if(state.view!=='catalog')armCatalogTail();
   };
   const run=deadline=>{
@@ -861,6 +863,12 @@ function warmCatalogGrid(){
 }
 document.addEventListener('courses:catalog-products-ready',warmCatalogGrid);
 if(window.COURSES_CATALOG_PRODUCTS_READY)warmCatalogGrid();
+function updateProductCount(products=visibleProducts()){
+  const count=$('#productCount');
+  if(!count)return;
+  const text=products.length+' produit'+(products.length>1?'s':'');
+  if(count.textContent!==text)count.textContent=text;
+}
 function renderProducts(){
   const el=$('#products');
   if(!el||!$('#catalogView')?.classList.contains('is-active'))return;
@@ -868,7 +876,7 @@ function renderProducts(){
   const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
   ensureProductGrid(el,quantities);
   syncProductGrid(products,quantities);
-  const count=$('#productCount');if(count)count.textContent=products.length+' produit'+(products.length>1?'s':'');
+  updateProductCount(products);
   notifyProductsUpdated();
 }
 function setProductQuantity(name,quantity){
@@ -1382,6 +1390,7 @@ function showView(){
   if(viewChanged){
     if(state.view==='catalog'){
       renderCategories();
+      if(productGridReady)updateProductCount();
       scheduleCatalogRender();
     }
     document.dispatchEvent(new CustomEvent('courses:view-changed',{detail:{view:state.view}}));

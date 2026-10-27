@@ -29,10 +29,10 @@ function harness(gridReady){
     afterSettle:fn=>{settles.add(fn);return ()=>settles.delete(fn);}
   };
   const factory=new Function('state','$','document','BOTTOM_NAV','requestAnimationFrame',
-    'cancelAnimationFrame','renderCategories','renderProducts',
+    'cancelAnimationFrame','renderCategories','renderProducts','updateProductCount',
     'CustomEvent','productGridReady','closeListRowMenu',app.slice(start,end)+'return showView;');
   const showView=factory(state,selector=>elements[selector],document,BOTTOM_NAV,raf,caf,
-    ()=>trace.push('categories'),()=>trace.push('products'),Event,gridReady,()=>{});
+    ()=>trace.push('categories'),()=>trace.push('products'),()=>trace.push('count'),Event,gridReady,()=>{});
   showView();
   trace.length=0;
   return {state,trace,showView,frame,settle};
@@ -59,6 +59,7 @@ test('grille déjà construite : mise à jour seulement après l arrivée de la 
   const {state,trace,showView,frame,settle}=harness(true);
   state.view='catalog';showView();
   assert.ok(trace.indexOf('nav')>=0&&trace.indexOf('nav')<trace.indexOf('categories'));
+  assert.equal(trace.filter(x=>x==='count').length,1,'le compteur est posé dès l ouverture, sans attendre la pastille');
   frame();frame();frame();
   assert.equal(trace.includes('products'),false,'aucun rendu lourd pendant la course de la pastille');
   settle();

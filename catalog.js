@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=607';
+    images.src='./dish-local-images.js?v=608';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -104,7 +104,7 @@
     loadDishStyles().then(()=>{
       if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
       const script=document.createElement('script');
-      script.src='./dishes-ui.js?v=607';
+      script.src='./dishes-ui.js?v=608';
       script.async=false;
       script.dataset.catalogDishes='script';
       script.addEventListener('load',loadLiquid,{once:true});
@@ -197,8 +197,20 @@
     script.addEventListener('load',loadRuntimeFeatures,{once:true});
     document.body.appendChild(script);
   };
+  // Au démarrage à froid, la synchronisation peut tarder : le Catalogue (grille, badges de mode
+  // d'achat) se prépare quand même au repos, pour qu'il soit complet dès sa première image.
+  const scheduleStartupWarmup=()=>{
+    const run=()=>{startProductCatalog();scheduleDishFeaturesWarmup();};
+    const idle=()=>{
+      if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:800});
+      else setTimeout(run,300);
+    };
+    if(document.readyState==='complete')idle();
+    else window.addEventListener('load',idle,{once:true});
+  };
   const bootstrap=()=>{
     loadAppUi();
+    scheduleStartupWarmup();
     if(document.getElementById('catalogView')?.classList.contains('is-active'))startCatalogView();
   };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootstrap,{once:true});
