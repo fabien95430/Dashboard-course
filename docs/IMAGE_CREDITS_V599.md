@@ -1,4 +1,4 @@
-# Crédits visuels produits — lot v599 (préparé, validation PR à confirmer)
+# Crédits visuels produits — lot v599 (publié et validé)
 
 **Base examinée :** `main` `ab80641bb9faf975697917e2eb836e3113f01588`, version v598. Le remplacement concerne uniquement **Capsules café**, catégorie Petit-déjeuner. Image unitaire générée avec la fonctionnalité native de création d'images ChatGPT, **sans appel à l'API OpenAI payante du projet**. Aucune image externe ni marque inventée : création originale pour le catalogue.
 
@@ -13,3 +13,8 @@
 **Justification du lot réduit :** aucun des autres candidats examinés ne réunissait simultanément exactitude de l'article, alpha réel, netteté à 192 px et bon conditionnement. Aucun ajout artificiel de source inadéquate. L'API payante du dépôt n'a pas été utilisée.
 
 **Périmètre :** seul `www/Items/capsules-cafe.webp` est remplacé, avec la version visible v599 et les références `catalog.js`/`dish-local-images.js`/`sw.js` nécessaires à la fraîcheur des caches. Les tuiles, CSS, navigation, images des plats, chargement et mécanismes Home Assistant/OAuth/WebSocket/biométrie restent intacts. Validation complète des tests sur la branche, SHA publié sur main et Pages **à confirmer**. Le rendu physique iPhone, l'accès HA et le mode hors ligne réel ne sont pas testés.
+
+
+### Statut final vérifié sur main — 27 octobre 2026
+
+**PUBLIÉ** via [PR #101](https://github.com/fabien95430/Dashboard-course/pull/101) fusionnée dans `main` au SHA `1f316be8decff585ff9c90b46ff3095de046ca6a`. Blob image réel `9db78238e81fdf5e88b8cdf889794fb3b55f3f16` (20 282 octets). [CI sur main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40517689292) ; [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40517688543). Le paragraphe ci-dessus mentionnant les validations « à confirmer » décrit l'état historique de préparation, pas l'état de publication final.

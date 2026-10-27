@@ -4,10 +4,10 @@
 
 ## Réalisé et vérifié
 
-- Dernier lot d'images publié **v596** sur `main`, [commit `ee9d72d5a16c8af1c5fbe7b1a557e16550bcb766`](https://github.com/fabien95430/Dashboard-course/commit/ee9d72d5a16c8af1c5fbe7b1a557e16550bcb766), [PR #100 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/100). [CI PR réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40490060755), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40490167213) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40490167242). Deux WebP natifs sous licence CC0, sans modification des CSS, de la navigation, de la sécurité, de Home Assistant ni des safe areas.
+- Dernier lot d'images publié **v599** sur `main`, [commit `1f316be8decff585ff9c90b46ff3095de046ca6a`](https://github.com/fabien95430/Dashboard-course/commit/1f316be8decff585ff9c90b46ff3095de046ca6a), [PR #101 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/101), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40517689292) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40517688543). Une image Capsules café d'origine ChatGPT en WebP unitaire, sans changement des CSS, de la navigation, de la sécurité, de Home Assistant ni des safe areas.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient désormais **414 WebP**, un par produit et sans fichier manquant. Les six images supplémentaires de l'ancien comptage étaient des fichiers orphelins hors catalogue, supprimés lors des travaux ultérieurs.
-- **307 produits distincts** renouvelés après v596 ; **107 produits** non renouvelés, dont **au moins 19** évalués et conservés distincts. **Au moins 326 produits** ont une décision de remplacement/conservation documentée, sans double comptage.
-- La compression v537 concernait 32 fichiers historiquement lourds. Sur le vrai main v592, **0 image au-dessus de 100 Kio (102 400 o)** ; une seule dépasse 100 000 octets : `romarin-frais.webp` à 100 866 octets, volontairement conservée car les alternatives testées étaient moins fidèles. Poids de `www/Items/` : **10 046 472 octets pour 414 fichiers WebP** ; aucune image manquante.
+- **303 produits distincts** réellement renouvelés après v599 (**308 opérations**, dont 5 produits renouvelés deux fois) ; **111 produits** non renouvelés, dont **au moins 19** évalués et conservés distincts. **Au moins 322 produits** ont une décision définitive de remplacement/conservation documentée, sans double comptage. Voir audit Git en fin de fichier.
+- La compression v537 concernait 32 fichiers historiquement lourds. Sur le vrai main v592, **0 image au-dessus de 100 Kio (102 400 o)** ; une seule dépasse 100 000 octets : `romarin-frais.webp` à 100 866 octets, volontairement conservée car les alternatives testées étaient moins fidèles. Poids de `www/Items/` : **10 063 316 octets pour 414 fichiers WebP** ; aucune image manquante.
 - Plusieurs anciennes vignettes restent sous 10 Kio ; le petit poids n'est pas une preuve de manque de netteté. Inventaire et contrôle individuels prioritaires avant toute modification.
 - **Le lot de 30 images initialement préparé en attente a finalement déjà été publié en v539** : ne pas refaire ces 30 fichiers.
 
@@ -701,8 +701,137 @@ Les rubriques à zéro peuvent encore contenir des produits **non renouvelés** 
 **PUBLIÉ ET REVÉRIFIÉ** : commit main [ee9d72d5a16c8af1c5fbe7b1a557e16550bcb766](https://github.com/fabien95430/Dashboard-course/commit/ee9d72d5a16c8af1c5fbe7b1a557e16550bcb766), [PR #100 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/100), [CI PR réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40490060755), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40490167213), [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40490167242). Les deux SHA binaires correspondent exactement aux deux sources CC0 validées : Coca `b952fd1df813854f99745bef54ad151539cfc80e` et Vinaigre de vin `0123592060e8ef6e07a2410715e00683c8a032a5`. **307/414 produits renouvelés, 107 non renouvelés, au moins 19 conservés distincts** ; 414 WebP, **10 046 472 octets**. Les 2 nouveaux WebP portent la hausse de 5 268 à 17 034 octets, variation +11 766 octets. La CI et Pages ont été recontrôlés sur le SHA publié, mais le test sur iPhone physique et le comportement hors ligne réel ne sont pas revendiqués. Périmètre de code limité aux marqueurs v596 de `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js` ; pas de changement de logique, CSS, tuiles, HA, WebSocket, OAuth, coffre, verrouillage, biométrie ou safe areas.
 
 
-### Lot v599 — 1 visuel préparé : Capsules café (en attente CI/Pages)
+### Lot v599 — 1 visuel initialement préparé : Capsules café (publication ensuite confirmée ci-dessous)
 
 Référence : `ab80641bb9faf975697917e2eb836e3113f01588` (version v598). Une **seule image unitaire** a passé la validation complète à 192 px : **Capsules café** (Petit-déjeuner) 3 438 → 20 282 octets, soit +16 844 octets. Génération originale ChatGPT, WebP RGBA 384 × 384 px, transparence vérifiée, marge et SHA Git `9db78238e81fdf5e88b8cdf889794fb3b55f3f16`. Détails des crédits et candidats rejetés : `docs/IMAGE_CREDITS_V599.md`. Les sources incorrectes ou à fond opaque ne sont pas publiées, ce qui justifie exceptionnellement la taille de ce lot.
 
 **PRÉPARÉ sur branche, NON ENCORE PUBLIÉ :** la CI PR, la fusion sur main et Pages sont à confirmer. En attendant : **307/414 images renouvelées, 107 non renouvelées, au moins 19 évaluées/conservées distinctes**. Objectif après publication vérifiée : 308/414 renouvelées, 106 non renouvelées, 19 conservées au moins ; poids du dossier estimé 10 063 316 octets pour 414 WebP. Un seul commit atomique application+WebP+crédits+version, aucun changement des tuiles, CSS, navigation, OAuth, HA, WebSocket, coffre, verrouillage, biométrie, safe areas ou stratégie de chargement. Un test physique iPhone et un test réseau hors ligne ne sont pas revendiqués.
+
+
+### Vérification réelle de la publication v599 et audit individuel du stock ancien — 27 octobre 2026
+
+**PUBLIÉ :** [PR #101 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/101), commit `1f316be8decff585ff9c90b46ff3095de046ca6a` sur `main`, [validation `success`](https://github.com/fabien95430/Dashboard-course/actions/runs/40517689292) et [GitHub Pages `success`](https://github.com/fabien95430/Dashboard-course/actions/runs/40517688543). Le blob `www/Items/capsules-cafe.webp` correspond à `9db78238e81fdf5e88b8cdf889794fb3b55f3f16` (20 282 octets, v599). Il n'est plus en attente : **1 nouvelle image publiée en v599**, non réimportée lors de cet audit. Poids réel `www/Items/` : **10 063 316 octets / 414 WebP**, aucun manquant. Version visible et cache : **v599**.
+
+**Rectification du cumul :** les totaux historiques de lots comptaient **cinq seconds remplacements du même produit** comme des références nouvelles : `Curry`, `Paprika`, `Poivre`, `Sel` et `Sauce soja` (première publication v534, nouvelle publication v560/v562/v563/v564). Les **308 interventions cumulées** à v599 portent donc sur **303 produits réellement distincts**. Bilan exclusif reconstitué depuis les arbres Git et les commits : **303 renouvelés distincts + 111 non renouvelés = 414**, dont **au moins 19 évalués et conservés** parmi les 111, soit **au moins 322 décisions finales distinctes**. Les 297 du tableau des lots antérieur à v594 désignent des opérations, **292 produits distincts**. Cette rectification ne modifie ni les fichiers existants ni leur qualité.
+
+**Contrôle des images non renouvelées :** comparaison du commit antérieur au pilote v528 `ff3de3a9ea8eab776f20c8d3ef95507e0ff83700`, du parent de compression v537 `5d69ab4793a56a34bba2403bd05a41edd5c1321a`, de v537 `84c75d78eb0862d99a5d91469fbf429b2aaa9051` et du main v599. **88 images ont exactement le blob initial** ; **23 ont uniquement reçu la compression v537 sans remplacement de sujet**. Les 111 aperçus originaux ont été examinés unitairement. Cet examen sert à identifier la fidélité et les défauts apparents ; il ne remplace pas une validation physique à 192 px sur fonds blanc/sauge ni un test hors ligne. Les 19 conservations définitives du suivi sont maintenues sans augmentation automatique. Toutes les autres images demeurent en place en attente d'un candidat démontrablement meilleur, pas nécessairement jugées mauvaises.
+
+**Rejets complémentaires :** génération composite multi-produits au lieu d'une image indépendante (Dosettes café, Filtres à café) ; nouvel essai représentant une capsule métallique à la place d'une dosette papier, avec arrière-plan non transparent ; alternatives CC0 incorrectes : `ginger_ale` ne démontre pas Ginger beer, `soda_bottle` ne démontre pas Coca zéro, `juice_carton` ne représente pas Jus multifruits, `fish_fillet` contient une planche/décor, `antiseptic_wipes` ne représente pas des lingettes ménage, `drain_cleaner` ne démontre pas Détartrant, `lemonade` est un pichet plutôt qu'une limonade embouteillée. **0 de ces propositions intégré.** Source inspectée : SwisserDev/fivem-icons-photoreal (CC0 selon le suivi existant). Pas d'API OpenAI payante. Les candidat(e)s non conformes sont REJETÉS ; les WebP correspondants restent EN ATTENTE, pas PUBLIÉS.
+
+**Inventaire nominatif des 111 WebP examinés et non renouvelés.** « Maintenu » = ancien fichier laissé intact, **pas** une nouvelle conservation finale. Les poids proviennent du vrai arbre Git v599, pas d'une estimation.
+
+| Catégorie | Produit | Fichier | Octets | Historique | Décision actuelle |
+|---|---|---|---:|---|---|
+| Apéritif & snacks | Kinder Maxi | `kinder-maxi.webp` | 22038 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Apéritif & snacks | Speculos | `speculos.webp` | 67434 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Bière blanche | `biere-blanche.webp` | 2578 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Bière sans alcool | `biere-sans-alcool.webp` | 2028 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Coca zéro | `coca-zero.webp` | 2442 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Eau aromatisée | `eau-aromatisee.webp` | 2798 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Ginger beer | `ginger-beer.webp` | 2476 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Jus de tomate | `jus-de-tomate.webp` | 3674 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Jus multifruits | `jus-multifruits.webp` | 4114 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Limonade | `limonade.webp` | 2346 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Orangeade | `orangeade.webp` | 2566 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Prosecco | `prosecco.webp` | 2682 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Rhum | `rhum.webp` | 18284 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Ricard | `ricard.webp` | 22006 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Sirop de grenadine | `sirop-de-grenadine.webp` | 2220 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Sirop de menthe | `sirop-de-menthe.webp` | 2306 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Sirop de pêche | `sirop-de-peche.webp` | 2330 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Soda citron | `soda-citron.webp` | 2346 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boissons | Vin rosé | `vin-rose.webp` | 3046 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Boulangerie | Pâte brisée | `pate-brisee.webp` | 26696 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Champignons en boîte | `champignons-en-boite.webp` | 4744 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Confiture fraise | `confiture-fraise.webp` | 50636 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Confiture mirabelles | `confiture-mirabelles.webp` | 52662 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Coulis de fruit | `coulis-de-fruit.webp` | 25910 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Croûtons | `croutons.webp` | 4588 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Lait de coco | `lait-de-coco.webp` | 3304 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Noix de coco râpée | `noix-de-coco-rapee.webp` | 4028 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Pâte feuilletée | `pate-feuilletee.webp` | 59958 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Petits pois carottes | `petits-pois-carottes.webp` | 4680 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Purée en flocons | `puree-en-flocons.webp` | 4004 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Raviolis en boîte | `raviolis-en-boite.webp` | 4672 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Soupes en brique | `soupes-en-brique.webp` | 4152 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Vinaigre balsamique | `vinaigre-balsamique.webp` | 2390 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Cuisine | Vinaigre de cidre | `vinaigre-de-cidre.webp` | 35956 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Enfant | Compotes bébé | `compotes-bebe.webp` | 3448 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Enfant | Lait infantile | `lait-infantile.webp` | 2994 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Enfant | Sacs à couches | `sacs-a-couches.webp` | 3854 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Enfant | Yaourt | `yaourt.webp` | 41440 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Frais | Cornichon | `cornichon.webp` | 43096 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Frais | Mozzarella râpée | `mozzarella-rapee.webp` | 29408 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Frais | Pâte à pizza | `pate-a-pizza.webp` | 43040 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Frais | Philadelphia | `philadelphia.webp` | 20230 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Hygiène & soins | Alcool 70 | `alcool-70.webp` | 17442 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Hygiène & soins | Antiseptique | `antiseptique.webp` | 2358 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Hygiène & soins | Baume lèvres | `baume-levres.webp` | 1794 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Hygiène & soins | Démaquillant | `demaquillant.webp` | 2434 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Hygiène & soins | Mouchoirs poche | `mouchoirs-poche.webp` | 2554 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Hygiène & soins | Pansements | `pansements.webp` | 4428 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Hygiène & soins | Protections hygiéniques | `protections-hygieniques.webp` | 3238 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Adoucissant | `adoucissant.webp` | 3008 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Amidon | `amidon.webp` | 1756 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Bicarbonate | `bicarbonate.webp` | 2930 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Désinfectant | `desinfectant.webp` | 3040 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Désodorisant textile | `desodorisant-textile.webp` | 3180 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Détachant | `detachant.webp` | 2520 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Détartrant | `detartrant.webp` | 2010 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Éponges magiques | `eponges-magiques.webp` | 2452 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Essuie-verres | `essuie-verres.webp` | 3460 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Filet de lavage | `filet-de-lavage.webp` | 3496 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Grattoirs | `grattoirs.webp` | 3722 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Javel | `javel.webp` | 2342 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Lave glace | `lave-glace.webp` | 24392 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Lessive liquide | `lessive-liquide.webp` | 3022 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Lessive poudre | `lessive-poudre.webp` | 3028 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Lingettes anti-décoloration | `lingettes-anti-decoloration.webp` | 3054 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Lingettes ménage | `lingettes-menage.webp` | 3278 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Liquide rinçage | `liquide-rincage.webp` | 2806 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Liquide vaisselle | `liquide-vaisselle.webp` | 2930 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Mouchoirs | `mouchoirs.webp` | 3998 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Nettoyant lave-vaisselle | `nettoyant-lave-vaisselle.webp` | 4938 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Nettoyant machine à laver | `nettoyant-machine-a-laver.webp` | 3470 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Nettoyant multi-usages | `nettoyant-multi-usages.webp` | 3260 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Nettoyant salle de bain | `nettoyant-salle-de-bain.webp` | 2844 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Nettoyant sol | `nettoyant-sol.webp` | 2174 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Nettoyant vitres | `nettoyant-vitres.webp` | 3282 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Nettoyant WC | `nettoyant-wc.webp` | 2290 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Papier cadeau | `papier-cadeau.webp` | 24190 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Papier cuisson | `papier-cuisson.webp` | 3582 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Pile AAA | `pile-aaa.webp` | 36684 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Piles AA | `piles-aa.webp` | 26788 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Pinces à linge | `pinces-a-linge.webp` | 4826 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Produit inox | `produit-inox.webp` | 2550 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Sacs congélation | `sacs-congelation.webp` | 5174 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Sacs linge délicat | `sacs-linge-delicat.webp` | 3124 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Sacs poubelle 30L | `sacs-poubelle-30l.webp` | 3000 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Sacs poubelle 50L | `sacs-poubelle-50l.webp` | 3048 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Sacs zip | `sacs-zip.webp` | 3518 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Sel lave-vaisselle | `sel-lave-vaisselle.webp` | 3552 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Serviettes papier | `serviettes-papier.webp` | 3008 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Tablettes lave-vaisselle | `tablettes-lave-vaisselle.webp` | 4078 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Torchons | `torchons.webp` | 3726 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Maison | Vinaigre ménager | `vinaigre-menager.webp` | 2700 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Céréales | `cereales.webp` | 4622 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Chicorée | `chicoree.webp` | 4328 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Dosettes café | `dosettes-cafe.webp` | 2990 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Filtres à café | `filtres-a-cafe.webp` | 2848 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Granola | `granola.webp` | 55140 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Infusion camomille | `infusion-camomille.webp` | 4080 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Infusion menthe | `infusion-menthe.webp` | 3852 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Infusion verveine | `infusion-verveine.webp` | 3798 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Matcha | `matcha.webp` | 3370 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Sirot d’érable | `sirot-d-erable.webp` | 27644 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Thé Earl Grey | `the-earl-grey.webp` | 3892 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Thé fruits rouges | `the-fruits-rouges.webp` | 4004 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Thé noir | `the-noir.webp` | 4116 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Petit-déjeuner | Thé vert | `the-vert.webp` | 4142 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Viandes & poissons | Pâté | `pate.webp` | 5016 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Viandes & poissons | Peperroni | `peperroni.webp` | 50496 | Compression seule v537 | Ancien maintenu ; nouveau visuel non validé |
+| Viandes & poissons | Poisson pané | `poisson-pane.webp` | 3746 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Viandes & poissons | Poisson surgelé | `poisson-surgele.webp` | 3744 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+| Viandes & poissons | Saucisses | `saucisses.webp` | 3582 | Initial non modifié | Ancien maintenu ; nouveau visuel non validé |
+
+**Périmètre de ce complément documentaire :** aucun WebP, aucun code, aucun CSS, aucun test ni version applicative modifié. Priorité des prochains essais : Petit-déjeuner, Maison et Boissons, avec fond alpha réel, emballage/variante exacte, visuel unitaire et comparaison sur fonds blanc/sauge à 192 px ; publication seulement après validation technique et graphique complète. Les 111 anciens visuels ont été revus, sans revendiquer 111 nouveaux remplacements ni 111 conservations définitives.
