@@ -31,7 +31,7 @@ test('Notifications reste une sous-vue de Gestion de l application et conserve l
  assert.match(ui,/function showNotifications\(\)/);
  assert.match(ui,/notificationsButton\.addEventListener\('click',showNotifications\)/);
  assert.match(ui,/setTitle\('Notifications','management'\)/);
- assert.match(ui,/else showManagement\(\)/);
+ assert.match(ui,/dialog\.addEventListener\('close',showSelections\)/);
  assert.match(notify,/const id of \['missingNotificationsStatus','notificationsManagementSummary'\]/);
  assert.match(notify,/enable\.addEventListener\('click',\(\)=>\{void register\(\{ask:true\}\)\}\)/);
  assert.match(notify,/getElementById\('disableMissingNotifications'\)\?\.addEventListener\('click'/);
@@ -55,9 +55,9 @@ test('le clic Notifications affiche la sous-vue sans laisser le panneau Gestion 
  assert.equal(opened,true);
 });
 test('le design préserve les safe areas et évite de masquer les panneaux cachés',()=>{
- const settings=read('settings-ui.js');
+ const settings=read('settings-ui.js'),styles=read('styles.css');
  assert.match(settings,/#preferencesNotificationsPanel\[hidden\]\{display:none!important\}/);
  assert.match(settings,/#preferencesNotificationsPanel \.notifications-management-actions/);
- assert.match(settings,/safe-area-inset-top/);
- assert.match(settings,/safe-area-inset-bottom/);
+ assert.match(styles,/\.settings-sheet\{[\s\S]*?safe-area-inset-top/);
+ assert.match(styles,/\.settings-sheet\{[\s\S]*?safe-area-inset-bottom/);
 });
