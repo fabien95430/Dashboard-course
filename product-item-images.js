@@ -70,11 +70,10 @@ function warmProductImagesStep(){
     const done=()=>{
       warmActive=Math.max(0,warmActive-1);
       warmedSources.add(source);
-      promoteWarmedImages(source);
       scheduleProductWarmup();
       markWarmCycleComplete();
     };
-    image.addEventListener('load',()=>{if(!visualScaleCache.has(source))measureVisualScale(image,source)},{once:true});
+    image.addEventListener('load',()=>measureVisualScale(image,source),{once:true});
     image.addEventListener('load',done,{once:true});
     image.addEventListener('error',done,{once:true});
     image.src=source;
@@ -82,14 +81,10 @@ function warmProductImagesStep(){
   scheduleProductWarmup();
   markWarmCycleComplete();
 }
-function imageLoading(source,eager=false){
-  return eager||warmedSources.has(source)?'eager':'lazy';
-}
-function promoteWarmedImages(source){
-  if(!products||!source)return;
-  products.querySelectorAll('.premium-sprite>img[data-single-product-source="'+source+'"]').forEach(image=>{
-    if(image.loading!=='eager')image.loading='eager';
-  });
+// Les visuels produits restent dans le cache persistant du service worker : ils sont chargés
+// tout de suite et décodés avant affichage, pour qu'une catégorie apparaisse déjà prête.
+function imageLoading(){
+  return 'eager';
 }
 function queueProductWarmup(){
   warmCycleRequested=true;
@@ -113,7 +108,7 @@ function warmProductImages(){
 function loadVisualScaleCache(){
   try{
     const stored=JSON.parse(localStorage.getItem(VISUAL_SCALE_KEY)||'null');
-    if(!stored||stored.version!==currentAppVersion()||!stored.items||typeof stored.items!=='object')return;
+    if(!stored||!stored.items||typeof stored.items!=='object')return;
     Object.entries(stored.items).forEach(([source,values])=>{
       if(Array.isArray(values)&&values.length===3&&values.every(Number.isFinite)){
         visualScaleCache.set(source,{scale:values[0],shiftX:values[1],shiftY:values[2]});
@@ -244,13 +239,47 @@ function measureVisualScale(image,source){
     return metrics;
   }catch(_){return null}
 }
-function applyVisualScale(image,source){
-  if(!image||!source)return;
-  const metrics=visualScaleCache.get(source)||measureVisualScale(image,source);
-  if(!metrics)return;
+function setVisualScale(image,metrics){
   image.style.setProperty('--single-product-scale',String(metrics.scale));
   image.style.setProperty('--single-product-shift-x',metrics.shiftX+'%');
   image.style.setProperty('--single-product-shift-y',metrics.shiftY+'%');
+}
+// Mesurer un cadrage décode l'image : seules les cartes visibles sont mesurées tout de suite,
+// les autres le sont par petits lots quand le navigateur est libre (aucun effet visible).
+const pendingVisualMeasures=new Map();
+let visualMeasureScheduled=false;
+function measurePendingVisualScales(deadline){
+  visualMeasureScheduled=false;
+  let first=true;
+  for(const [image,source] of pendingVisualMeasures){
+    // Une image par passage au minimum, puis seulement tant qu'il reste du temps libre.
+    if(!first&&!(deadline?.timeRemaining?.()>12))break;
+    first=false;
+    pendingVisualMeasures.delete(image);
+    if(!image.isConnected||!image.complete||!image.naturalWidth)continue;
+    const metrics=visualScaleCache.get(source)||measureVisualScale(image,source);
+    if(metrics)setVisualScale(image,metrics);
+  }
+  scheduleVisualMeasures();
+}
+function scheduleVisualMeasures(){
+  if(visualMeasureScheduled||!pendingVisualMeasures.size)return;
+  visualMeasureScheduled=true;
+  if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(measurePendingVisualScales,{timeout:1500});
+  else setTimeout(measurePendingVisualScales,50);
+}
+function applyVisualScale(image,source){
+  if(!image||!source)return;
+  const cached=visualScaleCache.get(source);
+  if(cached){setVisualScale(image,cached);return}
+  const card=image.closest('#products .product');
+  if(card&&!productCardVisible(card)){
+    pendingVisualMeasures.set(image,source);
+    scheduleVisualMeasures();
+    return;
+  }
+  const metrics=measureVisualScale(image,source);
+  if(metrics)setVisualScale(image,metrics);
 }
 function onSingleProductImageLoaded(image,source){
   image.closest('.premium-sprite')?.classList.remove('is-fallback');
@@ -264,7 +293,7 @@ function decorateFallback(card,name,source,eager=false){
   const image=new Image();
   image.alt='';
   image.loading=imageLoading(source,eager);
-  image.decoding='async';
+  image.decoding='sync';
   image.dataset.singleProductSource=source;
   bindProductImageSettle(image);
   image.addEventListener('load',()=>{
@@ -293,6 +322,7 @@ function decorateCard(card,eager=false){
   card.classList.add('has-single-product-image');
   sprite.classList.add('is-single-product-image');
   image.loading=imageLoading(source,eager);
+  if(image.decoding!=='sync')image.decoding='sync';
   const loaded=()=>onSingleProductImageLoaded(image,source);
   if(image.dataset.singleProductSource!==source){image.dataset.singleProductSource=source;image.src=source;}
   if(image.complete&&image.naturalWidth>0)loaded();

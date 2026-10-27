@@ -38,6 +38,7 @@ test('la variante sûre garde content-visibility auto hors des cartes',()=>{
   const css=read('product-item-first-paint.css');
   assert.match(css,/#products\.is-catalog-mode-hidden\{[\s\S]*content-visibility:hidden!important/);
   assert.doesNotMatch(css,/\.product[^\{]*\{[^\}]*content-visibility\s*:\s*auto/i);
+  assert.doesNotMatch(read('styles.css'),/\.product[^\{]*\{[^\}]*content-visibility\s*:\s*auto/i,'aucune carte au rendu différé : pas de carte vide qui apparaît');
   assert.doesNotMatch(css,/\.catalog-view \.page-version\{[\s\S]*?transform:/);
 });
 

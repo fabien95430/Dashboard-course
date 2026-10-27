@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v587';
+const APP_VERSION='v588';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({
@@ -36,9 +36,16 @@ const slugify=value=>String(value||'')
   .replace(/[^a-z0-9]+/g,'-')
   .replace(/^-+|-+$/g,'');
 
+function dishFileName(name){
+  return (CHILD_DISHES.has(name)?'enfant-':'')+(SPECIAL_SLUGS[name]||slugify(name));
+}
+// Adresses stables : le service worker garde les visuels tant que son cache n'est pas vidé,
+// et les rafraîchit en arrière-plan quand un fichier change.
 function localDishImage(name){
-  const slug=SPECIAL_SLUGS[name]||slugify(name);
-  return './www/Plats/'+(CHILD_DISHES.has(name)?'enfant-':'')+slug+'.png?v='+encodeURIComponent(APP_VERSION);
+  return './www/Plats/'+dishFileName(name)+'.png';
+}
+function localDishCardImage(name){
+  return './www/Plats/cartes/'+dishFileName(name)+'.webp';
 }
 function scheduleWarmStep(){
   if(warmScheduled||warmRunning||!warmQueue.length)return;
@@ -74,7 +81,7 @@ function warmDishImages(){
   if(!names.length)return false;
   const queued=new Set(warmQueue);
   for(const name of names){
-    const source=localDishImage(name);
+    const source=localDishCardImage(name);
     if(warmedSources.has(source)||queued.has(source))continue;
     warmQueue.push(source);
     queued.add(source);
@@ -100,10 +107,10 @@ function bindImageFallback(image){
     if(current!==DISH_PLACEHOLDER)image.src=DISH_PLACEHOLDER;
   });
 }
-function localizeImage(image,name){
+function localizeImage(image,name,card=false){
   if(!name||!image)return;
   bindImageFallback(image);
-  const source=localDishImage(name);
+  const source=card&&image.dataset.dishCardFallback!=='1'?localDishCardImage(name):localDishImage(name);
   const current=image.getAttribute('src')||'';
   if(image.dataset.localImageFailed===name&&current===DISH_PLACEHOLDER){
     image.dataset.localDish=name;
@@ -117,7 +124,7 @@ function localizeImage(image,name){
 function localizeCard(card){
   const name=card?.dataset?.dish||'';
   const image=card?.querySelector?.('.dish-visual img');
-  localizeImage(image,name);
+  localizeImage(image,name,true);
 }
 function localizeCards(grid){
   grid?.querySelectorAll?.('.dish-card').forEach(localizeCard);

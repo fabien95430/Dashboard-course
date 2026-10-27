@@ -126,10 +126,6 @@
   height:100%;
 }
 .premium-sprite.is-fallback>img{display:none}
-/* v581 — images du Catalogue et des plats : fondu une fois décodées (voir revealProductImageWhenReady). */
-.products .premium-sprite>img,.dish-visual img{transition:opacity .18s ease}
-.products .premium-sprite>img.is-image-pending,.dish-visual img.is-image-pending{opacity:0!important}
-@media(prefers-reduced-motion:reduce){.products .premium-sprite>img,.dish-visual img{transition:none}}
 .premium-sprite.is-fallback>.sprite-fallback{
   display:grid;
   place-items:center;
@@ -621,8 +617,6 @@ svg{display:block}
   padding:7px 7px 9px;
   overflow:hidden;
 }
-/* v572 — cartes hors écran ignorées au layout : bascule Ma liste/Catalogue sans latence */
-.products>.product{content-visibility:auto;contain-intrinsic-size:auto 164px}
 .product:active{transform:scale(.98)}
 .product.is-selected{
   background:linear-gradient(155deg,#e4ede3,#e9f0e8);
