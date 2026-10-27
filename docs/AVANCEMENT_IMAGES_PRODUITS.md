@@ -897,3 +897,19 @@ Référence : `ab80641bb9faf975697917e2eb836e3113f01588` (version v598). Une **s
 **Bilan réel et exclusif :** **318/414 produits renouvelés**, **96 non renouvelés**, **au moins 17 non renouvelés contrôlés et conservés distincts** (deux conservations historiques, Nettoyant WC et Nettoyant vitres, deviennent des remplacements après amélioration démontrée) ; **au moins 335/414 décisions de remplacement/conservation** documentées. Les 111 entrées de l'inventaire v599 et les 109 entrées de l'inventaire v600 sont **historiques**, non les listes actives après v602. Le poids du lot est **35 974 → 199 602 octets**, soit **+163 628 octets**. Les nouvelles images sont publiées ; les autres essais visuels rejetés ne le sont pas.
 
 **Limites restantes :** les tests automatisés de la CI du dépôt sont réussis ; validation sur iPhone physique, liste Home Assistant réelle et simulation d'un réseau complètement déconnecté non effectuées. Aucun correctif CSS/JS métier ou changement de sécurité n'a été inclus dans le commit v602. Les prochaines séries concernent surtout Maison (produits d'entretien et lave-vaisselle), Petit-déjeuner (thés, céréales et chicorée), Hygiène & soins et les anciennes images en conserves et viandes ; ne pas remplir artificiellement un lot à 30. La génération de planches composites et les images avec fond damier opaque restent REJETÉES.
+
+
+### Lot v604 — 3 visuels produits unitaires, en validation de publication
+
+**Base :** `f344522c8904cee430d7123e971ac242e775fd33` (v603), 414 WebP = 10 277 920 octets, **318 produits renouvelés distincts**, **96 non renouvelés**. Ce lot comprend **3 nouveaux produits jamais renouvelés**, sans retoucher une image renouvelée : Chicorée (Petit-déjeuner), Liquide vaisselle et Lessive poudre (Maison). Voir `docs/IMAGE_CREDITS_V604.md` pour provenance, SHA, contrôles et candidats rejetés.
+
+| Catégorie | Produit | Avant (o) | Après (o) |
+|---|---|---:|---:|
+| Petit-déjeuner | Chicorée | 4328 | 30116 |
+| Maison | Liquide vaisselle | 2930 | 16514 |
+| Maison | Lessive poudre | 3028 | 22458 |
+| **TOTAL** | **3 WebP** | **10286** | **69088** |
+
+**Bilan prévu après publication complète :** **321/414 renouvelés distincts**, **93 non renouvelés**, **au moins 17 évalués et conservés parmi ces 93** ; **414 WebP** totalisant **10 336 722 octets** (+58802 octets sur les 3 fichiers). Contrôles : WebP unitaires RGBA 384 px, fond alpha transparent, décodage et bords, 192 px sur blanc et sauge ; conformité de l’emballage. Les essais de génération de collages ont été rejetés ; seuls ces trois rendus unitaires atteignent la qualité requise dans cette passe. Le lot est inférieur à 30 parce qu’ajouter des remplaçants incohérents dégraderait le catalogue. Pas de version pour de simples crédits ; incrément v604 uniquement pour cette modification réelle des visuels et du cache.
+
+**Statut : PRÉPARÉ avant confirmation CI et publication.** Aucun changement de disposition, couleurs des tuiles, CSS, barre iOS, images déjà renouvelées, priorité de `Courses` Home Assistant, OAuth, WebSocket, coffre, biométrie, verrouillage, mode test ou chargement hors ligne. Tests complets via `bash scripts/validate_repo.sh` en CI PR et sur `main`. La validation sur iPhone physique et le test réseau déconnecté restent non effectués.
