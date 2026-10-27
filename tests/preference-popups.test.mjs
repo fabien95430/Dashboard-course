@@ -319,3 +319,21 @@ test('Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent
   assert.match(errors,/data-error-action/);
 });
 
+
+test('v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, recettes choisies dans une liste',()=>{
+  const css=read('styles.css'),html=read('index.html'),dishes=read('dishes-ui.js');
+  assert.match(css,/--sheet-muted:#55685b;/);
+  assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*font-size:14px!important;[^}]*line-height:20px!important/);
+  assert.match(css,/\.settings-sheet \.settings-sheet-icon\{position:absolute;left:0;top:0;width:44px;height:44px;/);
+  assert.doesNotMatch(css,/translateY\(11px\)/);
+  assert.match(css,/\.settings-sheet \.field>span,[^{]*\{[^}]*font-size:13\.5px!important;[^}]*text-transform:none!important/);
+  assert.match(css,/\.settings-sheet \.security-setting-copy strong,[^{]*\{[^}]*font-size:15px!important;font-weight:400!important/);
+  for(const id of ['connectionDialog','preferencesDialog','settingsDialog'])assert.match(html,new RegExp('<dialog id="'+id+'"[^>]*tabindex="-1" autofocus>'));
+  assert.match(dishes,/recipeCustomizationDialog\.autofocus=true;/);
+  const open=dishes.slice(dishes.indexOf('function openRecipeCustomization()'),dishes.indexOf('function saveRecipeCustomization()'));
+  assert.match(open,/loadRecipeCustomizationDish\(''\);/);
+  assert.doesNotMatch(open,/DISHES\[0\]/);
+  assert.match(dishes,/function setRecipeCustomizationStep\(dish\)\{[\s\S]*?dataset\.step=dish\?'edit':'choose'/);
+  assert.match(dishes,/recipeCustomizationPicker\.addEventListener\('click',[\s\S]*?selectRecipeCustomizationDish\(/);
+  assert.match(dishes,/\[data-step="choose"\] :is\(\.recipe-customization-list,\.recipe-customization-status,\.recipe-customization-add,\.dialog-actions\)\{display:none!important\}/);
+});

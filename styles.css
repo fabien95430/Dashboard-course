@@ -3913,7 +3913,7 @@ body{
 /* La feuille est ancrée en bas, mesure 78 % du viewport utile et respecte les safe areas. */
 .settings-sheet{
   --sheet-font:"Baskerville","Iowan Old Style",Georgia,serif;
-  --sheet-muted:#77847b;
+  --sheet-muted:#55685b;
   --sheet-inner-max:400px;
   position:fixed!important;inset:auto 0 0!important;left:0!important;right:0!important;margin:0!important;
   width:100vw!important;width:100dvw!important;max-width:none!important;max-inline-size:none!important;min-width:0!important;
@@ -3969,13 +3969,14 @@ body{
 .settings-sheet::backdrop{background:rgba(30,43,37,.35)!important;-webkit-backdrop-filter:blur(13px)!important;backdrop-filter:blur(13px)!important}
 .settings-sheet[open]{animation:settingsSheetIn .22s cubic-bezier(.2,.9,.3,1) both}
 @keyframes settingsSheetIn{from{opacity:.65;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{display:flex!important;align-items:center!important;gap:14px!important;min-height:44px!important;margin:0 auto 5px!important;padding:0!important;color:#263f30!important;font-size:20px!important;font-weight:600!important;line-height:1.16!important;letter-spacing:-.3px!important}
+/* En-tête : icône 44 px calée sur titre (24 px) + sous-titre (20 px), titre et sous-titre sur le même axe. */
+.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{position:relative!important;display:block!important;box-sizing:border-box!important;min-height:0!important;margin:0 auto!important;padding:0 0 0 58px!important;color:#263f30!important;font-size:20px!important;font-weight:600!important;line-height:24px!important;letter-spacing:-.3px!important;white-space:nowrap!important}
 /* En-tête commun : titre et sous-titre sur une ligne ; l'icône est centrée sur ce bloc de deux lignes (décalage fixe, lignes à hauteur constante). */
-.settings-sheet .settings-sheet-icon{transform:translateY(11px);width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.settings-sheet .settings-sheet-icon{position:absolute;left:0;top:0;width:44px;height:44px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
 .settings-sheet .settings-sheet-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
 .settings-sheet .settings-sheet-title{min-width:0;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:-9px auto 30px!important;padding-left:58px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:450!important;line-height:1.4!important;width:100%!important;max-width:var(--sheet-inner-max)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.settings-sheet .field>span,.settings-sheet .missing-category-heading strong,.settings-sheet .sheet-section-title{color:#65776b!important;font-size:11px!important;font-weight:770!important;letter-spacing:.06em!important}
+.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 auto 22px!important;padding-left:58px!important;color:var(--sheet-muted)!important;font-size:14px!important;font-weight:400!important;line-height:20px!important;width:100%!important;max-width:var(--sheet-inner-max)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settings-sheet .field>span,.settings-sheet .missing-category-heading strong,.settings-sheet .sheet-section-title{color:#4c6152!important;font-size:13.5px!important;font-weight:600!important;letter-spacing:0!important;text-transform:none!important}
 .settings-sheet .field input,.settings-sheet .field select,.settings-sheet .missing-products-add input,.settings-sheet .missing-category-select,.settings-sheet .recipe-customization-search,.settings-sheet .recipe-customization-ingredient-search,.settings-sheet .courses-product-admin-search{min-height:46px;border:1px solid rgba(59,83,65,.12)!important;border-radius:14px!important;background:rgba(255,255,255,.56)!important;color:#25392b!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.63)!important}
 .settings-sheet select{color:#263b2e!important}
 .settings-sheet .primary,.settings-sheet .dialog-actions .primary{min-height:47px!important;border:0!important;border-radius:15px!important;background:linear-gradient(150deg,#315d46,#284b39)!important;color:#fff!important;font-weight:750!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.17)!important}
@@ -3984,8 +3985,8 @@ body{
 .settings-sheet .security-setting-info,.settings-sheet .security-action-row,.settings-sheet .preference-toggle{min-height:67px!important;gap:10px}
 .settings-sheet .security-action-row{background:var(--tile-bg)!important;border:1px solid var(--tile-line)!important;border-radius:17px!important;box-shadow:var(--tile-shadow)!important;margin-top:10px!important}
 .settings-sheet .security-setting-icon{width:38px!important;height:38px!important;border-radius:12px!important;background:rgba(217,232,215,.84)!important;color:#2b6246!important}
-.settings-sheet .security-setting-copy strong,.settings-sheet .preference-toggle-copy strong{color:#1b2d21!important;font-size:13px!important;font-weight:750!important}
-.settings-sheet .security-setting-copy small,.settings-sheet .preference-toggle-copy small{color:#7c8780!important;font-size:11px!important;line-height:1.32!important}
+.settings-sheet .security-setting-copy strong,.settings-sheet .preference-toggle-copy strong{color:#1b2d21!important;font-size:15px!important;font-weight:400!important;line-height:1.25!important}
+.settings-sheet .security-setting-copy small,.settings-sheet .preference-toggle-copy small{color:#5f7064!important;font-size:12.5px!important;line-height:1.32!important}
 .settings-sheet .security-lock-select{border:1px solid rgba(59,83,65,.12)!important;border-radius:12px!important;background:rgba(255,255,255,.61)!important}
 .settings-sheet .preference-switch input:checked+span{background:#32704d!important}
 .settings-sheet .chevron{width:17px!important;height:17px!important;color:#8e9990!important;stroke-width:1.7!important}
@@ -4018,7 +4019,6 @@ body{
 .settings-sheet .recipe-customization-add-button{border-color:rgba(51,108,63,.19)!important;background:rgba(237,247,234,.57)!important;color:#296043!important}
 .settings-sheet .missing-product-row{background:rgba(255,255,255,.50)!important;border-color:rgba(40,70,49,.085)!important;box-shadow:none!important}
 .settings-sheet#missingProductsDialog .missing-products-header{padding-right:0!important;flex:0 0 auto}
-.settings-sheet#missingProductsDialog .missing-products-header h3{font-size:19px!important;line-height:1.16!important;font-weight:810!important;letter-spacing:-.45px!important}
 .settings-sheet#missingProductsDialog .missing-products-add input,.settings-sheet#missingProductsDialog .missing-products-add button{height:46px!important;min-height:46px!important;font-size:14px!important}
 .settings-sheet#preferencesDialog[open],.settings-sheet#missingProductsDialog[open],.settings-sheet.recipe-customization-dialog[open]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
 .settings-sheet#preferencesDialog .preference-dialog-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
@@ -4125,7 +4125,7 @@ body{
   #preferencesDialog .courses-error-tabs > button{transition:none!important}
 }
 
-@media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{gap:11px!important;font-size:17px!important}.settings-sheet .settings-sheet-icon{width:44px;height:44px;flex-basis:44px}.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{padding-left:55px!important}}
+@media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}}
 @media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;max-width:480px!important;max-inline-size:480px!important;margin:0 auto!important;bottom:18px!important;border-radius:32px!important;border-inline:1px solid rgba(255,255,255,.48)!important;height:min(78svh,720px)!important}}
 @media(prefers-reduced-motion:reduce){.settings-sheet[open]{animation:none!important}.settings-view .settings-row{transition:none!important}}
 
