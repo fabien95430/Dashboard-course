@@ -579,3 +579,19 @@ Les lots v539, v545 et v547 utilisent des WebP transparents ; v539 contient 30 f
 **Périmètre strict** : 8 WebP de `www/Items/`, versionnage cohérent v582 dans `index.html`, `catalog.js`, `dish-local-images.js` et `sw.js`, crédits et suivi uniquement. Ni les dimensions/emplacements de tuiles, ni le fond/les citrons, ni les animations, ni le cache visuel persistant et sa stratégie de chargement, ni Home Assistant, liste `Courses`, WebSocket, OAuth, coffre chiffré, verrouillage, biométrie, mode test ou safe areas ne sont modifiés.
 
 **Bilan publié après v582 : 289/414 renouvelés (69,8 %), 125 non renouvelés, au moins 18 évalués et conservés distincts, soit au moins 307 décisions documentées.** Les 414 images WebP sont toutes présentes, poids total 9 741 656 octets, aucun fichier au-dessus de 100 Kio. Priorités de poursuite : Maison, Hygiène & soins, Petit-déjeuner, Boissons, puis Viandes & poissons et Cuisine lorsque l'amélioration est certaine.
+
+
+### Lot v587 — trois nouveaux candidats en contrôle (PR ; à vérifier)
+
+**État de préparation :** branche basée sur `922bbcbe8be3c56354d92bcc576582869dcba0fa`, v586 fonctionnelle au départ. Les trois remplacements validés sur des produits jusqu'ici non renouvelés : Café soluble (Petit-déjeuner), Vinaigre de vin (Cuisine), Saucisson (Viandes & poissons). Fichiers 384 ou 256 px, alpha réel, poids sous 100 000 octets, aucun changement des tuiles, du catalogue métier, d'Home Assistant, du WebSocket, de l'OAuth, du coffre, du verrouillage, de la biométrie ou des safe areas.
+
+| Produit | Avant (octets) | Après (octets) |
+| --- | ---: | ---: |
+| Café soluble | 3706 | 35746 |
+| Vinaigre de vin | 2780 | 8936 |
+| Saucisson | 5450 | 18496 |
+| **Total** | **11936** | **63178** |
+
+**Origine, licences, SHA blobs, rejets :** `docs/IMAGE_CREDITS_V587.md`. Variantes exactes : café instantané en granulés dans bocal fermé ; vinaigre rouge en flacon rigide ; saucisson sec et tranches. **Remarque :** l'icône CC0 de Saucisson est identique à la source déjà utilisée pour Rosette ; ne pas la présenter comme une création différente. Le Romarin frais actuel, 100 866 octets, reste en attente de recompression sans perte visuelle ; l'alternative CC0 moins détaillée a été rejetée. Trois anciens fichiers de 84 px sont remplacés par des sources nettes 256/384 px.
+
+**Comptage prévisionnel si la PR est fusionnée, et uniquement alors :** 292/414 produits renouvelés, 122 non renouvelés, au moins 18 évalués et conservés distincts ; 414 fichiers WebP au poids total prévu de 9 792 898 octets. **Ne pas traiter ces nombres comme publiés avant CI/Pages et SHA `main` réellement vérifiés.**
