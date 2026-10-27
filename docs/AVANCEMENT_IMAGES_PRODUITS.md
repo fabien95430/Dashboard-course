@@ -664,3 +664,31 @@ Base : `fc2be1d6882c59b861c96341d2d6f356a5eda1a5` (version précédente v593). R
 **Comparaison avant/après préparée :** 74 408 → 255 712 octets (**+181 304 octets**), huit fichiers sous 44 Ko. **Publié et vérifié : 305/414 renouvelés, 109 non renouvelés, au moins 18 conservés distincts, soit au moins 323 décisions publiées**. PR #99 fusionnée sur `main` au commit `5f05417543326287620f4cd8cd291403b03afbec` ; validation préalable PR, CI sur main et GitHub Pages réussies ; huit blobs WebP comparés à leurs empreintes attendues dans le véritable inventaire GitHub. Aucun changement de CSS, tuiles, rendu de listes, chargement images, safe areas iOS, Home Assistant, WebSocket, OAuth, coffre, biométrie, mode test. Les tentatives de visuels composites et les sources représentant un produit différent sont rejetées.
 
 **Vérification finale v594 :** [PR #99](https://github.com/fabien95430/Dashboard-course/pull/99) fusionnée, commit publié [5f054175](https://github.com/fabien95430/Dashboard-course/commit/5f05417543326287620f4cd8cd291403b03afbec), [CI de PR verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40482814985), [CI main verte](https://github.com/fabien95430/Dashboard-course/actions/runs/40482933402) et [Pages vertes](https://github.com/fabien95430/Dashboard-course/actions/runs/40482932685). SHA des huit blobs Git revérifiés unitairement, 414 WebP totalisant **10 034 706 octets**, aucun au-dessus de 102 400 octets. Poids avant/après de ce lot : **74 408 → 255 712 octets**, +181 304 octets. Rejets : sources vives non pertinentes (sachet gris sans chips, objets mélangés, mauvais conditionnement). **Reste : 109 non renouvelés, au moins 18 évalués/conservés distincts**. Test matériel iPhone/HA et test hors ligne réel non réalisés.
+
+
+### Contrôle des 91 WebP non modifiés — 27 octobre 2026 (aucun nouveau visuel)
+
+**Base réelle de l'inspection :** main `36bbcdcca93c01793865fec2ee9a59d3b1a2e074`, version applicative **v595** (refonte Réglages publiée indépendamment des images) ; sa [CI](https://github.com/fabien95430/Dashboard-course/actions/runs/40486258629) et ses [Pages](https://github.com/fabien95430/Dashboard-course/actions/runs/40486257620) sont réussies. Le dernier **lot images** reste v594. Aucun WebP n'a été modifié par cette passe.
+
+**Mesure sans inflation des remplacements :** les deux comparaisons GitHub `ff3de3a9ea8eab776f20c8d3ef95507e0ff83700` (parent du pilote v528) → `a6e9fa8b70c43c3c382fdbf0a41103da7ffdcc69` (v557), puis ce dernier → `36bbcdcca93c01793865fec2ee9a59d3b1a2e074` détectent **91 WebP du catalogue qui n'ont jamais été modifiés** pendant cette période. Ce ne sont PAS tous les non-renouvelés : d'autres anciens WebP ont été compressés techniquement en v537 sans être considérés comme nouvellement illustrés. Le bilan métier issu des lots reste **305 renouvelés / 109 non renouvelés**. Les comparaisons sont scindées pour éviter la limite GitHub de 300 fichiers par diff.
+
+| Catégorie | WebP encore identiques à leur état antérieur à v528 |
+| --- | ---: |
+| Maison | 39 |
+| Boissons | 16 |
+| Petit-déjeuner | 13 |
+| Cuisine | 10 |
+| Hygiène & soins | 6 |
+| Viandes & poissons | 4 |
+| Enfant | 3 |
+| Apéritif & snacks, Boulangerie, Frais, Fruits & Légumes | 0 |
+| **Total** | **91** |
+
+Les rubriques à zéro peuvent encore contenir des produits **non renouvelés** compressés en v537 (exemples : Kinder Maxi, Speculos, Pâte feuilletée). Le tableau indique une absence de changement Git, **pas** la validation graphique d'un produit et ne doit pas être soustrait à nouveau des 109.
+
+**Contrôles individuels et candidats rejetés :** source CC0 SwisserDev `cooking_ingredients/vinegar_bottle.webp` = vinaigre alimentaire ambré, pas le vinaigre ménager ; source CC BY Soft Studio `images/sausage.webp` = saucisses cuites, non des saucisses crues ; source CC0 SwisserDev `food/raw_fish.webp` = poisson entier, non filets blancs crus de Poisson surgelé ; source CC0 SwisserDev `drink/juice_carton.webp` = jus d'orange en brique, non Jus multifruits. L'alternative de céréales `grape-nut-cereal.webp` est une variété spécifique en tas et non le bocal actuel ; `herbal_infusion.webp` est une théière pleine plutôt qu'un sachet ou des feuilles ; `en_chicory.webp` est une salade plutôt que la boisson Chicorée. Une génération visuelle a retourné une planche de produits du lot précédent au lieu des références demandées : **rejetée** et jamais utilisée. Aucun de ces visuels n'a été intégré.
+
+**Conservation supplémentaire constatée : Piles AA (Maison).** L'ancien WebP à 26 788 octets présente quatre piles AA détaillées, un conditionnement pluriel cohérent avec l'article, des contours et une netteté satisfaisants. La marque figurant sur la photographie est une marque réelle, pas inventée ; ce n'est pas une commande de substitution ni un nouveau WebP. Le précédent inventaire citait Piles AA parmi les images inspectées mais ne l'ajoutait pas aux **18 conservées distinctes** : elle porte le **minimum documentaire à 19**. Elle reste comptée parmi les 109 non renouvelées, sans modifier leur total. `Pile AAA` demeure à réévaluer quant au halo de détourage.
+
+**Résultat réel de cet audit :** **0 image publiée**, **0 fichier applicatif modifié**, aucun changement de version/cache demandé. **305/414 renouvelés, 109 non renouvelés, au moins 19 évalués et conservés distincts, au moins 324 produits avec décision de remplacement/conservation.** Les candidats invalides sont explicitement rejetés pour respecter cru/cuit, variété, conditionnement, fond transparent et fidélité à 192 px. Le vrai rendu sur iPhone et Home Assistant reste non testé. Les priorités sont les anciens petits visuels de Maison, Boissons, Petit-déjeuner, Hygiène & soins et Viandes & poissons ; aucune API OpenAI payante du projet utilisée.
+
