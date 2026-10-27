@@ -1,6 +1,6 @@
 # Crédits et conformité — 8 images v594
 
-**Base examinée :** `main` `fc2be1d6882c59b861c96341d2d6f356a5eda1a5` (application v593). Le commit du lot est initialement proposé en PR et n'est publiable sur main qu'après CI complète réussie. Le journal de publication définitif est consigné dans `docs/AVANCEMENT_IMAGES_PRODUITS.md` après la fusion et la vérification GitHub Pages.
+**Base examinée :** `main` `fc2be1d6882c59b861c96341d2d6f356a5eda1a5` (application v593). **Publié :** [commit 5f054175](https://github.com/fabien95430/Dashboard-course/commit/5f05417543326287620f4cd8cd291403b03afbec), [PR #99](https://github.com/fabien95430/Dashboard-course/pull/99), [CI PR](https://github.com/fabien95430/Dashboard-course/actions/runs/40482814985), [CI main](https://github.com/fabien95430/Dashboard-course/actions/runs/40482933402) et [GitHub Pages](https://github.com/fabien95430/Dashboard-course/actions/runs/40482932685), tous réussis. Empreintes Git des huit fichiers vérifiées sur le main réel.
 
 **Source des huit images :** créations visuelles originales produites avec l'outil de génération d'images ChatGPT pour Application Course le 27 octobre 2026, et non des images externes. Aucune licence tierce n'est revendiquée, ni aucune marque commerciale inventée ; aucun appel à l'API OpenAI payante du dépôt. PNG sources conservés dans les fichiers locaux de préparation, non déployés sur GitHub.
 
