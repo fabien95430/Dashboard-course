@@ -1,4 +1,4 @@
-# Crédits visuels produits — lot v596 (préparé sur branche, non encore fusionné)
+# Crédits visuels produits — lot v596 (publié et vérifié sur main)
  
 **Base examinée :** `main` `bf567cf0bdde6ee9abd0ea617de75bdc102249e7`, version v595. Deux sources CC0 externes déjà disponibles en WebP natif 256 × 256 px, recopiées octet pour octet sans traitement, sans agrandissement et sans appel à l'API OpenAI payante du projet.
  
@@ -14,4 +14,4 @@ Les deux sources contiennent RIFF WEBP, chunk VP8X avec indicateur alpha, bloc A
  
 **Candidats rejetés pendant les comparaisons :** `ginger_ale.webp` n'est pas `Ginger beer`; `lemonade.webp` représente une cruche plutôt qu'une limonade emballée ; `food/raw_fish.webp` un poisson entier plutôt que des filets de poisson surgelé ; `images/sausage.webp` contient des marques de cuisson incompatibles avec Saucisses crues ; `en_coconut-milk.webp` et `images/coconut-milk.webp` introduisent accessoires et un contenant différent du lait de coco en boîte ; `sponge_block.webp` est une éponge jaune et pas Éponges magiques blanches ; `en_breadcrumbs.webp` est de la chapelure et non des croûtons. Les autres 107 références non renouvelées restent en attente ou conservées. Aucune comparaison iPhone physique/HA n'est revendiquée.
  
-**Publication :** en attente de CI sur PR, fusion et Pages. Ne pas présenter ce fichier comme une publication tant que le SHA du nouveau main et les Actions ne sont pas vérifiés.
+**Publication effective :** [commit ee9d72d5](https://github.com/fabien95430/Dashboard-course/commit/ee9d72d5a16c8af1c5fbe7b1a557e16550bcb766) sur `main`, [PR #100 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/100), [CI PR réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40490060755), [CI main réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40490167213) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40490167242). Les deux SHA binaires sont revérifiés sur `main`. Aucun test matériel iPhone, Home Assistant ou hors ligne réel n'est revendiqué.
