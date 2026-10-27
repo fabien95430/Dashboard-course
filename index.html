@@ -28,7 +28,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-citrons-v552.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=588">
+  <link rel="stylesheet" href="./styles.css?v=589">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=580">
 </head>
 <body class="is-launching">
@@ -62,7 +62,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v590</span>
+            <span class="page-version">v591</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -85,7 +85,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v590</span>
+            <span class="page-version">v591</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -121,7 +121,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v590</span>
+            <span class="page-version">v591</span>
           </div>
           <p>Personnalisez votre expérience</p>
         </div>
@@ -165,14 +165,14 @@
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
             <button id="settingsRecipeCustomizationBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-list"></use></svg></span>
+              <span class="settings-icon"><svg><use href="#i-grid"></use></svg></span>
               <span class="settings-copy"><strong>Personnalisation des recettes</strong><small>Affiner les ingrédients sélectionnés par défaut</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
             <button id="settingsMissingProductsBtn" class="settings-row missing-products-settings-row" type="button">
-              <span class="settings-icon settings-icon-missing" style="position:relative;overflow:visible">
+              <span class="settings-icon settings-icon-missing">
                 <svg><use href="#i-cart"></use></svg>
-                <span id="settingsMissingProductsCount" class="settings-count" hidden style="position:absolute;top:-6px;right:-7px;min-width:20px;height:20px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#ff3b30;color:#fff;font-size:10px;line-height:16px;font-weight:800;display:grid;place-items:center;box-shadow:0 2px 7px rgba(207,33,26,.22);z-index:2;pointer-events:none">0</span>
+                <span id="settingsMissingProductsCount" class="settings-count" hidden>0</span>
               </span>
               <span class="settings-copy"><strong>Produits manquants</strong><small>Noter les produits absents du catalogue</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
@@ -261,8 +261,8 @@
     </div>
   </section>
 
-  <dialog id="connectionDialog" class="dialog connection-dialog" tabindex="-1">
-    <h3>Connexion Home Assistant</h3>
+  <dialog id="connectionDialog" class="dialog connection-dialog settings-sheet" tabindex="-1">
+    <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-home"></use></svg></span><span class="settings-sheet-title">Connexion Home Assistant</span></h3>
     <label class="field">
       <span>Liste Home Assistant</span>
       <select id="connectionEntitySelect">
@@ -291,8 +291,8 @@
   </dialog>
 
 
-  <dialog id="preferencesDialog" class="dialog preferences-dialog" tabindex="-1">
-    <h3>Préférences</h3>
+  <dialog id="preferencesDialog" class="dialog preferences-dialog settings-sheet" tabindex="-1">
+    <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-gear"></use></svg></span><span class="settings-sheet-title">Préférences</span></h3>
     <p class="dialog-intro">Personnalisez l’affichage et le comportement de l’application.</p>
 
     <label class="field">
@@ -350,10 +350,10 @@
     </div>
   </dialog>
 
-  <dialog id="missingProductsDialog" class="dialog" tabindex="-1">
+  <dialog id="missingProductsDialog" class="dialog settings-sheet" tabindex="-1">
     <div class="missing-products-header">
       <div>
-        <h3>Produits manquants</h3>
+        <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-cart"></use></svg></span><span class="settings-sheet-title">Produits manquants</span></h3>
         <p class="dialog-intro">Ajoutez les produits ou plats absents du catalogue.</p>
       </div>
     </div>
@@ -391,8 +391,8 @@
     <div id="missingProductsList" class="missing-products-list"></div>
   </dialog>
 
-  <dialog id="settingsDialog" class="dialog security-settings-dialog" tabindex="-1">
-    <h3>Mot de passe et verrouillage</h3>
+  <dialog id="settingsDialog" class="dialog security-settings-dialog settings-sheet" tabindex="-1">
+    <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-lock"></use></svg></span><span class="settings-sheet-title">Mot de passe et verrouillage</span></h3>
     <p class="dialog-intro">Protection locale de l’accès à vos courses sur cet appareil.</p>
     <p id="settingsDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
 
@@ -441,7 +441,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=590"></script>
+  <script src="./catalog.js?v=591"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=467"></script>
   <script src="./courses-notifications.js?v=481"></script>
@@ -449,7 +449,7 @@
   <script src="./app-ui.js?v=442" data-app-ui="script"></script>
   <script src="./app.js?v=589"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
-  <script src="./settings-ui.js?v=482"></script>
+  <script src="./settings-ui.js?v=483"></script>
   <script src="./error-center.js?v=411"></script>
 </body>
 </html>

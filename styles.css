@@ -3885,3 +3885,92 @@ body{
 
 /* Le numéro de version n'est affiché que dans Réglages. Les marqueurs des autres vues restent pour les intégrations automatiques. */
 .list-view .page-version,.catalog-view .page-version{display:none!important}
+
+/* Réglages v589 : thème ivoire / vert forêt. Coque unique pour toutes les sous-vues. */
+.settings-view .settings-scroll{padding-bottom:calc(96px + env(safe-area-inset-bottom))!important}
+.settings-view .settings-section{margin-bottom:21px!important}
+.settings-view .settings-section h2{margin:0 0 9px 8px!important;color:#64766b!important;gap:8px!important;font-size:11px!important;font-weight:780!important;letter-spacing:.12em!important;text-transform:uppercase}
+.settings-view .section-icon{width:26px!important;height:26px!important;border:0!important;border-radius:9px!important;background:rgba(50,108,69,.08)!important;color:#315e45!important;box-shadow:none!important}
+.settings-view .section-icon svg{width:15px!important;height:15px!important;stroke-width:1.75!important}
+.settings-view .settings-card{display:grid!important;gap:0!important;overflow:hidden!important;border:1px solid rgba(34,71,48,.07)!important;border-radius:21px!important;background:linear-gradient(155deg,rgba(255,255,255,.78),rgba(246,248,244,.64))!important;box-shadow:0 9px 24px rgba(35,60,43,.048)!important}
+.settings-view .settings-row,.settings-view .settings-row:last-child{min-height:70px!important;grid-template-columns:43px minmax(0,1fr) auto!important;gap:12px!important;padding:10px 12px!important;border:0!important;border-bottom:1px solid rgba(47,79,58,.085)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transition:background .15s ease,transform .12s ease!important}
+.settings-view .settings-row:last-child{border-bottom:0!important}
+.settings-view .settings-row:active{background:rgba(51,106,66,.07)!important;transform:scale(.993)!important}
+.settings-view .settings-icon{width:42px!important;height:42px!important;border:0!important;border-radius:14px!important;background:linear-gradient(150deg,rgba(215,232,212,.94),rgba(229,236,224,.82))!important;color:#2a5b43!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)!important}
+.settings-view .settings-icon svg{width:21px!important;height:21px!important;stroke-width:1.8!important}
+.settings-view .settings-copy{gap:3px!important}
+.settings-view .settings-copy strong{color:#1b2c22!important;font-size:14px!important;line-height:1.24!important;font-weight:760!important;letter-spacing:-.16px!important}
+.settings-view .settings-copy small{color:#7a857f!important;font-size:11.5px!important;line-height:1.3!important}
+.settings-view .settings-row .chevron{width:17px!important;height:17px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#939e97!important;stroke-width:1.7!important}
+.settings-view .settings-icon-missing{position:relative!important;overflow:visible!important}
+.settings-view .settings-count{position:absolute;top:-6px;right:-7px;z-index:2;min-width:20px!important;height:20px!important;padding:0 5px!important;border:2px solid #fff!important;border-radius:999px;background:#d85d54!important;color:#fff!important;display:grid;place-items:center;font-size:10px!important;font-weight:800!important;line-height:16px!important;box-shadow:0 2px 7px rgba(171,56,50,.16)!important;pointer-events:none}
+.settings-view .settings-count[hidden]{display:none!important}
+.settings-view .settings-logout{height:52px!important;margin:14px 0 7px!important;border:1px solid rgba(80,107,88,.11)!important;border-radius:17px!important;background:rgba(255,255,255,.42)!important;color:#69786d!important;box-shadow:none!important;font-weight:670!important}
+/* La feuille est ancrée en bas, mesure 78 % du viewport utile et respecte les safe areas. */
+.settings-sheet{
+  --sheet-muted:#77847b;
+  position:fixed!important;inset:auto 0 0!important;margin:0 auto!important;
+  width:min(100%,480px)!important;
+  height:min(78svh,calc(100svh - max(24px,env(safe-area-inset-top)) - env(safe-area-inset-bottom)))!important;
+  max-height:calc(100svh - max(24px,env(safe-area-inset-top)))!important;
+  box-sizing:border-box!important;
+  padding:50px 21px max(24px,env(safe-area-inset-bottom))!important;
+  border:1px solid rgba(255,255,255,.48)!important;border-bottom:0!important;
+  border-radius:32px 32px 0 0!important;
+  background:radial-gradient(ellipse at 6% 16%,rgba(216,232,210,.44),transparent 43%),radial-gradient(ellipse at 90% 88%,rgba(238,215,190,.39),transparent 48%),linear-gradient(155deg,rgba(252,251,247,.99),rgba(244,241,234,.99))!important;
+  color:#19291f!important;box-shadow:0 -14px 55px rgba(25,42,31,.16),inset 0 1px 0 rgba(255,255,255,.8)!important;
+  overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  -webkit-backdrop-filter:blur(28px) saturate(125%);backdrop-filter:blur(28px) saturate(125%);
+}
+.settings-sheet::-webkit-scrollbar,.settings-sheet *::-webkit-scrollbar{display:none}
+.settings-sheet::before{content:"";position:absolute;top:14px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:4px;background:rgba(126,135,129,.51);pointer-events:none;z-index:2}
+.settings-sheet::backdrop{background:rgba(30,43,37,.35)!important;-webkit-backdrop-filter:blur(13px)!important;backdrop-filter:blur(13px)!important}
+.settings-sheet[open]{animation:settingsSheetIn .22s cubic-bezier(.2,.9,.3,1) both}
+@keyframes settingsSheetIn{from{opacity:.65;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{display:flex!important;align-items:center!important;gap:14px!important;min-height:52px!important;margin:0 0 3px!important;padding:0!important;color:#17271f!important;font-size:19px!important;font-weight:810!important;line-height:1.16!important;letter-spacing:-.45px!important}
+.settings-sheet .settings-sheet-icon{width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.settings-sheet .settings-sheet-icon svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.settings-sheet .settings-sheet-title{min-width:0;display:block}
+.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 0 24px 66px!important;color:var(--sheet-muted)!important;font-size:12.5px!important;font-weight:450!important;line-height:1.4!important;max-width:none!important}
+.settings-sheet .field>span,.settings-sheet .missing-category-heading strong,.settings-sheet .connection-sync-section h4{color:#65776b!important;font-size:11px!important;font-weight:770!important;letter-spacing:.06em!important}
+.settings-sheet .field input,.settings-sheet .field select,.settings-sheet .missing-products-add input,.settings-sheet .missing-category-select,.settings-sheet .recipe-customization-search,.settings-sheet .recipe-customization-ingredient-search,.settings-sheet .courses-product-admin-search{min-height:46px;border:1px solid rgba(59,83,65,.12)!important;border-radius:14px!important;background:rgba(255,255,255,.56)!important;color:#25392b!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.63)!important}
+.settings-sheet select{color:#263b2e!important}
+.settings-sheet .primary,.settings-sheet .dialog-actions .primary{min-height:46px!important;border:0!important;border-radius:15px!important;background:linear-gradient(150deg,#32664a,#214b36)!important;color:#fff!important;font-weight:760!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.17)!important}
+.settings-sheet .secondary,.settings-sheet .dialog-actions .secondary{min-height:44px!important;border:1px solid rgba(71,98,77,.14)!important;border-radius:15px!important;background:rgba(255,255,255,.46)!important;color:#385540!important;box-shadow:none!important}
+.settings-sheet .security-settings-summary,.settings-sheet .preference-options,.settings-sheet .connection-sync-section,.settings-sheet .missing-category-panel,.settings-sheet .change-password-panel{border:1px solid rgba(40,70,49,.10)!important;border-radius:19px!important;background:rgba(255,255,255,.43)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)!important}
+.settings-sheet .security-setting-info,.settings-sheet .security-action-row,.settings-sheet .preference-toggle{min-height:67px!important;gap:10px}
+.settings-sheet .security-action-row{background:rgba(255,255,255,.49)!important;border:1px solid rgba(40,70,49,.09)!important;border-radius:17px!important;margin-top:10px!important}
+.settings-sheet .security-setting-icon{width:38px!important;height:38px!important;border-radius:12px!important;background:rgba(217,232,215,.84)!important;color:#2b6246!important}
+.settings-sheet .security-setting-copy strong,.settings-sheet .preference-toggle-copy strong{color:#1b2d21!important;font-size:13px!important;font-weight:750!important}
+.settings-sheet .security-setting-copy small,.settings-sheet .preference-toggle-copy small{color:#7c8780!important;font-size:11px!important;line-height:1.32!important}
+.settings-sheet .security-lock-select{border:1px solid rgba(59,83,65,.12)!important;border-radius:12px!important;background:rgba(255,255,255,.61)!important}
+.settings-sheet .preference-switch input:checked+span{background:#32704d!important}
+.settings-sheet .chevron{width:17px!important;height:17px!important;color:#8e9990!important;stroke-width:1.7!important}
+.settings-sheet .dialog-actions{margin-top:19px}
+.settings-sheet .dialog-feedback.is-visible{white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
+.settings-sheet #preferencesNotificationsPanel .notifications-management-summary{border:1px solid rgba(40,70,49,.09)!important;background:rgba(255,255,255,.43)!important}
+.settings-sheet .courses-error-card,.settings-sheet .courses-error-summary,.settings-sheet .courses-product-admin-row{background:rgba(255,255,255,.48)!important;border-color:rgba(40,70,49,.085)!important;box-shadow:none!important}
+.settings-sheet .courses-error-tabs,.settings-sheet .courses-product-admin-modes{background:rgba(216,233,211,.45)!important}
+.settings-sheet .courses-error-tabs button.is-active,.settings-sheet .courses-product-admin-mode.is-active{background:rgba(255,255,255,.85)!important;color:#28563e!important}
+.settings-sheet .recipe-customization-item,.settings-sheet .recipe-customization-ingredient-picker{background:rgba(255,255,255,.49)!important;border-color:rgba(40,70,49,.10)!important;box-shadow:none!important}
+.settings-sheet .recipe-customization-item.is-selected{background:rgba(221,237,216,.73)!important;border-color:rgba(62,124,77,.22)!important}
+.settings-sheet .recipe-customization-add-button{border-color:rgba(51,108,63,.19)!important;background:rgba(237,247,234,.57)!important;color:#296043!important}
+.settings-sheet .missing-product-row{background:rgba(255,255,255,.50)!important;border-color:rgba(40,70,49,.085)!important;box-shadow:none!important}
+.settings-sheet#missingProductsDialog .missing-products-header{padding-right:0!important;flex:0 0 auto}
+.settings-sheet#missingProductsDialog .missing-products-header h3{font-size:19px!important;line-height:1.16!important;font-weight:810!important;letter-spacing:-.45px!important}
+.settings-sheet#missingProductsDialog .missing-products-add input,.settings-sheet#missingProductsDialog .missing-products-add button{height:46px!important;min-height:46px!important;font-size:14px!important}
+.settings-sheet#preferencesDialog[open],.settings-sheet#missingProductsDialog[open],.settings-sheet.recipe-customization-dialog[open]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
+.settings-sheet#preferencesDialog .preference-dialog-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
+.settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .missing-dishes-list{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
+.settings-sheet.recipe-customization-dialog .recipe-customization-list{flex:1 1 auto!important;min-height:0!important;max-height:none!important}
+.settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto}
+.settings-sheet .missing-mode-switch{background:rgba(51,104,69,.11)!important}
+.settings-sheet .missing-mode-lens{background:rgba(255,255,255,.85)!important}
+@media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}.settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{gap:11px!important;font-size:17px!important}.settings-sheet .settings-sheet-icon{width:46px;height:46px;flex-basis:46px}.settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin-left:57px!important}}
+@media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;bottom:18px!important;border-radius:32px!important;height:min(78svh,720px)!important}}
+@media(prefers-reduced-motion:reduce){.settings-sheet[open]{animation:none!important}.settings-view .settings-row{transition:none!important}}
+
+.settings-sheet:not([open]){display:none!important}
+.settings-sheet .courses-product-admin-confirm{background:rgba(243,220,215,.54)!important;border-color:rgba(170,66,56,.15)!important}
+.settings-sheet .courses-error-actions button{border-radius:11px!important;background:rgba(228,239,225,.65)!important}

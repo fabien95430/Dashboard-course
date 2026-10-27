@@ -8,14 +8,15 @@ const here=dirname(fileURLToPath(import.meta.url));
 const root=resolve(here,'..');
 const read=name=>readFileSync(resolve(root,name),'utf8');
 
-test('les popups de préférences utilisent la même coque extérieure et un scroll interne',()=>{
-  const source=read('settings-ui.js');
-  assert.match(source,/#preferencesDialog,\s*#missingProductsDialog,\s*\.recipe-customization-dialog\{[\s\S]*?width:min\(calc\(100% - 28px\),430px\)!important;[\s\S]*?height:min\(590px,calc\(100svh[\s\S]*?padding:20px!important;[\s\S]*?border-radius:26px!important;[\s\S]*?overflow:hidden!important/);
-  assert.match(source,/#preferencesDialog\[open\],\s*#missingProductsDialog\[open\],\s*\.recipe-customization-dialog\[open\]\{\s*display:flex!important;\s*flex-direction:column!important/);
-  assert.match(source,/function ensurePreferenceDialogScroll\(dialog\)[\s\S]*?content\.className='preference-dialog-scroll'/);
-  assert.match(source,/\.preference-dialog-scroll\{[\s\S]*?flex:1 1 auto;[\s\S]*?min-height:0;[\s\S]*?overflow:auto/);
-  assert.match(source,/#missingProductsDialog \.missing-products-list,\s*#missingProductsDialog \.missing-dishes-list\{[\s\S]*?flex:1 1 auto!important;[\s\S]*?min-height:0!important;[\s\S]*?max-height:none!important;[\s\S]*?overflow:auto!important/);
-  assert.match(source,/#preferencesDialog::backdrop,\s*#missingProductsDialog::backdrop,\s*\.recipe-customization-dialog::backdrop\{[\s\S]*?backdrop-filter:blur\(8px\)!important/);
+test('les popups de Réglages partagent une coque iOS et le même défilement interne',()=>{
+  const src=read('settings-ui.js'),css=read('styles.css'),index=read('index.html'),dishes=read('dishes-ui.js');
+  assert.match(css,/\.settings-sheet\{[\s\S]*?height:min\(78svh/);
+  assert.match(css,/\.settings-sheet::backdrop\{[\s\S]*?blur\(13px\)/);
+  for(const id of ['connectionDialog','preferencesDialog','missingProductsDialog','settingsDialog'])assert.match(index,new RegExp('id="'+id+'" class="[^"]*settings-sheet"'));
+  assert.match(dishes,/recipeCustomizationDialog\.className='dialog recipe-customization-dialog settings-sheet'/);
+  assert.match(src,/function ensurePreferenceDialogScroll\(dialog\)[\s\S]*?content\.className='preference-dialog-scroll'/);
+  assert.match(src,/\.preference-dialog-scroll\{[\s\S]*?flex:1 1 auto;[\s\S]*?min-height:0;[\s\S]*?overflow:auto/);
+  assert.match(css,/\.settings-sheet#missingProductsDialog \.missing-products-list/);
 });
 
 test('le design moderne des produits manquants ne redéfinit plus les dimensions de la coque extérieure',()=>{
@@ -200,14 +201,12 @@ test('le popup produits et plats manquants conserve l ouverture native et peut t
   const index=read('index.html');
   const app=read('app.js');
   const popup=read('missing-products-popup-ui.js');
-  assert.match(index,/<dialog id="missingProductsDialog" class="dialog" tabindex="-1">/);
+  assert.match(index,/<dialog id=\"missingProductsDialog\" class=\"dialog settings-sheet\" tabindex=\"-1\">/);
   assert.doesNotMatch(index,/<dialog id="missingProductsDialog"[^>]*\bautofocus\b/);
   assert.match(app,/function openMissingProducts\(\)[\s\S]*?showNeutralDialog\(UI\.missingProductsDialog\)/);
   assert.doesNotMatch(popup,/function bindOpenFallback\(dialog\)/);
-  assert.match(popup,/function ensureCloseButton\(dialog\)/);
-  assert.match(popup,/button\.className='missing-products-close'/);
-  assert.match(popup,/button\.setAttribute\('aria-label','Fermer'\)/);
-  assert.match(popup,/button\.addEventListener\('click',[\s\S]*?closePopup\(dialog\)/);
+  assert.doesNotMatch(popup,/function ensureCloseButton\(dialog\)/);
+  assert.match(app,/bindDialogBackdropClose\(UI\.missingProductsDialog\)/);
   assert.match(popup,/dialog\.addEventListener\('cancel',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?closePopup\(dialog\)/);
 });
 
@@ -240,19 +239,15 @@ test('les explications de popup restent courtes et essentielles',()=>{
 });
 
 
-test('les trois vues de gestion utilisent un chevron retour discret dans le titre',()=>{
-  const settings=read('settings-ui.js');
-  const errors=read('error-center.js');
-  const catalog=read('catalog-product-admin.js');
-  assert.ok(settings.includes("button.className='preference-title-back'"));
-  assert.ok(settings.includes("setTitle('Gestion de l’application','preferences')"));
-  assert.ok(settings.includes("back.dataset.preferenceBack==='preferences'"));
-  assert.ok(errors.includes("window.COURSES_SETTINGS_NAV.setTitle('Messages d’erreur','management')"));
-  assert.ok(catalog.includes("window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management')"));
-  assert.match(settings,/\.preference-title-back\{[^}]*background:transparent/);
-  assert.match(settings,/\.preference-title-back\{[^}]*border-radius:0/);
-  assert.doesNotMatch(settings,/\.preference-title-back\{[^}]*background:rgba/);
-  assert.doesNotMatch(errors,/courses-error-back/);
-  assert.doesNotMatch(catalog,/courses-product-admin-back/);
-  assert.doesNotMatch(catalog,/courses-product-admin-note|Suppression définitive du catalogue et de GitHub/);
+test('les sous-vues de Réglages sans flèche gardent leur navigation et leur fermeture',()=>{
+  const settings=read('settings-ui.js'),errors=read('error-center.js'),catalog=read('catalog-product-admin.js'),app=read('app.js');
+  const html=read('index.html'),css=read('styles.css');
+  assert.doesNotMatch(settings,/preference-title-back|dataset.preferenceBack/);
+  assert.match(settings,/function setTitle\(label\)\{/);
+  assert.match(settings,/setTitle\('Gestion de l’application','preferences'\)/);
+  assert.match(errors,/COURSES_SETTINGS_NAV\.setTitle\('Messages d’erreur','management'\)/);
+  assert.match(catalog,/COURSES_SETTINGS_NAV\.setTitle\('Catalogue produit','management'\)/);
+  assert.match(app,/bindDialogBackdropClose\(UI\.preferencesDialog\)/);
+  assert.match(html,/id="settingsDialog" class="dialog security-settings-dialog settings-sheet"/);
+  assert.match(css,/\.settings-sheet::before\{content:"";position:absolute/);
 });

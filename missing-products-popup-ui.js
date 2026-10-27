@@ -43,24 +43,6 @@ function closePopup(dialog){
   resetPopupInteraction(dialog);
   dialog.close();
 }
-function ensureCloseButton(dialog){
-  const header=dialog.querySelector('.missing-products-header');
-  if(!header)return null;
-  let button=header.querySelector('.missing-products-close');
-  if(button)return button;
-  button=document.createElement('button');
-  button.type='button';
-  button.className='missing-products-close';
-  button.setAttribute('aria-label','Fermer');
-  button.textContent='×';
-  button.addEventListener('click',event=>{
-    event.preventDefault();
-    event.stopPropagation();
-    closePopup(dialog);
-  });
-  header.appendChild(button);
-  return button;
-}
 function positionMenu(menu,anchor){
   const rect=anchor.getBoundingClientRect();
   const dialog=document.getElementById('missingProductsDialog');
@@ -232,7 +214,6 @@ function decorate(){
   decorateFrame=0;
   const dialog=document.getElementById('missingProductsDialog');
   if(!dialog)return;
-  ensureCloseButton(dialog);
   const bound=bindModeSwitch(dialog);
   if(bound&&dialog.open)requestAnimationFrame(()=>resetModeLens(dialog));
   dialog.querySelectorAll('[data-missing-product-row],[data-missing-dish-row]').forEach(decorateRow);
@@ -247,10 +228,8 @@ function installStyle(){
   style.id='missing-products-popup-ui-style';
   style.textContent=`
     #missingProductsDialog #missingProductsList[hidden],#missingProductsDialog #missingDishesList[hidden]{display:none!important}
-    #missingProductsDialog .missing-products-header{position:relative!important;padding-right:42px!important}
+    #missingProductsDialog .missing-products-header{position:relative!important;padding-right:0!important}
     #missingProductsDialog .missing-products-header h3{font-size:22px!important;line-height:1.08!important;letter-spacing:-.35px!important;margin-bottom:0!important}
-    #missingProductsDialog .missing-products-close{position:absolute;top:0;right:0;width:34px;height:34px;padding:0;border:.5px solid rgba(255,255,255,.72);border-radius:50%;display:grid;place-items:center;background:rgba(242,242,247,.72);color:#69736e;box-shadow:0 4px 14px rgba(29,44,35,.08),inset 0 .5px 0 rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);font-size:25px;line-height:1;font-weight:400;cursor:pointer;-webkit-appearance:none;appearance:none;touch-action:manipulation}
-    #missingProductsDialog .missing-products-close:active{transform:scale(.94);background:rgba(232,234,238,.82)}
     #missingProductsDialog .dialog-intro{font-size:13px!important;line-height:1.38!important;margin-top:7px!important}
     #missingProductsDialog .missing-products-add{gap:8px!important;margin-bottom:10px!important}
     #missingProductsDialog .missing-products-add #missingProductName{height:46px!important;border-radius:15px!important;padding:0 14px!important;font-size:15px!important}
@@ -308,7 +287,6 @@ function bind(){
   if(!dialog)return false;
   if(dialog.dataset.missingPopupUiBound==='1'){queueDecorate();return true;}
   dialog.dataset.missingPopupUiBound='1';
-  ensureCloseButton(dialog);
   bindModeSwitch(dialog);
   dialog.addEventListener('close',()=>resetPopupInteraction(dialog));
   dialog.addEventListener('cancel',event=>{

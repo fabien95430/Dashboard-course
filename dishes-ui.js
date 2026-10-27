@@ -429,10 +429,10 @@ function buildRecipeCustomizationDialog(){
   }
   recipeCustomizationDialog=document.createElement('dialog');
   recipeCustomizationDialog.id='recipeCustomizationDialog';
-  recipeCustomizationDialog.className='dialog recipe-customization-dialog';
+  recipeCustomizationDialog.className='dialog recipe-customization-dialog settings-sheet';
   recipeCustomizationDialog.tabIndex=-1;
   recipeCustomizationDialog.innerHTML=
-    '<h3>Personnalisation des recettes</h3>'+ 
+    '<h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-grid"></use></svg></span><span class="settings-sheet-title">Personnalisation des recettes</span></h3>'+ 
     '<p class="dialog-intro">Modifiez ingrédients et quantités pour 2 personnes. Les portions s’adaptent automatiquement.</p>'+ 
     '<div class="recipe-customization-search-wrap"><label class="recipe-customization-search"><svg aria-hidden="true"><use href="#i-search"></use></svg><input type="search" autocomplete="off" placeholder="Rechercher un plat…" aria-label="Rechercher un plat" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="recipeCustomizationSuggestions"></label><div id="recipeCustomizationSuggestions" class="recipe-customization-suggestions" role="listbox" hidden></div></div>'+ 
     '<p class="recipe-customization-status" aria-live="polite"></p>'+ 

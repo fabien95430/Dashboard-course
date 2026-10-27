@@ -30,9 +30,9 @@ function harness(gridReady){
   };
   const factory=new Function('state','$','document','BOTTOM_NAV','requestAnimationFrame',
     'cancelAnimationFrame','renderCategories','renderProducts',
-    'CustomEvent','productGridReady',app.slice(start,end)+'return showView;');
+    'CustomEvent','productGridReady','closeListRowMenu',app.slice(start,end)+'return showView;');
   const showView=factory(state,selector=>elements[selector],document,BOTTOM_NAV,raf,caf,
-    ()=>trace.push('categories'),()=>trace.push('products'),Event,gridReady);
+    ()=>trace.push('categories'),()=>trace.push('products'),Event,gridReady,()=>{});
   showView();
   trace.length=0;
   return {state,trace,showView,frame,settle};

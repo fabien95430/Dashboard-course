@@ -114,7 +114,7 @@ document.head.appendChild(script);
 'use strict';
 if(document.querySelector('script[data-missing-products-modern]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-modern.js?v=410';
+script.src='./missing-products-modern.js?v=411';
 script.defer=true;
 script.dataset.missingProductsModern='1';
 document.head.appendChild(script);
@@ -204,28 +204,6 @@ function installPreferenceDialogAppearance(){
   const style=document.createElement('style');
   style.id='preferences-dialog-appearance';
   style.textContent=`
-    #preferencesDialog,
-    #missingProductsDialog,
-    .recipe-customization-dialog{
-      width:min(calc(100% - 28px),430px)!important;
-      height:min(590px,calc(100vh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
-      height:min(590px,calc(100svh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
-      max-height:min(590px,calc(100vh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
-      max-height:min(590px,calc(100svh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom))))!important;
-      inset:0!important;
-      margin:auto!important;
-      padding:20px!important;
-      border-radius:26px!important;
-      box-sizing:border-box;
-      overflow:hidden!important;
-      overscroll-behavior:contain;
-    }
-    #preferencesDialog[open],
-    #missingProductsDialog[open],
-    .recipe-customization-dialog[open]{
-      display:flex!important;
-      flex-direction:column!important;
-    }
     .preference-dialog-scroll{
       flex:1 1 auto;
       min-height:0;
@@ -265,16 +243,7 @@ function installPreferenceDialogAppearance(){
       margin:0!important;
       transform:none!important;
     }
-    #preferencesDialog::backdrop,
-    #missingProductsDialog::backdrop,
-    .recipe-customization-dialog::backdrop{
-      background:rgba(28,38,31,.28)!important;
-      -webkit-backdrop-filter:blur(8px)!important;
-      backdrop-filter:blur(8px)!important;
-    }
     #preferencesDialog .preference-dialog-scroll>h3{display:flex;align-items:center;gap:6px}
-    .preference-title-back{width:18px;height:32px;flex:0 0 18px;margin:-2px 0 -2px -2px;padding:0;border:0;border-radius:0;display:grid;place-items:center;background:transparent;color:#0b7040;font:inherit;font-size:28px;line-height:1;font-weight:500;-webkit-tap-highlight-color:transparent}
-    .preference-title-back:focus{outline:none}.preference-title-back:focus-visible{outline:2px solid rgba(11,112,64,.28);outline-offset:2px}
     #preferencesApplicationManagement .application-management-options:empty{display:none!important}
     #preferencesNotificationsPanel[hidden]{display:none!important}
     #preferencesNotificationsPanel{display:grid;gap:14px;padding-top:18px}
@@ -372,19 +341,10 @@ function initApplicationManagement(){
   const selectionNodes=[...content.children].filter(node=>node!==title&&node!==intro&&node!==managementPanel);
   const originalHidden=new Map(selectionNodes.map(node=>[node,node.hidden]));
 
-  function setTitle(label,back=''){
-    if(!title)return;
-    title.textContent='';
-    if(back){
-      const button=document.createElement('button');
-      button.type='button';
-      button.className='preference-title-back';
-      button.dataset.preferenceBack=back;
-      button.setAttribute('aria-label',back==='preferences'?'Retour aux préférences':'Retour à Gestion de l’application');
-      button.textContent='‹';
-      title.appendChild(button);
-    }
-    title.append(document.createTextNode(label));
+  function setTitle(label){
+    const labelNode=title?.querySelector('.settings-sheet-title');
+    if(labelNode)labelNode.textContent=label;
+    else if(title)title.textContent=label;
   }
 
   function showSelections(){
@@ -413,13 +373,6 @@ function initApplicationManagement(){
   }
 
   window.COURSES_SETTINGS_NAV=Object.freeze({setTitle});
-  content.addEventListener('click',event=>{
-    const back=event.target.closest('.preference-title-back');
-    if(!back)return;
-    if(back.dataset.preferenceBack==='preferences')showSelections();
-    else showManagement();
-  });
-
   selectionsButton.addEventListener('click',showSelections,true);
   managementButton.addEventListener('click',showManagement);
   notificationsButton.addEventListener('click',showNotifications);
