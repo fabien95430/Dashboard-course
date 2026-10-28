@@ -36,7 +36,7 @@ test('le précache ne garde qu une URL active par chemin',()=>{
   const shell=shellAssets();
   const paths=shell.map(assetPath);
   assert.equal(new Set(paths).size,paths.length,'Le SHELL contient plusieurs versions du même fichier');
-  assert.ok(shell.length<=36,'Le SHELL ne doit plus accumuler les anciennes générations');
+  assert.ok(shell.length<=37,'Le SHELL ne doit plus accumuler les anciennes générations (37 = 36 + lock-first-paint.js, v639)');
 });
 
 test('tout le graphe JS CSS actif est précaché avec son URL exacte',()=>{

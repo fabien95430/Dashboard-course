@@ -32,3 +32,18 @@ test('le générateur photographie la vraie page avec le même fond cover que l\
   assert.match(gen,/is-launching/);
   for(const [w,h,dpr] of [[402,874,3],[393,852,3],[375,667,2]])assert.ok(gen.includes(`[${w},${h},${dpr}]`));
 });
+
+test('premier affichage verrouillé : l\'écran de connexion est déjà peint avant app.js',()=>{
+  const lock=fs.readFileSync(new URL('../lock-first-paint.js',import.meta.url),'utf8');
+  const app=fs.readFileSync(new URL('../app.js',import.meta.url),'utf8');
+  const sw=fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8');
+  assert.match(index,/<script src="\.\/lock-first-paint\.js\?v=\d+"><\/script>\s*<title>/);
+  assert.match(lock,/courses-secure-vault-v1/);
+  assert.match(lock,/is-prelock/);
+  assert.match(styles,/html\.is-prelock #securityOverlay\{display:grid\}/);
+  assert.match(styles,/html\.is-prelock body\{[^}]*welcome-background-v40\.webp/s);
+  assert.match(index,/id="securityHint" class="hint" hidden/);
+  assert.match(app,/function hideSecurity\(\)\{[^}]*is-prelock/s);
+  assert.match(app,/function showSetup\([^)]*\)\{[^}]*is-prelock/s);
+  assert.match(sw,/lock-first-paint\.js\?v=\d+/);
+});

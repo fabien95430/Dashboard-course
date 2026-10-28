@@ -655,6 +655,7 @@ function refreshVisualLock(){
   if(changed)document.dispatchEvent(new CustomEvent('courses:lock-changed',{detail:{locked:blocked}}));
 }
 function showSetup(message=''){
+  document.documentElement.classList.remove('is-prelock');
   UI.securityOverlay.classList.remove('is-visible');
   UI.setup.classList.add('is-visible');
   UI.haUrlInput.value=state.haUrl||normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
@@ -1571,6 +1572,7 @@ function showSecurity(mode,message=''){
 }
 function hideSecurity(){
   unlockVersionChecked=false;
+  document.documentElement.classList.remove('is-prelock');
   UI.securityOverlay.classList.remove('is-visible');
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
