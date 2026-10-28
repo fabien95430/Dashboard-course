@@ -314,7 +314,7 @@ test('Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent
   assert.match(errors,/COURSES_SEGMENTED_LIQUID\?\.bindSegment\(filterTrack/);
   assert.match(errors,/role="tablist" aria-label="Filtrer les messages d’erreur"/);
   // Les validations des suppressions, les filtres et les actions HA restent propriétaires.
-  assert.match(admin,/data-delete-item/);
+  assert.match(admin,/data-item-name/);
   assert.match(admin,/data-undo-delete/);
   assert.match(errors,/data-error-filter/);
   assert.match(errors,/data-error-action/);

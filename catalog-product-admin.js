@@ -10,13 +10,11 @@ const RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/action
 let currentMode='products';
 let currentQuery='';
 let openGroup='';
-let openItem='';
 let blockedItem=null;
 /* Retraits en cours (comme « acheté » dans Ma liste) : phase « hold » = Annuler possible, « exit » = la ligne sort. */
 const removals=new Map();
 const REMOVE_HOLD_MS=2000;
 const REMOVE_EXIT_MS=800;
-let swipeSuppressUntil=0;
 let dishRows=null;
 let dishRowsPromise=null;
 let uiBound=false;
@@ -172,14 +170,7 @@ function installStyle(){
     .courses-product-admin-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
     .is-open>.courses-product-admin-group-head .courses-product-admin-caret{transform:rotate(-90deg)}
     .courses-product-admin-item{position:relative;overflow:hidden;max-height:240px;transition:transform .6s cubic-bezier(.4,0,.2,1),opacity .45s ease,max-height .45s cubic-bezier(.4,0,.2,1) .3s}
-    .courses-product-admin-row{grid-template-columns:minmax(0,1fr) 38px;touch-action:pan-y}
-    .courses-product-admin-row:disabled{opacity:1;color:#1b2d21}
-    .courses-product-admin-more{justify-self:center;color:rgba(7,62,44,.25);font-size:var(--fs-sub);font-weight:700;transition:opacity .18s ease}
-    .courses-product-admin-delete{position:absolute;top:50%;right:5px;width:52px;height:48px;padding:0;border:1px solid rgba(194,54,65,.09);border-radius:16px;display:grid;place-items:center;background:rgba(244,205,210,.3);color:#cf4050;box-shadow:inset 0 1px rgba(255,255,255,.55);opacity:0;visibility:hidden;pointer-events:none;transform:translate3d(10px,-50%,0);transition:opacity .18s ease,transform .2s ease,visibility .18s;-webkit-appearance:none;appearance:none}
-    .courses-product-admin-delete svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-    .courses-product-admin-delete:active{background:rgba(244,205,210,.6)}
-    .courses-product-admin-item.is-actions-open .courses-product-admin-delete{opacity:1;visibility:visible;pointer-events:auto;transform:translate3d(0,-50%,0)}
-    .courses-product-admin-item.is-actions-open .courses-product-admin-more,.courses-product-admin-item.is-deleting .courses-product-admin-more{opacity:0}
+    .courses-product-admin-row{grid-template-columns:minmax(0,1fr);touch-action:pan-y;-webkit-user-select:none;user-select:none}
     .courses-product-admin-undo{position:absolute;top:50%;right:12px;transform:translateY(-50%);padding:10px 2px;border:0;background:transparent;color:#087c3c;font:inherit;font-size:var(--fs-text);font-weight:600;white-space:nowrap;-webkit-appearance:none;appearance:none}
     .courses-product-admin-undo[hidden]{display:none}
     .courses-product-admin-item.is-deleting>.courses-product-admin-row{background:linear-gradient(90deg,#fff0f1 0%,#fff8f7 100%)}
@@ -190,7 +181,7 @@ function installStyle(){
     .courses-product-admin-feedback{min-height:0;margin-top:10px;color:#4c6152;font-size:13.5px;text-align:center}
     .courses-product-admin-feedback:empty{display:none}
     .courses-product-admin-feedback.is-error{color:#b23a30}.courses-product-admin-feedback.is-ok{color:#1f7a4a}
-    @media(prefers-reduced-motion:reduce){.courses-product-admin-caret,.courses-product-admin-item,.courses-product-admin-delete,.courses-product-admin-more{transition:none}}
+    @media(prefers-reduced-motion:reduce){.courses-product-admin-caret,.courses-product-admin-item{transition:none}}
   `;
   document.head.appendChild(style);
 }
@@ -206,43 +197,29 @@ function visibleRows(rows){
 function itemMarkup(item,itemType){
   const key=pendingKey(itemType,item.name);
   const removal=removals.get(key);
-  const open=!removal&&openItem===key;
   const name=esc(item.name);
   const blocked=blockedItem?.key===key;
-  return '<div class="courses-product-admin-item'+(open?' is-actions-open':'')+(removal?' is-deleting':'')+(removal?.phase==='exit'?' is-removing':'')+'" data-item="'+name+'">'+
-    '<button class="courses-product-admin-row" type="button" data-admin-item="'+esc(key)+'" aria-expanded="'+open+'"'+(removal?' disabled':'')+'><span class="courses-product-admin-copy"><strong>'+name+'</strong><small>'+esc(item.subgroup)+'</small></span><span class="courses-product-admin-more" aria-hidden="true">⋯</span></button>'+
-    '<button class="courses-product-admin-delete" type="button" data-delete-item="'+name+'" data-item-type="'+itemType+'" aria-label="Retirer '+name+' du catalogue"'+(open?'':' aria-hidden="true" tabindex="-1" disabled')+'><svg aria-hidden="true"><use href="#i-trash"></use></svg></button>'+
+  return '<div class="courses-product-admin-item'+(removal?' is-deleting':'')+(removal?.phase==='exit'?' is-removing':'')+'" data-item="'+name+'">'+
+    '<div class="courses-product-admin-row" data-admin-item="'+esc(key)+'" data-item-type="'+itemType+'" data-item-name="'+name+'"><span class="courses-product-admin-copy"><strong>'+name+'</strong><small>'+esc(item.subgroup)+'</small></span></div>'+
     '<button class="courses-product-admin-undo" type="button" data-undo-delete="'+esc(key)+'"'+(removal?.phase==='hold'?'':' hidden')+'>Annuler</button>'+
     (blocked?'<p class="courses-product-admin-note">Impossible de retirer « '+name+' » : utilisé par '+esc(blockedItem.usages.slice(0,5).join(', '))+(blockedItem.usages.length>5?'…':'')+'.</p>':'')+
   '</div>';
 }
 function itemElement(key){
   const {panel}=panelElements();
-  const row=[...(panel?.querySelectorAll('[data-admin-item]')||[])].find(button=>button.dataset.adminItem===key);
+  const row=[...(panel?.querySelectorAll('[data-admin-item]')||[])].find(element=>element.dataset.adminItem===key);
   return row?.closest('.courses-product-admin-item')||null;
 }
-/* Ouvre la corbeille d'une seule ligne (balayage vers la gauche ou toucher) sans reconstruire la liste : la transition reste fluide. */
-function setOpenItem(key){
-  const {panel}=panelElements();
-  openItem=key;
-  if(blockedItem){blockedItem=null;panel?.querySelectorAll('.courses-product-admin-note').forEach(note=>note.remove())}
-  panel?.querySelectorAll('.courses-product-admin-item').forEach(element=>{
-    const row=element.querySelector('[data-admin-item]');
-    const open=!!key&&row?.dataset.adminItem===key&&!element.classList.contains('is-deleting');
-    element.classList.toggle('is-actions-open',open);
-    row?.setAttribute('aria-expanded',String(open));
-    const trash=element.querySelector('[data-delete-item]');
-    if(!trash)return;
-    trash.disabled=!open;trash.tabIndex=open?0:-1;
-    if(open)trash.removeAttribute('aria-hidden');else trash.setAttribute('aria-hidden','true');
-  });
+function clearBlockedNote(){
+  if(!blockedItem)return;
+  blockedItem=null;
+  panelElements().panel?.querySelectorAll('.courses-product-admin-note').forEach(note=>note.remove());
 }
 function paintRemoval(key){
   const element=itemElement(key);if(!element)return;
   const removal=removals.get(key);
   element.classList.toggle('is-deleting',!!removal);
   element.classList.toggle('is-removing',removal?.phase==='exit');
-  const row=element.querySelector('[data-admin-item]');if(row)row.disabled=!!removal;
   const undo=element.querySelector('[data-undo-delete]');if(undo)undo.hidden=removal?.phase!=='hold';
 }
 function renderRows(rows,itemType,listOnly=false){
@@ -306,7 +283,6 @@ async function startRemoval(itemType,name){
   window.CoursesHaptics?.play('delete');
   const token={cancelled:false,phase:'hold',itemType,name};
   removals.set(key,token);
-  setOpenItem('');
   paintRemoval(key);
   const usage=itemType==='product'?recipeUsages(name).then(usages=>({usages}),error=>({error})):Promise.resolve({usages:[]});
   usage.then(result=>{
@@ -363,7 +339,7 @@ async function reconcilePending(){
     }
   }catch(_){}
 }
-function resetView(){currentQuery='';openGroup='';openItem='';blockedItem=null}
+function resetView(){currentQuery='';openGroup='';blockedItem=null}
 /* Le popup annonce sa vue et son type (Produits / Plats) ; la vue Suppression se rend ici. */
 function followCatalogView(detail){
   const nextMode=detail?.mode==='dishes'?'dishes':'products';
@@ -379,44 +355,39 @@ function bindUi(){
   uiBound=true;installStyle();
   panel.addEventListener('input',event=>{
     if(event.target.matches('[data-product-admin-search]')){
-      currentQuery=event.target.value;openItem='';blockedItem=null;void render(true);
+      currentQuery=event.target.value;blockedItem=null;void render(true);
     }
   });
-  /* Balayage vers la gauche sur une ligne : révèle la corbeille (vers la droite : la referme), comme dans Ma liste. */
+  /* Seul geste de retrait : balayage vers la gauche sur le produit ou le plat. Le retrait part au relâchement du doigt
+     (geste de l'utilisateur, nécessaire au retour haptique iOS) ; Annuler reste possible ensuite. */
   panel.addEventListener('pointerdown',event=>{
     if(event.button!==undefined&&event.button!==0)return;
     const row=event.target.closest('.courses-product-admin-row');if(!row)return;
-    const key=row.dataset.adminItem||'';
+    clearBlockedNote();
+    if(removals.has(row.dataset.adminItem||''))return;
     const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
-    const stop=()=>{document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',stop,true);document.removeEventListener('pointercancel',stop,true)};
+    let armed=false;
+    const stop=()=>{document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',end,true);document.removeEventListener('pointercancel',end,true)};
+    const end=endEvent=>{
+      if(endEvent.pointerId!==pointerId)return;
+      stop();
+      if(armed&&endEvent.type==='pointerup')void startRemoval(row.dataset.itemType||'product',row.dataset.itemName||'');
+    };
     const move=moveEvent=>{
       if(moveEvent.pointerId!==pointerId)return;
       const dx=moveEvent.clientX-startX,dy=moveEvent.clientY-startY;
-      if(Math.abs(dx)>26&&Math.abs(dx)>Math.abs(dy)*1.4){
-        stop();swipeSuppressUntil=Date.now()+400;
-        if(dx<0)setOpenItem(key);else if(openItem===key)setOpenItem('');
-        return;
-      }
-      if(Math.abs(dy)>12&&Math.abs(dy)>=Math.abs(dx))stop();
+      if(dx<-26&&Math.abs(dx)>Math.abs(dy)*1.4){armed=true;return}
+      if(Math.abs(dy)>12&&Math.abs(dy)>=Math.abs(dx)&&!armed)stop();
     };
     document.addEventListener('pointermove',move,{passive:true,capture:true});
-    document.addEventListener('pointerup',stop,{capture:true});
-    document.addEventListener('pointercancel',stop,{capture:true});
+    document.addEventListener('pointerup',end,{capture:true});
+    document.addEventListener('pointercancel',end,{capture:true});
   });
   panel.addEventListener('click',event=>{
     event.stopPropagation();
     const group=event.target.closest('[data-admin-group]');
-    if(group){const name=group.dataset.adminGroup||'';openGroup=openGroup===name?'':name;openItem='';blockedItem=null;void render();return}
-    const del=event.target.closest('[data-delete-item]');if(del){void startRemoval(del.dataset.itemType||'product',del.dataset.deleteItem||'');return}
-    const undo=event.target.closest('[data-undo-delete]');if(undo){undoRemoval(undo.dataset.undoDelete||'');return}
-    const item=event.target.closest('[data-admin-item]');
-    if(item){
-      if(Date.now()<swipeSuppressUntil)return;
-      const key=item.dataset.adminItem||'';
-      setOpenItem(openItem===key?'':key);
-      return;
-    }
-    if(openItem)setOpenItem('');
+    if(group){const name=group.dataset.adminGroup||'';openGroup=openGroup===name?'':name;blockedItem=null;void render();return}
+    const undo=event.target.closest('[data-undo-delete]');if(undo)undoRemoval(undo.dataset.undoDelete||'');
   });
   dialog.addEventListener('close',resetView);
   document.addEventListener('courses:catalog-view-changed',event=>followCatalogView(event.detail));
