@@ -2,6 +2,12 @@
 
 **Source de vérité de cette file :** historique `docs/AVANCEMENT_IMAGES_PRODUITS.md` (inventaire exhaustif v611, 84 références non renouvelées) ; comparaison ciblée avec les lots v612, v613, v614, v615 et v616 ; `main` de préparation `a8cbd3be4902467b12d951540ccf2b542abbf2c9`.
 
+## Lot v627 — 1 remplacement ciblé et 7 décisions de conservation (publication conditionnelle)
+
+- Un remplacement unique : `poisson-surgele.webp`, nouveau filet blanc cru isolé, WebP 320×320 alpha natif (Soft Studio Ingredients, CC BY 4.0), à compter seulement après CI et publication.
+- Sept visuels conservés, sans remplacement : Noix de coco râpée, Petits pois carottes, Désinfectant, Lingettes ménage, Mouchoirs, Céréales et Pâté. Les anciens fichiers sont lisibles et fidèles ; les alternatives examinées dégradaient la variante ou le conditionnement.
+- Bilan projeté : **360/414** renouvelés, **54** non renouvelés dont **35 conservés**, **1 défaut ciblé** (Sacs congélation) et **18 références en attente**. Aucun doublon. Source, licence et signatures : `docs/IMAGE_CREDITS_V627.md`.
+
 ## Lot v623 : quatre références sorties de la file (publication conditionnelle)
 
 Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a-laver.webp`, `detachant.webp`, `puree-en-flocons.webp` sont remplacés par des candidats unitaires WebP RGBA 384×384. Ancien/nouveau contrôlés visuellement à 192 px sur blanc/sauge. Les sources et SHA-256 sont consignés dans `docs/IMAGE_CREDITS_V623.md`. Après fusion réussie : **359/414 renouvelés distincts**, **55 non renouvelés**, dont **28 conservés, 1 défaut ciblé et 26 candidats restant à rechercher**. Le nombre 355/414 ci-dessous est l’état historique de départ, conservé pour traçabilité. Aucune image autre que ces quatre produits n’est modifiée.
@@ -22,7 +28,7 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 4. Ne jamais compter un produit deux fois. Un remplacement d'un WebP antérieurement renouvelé peut modifier sa qualité, **pas** le décompte des produits distincts.
 5. Un candidat n'est pas un produit publié. Les tests, licences, crédits, caches/versions, SHA Git, CI et Pages doivent être confirmés avant de modifier un statut. Ne jamais découper une planche ni utiliser l'API OpenAI payante du projet.
 
-## Références encore non renouvelées après v623 (55, publication conditionnelle)
+## Références encore non renouvelées après v627 (54, publication conditionnelle)
 
 | Catégorie | Produit | WebP | Décision opérationnelle |
 | --- | --- | --- | --- |
@@ -34,8 +40,8 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Boissons | Vin rosé | `vin-rose.webp` | `ATTENDRE_CANDIDAT` |
 | Boulangerie | Pâte brisée | `pate-brisee.webp` | `CONSERVER` |
 | Cuisine | Confiture fraise | `confiture-fraise.webp` | `ATTENDRE_CANDIDAT` |
-| Cuisine | Noix de coco râpée | `noix-de-coco-rapee.webp` | `ATTENDRE_CANDIDAT` |
-| Cuisine | Petits pois carottes | `petits-pois-carottes.webp` | `ATTENDRE_CANDIDAT` |
+| Cuisine | Noix de coco râpée | `noix-de-coco-rapee.webp` | `CONSERVER` |
+| Cuisine | Petits pois carottes | `petits-pois-carottes.webp` | `CONSERVER` |
 | Enfant | Compotes bébé | `compotes-bebe.webp` | `CONSERVER` |
 | Enfant | Lait infantile | `lait-infantile.webp` | `CONSERVER` |
 | Enfant | Sacs à couches | `sacs-a-couches.webp` | `CONSERVER` |
@@ -49,14 +55,14 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Hygiène & soins | Mouchoirs poche | `mouchoirs-poche.webp` | `CONSERVER` |
 | Hygiène & soins | Pansements | `pansements.webp` | `CONSERVER` |
 | Hygiène & soins | Protections hygiéniques | `protections-hygieniques.webp` | `ATTENDRE_CANDIDAT` |
-| Maison | Désinfectant | `desinfectant.webp` | `ATTENDRE_CANDIDAT` |
+| Maison | Désinfectant | `desinfectant.webp` | `CONSERVER` |
 | Maison | Éponges magiques | `eponges-magiques.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Essuie-verres | `essuie-verres.webp` | `CONSERVER` |
 | Maison | Grattoirs | `grattoirs.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Lave glace | `lave-glace.webp` | `CONSERVER` |
 | Maison | Lingettes anti-décoloration | `lingettes-anti-decoloration.webp` | `ATTENDRE_CANDIDAT` |
-| Maison | Lingettes ménage | `lingettes-menage.webp` | `ATTENDRE_CANDIDAT` |
-| Maison | Mouchoirs | `mouchoirs.webp` | `ATTENDRE_CANDIDAT` |
+| Maison | Lingettes ménage | `lingettes-menage.webp` | `CONSERVER` |
+| Maison | Mouchoirs | `mouchoirs.webp` | `CONSERVER` |
 | Maison | Papier cadeau | `papier-cadeau.webp` | `CONSERVER` |
 | Maison | Piles AA | `piles-aa.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Pinces à linge | `pinces-a-linge.webp` | `CONSERVER` |
@@ -71,15 +77,14 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Maison | Tablettes lave-vaisselle | `tablettes-lave-vaisselle.webp` | `CONSERVER` |
 | Maison | Torchons | `torchons.webp` | `CONSERVER` |
 | Maison | Vinaigre ménager | `vinaigre-menager.webp` | `ATTENDRE_CANDIDAT` |
-| Petit-déjeuner | Céréales | `cereales.webp` | `ATTENDRE_CANDIDAT` |
+| Petit-déjeuner | Céréales | `cereales.webp` | `CONSERVER` |
 | Petit-déjeuner | Sirot d’érable | `sirot-d-erable.webp` | `CONSERVER` |
 | Petit-déjeuner | Thé Earl Grey | `the-earl-grey.webp` | `ATTENDRE_CANDIDAT` |
 | Petit-déjeuner | Thé fruits rouges | `the-fruits-rouges.webp` | `ATTENDRE_CANDIDAT` |
 | Petit-déjeuner | Thé noir | `the-noir.webp` | `ATTENDRE_CANDIDAT` |
-| Viandes & poissons | Pâté | `pate.webp` | `ATTENDRE_CANDIDAT` |
+| Viandes & poissons | Pâté | `pate.webp` | `CONSERVER` |
 | Viandes & poissons | Peperroni | `peperroni.webp` | `CONSERVER` |
 | Viandes & poissons | Poisson pané | `poisson-pane.webp` | `ATTENDRE_CANDIDAT` |
-| Viandes & poissons | Poisson surgelé | `poisson-surgele.webp` | `ATTENDRE_CANDIDAT` |
 | Viandes & poissons | Saucisses | `saucisses.webp` | `ATTENDRE_CANDIDAT` |
 
 ## Provenance et limites
