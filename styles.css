@@ -298,8 +298,22 @@ svg{display:block}
 .icon-btn svg{width:29px;height:29px}
 
 .icon-btn svg:has(use[href="#i-refresh"]){stroke-width:1.7}
-.icon-btn.is-refreshing svg{animation:header-refresh-spin .3s linear infinite}
-@keyframes header-refresh-spin{to{transform:rotate(360deg)}}
+/* Rafraîchir : rotation dans le sens des flèches de l'icône, puis coche 1,5 s une fois la liste à jour. */
+#refreshBtn{position:relative;display:grid;place-items:center}
+#refreshBtn>svg{grid-area:1/1;transition:opacity .2s ease,transform .25s cubic-bezier(.34,1.45,.64,1)}
+#refreshBtn .refresh-done{opacity:0;transform:scale(.5);stroke-width:2.3}
+#refreshBtn.is-done{background:rgba(31,122,74,.14)}
+#refreshBtn.is-done .refresh-icon{opacity:0;transform:scale(.5)}
+#refreshBtn.is-done .refresh-done{opacity:1;transform:none}
+.icon-btn.is-refreshing .refresh-icon{animation:header-refresh-spin 1.6s linear infinite}
+@keyframes header-refresh-spin{to{transform:rotate(-360deg)}}
+#refreshBtn.is-refreshing::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #2a5b43;opacity:0;pointer-events:none;animation:header-refresh-halo 1.6s ease-out infinite}
+@keyframes header-refresh-halo{0%{transform:scale(.85);opacity:.45}100%{transform:scale(1.25);opacity:0}}
+#settingsHeaderStatus{font-variant-numeric:tabular-nums;transition:color .2s ease}
+#settingsHeaderStatus[data-state="ok"]{color:#1f7a4a}
+#settingsHeaderStatus[data-state="new"]{color:#9a6a00}
+#settingsHeaderStatus[data-state="error"]{color:#b6652c}
+@media(prefers-reduced-motion:reduce){.icon-btn.is-refreshing .refresh-icon{animation-duration:3s}#refreshBtn.is-refreshing::after{animation:none}#refreshBtn>svg{transition:none}}
 
 /* Recherche */
 .searchbox{

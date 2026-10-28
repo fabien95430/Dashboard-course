@@ -2986,19 +2986,46 @@ async function checkForUpdateBeforeUnlock(){
     if(!reloading&&state.securityMode==='unlock')UI.securitySubmit.disabled=false;
   }
 }
+/* Mise à jour depuis l'en-tête : l'étape en cours puis le résultat restent écrits sous le titre de Réglages. */
+function setHeaderRefreshStatus(text,kind=''){
+  const status=document.getElementById('settingsHeaderStatus');
+  if(!status)return;
+  status.textContent=text;
+  status.dataset.state=kind;
+}
+function headerRefreshTime(){
+  try{return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(new Date())}catch(_){return ''}
+}
 async function refreshFromHeader(button,checkUpdate=false){
   if(button?.classList.contains('is-refreshing'))return;
+  clearTimeout(button?._doneTimer);
+  button?.classList.remove('is-done');
   button?.classList.add('is-refreshing');
   if(button)button.disabled=true;
+  let succeeded=false;
   try{
-    if(checkUpdate&&await installLatestAppVersion()){
-      location.reload();
-      return;
+    if(checkUpdate){
+      setHeaderRefreshStatus('Vérification de la mise à jour…','busy');
+      if(await installLatestAppVersion()){
+        setHeaderRefreshStatus('Nouvelle version · redémarrage…','new');
+        location.reload();
+        return;
+      }
     }
+    setHeaderRefreshStatus('Synchronisation de la liste…','busy');
     await refreshItems();
+    succeeded=true;
+    setHeaderRefreshStatus('À jour · vérifié à '+headerRefreshTime(),'ok');
+  }catch(error){
+    setHeaderRefreshStatus('Mise à jour impossible · réessayez','error');
+    console.warn('courses-app: rafraîchissement',error);
   }finally{
     button?.classList.remove('is-refreshing');
     if(button)button.disabled=false;
+    if(button&&succeeded){
+      button.classList.add('is-done');
+      button._doneTimer=setTimeout(()=>button.classList.remove('is-done'),1500);
+    }
   }
 }
 

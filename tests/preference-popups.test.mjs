@@ -366,3 +366,21 @@ test('v618 : Messages d erreur en liste groupée, détails dépliés sur place, 
   assert.match(css,/#preferencesDialog \.courses-error-tabs\{[^}]*grid-template-columns:130px 130px!important;[^}]*background:transparent!important/);
   assert.match(css,/#preferencesDialog \.courses-error-tabs > button\{[^}]*font:inherit!important;[^}]*font-size:16px!important/);
 });
+
+test('v621 : recettes par catégories repliables avec flèche retour, et rafraîchissement qui affiche son état',()=>{
+  const dishes=read('dishes-ui.js'),app=read('app.js'),css=read('styles.css'),html=read('index.html');
+  assert.doesNotMatch(dishes,/recipe-dish-current|recipeCustomizationCurrent/);
+  assert.match(dishes,/data-recipe-category="'\+escapeHtml\(category\)\+'"/);
+  assert.match(dishes,/recipeCustomizationOpenCategory=recipeCustomizationOpenCategory===next\?'':next;/);
+  assert.match(dishes,/recipeCustomizationBack\.className='settings-sheet-back';/);
+  assert.match(dishes,/recipeCustomizationBack\.addEventListener\('click',\(\)=>loadRecipeCustomizationDish\(''\)\)/);
+  assert.match(dishes,/label\.textContent=dish\?\.name\|\|'Personnalisation des recettes';/);
+  assert.match(dishes,/\.recipe-cat-head span\{[^}]*font-weight:600/);
+  assert.match(html,/<p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience<\/p>/);
+  assert.match(html,/class="refresh-done"[^>]*><use href="#i-check">/);
+  assert.match(app,/setHeaderRefreshStatus\('Vérification de la mise à jour…','busy'\)/);
+  assert.match(app,/setHeaderRefreshStatus\('À jour · vérifié à '\+headerRefreshTime\(\),'ok'\)/);
+  assert.match(app,/button\._doneTimer=setTimeout\(\(\)=>button\.classList\.remove\('is-done'\),1500\)/);
+  assert.match(css,/@keyframes header-refresh-spin\{to\{transform:rotate\(-360deg\)\}\}/);
+  assert.match(css,/#refreshBtn\.is-refreshing::after\{[^}]*animation:header-refresh-halo 1\.6s/);
+});
