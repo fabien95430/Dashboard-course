@@ -1,4 +1,4 @@
-const CACHE='courses-app-v625-r1';
+const CACHE='courses-app-v626-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -7,8 +7,16 @@ const CORE_VISUALS=[
   './www/empty-list-premium-v4.webp?v=305',
   './www/list-header-citrons-v552.webp'
 ];
-const SHELL=["./index.html","./marble-ivory-sage-v517.svg","./styles.css?v=625","./product-item-first-paint.css?v=610","./catalog.js?v=625","./preferences-service.js?v=398","./missing-requests-store.js?v=619","./courses-notifications.js?v=482","./bottom-nav-liquid.js?v=573","./app.js?v=624","./settings-tab-badge.js?v=410","./settings-ui.js?v=625","./error-center.js?v=618","./dishes.css?v=532","./catalog-liquid.css?v=496","./dish-detail.css?v=6","./catalog-liquid.js?v=495","./dishes-ui.js?v=621","./catalog-quantities.js?v=492","./repurchase-soon.js?v=576","./dish-local-images.js?v=625","./app-ui.js?v=442","./runtime-features.js?v=625","./missing-products-fixes.js?v=493","./missing-products-popup-ui.js?v=625","./product-item-images.js?v=610","./catalog-product-admin.js?v=625","./purchase-intelligence.js?v=619","./missing-products-dishes.js?v=625","./missing-products-modern.js?v=625","./dish-added-marker.js?v=408","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];
+const SHELL=["./index.html","./marble-ivory-sage-v517.svg","./styles.css?v=625","./product-item-first-paint.css?v=610","./catalog.js?v=626","./preferences-service.js?v=398","./missing-requests-store.js?v=619","./courses-notifications.js?v=482","./bottom-nav-liquid.js?v=573","./app.js?v=624","./settings-tab-badge.js?v=410","./settings-ui.js?v=625","./error-center.js?v=618","./dishes.css?v=532","./catalog-liquid.css?v=496","./dish-detail.css?v=6","./catalog-liquid.js?v=495","./dishes-ui.js?v=621","./catalog-quantities.js?v=492","./repurchase-soon.js?v=576","./dish-local-images.js?v=626","./app-ui.js?v=442","./runtime-features.js?v=625","./missing-products-fixes.js?v=493","./missing-products-popup-ui.js?v=625","./product-item-images.js?v=610","./catalog-product-admin.js?v=625","./purchase-intelligence.js?v=619","./missing-products-dishes.js?v=625","./missing-products-modern.js?v=625","./dish-added-marker.js?v=408","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];
 const refreshedVisuals=new Set();
+// Fichiers précachés de la version courante (adresses versionnées) : servis depuis le cache, sans attendre le réseau.
+const SHELL_SUFFIXES=SHELL.filter(src=>src!=='./index.html').map(src=>src.slice(1));
+function isPrecachedShellAsset(url){
+  const tail=url.pathname+url.search;
+  return SHELL_SUFFIXES.some(suffix=>tail.endsWith(suffix));
+}
+// Marque posée sur chaque visuel téléchargé : un visuel déjà vérifié pour cette version n'est plus re-téléchargé à chaque lancement.
+const VISUAL_REFRESH_MARK='X-Courses-Refreshed';
 
 function isPersistentVisual(url){
   return url.pathname.includes('/www/Plats/')
@@ -57,16 +65,23 @@ async function pruneVersionedDishVisuals(){
   }).map(request=>cache.delete(request)));
 }
 
-function refreshVisual(cache,request){
+function markVisualRefreshed(response){
+  const headers=new Headers(response.headers);
+  headers.set(VISUAL_REFRESH_MARK,CACHE);
+  return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+}
+
+function refreshVisual(cache,request,hit){
   const key=request.url;
   if(refreshedVisuals.has(key))return Promise.resolve();
+  if(hit?.headers?.get(VISUAL_REFRESH_MARK)===CACHE)return Promise.resolve();
   refreshedVisuals.add(key);
   return fetch(new Request(request,{cache:'reload'})).then(response=>{
     if(!response.ok){
       refreshedVisuals.delete(key);
       return;
     }
-    return cache.put(request,response.clone());
+    return cache.put(request,markVisualRefreshed(response.clone()));
   }).catch(()=>{
     refreshedVisuals.delete(key);
   });
@@ -142,7 +157,7 @@ self.addEventListener('fetch',event=>{
     event.waitUntil(
       hitPromise.then(hit=>{
         if(!hit)return;
-        return cachePromise.then(cache=>refreshVisual(cache,event.request));
+        return cachePromise.then(cache=>refreshVisual(cache,event.request,hit));
       }).catch(()=>{})
     );
     event.respondWith(
@@ -150,7 +165,7 @@ self.addEventListener('fetch',event=>{
         if(hit)return hit;
         try{
           const response=await fetch(new Request(event.request,{cache:'reload'}));
-          if(response.ok)await cache.put(event.request,response.clone());
+          if(response.ok)await cache.put(event.request,markVisualRefreshed(response.clone()));
           return response;
         }catch(_){
           return Response.error();
@@ -168,6 +183,18 @@ self.addEventListener('fetch',event=>{
     event.respondWith(hitPromise.then(async hit=>{
       if(hit)return hit;
       try{return await networkPromise}catch(_){return Response.error()}
+    }));
+    return;
+  }
+
+  if(isPrecachedShellAsset(url)){
+    event.respondWith(caches.open(CACHE).then(cache=>cache.match(event.request)).then(hit=>{
+      if(hit)return hit;
+      return fetch(new Request(event.request,{cache:'reload'})).then(response=>{
+        const copy=response.clone();
+        if(response.ok)caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+        return response;
+      }).catch(()=>Response.error());
     }));
     return;
   }
