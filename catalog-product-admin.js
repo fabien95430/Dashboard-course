@@ -9,10 +9,14 @@ const PENDING_TTL_MS=30*60*1000;
 const RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/actions/workflows/integrate-dish-openai.yml/runs?event=repository_dispatch&per_page=50';
 let currentMode='products';
 let currentQuery='';
-let currentConfirm='';
 let openGroup='';
 let openItem='';
 let blockedItem=null;
+/* Retraits en cours (comme « acheté » dans Ma liste) : phase « hold » = Annuler possible, « exit » = la ligne sort. */
+const removals=new Map();
+const REMOVE_HOLD_MS=2000;
+const REMOVE_EXIT_MS=800;
+let swipeSuppressUntil=0;
 let dishRows=null;
 let dishRowsPromise=null;
 let uiBound=false;
@@ -166,24 +170,27 @@ function installStyle(){
     .courses-product-admin-copy strong{font-size:var(--fs-text);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .courses-product-admin-copy small{color:#617366;font-size:var(--fs-note);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .courses-product-admin-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
-    .is-open>.courses-product-admin-group-head .courses-product-admin-caret,.is-open>.courses-product-admin-row .courses-product-admin-caret{transform:rotate(-90deg)}
-    .courses-product-admin-item.is-open{background:rgba(237,247,234,.55)}
-    .courses-product-admin-pending{padding:4px 11px;border-radius:999px;background:rgba(255,149,0,.2);color:#7a4700;font-size:var(--fs-note);font-weight:600;white-space:nowrap;flex:none}
-    .courses-product-admin-tools{display:grid;gap:8px;padding:0 14px 12px 16px}
-    .courses-product-admin-tools:has(.courses-product-admin-delete){padding-bottom:0}
-    .courses-product-admin-group-body .courses-product-admin-tools{padding-left:28px}
-    .courses-product-admin-tools.is-confirm{grid-template-columns:1fr 1fr}
-    .courses-product-admin-tools p{grid-column:1/-1;margin:0;color:#6c4a45;font-size:14px;line-height:1.4}
-    .courses-product-admin-tools button{min-height:42px;padding:0 12px;border:1px solid rgba(178,58,48,.2);border-radius:13px;background:rgba(255,255,255,.78);color:#b23a30;font:inherit;font-size:var(--fs-text);-webkit-appearance:none;appearance:none}
-    .courses-product-admin-tools .courses-product-admin-delete{min-height:44px;padding:0;border:0;border-top:1px solid rgba(39,66,47,.09);border-radius:0;background:transparent;text-align:left}
-    .courses-product-admin-tools .courses-product-admin-cancel{border-color:rgba(47,106,73,.18);color:#1f5a3b}
-    .courses-product-admin-tools .courses-product-admin-confirm-delete{border-color:transparent;background:#b8433a;color:#fff}
-    .courses-product-admin-tools button:disabled{opacity:.45}
+    .is-open>.courses-product-admin-group-head .courses-product-admin-caret{transform:rotate(-90deg)}
+    .courses-product-admin-item{position:relative;overflow:hidden;max-height:240px;transition:transform .6s cubic-bezier(.4,0,.2,1),opacity .45s ease,max-height .45s cubic-bezier(.4,0,.2,1) .3s}
+    .courses-product-admin-row{grid-template-columns:minmax(0,1fr) 38px;touch-action:pan-y}
+    .courses-product-admin-row:disabled{opacity:1;color:#1b2d21}
+    .courses-product-admin-more{justify-self:center;color:rgba(7,62,44,.25);font-size:var(--fs-sub);font-weight:700;transition:opacity .18s ease}
+    .courses-product-admin-delete{position:absolute;top:50%;right:5px;width:52px;height:48px;padding:0;border:1px solid rgba(194,54,65,.09);border-radius:16px;display:grid;place-items:center;background:rgba(244,205,210,.3);color:#cf4050;box-shadow:inset 0 1px rgba(255,255,255,.55);opacity:0;visibility:hidden;pointer-events:none;transform:translate3d(10px,-50%,0);transition:opacity .18s ease,transform .2s ease,visibility .18s;-webkit-appearance:none;appearance:none}
+    .courses-product-admin-delete svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .courses-product-admin-delete:active{background:rgba(244,205,210,.6)}
+    .courses-product-admin-item.is-actions-open .courses-product-admin-delete{opacity:1;visibility:visible;pointer-events:auto;transform:translate3d(0,-50%,0)}
+    .courses-product-admin-item.is-actions-open .courses-product-admin-more,.courses-product-admin-item.is-deleting .courses-product-admin-more{opacity:0}
+    .courses-product-admin-undo{position:absolute;top:50%;right:12px;transform:translateY(-50%);padding:10px 2px;border:0;background:transparent;color:#087c3c;font:inherit;font-size:var(--fs-text);font-weight:600;white-space:nowrap;-webkit-appearance:none;appearance:none}
+    .courses-product-admin-undo[hidden]{display:none}
+    .courses-product-admin-item.is-deleting>.courses-product-admin-row{background:linear-gradient(90deg,#fff0f1 0%,#fff8f7 100%)}
+    .courses-product-admin-item.is-deleting .courses-product-admin-copy strong{color:#a73b42}
+    .courses-product-admin-item.is-removing{transform:translate3d(-40%,0,0);opacity:0;max-height:0}
+    .courses-product-admin-note{margin:0;padding:0 16px 12px;color:#a73b42;font-size:var(--fs-note);line-height:1.4}
     .courses-product-admin-empty{margin:0;padding:26px 16px;text-align:center;color:#617366;font-size:14px;line-height:1.45}
     .courses-product-admin-feedback{min-height:0;margin-top:10px;color:#4c6152;font-size:13.5px;text-align:center}
     .courses-product-admin-feedback:empty{display:none}
     .courses-product-admin-feedback.is-error{color:#b23a30}.courses-product-admin-feedback.is-ok{color:#1f7a4a}
-    @media(prefers-reduced-motion:reduce){.courses-product-admin-caret{transition:none}}
+    @media(prefers-reduced-motion:reduce){.courses-product-admin-caret,.courses-product-admin-item,.courses-product-admin-delete,.courses-product-admin-more{transition:none}}
   `;
   document.head.appendChild(style);
 }
@@ -196,31 +203,56 @@ function visibleRows(rows){
   const query=norm(currentQuery);
   return rows.filter(item=>!query||norm(item.name+' '+item.category+' '+item.subgroup).includes(query));
 }
-function confirmMarkup(item,itemType){
-  if(currentConfirm!==pendingKey(itemType,item.name))return '';
-  const message=itemType==='product'
-    ?'Le produit sera retiré du catalogue et son image supprimée du dépôt GitHub. La liste Home Assistant n’est pas modifiée.'
-    :'Le plat, sa recette et son image seront supprimés définitivement. Les produits du catalogue et la liste Home Assistant ne sont pas modifiés.';
-  return '<div class="courses-product-admin-tools courses-product-admin-confirm is-confirm"><p>Retirer définitivement « '+esc(item.name)+' » ? '+message+'</p><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-confirm-delete" type="button" data-confirm-delete="'+esc(item.name)+'" data-item-type="'+itemType+'">Retirer</button></div>';
-}
 function itemMarkup(item,itemType){
   const key=pendingKey(itemType,item.name);
-  const pending=pendingFor(itemType,item.name);
-  const open=!pending&&openItem===key;
-  let tools='';
-  if(open){
-    if(blockedItem?.key===key)tools='<div class="courses-product-admin-tools"><p>Impossible de retirer « '+esc(item.name)+' » : utilisé par '+esc(blockedItem.usages.slice(0,5).join(', '))+(blockedItem.usages.length>5?'…':'')+'.</p></div>';
-    else tools=confirmMarkup(item,itemType)||'<div class="courses-product-admin-tools"><button class="courses-product-admin-delete" type="button" data-delete-item="'+esc(item.name)+'" data-item-type="'+itemType+'">Retirer du catalogue</button></div>';
-  }
-  return '<div class="courses-product-admin-item'+(open?' is-open':'')+'" data-item="'+esc(item.name)+'"><button class="courses-product-admin-row" type="button" data-admin-item="'+esc(key)+'" aria-expanded="'+open+'"'+(pending?' disabled':'')+'><span class="courses-product-admin-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.subgroup)+'</small></span>'+
-    (pending?'<span class="courses-product-admin-pending">Retrait en cours</span>':'<span></span>')+'<svg class="courses-product-admin-caret" aria-hidden="true"><use href="#i-chevron"></use></svg></button>'+tools+'</div>';
+  const removal=removals.get(key);
+  const open=!removal&&openItem===key;
+  const name=esc(item.name);
+  const blocked=blockedItem?.key===key;
+  return '<div class="courses-product-admin-item'+(open?' is-actions-open':'')+(removal?' is-deleting':'')+(removal?.phase==='exit'?' is-removing':'')+'" data-item="'+name+'">'+
+    '<button class="courses-product-admin-row" type="button" data-admin-item="'+esc(key)+'" aria-expanded="'+open+'"'+(removal?' disabled':'')+'><span class="courses-product-admin-copy"><strong>'+name+'</strong><small>'+esc(item.subgroup)+'</small></span><span class="courses-product-admin-more" aria-hidden="true">⋯</span></button>'+
+    '<button class="courses-product-admin-delete" type="button" data-delete-item="'+name+'" data-item-type="'+itemType+'" aria-label="Retirer '+name+' du catalogue"'+(open?'':' aria-hidden="true" tabindex="-1" disabled')+'><svg aria-hidden="true"><use href="#i-trash"></use></svg></button>'+
+    '<button class="courses-product-admin-undo" type="button" data-undo-delete="'+esc(key)+'"'+(removal?.phase==='hold'?'':' hidden')+'>Annuler</button>'+
+    (blocked?'<p class="courses-product-admin-note">Impossible de retirer « '+name+' » : utilisé par '+esc(blockedItem.usages.slice(0,5).join(', '))+(blockedItem.usages.length>5?'…':'')+'.</p>':'')+
+  '</div>';
+}
+function itemElement(key){
+  const {panel}=panelElements();
+  const row=[...(panel?.querySelectorAll('[data-admin-item]')||[])].find(button=>button.dataset.adminItem===key);
+  return row?.closest('.courses-product-admin-item')||null;
+}
+/* Ouvre la corbeille d'une seule ligne (balayage vers la gauche ou toucher) sans reconstruire la liste : la transition reste fluide. */
+function setOpenItem(key){
+  const {panel}=panelElements();
+  openItem=key;
+  if(blockedItem){blockedItem=null;panel?.querySelectorAll('.courses-product-admin-note').forEach(note=>note.remove())}
+  panel?.querySelectorAll('.courses-product-admin-item').forEach(element=>{
+    const row=element.querySelector('[data-admin-item]');
+    const open=!!key&&row?.dataset.adminItem===key&&!element.classList.contains('is-deleting');
+    element.classList.toggle('is-actions-open',open);
+    row?.setAttribute('aria-expanded',String(open));
+    const trash=element.querySelector('[data-delete-item]');
+    if(!trash)return;
+    trash.disabled=!open;trash.tabIndex=open?0:-1;
+    if(open)trash.removeAttribute('aria-hidden');else trash.setAttribute('aria-hidden','true');
+  });
+}
+function paintRemoval(key){
+  const element=itemElement(key);if(!element)return;
+  const removal=removals.get(key);
+  element.classList.toggle('is-deleting',!!removal);
+  element.classList.toggle('is-removing',removal?.phase==='exit');
+  const row=element.querySelector('[data-admin-item]');if(row)row.disabled=!!removal;
+  const undo=element.querySelector('[data-undo-delete]');if(undo)undo.hidden=removal?.phase!=='hold';
 }
 function renderRows(rows,itemType,listOnly=false){
   const {panel}=panelElements();if(!panel)return;
   pendingSnapshot=readPending();
   try{renderRowsNow(panel,rows,itemType,listOnly)}finally{pendingSnapshot=null}
 }
-function renderRowsNow(panel,rows,itemType,listOnly){
+function renderRowsNow(panel,allRows,itemType,listOnly){
+  /* Un élément dont le retrait est demandé disparaît de la liste, comme un article acheté dans Ma liste. */
+  const rows=allRows.filter(item=>!pendingFor(itemType,item.name));
   const label=itemType==='dish'?'plat':'produit';
   const query=norm(currentQuery);
   let list='';
@@ -237,7 +269,11 @@ function renderRowsNow(panel,rows,itemType,listOnly){
     }).join('');
   }
   const listEl=panel.querySelector('.courses-product-admin-list');
-  if(listOnly&&listEl){listEl.innerHTML=list;return}
+  if(listOnly&&listEl){
+    listEl.innerHTML=list;
+    const count=panel.querySelector('.courses-product-admin-title span');if(count)count.textContent=String(rows.length);
+    return;
+  }
   const keepFocus=document.activeElement?.matches?.('[data-product-admin-search]');
   panel.innerHTML='<div class="courses-product-admin-title">Dans le catalogue<span>'+rows.length+'</span></div>'+
     '<label class="courses-product-admin-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><input type="search" value="'+esc(currentQuery)+'" placeholder="Rechercher un '+label+'" aria-label="Rechercher un '+label+'" autocomplete="off" enterkeyhint="search" data-product-admin-search></label>'+
@@ -255,35 +291,50 @@ function feedback(message,type=''){
   if(type==='error')window.CoursesHaptics?.play('error');else if(type==='ok')window.CoursesHaptics?.play('delete');
   el.textContent=message||'';el.className='courses-product-admin-feedback'+(type?' is-'+type:'');
 }
-async function beginDeletion(itemType,name,button){
-  button.disabled=true;
-  if(itemType==='dish'){
-    currentConfirm=pendingKey(itemType,name);await render();return;
-  }
-  feedback('Vérification des recettes…');
-  try{
-    const usages=await recipeUsages(name);
-    if(usages.length){
-      blockedItem={key:pendingKey(itemType,name),usages};
-      await render();
-      return;
-    }
-    currentConfirm=pendingKey(itemType,name);await render();
-  }catch(error){
-    button.disabled=false;feedback(String(error?.message||'Vérification impossible.'),'error');
-  }
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function abortRemoval(key,token,usages,message){
+  token.cancelled=true;removals.delete(key);
+  if(usages?.length)blockedItem={key,usages};
+  void render(true);
+  if(message)feedback(message,'error');
 }
-async function confirmDeletion(itemType,name,button){
-  button.disabled=true;feedback('Envoi de la suppression à GitHub…');
-  /* iOS n'accorde le retour haptique que pendant le geste de l'utilisateur : on le joue au toucher, avant les attentes réseau. */
+/* Même parcours que « acheté » dans Ma liste : la ligne passe en rose avec Annuler, puis sort vers la gauche ; la demande n'est envoyée qu'ensuite. */
+async function startRemoval(itemType,name){
+  const key=pendingKey(itemType,name);
+  if(!norm(name)||removals.has(key))return;
+  /* iOS n'accorde le retour haptique que pendant le geste de l'utilisateur : on le joue au toucher. */
   window.CoursesHaptics?.play('delete');
+  const token={cancelled:false,phase:'hold',itemType,name};
+  removals.set(key,token);
+  setOpenItem('');
+  paintRemoval(key);
+  const usage=itemType==='product'?recipeUsages(name).then(usages=>({usages}),error=>({error})):Promise.resolve({usages:[]});
+  usage.then(result=>{
+    if(token.cancelled||token.phase!=='hold')return;
+    if(result.error)abortRemoval(key,token,null,String(result.error?.message||'Vérification impossible.'));
+    else if(result.usages.length)abortRemoval(key,token,result.usages);
+  });
+  await wait(REMOVE_HOLD_MS);
+  await usage;
+  if(token.cancelled)return;
+  token.phase='exit';paintRemoval(key);
+  await wait(REMOVE_EXIT_MS);
   try{
     await requestDeletion(itemType,name);
-    currentConfirm='';openItem='';await render();
+    removals.delete(key);
+    await render(true);
   }catch(error){
-    button.disabled=false;feedback(String(error?.message||'Suppression impossible.'),'error');
+    removals.delete(key);await render(true);
+    feedback(String(error?.message||'Suppression impossible.'),'error');
     window.CoursesErrors?.report?.({key:'catalog-delete:'+itemType+':'+norm(name),severity:'error',source:'Catalogue',title:'Suppression de « '+name+' » impossible',message:String(error?.message||'La demande n’a pas pu être envoyée.')});
   }
+}
+function undoRemoval(key){
+  const token=removals.get(key);
+  if(!token||token.phase!=='hold')return;
+  token.cancelled=true;removals.delete(key);
+  paintRemoval(key);
+  window.CoursesHaptics?.play('tick');
 }
 async function reconcilePending(){
   const pending=readPending();
@@ -312,7 +363,7 @@ async function reconcilePending(){
     }
   }catch(_){}
 }
-function resetView(){currentQuery='';currentConfirm='';openGroup='';openItem='';blockedItem=null}
+function resetView(){currentQuery='';openGroup='';openItem='';blockedItem=null}
 /* Le popup annonce sa vue et son type (Produits / Plats) ; la vue Suppression se rend ici. */
 function followCatalogView(detail){
   const nextMode=detail?.mode==='dishes'?'dishes':'products';
@@ -328,18 +379,44 @@ function bindUi(){
   uiBound=true;installStyle();
   panel.addEventListener('input',event=>{
     if(event.target.matches('[data-product-admin-search]')){
-      currentQuery=event.target.value;currentConfirm='';openItem='';blockedItem=null;void render(true);
+      currentQuery=event.target.value;openItem='';blockedItem=null;void render(true);
     }
+  });
+  /* Balayage vers la gauche sur une ligne : révèle la corbeille (vers la droite : la referme), comme dans Ma liste. */
+  panel.addEventListener('pointerdown',event=>{
+    if(event.button!==undefined&&event.button!==0)return;
+    const row=event.target.closest('.courses-product-admin-row');if(!row)return;
+    const key=row.dataset.adminItem||'';
+    const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
+    const stop=()=>{document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',stop,true);document.removeEventListener('pointercancel',stop,true)};
+    const move=moveEvent=>{
+      if(moveEvent.pointerId!==pointerId)return;
+      const dx=moveEvent.clientX-startX,dy=moveEvent.clientY-startY;
+      if(Math.abs(dx)>26&&Math.abs(dx)>Math.abs(dy)*1.4){
+        stop();swipeSuppressUntil=Date.now()+400;
+        if(dx<0)setOpenItem(key);else if(openItem===key)setOpenItem('');
+        return;
+      }
+      if(Math.abs(dy)>12&&Math.abs(dy)>=Math.abs(dx))stop();
+    };
+    document.addEventListener('pointermove',move,{passive:true,capture:true});
+    document.addEventListener('pointerup',stop,{capture:true});
+    document.addEventListener('pointercancel',stop,{capture:true});
   });
   panel.addEventListener('click',event=>{
     event.stopPropagation();
     const group=event.target.closest('[data-admin-group]');
-    if(group){const name=group.dataset.adminGroup||'';openGroup=openGroup===name?'':name;openItem='';currentConfirm='';blockedItem=null;void render();return}
-    const del=event.target.closest('[data-delete-item]');if(del){void beginDeletion(del.dataset.itemType||'product',del.dataset.deleteItem||'',del);return}
-    if(event.target.closest('.courses-product-admin-cancel')){currentConfirm='';void render();return}
-    const finalButton=event.target.closest('[data-confirm-delete]');if(finalButton){void confirmDeletion(finalButton.dataset.itemType||'product',finalButton.dataset.confirmDelete||'',finalButton);return}
+    if(group){const name=group.dataset.adminGroup||'';openGroup=openGroup===name?'':name;openItem='';blockedItem=null;void render();return}
+    const del=event.target.closest('[data-delete-item]');if(del){void startRemoval(del.dataset.itemType||'product',del.dataset.deleteItem||'');return}
+    const undo=event.target.closest('[data-undo-delete]');if(undo){undoRemoval(undo.dataset.undoDelete||'');return}
     const item=event.target.closest('[data-admin-item]');
-    if(item){const key=item.dataset.adminItem||'';openItem=openItem===key?'':key;currentConfirm='';blockedItem=null;void render()}
+    if(item){
+      if(Date.now()<swipeSuppressUntil)return;
+      const key=item.dataset.adminItem||'';
+      setOpenItem(openItem===key?'':key);
+      return;
+    }
+    if(openItem)setOpenItem('');
   });
   dialog.addEventListener('close',resetView);
   document.addEventListener('courses:catalog-view-changed',event=>followCatalogView(event.detail));

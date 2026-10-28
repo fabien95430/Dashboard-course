@@ -12,8 +12,12 @@ test('l administration du catalogue distingue produits et plats',()=>{
   assert.match(source,/document\.addEventListener\('courses:catalog-view-changed',event=>followCatalogView\(event\.detail\)\)/);
   assert.match(source,/requestDeletion\(itemType,name\)/);
   assert.match(source,/itemType==='dish'\?DELETE_DISH_PREFIX:DELETE_PRODUCT_PREFIX/);
-  assert.match(source,/if\(itemType==='dish'\)\{[\s\S]*?currentConfirm=pendingKey\(itemType,name\)/);
-  assert.match(source,/const usages=await recipeUsages\(name\)/);
+  assert.match(source,/removals\.set\(key,token\)/);
+  assert.match(source,/await wait\(REMOVE_HOLD_MS\);[\s\S]*?if\(token\.cancelled\)return;[\s\S]*?await requestDeletion\(itemType,name\)/);
+  assert.match(source,/function undoRemoval\(key\)\{/);
+  assert.match(source,/data-undo-delete/);
+  assert.match(source,/recipeUsages\(name\)\.then\(usages=>\(\{usages\}\)/);
+  assert.match(source,/await usage;\s*if\(token\.cancelled\)return;\s*token\.phase='exit'/);
 });
 
 test('la suppression d un plat retire recette, quantités et visuel sans toucher aux produits',()=>{

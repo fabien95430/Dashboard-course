@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v648';
+const APP_VERSION='v649';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 const SPECIAL_SLUGS=Object.freeze({

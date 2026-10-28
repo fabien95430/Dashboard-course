@@ -3922,7 +3922,7 @@ body{
 .settings-sheet .field>span.connection-list-status[data-state="synced"]{color:#147545!important}
 .settings-sheet .dialog-feedback.is-visible{white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
 .settings-sheet #preferencesNotificationsPanel .notifications-management-summary{border:1px solid var(--tile-line)!important;background:var(--tile-bg)!important;box-shadow:var(--tile-shadow)!important}
-.settings-sheet .courses-product-admin-row{background:var(--tile-bg)!important;border-color:var(--tile-line)!important;box-shadow:var(--tile-shadow)!important}
+.settings-sheet .courses-product-admin-item:not(.is-deleting)>.courses-product-admin-row{background:var(--tile-bg)!important;border-color:var(--tile-line)!important;box-shadow:var(--tile-shadow)!important}
 .settings-sheet .recipe-customization-item,.settings-sheet .recipe-customization-ingredient-picker{background:rgba(255,255,255,.49)!important;border-color:rgba(40,70,49,.10)!important;box-shadow:none!important}
 .settings-sheet .recipe-customization-item.is-selected{background:rgba(221,237,216,.73)!important;border-color:rgba(62,124,77,.22)!important}
 .settings-sheet .recipe-customization-add-button{border-color:rgba(51,108,63,.19)!important;background:rgba(237,247,234,.57)!important;color:#296043!important}
@@ -4006,9 +4006,6 @@ body{
 .settings-sheet .connection-sync-line+.connection-sync-line{
   border-top:1px solid rgba(39,66,47,.09)!important;
 }
-.settings-sheet .courses-product-admin-row+.courses-product-admin-row{
-  border-top-color:rgba(39,66,47,.09)!important;
-}
 @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-button{transition:none!important}}
 
 /* Messages d'erreur v618 : sélecteur À traiter / Résolues comme Produits / Plats (deux mots, trait sous l'actif). */
@@ -4043,7 +4040,6 @@ body{
 @media(prefers-reduced-motion:reduce){.settings-sheet[open]{animation:none!important}.settings-view .settings-row{transition:none!important}}
 
 .settings-sheet:not([open]){display:none!important}
-.settings-sheet .courses-product-admin-confirm{background:rgba(243,220,215,.54)!important;border-color:rgba(170,66,56,.15)!important}
 
 /* ===== UI v633 — écran de connexion : tuile « accès privé », clé dorée, bouton sapin à double filet or ===== */
 .security-modal{
