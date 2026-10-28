@@ -369,7 +369,7 @@ function initMissingProductsAndDishes(){
     removePanel.hidden=view!=='remove';
     if(dialogIntro){
       dialogIntro.textContent=view==='remove'
-        ?'Retirez un produit ou un plat du catalogue.'
+        ?(dishesMode?'Les plats ne se retirent pas depuis ce menu.':'Retirez un produit du catalogue.')
         :formStep?(dishesMode?'Nouveau plat à intégrer au catalogue.':'Nouveau produit à intégrer au catalogue.')
           :'Demandez l’ajout d’un produit ou d’un plat.';
     }

@@ -125,3 +125,13 @@ test('recette : compteur sans « ingrédients sur », badges de quantité de lar
   assert.match(css,/\.recipe-customization-list\{flex:0 1 auto!important;/);
   assert.match(css,/\.recipe-customization-dialog \.dialog-actions\{flex:0 0 auto;margin-top:auto!important;/);
 });
+
+test('catalogue (Suppression) : Annuler rouge, ligne en retrait rouge franc sans rose, aucun balayage sur les plats',()=>{
+  const admin=readFileSync(new URL('../catalog-product-admin.js',import.meta.url),'utf8');
+  const dishes=readFileSync(new URL('../missing-products-dishes.js',import.meta.url),'utf8');
+  assert.match(admin,/\.courses-product-admin-undo\{[^}]*color:#D32F2F;/);
+  assert.match(admin,/\.is-deleting>\.courses-product-admin-row\{background:#FDECEA\}/);
+  assert.match(admin,/\.is-deleting \.courses-product-admin-copy strong\{color:#B71C1C\}/);
+  assert.match(admin,/if\(row\.dataset\.itemType==='dish'\)return;\s*clearBlockedNote\(\);/);
+  assert.doesNotMatch(dishes,/Retirez un produit ou un plat/);
+});

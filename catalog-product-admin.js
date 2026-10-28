@@ -171,10 +171,10 @@ function installStyle(){
     .is-open>.courses-product-admin-group-head .courses-product-admin-caret{transform:rotate(-90deg)}
     .courses-product-admin-item{position:relative;overflow:hidden;max-height:240px;transition:transform .6s cubic-bezier(.4,0,.2,1),opacity .45s ease,max-height .45s cubic-bezier(.4,0,.2,1) .3s}
     .courses-product-admin-row{grid-template-columns:minmax(0,1fr);touch-action:pan-y;-webkit-user-select:none;user-select:none}
-    .courses-product-admin-undo{position:absolute;top:50%;right:12px;transform:translateY(-50%);padding:10px 2px;border:0;background:transparent;color:#087c3c;font:inherit;font-size:var(--fs-text);font-weight:600;white-space:nowrap;-webkit-appearance:none;appearance:none}
+    .courses-product-admin-undo{position:absolute;top:50%;right:12px;transform:translateY(-50%);padding:10px 2px;border:0;background:transparent;color:#D32F2F;font:inherit;font-size:var(--fs-text);font-weight:600;white-space:nowrap;-webkit-appearance:none;appearance:none}
     .courses-product-admin-undo[hidden]{display:none}
-    .courses-product-admin-item.is-deleting>.courses-product-admin-row{background:linear-gradient(90deg,#fff0f1 0%,#fff8f7 100%)}
-    .courses-product-admin-item.is-deleting .courses-product-admin-copy strong{color:#a73b42}
+    .courses-product-admin-item.is-deleting>.courses-product-admin-row{background:#FDECEA}
+    .courses-product-admin-item.is-deleting .courses-product-admin-copy strong{color:#B71C1C}
     .courses-product-admin-item.is-removing{transform:translate3d(-40%,0,0);opacity:0;max-height:0}
     .courses-product-admin-note{margin:0;padding:0 16px 12px;color:#a73b42;font-size:var(--fs-note);line-height:1.4}
     .courses-product-admin-empty{margin:0;padding:26px 16px;text-align:center;color:#617366;font-size:14px;line-height:1.45}
@@ -363,6 +363,7 @@ function bindUi(){
   panel.addEventListener('pointerdown',event=>{
     if(event.button!==undefined&&event.button!==0)return;
     const row=event.target.closest('.courses-product-admin-row');if(!row)return;
+    if(row.dataset.itemType==='dish')return;
     clearBlockedNote();
     if(removals.has(row.dataset.adminItem||''))return;
     const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;

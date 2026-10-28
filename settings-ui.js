@@ -103,7 +103,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=635';
+script.src='./missing-products-dishes.js?v=654';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
