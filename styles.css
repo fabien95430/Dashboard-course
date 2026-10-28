@@ -4119,16 +4119,3 @@ body{
 /* ===== UI v636 — la tuile ne bouge pas à l'ouverture du clavier ===== */
 .security-shell.is-password-open .security-modal{top:var(--security-pin-modal,36%)!important}
 .security-shell.is-password-open .security-hero{top:var(--security-pin-hero,4.1%)!important}
-
-/* ===== v639 — premier affichage verrouillé : l'écran de connexion est déjà peint ===== */
-/* lock-first-paint.js pose html.is-prelock quand un coffre existe ; app.js la retire. */
-html.is-prelock #securityOverlay{display:grid}
-html.is-prelock #securityOverlay,
-html.is-prelock,
-html.is-prelock body{
-  background-color:#f6f1e7!important;
-  background-image:url("./welcome-background-v40.webp")!important;
-  background-position:center!important;
-  background-size:cover!important;
-  background-repeat:no-repeat!important;
-}
