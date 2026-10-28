@@ -2,6 +2,12 @@
 
 **Source de vérité de cette file :** historique `docs/AVANCEMENT_IMAGES_PRODUITS.md` (inventaire exhaustif v611, 84 références non renouvelées) ; comparaison ciblée avec les lots v612, v613, v614, v615 et v616 ; `main` de préparation `a8cbd3be4902467b12d951540ccf2b542abbf2c9`.
 
+## Lot v629 — six WebP unitaires (publication conditionnelle)
+
+Six références auparavant non renouvelées passent en remplacement conditionnel : **Sacs congélation, Prosecco, Vin rosé, Démaquillant, Protections hygiéniques et Bière blanche**. Candidats originaux générés via ChatGPT sans API du projet, PNG RGBA 1 produit autonome par visuel, traités en WebP RGBA **384 × 384 px**, avec véritables marges alpha. Contrôle sur **fonds blanc et sauge à 192 px**, comparaison de leurs variantes avec les anciens WebP GitHub. Aucune planche recadrée, aucune image déjà renouvelée ou déjà conservée réouverte ; crédits/détails : `docs/IMAGE_CREDITS_V629.md`.
+
+**Projection uniquement après fusion validée : 366/414 renouvelés distincts ; 48 non renouvelés, dont 35 conservés et 13 encore en attente d'un candidat satisfaisant.** Le défaut Sacs congélation est corrigé, il ne reste plus de statut `CORRIGER_SI_CANDIDAT_CONFORME` dans cette file. Garder le suivi historique des lots précédents.
+
 ## Lot v627 — 1 remplacement ciblé et 7 décisions de conservation (publication conditionnelle)
 
 - Un remplacement unique : `poisson-surgele.webp`, nouveau filet blanc cru isolé, WebP 320×320 alpha natif (Soft Studio Ingredients, CC BY 4.0), à compter seulement après CI et publication.
@@ -28,16 +34,13 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 4. Ne jamais compter un produit deux fois. Un remplacement d'un WebP antérieurement renouvelé peut modifier sa qualité, **pas** le décompte des produits distincts.
 5. Un candidat n'est pas un produit publié. Les tests, licences, crédits, caches/versions, SHA Git, CI et Pages doivent être confirmés avant de modifier un statut. Ne jamais découper une planche ni utiliser l'API OpenAI payante du projet.
 
-## Références encore non renouvelées après v627 (54, publication conditionnelle)
+## Références encore non renouvelées après v629 (48, publication conditionnelle)
 
 | Catégorie | Produit | WebP | Décision opérationnelle |
 | --- | --- | --- | --- |
 | Apéritif & snacks | Kinder Maxi | `kinder-maxi.webp` | `CONSERVER` |
-| Boissons | Bière blanche | `biere-blanche.webp` | `ATTENDRE_CANDIDAT` |
-| Boissons | Prosecco | `prosecco.webp` | `ATTENDRE_CANDIDAT` |
 | Boissons | Rhum | `rhum.webp` | `CONSERVER` |
 | Boissons | Ricard | `ricard.webp` | `CONSERVER` |
-| Boissons | Vin rosé | `vin-rose.webp` | `ATTENDRE_CANDIDAT` |
 | Boulangerie | Pâte brisée | `pate-brisee.webp` | `CONSERVER` |
 | Cuisine | Confiture fraise | `confiture-fraise.webp` | `ATTENDRE_CANDIDAT` |
 | Cuisine | Noix de coco râpée | `noix-de-coco-rapee.webp` | `CONSERVER` |
@@ -51,10 +54,8 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Hygiène & soins | Alcool 70 | `alcool-70.webp` | `CONSERVER` |
 | Hygiène & soins | Antiseptique | `antiseptique.webp` | `CONSERVER` |
 | Hygiène & soins | Baume lèvres | `baume-levres.webp` | `CONSERVER` |
-| Hygiène & soins | Démaquillant | `demaquillant.webp` | `ATTENDRE_CANDIDAT` |
 | Hygiène & soins | Mouchoirs poche | `mouchoirs-poche.webp` | `CONSERVER` |
 | Hygiène & soins | Pansements | `pansements.webp` | `CONSERVER` |
-| Hygiène & soins | Protections hygiéniques | `protections-hygieniques.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Désinfectant | `desinfectant.webp` | `CONSERVER` |
 | Maison | Éponges magiques | `eponges-magiques.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Essuie-verres | `essuie-verres.webp` | `CONSERVER` |
@@ -67,7 +68,6 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Maison | Piles AA | `piles-aa.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Pinces à linge | `pinces-a-linge.webp` | `CONSERVER` |
 | Maison | Produit inox | `produit-inox.webp` | `ATTENDRE_CANDIDAT` |
-| Maison | Sacs congélation | `sacs-congelation.webp` | `CORRIGER_SI_CANDIDAT_CONFORME` |
 | Maison | Sacs linge délicat | `sacs-linge-delicat.webp` | `CONSERVER` |
 | Maison | Sacs poubelle 30L | `sacs-poubelle-30l.webp` | `CONSERVER` |
 | Maison | Sacs poubelle 50L | `sacs-poubelle-50l.webp` | `CONSERVER` |
