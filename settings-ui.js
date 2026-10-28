@@ -326,6 +326,17 @@ function initApplicationManagement(){
     notificationsButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-bell"></use></svg></span><span class="security-setting-copy"><strong>Notifications</strong><small id="notificationsManagementSummary">À activer sur chaque iPhone</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
   }
   managementPanel.appendChild(notificationsButton);
+
+  /* Tuile Catalogue créée avec les autres : catalog-product-admin.js la relie à son chargement, sans apparition différée. */
+  let catalogButton=document.getElementById('preferencesProductCatalog');
+  if(!catalogButton){
+    catalogButton=document.createElement('button');
+    catalogButton.id='preferencesProductCatalog';
+    catalogButton.type='button';
+    catalogButton.className='security-action-row';
+    catalogButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-grid"></use></svg></span><span class="security-setting-copy"><strong>Catalogue</strong><small>Consulter et supprimer des produits ou des plats</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+  }
+  managementPanel.appendChild(catalogButton);
   const notificationsPanel=document.getElementById('preferencesNotificationsPanel');
   const currentNotificationStatus=window.COURSES_NOTIFICATIONS?.getStatus?.();
   if(currentNotificationStatus){
@@ -340,17 +351,33 @@ function initApplicationManagement(){
   const selectionNodes=[...content.children].filter(node=>node!==title&&node!==intro&&node!==managementPanel);
   const originalHidden=new Map(selectionNodes.map(node=>[node,node.hidden]));
 
-  function setTitle(label){
+  /* Dans les sous-écrans de Gestion, une flèche remplace l'icône devant le titre et ramène au menu Gestion. */
+  let backButton=title?.querySelector('.settings-sheet-back')||null;
+  if(title&&!backButton){
+    backButton=document.createElement('button');
+    backButton.type='button';
+    backButton.className='settings-sheet-back';
+    backButton.hidden=true;
+    backButton.setAttribute('aria-label','Retour à Gestion de l’application');
+    backButton.innerHTML='<svg aria-hidden="true"><use href="#i-chevron"></use></svg>';
+    title.prepend(backButton);
+  }
+  backButton?.addEventListener('click',()=>showManagement());
+
+  function setTitle(label,parent=''){
     const labelNode=title?.querySelector('.settings-sheet-title');
     if(labelNode)labelNode.textContent=label;
     else if(title)title.textContent=label;
+    const back=parent==='management';
+    if(backButton)backButton.hidden=!back;
+    title?.classList.toggle('has-back',back);
   }
 
   function showSelections(){
     [...content.children].forEach(node=>{if(node!==title&&node!==intro)node.hidden=true});
     selectionNodes.forEach(node=>{node.hidden=Boolean(originalHidden.get(node))});
     managementPanel.hidden=true;
-    setTitle(originalTitle);
+    setTitle(originalTitle,'');
     if(intro)intro.textContent=originalIntro;
   }
 

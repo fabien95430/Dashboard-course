@@ -276,20 +276,14 @@ function showCatalog(){
 function bindUi(){
   if(uiBound)return true;
   const management=document.getElementById('preferencesApplicationManagement');
-  const errorButton=document.getElementById('preferencesErrorMessages');
   const dialog=document.getElementById('preferencesDialog');
   const content=dialog?.querySelector(':scope>.preference-dialog-scroll');
   if(!management||!dialog||!content)return false;
   uiBound=true;installStyle();
-  let button=document.getElementById('preferencesProductCatalog');
-  if(!button){
-    button=document.createElement('button');button.id='preferencesProductCatalog';button.type='button';button.className='security-action-row';
-    button.innerHTML='<span class="security-setting-icon"><svg><use href="#i-grid"></use></svg></span><span class="security-setting-copy"><strong>Catalogue</strong><small>Consulter et supprimer des produits ou des plats</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
-    if(errorButton)errorButton.before(button);else management.appendChild(button);
-  }
+  const button=document.getElementById('preferencesProductCatalog');
   let panel=document.getElementById('preferencesProductCatalogPanel');
   if(!panel){panel=document.createElement('div');panel.id='preferencesProductCatalogPanel';panel.className='courses-product-admin';panel.hidden=true;content.appendChild(panel)}
-  button.addEventListener('click',showCatalog);
+  button?.addEventListener('click',showCatalog);
   panel.addEventListener('input',event=>{
     if(event.target.matches('[data-product-admin-search]')){
       currentQuery=event.target.value;currentConfirm='';void render().then(()=>panel.querySelector('[data-product-admin-search]')?.focus());

@@ -3980,6 +3980,12 @@ body{
 .settings-sheet h3,.settings-sheet .preference-dialog-scroll>h3{position:relative!important;display:block!important;box-sizing:border-box!important;min-height:0!important;margin:0 auto!important;padding:0 0 0 58px!important;color:#263f30!important;font-size:20px!important;font-weight:600!important;line-height:24px!important;letter-spacing:-.3px!important;white-space:nowrap!important}
 /* En-tête commun : titre et sous-titre sur une ligne ; l'icône est centrée sur ce bloc de deux lignes (décalage fixe, lignes à hauteur constante). */
 .settings-sheet .settings-sheet-icon{position:absolute;left:0;top:0;width:44px;height:44px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.settings-sheet .settings-sheet-back{position:absolute;z-index:1;left:0;top:0;width:44px;height:44px;display:grid;place-items:center;padding:0;border:0;border-radius:17px;background:linear-gradient(145deg,rgba(214,230,210,.95),rgba(225,235,220,.81));color:#28583e;box-shadow:inset 0 1px 0 rgba(255,255,255,.65);-webkit-appearance:none;appearance:none}
+.settings-sheet .settings-sheet-back[hidden]{display:none}
+.settings-sheet .settings-sheet-back:active{transform:scale(.94)}
+.settings-sheet .settings-sheet-back:focus-visible{outline:2px solid rgba(51,105,72,.3);outline-offset:2px}
+.settings-sheet .settings-sheet-back svg{width:22px;height:22px;transform:scaleX(-1);fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.settings-sheet h3.has-back .settings-sheet-icon{visibility:hidden}
 .settings-sheet .settings-sheet-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
 .settings-sheet .settings-sheet-title{min-width:0;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .settings-sheet .dialog-intro,.settings-sheet .preference-dialog-scroll>.dialog-intro,.settings-sheet#missingProductsDialog .missing-products-header .dialog-intro{margin:0 auto 22px!important;padding-left:58px!important;color:var(--sheet-muted)!important;font-size:14px!important;font-weight:400!important;line-height:20px!important;width:100%!important;max-width:var(--sheet-inner-max)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

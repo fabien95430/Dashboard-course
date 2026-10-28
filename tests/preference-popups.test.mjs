@@ -243,7 +243,7 @@ test('les sous-vues de Réglages sans flèche gardent leur navigation et leur fe
   const settings=read('settings-ui.js'),errors=read('error-center.js'),catalog=read('catalog-product-admin.js'),app=read('app.js');
   const html=read('index.html'),css=read('styles.css');
   assert.doesNotMatch(settings,/preference-title-back|dataset.preferenceBack/);
-  assert.match(settings,/function setTitle\(label\)\{/);
+  assert.match(settings,/function setTitle\(label,parent=''\)\{/);
   assert.match(settings,/setTitle\('Gestion de l’application','preferences'\)/);
   assert.match(errors,/COURSES_SETTINGS_NAV\.setTitle\('Messages d’erreur','management'\)/);
   assert.match(catalog,/COURSES_SETTINGS_NAV\.setTitle\('Catalogue produit','management'\)/);
@@ -336,4 +336,19 @@ test('v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, rec
   assert.match(dishes,/function setRecipeCustomizationStep\(dish\)\{[\s\S]*?dataset\.step=dish\?'edit':'choose'/);
   assert.match(dishes,/recipeCustomizationPicker\.addEventListener\('click',[\s\S]*?selectRecipeCustomizationDish\(/);
   assert.match(dishes,/\[data-step="choose"\] :is\(\.recipe-customization-list,\.recipe-customization-status,\.recipe-customization-add,\.dialog-actions\)\{display:none!important\}/);
+});
+
+test('v617 : les sous-écrans de Gestion ont une flèche retour à la place de l icône, et la tuile Catalogue s affiche avec les autres',()=>{
+  const settings=read('settings-ui.js'),css=read('styles.css'),catalog=read('catalog-product-admin.js');
+  assert.match(settings,/backButton\.className='settings-sheet-back';/);
+  assert.match(settings,/backButton\?\.addEventListener\('click',\(\)=>showManagement\(\)\)/);
+  assert.match(settings,/const back=parent==='management';[\s\S]*?backButton\.hidden=!back;[\s\S]*?classList\.toggle\('has-back',back\)/);
+  assert.match(settings,/setTitle\('Notifications','management'\)/);
+  assert.match(css,/\.settings-sheet \.settings-sheet-back\{position:absolute;[^}]*width:44px;height:44px;/);
+  assert.match(css,/\.settings-sheet h3\.has-back \.settings-sheet-icon\{visibility:hidden\}/);
+  assert.match(settings,/catalogButton\.id='preferencesProductCatalog';[\s\S]*?managementPanel\.appendChild\(catalogButton\)/);
+  assert.doesNotMatch(catalog,/createElement\('button'\);button\.id='preferencesProductCatalog'/);
+  assert.match(catalog,/button\?\.addEventListener\('click',showCatalog\)/);
+  const ui=settings.indexOf("managementPanel.appendChild(notificationsButton)"),cat=settings.indexOf('managementPanel.appendChild(catalogButton)'),err=settings.indexOf('managementPanel.appendChild(errorMessagesButton)');
+  assert.ok(ui<cat&&cat<err,'ordre Documentation, Notifications, Catalogue, Messages d erreur');
 });
