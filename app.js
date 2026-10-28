@@ -39,7 +39,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Poêlée de légumes":"Poêlée lég.",
   "Poisson surgelé":"Poisson surg.",
 
-  "Pizza surgelée":"Pizza surg.",
+
   "Glace chocolat":"Glace choco.",
   "Pain aux céréales":"Pain céréales",
   "Pains au chocolat":"Pains choco.",
