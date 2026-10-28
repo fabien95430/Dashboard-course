@@ -142,33 +142,33 @@ function installStyle(){
   style.textContent=`
     .catalog-remove-panel{display:grid;gap:0;padding-bottom:6px}
     .catalog-remove-panel[hidden]{display:none!important}
-    .courses-product-admin-title{display:flex;justify-content:space-between;align-items:baseline;margin:2px 2px 7px;color:#4c6152;font-size:13.5px;font-weight:600}
+    .courses-product-admin-title{display:flex;justify-content:space-between;align-items:baseline;margin:2px 2px 7px;color:#4c6152;font-size:var(--fs-label);font-weight:600}
     .courses-product-admin-title span{font-weight:400;font-variant-numeric:tabular-nums}
     .courses-product-admin-search{display:flex;align-items:center;gap:9px;height:44px;margin-bottom:10px;padding:0 13px;border:1px solid rgba(59,83,65,.12);border-radius:14px;background:rgba(255,255,255,.7);color:#617366}
     .courses-product-admin-search svg{width:18px;height:18px;flex:0 0 18px}
-    .courses-product-admin-search input{min-width:0;width:100%;border:0!important;outline:0;background:transparent;color:#1b2d21;font:inherit;font-size:16px}
+    .courses-product-admin-search input{min-width:0;width:100%;border:0!important;outline:0;background:transparent;color:#1b2d21;font:inherit;font-size:var(--fs-text)}
     .courses-product-admin-list{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);overflow:hidden}
     .courses-product-admin-group+.courses-product-admin-group,.courses-product-admin-item+.courses-product-admin-item{border-top:1px solid rgba(39,66,47,.09)}
     .courses-product-admin-group-head,.courses-product-admin-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 18px;align-items:center;gap:10px;border:0;background:transparent;color:#1b2d21;font:inherit;text-align:left;-webkit-appearance:none;appearance:none}
     .courses-product-admin-group-head{min-height:54px;padding:0 14px 0 16px}
-    .courses-product-admin-group-head span{font-size:16px;font-weight:600;color:#263f30}
-    .courses-product-admin-group-head small{color:#617366;font-size:13px;font-variant-numeric:tabular-nums}
+    .courses-product-admin-group-head span{font-size:var(--fs-text);font-weight:600;color:#263f30}
+    .courses-product-admin-group-head small{color:#617366;font-size:var(--fs-label);font-variant-numeric:tabular-nums}
     .courses-product-admin-group.is-open>.courses-product-admin-group-head{background:rgba(221,237,216,.8)}
     .courses-product-admin-group-body{border-top:1px solid rgba(39,66,47,.09);background:rgba(240,245,238,.85)}
     .courses-product-admin-row{min-height:52px;padding:6px 14px 6px 16px}
     .courses-product-admin-group-body .courses-product-admin-row{padding-left:28px}
     .courses-product-admin-copy{display:grid;gap:2px;min-width:0}
-    .courses-product-admin-copy strong{font-size:15px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .courses-product-admin-copy small{color:#617366;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .courses-product-admin-copy strong{font-size:var(--fs-text);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .courses-product-admin-copy small{color:#617366;font-size:var(--fs-note);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .courses-product-admin-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
     .is-open>.courses-product-admin-group-head .courses-product-admin-caret,.is-open>.courses-product-admin-row .courses-product-admin-caret{transform:rotate(-90deg)}
     .courses-product-admin-item.is-open{background:rgba(237,247,234,.55)}
-    .courses-product-admin-pending{padding:3px 9px;border-radius:999px;background:rgba(255,149,0,.12);color:#9a5d00;font-size:12px;white-space:nowrap}
+    .courses-product-admin-pending{padding:3px 9px;border-radius:999px;background:rgba(255,149,0,.12);color:#9a5d00;font-size:var(--fs-note);white-space:nowrap}
     .courses-product-admin-tools{display:grid;gap:8px;padding:0 14px 12px 16px}
     .courses-product-admin-group-body .courses-product-admin-tools{padding-left:28px}
     .courses-product-admin-tools.is-confirm{grid-template-columns:1fr 1fr}
     .courses-product-admin-tools p{grid-column:1/-1;margin:0;color:#6c4a45;font-size:14px;line-height:1.4}
-    .courses-product-admin-tools button{min-height:42px;padding:0 12px;border:1px solid rgba(178,58,48,.2);border-radius:13px;background:rgba(255,255,255,.78);color:#b23a30;font:inherit;font-size:14.5px;-webkit-appearance:none;appearance:none}
+    .courses-product-admin-tools button{min-height:42px;padding:0 12px;border:1px solid rgba(178,58,48,.2);border-radius:13px;background:rgba(255,255,255,.78);color:#b23a30;font:inherit;font-size:var(--fs-text);-webkit-appearance:none;appearance:none}
     .courses-product-admin-tools .courses-product-admin-cancel{border-color:rgba(47,106,73,.18);color:#1f5a3b}
     .courses-product-admin-tools .courses-product-admin-confirm-delete{border-color:transparent;background:#b8433a;color:#fff}
     .courses-product-admin-tools button:disabled{opacity:.45}

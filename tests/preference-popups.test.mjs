@@ -323,11 +323,11 @@ test('Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent
 test('v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, recettes choisies dans une liste',()=>{
   const css=read('styles.css'),html=read('index.html'),dishes=read('dishes-ui.js');
   assert.match(css,/--sheet-muted:#55685b;/);
-  assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*font-size:14px!important;[^}]*line-height:20px!important/);
+  assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*font-size:var\(--fs-sub\)!important;[^}]*line-height:20px!important/);
   assert.match(css,/\.settings-sheet \.settings-sheet-icon\{position:absolute;left:0;top:0;width:44px;height:44px;/);
   assert.doesNotMatch(css,/translateY\(11px\)/);
-  assert.match(css,/\.settings-sheet \.field>span,[^{]*\{[^}]*font-size:13\.5px!important;[^}]*text-transform:none!important/);
-  assert.match(css,/\.settings-sheet \.security-setting-copy strong,[^{]*\{[^}]*font-size:15px!important;font-weight:400!important/);
+  assert.match(css,/\.settings-sheet \.field>span,[^{]*\{[^}]*font-size:var\(--fs-label\)!important;[^}]*text-transform:none!important/);
+  assert.match(css,/\.settings-sheet \.security-setting-copy strong,[^{]*\{[^}]*font-size:var\(--fs-text\)!important;font-weight:400!important/);
   for(const id of ['connectionDialog','preferencesDialog','settingsDialog'])assert.match(html,new RegExp('<dialog id="'+id+'"[^>]*tabindex="-1" autofocus>'));
   assert.match(dishes,/recipeCustomizationDialog\.autofocus=true;/);
   const open=dishes.slice(dishes.indexOf('function openRecipeCustomization()'),dishes.indexOf('function saveRecipeCustomization()'));
@@ -364,7 +364,7 @@ test('v618 : Messages d erreur en liste groupée, détails dépliés sur place, 
   assert.match(errors,/currentFilter==='resolved'&&resolved\.length\?'<button class="courses-error-clear"/);
   assert.match(errors,/Aucune erreur à traiter/);
   assert.match(css,/#preferencesDialog \.courses-error-tabs\{[^}]*grid-template-columns:130px 130px!important;[^}]*background:transparent!important/);
-  assert.match(css,/#preferencesDialog \.courses-error-tabs > button\{[^}]*font:inherit!important;[^}]*font-size:16px!important/);
+  assert.match(css,/#preferencesDialog \.courses-error-tabs > button\{[^}]*font:inherit!important;[^}]*font-size:var\(--fs-text\)!important/);
 });
 
 test('v621 : recettes par catégories repliables avec flèche retour, et rafraîchissement qui affiche son état',()=>{

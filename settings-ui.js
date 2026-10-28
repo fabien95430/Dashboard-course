@@ -247,17 +247,17 @@ function installPreferenceDialogAppearance(){
     #preferencesNotificationsPanel[hidden]{display:none!important}
     #preferencesNotificationsPanel{display:grid;gap:14px;padding-top:18px}
     #preferencesNotificationsPanel .notifications-management-summary{display:grid;gap:6px;padding:14px;border:1px solid #e4eee6;border-radius:17px;background:#f4f9f4}
-    #preferencesNotificationsPanel .notifications-management-summary strong{font-size:14px;color:#173527}
-    #preferencesNotificationsPanel .notifications-management-summary small{font-size:12px;color:#557364;line-height:1.45;overflow-wrap:anywhere}
+    #preferencesNotificationsPanel .notifications-management-summary strong{font-size:var(--fs-text);color:#173527}
+    #preferencesNotificationsPanel .notifications-management-summary small{font-size:var(--fs-note);color:#557364;line-height:1.45;overflow-wrap:anywhere}
     #preferencesNotificationsPanel .notifications-management-actions{display:flex;gap:8px;flex-wrap:wrap}
-    #preferencesNotificationsPanel .notifications-management-actions button{flex:1 1 130px;min-height:44px;border-radius:13px;padding:8px 12px;font-size:12px;font-weight:750}
-    #preferencesNotificationsPanel .notifications-management-hint{margin:0;font-size:11px;line-height:1.5;color:#7d858d}
+    #preferencesNotificationsPanel .notifications-management-actions button{flex:1 1 130px;min-height:44px;border-radius:13px;padding:8px 12px;font-size:var(--fs-text);font-weight:750}
+    #preferencesNotificationsPanel .notifications-management-hint{margin:0;font-size:var(--fs-note);line-height:1.5;color:#7d858d}
     .connection-dialog .connection-sync-section{margin-top:0;padding:12px 13px;border:1px solid #e5ede6;border-radius:16px;background:#f8faf7}
-    .connection-dialog .sheet-section-title{margin:14px 0 7px;font-size:12px;color:#52675a;font-weight:800}
-    .connection-dialog .connection-sync-line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 0;font-size:12px}
+    .connection-dialog .sheet-section-title{margin:14px 0 7px;font-size:var(--fs-note);color:#52675a;font-weight:800}
+    .connection-dialog .connection-sync-line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 0;font-size:var(--fs-note)}
     .connection-dialog .connection-sync-line+.connection-sync-line{border-top:1px solid #e7eee8}
     .connection-dialog .connection-sync-line>span:first-child{flex:0 0 auto;font-weight:700;color:#26362c}
-    .connection-dialog .connection-sync-line>span:last-child{min-width:0;text-align:right;font-size:11px;line-height:1.4;color:#748076;overflow-wrap:anywhere}
+    .connection-dialog .connection-sync-line>span:last-child{min-width:0;text-align:right;font-size:var(--fs-note);line-height:1.4;color:#748076;overflow-wrap:anywhere}
     .connection-dialog .connection-sync-line>span[data-state="synced"]{color:#147545}
     .connection-dialog .connection-sync-line>span[data-state="error"],.connection-dialog .connection-sync-line>span[data-state="missing"]{color:#b6652c}
     @media(max-width:390px){.connection-dialog .connection-sync-line{align-items:flex-start;flex-direction:column;gap:3px}.connection-dialog .connection-sync-line>span:last-child{text-align:left}}
