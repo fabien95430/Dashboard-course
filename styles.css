@@ -4117,8 +4117,8 @@ body{
 #missingProductsDialog .missing-category-choice::after{display:none!important}
 #missingProductsDialog .missing-category-choice span{overflow:hidden;text-overflow:ellipsis}
 #missingProductsDialog .missing-category-choice.is-active{border-color:#2f6a49!important;background:#2f6a49!important;color:#fff!important}
-#missingProductsDialog .missing-add-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:auto;padding-top:14px}
-#missingProductsDialog .missing-add-actions button{min-height:48px!important;height:48px;border-radius:15px!important;font:inherit;font-size:var(--fs-text)!important}
+#missingProductsDialog .missing-add-actions{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:10px;margin-top:auto;padding-top:14px}
+#missingProductsDialog .missing-add-actions button{box-sizing:border-box;width:100%!important;min-height:48px!important;height:48px!important;margin:0!important;padding:0 12px!important;border-radius:15px!important;font:inherit;font-size:var(--fs-text)!important}
 #missingProductsDialog .missing-add-actions .primary:disabled{opacity:.42}
 .settings-sheet .preference-toggle+.preference-toggle,
 .settings-sheet .security-setting-info+.security-setting-info,

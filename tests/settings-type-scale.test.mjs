@@ -82,3 +82,11 @@ test('Réglages : les textes de tuiles restent assez courts pour tenir sur une l
   const ignored=/^(Optionnel|Choisir une catégorie|Notifications sur cet iPhone)$/;
   assert.deepEqual(tooLong.filter(l=>!ignored.test(l.split(' : ')[1])),[]);
 });
+
+test('Catalogue : Annuler et Ajouter ont exactement la même taille et le même alignement',()=>{
+  const css=read('styles.css');
+  assert.match(css,/#missingProductsDialog \.missing-add-actions\{[^}]*grid-template-columns:1fr 1fr;[^}]*align-items:start/);
+  const rule=/#missingProductsDialog \.missing-add-actions button\{([^}]*)\}/.exec(css);
+  assert.ok(rule,'règle des boutons absente');
+  for(const decl of ['width:100%!important','min-height:48px!important','height:48px!important','margin:0!important'])assert.ok(rule[1].includes(decl),decl+' manquant');
+});
