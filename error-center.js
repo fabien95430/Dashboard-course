@@ -8,6 +8,7 @@ const RESOLVED_TTL_MS=30*24*60*60*1000;
 const TRANSIENT_PREFIXES=Object.freeze(['resource:','javascript:','promise:','integration-local:','notifications:']);
 let currentFilter='active';
 let filterTrack=null;
+let openErrorId='';
 let uiBound=false;
 
 function scrub(value,max=900){
@@ -323,20 +324,28 @@ function installStyle(){
   style.textContent=`
     #preferencesErrorMessages .security-setting-icon{position:relative;overflow:visible}
     .courses-error-badge{position:absolute;top:-7px;right:-8px;min-width:19px;height:19px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#ff3b30;color:#fff;font-size:9.5px;line-height:15px;font-weight:850;display:none;place-items:center;box-sizing:border-box;box-shadow:0 2px 7px rgba(207,33,26,.22)}
-    .courses-error-center{display:grid;gap:12px;padding-bottom:4px}
-    .courses-error-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;border:1px solid rgba(27,65,44,.10);border-radius:18px;background:rgba(248,250,248,.92)}
-    .courses-error-summary strong{font-size:14px;color:#22372a}.courses-error-summary small{display:block;margin-top:2px;color:#768078;font-size:10.5px}
-    .courses-error-count{min-width:34px;height:34px;padding:0 8px;border-radius:12px;background:rgba(255,59,48,.10);color:#d93025;display:grid;place-items:center;font-size:13px;font-weight:850}
-    .courses-error-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:3px;border-radius:14px;background:#edf1ee}
-    .courses-error-tabs button{min-height:34px;border:0;border-radius:11px;background:transparent;color:#6b756f;font-size:11px;font-weight:780}.courses-error-tabs button.is-active{background:#fff;color:#1f3327;box-shadow:0 1px 5px rgba(31,51,39,.08)}
-    .courses-error-list{display:grid;gap:9px}
-    .courses-error-card{padding:12px;border:1px solid rgba(24,52,36,.10);border-radius:18px;background:#fff;box-shadow:0 5px 18px rgba(35,56,43,.045)}
-    .courses-error-card-head{display:flex;align-items:flex-start;gap:9px}.courses-error-dot{width:9px;height:9px;margin-top:4px;border-radius:50%;background:#ff3b30;flex:0 0 auto}.courses-error-card.is-warning .courses-error-dot{background:#ff9500}
-    .courses-error-card-copy{min-width:0;flex:1}.courses-error-source{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#7a837e;font-size:9.5px;font-weight:760;text-transform:uppercase;letter-spacing:.02em}.courses-error-card h4{margin:3px 0 2px;font-size:12.5px;line-height:1.2;color:#23372a}.courses-error-card p{margin:0;color:#5f6c64;font-size:10.5px;line-height:1.35}
-    .courses-error-occurrences{margin-left:auto;color:#9a6a00;font-size:9px;font-weight:800}.courses-error-details{margin-top:8px;padding-top:8px;border-top:1px solid rgba(24,52,36,.08)}.courses-error-details summary{cursor:pointer;color:#667269;font-size:10px;font-weight:760}.courses-error-details div{margin-top:6px;color:#78817c;font-size:9.5px;line-height:1.4;overflow-wrap:anywhere}
-    .courses-error-actions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}.courses-error-actions button{min-height:31px;padding:0 11px;border-radius:11px;border:1px solid rgba(11,112,64,.14);background:#f4f8f5;color:#0b7040;font-size:10px;font-weight:790}.courses-error-actions button[data-error-resolve]{color:#68736c;border-color:rgba(76,91,82,.12);background:#f6f7f6}
-    .courses-error-empty{padding:28px 16px;text-align:center;border:1px dashed rgba(43,72,54,.14);border-radius:18px;color:#758078;font-size:11px;line-height:1.4}.courses-error-empty strong{display:block;margin-bottom:4px;color:#2c4635;font-size:13px}
-    .courses-error-clear{justify-self:center;border:0;background:transparent;color:#89918c;font-size:10px;font-weight:740;padding:5px 8px}
+    .courses-error-center{display:grid;gap:0;padding-bottom:4px}
+    .courses-error-list{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);overflow:hidden}
+    .courses-error-item+.courses-error-item{border-top:1px solid rgba(39,66,47,.09)}
+    .courses-error-item.is-open{background:rgba(237,247,234,.5)}
+    .courses-error-row{width:100%;min-height:62px;display:grid;grid-template-columns:10px minmax(0,1fr) 16px;align-items:center;gap:12px;padding:9px 14px 9px 16px;border:0;background:transparent;color:#1b2d21;font:inherit;text-align:left;-webkit-appearance:none;appearance:none}
+    .courses-error-dot{width:10px;height:10px;border-radius:50%;background:#d93a2f}
+    .courses-error-item.is-warning .courses-error-dot{background:#e2901b}
+    .courses-error-item.is-resolved .courses-error-dot{background:#9db3a4}
+    .courses-error-copy{display:grid;gap:2px;min-width:0}
+    .courses-error-copy strong{font-size:15.5px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .courses-error-copy small{color:#617366;font-size:12.5px;font-variant-numeric:tabular-nums}
+    .courses-error-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
+    .courses-error-item.is-open .courses-error-caret{transform:rotate(-90deg)}
+    .courses-error-body{display:grid;gap:10px;padding:0 14px 14px 38px}
+    .courses-error-body p{margin:0;color:#2c4334;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+    .courses-error-details{margin:0;padding:9px 11px;border-radius:11px;background:rgba(39,66,47,.06);color:#4c6152;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .courses-error-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .courses-error-actions button,.courses-error-clear{min-height:40px;padding:0 14px;border:1px solid rgba(47,106,73,.18);border-radius:13px;background:rgba(255,255,255,.75);color:#1f5a3b;font:inherit;font-size:14.5px;-webkit-appearance:none;appearance:none}
+    .courses-error-empty{margin:0;padding:28px 16px;text-align:center;color:#617366;font-size:14px;line-height:1.45}
+    .courses-error-empty strong{display:block;color:#1b2d21;font-size:15.5px;font-weight:400;margin-bottom:3px}
+    .courses-error-clear{width:100%;margin-top:12px;border-color:rgba(178,58,48,.2);color:#b23a30}
+    @media(prefers-reduced-motion:reduce){.courses-error-caret{transition:none}}
   `;
   document.head.appendChild(style);
 }
@@ -373,6 +382,7 @@ function showErrorCenter(){
   if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Messages d’erreur','management');else if(title)title.textContent='Messages d’erreur';
   if(intro)intro.textContent='Anomalies actives et problèmes récemment résolus.';
   currentFilter='active';
+  openErrorId='';
   renderPanel();
   if(!dialog.open)dialog.showModal();
 }
@@ -382,25 +392,32 @@ function renderPanel(entries=readEntries()){
   const active=entries.filter(entry=>!entry.resolved);
   const resolved=entries.filter(entry=>entry.resolved);
   const visible=currentFilter==='resolved'?resolved:active;
-  const cards=visible.map(entry=>{
+  const filterLabel=(filter,count)=>(filter==='active'?'À traiter':'Résolues')+'<b>'+count+'</b>';
+  /* Une tuile groupée : chaque erreur se déplie sur place (message, détail technique, actions). */
+  const rows=visible.map(entry=>{
+    const open=openErrorId===entry.id;
+    const kind=entry.resolved?'is-resolved':entry.severity==='warning'?'is-warning':'is-error';
+    const kindLabel=entry.resolved?'Résolue':entry.severity==='warning'?'Avertissement':'Erreur';
+    const count=Number(entry.count||1)>1?' · ×'+Number(entry.count||1):'';
     const action=entry.action==='refresh-ha'
       ?'<button type="button" data-error-action="refresh-ha">Réessayer</button>'
       :entry.action==='open-missing'
         ?'<button type="button" data-error-action="open-missing">Ouvrir la demande</button>'
         :'';
-    const details=entry.details?'<details class="courses-error-details"><summary>Détails</summary><div>'+escapeHtml(entry.details)+'</div></details>':'';
-    const count=Number(entry.count||1)>1?'<span class="courses-error-occurrences">×'+Number(entry.count||1)+'</span>':'';
-    return '<article class="courses-error-card '+(entry.severity==='warning'?'is-warning':'')+'" data-error-id="'+escapeHtml(entry.id)+'">'+
-      '<div class="courses-error-card-head"><span class="courses-error-dot" aria-hidden="true"></span><div class="courses-error-card-copy">'+
-      '<div class="courses-error-source"><span>'+escapeHtml(entry.source)+' · '+escapeHtml(formatDate(entry.lastAt||entry.createdAt))+'</span>'+count+'</div>'+
-      '<h4>'+escapeHtml(entry.title)+'</h4><p>'+escapeHtml(entry.message||'Erreur détectée.')+'</p>'+details+
-      '<div class="courses-error-actions">'+action+(entry.resolved?'':'<button type="button" data-error-resolve="'+escapeHtml(entry.key)+'">Marquer comme résolue</button>')+'</div></div></div></article>';
+    const body=open
+      ?'<div class="courses-error-body"><p>'+escapeHtml(entry.message||'Erreur détectée.')+'</p>'+
+        (entry.details?'<pre class="courses-error-details">'+escapeHtml(entry.details)+'</pre>':'')+
+        (entry.resolved?'':'<div class="courses-error-actions">'+action+'<button type="button" data-error-resolve="'+escapeHtml(entry.key)+'">Marquer comme résolue</button></div>')+'</div>'
+      :'';
+    return '<div class="courses-error-item '+kind+(open?' is-open':'')+'" data-error-id="'+escapeHtml(entry.id)+'">'+
+      '<button type="button" class="courses-error-row" data-error-toggle="'+escapeHtml(entry.id)+'" aria-expanded="'+open+'"><span class="courses-error-dot" role="img" aria-label="'+kindLabel+'"></span>'+
+      '<span class="courses-error-copy"><strong>'+escapeHtml(entry.title)+'</strong><small>'+escapeHtml(entry.source)+' · '+escapeHtml(formatDate(entry.lastAt||entry.createdAt))+count+'</small></span>'+
+      '<svg class="courses-error-caret" aria-hidden="true"><use href="#i-chevron"></use></svg></button>'+body+'</div>';
   }).join('');
   panel.innerHTML=
-    '<div class="courses-error-summary"><div><strong>État de l’application</strong><small>'+active.length+' anomalie'+(active.length>1?'s':'')+' active'+(active.length>1?'s':'')+'</small></div><span class="courses-error-count">'+active.length+'</span></div>'+
-    '<div class="courses-error-tabs" role="tablist" aria-label="Filtrer les messages d’erreur"><button type="button" role="tab" aria-selected="'+(currentFilter==='active')+'" data-error-filter="active" class="'+(currentFilter==='active'?'is-active':'')+'">À traiter ('+active.length+')</button><button type="button" role="tab" aria-selected="'+(currentFilter==='resolved')+'" data-error-filter="resolved" class="'+(currentFilter==='resolved'?'is-active':'')+'">Résolues ('+resolved.length+')</button></div>'+
-    '<div class="courses-error-list">'+(cards||'<div class="courses-error-empty"><strong>'+(currentFilter==='active'?'Aucune erreur active':'Aucune erreur résolue')+'</strong>'+(currentFilter==='active'?'L’application ne signale actuellement aucun problème nécessitant votre attention.':'Les problèmes corrigés apparaîtront ici pendant 30 jours.')+'</div>')+'</div>'+
-    (resolved.length?'<button class="courses-error-clear" type="button">Effacer les erreurs résolues</button>':'');
+    '<div class="courses-error-tabs" role="tablist" aria-label="Filtrer les messages d’erreur"><button type="button" role="tab" aria-selected="'+(currentFilter==='active')+'" data-error-filter="active" class="'+(currentFilter==='active'?'is-active':'')+'">'+filterLabel('active',active.length)+'</button><button type="button" role="tab" aria-selected="'+(currentFilter==='resolved')+'" data-error-filter="resolved" class="'+(currentFilter==='resolved'?'is-active':'')+'">'+filterLabel('resolved',resolved.length)+'</button></div>'+
+    '<div class="courses-error-list">'+(rows||'<p class="courses-error-empty"><strong>'+(currentFilter==='active'?'Aucune erreur à traiter':'Aucune erreur résolue')+'</strong>'+(currentFilter==='active'?'L’application fonctionne normalement.':'Les erreurs marquées comme résolues apparaîtront ici.')+'</p>')+'</div>'+
+    (currentFilter==='resolved'&&resolved.length?'<button class="courses-error-clear" type="button">Effacer les erreurs résolues</button>':'');
   const freshTrack=panel.querySelector('.courses-error-tabs');
   if(filterTrack&&freshTrack){
     freshTrack.replaceWith(filterTrack);
@@ -408,7 +425,7 @@ function renderPanel(entries=readEntries()){
       const isActive=button.dataset.errorFilter===currentFilter;
       button.classList.toggle('is-active',isActive);
       button.setAttribute('aria-selected',String(isActive));
-      button.textContent=button.dataset.errorFilter==='active'?'À traiter ('+active.length+')':'Résolues ('+resolved.length+')';
+      button.innerHTML=filterLabel(button.dataset.errorFilter,button.dataset.errorFilter==='active'?active.length:resolved.length);
     });
   }else filterTrack=freshTrack;
   window.COURSES_SEGMENTED_LIQUID?.bindSegment(filterTrack,'.courses-error-tabs button')?.sync(true);
@@ -424,7 +441,9 @@ function bindUi(){
   if(!panel){panel=document.createElement('div');panel.id='preferencesErrorCenter';panel.className='courses-error-center';panel.hidden=true;content.appendChild(panel)}
   panel.addEventListener('click',event=>{
     const filter=event.target.closest('[data-error-filter]')?.dataset.errorFilter;
-    if(filter){currentFilter=filter==='resolved'?'resolved':'active';renderPanel();return}
+    if(filter){currentFilter=filter==='resolved'?'resolved':'active';openErrorId='';renderPanel();return}
+    const toggle=event.target.closest('[data-error-toggle]');
+    if(toggle){const id=toggle.dataset.errorToggle||'';openErrorId=openErrorId===id?'':id;renderPanel();return}
     const resolveButton=event.target.closest('[data-error-resolve]');
     if(resolveButton){resolve(resolveButton.dataset.errorResolve);return}
     if(event.target.closest('.courses-error-clear')){clearResolved();return}

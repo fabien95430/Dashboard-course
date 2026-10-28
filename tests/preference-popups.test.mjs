@@ -304,7 +304,7 @@ test('Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent
   const css=read('styles.css');
   const admin=read('catalog-product-admin.js');
   const errors=read('error-center.js');
-  assert.match(css,/#preferencesDialog \.courses-product-admin-modes::after,[\s\S]*?#preferencesDialog \.courses-error-tabs::after\{/);
+  assert.match(css,/#preferencesDialog \.courses-product-admin-modes::after\{[\s\S]*?#preferencesDialog \.courses-error-tabs::after\{/);
   assert.match(css,/#preferencesDialog \.courses-product-admin-modes > button\.is-active,[\s\S]*?background:transparent!important/);
   assert.match(admin,/let modeTrack=null/);
   assert.match(admin,/freshTrack\.replaceWith\(modeTrack\)/);
@@ -351,4 +351,18 @@ test('v617 : les sous-écrans de Gestion ont une flèche retour à la place de l
   assert.match(catalog,/button\?\.addEventListener\('click',showCatalog\)/);
   const ui=settings.indexOf("managementPanel.appendChild(notificationsButton)"),cat=settings.indexOf('managementPanel.appendChild(catalogButton)'),err=settings.indexOf('managementPanel.appendChild(errorMessagesButton)');
   assert.ok(ui<cat&&cat<err,'ordre Documentation, Notifications, Catalogue, Messages d erreur');
+});
+
+test('v618 : Messages d erreur en liste groupée, détails dépliés sur place, sélecteur à deux mots',()=>{
+  const errors=read('error-center.js'),css=read('styles.css');
+  assert.doesNotMatch(errors,/courses-error-summary|courses-error-card/);
+  assert.match(errors,/let openErrorId='';/);
+  assert.match(errors,/data-error-toggle="'\+escapeHtml\(entry\.id\)\+'"/);
+  assert.match(errors,/const toggle=event\.target\.closest\('\[data-error-toggle\]'\);[\s\S]*?openErrorId=openErrorId===id\?'':id;renderPanel\(\)/);
+  assert.match(errors,/<pre class="courses-error-details">/);
+  assert.match(errors,/data-error-resolve="'\+escapeHtml\(entry\.key\)\+'">Marquer comme résolue/);
+  assert.match(errors,/currentFilter==='resolved'&&resolved\.length\?'<button class="courses-error-clear"/);
+  assert.match(errors,/Aucune erreur à traiter/);
+  assert.match(css,/#preferencesDialog \.courses-error-tabs\{[^}]*grid-template-columns:130px 130px!important;[^}]*background:transparent!important/);
+  assert.match(css,/#preferencesDialog \.courses-error-tabs > button\{[^}]*font:inherit!important;[^}]*font-size:16px!important/);
 });

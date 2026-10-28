@@ -4024,9 +4024,9 @@ body{
 .settings-sheet .field>span.connection-list-status[data-state="synced"]{color:#147545!important}
 .settings-sheet .dialog-feedback.is-visible{white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
 .settings-sheet #preferencesNotificationsPanel .notifications-management-summary{border:1px solid var(--tile-line)!important;background:var(--tile-bg)!important;box-shadow:var(--tile-shadow)!important}
-.settings-sheet .courses-error-card,.settings-sheet .courses-error-summary,.settings-sheet .courses-product-admin-row{background:var(--tile-bg)!important;border-color:var(--tile-line)!important;box-shadow:var(--tile-shadow)!important}
-.settings-sheet .courses-error-tabs,.settings-sheet .courses-product-admin-modes{background:rgba(216,233,211,.45)!important}
-.settings-sheet .courses-error-tabs button.is-active,.settings-sheet .courses-product-admin-mode.is-active{background:rgba(255,255,255,.85)!important;color:#28563e!important}
+.settings-sheet .courses-product-admin-row{background:var(--tile-bg)!important;border-color:var(--tile-line)!important;box-shadow:var(--tile-shadow)!important}
+.settings-sheet .courses-product-admin-modes{background:rgba(216,233,211,.45)!important}
+.settings-sheet .courses-product-admin-mode.is-active{background:rgba(255,255,255,.85)!important;color:#28563e!important}
 .settings-sheet .recipe-customization-item,.settings-sheet .recipe-customization-ingredient-picker{background:rgba(255,255,255,.49)!important;border-color:rgba(40,70,49,.10)!important;box-shadow:none!important}
 .settings-sheet .recipe-customization-item.is-selected{background:rgba(221,237,216,.73)!important;border-color:rgba(62,124,77,.22)!important}
 .settings-sheet .recipe-customization-add-button{border-color:rgba(51,108,63,.19)!important;background:rgba(237,247,234,.57)!important;color:#296043!important}
@@ -4086,15 +4086,13 @@ body{
 .settings-sheet .connection-sync-line+.connection-sync-line{
   border-top:1px solid rgba(39,66,47,.09)!important;
 }
-.settings-sheet .courses-product-admin-row+.courses-product-admin-row,
-.settings-sheet .courses-error-card+.courses-error-card{
+.settings-sheet .courses-product-admin-row+.courses-product-admin-row{
   border-top-color:rgba(39,66,47,.09)!important;
 }
 @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-button{transition:none!important}}
 
 /* Sous-vues de Gestion : même trait actif que le Catalogue, sans capsules concurrentes. */
-#preferencesDialog .courses-product-admin-modes,
-#preferencesDialog .courses-error-tabs{
+#preferencesDialog .courses-product-admin-modes{
   --catalog-lens-x:3px;--catalog-lens-w:calc(50% - 3px);--catalog-liquid-sx:1;
   position:relative!important;display:grid!important;grid-template-columns:1fr 1fr!important;
   width:72%!important;max-width:100%!important;height:46px!important;
@@ -4104,16 +4102,14 @@ body{
   box-shadow:0 6px 20px rgba(57,75,62,.055)!important;
   isolation:isolate;overflow:hidden!important;touch-action:pan-y;
 }
-#preferencesDialog .courses-product-admin-modes::after,
-#preferencesDialog .courses-error-tabs::after{
+#preferencesDialog .courses-product-admin-modes::after{
   content:"";position:absolute;left:0;bottom:2px;z-index:0;
   width:var(--catalog-lens-w);height:2px;border-radius:1px;
   background:#073e2c;
   transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx));
   pointer-events:none;
 }
-#preferencesDialog .courses-product-admin-modes > button,
-#preferencesDialog .courses-error-tabs > button{
+#preferencesDialog .courses-product-admin-modes > button{
   position:relative;z-index:1;
   min-width:0!important;min-height:0!important;height:100%!important;
   border:0!important;border-radius:21px!important;
@@ -4122,21 +4118,43 @@ body{
   touch-action:pan-y;
 }
 #preferencesDialog .courses-product-admin-modes > button.is-active,
-#preferencesDialog .courses-error-tabs > button.is-active,
-#preferencesDialog .courses-product-admin-modes > button.is-liquid-under,
-#preferencesDialog .courses-error-tabs > button.is-liquid-under{
+#preferencesDialog .courses-product-admin-modes > button.is-liquid-under{
   background:transparent!important;box-shadow:none!important;color:#073e2c!important;font-weight:800!important;
 }
-#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound])::after,
-#preferencesDialog .courses-error-tabs:not([data-segmented-liquid-bound])::after{display:none}
-#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound]) > button.is-active::after,
-#preferencesDialog .courses-error-tabs:not([data-segmented-liquid-bound]) > button.is-active::after{
+#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound])::after{display:none}
+#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound]) > button.is-active::after{
   content:"";position:absolute;bottom:2px;left:25%;width:50%;height:2px;background:#073e2c;border-radius:1px;
 }
 @media(prefers-reduced-motion:reduce){
-  #preferencesDialog .courses-product-admin-modes > button,
-  #preferencesDialog .courses-error-tabs > button{transition:none!important}
+  #preferencesDialog .courses-product-admin-modes > button{transition:none!important}
 }
+
+/* Messages d'erreur v618 : sélecteur À traiter / Résolues comme Produits / Plats (deux mots, trait sous l'actif). */
+#preferencesDialog .courses-error-tabs{
+  --catalog-lens-x:0px;--catalog-lens-w:130px;--catalog-liquid-sx:1;
+  position:relative!important;display:grid!important;grid-template-columns:130px 130px!important;justify-content:center;
+  width:260px!important;max-width:100%!important;height:38px!important;margin:0 auto 14px!important;padding:0!important;gap:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  isolation:isolate;overflow:visible!important;touch-action:pan-y;
+}
+#preferencesDialog .courses-error-tabs::after{
+  content:"";position:absolute;left:0;bottom:0;z-index:0;width:60px;height:2px;border-radius:1px;background:#073e2c;
+  transform:translate3d(calc(var(--catalog-lens-x) + (var(--catalog-lens-w) - 60px) / 2),0,0) scaleX(var(--catalog-liquid-sx));
+  pointer-events:none;
+}
+#preferencesDialog .courses-error-tabs > button{
+  position:relative;z-index:1;min-width:0!important;min-height:0!important;height:100%!important;padding:1px 6px!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  color:#87928b!important;font:inherit!important;font-size:16px!important;font-weight:600!important;touch-action:pan-y;
+}
+#preferencesDialog .courses-error-tabs > button.is-active,
+#preferencesDialog .courses-error-tabs > button.is-liquid-under{color:#073e2c!important}
+#preferencesDialog .courses-error-tabs > button b{font-weight:400;margin-left:4px;font-variant-numeric:tabular-nums}
+#preferencesDialog .courses-error-tabs:not([data-segmented-liquid-bound])::after{display:none}
+#preferencesDialog .courses-error-tabs:not([data-segmented-liquid-bound]) > button.is-active::after{
+  content:"";position:absolute;bottom:0;left:calc(50% - 30px);width:60px;height:2px;background:#073e2c;border-radius:1px;
+}
+@media(prefers-reduced-motion:reduce){#preferencesDialog .courses-error-tabs > button{transition:none!important}}
 
 @media(max-width:390px){.settings-sheet{padding-left:17px!important;padding-right:17px!important}}
 @media(min-width:650px){.settings-sheet{width:min(calc(100% - 32px),480px)!important;max-width:480px!important;max-inline-size:480px!important;margin:0 auto!important;bottom:18px!important;border-radius:32px!important;border-inline:1px solid rgba(255,255,255,.48)!important;height:min(78svh,720px)!important}}
@@ -4144,4 +4162,4 @@ body{
 
 .settings-sheet:not([open]){display:none!important}
 .settings-sheet .courses-product-admin-confirm{background:rgba(243,220,215,.54)!important;border-color:rgba(170,66,56,.15)!important}
-.settings-sheet .courses-error-actions button{border-radius:11px!important;background:rgba(228,239,225,.65)!important}
+
