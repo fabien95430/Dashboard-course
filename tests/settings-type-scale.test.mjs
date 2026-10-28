@@ -71,3 +71,14 @@ test('Réglages : les boutons de popup et « Se déconnecter » héritent de l�
   assert.ok(logout.length>0,'aucune taille pour Se déconnecter');
   assert.deepEqual([...new Set(logout)],['var(--fs-text)']);
 });
+
+test('Réglages : les textes de tuiles restent assez courts pour tenir sur une ligne',()=>{
+  const sources=['index.html','settings-ui.js','purchase-intelligence.js'].map(read).join('\n');
+  const texts=[];
+  for(const m of sources.matchAll(/<(strong|small)[^>]*>([^<{'+]{4,})<\/\1>/g))texts.push({tag:m[1],text:m[2].replace(/&amp;/g,'&').trim()});
+  const tile=sources.match(/class="(?:settings-copy|security-setting-copy|preference-toggle-copy|notifications-management-summary)"/g);
+  assert.ok(tile&&tile.length>=5,'tuiles introuvables');
+  const tooLong=texts.filter(t=>t.tag==='strong'?t.text.length>34:t.text.length>40).map(t=>t.tag+' ('+t.text.length+') : '+t.text);
+  const ignored=/^(Optionnel|Choisir une catégorie|Notifications sur cet iPhone)$/;
+  assert.deepEqual(tooLong.filter(l=>!ignored.test(l.split(' : ')[1])),[]);
+});

@@ -139,7 +139,7 @@ function installPreferenceToggle(){
   if(!input){
     const row=document.createElement('label');
     row.className='preference-toggle';row.dataset.purchaseHistoryToggle='1';
-    row.innerHTML='<span class="preference-toggle-copy"><strong>Historique des achats</strong><small>Adapte les recommandations à vos achats récents.</small></span><span class="preference-switch"><input id="preferencesPurchaseHistory" type="checkbox" aria-label="Historique des achats"><span aria-hidden="true"></span></span>';
+    row.innerHTML='<span class="preference-toggle-copy"><strong>Historique des achats</strong><small>Adapte les suggestions à vos achats.</small></span><span class="preference-switch"><input id="preferencesPurchaseHistory" type="checkbox" aria-label="Historique des achats"><span aria-hidden="true"></span></span>';
     options.appendChild(row);input=row.querySelector('input');
     input?.addEventListener('change',()=>setEnabled(input.checked));
   }

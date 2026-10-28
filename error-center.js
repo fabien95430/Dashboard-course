@@ -334,14 +334,14 @@ function installStyle(){
     .courses-error-item.is-resolved .courses-error-dot{background:#9db3a4}
     .courses-error-copy{display:grid;gap:2px;min-width:0}
     .courses-error-copy strong{font-size:var(--fs-text);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .courses-error-copy small{color:#617366;font-size:var(--fs-note);font-variant-numeric:tabular-nums}
+    .courses-error-copy small{color:#617366;font-size:var(--fs-note);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
     .courses-error-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
     .courses-error-item.is-open .courses-error-caret{transform:rotate(-90deg)}
     .courses-error-body{display:grid;gap:10px;padding:0 14px 14px 38px}
     .courses-error-body p{margin:0;color:#2c4334;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
     .courses-error-details{margin:0;padding:9px 11px;border-radius:11px;background:rgba(39,66,47,.06);color:#4c6152;font:var(--fs-note)/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
     .courses-error-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .courses-error-actions button,.courses-error-clear{min-height:40px;padding:0 14px;border:1px solid rgba(47,106,73,.18);border-radius:13px;background:rgba(255,255,255,.75);color:#1f5a3b;font:inherit;font-size:var(--fs-text);-webkit-appearance:none;appearance:none}
+    .courses-error-actions button,.courses-error-clear{min-height:40px;padding:0 14px;border:1px solid rgba(47,106,73,.18);border-radius:13px;background:rgba(255,255,255,.75);color:#1f5a3b;font:inherit;font-size:var(--fs-text);white-space:nowrap;-webkit-appearance:none;appearance:none}
     .courses-error-empty{margin:0;padding:28px 16px;text-align:center;color:#617366;font-size:14px;line-height:1.45}
     .courses-error-empty strong{display:block;color:#1b2d21;font-size:var(--fs-text);font-weight:400;margin-bottom:3px}
     .courses-error-clear{width:100%;margin-top:12px;border-color:rgba(178,58,48,.2);color:#b23a30}

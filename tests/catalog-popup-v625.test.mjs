@@ -5,7 +5,7 @@ const read=file=>readFileSync(new URL('../'+file,import.meta.url),'utf8');
 
 test('v625 : le bouton Réglages ouvre « Catalogue des produits » avec deux vues', ()=>{
   const html=read('index.html');
-  assert.match(html,/id="settingsMissingProductsBtn"[\s\S]{0,600}Catalogue des produits[\s\S]{0,200}Ajouter ou supprimer des produits et des plats/);
+  assert.match(html,/id="settingsMissingProductsBtn"[\s\S]{0,600}Catalogue des produits[\s\S]{0,200}Ajouter ou retirer produits et plats/);
   assert.match(html,/data-catalog-view="add"/);
   assert.match(html,/data-catalog-view="remove"/);
   assert.match(html,/id="catalogRemovePanel"/);
