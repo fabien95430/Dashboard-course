@@ -2,6 +2,15 @@
 
 **Source de vérité de cette file :** historique `docs/AVANCEMENT_IMAGES_PRODUITS.md` (inventaire exhaustif v611, 84 références non renouvelées) ; comparaison ciblée avec les lots v612, v613, v614, v615 et v616 ; `main` de préparation `a8cbd3be4902467b12d951540ccf2b542abbf2c9`.
 
+## Lot v637 — deux WebP unitaires, qualité contrôlée (publication conditionnelle)
+
+- **Sel lave-vaisselle** : bocal fermé à bouchon bleu, cristaux blancs visibles, WebP 320 × 320 px avec transparence réelle. Fichier initial 84 × 84 px, blob `20decb9ce16c9c2f9e51cc87271b799e00e62101`, remplacé par `a1e1c4b4340b9bd6f144f431c2385eff310733a3`.
+- **Vinaigre ménager** : bouteille transparente avec liquide jaune clair et bouchon vert, fermée et sans marque, WebP 320 × 320 px. Ancien 84 × 84 px, blob `0892af3a2c7bc7a5917125aaf1f7facc9df1d000`, nouveau `80eb352c96663a0d1443b163ae19533b6e17aade`.
+- Les deux créations sont des **rendus 3D stylisés originaux réalisés localement**, sans API OpenAI payante du dépôt et sans marque inventée. Les deux sont conçus en SVG 768 px avec gradients, textures et volumes puis convertis en WebP RGBA 320 px via CairoSVG/Pillow ; aperçus à 192 px sur blanc/sauge. Ne pas les présenter comme des photographies commerciales.
+- **Cinq références non modifiées** : Éponges magiques, Lingettes anti-décoloration, Produit inox, Thé Earl Grey et Thé fruits rouges. Leurs prototypes locaux ou alternatives trouvées ont été rejetés comme trop illustratifs, imprécis ou à fond opaque. Aucune image ne doit être remplacée uniquement pour terminer le compteur.
+- **Progression prévue après fusion et CI : 368/414 renouvelés distincts (88,9 %), 46 non renouvelés = 41 conservés + 5 ouverts.** Aucun doublon ni autre changement d'application ; cache et versions globaux v637 actualisés.
+- Détails de provenance et empreintes dans `docs/IMAGE_CREDITS_V637.md`. Les notes des lots précédents sont conservées.
+
 ## Six conservations complémentaires — 28 octobre 2026
 
 **Progression inchangée : 366/414 produits distincts renouvelés (88,4 %).** Sur les 48 non renouvelés, **41 sont conservés** sur décision documentée et **7 restent ouverts**. Ces décisions n'entraînent aucun remplacement de fichier produit.
@@ -51,7 +60,7 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 4. Ne jamais compter un produit deux fois. Un remplacement d'un WebP antérieurement renouvelé peut modifier sa qualité, **pas** le décompte des produits distincts.
 5. Un candidat n'est pas un produit publié. Les tests, licences, crédits, caches/versions, SHA Git, CI et Pages doivent être confirmés avant de modifier un statut. Ne jamais découper une planche ni utiliser l'API OpenAI payante du projet.
 
-## Références encore non renouvelées après v629 (48, v629 publiée)
+## Références encore non renouvelées après v637 (46, publication conditionnelle)
 
 | Catégorie | Produit | WebP | Décision opérationnelle |
 | --- | --- | --- | --- |
@@ -89,11 +98,9 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Maison | Sacs poubelle 30L | `sacs-poubelle-30l.webp` | `CONSERVER` |
 | Maison | Sacs poubelle 50L | `sacs-poubelle-50l.webp` | `CONSERVER` |
 | Maison | Sacs zip | `sacs-zip.webp` | `CONSERVER` |
-| Maison | Sel lave-vaisselle | `sel-lave-vaisselle.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Serviettes papier | `serviettes-papier.webp` | `CONSERVER` |
 | Maison | Tablettes lave-vaisselle | `tablettes-lave-vaisselle.webp` | `CONSERVER` |
 | Maison | Torchons | `torchons.webp` | `CONSERVER` |
-| Maison | Vinaigre ménager | `vinaigre-menager.webp` | `ATTENDRE_CANDIDAT` |
 | Petit-déjeuner | Céréales | `cereales.webp` | `CONSERVER` |
 | Petit-déjeuner | Sirot d’érable | `sirot-d-erable.webp` | `CONSERVER` |
 | Petit-déjeuner | Thé Earl Grey | `the-earl-grey.webp` | `ATTENDRE_CANDIDAT` |

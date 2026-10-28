@@ -8,6 +8,12 @@
 
 **File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
 
+## Lot v637 — Sel lave-vaisselle et Vinaigre ménager (publication conditionnelle)
+
+**Base Git :** `aabb502711944952a1b8d71cd5c74e25e1bdeef6` (v636). Deux nouveaux WebP unitaires transparents **320 × 320 px** pour Sel lave-vaisselle et Vinaigre ménager, issus de rendus originaux locaux avec cadrage centré, sans logo ni texte ajouté. Comparaison ciblée des anciens visuels 84 × 84 px avec les nouveaux, et contrôle du rendu de ces nouveaux fichiers à 192 px sur fonds blanc et sauge. Contrôles d'alpha, dimensions et transparence des quatre coins ; blobs et SHA-256 dans `docs/IMAGE_CREDITS_V637.md`.
+
+**Après publication, CI et Pages validées (projection)** : 368 / 414 renouvelés distincts (88,9 %), 46 non renouvelés dont 41 conservés et 5 toujours ouverts. Aucun changement des images déjà renouvelées ou des 41 conservations ; aucune modification fonctionnelle. La suite GitHub est impérative avant de compter ce lot comme publié.
+
 ## Six produits supplémentaires conservés — état à jour au 28 octobre 2026
 
 **366/414 visuels distincts renouvelés (88,4 %), 48 non renouvelés, dont 41 conservations documentées et 7 références sans candidat conforme.** Les 6 nouvelles conservations — Confiture fraise, Piles AA, Grattoirs, Thé noir, Poisson pané, Saucisses — n'ont pas modifié leurs anciens WebP ; voir `docs/REPRISE_IMAGES_PRODUITS_20261028.md` pour les blobs vérifiés. Certaines anciennes vignettes sont encore à 84 px et ne sont pas présentées comme des remplacements haute définition. Ce complément est **uniquement documentaire** : aucune image, fonction, version/cache ou API payante modifiée.
