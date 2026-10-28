@@ -3836,7 +3836,7 @@ body{
 }
 .settings-sheet,.settings-sheet :is(button,input,select,textarea,strong,small,span,h3,h4,p,label,div){font-family:var(--sheet-font)}
 /* Réglages : un seul axe centré pour les zones et les actions, coque toujours bord à bord. */
-.settings-sheet > *,
+.settings-sheet > :where(:not(.courses-openai-feedback)),
 .settings-sheet .preference-dialog-scroll{
   box-sizing:border-box;
   width:100%!important;

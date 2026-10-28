@@ -20,7 +20,7 @@ test('une annulation OpenAI passe la demande à Annulé et autorise une relance'
   assert.match(fixes,/if\(progress\.textContent!==progressLabel\)progress\.textContent=progressLabel;/);
   assert.match(fixes,/const retryable=cancelled\|\|failed;/);
   assert.match(fixes,/retryable\?'Relancer ce '\+noun\+' avec OpenAI'/);
-  assert.match(fixes,/appNotify\('Intégration OpenAI annulée',unique\[0\]\+' peut être relancé\.'\)/);
+  assert.match(fixes,/appNotify\('Intégration annulée',unique\[0\]\)/);
 });
 
 test('un échec GitHub passe la demande à Erreur et libère immédiatement la relance',()=>{
@@ -32,7 +32,7 @@ test('un échec GitHub passe la demande à Erreur et libère immédiatement la r
   assert.match(fixes,/request\?\.status==='failed'/);
   assert.match(fixes,/failed=!added&&status==='failed'/);
   assert.match(fixes,/button\.disabled=added\|\|running\|\|openAiCooldown\.has\(key\)/);
-  assert.match(fixes,/appNotify\('Intégration OpenAI échouée',unique\[0\]\+' peut être relancé\.'\)/);
+  assert.match(fixes,/appNotify\('Intégration échouée',unique\[0\]\)/);
 });
 
 test('une demande OpenAI orpheline ne peut plus rester bloquée indéfiniment',()=>{

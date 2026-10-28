@@ -208,19 +208,19 @@ function notifyOpenAiCancelled(names){
   const unique=[...new Set(names.filter(Boolean))];
   if(!unique.length)return;
   if(unique.length===1){
-    appNotify('Intégration OpenAI annulée',unique[0]+' peut être relancé.');
+    appNotify('Intégration annulée',unique[0]);
     return;
   }
-  appNotify('Intégrations OpenAI annulées',unique.length+' demandes peuvent être relancées.');
+  appNotify('Intégrations annulées',unique.length+' demandes');
 }
 function notifyOpenAiFailed(names){
   const unique=[...new Set(names.filter(Boolean))];
   if(!unique.length)return;
   if(unique.length===1){
-    appNotify('Intégration OpenAI échouée',unique[0]+' peut être relancé.');
+    appNotify('Intégration échouée',unique[0]);
     return;
   }
-  appNotify('Intégrations OpenAI échouées',unique.length+' demandes peuvent être relancées.');
+  appNotify('Intégrations échouées',unique.length+' demandes');
 }
 async function reconcileOpenAiRequests(){
   const tracked=trackedRunningOpenAiRequests();
@@ -379,7 +379,7 @@ async function integrateWithOpenAi(type,id,requestId){
   }catch(error){
     const detail=String(error?.message||'Impossible d’armer la notification de fin.').slice(0,140);
     window.CoursesErrors?.report?.({key:'notifications:'+detail.toLowerCase(),severity:'error',source:'Notifications',title:'Notifications indisponibles',message:detail});
-    appNotify('Notification requise',detail);
+    appNotify('Notification requise');
     return false;
   }
   try{
@@ -398,12 +398,12 @@ async function integrateWithOpenAi(type,id,requestId){
     }else void notifyIntegrationStarted(type,item,serviceData.request_id);
     window.CoursesErrors?.resolvePrefix?.('integration-local:');
     window.CoursesErrors?.resolvePrefix?.('notifications:');
-    appNotify('Intégration OpenAI lancée',String(item.name||''));
+    appNotify('Intégration lancée',String(item.name||''));
     return true;
   }catch(error){
     const detail=String(error?.message||'Réessaie après avoir vérifié Home Assistant.').slice(0,140);
     window.CoursesErrors?.report?.({key:'integration-local:'+detail.toLowerCase(),severity:'error',source:'Intégration',title:'Intégration impossible',message:detail,action:'open-missing'});
-    appNotify('Intégration OpenAI impossible',detail);
+    appNotify('Intégration impossible');
     return false;
   }
 }
@@ -425,7 +425,7 @@ function installOpenAiStyle(){
     #missingProductsDialog .missing-product-integrate.is-running,#missingProductsDialog .missing-dish-integrate.is-running{background:#edf0ee!important;color:#7a837e!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-integrate.is-added{background:#edf0ee!important;color:#65736b!important;opacity:1!important;box-shadow:none!important}
     #missingProductsDialog .missing-dish-openai.is-running{background:#edf0ee!important;color:#8a928d!important;border-left-color:#dfe4e1!important;opacity:1!important}
-    #missingProductsDialog .courses-openai-feedback{position:absolute;z-index:80;left:14px;right:14px;bottom:14px;padding:9px 11px;border-radius:14px;background:rgba(24,36,29,.94);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:11.5px;line-height:1.2;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
+    #missingProductsDialog .courses-openai-feedback{position:absolute;z-index:80;left:14px;right:14px;bottom:14px;padding:9px 11px;border-radius:14px;background:rgba(24,36,29,.94);color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;font-size:var(--fs-note);line-height:1.25;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}
     #missingProductsDialog .courses-openai-feedback.is-visible{opacity:1;transform:translateY(0)}
     @media(max-width:390px){#missingProductsDialog .missing-dish-integrate{padding-left:11px!important;padding-right:10px!important}#missingProductsDialog .missing-dish-openai{width:36px!important;min-width:36px!important;min-height:40px!important;font-size:16px!important}}
   `;

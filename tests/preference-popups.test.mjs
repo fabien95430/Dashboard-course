@@ -281,7 +281,7 @@ test('le titre produits manquants conserve son icône et le style des actions es
 test('Réglages aligne les éléments internes sur une colonne centrale sobre',()=>{
   const css=read('styles.css');
   assert.match(css,/--sheet-inner-max:400px/);
-  assert.match(css,/\.settings-sheet > \*,\s*\.settings-sheet \.preference-dialog-scroll\{[^}]*width:100%!important;[^}]*max-width:var\(--sheet-inner-max\)!important;[^}]*margin-inline:auto!important/s);
+  assert.match(css,/\.settings-sheet > :where\(:not\(\.courses-openai-feedback\)\),\s*\.settings-sheet \.preference-dialog-scroll\{[^}]*width:100%!important;[^}]*max-width:var\(--sheet-inner-max\)!important;[^}]*margin-inline:auto!important/s);
   assert.match(css,/\.settings-sheet \.preference-dialog-scroll > :is\(\.field,\.preference-options,\.dialog-actions,#preferencesApplicationManagement,#preferencesNotificationsPanel\)\{/);
   assert.match(css,/\.settings-sheet \.dialog-actions\{\s*display:flex;\s*align-items:stretch;\s*justify-content:center;/);
   assert.match(css,/\.settings-sheet \.dialog-actions > button:only-child\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/s);

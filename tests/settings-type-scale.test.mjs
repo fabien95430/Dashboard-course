@@ -20,7 +20,8 @@ const SCOPES={
   'settings-ui.js':/#preferencesNotificationsPanel|\.connection-dialog/,
   'missing-products-popup-ui.js':/#missingProductsDialog/,
   'error-center.js':/\.courses-error/,
-  'catalog-product-admin.js':/\.courses-product-admin|\.catalog-remove-panel/
+  'catalog-product-admin.js':/\.courses-product-admin|\.catalog-remove-panel/,
+  'missing-products-fixes.js':/\.courses-openai-feedback/
 };
 // Titres (page et popups), glyphes (« + », « × ») et pastilles de compteur : hors règle texte.
 const EXEMPT=/(^|\s)\.settings-sheet h3|settings-sheet-title|\.connection-dialog h3|\.page-header h1|missing-products-close|missing-add-start>span:first-child|courses-error-badge|settings-count/;
@@ -89,4 +90,27 @@ test('Catalogue : Annuler et Ajouter ont exactement la même taille et le même 
   const rule=/#missingProductsDialog \.missing-add-actions button\{([^}]*)\}/.exec(css);
   assert.ok(rule,'règle des boutons absente');
   for(const decl of ['width:100%!important','min-height:48px!important','height:48px!important','margin:0!important'])assert.ok(rule[1].includes(decl),decl+' manquant');
+});
+
+test('Catalogue : le message flottant du bas garde sa pose native (marges de 14 px, police système) et reste dans l’écran',()=>{
+  const css=read('styles.css'),fixes=read('missing-products-fixes.js');
+  assert.match(css,/\.settings-sheet > :where\(:not\(\.courses-openai-feedback\)\),/);
+  const rule=/#missingProductsDialog \.courses-openai-feedback\{([^}]*)\}/.exec(fixes);
+  assert.ok(rule,'règle du message flottant absente');
+  assert.match(rule[1],/position:absolute;[^}]*left:14px;right:14px;bottom:14px/);
+  assert.match(rule[1],/font-family:-apple-system/);
+  assert.match(rule[1],/font-size:var\(--fs-note\)/);
+});
+
+test('Catalogue : les messages du bas tiennent sur une ligne (titres courts, détail limité au nom ou à un compteur)',()=>{
+  const source=['missing-products-fixes.js','missing-products-dishes.js'].map(read).join('\n');
+  const calls=[...source.matchAll(/appNotify\('([^']*)'(?:,([^;]*?))?\);/g)];
+  assert.ok(calls.length>=8,'appels appNotify introuvables');
+  const problems=[];
+  for(const [,title,detail] of calls){
+    if(title.length>26)problems.push('titre trop long : '+title);
+    if(detail&&/^detail\b/.test(detail.trim()))problems.push('détail libre (message d’erreur) : '+title);
+    for(const [,literal] of (detail||'').matchAll(/'([^']*)'/g))if(literal.length>24)problems.push('détail trop long : '+literal);
+  }
+  assert.deepEqual(problems,[]);
 });

@@ -140,7 +140,7 @@ function cancelQueuedProductNotification(id){
 }
 function notifyAdded(type,name){
   const title=type==='dish'?'Plat ajouté':'Produit ajouté';
-  appNotify(title,name+' est maintenant disponible dans le catalogue.');
+  appNotify(title,name);
 }
 function fallbackCopy(text){
   const area=document.createElement('textarea');
@@ -613,7 +613,7 @@ function removeDish(id){
         if(!notify)return;
         if(catalog.has(normalize(item.name))){
           catalogDuplicateIds.add(item.id);
-          appNotify('Produit déjà présent','« '+item.name+' » existe déjà dans le catalogue.');
+          appNotify('Produit déjà présent',item.name);
           void notifyProductAlreadyPresent(item.id,item.name);
         }else{
           notifyRequest(item.name);
