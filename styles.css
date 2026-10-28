@@ -1039,10 +1039,13 @@ html #products .product.is-deferred{display:none!important}
 }
 
 .toast{
-  color:#fff;
-  border:0;
-  background:rgba(22,31,25,.92);
-  box-shadow:0 8px 26px rgba(28,39,31,.18);
+  color:#1f3326;
+  border:1px solid rgba(255,255,255,.72);
+  background:rgba(255,255,255,.66);
+  -webkit-backdrop-filter:blur(22px) saturate(1.8);
+  backdrop-filter:blur(22px) saturate(1.8);
+  box-shadow:0 8px 28px rgba(28,39,31,.16),inset 0 1px 0 rgba(255,255,255,.7);
+  font-weight:600;
 }
 
 /* Mobile compact */
