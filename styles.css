@@ -4039,17 +4039,15 @@ body{
 .settings-sheet .dialog-feedback.is-visible{white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
 .settings-sheet #preferencesNotificationsPanel .notifications-management-summary{border:1px solid var(--tile-line)!important;background:var(--tile-bg)!important;box-shadow:var(--tile-shadow)!important}
 .settings-sheet .courses-product-admin-row{background:var(--tile-bg)!important;border-color:var(--tile-line)!important;box-shadow:var(--tile-shadow)!important}
-.settings-sheet .courses-product-admin-modes{background:rgba(216,233,211,.45)!important}
-.settings-sheet .courses-product-admin-mode.is-active{background:rgba(255,255,255,.85)!important;color:#28563e!important}
 .settings-sheet .recipe-customization-item,.settings-sheet .recipe-customization-ingredient-picker{background:rgba(255,255,255,.49)!important;border-color:rgba(40,70,49,.10)!important;box-shadow:none!important}
 .settings-sheet .recipe-customization-item.is-selected{background:rgba(221,237,216,.73)!important;border-color:rgba(62,124,77,.22)!important}
 .settings-sheet .recipe-customization-add-button{border-color:rgba(51,108,63,.19)!important;background:rgba(237,247,234,.57)!important;color:#296043!important}
 .settings-sheet .missing-product-row{background:rgba(255,255,255,.50)!important;border-color:rgba(40,70,49,.085)!important;box-shadow:none!important}
 .settings-sheet#missingProductsDialog .missing-products-header{padding-right:0!important;flex:0 0 auto}
-.settings-sheet#missingProductsDialog .missing-products-add input,.settings-sheet#missingProductsDialog .missing-products-add button{height:46px!important;min-height:46px!important;font-size:14px!important}
 .settings-sheet#preferencesDialog[open],.settings-sheet#missingProductsDialog[open],.settings-sheet.recipe-customization-dialog[open]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
 .settings-sheet#preferencesDialog .preference-dialog-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
-.settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .missing-dishes-list{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
+.settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .missing-dishes-list{flex:0 1 auto!important;min-height:0!important;overflow-y:auto!important}
+.settings-sheet#missingProductsDialog .catalog-remove-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .settings-sheet.recipe-customization-dialog .recipe-customization-list{flex:1 1 auto!important;min-height:0!important;max-height:none!important}
 .settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto}
 /* Finitions Réglages : actions, lignes et états des feuilles iOS. */
@@ -4064,20 +4062,18 @@ body{
 .settings-sheet#connectionDialog .connection-sync-line{gap:12px}
 .settings-sheet#connectionDialog .connection-sync-line>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;color:#25392b;font-size:15px;font-weight:400}
 .settings-sheet#connectionDialog .connection-sync-line>span:last-child{flex:0 0 auto;min-width:0;font-size:13.5px}
-/* Réglages : même sélecteur, même trait et mêmes séparateurs que le Catalogue. */
+/* Catalogue des produits v624 : sélecteur Produits / Plats à deux mots (logique du Catalogue), trait sous l'actif. */
 #missingProductsDialog .missing-mode-switch{
-  --catalog-lens-x:3px;--catalog-lens-w:calc(50% - 3px);--catalog-liquid-sx:1;
-  position:relative!important;display:grid!important;grid-template-columns:1fr 1fr!important;
-  width:72%!important;max-width:100%!important;height:46px!important;
-  margin:11px auto 15px!important;padding:3px!important;
-  border:1px solid rgba(27,49,35,.055)!important;border-radius:24px!important;
-  background:rgba(255,255,255,.94)!important;
-  box-shadow:0 6px 20px rgba(57,75,62,.055)!important;
-  overflow:hidden!important;isolation:isolate;touch-action:pan-y;
+  --catalog-lens-x:30px;--catalog-lens-w:60px;--catalog-liquid-sx:1;
+  position:relative!important;display:grid!important;grid-template-columns:120px 120px!important;justify-content:center;
+  width:240px!important;max-width:100%!important;height:38px!important;flex:0 0 auto;
+  margin:0 auto 12px!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  overflow:visible!important;isolation:isolate;touch-action:pan-y;
 }
 #missingProductsDialog .missing-mode-lens{
   position:absolute!important;z-index:0!important;
-  top:auto!important;bottom:2px!important;left:0!important;
+  top:auto!important;bottom:0!important;left:0!important;
   width:var(--catalog-lens-w)!important;height:2px!important;
   border:0!important;border-radius:1px!important;background:#073e2c!important;box-shadow:none!important;
   transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx))!important;
@@ -4085,16 +4081,42 @@ body{
 }
 #missingProductsDialog .missing-mode-button{
   position:relative!important;z-index:1!important;min-width:0!important;
-  border:0!important;border-radius:21px!important;background:transparent!important;
-  display:flex!important;align-items:center!important;justify-content:center!important;
-  color:#7b838c!important;font-size:14px!important;font-weight:720!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;padding:1px 6px!important;
+  color:#87928b!important;font:inherit!important;font-size:16px!important;font-weight:600!important;
   transform:none!important;touch-action:pan-y;
 }
 #missingProductsDialog .missing-mode-button.is-active,
 #missingProductsDialog .missing-mode-button.is-liquid-under{color:#073e2c!important}
 #missingProductsDialog .missing-mode-button:active{transform:none!important}
 #missingProductsDialog .missing-mode-button:focus-visible{outline:2px solid rgba(7,62,44,.24);outline-offset:-4px}
-#missingProductsDialog .missing-mode-button.is-active{font-weight:800!important}
+/* Vues Ajout / Suppression, bouton d'ajout, formulaire et liste. */
+#missingProductsDialog#missingProductsDialog [hidden]{display:none!important}
+.settings-sheet#missingProductsDialog>:is(.catalog-view-switch,.missing-add-start,.missing-products-add,.missing-image-hint-field,.missing-category-panel,.missing-products-list-heading,.missing-add-actions){flex:0 0 auto}
+#missingProductsDialog .catalog-view-switch{display:grid;grid-template-columns:1fr 1fr;width:100%;height:42px;margin:0 auto 10px;padding:3px;border-radius:13px;background:rgba(118,128,120,.13);box-sizing:border-box}
+#missingProductsDialog .catalog-view-button{border:0;border-radius:10px;background:transparent;color:#55655a;font:inherit;font-size:14.5px;-webkit-appearance:none;appearance:none}
+#missingProductsDialog .catalog-view-button.is-active{background:#fffefb;color:#1b2d21;font-weight:600;box-shadow:0 2px 7px rgba(40,60,46,.12)}
+#missingProductsDialog .catalog-view-button:focus-visible{outline:2px solid rgba(51,105,72,.3);outline-offset:1px}
+#missingProductsDialog .missing-add-start{width:100%;min-height:52px;display:flex;align-items:center;gap:10px;margin:0 0 4px;padding:0 16px;border:1px dashed rgba(51,108,63,.28);border-radius:18px;background:rgba(237,247,234,.6);color:#1f6a43;font:inherit;font-size:15.5px;text-align:left;-webkit-appearance:none;appearance:none}
+#missingProductsDialog .missing-add-start>span:first-child{font-size:20px;line-height:1}
+#missingProductsDialog .missing-products-list-heading{display:flex!important;justify-content:space-between!important;align-items:baseline!important;margin:16px 2px 7px!important}
+#missingProductsDialog .missing-products-list-heading strong{color:#4c6152!important;font-size:13.5px!important;font-weight:600!important}
+#missingProductsDialog #missingProductsListCount{min-width:0!important;height:auto!important;padding:0!important;border-radius:0!important;background:transparent!important;color:#4c6152!important;font-size:13.5px!important;font-weight:400!important;font-variant-numeric:tabular-nums}
+#missingProductsDialog .missing-products-add{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:6px!important;margin:0!important;padding:0!important;background:none!important}
+#missingProductsDialog .missing-field-label{color:#4c6152;font-size:13.5px;font-weight:600}
+#missingProductsDialog .missing-products-add input,#missingProductsDialog #missingProductImageHint{width:100%;height:44px!important;min-height:44px!important;box-sizing:border-box;padding:0 14px!important;border:1px solid rgba(59,83,65,.12)!important;border-radius:14px!important;background:rgba(255,255,255,.7)!important;color:#1b2d21!important;font:inherit!important;font-size:16px!important;box-shadow:none!important}
+#missingProductsDialog .missing-image-hint-field{display:grid!important;gap:6px;margin:10px 0 0!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important}
+#missingProductsDialog .missing-category-panel{display:block!important;margin:13px 0 0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+#missingProductsDialog .missing-category-heading{display:block!important;margin:0 2px 6px!important;padding:0!important}
+#missingProductsDialog .missing-category-heading small{display:none!important}
+#missingProductsDialog .missing-category-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+#missingProductsDialog .missing-category-choice{min-width:0!important;height:34px!important;min-height:34px!important;padding:0 5px!important;border:1px solid rgba(59,83,65,.14)!important;border-radius:11px!important;background:rgba(255,255,255,.7)!important;color:#2c4334!important;font:inherit!important;font-size:min(13px,3.25vw)!important;font-weight:400!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:none!important}
+#missingProductsDialog .missing-category-choice::after{display:none!important}
+#missingProductsDialog .missing-category-choice span{overflow:hidden;text-overflow:ellipsis}
+#missingProductsDialog .missing-category-choice.is-active{border-color:#2f6a49!important;background:#2f6a49!important;color:#fff!important}
+#missingProductsDialog .missing-add-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:auto;padding-top:14px}
+#missingProductsDialog .missing-add-actions button{min-height:48px!important;height:48px;border-radius:15px!important;font:inherit;font-size:15.5px!important}
+#missingProductsDialog .missing-add-actions .primary:disabled{opacity:.42}
 .settings-sheet .preference-toggle+.preference-toggle,
 .settings-sheet .security-setting-info+.security-setting-info,
 .settings-sheet .connection-sync-line+.connection-sync-line{
@@ -4104,44 +4126,6 @@ body{
   border-top-color:rgba(39,66,47,.09)!important;
 }
 @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-mode-button{transition:none!important}}
-
-/* Sous-vues de Gestion : même trait actif que le Catalogue, sans capsules concurrentes. */
-#preferencesDialog .courses-product-admin-modes{
-  --catalog-lens-x:3px;--catalog-lens-w:calc(50% - 3px);--catalog-liquid-sx:1;
-  position:relative!important;display:grid!important;grid-template-columns:1fr 1fr!important;
-  width:72%!important;max-width:100%!important;height:46px!important;
-  margin:12px auto 16px!important;padding:3px!important;gap:0!important;
-  border:1px solid rgba(27,49,35,.055)!important;border-radius:24px!important;
-  background:rgba(255,255,255,.94)!important;
-  box-shadow:0 6px 20px rgba(57,75,62,.055)!important;
-  isolation:isolate;overflow:hidden!important;touch-action:pan-y;
-}
-#preferencesDialog .courses-product-admin-modes::after{
-  content:"";position:absolute;left:0;bottom:2px;z-index:0;
-  width:var(--catalog-lens-w);height:2px;border-radius:1px;
-  background:#073e2c;
-  transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx));
-  pointer-events:none;
-}
-#preferencesDialog .courses-product-admin-modes > button{
-  position:relative;z-index:1;
-  min-width:0!important;min-height:0!important;height:100%!important;
-  border:0!important;border-radius:21px!important;
-  background:transparent!important;box-shadow:none!important;
-  color:#7b838c!important;font-size:13px!important;font-weight:720!important;
-  touch-action:pan-y;
-}
-#preferencesDialog .courses-product-admin-modes > button.is-active,
-#preferencesDialog .courses-product-admin-modes > button.is-liquid-under{
-  background:transparent!important;box-shadow:none!important;color:#073e2c!important;font-weight:800!important;
-}
-#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound])::after{display:none}
-#preferencesDialog .courses-product-admin-modes:not([data-segmented-liquid-bound]) > button.is-active::after{
-  content:"";position:absolute;bottom:2px;left:25%;width:50%;height:2px;background:#073e2c;border-radius:1px;
-}
-@media(prefers-reduced-motion:reduce){
-  #preferencesDialog .courses-product-admin-modes > button{transition:none!important}
-}
 
 /* Messages d'erreur v618 : sélecteur À traiter / Résolues comme Produits / Plats (deux mots, trait sous l'actif). */
 #preferencesDialog .courses-error-tabs{

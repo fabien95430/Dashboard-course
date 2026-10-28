@@ -231,7 +231,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(index,/Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local\./);
   assert.match(dishes,/Modifiez ingrédients et quantités pour 2 personnes\./);
   assert.match(dishes,/À ajouter manuellement si besoin\./);
-  assert.match(missing,/Ajoutez les produits ou plats absents du catalogue\./);
+  assert.match(missing,/Demandez l’ajout d’un produit ou d’un plat\./);
   assert.match(settings,/Documentation, historique et informations\./);
   assert.match(repurchase,/Suggestions selon vos habitudes\. Aucun ajout automatique\./);
   assert.match(repurchase,/Activez l’historique des achats dans Préférences\./);
@@ -246,7 +246,7 @@ test('les sous-vues de Réglages sans flèche gardent leur navigation et leur fe
   assert.match(settings,/function setTitle\(label,parent=''\)\{/);
   assert.match(settings,/setTitle\('Gestion de l’application','preferences'\)/);
   assert.match(errors,/COURSES_SETTINGS_NAV\.setTitle\('Messages d’erreur','management'\)/);
-  assert.match(catalog,/COURSES_SETTINGS_NAV\.setTitle\('Catalogue produit','management'\)/);
+  assert.doesNotMatch(catalog,/COURSES_SETTINGS_NAV|preferencesDialog/);
   assert.match(app,/bindDialogBackdropClose\(UI\.preferencesDialog\)/);
   assert.match(html,/id="settingsDialog" class="dialog security-settings-dialog settings-sheet"/);
   assert.match(css,/\.settings-sheet::before\{content:"";position:absolute/);
@@ -273,7 +273,8 @@ test('le titre produits manquants conserve son icône et le style des actions es
   assert.match(source,/dialog\.querySelector\('\.missing-products-header \.settings-sheet-title'\)/);
   assert.doesNotMatch(source,/dialogTitle=dialog\.querySelector\('\.missing-products-header h3'\)/);
   assert.match(html,/settings-sheet-title">Connexion Home Assistant<\/span><\/h3>\s*<p class="dialog-intro">/);
-  assert.match(modern,/background:linear-gradient\(160deg,#32664a,#214b36\)!important/);
+  assert.match(html,/<div class="missing-add-actions" hidden>\s*<button id="missingAddCancel" class="secondary" type="button">Annuler<\/button>\s*<button id="addMissingProduct" class="primary" type="button" disabled>Ajouter<\/button>/);
+  assert.doesNotMatch(modern,/missing-products-add|missing-product-row/);
   assert.match(notifications,/Notifications indisponibles : Service Worker non prêt/);
 });
 
@@ -304,11 +305,10 @@ test('Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent
   const css=read('styles.css');
   const admin=read('catalog-product-admin.js');
   const errors=read('error-center.js');
-  assert.match(css,/#preferencesDialog \.courses-product-admin-modes::after\{[\s\S]*?#preferencesDialog \.courses-error-tabs::after\{/);
-  assert.match(css,/#preferencesDialog \.courses-product-admin-modes > button\.is-active,[\s\S]*?background:transparent!important/);
-  assert.match(admin,/let modeTrack=null/);
-  assert.match(admin,/freshTrack\.replaceWith\(modeTrack\)/);
-  assert.match(admin,/COURSES_SEGMENTED_LIQUID\?\.bindSegment\(modeTrack/);
+  assert.match(css,/#preferencesDialog \.courses-error-tabs::after\{/);
+  assert.match(css,/#missingProductsDialog \.missing-mode-lens\{[\s\S]*?transform:translate3d\(var\(--catalog-lens-x\),0,0\)/);
+  assert.doesNotMatch(css,/courses-product-admin-modes/);
+  assert.doesNotMatch(admin,/modeTrack|data-catalog-admin-mode/);
   assert.match(errors,/let filterTrack=null/);
   assert.match(errors,/freshTrack\.replaceWith\(filterTrack\)/);
   assert.match(errors,/COURSES_SEGMENTED_LIQUID\?\.bindSegment\(filterTrack/);
@@ -338,7 +338,7 @@ test('v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, rec
   assert.match(dishes,/\[data-step="choose"\] :is\(\.recipe-customization-list,\.recipe-customization-status,\.recipe-customization-add,\.dialog-actions\)\{display:none!important\}/);
 });
 
-test('v617 : les sous-écrans de Gestion ont une flèche retour à la place de l icône, et la tuile Catalogue s affiche avec les autres',()=>{
+test('v617 : les sous-écrans de Gestion ont une flèche retour à la place de l icône, sans tuile différée',()=>{
   const settings=read('settings-ui.js'),css=read('styles.css'),catalog=read('catalog-product-admin.js');
   assert.match(settings,/backButton\.className='settings-sheet-back';/);
   assert.match(settings,/backButton\?\.addEventListener\('click',\(\)=>showManagement\(\)\)/);
@@ -346,11 +346,11 @@ test('v617 : les sous-écrans de Gestion ont une flèche retour à la place de l
   assert.match(settings,/setTitle\('Notifications','management'\)/);
   assert.match(css,/\.settings-sheet \.settings-sheet-back\{position:absolute;[^}]*width:44px;height:44px;/);
   assert.match(css,/\.settings-sheet h3\.has-back \.settings-sheet-icon\{visibility:hidden\}/);
-  assert.match(settings,/catalogButton\.id='preferencesProductCatalog';[\s\S]*?managementPanel\.appendChild\(catalogButton\)/);
-  assert.doesNotMatch(catalog,/createElement\('button'\);button\.id='preferencesProductCatalog'/);
-  assert.match(catalog,/button\?\.addEventListener\('click',showCatalog\)/);
-  const ui=settings.indexOf("managementPanel.appendChild(notificationsButton)"),cat=settings.indexOf('managementPanel.appendChild(catalogButton)'),err=settings.indexOf('managementPanel.appendChild(errorMessagesButton)');
-  assert.ok(ui<cat&&cat<err,'ordre Documentation, Notifications, Catalogue, Messages d erreur');
+  // v624 : le Catalogue a quitté Gestion pour « Catalogue des produits » ; plus aucune tuile différée dans Gestion.
+  assert.doesNotMatch(settings,/preferencesProductCatalog/);
+  assert.doesNotMatch(catalog,/preferencesProductCatalog/);
+  const ui=settings.indexOf("managementPanel.appendChild(notificationsButton)"),err=settings.indexOf('managementPanel.appendChild(errorMessagesButton)');
+  assert.ok(ui>0&&ui<err,'ordre Documentation, Notifications, Messages d erreur');
 });
 
 test('v618 : Messages d erreur en liste groupée, détails dépliés sur place, sélecteur à deux mots',()=>{

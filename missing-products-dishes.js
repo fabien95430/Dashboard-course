@@ -258,51 +258,34 @@ function initMissingProductsAndDishes(){
   const productList=document.getElementById('missingProductsList');
   const listHeading=dialog?.querySelector('.missing-products-list-heading strong');
   const listCount=document.getElementById('missingProductsListCount');
-  if(!dialog||!settingsButton||!input||!addButton||!addRow||!categoryPanel||!categoryHeading||!categoryGrid||!productList||!listHeading||!listCount)return;
+  const listHeadingRow=dialog?.querySelector('.missing-products-list-heading');
+  const viewSwitch=dialog?.querySelector('.catalog-view-switch');
+  const addStart=document.getElementById('missingAddStart');
+  const addStartLabel=addStart?.querySelector('.missing-add-start-label');
+  const addActions=dialog?.querySelector('.missing-add-actions');
+  const cancelButton=document.getElementById('missingAddCancel');
+  const removePanel=document.getElementById('catalogRemovePanel');
+  const nameLabel=addRow?.querySelector('.missing-field-label');
+  if(!dialog||!settingsButton||!input||!addButton||!addRow||!categoryPanel||!categoryHeading||!categoryGrid||!productList||!listHeading||!listCount||!listHeadingRow||!viewSwitch||!addStart||!addActions||!cancelButton||!removePanel)return;
 
   const settingsCopy=settingsButton.querySelector('.settings-copy');
   if(settingsCopy){
     const title=settingsCopy.querySelector('strong');
     const subtitle=settingsCopy.querySelector('small');
-    if(title)title.textContent='Produits & plats manquants';
-    if(subtitle)subtitle.textContent='Noter les produits et plats absents du catalogue';
+    if(title)title.textContent='Catalogue des produits';
+    if(subtitle)subtitle.textContent='Ajouter ou supprimer des produits et des plats';
   }
   const dialogTitle=dialog.querySelector('.missing-products-header .settings-sheet-title');
   const dialogIntro=dialog.querySelector('.missing-products-header .dialog-intro');
   const categoryTitle=categoryHeading.querySelector('strong');
-  if(dialogTitle)dialogTitle.textContent='Produits & plats manquants';
-  if(dialogIntro)dialogIntro.textContent='Ajoutez les produits ou plats absents du catalogue.';
+  if(dialogTitle)dialogTitle.textContent='Catalogue des produits';
   if(categoryTitle)categoryTitle.textContent='Catégorie';
 
   const style=document.createElement('style');
   style.id='missing-products-dishes-ui';
   style.textContent=`
     #missingProductsDialog .preference-dialog-scroll{overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch;touch-action:pan-y}
-    #missingProductsDialog .missing-image-hint-field{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;margin:0 0 8px;padding:5px 8px;border:1px solid rgba(35,144,90,.13);border-radius:14px;background:linear-gradient(145deg,rgba(246,251,248,.96),rgba(239,247,242,.82));box-shadow:inset 0 1px 0 rgba(255,255,255,.94)}
-    #missingProductsDialog .missing-image-hint-field[hidden]{display:none!important}
-    #missingProductsDialog .missing-image-hint-mark{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:rgba(35,144,90,.10);color:#17844d;font-size:14px;font-weight:850}
-    #missingProductsDialog #missingProductImageHint{width:100%;min-width:0;height:32px;border:0;border-radius:9px;background:transparent;color:#1a2821;padding:0 3px;font-size:12.5px;font-weight:620;outline:none;-webkit-appearance:none;appearance:none}
-    #missingProductsDialog #missingProductImageHint::placeholder{color:#98a29c;font-weight:560}
-    #missingProductsDialog #missingProductImageHint:focus{box-shadow:none}
-    #missingProductsDialog .missing-image-hint-optional{color:#8a948e;font-size:9.5px;font-weight:720;white-space:nowrap;padding-right:2px}
-    #missingProductsDialog .missing-category-grid{display:none!important}
-    #missingProductsDialog .missing-category-panel{display:grid!important;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin:0 0 10px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-    #missingProductsDialog .missing-category-heading{display:block!important;margin:0!important;padding:0!important}
-    #missingProductsDialog .missing-category-heading strong{font-size:12px!important;line-height:1!important;font-weight:790!important;color:#526159!important;white-space:nowrap}
-    #missingProductsDialog .missing-category-heading small{display:none!important}
-    #missingProductsDialog .missing-category-select{width:100%;min-width:0;height:40px;border:1px solid #e0e7e2;border-radius:12px;background:#fff;color:#27342d;padding:0 11px;font-size:12.5px;font-weight:700;outline:none}
-    #missingProductsDialog .missing-category-select:focus{border-color:#cbd8cf;box-shadow:0 0 0 3px rgba(38,144,82,.07)}
-    #missingProductsDialog .missing-products-list-heading{margin-top:8px!important;margin-bottom:5px!important}
-    #missingProductsDialog .missing-products-list,#missingProductsDialog .missing-dishes-list{flex:0 0 auto!important;min-height:auto!important;max-height:none!important;overflow:visible!important;overscroll-behavior:auto!important;-webkit-overflow-scrolling:auto!important}
-    #missingProductsDialog .missing-dishes-list[hidden]{display:none!important}
-    #missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:38px minmax(0,1fr) auto 42px!important;gap:8px!important}
-    #missingProductsDialog .missing-product-row.is-dish{gap:10px;align-items:center}
-    #missingProductsDialog .missing-product-row.is-dish .missing-product-mark{font-size:17px;line-height:1;flex:0 0 auto}
-    #missingProductsDialog .missing-product-row.is-dish .missing-product-copy{min-width:0;flex:1 1 auto}
-    #missingProductsDialog .missing-dish-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex:0 0 auto}
-    #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{border:0;border-radius:999px;min-height:40px;padding:0 14px;background:#e5f4e9;color:#0b7040;font-size:12px;font-weight:850;white-space:nowrap}
-    #missingProductsDialog .missing-product-remove:disabled{opacity:.3}
-    @media(max-width:390px){#missingProductsDialog .missing-image-hint-field{grid-template-columns:28px minmax(0,1fr) auto;gap:6px;padding:4px 7px}#missingProductsDialog .missing-image-hint-mark{width:28px;height:28px;border-radius:9px;font-size:13px}#missingProductsDialog #missingProductImageHint{height:30px;font-size:12px}#missingProductsDialog .missing-category-panel{gap:8px}#missingProductsDialog .missing-category-select{height:38px;font-size:12px}#missingProductsDialog .missing-product-row.has-integration-action{grid-template-columns:32px minmax(0,1fr) auto 40px!important;gap:6px!important}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{padding:0 11px!important;font-size:11px!important}}
+    #missingProductsDialog .missing-image-hint-field[hidden],#missingProductsDialog .missing-dishes-list[hidden],#missingProductsDialog .missing-category-grid[hidden]{display:none!important}
   `;
   document.head.appendChild(style);
 
@@ -311,18 +294,19 @@ function initMissingProductsAndDishes(){
   modeSwitch.setAttribute('role','tablist');
   modeSwitch.setAttribute('aria-label','Type d’élément manquant');
   modeSwitch.innerHTML='<span class="missing-mode-lens" aria-hidden="true"></span><button class="missing-mode-button is-active" type="button" data-missing-mode="products" role="tab" aria-selected="true">Produits</button><button class="missing-mode-button" type="button" data-missing-mode="dishes" role="tab" aria-selected="false">Plats</button>';
-  addRow.before(modeSwitch);
+  viewSwitch.after(modeSwitch);
 
   const imageHintField=document.createElement('label');
   imageHintField.className='missing-image-hint-field';
-  imageHintField.innerHTML='<span class="missing-image-hint-mark" aria-hidden="true">✦</span><input id="missingProductImageHint" type="text" maxlength="'+PRODUCT_IMAGE_HINT_MAX+'" autocomplete="off" autocapitalize="sentences" placeholder="Précision image · ex. tube d’épice" aria-label="Précision pour l’image du produit"><small class="missing-image-hint-optional">Optionnel</small>';
+  imageHintField.innerHTML='<span class="missing-field-label">Précision pour la photo · facultatif</span><input id="missingProductImageHint" type="text" maxlength="'+PRODUCT_IMAGE_HINT_MAX+'" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" placeholder="Ex. tube d’épice" aria-label="Précision pour l’image du produit">';
   addRow.after(imageHintField);
   const imageHintInput=imageHintField.querySelector('#missingProductImageHint');
 
-  const categorySelect=document.createElement('select');
-  categorySelect.className='missing-category-select';
-  categorySelect.setAttribute('aria-label','Choisir une catégorie');
-  categoryPanel.appendChild(categorySelect);
+  /* Catégories des plats : même grille que celle des produits (#missingCategoryGrid, propriété d'app.js). */
+  const dishCategoryGrid=document.createElement('div');
+  dishCategoryGrid.className='missing-category-grid missing-dish-category-grid';
+  dishCategoryGrid.hidden=true;
+  categoryPanel.appendChild(dishCategoryGrid);
 
   const dishesList=document.createElement('div');
   dishesList.id='missingDishesList';
@@ -334,22 +318,89 @@ function initMissingProductsAndDishes(){
   let mode='products';
   let lastMode='products';
   let dishCategory='';
+  /* Deux vues (Ajout / Suppression) ; dans Ajout, la liste puis le formulaire d'ajout. */
+  let view='add';
+  let step='list';
   let productEnhanceQueued=false;
   let knownProductIds=new Set(readProducts().map(item=>item.id));
   const completedThisSession=new Set();
   const catalogDuplicateIds=new Set();
 
-  function selectedProductCategory(){
-    return categoryGrid.querySelector('.missing-category-choice.is-active')?.dataset?.missingCategory||'';
+  function renderDishCategoryGrid(){
+    const categories=['',...catalogDishCategories()];
+    dishCategoryGrid.innerHTML=categories.map(value=>{
+      const active=value===dishCategory;
+      return '<button class="missing-category-choice'+(active?' is-active':'')+'" type="button" data-dish-category="'+escapeHtml(value)+'" aria-pressed="'+active+'"><span>'+escapeHtml(value||'Aucune')+'</span></button>';
+    }).join('');
   }
-  function categoryLabel(category){return category||'Aucune'}
-  function renderCategorySelect(){
-    const selected=mode==='dishes'?dishCategory:selectedProductCategory();
-    const options=mode==='dishes'
-      ?['',...catalogDishCategories()].map(value=>({value,label:categoryLabel(value)}))
-      :[...categoryGrid.querySelectorAll('[data-missing-category]')].map(button=>({value:button.dataset.missingCategory||'',label:button.textContent.trim()}));
-    categorySelect.innerHTML=options.map(option=>'<option value="'+escapeHtml(option.value)+'">'+escapeHtml(option.label)+'</option>').join('');
-    categorySelect.value=selected;
+  function resetProductCategory(){
+    const original=categoryGrid.querySelector('[data-missing-category=""]');
+    original?.onclick?.();
+  }
+  function syncAddButton(){
+    addButton.disabled=!String(input.value||'').trim();
+  }
+  function applyLayout(){
+    const dishesMode=mode==='dishes';
+    const listStep=view==='add'&&step==='list';
+    const formStep=view==='add'&&step==='form';
+    dialog.dataset.catalogView=view;
+    dialog.dataset.catalogStep=step;
+    dialog.dataset.catalogMode=mode;
+    viewSwitch.querySelectorAll('[data-catalog-view]').forEach(button=>{
+      const active=button.dataset.catalogView===view;
+      button.classList.toggle('is-active',active);
+      button.setAttribute('aria-selected',String(active));
+    });
+    viewSwitch.hidden=formStep;
+    modeSwitch.hidden=formStep;
+    addStart.hidden=!listStep;
+    if(addStartLabel)addStartLabel.textContent=dishesMode?'Ajouter un plat':'Ajouter un produit';
+    addRow.hidden=!formStep;
+    if(nameLabel)nameLabel.textContent=dishesMode?'Nom du plat':'Nom du produit';
+    imageHintField.hidden=!formStep||dishesMode;
+    categoryPanel.hidden=!formStep;
+    categoryGrid.hidden=dishesMode;
+    dishCategoryGrid.hidden=!dishesMode;
+    addActions.hidden=!formStep;
+    listHeadingRow.hidden=!listStep;
+    productList.hidden=!listStep||dishesMode;
+    dishesList.hidden=!listStep||!dishesMode;
+    removePanel.hidden=view!=='remove';
+    if(dialogIntro){
+      dialogIntro.textContent=view==='remove'
+        ?'Retirez un produit ou un plat du catalogue.'
+        :formStep?(dishesMode?'Nouveau plat à intégrer au catalogue.':'Nouveau produit à intégrer au catalogue.')
+          :'Demandez l’ajout d’un produit ou d’un plat.';
+    }
+    syncAddButton();
+  }
+  function announceView(){
+    document.dispatchEvent(new CustomEvent('courses:catalog-view-changed',{detail:{view,mode}}));
+  }
+  function setStep(next){
+    step=next==='form'?'form':'list';
+    if(step==='form'){
+      renderDishCategoryGrid();
+      requestAnimationFrame(()=>window.COURSES_SEGMENTED_LIQUID?.syncMissing(false));
+    }
+    applyLayout();
+    if(step==='list')requestAnimationFrame(()=>window.COURSES_SEGMENTED_LIQUID?.syncMissing(false));
+  }
+  function setView(next){
+    const target=next==='remove'?'remove':'add';
+    if(view===target)return;
+    view=target;
+    step='list';
+    applyLayout();
+    announceView();
+  }
+  function cancelAdd(){
+    input.value='';
+    imageHintInput.value='';
+    dishCategory='';
+    resetProductCategory();
+    setStep('list');
   }
   function renderDishes(){
     dishes=readDishes();
@@ -383,12 +434,10 @@ function initMissingProductsAndDishes(){
       button.classList.toggle('is-active',active);
       button.setAttribute('aria-selected',String(active));
     });
-    input.placeholder=dishesMode?'Nom du plat':'Nom du produit';
+    input.placeholder=dishesMode?'Ex. poulet tikka masala':'Ex. lait d’avoine';
     input.setAttribute('aria-label',dishesMode?'Nom du plat':'Nom du produit');
-    imageHintField.hidden=dishesMode;
-    listHeading.textContent=dishesMode?'Plats manquants':'Produits manquants';
-    productList.hidden=dishesMode;
-    dishesList.hidden=!dishesMode;
+    listHeading.textContent='À intégrer';
+    applyLayout();
     if(dishesMode){
       renderDishes();
       listCount.textContent=String(dishes.length);
@@ -396,7 +445,7 @@ function initMissingProductsAndDishes(){
       listCount.textContent=String(productCount());
       queueEnhanceProducts();
     }
-    renderCategorySelect();
+    renderDishCategoryGrid();
   }
   function setMode(next,{animate=true,clearInput=true}={}){
     if(next!=='products'&&next!=='dishes')return;
@@ -409,6 +458,7 @@ function initMissingProductsAndDishes(){
     }
     renderMode();
     window.COURSES_SEGMENTED_LIQUID?.syncMissing(animate);
+    announceView();
   }
   function saveProductImageHintDraft(){
     if(mode!=='products')return;
@@ -436,6 +486,7 @@ function initMissingProductsAndDishes(){
   dishes=result.items;
   input.value='';
   dishCategory='';
+  step='list';
   renderMode();
   notifyRequest(name);
   void window.COURSES_NOTIFICATIONS?.broadcast({
@@ -571,6 +622,10 @@ function removeDish(id){
       }
     });
     knownProductIds=nextIds;
+    if(added.length&&notify&&step==='form'){
+      imageHintInput.value='';
+      setStep('list');
+    }
     if(mode==='products')listCount.textContent=String(products.length);
     queueEnhanceProducts();
     if(added.length&&notify)revealProduct(added[added.length-1].id);
@@ -580,18 +635,24 @@ function removeDish(id){
     const button=event.target.closest('[data-missing-mode]');
     if(button)setMode(button.dataset.missingMode||'products');
   });
-  categorySelect.addEventListener('change',()=>{
-    const category=categorySelect.value||'';
-    if(mode==='dishes'){
-      const categories=catalogDishCategories();
-      dishCategory=!category||categories.includes(category)?category:'';
-    }else{
-      const original=[...categoryGrid.querySelectorAll('[data-missing-category]')].find(button=>(button.dataset.missingCategory||'')===category);
-      original?.onclick?.();
-    }
-    renderCategorySelect();
+  dishCategoryGrid.addEventListener('click',event=>{
+    const choice=event.target.closest('[data-dish-category]');
+    if(!choice)return;
+    const category=choice.dataset.dishCategory||'';
+    const categories=catalogDishCategories();
+    dishCategory=!category||categories.includes(category)?category:'';
+    renderDishCategoryGrid();
     navigator.vibrate?.(4);
   });
+  viewSwitch.addEventListener('click',event=>{
+    const button=event.target.closest('[data-catalog-view]');
+    if(button)setView(button.dataset.catalogView||'add');
+  });
+  addStart.addEventListener('click',()=>{
+    setStep('form');
+  });
+  cancelButton.addEventListener('click',cancelAdd);
+  input.addEventListener('input',syncAddButton);
 
   addButton.addEventListener('click',event=>{
     if(mode==='products'){
@@ -639,9 +700,6 @@ function removeDish(id){
     removeDish(remove.dataset.removeMissingDish||'');
   });
 
-  document.addEventListener('courses:missing-product-category-changed',()=>{
-    if(mode==='products')queueMicrotask(renderCategorySelect);
-  });
   document.addEventListener('courses:integration-started',event=>{
     if(event.detail?.type!=='product')return;
     cancelQueuedProductNotification(event.detail?.id);
@@ -652,15 +710,18 @@ function removeDish(id){
   });
   document.addEventListener('courses:products-updated',reconcileProducts);
   document.addEventListener('courses:dishes-rendered',()=>{
-    if(mode==='dishes')renderCategorySelect();
+    if(mode==='dishes')renderDishCategoryGrid();
     reconcileDishes();
   });
 
     settingsButton.addEventListener('click',()=>{
     imageHintInput.value='';
+    view='add';
+    step='list';
     setMode(lastMode,{animate:false,clearInput:false});
+    applyLayout();
+    announceView();
     requestAnimationFrame(()=>{
-      renderCategorySelect();
       syncNewProductRequests();
       reconcileDishes();
     });
@@ -668,6 +729,11 @@ function removeDish(id){
   dialog.addEventListener('close',()=>{
     lastMode=mode;
     imageHintInput.value='';
+    input.value='';
+    dishCategory='';
+    view='add';
+    step='list';
+    applyLayout();
   });
 
   renderMode();

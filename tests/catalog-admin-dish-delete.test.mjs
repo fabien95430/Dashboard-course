@@ -8,8 +8,8 @@ test('l administration du catalogue distingue produits et plats',()=>{
   const source=read('catalog-product-admin.js');
   assert.match(source,/DELETE_PRODUCT_PREFIX='__courses_delete_product__:'/);
   assert.match(source,/DELETE_DISH_PREFIX='__courses_delete_dish__:'/);
-  assert.match(source,/data-catalog-admin-mode="products"/);
-  assert.match(source,/data-catalog-admin-mode="dishes"/);
+  assert.match(source,/const nextMode=detail\?\.mode==='dishes'\?'dishes':'products';/);
+  assert.match(source,/document\.addEventListener\('courses:catalog-view-changed',event=>followCatalogView\(event\.detail\)\)/);
   assert.match(source,/requestDeletion\(itemType,name\)/);
   assert.match(source,/itemType==='dish'\?DELETE_DISH_PREFIX:DELETE_PRODUCT_PREFIX/);
   assert.match(source,/if\(itemType==='dish'\)\{[\s\S]*?currentConfirm=pendingKey\(itemType,name\)/);

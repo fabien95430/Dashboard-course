@@ -28,7 +28,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-citrons-v552.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=621">
+  <link rel="stylesheet" href="./styles.css?v=625">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=610">
 </head>
 <body class="is-launching">
@@ -62,7 +62,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v624</span>
+            <span class="page-version">v625</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -85,7 +85,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v624</span>
+            <span class="page-version">v625</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -121,7 +121,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v624</span>
+            <span class="page-version">v625</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -172,10 +172,10 @@
             </button>
             <button id="settingsMissingProductsBtn" class="settings-row missing-products-settings-row" type="button">
               <span class="settings-icon settings-icon-missing">
-                <svg><use href="#i-cart"></use></svg>
+                <svg><use href="#i-grid"></use></svg>
                 <span id="settingsMissingProductsCount" class="settings-count" hidden>0</span>
               </span>
-              <span class="settings-copy"><strong>Produits manquants</strong><small>Noter les produits absents du catalogue</small></span>
+              <span class="settings-copy"><strong>Catalogue des produits</strong><small>Ajouter ou supprimer des produits et des plats</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
           </div>
@@ -346,17 +346,22 @@
   <dialog id="missingProductsDialog" class="dialog settings-sheet" tabindex="-1">
     <div class="missing-products-header">
       <div>
-        <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-cart"></use></svg></span><span class="settings-sheet-title">Produits manquants</span></h3>
-        <p class="dialog-intro">Ajoutez les produits ou plats absents du catalogue.</p>
+        <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-grid"></use></svg></span><span class="settings-sheet-title">Catalogue des produits</span></h3>
+        <p class="dialog-intro">Demandez l’ajout d’un produit ou d’un plat.</p>
       </div>
     </div>
-    <div class="missing-products-add">
-      <input id="missingProductName" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" placeholder="Nom du produit" aria-label="Nom du produit">
-      <button id="addMissingProduct" class="primary" type="button">Ajouter</button>
+    <div class="catalog-view-switch" role="tablist" aria-label="Vue du catalogue">
+      <button class="catalog-view-button is-active" type="button" role="tab" data-catalog-view="add" aria-selected="true">Ajout</button>
+      <button class="catalog-view-button" type="button" role="tab" data-catalog-view="remove" aria-selected="false">Suppression</button>
+    </div>
+    <button id="missingAddStart" class="missing-add-start" type="button"><span aria-hidden="true">＋</span><span class="missing-add-start-label">Ajouter un produit</span></button>
+    <div class="missing-products-add" hidden>
+      <label class="missing-field-label" for="missingProductName">Nom du produit</label>
+      <input id="missingProductName" type="text" maxlength="80" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" placeholder="Ex. lait d’avoine" aria-label="Nom du produit">
     </div>
     <p id="missingProductsFeedback" class="dialog-feedback courses-openai-feedback" role="status" aria-live="polite"></p>
 
-    <section class="missing-category-panel" aria-labelledby="missingCategoryTitle">
+    <section class="missing-category-panel" aria-labelledby="missingCategoryTitle" hidden>
       <div class="missing-category-heading">
         <strong id="missingCategoryTitle">Choisir une catégorie</strong>
         <small>Optionnel</small>
@@ -375,10 +380,15 @@
     </section>
 
     <div class="missing-products-list-heading">
-      <strong>Liste des produits</strong>
+      <strong>À intégrer</strong>
       <span id="missingProductsListCount">0</span>
     </div>
     <div id="missingProductsList" class="missing-products-list"></div>
+    <section id="catalogRemovePanel" class="catalog-remove-panel" aria-label="Retirer du catalogue" hidden></section>
+    <div class="missing-add-actions" hidden>
+      <button id="missingAddCancel" class="secondary" type="button">Annuler</button>
+      <button id="addMissingProduct" class="primary" type="button" disabled>Ajouter</button>
+    </div>
   </dialog>
 
   <dialog id="settingsDialog" class="dialog security-settings-dialog settings-sheet" tabindex="-1" autofocus>
@@ -429,7 +439,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=624"></script>
+  <script src="./catalog.js?v=625"></script>
   <script src="./product-item-images.js?v=610" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=619"></script>
@@ -438,7 +448,7 @@
   <script src="./app-ui.js?v=442" data-app-ui="script"></script>
   <script src="./app.js?v=624"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
-  <script src="./settings-ui.js?v=617"></script>
+  <script src="./settings-ui.js?v=625"></script>
   <script src="./error-center.js?v=618"></script>
 </body>
 </html>

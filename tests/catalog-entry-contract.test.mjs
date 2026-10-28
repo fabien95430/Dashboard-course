@@ -41,7 +41,7 @@ test('les images produits respectent la visibilité et ne possèdent plus ladmin
 
 test('les propriétaires secondaires sont chargés depuis leur vrai contexte',()=>{
   const catalog=read('catalog.js'),settings=read('settings-ui.js');
-  assert.match(catalog,/courses:settings-management-opened',loadCatalogProductAdmin/);
+  assert.match(catalog,/courses:catalog-view-changed',event=>\{if\(event\.detail\?\.view==='remove'\)loadCatalogProductAdmin\(\)\}/);
   assert.match(catalog,/loadRepurchaseSoon\(\)/);
   assert.match(catalog,/loadDishAddedMarker/);
   assert.doesNotMatch(settings,/data-dish-added-marker|dish-added-marker\.js/);

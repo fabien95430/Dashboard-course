@@ -103,7 +103,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=483';
+script.src='./missing-products-dishes.js?v=625';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
@@ -113,7 +113,7 @@ document.head.appendChild(script);
 'use strict';
 if(document.querySelector('script[data-missing-products-modern]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-modern.js?v=611';
+script.src='./missing-products-modern.js?v=625';
 script.defer=true;
 script.dataset.missingProductsModern='1';
 document.head.appendChild(script);
@@ -327,16 +327,6 @@ function initApplicationManagement(){
   }
   managementPanel.appendChild(notificationsButton);
 
-  /* Tuile Catalogue créée avec les autres : catalog-product-admin.js la relie à son chargement, sans apparition différée. */
-  let catalogButton=document.getElementById('preferencesProductCatalog');
-  if(!catalogButton){
-    catalogButton=document.createElement('button');
-    catalogButton.id='preferencesProductCatalog';
-    catalogButton.type='button';
-    catalogButton.className='security-action-row';
-    catalogButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-grid"></use></svg></span><span class="security-setting-copy"><strong>Catalogue</strong><small>Consulter et supprimer des produits ou des plats</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
-  }
-  managementPanel.appendChild(catalogButton);
   const notificationsPanel=document.getElementById('preferencesNotificationsPanel');
   const currentNotificationStatus=window.COURSES_NOTIFICATIONS?.getStatus?.();
   if(currentNotificationStatus){

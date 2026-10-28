@@ -7,13 +7,14 @@ const SVG_DESSERT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 31h2
 const SVG_MENU_OPENAI='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7c.55 4.55 2.75 6.75 7.3 7.3-4.55.55-6.75 2.75-7.3 7.3-.55-4.55-2.75-6.75-7.3-7.3 4.55-.55 6.75-2.75 7.3-7.3Z" fill="currentColor"/><circle cx="18.4" cy="17.9" r="1.55" fill="currentColor" opacity=".75"/></svg>';
 const SVG_MENU_CHATGPT='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M9 6h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_MENU_DELETE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6.5 7l.8 13h9.4l.8-13M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const SVG_MENU_MORE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.65" fill="currentColor"/><circle cx="12" cy="12" r="1.65" fill="currentColor"/><circle cx="19" cy="12" r="1.65" fill="currentColor"/></svg>';
 
-let openMenu=null;
+/* Actions d'une demande : la ligne se déplie sur place (aucun menu flottant ni popup secondaire). */
+let openRowKey='';
+let confirmRowKey='';
 let decorateFrame=0;
 
 function normalize(value){
-  return String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  return String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[̀-ͯ]/g,'');
 }
 function isDessertRow(row){
   const label=normalize(row.querySelector('.missing-product-copy small')?.textContent||'');
@@ -25,110 +26,109 @@ function rowType(row){
   if(row.hasAttribute('data-missing-product-row'))return 'product';
   return isDessertRow(row)?'dessert':'dish';
 }
+function rowKey(row){
+  if(row.hasAttribute('data-missing-product-row'))return 'product:'+String(row.dataset.missingProductRow||'');
+  if(row.hasAttribute('data-missing-dish-row'))return 'dish:'+String(row.dataset.missingDishRow||'');
+  return '';
+}
 function thumbSvg(type){
   if(type==='product')return SVG_PRODUCT;
   if(type==='dessert')return SVG_DESSERT;
   return SVG_DISH;
 }
-function closeMenu(){
-  if(openMenu){openMenu.remove();openMenu=null;}
-  document.querySelectorAll('#missingProductsDialog .missing-row-more[aria-expanded="true"]').forEach(button=>button.setAttribute('aria-expanded','false'));
-}
+function escapeHtml(value){return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function resetPopupInteraction(dialog){
-  closeMenu();
+  openRowKey='';
+  confirmRowKey='';
   syncModeSelection(dialog);
+  queueDecorate();
 }
 function closePopup(dialog){
   if(!dialog?.open)return;
   resetPopupInteraction(dialog);
   dialog.close();
 }
-function positionMenu(menu,anchor){
-  const rect=anchor.getBoundingClientRect();
-  const dialog=document.getElementById('missingProductsDialog');
-  const dialogRect=dialog?.getBoundingClientRect?.();
-  const margin=14;
-  const leftBound=Math.max(margin,(dialogRect?.left||0)+margin);
-  const rightBound=Math.min(window.innerWidth-margin,(dialogRect?.right||window.innerWidth)-margin);
-  const topBound=Math.max(margin,(dialogRect?.top||0)+margin);
-  const bottomBound=Math.min(window.innerHeight-margin,(dialogRect?.bottom||window.innerHeight)-margin);
-  const width=Math.min(224,Math.max(204,rightBound-leftBound));
-  menu.style.width=width+'px';
-  const left=Math.max(leftBound,Math.min(rightBound-width,rect.right-width+2));
-  menu.style.left=left+'px';
-  const below=rect.bottom+6;
-  const above=rect.top-menu.offsetHeight-6;
-  const placeAbove=below+menu.offsetHeight>bottomBound&&above>=topBound;
-  menu.classList.toggle('is-above',placeAbove);
-  const top=placeAbove?above:Math.min(bottomBound-menu.offsetHeight,below);
-  menu.style.top=Math.max(topBound,top)+'px';
+/* Les boutons natifs (OpenAI, ChatGPT, suppression) restent la source des actions : le clic est relayé au centre de la ligne, donc dans la feuille. */
+function relayClick(target,row){
+  if(!target||target.disabled)return false;
+  const rect=row.getBoundingClientRect();
+  target.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window,clientX:rect.left+rect.width/2,clientY:rect.top+rect.height/2}));
+  return true;
 }
-function openRowMenu(row,anchor){
-  closeMenu();
-  const menu=document.createElement('div');
-  menu.className='missing-row-menu';
-  menu.setAttribute('role','menu');
-  const appendAction=(label,icon,target)=>{
-    const action=document.createElement('button');
-    action.type='button';
-    action.className='missing-row-menu-item';
-    action.setAttribute('role','menuitem');
-    action.innerHTML='<span class="missing-menu-icon" aria-hidden="true">'+icon+'</span><span><strong>'+label+'</strong></span>';
-    const disabled=!target||target.disabled;
-    action.disabled=disabled;
-    action.classList.toggle('is-disabled',disabled);
-    action.setAttribute('aria-disabled',String(disabled));
-    if(!disabled){
-      action.addEventListener('click',event=>{
-        event.preventDefault();
-        event.stopPropagation();
-        closeMenu();
-        target.click();
-      });
-    }
-    menu.appendChild(action);
-  };
-  appendAction('Intégrer avec OpenAI',SVG_MENU_OPENAI,row.querySelector('[data-openai-missing-product],[data-openai-missing-dish]'));
-  appendAction('Intégrer avec ChatGPT',SVG_MENU_CHATGPT,row.querySelector('[data-integrate-missing-product],[data-integrate-missing-dish]'));
-  const remove=document.createElement('button');
-  remove.type='button';
-  remove.className='missing-row-menu-item is-danger';
-  remove.setAttribute('role','menuitem');
-  remove.innerHTML='<span class="missing-menu-icon" aria-hidden="true">'+SVG_MENU_DELETE+'</span><span><strong>Supprimer</strong></span>';
-  remove.addEventListener('click',event=>{
+function ensureCaret(row){
+  if(row.querySelector(':scope>.missing-row-caret'))return;
+  const caret=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  caret.setAttribute('class','missing-row-caret');
+  caret.setAttribute('aria-hidden','true');
+  caret.innerHTML='<use href="#i-chevron"></use>';
+  row.appendChild(caret);
+}
+function ensureTools(row,key,type){
+  let tools=row.querySelector(':scope>.missing-row-tools');
+  if(!tools){
+    tools=document.createElement('div');
+    tools.className='missing-row-tools';
+    row.appendChild(tools);
+  }
+  const open=key&&openRowKey===key;
+  const confirming=open&&confirmRowKey===key;
+  const name=row.querySelector('.missing-product-copy strong')?.textContent||'';
+  const openai=row.querySelector('[data-openai-missing-product],[data-openai-missing-dish]');
+  const chatgpt=row.querySelector('[data-integrate-missing-product],[data-integrate-missing-dish]');
+  const added=row.dataset.missingDishAdded==='1'||row.classList.contains('is-added-request');
+  const noun=type==='product'?'produit':'plat';
+  const state=[open,confirming,added,Boolean(openai&&!openai.disabled),Boolean(chatgpt&&!chatgpt.disabled),name].join('|');
+  row.classList.toggle('is-open',Boolean(open));
+  row.setAttribute('aria-expanded',String(Boolean(open)));
+  tools.hidden=!open;
+  if(tools.dataset.toolsState===state)return;
+  tools.dataset.toolsState=state;
+  if(!open){tools.innerHTML='';return}
+  if(confirming){
+    tools.className='missing-row-tools is-confirm';
+    tools.innerHTML='<p class="missing-row-confirm-text">Supprimer « '+escapeHtml(name)+' » de la liste ?</p>'+
+      '<button class="missing-row-tool" type="button" data-row-tool="keep">Annuler</button>'+
+      '<button class="missing-row-tool is-danger-solid" type="button" data-row-tool="delete">Supprimer</button>';
+    return;
+  }
+  tools.className='missing-row-tools';
+  tools.innerHTML=added
+    ?'<button class="missing-row-tool is-danger is-wide" type="button" data-row-tool="ask-delete">'+SVG_MENU_DELETE+'<span>Retirer de la liste</span></button>'
+    :'<button class="missing-row-tool" type="button" data-row-tool="openai" aria-label="Intégrer avec OpenAI"'+(openai&&!openai.disabled?'':' disabled')+'>'+SVG_MENU_OPENAI+'<span>OpenAI</span></button>'+
+      '<button class="missing-row-tool" type="button" data-row-tool="chatgpt" aria-label="Intégrer avec ChatGPT"'+(chatgpt&&!chatgpt.disabled?'':' disabled')+'>'+SVG_MENU_CHATGPT+'<span>ChatGPT</span></button>'+
+      '<button class="missing-row-tool is-danger is-icon" type="button" data-row-tool="ask-delete" aria-label="Supprimer ce '+noun+' : '+escapeHtml(name)+'">'+SVG_MENU_DELETE+'</button>';
+}
+function handleRowClick(event){
+  const dialog=event.currentTarget;
+  const row=event.target.closest?.('[data-missing-product-row],[data-missing-dish-row]');
+  if(!row||!dialog.contains(row))return;
+  const key=rowKey(row);
+  if(!key)return;
+  const tool=event.target.closest('[data-row-tool]');
+  if(tool){
     event.preventDefault();
     event.stopPropagation();
-    const native=row.querySelector('.missing-product-remove');
-    if(native){
-      const nativeClick=new MouseEvent('click',{bubbles:true,cancelable:true,view:window,clientX:native.getBoundingClientRect().left+1,clientY:native.getBoundingClientRect().top+1});
-      native.dispatchEvent(nativeClick);
+    const action=tool.dataset.rowTool;
+    if(action==='openai'){
+      if(relayClick(row.querySelector('[data-openai-missing-product],[data-openai-missing-dish]'),row))openRowKey='';
+    }else if(action==='chatgpt'){
+      relayClick(row.querySelector('[data-integrate-missing-product],[data-integrate-missing-dish]'),row);
+    }else if(action==='ask-delete'){
+      confirmRowKey=key;
+    }else if(action==='keep'){
+      confirmRowKey='';
+    }else if(action==='delete'){
+      openRowKey='';
+      confirmRowKey='';
+      relayClick(row.querySelector('.missing-product-remove'),row);
     }
-    closeMenu();
-  });
-  menu.appendChild(remove);
-  (document.getElementById('missingProductsDialog')||document.body).appendChild(menu);
-  openMenu=menu;
-  anchor.setAttribute('aria-expanded','true');
-  requestAnimationFrame(()=>positionMenu(menu,anchor));
-}
-function ensureMore(row){
-  let button=row.querySelector('.missing-row-more');
-  if(button)return button;
-  button=document.createElement('button');
-  button.type='button';
-  button.className='missing-row-more';
-  button.setAttribute('aria-label','Plus d’actions');
-  button.setAttribute('aria-haspopup','menu');
-  button.setAttribute('aria-expanded','false');
-  button.innerHTML=SVG_MENU_MORE;
-  button.addEventListener('click',event=>{
-    event.preventDefault();
-    event.stopPropagation();
-    if(openMenu&&button.getAttribute('aria-expanded')==='true'){closeMenu();return;}
-    openRowMenu(row,button);
-  });
-  row.appendChild(button);
-  return button;
+    queueDecorate();
+    return;
+  }
+  if(event.target.closest('button,input,select,textarea,a'))return;
+  openRowKey=openRowKey===key?'':key;
+  confirmRowKey='';
+  queueDecorate();
 }
 function ensureThumb(row,type){
   let thumb=row.querySelector('.missing-request-thumb');
@@ -186,8 +186,9 @@ function decorateRow(row){
     if(row.classList.contains(className)!==active)row.classList.toggle(className,active);
   });
   ensureThumb(row,type);
-  ensureMore(row);
+  ensureCaret(row);
   syncRunning(row);
+  ensureTools(row,rowKey(row),type);
 }
 function decorate(){
   decorateFrame=0;
@@ -208,54 +209,41 @@ function installStyle(){
   style.textContent=`
     #missingProductsDialog #missingProductsList[hidden],#missingProductsDialog #missingDishesList[hidden]{display:none!important}
     #missingProductsDialog .missing-products-header{position:relative!important;padding-right:0!important}
-    #missingProductsDialog .missing-products-add{gap:8px!important;margin-bottom:10px!important}
-    #missingProductsDialog .missing-products-add #missingProductName{height:46px!important;border-radius:15px!important;padding:0 14px!important;font-size:15px!important}
-    #missingProductsDialog .missing-products-add #addMissingProduct.primary{height:46px!important;min-width:92px!important;border-radius:15px!important;padding:0 15px!important;font-size:14px!important}
-    #missingProductsDialog .missing-category-panel{margin-bottom:16px!important;padding:10px!important;border-radius:18px!important}
-    #missingProductsDialog .missing-category-panel .missing-category-heading{margin-bottom:7px!important}
-    #missingProductsDialog .missing-category-panel .missing-category-select{height:44px!important;border-radius:14px!important;font-size:13px!important}
-    #missingProductsDialog .missing-product-row.missing-request-row{position:relative!important;display:grid!important;grid-template-columns:48px minmax(0,1fr) 36px!important;gap:8px!important;min-height:68px!important;padding:8px!important;align-items:center!important;overflow:visible!important}
+    #missingProductsDialog .missing-products-list,#missingProductsDialog .missing-dishes-list{display:block!important;padding:0!important;border:1px solid var(--tile-line,rgba(33,55,40,.035))!important;border-radius:18px!important;background:var(--tile-bg,#fffefb)!important;box-shadow:var(--tile-shadow,none)!important;overflow:hidden!important}
+    #missingProductsDialog .missing-products-empty{margin:0!important;padding:26px 16px!important;border:0!important;background:transparent!important;text-align:center;color:#617366!important;font-size:14px!important;line-height:1.45}
+    #missingProductsDialog .missing-product-row.missing-request-row{position:relative!important;display:grid!important;grid-template-columns:44px minmax(0,1fr) 18px!important;gap:12px!important;min-height:64px!important;margin:0!important;padding:9px 14px 9px 16px!important;align-items:center!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;cursor:pointer;overflow:visible!important}
+    #missingProductsDialog .missing-product-row.missing-request-row+.missing-product-row{border-top:1px solid rgba(39,66,47,.09)!important}
+    #missingProductsDialog .missing-product-row.missing-request-row.is-open{background:rgba(237,247,234,.55)!important}
     #missingProductsDialog .missing-product-row.missing-request-row .missing-product-mark{display:none!important}
-    #missingProductsDialog .missing-request-thumb{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(54,75,60,.045)}
-    #missingProductsDialog .missing-request-thumb svg{width:36px;height:36px;display:block}
+    #missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(54,75,60,.045)}
+    #missingProductsDialog .missing-request-thumb svg{width:33px;height:33px;display:block}
     #missingProductsDialog .missing-request-thumb.is-product{background:linear-gradient(145deg,#eef7ed,#e5efe6)}
     #missingProductsDialog .missing-request-thumb.is-dish{background:linear-gradient(145deg,#fff6df,#f8e9c1)}
     #missingProductsDialog .missing-request-thumb.is-dessert{background:linear-gradient(145deg,#fff0e7,#f8d9c9)}
-    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy{display:flex!important;flex-flow:row wrap!important;align-items:center!important;align-self:center!important;column-gap:5px!important;row-gap:3px!important;min-width:0!important}
-    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy strong{display:block!important;flex:0 0 100%!important;min-width:0!important;font-size:14.5px!important;line-height:1.22!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:break-word!important}
-    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){padding:4px 8px!important;font-size:9.5px!important;line-height:1.15!important}
-    #missingProductsDialog .is-request-product .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){background:#edf7f0!important;color:#19804a!important}
-    #missingProductsDialog .is-request-dish .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){background:#fff4d9!important;color:#9b6811!important}
-    #missingProductsDialog .is-request-dessert .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){background:#fff0e8!important;color:#ad5b39!important}
-    #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:inline-flex!important;align-items:center!important;width:max-content!important;max-width:100%!important;margin:0!important;padding:3px 7px!important;font-size:9.5px!important;line-height:1!important;white-space:nowrap!important}
-    #missingProductsDialog .missing-product-remove{display:none!important}
+    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy{display:flex!important;flex-flow:row wrap!important;align-items:center!important;align-self:center!important;column-gap:8px!important;row-gap:3px!important;min-width:0!important}
+    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy strong{display:block!important;flex:0 0 100%!important;min-width:0!important;color:#1b2d21!important;font-size:15.5px!important;font-weight:400!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+    #missingProductsDialog .missing-product-row.missing-request-row .missing-product-copy small:not(.missing-dish-error):not(.missing-dish-progress){display:inline!important;width:auto!important;padding:0!important;border-radius:0!important;background:transparent!important;color:#617366!important;font-size:12.5px!important;font-weight:400!important;line-height:1.2!important}
+    #missingProductsDialog .missing-product-copy .missing-dish-progress,#missingProductsDialog .missing-product-copy small.missing-dish-progress{display:inline-flex!important;align-items:center!important;width:max-content!important;max-width:100%!important;margin:0!important;padding:3px 9px!important;font-size:12px!important;line-height:1.1!important;font-weight:500!important;white-space:nowrap!important}
+    #missingProductsDialog .missing-product-remove,#missingProductsDialog .missing-row-more{display:none!important}
     #missingProductsDialog .missing-product-row.missing-request-row>.missing-product-integrate,#missingProductsDialog .missing-product-row.missing-request-row .missing-dish-actions{display:none!important}
-    #missingProductsDialog .missing-row-more{width:32px;height:32px;min-width:32px;padding:0;border:0;border-radius:50%;background:rgba(118,118,128,.08);color:#59645f;display:grid;place-items:center;box-shadow:none;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
-    #missingProductsDialog .missing-row-more svg{width:18px;height:18px;display:block}
-    #missingProductsDialog .missing-row-more:active{transform:scale(.94);background:rgba(118,118,128,.14)}
-    #missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:78px!important;min-height:36px!important;padding:0 10px!important;font-size:11px!important}
-    #missingProductsDialog .missing-product-integrate.is-running-label,#missingProductsDialog .missing-dish-integrate.is-running-label{background:#eef3ef!important;color:#7b8d82!important;opacity:1!important}
-    #missingProductsDialog .missing-dish-integrate.is-added-label{background:#edf0ee!important;color:#65736b!important;opacity:1!important}
+    #missingProductsDialog .missing-row-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
+    #missingProductsDialog .missing-product-row.is-open .missing-row-caret{transform:rotate(-90deg)}
+    #missingProductsDialog .missing-row-tools{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 44px;gap:8px;padding:2px 0 3px}
+    #missingProductsDialog .missing-row-tools[hidden]{display:none!important}
+    #missingProductsDialog .missing-row-tools.is-confirm{grid-template-columns:1fr 1fr}
+    #missingProductsDialog .missing-row-confirm-text{grid-column:1/-1;margin:0 0 2px;color:#6c4a45;font-size:14px;line-height:1.35}
+    #missingProductsDialog .missing-row-tool{min-width:0;height:42px;display:flex;align-items:center;justify-content:center;gap:7px;padding:0 8px;border:1px solid rgba(47,106,73,.18);border-radius:13px;background:rgba(255,255,255,.78);color:#1f5a3b;font:inherit;font-size:14.5px;white-space:nowrap;-webkit-appearance:none;appearance:none}
+    #missingProductsDialog .missing-row-tool svg{flex:0 0 17px;width:17px;height:17px}
+    #missingProductsDialog .missing-row-tool:disabled{opacity:.42}
+    #missingProductsDialog .missing-row-tool.is-danger{border-color:rgba(178,58,48,.2);color:#b23a30}
+    #missingProductsDialog .missing-row-tool.is-icon{padding:0}
+    #missingProductsDialog .missing-row-tool.is-wide{grid-column:1/-1}
+    #missingProductsDialog .missing-row-tool.is-danger-solid{border-color:transparent;background:#b8433a;color:#fff}
+    #missingProductsDialog .missing-product-integrate.is-running-label,#missingProductsDialog .missing-dish-integrate.is-running-label{opacity:1!important}
     #missingProductsDialog .is-added-request .missing-product-copy strong{color:#748078!important}
     #missingProductsDialog .is-added-request .missing-request-thumb{filter:saturate(.45);opacity:.72}
-    #missingProductsDialog .is-added-request .missing-row-more{color:#7f8983!important}
     #missingProductsDialog .missing-dish-magic{display:none!important}
-    .missing-row-menu{position:fixed;z-index:2147483647;padding:4px 0;border:.5px solid rgba(255,255,255,.58);border-radius:14px;background:rgba(242,242,247,.82);box-shadow:0 8px 22px rgba(0,0,0,.14),inset 0 .5px 0 rgba(255,255,255,.72);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);transform-origin:calc(100% - 16px) top;animation:missingMenuIn .12s cubic-bezier(.2,.8,.2,1) both;overflow:hidden}
-    .missing-row-menu.is-above{transform-origin:calc(100% - 16px) bottom;animation-name:missingMenuInAbove}
-    .missing-row-menu-item{position:relative;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:0;background:transparent;color:#1c1c1e;display:grid;grid-template-columns:20px 1fr;gap:9px;align-items:center;text-align:left;overflow:hidden;touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
-    .missing-row-menu-item+.missing-row-menu-item{border-top:.5px solid rgba(60,60,67,.18)}
-    .missing-row-menu-item:active{background:rgba(118,118,128,.12)}
-    .missing-row-menu-item strong{display:block;font-size:13.5px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
-    .missing-row-menu-item small{display:block;margin-top:3px;color:#8a938d;font-size:10.5px;font-weight:650;line-height:1.2}
-    .missing-menu-icon{position:relative;z-index:1;width:20px;height:20px;display:grid;place-items:center;color:#15935a}
-    .missing-menu-icon svg{width:18.5px;height:18.5px;display:block}
-    .missing-row-menu-item>span:last-child{position:relative;z-index:1}
-    .missing-row-menu-item.is-danger,.missing-row-menu-item.is-danger .missing-menu-icon{color:#ff3b30}
-    .missing-row-menu-item.is-disabled,.missing-row-menu-item:disabled{opacity:.38;pointer-events:none}
-    @keyframes missingMenuIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-    @keyframes missingMenuInAbove{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-    @media(max-width:390px){#missingProductsDialog .missing-products-add #missingProductName{height:44px!important;font-size:14px!important}#missingProductsDialog .missing-products-add #addMissingProduct.primary{height:44px!important;min-width:84px!important;padding:0 12px!important;font-size:13px!important}#missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr) 32px!important;gap:6px!important;padding:7px!important;min-height:62px!important}#missingProductsDialog .missing-request-thumb{width:44px;height:44px;border-radius:13px}#missingProductsDialog .missing-request-thumb svg{width:33px;height:33px}#missingProductsDialog .missing-row-more{width:32px;height:32px;min-width:32px}#missingProductsDialog .missing-product-integrate,#missingProductsDialog .missing-dish-integrate{min-width:70px!important;min-height:34px!important;padding-left:8px!important;padding-right:8px!important;font-size:10.5px!important}}
-    @media(prefers-reduced-motion:reduce){.missing-row-menu{animation:none}}
+    @media(prefers-reduced-motion:reduce){#missingProductsDialog .missing-row-caret{transition:none}}
   `;
   document.head.appendChild(style);
 }
@@ -265,24 +253,17 @@ function bind(){
   if(dialog.dataset.missingPopupUiBound==='1'){queueDecorate();return true;}
   dialog.dataset.missingPopupUiBound='1';
   bindModeSwitch(dialog);
+  dialog.addEventListener('click',handleRowClick);
   dialog.addEventListener('close',()=>resetPopupInteraction(dialog));
   dialog.addEventListener('cancel',event=>{
     event.preventDefault();
     closePopup(dialog);
   });
-  dialog.addEventListener('scroll',closeMenu,{passive:true});
   queueDecorate();
   return true;
 }
 
 installStyle();
-document.addEventListener('pointerdown',event=>{
-  if(!openMenu)return;
-  if(event.target.closest?.('.missing-row-menu,.missing-row-more'))return;
-  closeMenu();
-},true);
-document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenu();},true);
-window.addEventListener('resize',closeMenu,{passive:true});
 document.addEventListener('courses:missing-requests-rendered',queueDecorate);
 document.addEventListener('courses:missing-integration-ui-updated',queueDecorate);
 document.addEventListener('courses:dialog-opened',event=>{

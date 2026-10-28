@@ -11,7 +11,7 @@ function installMissingProductsFixes(){
   }
   if(!document.querySelector('script[data-missing-products-popup-ui]')){
     const script=document.createElement('script');
-    script.src='./missing-products-popup-ui.js?v=605';
+    script.src='./missing-products-popup-ui.js?v=625';
     script.defer=true;
     script.dataset.missingProductsPopupUi='1';
     document.head.appendChild(script);

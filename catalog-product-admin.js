@@ -8,9 +8,11 @@ const PENDING_KEY='courses-catalog-delete-pending-v2';
 const PENDING_TTL_MS=30*60*1000;
 const RUNS_URL='https://api.github.com/repos/fabien95430/Dashboard-course/actions/workflows/integrate-dish-openai.yml/runs?event=repository_dispatch&per_page=50';
 let currentMode='products';
-let modeTrack=null;
 let currentQuery='';
 let currentConfirm='';
+let openGroup='';
+let openItem='';
+let blockedItem=null;
 let dishRows=null;
 let dishRowsPromise=null;
 let uiBound=false;
@@ -138,35 +140,50 @@ function installStyle(){
   const style=document.createElement('style');
   style.id='courses-product-admin-style';
   style.textContent=`
-    .courses-product-admin{display:grid;gap:11px;padding-bottom:5px}
-    .courses-product-admin-modes{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid rgba(34,65,45,.10);border-radius:15px;background:rgba(235,240,236,.72)}
-    .courses-product-admin-mode{height:34px;border:0;border-radius:11px;background:transparent;color:#66736b;font:inherit;font-size:11px;font-weight:780}.courses-product-admin-mode.is-active{background:#fff;color:#184c32;box-shadow:0 2px 8px rgba(36,62,45,.10),inset 0 1px 0 rgba(255,255,255,.9)}
-    .courses-product-admin-search{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid rgba(34,65,45,.11);border-radius:14px;background:#fff}
-    .courses-product-admin-search svg{width:15px;height:15px;color:#78827c}.courses-product-admin-search input{min-width:0;flex:1;border:0!important;outline:0;background:transparent;font:inherit;font-size:12px;color:#24392c}.courses-product-admin-search span{font-size:9.5px;color:#8a928d;font-weight:750}
-    .courses-product-admin-list{display:grid;gap:7px}.courses-product-admin-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 10px 10px 12px;border:1px solid rgba(33,64,44,.09);border-radius:16px;background:#fff}
-    .courses-product-admin-copy{min-width:0}.courses-product-admin-copy strong{display:block;color:#253a2d;font-size:12px;line-height:1.2}.courses-product-admin-copy small{display:block;margin-top:3px;color:#7a847d;font-size:9.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .courses-product-admin-delete{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(218,48,42,.12);border-radius:12px;background:rgba(255,59,48,.065);color:#d93025}.courses-product-admin-delete svg{width:15px;height:15px}.courses-product-admin-delete:disabled{opacity:.42}
-    .courses-product-admin-pending{font-size:9.5px;font-weight:780;color:#b36a00;background:rgba(255,149,0,.10);padding:5px 8px;border-radius:9px}
-    .courses-product-admin-confirm{grid-column:1/-1;margin-top:2px;padding:11px;border-radius:13px;background:rgba(255,59,48,.055);border:1px solid rgba(218,48,42,.10)}
-    .courses-product-admin-confirm strong{display:block;color:#b82924;font-size:11.5px}.courses-product-admin-confirm p{margin:4px 0 9px;color:#6f615e;font-size:9.8px;line-height:1.4}.courses-product-admin-confirm-actions{display:flex;gap:7px;justify-content:flex-end;align-items:center}.courses-product-admin-confirm-actions button{min-height:32px;padding:0 11px;border-radius:10px;font-size:10px;font-weight:790}.courses-product-admin-cancel{border:1px solid rgba(55,75,63,.10);background:#fff;color:#68736c}.courses-product-admin-confirm-delete{border:0;background:#d93025;color:#fff}
-    .courses-product-admin-empty{padding:28px 14px;text-align:center;color:#78827c;font-size:11px;border:1px dashed rgba(43,72,54,.14);border-radius:16px}.courses-product-admin-feedback{min-height:16px;color:#657269;font-size:10px;text-align:center}.courses-product-admin-feedback.is-error{color:#d93025}.courses-product-admin-feedback.is-ok{color:#0b7040}
+    .catalog-remove-panel{display:grid;gap:0;padding-bottom:6px}
+    .catalog-remove-panel[hidden]{display:none!important}
+    .courses-product-admin-title{display:flex;justify-content:space-between;align-items:baseline;margin:2px 2px 7px;color:#4c6152;font-size:13.5px;font-weight:600}
+    .courses-product-admin-title span{font-weight:400;font-variant-numeric:tabular-nums}
+    .courses-product-admin-search{display:flex;align-items:center;gap:9px;height:44px;margin-bottom:10px;padding:0 13px;border:1px solid rgba(59,83,65,.12);border-radius:14px;background:rgba(255,255,255,.7);color:#617366}
+    .courses-product-admin-search svg{width:18px;height:18px;flex:0 0 18px}
+    .courses-product-admin-search input{min-width:0;width:100%;border:0!important;outline:0;background:transparent;color:#1b2d21;font:inherit;font-size:16px}
+    .courses-product-admin-list{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);overflow:hidden}
+    .courses-product-admin-group+.courses-product-admin-group,.courses-product-admin-item+.courses-product-admin-item{border-top:1px solid rgba(39,66,47,.09)}
+    .courses-product-admin-group-head,.courses-product-admin-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 18px;align-items:center;gap:10px;border:0;background:transparent;color:#1b2d21;font:inherit;text-align:left;-webkit-appearance:none;appearance:none}
+    .courses-product-admin-group-head{min-height:54px;padding:0 14px 0 16px}
+    .courses-product-admin-group-head span{font-size:16px;font-weight:600;color:#263f30}
+    .courses-product-admin-group-head small{color:#617366;font-size:13px;font-variant-numeric:tabular-nums}
+    .courses-product-admin-group.is-open>.courses-product-admin-group-head{background:rgba(221,237,216,.8)}
+    .courses-product-admin-group-body{border-top:1px solid rgba(39,66,47,.09);background:rgba(240,245,238,.85)}
+    .courses-product-admin-row{min-height:52px;padding:6px 14px 6px 16px}
+    .courses-product-admin-group-body .courses-product-admin-row{padding-left:28px}
+    .courses-product-admin-copy{display:grid;gap:2px;min-width:0}
+    .courses-product-admin-copy strong{font-size:15px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .courses-product-admin-copy small{color:#617366;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .courses-product-admin-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
+    .is-open>.courses-product-admin-group-head .courses-product-admin-caret,.is-open>.courses-product-admin-row .courses-product-admin-caret{transform:rotate(-90deg)}
+    .courses-product-admin-item.is-open{background:rgba(237,247,234,.55)}
+    .courses-product-admin-pending{padding:3px 9px;border-radius:999px;background:rgba(255,149,0,.12);color:#9a5d00;font-size:12px;white-space:nowrap}
+    .courses-product-admin-tools{display:grid;gap:8px;padding:0 14px 12px 16px}
+    .courses-product-admin-group-body .courses-product-admin-tools{padding-left:28px}
+    .courses-product-admin-tools.is-confirm{grid-template-columns:1fr 1fr}
+    .courses-product-admin-tools p{grid-column:1/-1;margin:0;color:#6c4a45;font-size:14px;line-height:1.4}
+    .courses-product-admin-tools button{min-height:42px;padding:0 12px;border:1px solid rgba(178,58,48,.2);border-radius:13px;background:rgba(255,255,255,.78);color:#b23a30;font:inherit;font-size:14.5px;-webkit-appearance:none;appearance:none}
+    .courses-product-admin-tools .courses-product-admin-cancel{border-color:rgba(47,106,73,.18);color:#1f5a3b}
+    .courses-product-admin-tools .courses-product-admin-confirm-delete{border-color:transparent;background:#b8433a;color:#fff}
+    .courses-product-admin-tools button:disabled{opacity:.45}
+    .courses-product-admin-empty{margin:0;padding:26px 16px;text-align:center;color:#617366;font-size:14px;line-height:1.45}
+    .courses-product-admin-feedback{min-height:0;margin-top:10px;color:#4c6152;font-size:13.5px;text-align:center}
+    .courses-product-admin-feedback:empty{display:none}
+    .courses-product-admin-feedback.is-error{color:#b23a30}.courses-product-admin-feedback.is-ok{color:#1f7a4a}
+    @media(prefers-reduced-motion:reduce){.courses-product-admin-caret{transition:none}}
   `;
   document.head.appendChild(style);
 }
+/* Vue Suppression du popup Catalogue des produits : le popup (missing-products-dishes.js) choisit la vue et le type. */
 function panelElements(){
-  const dialog=document.getElementById('preferencesDialog');
-  const content=dialog?.querySelector(':scope>.preference-dialog-scroll');
-  return {dialog,content,panel:document.getElementById('preferencesProductCatalogPanel'),title:content?.querySelector(':scope>h3'),intro:content?.querySelector(':scope>.dialog-intro')};
-}
-function titleForMode(){
-  const {title,intro}=panelElements();
-  if(currentMode==='products'){
-    if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue produit','management');else if(title)title.textContent='Catalogue produit';
-    if(intro)intro.textContent='Gérez les produits du catalogue.';
-  }else{
-    if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Catalogue plats','management');else if(title)title.textContent='Catalogue plats';
-    if(intro)intro.textContent='Gérez les plats et leurs recettes présents dans le catalogue.';
-  }
+  const dialog=document.getElementById('missingProductsDialog');
+  return {dialog,panel:document.getElementById('catalogRemovePanel')};
 }
 function visibleRows(rows){
   const query=norm(currentQuery);
@@ -177,39 +194,51 @@ function confirmMarkup(item,itemType){
   const message=itemType==='product'
     ?'Le produit sera retiré du catalogue et son image supprimée du dépôt GitHub. La liste Home Assistant n’est pas modifiée.'
     :'Le plat, sa recette et son image seront supprimés définitivement. Les produits du catalogue et la liste Home Assistant ne sont pas modifiés.';
-  return '<div class="courses-product-admin-confirm"><strong>Supprimer définitivement « '+esc(item.name)+' » ?</strong><p>'+message+'</p><div class="courses-product-admin-confirm-actions"><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-confirm-delete" type="button" data-confirm-delete="'+esc(item.name)+'" data-item-type="'+itemType+'">Supprimer définitivement</button></div></div>';
+  return '<div class="courses-product-admin-tools courses-product-admin-confirm is-confirm"><p>Retirer définitivement « '+esc(item.name)+' » ? '+message+'</p><button class="courses-product-admin-cancel" type="button">Annuler</button><button class="courses-product-admin-confirm-delete" type="button" data-confirm-delete="'+esc(item.name)+'" data-item-type="'+itemType+'">Retirer</button></div>';
+}
+function itemMarkup(item,itemType){
+  const key=pendingKey(itemType,item.name);
+  const pending=pendingFor(itemType,item.name);
+  const open=!pending&&openItem===key;
+  let tools='';
+  if(open){
+    if(blockedItem?.key===key)tools='<div class="courses-product-admin-tools"><p>Impossible de retirer « '+esc(item.name)+' » : utilisé par '+esc(blockedItem.usages.slice(0,5).join(', '))+(blockedItem.usages.length>5?'…':'')+'.</p></div>';
+    else tools=confirmMarkup(item,itemType)||'<div class="courses-product-admin-tools"><button class="courses-product-admin-delete" type="button" data-delete-item="'+esc(item.name)+'" data-item-type="'+itemType+'">Retirer du catalogue</button></div>';
+  }
+  return '<div class="courses-product-admin-item'+(open?' is-open':'')+'" data-item="'+esc(item.name)+'"><button class="courses-product-admin-row" type="button" data-admin-item="'+esc(key)+'" aria-expanded="'+open+'"'+(pending?' disabled':'')+'><span class="courses-product-admin-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.subgroup)+'</small></span>'+
+    (pending?'<span class="courses-product-admin-pending">Retrait…</span>':'<span></span>')+'<svg class="courses-product-admin-caret" aria-hidden="true"><use href="#i-chevron"></use></svg></button>'+tools+'</div>';
 }
 function renderRows(rows,itemType){
-  const panel=document.getElementById('preferencesProductCatalogPanel');if(!panel)return;
-  const visible=visibleRows(rows);
+  const {panel}=panelElements();if(!panel)return;
   const label=itemType==='dish'?'plat':'produit';
-  panel.innerHTML=
-    '<div class="courses-product-admin-modes" role="tablist" aria-label="Type de catalogue"><button class="courses-product-admin-mode'+(currentMode==='products'?' is-active':'')+'" type="button" role="tab" aria-selected="'+(currentMode==='products')+'" data-catalog-admin-mode="products">Produits</button><button class="courses-product-admin-mode'+(currentMode==='dishes'?' is-active':'')+'" type="button" role="tab" aria-selected="'+(currentMode==='dishes')+'" data-catalog-admin-mode="dishes">Plats</button></div>'+
-    '<label class="courses-product-admin-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><input type="search" value="'+esc(currentQuery)+'" placeholder="Rechercher un '+label+'…" autocomplete="off" data-product-admin-search><span>'+rows.length+'</span></label>'+
-    '<div class="courses-product-admin-list">'+(visible.map(item=>{
-      const pending=pendingFor(itemType,item.name);
-      return '<article class="courses-product-admin-row" data-item="'+esc(item.name)+'"><div class="courses-product-admin-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.category)+' · '+esc(item.subgroup)+'</small></div>'+
-        (pending?'<span class="courses-product-admin-pending">Suppression…</span>':'<button class="courses-product-admin-delete" type="button" aria-label="Supprimer '+esc(item.name)+'" data-delete-item="'+esc(item.name)+'" data-item-type="'+itemType+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8.5 0 .8 13h9.4l.8-13M10 11v5m4-5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>')+confirmMarkup(item,itemType)+'</article>';
-    }).join('')||'<div class="courses-product-admin-empty">Aucun '+label+' ne correspond à cette recherche.</div>')+'</div><div class="courses-product-admin-feedback" role="status" aria-live="polite"></div>';
-  const freshTrack=panel.querySelector('.courses-product-admin-modes');
-  if(modeTrack&&freshTrack){
-    freshTrack.replaceWith(modeTrack);
-    modeTrack.querySelectorAll('[data-catalog-admin-mode]').forEach(button=>{
-      const active=button.dataset.catalogAdminMode===currentMode;
-      button.classList.toggle('is-active',active);
-      button.setAttribute('aria-selected',String(active));
-    });
-  }else modeTrack=freshTrack;
-  window.COURSES_SEGMENTED_LIQUID?.bindSegment(modeTrack,'.courses-product-admin-mode')?.sync(true);
+  const query=norm(currentQuery);
+  let list='';
+  if(query){
+    const visible=visibleRows(rows);
+    list=visible.length?visible.slice(0,80).map(item=>itemMarkup(item,itemType)).join(''):'<p class="courses-product-admin-empty">Aucun '+label+' ne correspond à cette recherche.</p>';
+  }else{
+    const groups=new Map();
+    rows.forEach(item=>{if(!groups.has(item.category))groups.set(item.category,[]);groups.get(item.category).push(item)});
+    list=[...groups.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0]),"fr")).map(([category,items])=>{
+      const open=openGroup===category;
+      return '<div class="courses-product-admin-group'+(open?' is-open':'')+'"><button class="courses-product-admin-group-head" type="button" data-admin-group="'+esc(category)+'" aria-expanded="'+open+'"><span>'+esc(category)+'</span><small>'+items.length+'</small><svg class="courses-product-admin-caret" aria-hidden="true"><use href="#i-chevron"></use></svg></button>'+
+        (open?'<div class="courses-product-admin-group-body">'+items.map(item=>itemMarkup(item,itemType)).join('')+'</div>':'')+'</div>';
+    }).join('');
+  }
+  const keepFocus=document.activeElement?.matches?.('[data-product-admin-search]');
+  panel.innerHTML='<div class="courses-product-admin-title">Dans le catalogue<span>'+rows.length+'</span></div>'+
+    '<label class="courses-product-admin-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><input type="search" value="'+esc(currentQuery)+'" placeholder="Rechercher un '+label+'" aria-label="Rechercher un '+label+'" autocomplete="off" enterkeyhint="search" data-product-admin-search></label>'+
+    '<div class="courses-product-admin-list">'+list+'</div><div class="courses-product-admin-feedback" role="status" aria-live="polite"></div>';
+  if(keepFocus){const input=panel.querySelector('[data-product-admin-search]');input?.focus({preventScroll:true});try{input?.setSelectionRange(input.value.length,input.value.length)}catch(_){}}
 }
 async function render(){
+  const {panel}=panelElements();if(!panel)return;
   if(currentMode==='products'){renderRows(products(),'product');return}
-  const panel=document.getElementById('preferencesProductCatalogPanel');if(!panel)return;
-  panel.innerHTML='<div class="courses-product-admin-feedback">Chargement des plats…</div>';
-  try{renderRows(await dishes(),'dish')}catch(error){panel.innerHTML='<div class="courses-product-admin-empty">'+esc(error?.message||'Impossible de charger les plats.')+'</div>'}
+  if(!dishRows)panel.innerHTML='<div class="courses-product-admin-feedback">Chargement des plats…</div>';
+  try{renderRows(await dishes(),'dish')}catch(error){panel.innerHTML='<p class="courses-product-admin-empty">'+esc(error?.message||'Impossible de charger les plats.')+'</p>'}
 }
 function feedback(message,type=''){
-  const el=document.querySelector('#preferencesProductCatalogPanel .courses-product-admin-feedback');if(!el)return;
+  const el=document.querySelector('#catalogRemovePanel .courses-product-admin-feedback');if(!el)return;
   el.textContent=message||'';el.className='courses-product-admin-feedback'+(type?' is-'+type:'');
 }
 async function beginDeletion(itemType,name,button){
@@ -221,8 +250,9 @@ async function beginDeletion(itemType,name,button){
   try{
     const usages=await recipeUsages(name);
     if(usages.length){
-      feedback('Suppression bloquée : utilisé par '+usages.slice(0,5).join(', ')+(usages.length>5?'…':''),'error');
-      button.disabled=false;return;
+      blockedItem={key:pendingKey(itemType,name),usages};
+      await render();
+      return;
     }
     currentConfirm=pendingKey(itemType,name);await render();
   }catch(error){
@@ -233,8 +263,8 @@ async function confirmDeletion(itemType,name,button){
   button.disabled=true;feedback('Envoi de la suppression à GitHub…');
   try{
     await requestDeletion(itemType,name);
-    currentConfirm='';await render();
-    feedback('Suppression demandée. GitHub applique la modification en arrière-plan.','ok');
+    currentConfirm='';openItem='';await render();
+    feedback('Retrait demandé. GitHub applique la modification en arrière-plan.','ok');
   }catch(error){
     button.disabled=false;feedback(String(error?.message||'Suppression impossible.'),'error');
     window.CoursesErrors?.report?.({key:'catalog-delete:'+itemType+':'+norm(name),severity:'error',source:'Catalogue',title:'Suppression de « '+name+' » impossible',message:String(error?.message||'La demande n’a pas pu être envoyée.')});
@@ -267,41 +297,43 @@ async function reconcilePending(){
     }
   }catch(_){}
 }
-function showCatalog(){
-  const {dialog,content,panel}=panelElements();if(!dialog||!content||!panel)return;
-  [...content.children].forEach(node=>{if(node===panel||node===content.querySelector(':scope>h3')||node===content.querySelector(':scope>.dialog-intro'))return;node.hidden=true});
-  panel.hidden=false;currentMode='products';currentQuery='';currentConfirm='';titleForMode();void render();if(!dialog.open)dialog.showModal();
+function resetView(){currentQuery='';currentConfirm='';openGroup='';openItem='';blockedItem=null}
+/* Le popup annonce sa vue et son type (Produits / Plats) ; la vue Suppression se rend ici. */
+function followCatalogView(detail){
+  const nextMode=detail?.mode==='dishes'?'dishes':'products';
+  if(nextMode!==currentMode){currentMode=nextMode;resetView()}
+  if(detail?.view!=='remove')return;
+  void render();
   void reconcilePending();
 }
 function bindUi(){
   if(uiBound)return true;
-  const management=document.getElementById('preferencesApplicationManagement');
-  const dialog=document.getElementById('preferencesDialog');
-  const content=dialog?.querySelector(':scope>.preference-dialog-scroll');
-  if(!management||!dialog||!content)return false;
+  const {dialog,panel}=panelElements();
+  if(!dialog||!panel)return false;
   uiBound=true;installStyle();
-  const button=document.getElementById('preferencesProductCatalog');
-  let panel=document.getElementById('preferencesProductCatalogPanel');
-  if(!panel){panel=document.createElement('div');panel.id='preferencesProductCatalogPanel';panel.className='courses-product-admin';panel.hidden=true;content.appendChild(panel)}
-  button?.addEventListener('click',showCatalog);
   panel.addEventListener('input',event=>{
     if(event.target.matches('[data-product-admin-search]')){
-      currentQuery=event.target.value;currentConfirm='';void render().then(()=>panel.querySelector('[data-product-admin-search]')?.focus());
+      currentQuery=event.target.value;currentConfirm='';openItem='';blockedItem=null;void render();
     }
   });
   panel.addEventListener('click',event=>{
-    const mode=event.target.closest('[data-catalog-admin-mode]');
-    if(mode){currentMode=mode.dataset.catalogAdminMode==='dishes'?'dishes':'products';currentQuery='';currentConfirm='';titleForMode();void render();return}
+    event.stopPropagation();
+    const group=event.target.closest('[data-admin-group]');
+    if(group){const name=group.dataset.adminGroup||'';openGroup=openGroup===name?'':name;openItem='';currentConfirm='';blockedItem=null;void render();return}
     const del=event.target.closest('[data-delete-item]');if(del){void beginDeletion(del.dataset.itemType||'product',del.dataset.deleteItem||'',del);return}
     if(event.target.closest('.courses-product-admin-cancel')){currentConfirm='';void render();return}
-    const finalButton=event.target.closest('[data-confirm-delete]');if(finalButton){void confirmDeletion(finalButton.dataset.itemType||'product',finalButton.dataset.confirmDelete||'',finalButton)}
+    const finalButton=event.target.closest('[data-confirm-delete]');if(finalButton){void confirmDeletion(finalButton.dataset.itemType||'product',finalButton.dataset.confirmDelete||'',finalButton);return}
+    const item=event.target.closest('[data-admin-item]');
+    if(item){const key=item.dataset.adminItem||'';openItem=openItem===key?'':key;currentConfirm='';blockedItem=null;void render()}
   });
-  dialog.addEventListener('close',()=>{panel.hidden=true;currentConfirm=''});
+  dialog.addEventListener('close',resetView);
+  document.addEventListener('courses:catalog-view-changed',event=>followCatalogView(event.detail));
+  followCatalogView({view:dialog.dataset.catalogView,mode:dialog.dataset.catalogMode});
   return true;
 }
 function bindWhenReady(){
   if(bindUi())return;
-  document.addEventListener('courses:settings-management-ready',bindUi,{once:true});
+  document.addEventListener('DOMContentLoaded',bindUi,{once:true});
 }
 
 if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',event=>{

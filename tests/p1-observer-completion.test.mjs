@@ -33,7 +33,7 @@ test('les consommateurs P1 écoutent les événements propriétaires au lieu du 
   assert.match(repurchase,/document\.addEventListener\('courses:lock-changed'/);
   assert.match(fixes,/document\.addEventListener\('courses:missing-requests-rendered',decorateOpenAiButtons\)/);
   assert.match(popup,/document\.addEventListener\('courses:missing-requests-rendered',queueDecorate\)/);
-  assert.match(admin,/document\.addEventListener\('courses:settings-management-ready',bindUi/);
+  assert.match(admin,/document\.addEventListener\('courses:catalog-view-changed',event=>followCatalogView\(event\.detail\)\)/);
 });
 
 test('Ma liste attend la confirmation Home Assistant avant le panier premium',()=>{

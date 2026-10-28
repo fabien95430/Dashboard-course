@@ -63,7 +63,7 @@
   const loadCatalogProductAdmin=()=>{
     if(document.querySelector('script[data-catalog-product-admin]'))return;
     const script=document.createElement('script');
-    script.src='./catalog-product-admin.js?v=617';
+    script.src='./catalog-product-admin.js?v=625';
     script.async=false;
     script.dataset.catalogProductAdmin='script';
     document.body.appendChild(script);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=624';
+    images.src='./dish-local-images.js?v=625';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -171,7 +171,8 @@
     if(event.detail?.view!=='catalog')return;
     startCatalogView();
   });
-  document.addEventListener('courses:settings-management-opened',loadCatalogProductAdmin);
+  /* La suppression du catalogue vit dans le popup Catalogue des produits : le module se charge à l'ouverture de cette vue. */
+  document.addEventListener('courses:catalog-view-changed',event=>{if(event.detail?.view==='remove')loadCatalogProductAdmin()});
   const loadRuntimeFeatures=()=>{
     if(document.querySelector('script[data-runtime-features]')){
       runtimeReady=true;
@@ -179,7 +180,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=619';
+    script.src='./runtime-features.js?v=625';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
