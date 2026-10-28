@@ -204,7 +204,7 @@ async function addSuggested(button){
     const result=await list.ensureQuantity(name,current+1);
     if(Number(result?.failed||0)>0)throw new Error('add failed');
     button.textContent='✓';
-    navigator.vibrate?.(6);
+    window.CoursesHaptics?.vibrate(6);
     setTimeout(()=>refresh(true),260);
   }catch(_){
     button.textContent='!';

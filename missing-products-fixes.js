@@ -573,7 +573,7 @@ function bindOpenAiUi(){
       button.setAttribute('aria-disabled','true');
       button.setAttribute('aria-busy','true');
       queueMicrotask(decorateOpenAiButtons);
-      navigator.vibrate?.(12);
+      window.CoursesHaptics?.vibrate(12);
       void integrateWithOpenAi(type,id,requestId).then(ok=>{
         if(!ok){
           openAiErrors.add(key);

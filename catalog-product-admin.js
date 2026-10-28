@@ -239,6 +239,7 @@ async function render(){
 }
 function feedback(message,type=''){
   const el=document.querySelector('#catalogRemovePanel .courses-product-admin-feedback');if(!el)return;
+  if(type==='error')window.CoursesHaptics?.play('error');else if(type==='ok')window.CoursesHaptics?.play('delete');
   el.textContent=message||'';el.className='courses-product-admin-feedback'+(type?' is-'+type:'');
 }
 async function beginDeletion(itemType,name,button){

@@ -146,7 +146,7 @@ function attach(track,buttonSelector,flag){
       setTimeout(()=>{liquid.justScrubbed=false},0);
     }
     if(target&&!target.classList.contains('is-active')){
-      navigator.vibrate?.(4);
+      window.CoursesHaptics?.vibrate(4);
       liquid.allowProgrammatic=true;
       try{target.click()}finally{liquid.allowProgrammatic=false}
       requestAnimationFrame(()=>sync(true));

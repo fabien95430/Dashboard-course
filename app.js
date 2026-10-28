@@ -621,7 +621,7 @@ function status(kind,title,detail=''){
   renderSettingsPage();
   document.dispatchEvent(new CustomEvent('courses:status-changed',{detail:{kind,title,detail}}));
 }
-function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
+function toast(message){window.CoursesHaptics?.forMessage(message);const el=$('#toast');el.textContent=message;el.classList.add('is-visible');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('is-visible'),1700)}
 function publishPurchaseSettled(name,quantity,queued=false){
   const item=String(name||'').trim();
   if(!item)return;
@@ -639,6 +639,7 @@ function clearDialogFeedback(target){
 }
 function setDialogFeedback(target,message,kind='success'){
   if(!target)return;
+  if(message)window.CoursesHaptics?.forMessage(message,kind==='error'?'error':'save');
   clearTimeout(target._t);
   target.textContent=String(message||'');
   target.classList.toggle('is-error',kind==='error');
@@ -1192,7 +1193,7 @@ async function persistListReorder(root,movedKey){
   try{
     if(state.demo){
       applyDemoListOrder(orderKeys);
-      navigator.vibrate?.(8);
+      window.CoursesHaptics?.play('tick');
       toast('Ordre enregistré');
       return;
     }
@@ -1210,7 +1211,7 @@ async function persistListReorder(root,movedKey){
     }
     applyLocalListMove(orderKeys,movedKey);
     verifyAfterReorder=true;
-    navigator.vibrate?.(8);
+    window.CoursesHaptics?.play('tick');
     toast('Ordre enregistré');
   }catch(error){
     const message=String(error?.message||'').toLowerCase();
@@ -1266,7 +1267,7 @@ function bindListReorder(root){
         const rows=reorderableListRows(root,row),index=rows.indexOf(row),nextIndex=event.key==='ArrowUp'?index-1:index+1;
         if(index<0||nextIndex<0||nextIndex>=rows.length)return;
         if(event.key==='ArrowUp')root.insertBefore(row,rows[nextIndex]);else rows[nextIndex].after(row);
-        navigator.vibrate?.(4);persistListReorder(root,row.dataset.key||'');
+        window.CoursesHaptics?.play('tick');persistListReorder(root,row.dataset.key||'');
       });
     }
     const remove=row.querySelector('.list-row-delete');
@@ -1306,7 +1307,7 @@ function bindListReorder(root){
         const sourceIcon=row.querySelector('.list-icon'),previewIcon=preview.querySelector('.list-icon');let iconPlaceholder=null;
         if(sourceIcon&&previewIcon){iconPlaceholder=sourceIcon.cloneNode(false);sourceIcon.replaceWith(iconPlaceholder);previewIcon.replaceWith(sourceIcon)}
         preview.style.left=startRect.left+'px';preview.style.top=startRect.top+'px';preview.style.width=startRect.width+'px';preview.style.height=startRect.height+'px';
-        document.body.appendChild(preview);row.classList.add('is-drag-origin','is-reorder-dragging');root.classList.add('is-reordering');navigator.vibrate?.(5);
+        document.body.appendChild(preview);row.classList.add('is-drag-origin','is-reorder-dragging');root.classList.add('is-reordering');window.CoursesHaptics?.play('tick');
         try{row.setPointerCapture(pointerId)}catch(_){}
         const grabOffsetY=startClientY-startRect.top;let lastClientY=startClientY;
         const movePreview=top=>{preview.style.transform='translate3d(0,'+(top-startRect.top)+'px,0) scale(1.015)'};
@@ -1318,7 +1319,7 @@ function bindListReorder(root){
           if(moveEvent.clientY<rootRect.top+48)root.scrollTop=Math.max(0,root.scrollTop-12);else if(moveEvent.clientY>rootRect.bottom-48)root.scrollTop+=12;
           const rowRects=rows.map(entry=>({entry,rect:entry.getBoundingClientRect()})),listTop=Math.min(...rowRects.map(item=>item.rect.top)),listBottom=Math.max(...rowRects.map(item=>item.rect.bottom)),maxTop=Math.max(listTop,listBottom-startRect.height),previewTop=Math.min(maxTop,Math.max(listTop,moveEvent.clientY-grabOffsetY));
           movePreview(previewTop);const previewCenter=previewTop+startRect.height/2,siblings=rowRects.filter(item=>item.entry!==row),before=siblings.find(item=>{const middle=item.rect.top+item.rect.height/2;return movingUp?previewCenter<=middle:previewCenter<middle}),previousNext=row.nextElementSibling;
-          if(before)root.insertBefore(row,before.entry);else siblings.at(-1)?.entry.after(row);if(row.nextElementSibling!==previousNext)navigator.vibrate?.(3);
+          if(before)root.insertBefore(row,before.entry);else siblings.at(-1)?.entry.after(row);if(row.nextElementSibling!==previousNext)window.CoursesHaptics?.play('tick');
         };
         const stopTracking=()=>{row.classList.remove('is-reorder-dragging');root.classList.remove('is-reordering');document.removeEventListener('pointermove',move,true);document.removeEventListener('pointerup',finish,true);document.removeEventListener('pointercancel',cancel,true);try{row.releasePointerCapture(pointerId)}catch(_){}};
         const revealRow=()=>{if(iconPlaceholder?.isConnected&&sourceIcon)iconPlaceholder.replaceWith(sourceIcon);preview.remove();row.classList.remove('is-drag-origin')};
@@ -1342,7 +1343,7 @@ function undoPurchase(name,row){
     const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=true;
     const check=row.querySelector('.purchase-check');if(check)check.disabled=false;
   }
-  navigator.vibrate?.(5);
+  window.CoursesHaptics?.play('tick');
   toast('Article conservé');
 }
 
@@ -2020,12 +2021,12 @@ async function addItem(name,{deferRefresh=false}={}){
     const items=loadJson(DEMO_KEY,[])||[];
     items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
     saveJson(DEMO_KEY,items);state.items=items;recordUsage(item);
-    navigator.vibrate?.(10);toast(item+' ajouté');renderSelectionAndList();return true;
+    toast(item+' ajouté');renderSelectionAndList();return true;
   }
   if(!state.entity)return;
   const queueLocal=async()=>{
     await queueOfflineAdd(item);
-    recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');
+    recordUsage(item);toast(item+' ajouté');
     if(deferRefresh)syncProductSelection();
     else renderSelectionAndList();
     return true;
@@ -2040,7 +2041,7 @@ async function addItem(name,{deferRefresh=false}={}){
   }
   try{
     await todoService('add_item',{item});
-    recordUsage(item);navigator.vibrate?.(10);toast(item+' ajouté');
+    recordUsage(item);toast(item+' ajouté');
     if(deferRefresh){
       state.items=[...state.items,{uid:'',summary:item,status:'needs_action'}];
       await persistOfflineState();
@@ -2080,12 +2081,12 @@ async function removeOneItem(name,groupHint=null,{deferRefresh=false}={}){
       if(removeIndex<0)return;
       items.splice(removeIndex,1);
       saveJson(DEMO_KEY,items);state.items=items;
-      navigator.vibrate?.(8);toast(item+' -1');renderSelectionAndList();return true;
+      toast(item+' -1');renderSelectionAndList();return true;
     }
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
     if(state.offlinePending.some(action=>action.entity===state.entity&&action.type==='add'&&norm(action.name)===key)){
       await cancelQueuedOfflineAdd(item);
-      navigator.vibrate?.(8);toast(item+' -1');
+      toast(item+' -1');
       return true;
     }
     if(deferRefresh&&group.uids.filter(Boolean).length<group.count){
@@ -2095,7 +2096,7 @@ async function removeOneItem(name,groupHint=null,{deferRefresh=false}={}){
     }
     const uid=group.uids.filter(Boolean).at(-1);
     await completeTodoItem(uid);
-    navigator.vibrate?.(8);toast(item+' -1');
+    toast(item+' -1');
     if(deferRefresh){
       let removed=false;
       state.items=state.items.filter(entry=>{
@@ -2129,7 +2130,7 @@ async function removeGroup(name,row=null,intent='purchase'){
     row.classList.add('is-purchased','is-busy');
     const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
     const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=false;
-    navigator.vibrate?.(8);
+    window.CoursesHaptics?.play('tick');
     await new Promise(resolve=>setTimeout(resolve,PURCHASE_HOLD_MS));
     if(undoToken.cancelled)return;
     row.classList.add('is-removing');
@@ -2140,7 +2141,7 @@ async function removeGroup(name,row=null,intent='purchase'){
     row.classList.add('is-deleting','is-busy');
     const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
     const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
-    navigator.vibrate?.(7);
+    window.CoursesHaptics?.play('tick');
     await new Promise(resolve=>setTimeout(resolve,180));
     row.classList.add('is-removing');
     await new Promise(resolve=>setTimeout(resolve,180));
@@ -2294,7 +2295,7 @@ function setMissingProductCategory(category){
   state.missingProductCategory=next;
   document.dispatchEvent(new CustomEvent('courses:missing-product-category-changed',{detail:{category:next}}));
   renderMissingCategorySelection();
-  navigator.vibrate?.(4);
+  window.CoursesHaptics?.play('tick');
 }
 function addMissingProduct(){
   const name=String(UI.missingProductName.value||'').trim().replace(/\s+/g,' ').slice(0,80);
@@ -2313,7 +2314,7 @@ function addMissingProduct(){
   state.missingProductCategory='';
   renderMissingProducts();
   renderSettingsPage();
-  navigator.vibrate?.(8);
+  window.CoursesHaptics?.play('tick');
   setDialogFeedback(UI.missingProductsFeedback,'Produit ajouté');
 }
 function removeMissingProduct(id){
@@ -2322,7 +2323,7 @@ function removeMissingProduct(id){
   state.missingProducts=result.items;
   renderMissingProducts();
   renderSettingsPage();
-  navigator.vibrate?.(6);
+  window.CoursesHaptics?.play('tick');
 }
 
 function openPreferences(){
@@ -2741,7 +2742,7 @@ removeGroup=async function(name,row=null,intent='purchase'){
     row.classList.add('is-purchased','is-busy');
     const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
     const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=false;
-    navigator.vibrate?.(8);
+    window.CoursesHaptics?.play('tick');
     await new Promise(resolve=>setTimeout(resolve,PURCHASE_HOLD_MS));
     if(undoToken.cancelled)return;
     row.classList.add('is-removing');
@@ -2752,7 +2753,7 @@ removeGroup=async function(name,row=null,intent='purchase'){
     row.classList.add('is-deleting','is-busy');
     const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
     const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
-    navigator.vibrate?.(7);
+    window.CoursesHaptics?.play('tick');
     await new Promise(resolve=>setTimeout(resolve,260));
     row.style.maxHeight=row.offsetHeight+'px';
     void row.offsetHeight;
@@ -3129,13 +3130,13 @@ function bindUiEvents(){
     if(next===state.view){BOTTOM_NAV.sync(false);return}
     closeListRowMenu();
     state.view=next;
-    navigator.vibrate?.(4);
+    window.CoursesHaptics?.play('tick');
     showView();
   });
   BOTTOM_NAV.bind(next=>{
     closeListRowMenu();
     state.view=next;
-    navigator.vibrate?.(4);
+    window.CoursesHaptics?.play('tick');
     showView();
   });
 }

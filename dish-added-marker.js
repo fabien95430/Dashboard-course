@@ -479,7 +479,7 @@ function startConfirmationFeedback(dialog,button){
   if(label)label.textContent='Sélection validée';
   const use=button.querySelector('svg use');
   if(use)use.setAttribute('href','#i-check');
-  navigator.vibrate?.([8,24,8]);
+  window.CoursesHaptics?.vibrate([8,24,8]);
 }
 
 function closeAfterConfirmation(dialog,button){
@@ -548,7 +548,7 @@ async function confirmWithFeedback(event){
   }
   const result=outcome.result||{added:0,failed:1,present:0};
   publishDishAddResult(name,ingredients,result);
-  navigator.vibrate?.(result.added?[10,28,10]:8);
+  window.CoursesHaptics?.vibrate(result.added?[10,28,10]:8);
   showConfirmationToast(confirmationResultMessage(name,result));
 }
 

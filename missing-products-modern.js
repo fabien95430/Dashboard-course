@@ -14,7 +14,7 @@ function bindSharedSelector(){
   let script=document.querySelector('script[data-catalog-liquid]');
   if(!script){
     script=document.createElement('script');
-    script.src='./catalog-liquid.js?v=495';
+    script.src='./catalog-liquid.js?v=635';
     script.async=false;
     script.dataset.catalogLiquid='script';
     document.body.appendChild(script);

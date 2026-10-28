@@ -756,7 +756,7 @@ function buildServingsControl(){
   setServings(saved);
   block.querySelectorAll('.dish-servings-step').forEach(button=>button.addEventListener('click',()=>{
     setServings(servings()+Number(button.dataset.step||0));
-    navigator.vibrate?.(4);
+    window.CoursesHaptics?.vibrate(4);
   }));
   input.addEventListener('input',()=>{
     const value=Number(input.value);

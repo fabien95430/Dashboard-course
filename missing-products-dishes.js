@@ -492,26 +492,26 @@ function initMissingProductsAndDishes(){
   void window.COURSES_NOTIFICATIONS?.broadcast({
     kind:'request_added',type:'dish',name,requestId:'dish-'+result.item.id
   });
-  navigator.vibrate?.(8);
+  window.CoursesHaptics?.vibrate(8);
 }
 function removeDish(id){
   const result=REQUESTS.removeDish(id);
   if(!result.ok)return;
   dishes=result.items;
   renderMode();
-  navigator.vibrate?.(6);
+  window.CoursesHaptics?.vibrate(6);
 }
   function integrateDish(id){
     const item=readDishes().find(entry=>entry.id===id);
     if(!item)return;
     launchChatGpt(buildDishPrompt(item));
-    navigator.vibrate?.(10);
+    window.CoursesHaptics?.vibrate(10);
   }
   function integrateProduct(id){
     const item=readProducts().find(entry=>entry.id===id);
     if(!item)return;
     launchChatGpt(buildProductPrompt(item));
-    navigator.vibrate?.(10);
+    window.CoursesHaptics?.vibrate(10);
   }
   function enhanceProductRows(){
     productEnhanceQueued=false;
@@ -642,7 +642,7 @@ function removeDish(id){
     const categories=catalogDishCategories();
     dishCategory=!category||categories.includes(category)?category:'';
     renderDishCategoryGrid();
-    navigator.vibrate?.(4);
+    window.CoursesHaptics?.vibrate(4);
   });
   viewSwitch.addEventListener('click',event=>{
     const button=event.target.closest('[data-catalog-view]');

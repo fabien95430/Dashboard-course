@@ -374,3 +374,68 @@ document.addEventListener('courses:list-rendered',()=>syncListEmptyState(documen
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
 })();
+
+// v634 — retour haptique unique de l'application.
+// Android : API Vibration. iPhone (Safari 17.4+/iOS 18) : pas d'API Vibration ; le système joue un léger
+// retour haptique à chaque bascule d'un interrupteur natif (<input type="checkbox" switch>) déclenchée par un geste.
+(function(){
+  'use strict';
+  // Séquences en millisecondes : durée, pause, durée…
+  const PATTERNS={
+    tick:[5],
+    success:[10],
+    add:[10],
+    save:[10],
+    remove:[8,45,8],
+    delete:[14,55,14],
+    error:[22,70,22]
+  };
+  const PULSE_GAP_MS=70;
+  let label=null;
+
+  function ensureSwitch(){
+    if(label||!document.body)return;
+    label=document.createElement('label');
+    label.setAttribute('aria-hidden','true');
+    label.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden';
+    const input=document.createElement('input');
+    input.type='checkbox';
+    input.setAttribute('switch','');
+    input.tabIndex=-1;
+    label.appendChild(input);
+    document.body.appendChild(label);
+  }
+  function pulse(){
+    ensureSwitch();
+    if(label)label.click();
+  }
+  function run(pattern){
+    try{
+      if(typeof navigator.vibrate==='function'){navigator.vibrate(pattern);return true}
+      let at=0;
+      pattern.forEach((ms,index)=>{
+        if(index%2===0)setTimeout(pulse,at);
+        at+=Math.max(ms,PULSE_GAP_MS/2);
+      });
+      return true;
+    }catch(_){return false}
+  }
+  function play(kind){return run(PATTERNS[kind]||PATTERNS.success)}
+  // Séquence libre (nombre ou tableau en millisecondes), pour les gestes déjà réglés finement.
+  function vibrate(pattern){
+    return run(Array.isArray(pattern)?pattern:[Math.max(1,Number(pattern)||10)]);
+  }
+  // Type de retour d'après le libellé affiché à l'utilisateur.
+  function kindFor(message){
+    const text=String(message||'').toLowerCase();
+    if(!text)return null;
+    if(/impossible|erreur|échec|echec|déjà noté|refus|invalide|entre une|indique/.test(text))return 'error';
+    if(/supprim|retrait|retiré|retire|-1\b/.test(text))return 'remove';
+    return 'success';
+  }
+  function forMessage(message,explicit){
+    const kind=explicit||kindFor(message);
+    return kind?play(kind):false;
+  }
+  window.CoursesHaptics={play,vibrate,forMessage,kindFor};
+})();

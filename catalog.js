@@ -55,7 +55,7 @@
   const loadRepurchaseSoon=()=>{
     if(document.querySelector('script[data-repurchase-soon]'))return;
     const script=document.createElement('script');
-    script.src='./repurchase-soon.js?v=576';
+    script.src='./repurchase-soon.js?v=635';
     script.async=false;
     script.dataset.repurchaseSoon='script';
     document.body.appendChild(script);
@@ -63,7 +63,7 @@
   const loadCatalogProductAdmin=()=>{
     if(document.querySelector('script[data-catalog-product-admin]'))return;
     const script=document.createElement('script');
-    script.src='./catalog-product-admin.js?v=629';
+    script.src='./catalog-product-admin.js?v=635';
     script.async=false;
     script.dataset.catalogProductAdmin='script';
     document.body.appendChild(script);
@@ -72,7 +72,7 @@
   const loadDishAddedMarker=()=>{
     if(document.querySelector('script[data-dish-added-marker]'))return;
     const marker=document.createElement('script');
-    marker.src='./dish-added-marker.js?v=408';
+    marker.src='./dish-added-marker.js?v=635';
     marker.async=false;
     marker.dataset.dishAddedMarker='script';
     document.body.appendChild(marker);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=634';
+    images.src='./dish-local-images.js?v=635';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -93,7 +93,7 @@
   const loadLiquid=()=>{
     if(document.querySelector('script[data-catalog-liquid]')){loadDishLocalImages();return}
     const liquid=document.createElement('script');
-    liquid.src='./catalog-liquid.js?v=495';
+    liquid.src='./catalog-liquid.js?v=635';
     liquid.async=false;
     liquid.dataset.catalogLiquid='script';
     liquid.addEventListener('load',loadDishLocalImages,{once:true});
@@ -104,7 +104,7 @@
     loadDishStyles().then(()=>{
       if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
       const script=document.createElement('script');
-      script.src='./dishes-ui.js?v=621';
+      script.src='./dishes-ui.js?v=635';
       script.async=false;
       script.dataset.catalogDishes='script';
       script.addEventListener('load',loadLiquid,{once:true});
@@ -115,7 +115,7 @@
     if(window.COURSES_QUANTITIES){loadDishes();return}
     if(document.querySelector('script[data-catalog-quantities]'))return;
     const quantities=document.createElement('script');
-    quantities.src='./catalog-quantities.js?v=631';
+    quantities.src='./catalog-quantities.js?v=635';
     quantities.async=false;
     quantities.dataset.catalogQuantities='script';
     quantities.addEventListener('load',loadDishes,{once:true});
@@ -192,7 +192,7 @@
   const loadAppUi=()=>{
     if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
     const script=document.createElement('script');
-    script.src='./app-ui.js?v=442';
+    script.src='./app-ui.js?v=635';
     script.async=false;
     script.dataset.appUi='script';
     script.addEventListener('load',loadRuntimeFeatures,{once:true});

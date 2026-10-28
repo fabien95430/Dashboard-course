@@ -103,7 +103,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=634';
+script.src='./missing-products-dishes.js?v=635';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
@@ -113,7 +113,7 @@ document.head.appendChild(script);
 'use strict';
 if(document.querySelector('script[data-missing-products-modern]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-modern.js?v=625';
+script.src='./missing-products-modern.js?v=635';
 script.defer=true;
 script.dataset.missingProductsModern='1';
 document.head.appendChild(script);

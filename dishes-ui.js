@@ -221,6 +221,7 @@ recipeCustomizations=readRecipeCustomizations();
 function showToast(message){
   const toast=document.getElementById('toast');
   if(!toast)return;
+  window.CoursesHaptics?.forMessage(message);
   clearTimeout(toastTimer);
   toast.textContent=message;
   toast.classList.add('is-visible');
@@ -981,7 +982,7 @@ async function confirmDishAdd(){
   }finally{
     busyDish='';
   }
-  navigator.vibrate?.(result.added?[12,35,12]:10);
+  window.CoursesHaptics?.vibrate(result.added?[12,35,12]:10);
   if(result.failed){showToast('Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
   if(!result.added){showToast('Les quantités nécessaires sont déjà dans Ma liste');return}
   showToast(dish.name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':''));
