@@ -8,6 +8,12 @@
 
 **File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
 
+## Lot v627 — 1 WebP et 7 conservations ciblées (publication conditionnelle)
+
+Depuis `main` `b23d35947166b9d6ac8d3a7e8f6edfd74f2ed7a8` (v625), remplacement de `poisson-surgele.webp` par un filet de poisson blanc cru 320×320 à canal alpha natif, source Soft Studio Ingredients (Alex Wang), CC BY 4.0, repris bit pour bit (source Git blob `dcb369519993123da7ba252ac991ac4572bedb1f`). Voir `docs/IMAGE_CREDITS_V627.md`. Sept anciens visuels sont définitivement conservés, sans changement binaire ni nouveau comptage : Coco râpée, Petits pois carottes, Désinfectant, Lingettes ménage, Mouchoirs, Céréales et Pâté.
+
+**Projection conditionnelle** après validation et publication : **360/414** renouvelés distincts, **54 non renouvelés** (35 conservés ; 1 défaut ciblé ; 18 sans candidat conforme). Ne pas comptabiliser avant vérification SHA, CI et Pages. Aucun module fonctionnel ou cache visuel modifié.
+
 ## Lot v623 — quatre produits à valider
 
 Quatre illustrations originales unitaires et transparentes 384×384 proposées depuis la base b5e7ad27989b56076a38b8ea553d9d38ff6572f2 (v622) : Nettoyant lave-vaisselle, Nettoyant machine à laver, Détachant, Purée en flocons. Seules ces quatre images étaient dans les 59 références restantes, sans double comptage. **Projection après fusion et tests : 359/414 distincts renouvelés (86,7 %), 55 non renouvelés ; 28 conservés, 1 défaut ciblé et 26 sans nouveau candidat.** Détails : `docs/IMAGE_CREDITS_V623.md` et file `docs/REPRISE_IMAGES_PRODUITS_20261028.md`. L'historique v616 et antérieur est préservé. Statuts CI/Pages à confirmer avant de marquer le lot publié.
