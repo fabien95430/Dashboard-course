@@ -2,6 +2,12 @@
 
 **Point d'avancement : 28 octobre 2026.** Dépôt source de vérité : `fabien95430/Dashboard-course`, branche `main`. Cette note décrit un état constaté : relire impérativement le code et `AGENTS.md` au moment de reprendre le chantier.
 
+## Correction de décompte et file anti-doublons (28 octobre 2026)
+
+**État corrigé : 355 / 414 renouvelés distincts (85,7 %), 59 non renouvelés.** La relecture des 84 anciens slugs montre que **Miel** avait déjà été renouvelé en v534 et a été de nouveau remplacé en v614 ; il ne devait pas être compté comme nouveau produit distinct dans le total v614-v616. Les chiffres des lots ci-dessous restent l'historique tel que publié ; **la correction ici prévaut** pour les reprises et les bilans.
+
+**File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
+
 ## Réalisé et vérifié
 
 - **Lot v616 — 6 nouveaux WebP unitaires préparés pour validation PR (28 octobre 2026)** : Vinaigre de cidre (bouteille fermée, pomme sur l'étiquette sans fruit extérieur), Vinaigre balsamique (bouteille sombre), Jus de tomate (bouteille fermée), Soda citron (canette fermée), Thé vert (boîte métallique fermée) et Matcha (poudre dans un bol unique). Vrais fonds alpha, 384×384 et comparaisons à 192 px sur blanc et sauge. Base `b266594bb178da6d0b031345dc14ab9904d2c588` (v615). **Après fusion et validation : 356/414 renouvelés distincts, 58 non renouvelés, au moins 24 conservés, au moins 380 décisions documentées**, 414 WebP totalisant **10 438 462 octets**. Sources, poids et SHA256 : `docs/IMAGE_CREDITS_V616.md`. Statut PR/CI/Pages à confirmer avant de considérer ce lot publié.
