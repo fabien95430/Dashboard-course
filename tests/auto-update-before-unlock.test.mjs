@@ -63,3 +63,44 @@ test('la vérification reste ponctuelle et la liste est relue après authentific
   assert.match(app,/const cacheNames=await caches.keys\(\);[\s\S]*?name\.startsWith\('courses-app-v'\+latest\+'-'\)/);
   assert.match(app,/const timeout=setTimeout\(\(\)=>controller\.abort\(\),4000\)/);
 });
+
+const shellStart=app.indexOf('function htmlAppVersion(');
+const shellEnd=app.indexOf('function waitForServiceWorkerActivation(',shellStart);
+assert.ok(shellStart>0&&shellEnd>shellStart,'Vérification de la page précachée introuvable');
+const shellSource=app.slice(shellStart,shellEnd);
+const page=version=>'<h1>Ma liste <span class="page-version">v'+version+'</span></h1>';
+function response(html,ok=true){
+  return {ok,text:async()=>html,clone(){return response(html,ok)}};
+}
+function shellHarness({cachedVersion=null,networkVersion=620}={}){
+  const calls=[];
+  const store=new Map(cachedVersion?[['./index.html',response(page(cachedVersion))]]:[]);
+  const cache={
+    match:async key=>store.get(key),
+    put:async(key,value)=>{calls.push('put');store.set(key,value)}
+  };
+  const ensure=vm.runInNewContext(shellSource+';ensureCachedShellVersion',{
+    Date,
+    fetch:async()=>{calls.push('fetch');return response(page(networkVersion))}
+  });
+  return {ensure,cache,calls,store};
+}
+
+test('une page d accueil précachée à jour permet le rechargement immédiat',async()=>{
+  const {ensure,cache,calls}=shellHarness({cachedVersion:620});
+  assert.equal(await ensure(cache,620),true);
+  assert.deepEqual(calls,[]);
+});
+
+test('une page d accueil précachée périmée est remplacée avant le rechargement',async()=>{
+  const {ensure,cache,calls,store}=shellHarness({cachedVersion:619,networkVersion:620});
+  assert.equal(await ensure(cache,620),true);
+  assert.deepEqual(calls,['fetch','put']);
+  assert.match(await store.get('./index.html').text(),/v620/);
+});
+
+test('sans page à jour disponible, aucun rechargement inutile n est demandé',async()=>{
+  const {ensure,cache,calls}=shellHarness({cachedVersion:619,networkVersion:619});
+  assert.equal(await ensure(cache,620),false);
+  assert.deepEqual(calls,['fetch']);
+});

@@ -2905,11 +2905,24 @@ async function deployedAppVersion(){
   try{
     const response=await fetch('./index.html?courses-version-check='+Date.now(),{cache:'no-store',signal:controller.signal});
     if(!response.ok)return 0;
-    const html=await response.text();
-    const versions=[...html.matchAll(/class=\"page-version\">v(\d+)/g)].map(match=>Number(match[1]));
-    return versions.length?Math.max(...versions):0;
+    return htmlAppVersion(await response.text());
   }catch(_){return 0}
   finally{clearTimeout(timeout)}
+}
+function htmlAppVersion(html){
+  const versions=[...String(html||'').matchAll(/class=\"page-version\">v(\d+)/g)].map(match=>Number(match[1]));
+  return versions.length?Math.max(...versions):0;
+}
+// Le nouveau service worker peut avoir précaché une ancienne page d'accueil (cache HTTP ou CDN) :
+// le rechargement afficherait alors toujours l'ancienne version. On vérifie et on corrige la copie.
+async function ensureCachedShellVersion(cache,latest){
+  const cached=await cache.match('./index.html');
+  if(cached&&htmlAppVersion(await cached.clone().text())>=latest)return true;
+  const response=await fetch('./index.html?courses-shell-refresh='+Date.now(),{cache:'no-store'});
+  if(!response.ok)return false;
+  if(htmlAppVersion(await response.clone().text())<latest)return false;
+  await cache.put('./index.html',response);
+  return true;
 }
 function waitForServiceWorkerActivation(worker,timeoutMs=15000){
   if(!worker||worker.state==='activated')return Promise.resolve(true);
@@ -2942,7 +2955,9 @@ async function installLatestAppVersion(){
   if(worker&&!await waitForServiceWorkerActivation(worker))return false;
   try{
     const cacheNames=await caches.keys();
-    return cacheNames.some(name=>name.startsWith('courses-app-v'+latest+'-'));
+    const cacheName=cacheNames.find(name=>name.startsWith('courses-app-v'+latest+'-'));
+    if(!cacheName)return false;
+    return await ensureCachedShellVersion(await caches.open(cacheName),latest);
   }catch(_){return false}
 }
 async function checkForUpdateBeforeUnlock(){
