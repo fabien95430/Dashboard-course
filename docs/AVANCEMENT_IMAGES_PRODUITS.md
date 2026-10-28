@@ -8,6 +8,12 @@
 
 **File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
 
+## Lot v629 — six visuels produits unitaires contrôlés (publication conditionnelle)
+
+**Base :** `4c90dc80fd4fe3a1e6e2c9525a290f29e50cabb0` (v628), aucun des six slugs concernés n'a été renouvelé dans les 360 références précédemment publiées. **6 nouveaux WebP** : Sacs congélation (boîte contenant un sachet zip), Prosecco (bouteille fermée pétillante), Vin rosé (bouteille rosée fermée), Démaquillant (flacon liquide fermé), Protections hygiéniques (paquet scellé), Bière blanche (bouteille capsulée de bière de blé). Générations ChatGPT natives, détourages PNG RGBA traités individuellement, WebP alpha **384 × 384 px**, cadrage 90 %, vérification à **192 px blanc/sauge** et confrontation aux anciens conditionnements. Pas de source externe payante, de collage ni d'élément marque fictive.
+
+**Projection conditionnelle : 366/414 produits distincts renouvelés (88,4 %), 48 non renouvelés = 35 conservés + 13 en attente de candidat supérieur.** Validation et publication effectives à confirmer sur SHA CI/main/Pages avant de remplacer le mot « projection » par « publié ». Documentation de provenance et empreintes : `docs/IMAGE_CREDITS_V629.md`. Les anciens bilans restent inchangés pour la traçabilité.
+
 ## Lot v627 — 1 WebP et 7 conservations ciblées (publication conditionnelle)
 
 Depuis `main` `b23d35947166b9d6ac8d3a7e8f6edfd74f2ed7a8` (v625), remplacement de `poisson-surgele.webp` par un filet de poisson blanc cru 320×320 à canal alpha natif, source Soft Studio Ingredients (Alex Wang), CC BY 4.0, repris bit pour bit (source Git blob `dcb369519993123da7ba252ac991ac4572bedb1f`). Voir `docs/IMAGE_CREDITS_V627.md`. Sept anciens visuels sont définitivement conservés, sans changement binaire ni nouveau comptage : Coco râpée, Petits pois carottes, Désinfectant, Lingettes ménage, Mouchoirs, Céréales et Pâté.
