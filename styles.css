@@ -6,7 +6,7 @@
 .security-modal .secondary{margin-top:9px}
 .security-modal input[type="password"]{letter-spacing:.04em}
 
-.reset-link{height:38px!important;font-size:10px!important;opacity:.72}
+
 
 /* Interface mobile : fond plus sobre, liste prioritaire et commandes tactiles */
 
@@ -1010,32 +1010,11 @@ html #products .product.is-deferred{display:none!important}
 .password-panel{margin-top:10px;text-align:left}
 .password-panel[hidden]{display:none}
 .security-modal .password-panel .primary{width:100%;margin-top:14px}
-.security-benefits{
-  margin-top:auto;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  color:#177642;
-}
-.security-benefits>span{
-  display:grid;
-  justify-items:center;
-  gap:7px;
-  text-align:center;
-}
-.security-benefits svg{
-  width:35px;
-  height:35px;
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.8;
-}
-.security-benefits strong{font-size:31px;line-height:1}
-.security-benefits small{
-  color:#39704f;
-  font-size:11px;
-  line-height:1.2;
-}
+
+
+
+
+
 
 /* DIALOGUE DE DÉTAIL DES RÉGLAGES */
 .dialog{
@@ -1180,57 +1159,16 @@ html #products .product.is-deferred{display:none!important}
 .security-modal .password-panel .field{margin-top:9px!important}
 .security-modal .password-panel .field input{height:42px!important}
 .security-modal .password-panel .primary{height:44px!important;margin-top:10px!important}
-.security-modal .reset-link{height:35px!important;margin-top:7px!important}
-.security-note{
-  position:absolute;
-  z-index:2;
-  top:69.8%;
-  left:50%;
-  transform:translateX(-50%) rotate(-3deg);
-  width:220px;
-  color:#0d4d2c;
-  text-align:center;
-  font-family:"Bradley Hand","Segoe Print","Comic Sans MS",cursive;
-  font-size:16px;
-  line-height:1.18;
-  font-weight:540;
-  letter-spacing:.15px;
-}
-.security-note span{
-  display:block;
-  width:85px;
-  height:2px;
-  margin:7px auto 0;
-  border-radius:999px;
-  background:#0e6c3a;
-  transform:rotate(-8deg);
-}
-.security-benefits{
-  position:absolute!important;
-  z-index:2;
-  left:4px;
-  right:4px;
-  bottom:max(24px,calc(env(safe-area-inset-bottom) + 14px));
-  margin:0!important;
-  display:grid!important;
-  grid-template-columns:repeat(3,1fr)!important;
-  gap:8px!important;
-}
-.security-benefits>span{display:grid!important;justify-items:center!important;gap:6px!important;text-align:center!important}
-.security-benefits i{
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  background:rgba(226,245,218,.92);
-  color:#167844;
-  font-style:normal;
-}
-.security-benefits i svg{width:27px!important;height:27px!important;fill:none;stroke:currentColor;stroke-width:1.9}
-.security-benefits .benefit-bolt{font-size:27px;color:#12834a}
-.security-benefits small{color:#2e6746!important;}
-.security-shell.is-password-open .security-note,.security-shell.is-password-open .security-benefits,.security-shell.is-form-mode .security-note{opacity:0;pointer-events:none}
+
+
+
+
+
+
+
+
+
+
 .security-shell.is-form-mode .security-modal{top:31%}
 @media(max-height:720px){
   .security-hero{top:5.5%}
@@ -1238,9 +1176,9 @@ html #products .product.is-deferred{display:none!important}
   .security-hero h2{font-size:36px!important}
   .security-tagline{font-size:14px!important}
   .security-modal{top:35.5%;width:min(82%,350px)!important;padding:14px!important}
-  .security-note{top:70.5%;font-size:14px}
-  .security-benefits{bottom:max(15px,calc(env(safe-area-inset-bottom) + 8px))}
-  .security-benefits i{width:42px;height:42px}
+  
+  
+  
 }
 
 /* ===== UI v26 — zoom verrouillé ===== */
@@ -1252,17 +1190,9 @@ html,body{touch-action:pan-x pan-y}
 /* ===== UI v113 — détails sécurité conservés après consolidation ===== */
 .security-modal .setup-error{min-height:0!important}
 .security-modal .setup-error:empty{display:none!important}
-.security-benefits i svg{
-  width:26px!important;
-  height:26px!important;
-}
-.security-benefits .benefit-bolt{color:#167844!important}
-.security-benefits .benefit-bolt svg{
-  fill:none!important;
-  stroke:currentColor!important;
-  stroke-width:1.8!important;
-  stroke-linejoin:round;
-}
+
+
+
 
 /* ===== UI v36 — référence 2 finale ===== */
 /* Un seul fond de scène sur l'overlay : plus aucun panneau central ni raccord de pseudo-élément. */
@@ -1349,36 +1279,21 @@ html,body{touch-action:pan-x pan-y}
   font-size:12.5px!important;
   line-height:1.3!important;
 }
-.security-note{
-  display:none!important;
-}
-.security-benefits{
-  left:4px!important;
-  right:4px!important;
-  bottom:max(31px,calc(env(safe-area-inset-bottom) + 19px))!important;
-}
-.security-benefits i{
-  width:46px!important;
-  height:46px!important;
-}
-.security-benefits small{
-  font-size:10px!important;
-  line-height:1.2!important;
-}
+
+
+
+
 .security-shell.is-form-mode .security-modal{
   top:29.5%!important;
 }
-.security-shell.is-form-mode .security-benefits{
-  opacity:0!important;
-  pointer-events:none!important;
-}
+
 @media(max-height:720px){
   .security-hero{top:3.2%!important}
   .welcome-cart-art{width:158px!important;margin-bottom:-20px!important}
   .security-modal{top:32.2%!important}
   .security-shell.is-password-open .security-modal{top:32.2%!important}
   .security-shell.is-form-mode .security-modal{top:27.8%!important}
-  .security-benefits{bottom:max(17px,calc(env(safe-area-inset-bottom) + 8px))!important}
+  
 }
 
 /* ===== UI v38 — fond généré propre, UI séparée ===== */
@@ -1399,37 +1314,14 @@ html,body{touch-action:pan-x pan-y}
 .security-settings-pill{
   z-index:6!important;
 }
-.security-shell,
-.security-hero,
-.security-modal,
-.security-note,
-.security-benefits{
+.security-shell,.security-hero,.security-modal{
   z-index:2;
 }
-.security-note{
-  display:block!important;
-  top:70.8%!important;
-  width:220px!important;
-  color:#0d4d2c!important;
-  opacity:1!important;
-}
-.security-note span{
-  display:block!important;
-}
-.security-benefits{
-  bottom:max(30px,calc(env(safe-area-inset-bottom) + 18px))!important;
-}
-.security-shell.is-password-open .security-note,
-.security-shell.is-password-open .security-benefits,
-.security-shell.is-form-mode .security-note,
-.security-shell.is-form-mode .security-benefits{
-  opacity:0!important;
-  pointer-events:none!important;
-}
-@media(max-height:720px){
-  .security-note{top:69.8%!important}
-  .security-benefits{bottom:max(16px,calc(env(safe-area-inset-bottom) + 8px))!important}
-}
+
+
+
+
+
 
 /* ===== UI v40 — image générée validée ===== */
 /* Fond décoratif uniquement : toute l'interface reste en HTML/CSS au-dessus. */
@@ -1538,19 +1430,15 @@ body:has(#securityOverlay.is-visible){
 .security-shell.is-password-open .security-modal{
   top:38%!important;
 }
-.security-note{
-  top:72.3%!important;
-}
-.security-benefits{
-  bottom:max(38px,calc(env(safe-area-inset-bottom) + 26px))!important;
-}
+
+
 @media(max-height:720px){
   .security-hero{top:5.1%!important}
   .welcome-cart-art{width:178px!important;margin-bottom:-22px!important}
   .security-modal,
   .security-shell.is-password-open .security-modal{top:36.8%!important}
-  .security-note{top:71.6%!important}
-  .security-benefits{bottom:max(22px,calc(env(safe-area-inset-bottom) + 13px))!important}
+  
+  
 }
 
 /* ===== UI v110 — proportions finales de Ma liste sur mobile ===== */
@@ -1693,10 +1581,7 @@ body:has(#securityOverlay.is-visible){
 }
 
 /* ===== UI v53 — attendre la fin du zoom de lancement avant l’UI sécurité ===== */
-body.is-launching #securityOverlay.is-visible .security-hero,
-body.is-launching #securityOverlay.is-visible .security-modal,
-body.is-launching #securityOverlay.is-visible .security-note,
-body.is-launching #securityOverlay.is-visible .security-benefits{
+body.is-launching #securityOverlay.is-visible .security-hero,body.is-launching #securityOverlay.is-visible .security-modal{
   visibility:hidden!important;
 }
 
@@ -2350,17 +2235,13 @@ body{
 .security-shell.is-password-open .security-modal{
   top:36%!important;
 }
-.security-note{
-  top:74.5%!important;
-}
+
 @media(max-height:720px){
   .security-modal,
   .security-shell.is-password-open .security-modal{
     top:35.2%!important;
   }
-  .security-note{
-    top:73.6%!important;
-  }
+  
 }
 
 /* ===== UI v86 — focus neutre des popups + sécurité dédiée ===== */
@@ -4164,3 +4045,73 @@ body{
 .settings-sheet:not([open]){display:none!important}
 .settings-sheet .courses-product-admin-confirm{background:rgba(243,220,215,.54)!important;border-color:rgba(170,66,56,.15)!important}
 
+/* ===== UI v633 — écran de connexion : tuile « accès privé », clé dorée, bouton sapin à double filet or ===== */
+.security-modal{
+  min-height:324px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  padding:14px 22px 16px!important;
+  border-radius:24px!important;
+  background:rgba(255,253,248,.95)!important;
+  border:1px solid rgba(160,130,70,.35)!important;
+  box-shadow:0 22px 46px rgba(50,60,45,.15),inset 0 0 0 6px #fffdf8,inset 0 0 0 7px rgba(160,130,70,.28)!important;
+}
+.security-modal .security-eyebrow{
+  margin:0 0 4px!important;
+  font:10px/1.2 "Baskerville","Iowan Old Style",Georgia,serif;
+  letter-spacing:3.2px;
+  color:#a58a4f!important;
+  text-align:center;
+}
+.security-lock-icon{
+  width:40px!important;
+  height:40px!important;
+  margin:0 auto 4px!important;
+  display:grid!important;
+  place-items:center;
+  background:transparent!important;
+  border:0!important;
+  color:#9a7f45!important;
+}
+.security-modal .security-lock-icon svg{width:34px!important;height:34px!important;fill:none;stroke:currentColor;stroke-width:1.1}
+.security-modal h3{
+  margin:0!important;
+  font:600 27px/1.1 "Baskerville","Iowan Old Style",Georgia,serif!important;
+  letter-spacing:-.2px!important;
+  color:#16301f!important;
+}
+.security-card-copy{
+  margin:3px auto 0!important;
+  font:italic 14px/1.3 "Baskerville","Iowan Old Style",Georgia,serif!important;
+  color:#7a6a45!important;
+}
+.security-ornament{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:8px auto 10px}
+.security-ornament i{flex:1;height:1px;background:rgba(160,130,70,.5)}
+.security-ornament b{width:5px;height:5px;transform:rotate(45deg);background:#b99a58}
+.security-modal .password-panel,
+.security-modal .password-panel .field{margin-top:0!important}
+.security-modal .password-panel .field>span{
+  margin-bottom:5px!important;
+  font:12.5px/1.2 "Baskerville","Iowan Old Style",Georgia,serif;
+  letter-spacing:.3px;
+  color:#6b6a5c!important;
+}
+.security-modal .password-panel .field input{
+  height:46px!important;
+  background:#f6f2e8!important;
+  border:1px solid rgba(160,130,70,.3)!important;
+  border-radius:10px!important;
+}
+.security-modal .password-panel .primary,
+#securitySubmit{
+  height:48px!important;
+  margin-top:12px!important;
+  border:0!important;
+  border-radius:12px!important;
+  background:#3a5646!important;
+  color:#f3ead2!important;
+  font:600 18px/1 "Baskerville","Iowan Old Style",Georgia,serif!important;
+  letter-spacing:.8px!important;
+  box-shadow:0 0 0 2px #fffdf8,0 0 0 3px rgba(185,154,88,.8),0 12px 22px rgba(40,60,48,.22)!important;
+}

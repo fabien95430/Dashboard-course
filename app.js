@@ -229,7 +229,6 @@ const UI = Object.freeze({
   confirmNewLocalPassword: document.getElementById('confirmNewLocalPassword'),
   changePasswordError: document.getElementById('changePasswordError'),
   productSearch: document.getElementById('productSearch'),
-  resetSecurityBtn: document.getElementById('resetSecurityBtn'),
   currentLocalPassword: document.getElementById('currentLocalPassword'),
   newLocalPassword: document.getElementById('newLocalPassword'),
   changePasswordPanel: document.getElementById('changePasswordPanel'),
@@ -1564,7 +1563,6 @@ function showSecurity(mode,message=''){
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
   UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Connexion';
-  UI.resetSecurityBtn.hidden=creating;
   UI.securityError.textContent='';
   refreshVisualLock();
   setTimeout(()=>UI.securityPassword.focus(),80);
@@ -1599,11 +1597,6 @@ function clearLocalConnectionData(){
   deleteKey(STORAGE.vault);deleteKey(LEGACY_UNLOCK_KEY);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();clearUnlockGuard();
   state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;
-}
-async function resetLocalConnection(){
-  state.demo=false;
-  clearLocalConnectionData();
-  hideSecurity();showSetup('Connexion locale supprimée. Tu peux reconnecter Home Assistant.');
 }
 async function exchangeCodeRaw(code,returnedState){
   const authState=loadOAuthState();
@@ -3085,7 +3078,6 @@ function bindUiEvents(){
   });
   UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
   UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
-  UI.resetSecurityBtn.onclick=resetLocalConnection;
   $('#demoBtn').onclick=()=>{
     state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
     state.loading=false;state.error='';
