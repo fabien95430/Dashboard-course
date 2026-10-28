@@ -8,6 +8,10 @@
 
 **File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
 
+## Lot v623 — quatre produits à valider
+
+Quatre illustrations originales unitaires et transparentes 384×384 proposées depuis la base b5e7ad27989b56076a38b8ea553d9d38ff6572f2 (v622) : Nettoyant lave-vaisselle, Nettoyant machine à laver, Détachant, Purée en flocons. Seules ces quatre images étaient dans les 59 références restantes, sans double comptage. **Projection après fusion et tests : 359/414 distincts renouvelés (86,7 %), 55 non renouvelés ; 28 conservés, 1 défaut ciblé et 26 sans nouveau candidat.** Détails : `docs/IMAGE_CREDITS_V623.md` et file `docs/REPRISE_IMAGES_PRODUITS_20261028.md`. L'historique v616 et antérieur est préservé. Statuts CI/Pages à confirmer avant de marquer le lot publié.
+
 ## Réalisé et vérifié
 
 - **Lot v616 — 6 nouveaux WebP unitaires préparés pour validation PR (28 octobre 2026)** : Vinaigre de cidre (bouteille fermée, pomme sur l'étiquette sans fruit extérieur), Vinaigre balsamique (bouteille sombre), Jus de tomate (bouteille fermée), Soda citron (canette fermée), Thé vert (boîte métallique fermée) et Matcha (poudre dans un bol unique). Vrais fonds alpha, 384×384 et comparaisons à 192 px sur blanc et sauge. Base `b266594bb178da6d0b031345dc14ab9904d2c588` (v615). **Après fusion et validation : 356/414 renouvelés distincts, 58 non renouvelés, au moins 24 conservés, au moins 380 décisions documentées**, 414 WebP totalisant **10 438 462 octets**. Sources, poids et SHA256 : `docs/IMAGE_CREDITS_V616.md`. Statut PR/CI/Pages à confirmer avant de considérer ce lot publié.
