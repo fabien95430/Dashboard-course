@@ -1,9 +1,10 @@
 # Suivi de la bascule des visuels produits
 
-**Point d'avancement : 27 octobre 2026.** Dépôt source de vérité : `fabien95430/Dashboard-course`, branche `main`. Cette note décrit un état constaté : relire impérativement le code et `AGENTS.md` au moment de reprendre le chantier.
+**Point d'avancement : 28 octobre 2026.** Dépôt source de vérité : `fabien95430/Dashboard-course`, branche `main`. Cette note décrit un état constaté : relire impérativement le code et `AGENTS.md` au moment de reprendre le chantier.
 
 ## Réalisé et vérifié
 
+- **Lot v612 en validation sur PR** : deux visuels unitaires préparés, `Coulis de fruit` (bocal rigide fermé, sauce lisse rouge) et `Philadelphia` (pot ovale fermé) ; origine : génération native ChatGPT, 384×384 px alpha réel, 192 px blanc et sauge. **Statut PRÉPARÉ tant que CI, fusion et Pages ne sont pas confirmés.** Après publication validée : **332 renouvelés distincts / 414**, **82 non renouvelés**, **au moins 24 conservés**, **au moins 356 décisions finales**, poids WebP **10 471 634 octets**. Aucun autre fichier WebP réimporté ; aucune API OpenAI payante.
 - Dernier lot d'images publié **v606** sur `main`, [commit `7d8e0ef9929a28e039dd2351129f8764122d9c3e`](https://github.com/fabien95430/Dashboard-course/commit/7d8e0ef9929a28e039dd2351129f8764122d9c3e), [PR #105 fusionnée](https://github.com/fabien95430/Dashboard-course/pull/105), [CI réussie](https://github.com/fabien95430/Dashboard-course/actions/runs/40590484112) et [GitHub Pages réussi](https://github.com/fabien95430/Dashboard-course/actions/runs/40590483377). Neuf visuels unitaires publiés : Détartrant, Nettoyant salle de bain, Liquide rinçage, Sirops Grenadine/Menthe/Pêche et Infusions Camomille/Menthe/Verveine. Les lots antérieurs restent consignés ci-dessous et dans `docs/AVANCEMENT_IMAGES_PRODUITS_V606.md`.
 - `catalog.js` contient **414 produits** ; `www/Items/` contient désormais **414 WebP**, un par produit et sans fichier manquant. Les six images supplémentaires de l'ancien comptage étaient des fichiers orphelins hors catalogue, supprimés lors des travaux ultérieurs.
 - **330 produits distincts** réellement renouvelés après v606 ; **84 produits** non renouvelés, dont **au moins 24** évalués et conservés distincts. **Au moins 354 décisions définitives** de remplacement/conservation documentées (sans double comptage) ; **au plus 60** références sans décision. Historique du recalcul et contrôles dans le suivi.
@@ -1037,3 +1038,18 @@ Référence : `ab80641bb9faf975697917e2eb836e3113f01588` (version v598). Une **s
 **Rejets confirmés au cours de la recherche :** collages et planches même lorsqu'une génération unitaire était demandée ; photos sur fond blanc opaque ; source externe montrant un pot de fromage frais ouvert à la place d'un pot fermé ; source de pansements ressemblant à un rouleau de bande ; sauces, boissons et vinaigres dont la forme ou la variante diffère ; prototypes de coulis trop schématiques. Aucune planche découpée, aucune nouvelle image acceptée pendant ce relevé. L'API OpenAI payante configurée dans l'application n'a pas été appelée.
 
 **Pour le prochain lot de WebP :** ne sélectionner que des améliorations prouvées par comparaison visuelle ancien/nouveau à 192 px sur fonds clair/sauge ; imposer un fichier unitaire, vrai alpha, format exact, marge et centrage, provenance/licences et variantes correctes ; maximum 30 remplacements par commit ; valider `bash scripts/validate_repo.sh` et la suite Node avant publication, puis SHA réel, CI et GitHub Pages. **Ce complément est documentaire uniquement** : 0 nouvelle image publiée, aucun fichier applicatif modifié, version/cache v611 inchangés. Les contrôles sur iPhone physique et hors ligne réel ne sont pas revendiqués.
+
+
+### Lot v612 — 2 visuels unitaires préparés pour validation CI (28 octobre 2026)
+
+**Base de travail :** `main` `399028980446f885d2a868295f67c3cfb6cab608` (v611, CI et GitHub Pages success). **État avant fusion : PRÉPARÉ**, puis statut final à documenter après vérification. Lot de deux produits, bien inférieur au plafond 30 : les autres propositions n'atteignent pas le niveau requis ; aucune planche de génération découpée.
+
+| Catégorie | Produit | Fichier | Avant (o) | Après (o) | Origine et conformité |
+|---|---|---|---:|---:|---|
+| Cuisine | Coulis de fruit | `www/Items/coulis-de-fruit.webp` | 25 910 | 25 106 | Création native ChatGPT, pot en verre fermé, purée rouge lisse ; damier de fond retiré par segmentation du produit et contrôle d'alpha |
+| Frais | Philadelphia | `www/Items/philadelphia.webp` | 20 230 | 14 230 | Création native ChatGPT, pot ovale blanc fermé avec couvercle visible, sans marque fictive |
+| **TOTAL** | **2** | | **46 140** | **39 336** | **−6 804 octets** |
+
+Tous deux sont des WebP indépendants de **384 × 384 pixels**, transparents (alpha 0..255), bords extérieurs vides, marges ≥20px, objets entiers ; contrôle visuel à 192px sur fond blanc et sauge. Le contenu du pot de coulis est lisse et non en morceaux (distinct de la confiture), aucun accessoire ; le pot de fromage frais est fermé (distinct de l'ancien pot ouvert). **Candidats rejetés :** collages multiproduits, sources CC0 avec mauvaises variantes/emballages, et anciens pots ouverts. Sources de ces deux fichiers : génération native ChatGPT uniquement, sans recours à l'API OpenAI payante.
+
+**Impact technique limité :** `index.html` (3 marqueurs de version), `catalog.js` (référence de chargement du module de version), `dish-local-images.js` (version globale), `sw.js` (nom de cache et URLs déjà versionnées), plus WebP et cette documentation. Le comportement du cache reste identique : visuels persistants, rafraîchissement événementiel du cache ; Ma liste, Catalogue, UI, Home Assistant et sécurité inchangés. **Le test sur iPhone réel, la simulation hors ligne et la connexion à Home Assistant réel restent non effectués.** Les tests automatisés de dépôt doivent être exécutés par la CI sur PR avant toute fusion.
