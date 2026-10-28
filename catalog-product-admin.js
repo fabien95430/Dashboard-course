@@ -275,10 +275,11 @@ async function beginDeletion(itemType,name,button){
 }
 async function confirmDeletion(itemType,name,button){
   button.disabled=true;feedback('Envoi de la suppression à GitHub…');
+  /* iOS n'accorde le retour haptique que pendant le geste de l'utilisateur : on le joue au toucher, avant les attentes réseau. */
+  window.CoursesHaptics?.play('delete');
   try{
     await requestDeletion(itemType,name);
     currentConfirm='';openItem='';await render();
-    feedback('','ok');
   }catch(error){
     button.disabled=false;feedback(String(error?.message||'Suppression impossible.'),'error');
     window.CoursesErrors?.report?.({key:'catalog-delete:'+itemType+':'+norm(name),severity:'error',source:'Catalogue',title:'Suppression de « '+name+' » impossible',message:String(error?.message||'La demande n’a pas pu être envoyée.')});
