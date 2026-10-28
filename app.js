@@ -2914,15 +2914,26 @@ function htmlAppVersion(html){
   return versions.length?Math.max(...versions):0;
 }
 // Le nouveau service worker peut avoir précaché une ancienne page d'accueil (cache HTTP ou CDN) :
-// le rechargement afficherait alors toujours l'ancienne version. On vérifie et on corrige la copie.
+// le rechargement afficherait alors toujours l'ancienne version. On vérifie et on corrige la copie
+// d'index.html et celle de l'adresse de démarrage './', servie en priorité au lancement.
 async function ensureCachedShellVersion(cache,latest){
-  const cached=await cache.match('./index.html');
-  if(cached&&htmlAppVersion(await cached.clone().text())>=latest)return true;
-  const response=await fetch('./index.html?courses-shell-refresh='+Date.now(),{cache:'no-store'});
-  if(!response.ok)return false;
-  if(htmlAppVersion(await response.clone().text())<latest)return false;
-  await cache.put('./index.html',response);
-  return true;
+  const stale=[];
+  const index=await cache.match('./index.html');
+  if(!index||htmlAppVersion(await index.clone().text())<latest)stale.push('./index.html');
+  const start=await cache.match('./');
+  if(start&&htmlAppVersion(await start.clone().text())<latest)stale.push('./');
+  if(!stale.length)return true;
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),6000);
+  try{
+    const response=await fetch('./index.html?courses-shell-refresh='+Date.now(),{cache:'no-store',signal:controller.signal});
+    if(!response.ok)return false;
+    const html=await response.text();
+    if(htmlAppVersion(html)<latest)return false;
+    const headers={'Content-Type':response.headers.get('Content-Type')||'text/html; charset=utf-8'};
+    await Promise.all(stale.map(key=>cache.put(key,new Response(html,{headers}))));
+    return true;
+  }finally{clearTimeout(timeout)}
 }
 function waitForServiceWorkerActivation(worker,timeoutMs=15000){
   if(!worker||worker.state==='activated')return Promise.resolve(true);
@@ -2944,21 +2955,26 @@ function waitForServiceWorkerActivation(worker,timeoutMs=15000){
     onStateChange();
   });
 }
-async function installLatestAppVersion(){
-  if(!('serviceWorker' in navigator)||navigator.onLine===false)return false;
+// 'none' : pas de version plus récente publiée ; 'ready' : nouvelle version installée, rechargement possible ;
+// 'pending' : une version plus récente existe mais n'a pas pu être installée maintenant.
+async function latestAppVersionStatus(){
+  if(!('serviceWorker' in navigator)||navigator.onLine===false)return 'none';
   const current=currentAppVersion(),latest=await deployedAppVersion();
-  if(!latest||latest<=current)return false;
+  if(!latest||latest<=current)return 'none';
   const registration=await navigator.serviceWorker.getRegistration();
-  if(!registration)return false;
-  try{await registration.update()}catch(_){return false}
+  if(!registration)return 'pending';
+  try{await registration.update()}catch(_){return 'pending'}
   const worker=registration.installing||registration.waiting;
-  if(worker&&!await waitForServiceWorkerActivation(worker))return false;
+  if(worker&&!await waitForServiceWorkerActivation(worker))return 'pending';
   try{
     const cacheNames=await caches.keys();
     const cacheName=cacheNames.find(name=>name.startsWith('courses-app-v'+latest+'-'));
-    if(!cacheName)return false;
-    return await ensureCachedShellVersion(await caches.open(cacheName),latest);
-  }catch(_){return false}
+    if(!cacheName)return 'pending';
+    return await ensureCachedShellVersion(await caches.open(cacheName),latest)?'ready':'pending';
+  }catch(_){return 'pending'}
+}
+async function installLatestAppVersion(){
+  return await latestAppVersionStatus()==='ready';
 }
 // Le contrôle de version au déverrouillage ne doit jamais bloquer la connexion :
 // durée bornée, et un seul rechargement par version (sinon une page encore périmée
@@ -3012,26 +3028,40 @@ function setHeaderRefreshStatus(text,kind=''){
 function headerRefreshTime(){
   try{return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(new Date())}catch(_){return ''}
 }
+// La flèche ne doit jamais tourner indéfiniment : au-delà, la mise à jour est signalée comme non terminée.
+const HEADER_UPDATE_TIMEOUT_MS=20000;
+function headerUpdateStatus(){
+  let timer=null;
+  const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve('pending'),HEADER_UPDATE_TIMEOUT_MS)});
+  const check=latestAppVersionStatus().catch(error=>{
+    console.warn('courses-app: mise à jour',error);
+    return 'pending';
+  });
+  return Promise.race([check,timeout]).finally(()=>clearTimeout(timer));
+}
 async function refreshFromHeader(button,checkUpdate=false){
   if(button?.classList.contains('is-refreshing'))return;
   clearTimeout(button?._doneTimer);
   button?.classList.remove('is-done');
   button?.classList.add('is-refreshing');
   if(button)button.disabled=true;
-  let succeeded=false;
+  let succeeded=false,updatePending=false;
   try{
     if(checkUpdate){
       setHeaderRefreshStatus('Vérification de la mise à jour…','busy');
-      if(await installLatestAppVersion()){
+      const update=await headerUpdateStatus();
+      if(update==='ready'){
         setHeaderRefreshStatus('Nouvelle version · redémarrage…','new');
         location.reload();
         return;
       }
+      updatePending=update==='pending';
     }
     setHeaderRefreshStatus('Synchronisation de la liste…','busy');
     await refreshItems();
     succeeded=true;
-    setHeaderRefreshStatus('À jour · vérifié à '+headerRefreshTime(),'ok');
+    if(updatePending)setHeaderRefreshStatus('Mise à jour non terminée · réessayez','error');
+    else setHeaderRefreshStatus('À jour · vérifié à '+headerRefreshTime(),'ok');
   }catch(error){
     setHeaderRefreshStatus('Mise à jour impossible · réessayez','error');
     console.warn('courses-app: rafraîchissement',error);
