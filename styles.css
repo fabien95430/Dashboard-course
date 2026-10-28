@@ -2104,8 +2104,10 @@ body{
     --catalog-first-page-height:calc(100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 300px);
     grid-auto-rows:max(132px,calc((var(--catalog-first-page-height) - 25px) / 3))!important;
     gap:9px!important;
-    padding:1px 12px calc(84px + env(safe-area-inset-bottom))!important;
-    scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom));
+    /* Réserve au bas = barre flottante (60 px + son décalage) + 10 px d'air + la zone sûre que la vue
+       déborde : au bout du défilement, la dernière rangée reste entièrement au-dessus de la barre. */
+    padding:1px 12px max(78px,calc(66px + 2 * env(safe-area-inset-bottom)))!important;
+    scroll-padding-bottom:max(78px,calc(66px + 2 * env(safe-area-inset-bottom)));
   }
   .catalog-view>#products .product{
     grid-template-rows:94px minmax(0,1fr)!important;
@@ -3037,7 +3039,7 @@ body{
 /* v143 — navigation plus basse */
 @media(max-width:520px){
   .app>.tabs{
-    transform:translate(-50%,min(6px,env(safe-area-inset-bottom)))!important;
+    transform:translate(-50%,min(12px,env(safe-area-inset-bottom)))!important;
   }
 }
 

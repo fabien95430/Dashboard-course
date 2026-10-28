@@ -193,7 +193,7 @@ test('le Catalogue occupe la première page avec neuf cartes plus grandes, sans 
   assert.ok(rule.includes('100dvh - max(14px,env(safe-area-inset-top)) - env(safe-area-inset-bottom) - 300px'));
   assert.ok(!rule.includes('height:min('),'le conteneur ne doit plus se terminer au-dessus de la barre');
   assert.ok(rule.includes('grid-auto-rows:max(132px,calc((var(--catalog-first-page-height) - 25px) / 3))!important'));
-  assert.ok(rule.includes('padding:1px 12px calc(84px + env(safe-area-inset-bottom))!important'));
+  assert.ok(rule.includes('padding:1px 12px max(78px,calc(66px + 2 * env(safe-area-inset-bottom)))!important'));
   assert.ok(style.includes('.catalog-view>#products .product{\n    grid-template-rows:94px minmax(0,1fr)!important'));
   assert.ok(style.includes('.catalog-view>#products .product .media{\n    height:92px!important'));
   assert.ok(!style.includes(' - 334px'),'ancien bandeau artificiel supprimé');
@@ -244,7 +244,7 @@ test('les grilles Produits et Plats défilent sous la barre Liquid Glass sans pe
   assert.ok(start>=0);
   assert.ok(!productRule.includes('height:min('));
   assert.ok(productRule.includes('grid-auto-rows:max(132px,calc((var(--catalog-first-page-height) - 25px) / 3))!important'));
-  assert.ok(productRule.includes('padding:1px 12px calc(84px + env(safe-area-inset-bottom))!important'));
+  assert.ok(productRule.includes('padding:1px 12px max(78px,calc(66px + 2 * env(safe-area-inset-bottom)))!important'));
   assert.ok(styles.includes('.app>.tabs{\n    position:fixed!important;\n    z-index:40!important'));
   const dishesRule='.dishes-grid{margin-left:0!important;margin-right:0!important;padding:1px 19px calc(84px + env(safe-area-inset-bottom))!important}';
   assert.equal(dishes.split(dishesRule).length-1,2);
