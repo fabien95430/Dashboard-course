@@ -285,7 +285,8 @@ test('Réglages aligne les éléments internes sur une colonne centrale sobre',(
   assert.match(css,/\.settings-sheet \.preference-dialog-scroll > :is\(\.field,\.preference-options,\.dialog-actions,#preferencesApplicationManagement,#preferencesNotificationsPanel\)\{/);
   assert.match(css,/\.settings-sheet \.dialog-actions\{\s*display:flex;\s*align-items:stretch;\s*justify-content:center;/);
   assert.match(css,/\.settings-sheet \.dialog-actions > button:only-child\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/s);
-  assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions > button\{[^}]*flex:1 1 0;[^}]*min-width:0;/s);
+  assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions\{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:10px\}/);
+  assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions > button\{[^}]*min-width:0;[^}]*width:100%!important;[^}]*min-height:48px!important;[^}]*height:48px!important;/s);
   assert.match(css,/\.settings-sheet \.security-lock-now\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/);
   assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*padding-left:58px!important;[^}]*max-width:var\(--sheet-inner-max\)!important/);
 });

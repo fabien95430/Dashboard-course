@@ -424,7 +424,7 @@ function buildRecipeCustomizationDialog(){
       .recipe-customization-suggestion span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:720}
       .recipe-customization-suggestion small{flex:0 0 auto;color:#8a948e;font-size:11px;font-weight:650}
       .recipe-customization-suggestion-empty{padding:14px 10px;color:#7d8781;text-align:center;font-size:13px;font-weight:650}
-      .recipe-customization-status{flex:0 0 auto;margin:0 0 9px;color:#6f7872;font-size:12px;font-weight:650}
+      .recipe-customization-status{flex:0 0 auto;margin:0 0 9px;color:#6f7872;font-size:var(--fs-note,13.5px);font-weight:650}
       .recipe-customization-list{min-height:0;max-height:42dvh;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:8px;padding:2px 1px 7px}
       .recipe-customization-empty{padding:30px 12px;color:#7d8781;text-align:center;font-size:13px;font-weight:650}
       .recipe-customization-item{width:100%;min-height:58px;padding:7px 10px;border:1px solid #e2e8e2;border-radius:16px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px;background:#f8faf7;color:#253028}
@@ -433,12 +433,12 @@ function buildRecipeCustomizationDialog(){
       .recipe-customization-toggle i{width:24px;height:24px;flex:0 0 24px;border:1.5px solid #cbd4cd;border-radius:50%;display:grid;place-items:center;color:transparent;font-style:normal;font-size:14px;font-weight:850;background:#fff}
       .recipe-customization-item.is-selected .recipe-customization-toggle i{border-color:#238b50;background:#238b50;color:#fff}
       .recipe-customization-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      .recipe-customization-quantity{height:38px;min-width:86px;padding:0 9px;border:1px solid #dce4dd;border-radius:12px;display:flex;align-items:center;justify-content:flex-end;gap:5px;background:#fff;color:#637068}
-      .recipe-customization-quantity input{width:52px;border:0;outline:0;background:transparent;color:#1d2821;text-align:right;font-size:14px;font-weight:760;-moz-appearance:textfield}
+      .recipe-customization-quantity{box-sizing:border-box;width:124px;height:38px;padding:0 10px;border:1px solid #dce4dd;border-radius:12px;display:grid;grid-template-columns:minmax(0,1fr) 40px;align-items:center;column-gap:6px;background:#fff;color:#637068}
+      .recipe-customization-quantity input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#1d2821;text-align:right;font-size:14px;font-weight:760;-moz-appearance:textfield}
       .recipe-customization-quantity input::-webkit-outer-spin-button,.recipe-customization-quantity input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       .recipe-customization-quantity input:disabled{color:#a6aea9}
-      .recipe-customization-quantity span{font-size:11px;font-weight:720;white-space:nowrap}
-      .recipe-customization-auto{min-width:70px;color:#98a09b;font-size:12px;font-weight:700;text-align:right}
+      .recipe-customization-quantity span{font-size:var(--fs-note,13.5px);font-weight:720;white-space:nowrap;text-align:left}
+      .recipe-customization-auto{box-sizing:border-box;width:124px;color:#98a09b;font-size:var(--fs-note,13.5px);font-weight:700;text-align:center}
       .recipe-customization-add{flex:0 0 auto;margin-top:8px}
       .recipe-customization-add-button{width:100%;height:44px;border:1px dashed #8dc5a0;border-radius:13px;background:#f8fcf9;color:#157545;font:inherit;font-size:14px;font-weight:780;-webkit-appearance:none;appearance:none}
       .recipe-customization-add-button:active{background:#edf8f0}
@@ -699,8 +699,7 @@ function syncRecipeCustomizationActions(){
     return;
   }
   const count=recipeCustomizationSelection.size;
-  const total=recipeIngredientsForDish(dish,recipeCustomizationSelection).length;
-  recipeCustomizationStatus.textContent=count+' ingrédient'+(count>1?'s':'')+' sur '+total+' · quantités pour 2 personnes';
+  recipeCustomizationStatus.textContent='Quantités pour 2 personnes';
   recipeCustomizationReset.disabled=recipeCustomizationMatchesBase();
   recipeCustomizationSave.disabled=count===0;
   if(recipeCustomizationAddButton)recipeCustomizationAddButton.disabled=false;

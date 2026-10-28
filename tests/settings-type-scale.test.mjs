@@ -114,3 +114,14 @@ test('Catalogue : les messages du bas tiennent sur une ligne (titres courts, dé
   }
   assert.deepEqual(problems,[]);
 });
+
+test('recette : compteur sans « ingrédients sur », badges de quantité de largeur identique, ajout collé à la liste',()=>{
+  const dishes=readFileSync(new URL('../dishes-ui.js',import.meta.url),'utf8');
+  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.doesNotMatch(dishes,/ sur '\+total/);
+  assert.match(dishes,/recipeCustomizationStatus\.textContent='Quantités pour 2 personnes'/);
+  assert.match(dishes,/\.recipe-customization-quantity\{box-sizing:border-box;width:124px;/);
+  assert.match(dishes,/\.recipe-customization-auto\{box-sizing:border-box;width:124px;/);
+  assert.match(css,/\.recipe-customization-list\{flex:0 1 auto!important;/);
+  assert.match(css,/\.recipe-customization-dialog \.dialog-actions\{flex:0 0 auto;margin-top:auto!important;/);
+});

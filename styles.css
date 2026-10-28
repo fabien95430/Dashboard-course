@@ -3862,11 +3862,19 @@ body{
   min-width:0;
   margin-inline:auto!important;
 }
+.settings-sheet.recipe-customization-dialog .dialog-actions{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:10px}
 .settings-sheet.recipe-customization-dialog .dialog-actions > button{
-  flex:1 1 0;
   min-width:0;
-  width:0;
+  width:100%!important;
   margin:0!important;
+  box-sizing:border-box;
+  min-height:48px!important;
+  height:48px!important;
+  padding:0 12px!important;
+  border-radius:15px!important;
+  font:inherit;
+  font-size:var(--fs-text)!important;
+  line-height:1!important;
 }
 .settings-sheet .security-lock-now{box-sizing:border-box;width:100%!important;margin-inline:auto!important}
 .settings-sheet::-webkit-scrollbar,.settings-sheet *::-webkit-scrollbar{display:none}
@@ -3932,8 +3940,9 @@ body{
 .settings-sheet#preferencesDialog .preference-dialog-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
 .settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .missing-dishes-list{flex:0 1 auto!important;min-height:0!important;overflow-y:auto!important}
 .settings-sheet#missingProductsDialog .catalog-remove-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.settings-sheet.recipe-customization-dialog .recipe-customization-list{flex:1 1 auto!important;min-height:0!important;max-height:none!important}
-.settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto}
+/* v652 — la liste ne pousse plus « Ajouter un ingrédient » en bas : il suit la dernière ligne, les actions restent calées en bas. */
+.settings-sheet.recipe-customization-dialog .recipe-customization-list{flex:0 1 auto!important;min-height:0!important;max-height:none!important}
+.settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto;margin-top:auto!important;padding-top:14px}
 /* Finitions Réglages : actions, lignes et états des feuilles iOS. */
 .settings-sheet#connectionDialog[open],.settings-sheet#settingsDialog[open]{display:flex!important;flex-direction:column!important}
 .settings-sheet#connectionDialog .dialog-actions{flex:0 0 auto;margin-top:auto!important;padding-top:18px}
