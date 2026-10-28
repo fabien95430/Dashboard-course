@@ -8,20 +8,17 @@ const GROUPS = CATALOG.groups;
 const FAVORITES = CATALOG.favorites;
 const CATEGORY_META = {
   'Toutes': { label:'Tous' },
-  'Apéritif & snacks': { label:'Apéritif & snacks' },
+  'Favoris': { label:'Favoris' },
   'Boissons': { label:'Boissons' },
-  'Boulangerie': { label:'Boulangerie' },
-  'Cuisine': { label:'Cuisine' },
-  'Enfant': { label:'Enfant' },
+  'Épicerie': { label:'Épicerie' },
   'Frais': { label:'Frais' },
   'Fruits & Légumes': { label:'Fruits & légumes' },
-  'Hygiène & soins': { label:'Hygiène & soins' },
+  'Hygiène & enfant': { label:'Hygiène & enfant' },
   'Maison': { label:'Maison' },
-  'Petit-déjeuner': { label:'Petit-déjeuner' },
-  'Viandes & poissons': { label:'Viandes & poissons' },
-  'Favoris': { label:'Favoris' }
+  'Petit-déj & snacks': { label:'Petit-déj & snacks' },
+  'Viandes & poissons': { label:'Viandes & poissons' }
 };
-const CATALOG_CATEGORY_ORDER=['Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons','Favoris'];
+const CATALOG_CATEGORY_ORDER=['Favoris','Boissons','Épicerie','Frais','Fruits & Légumes','Hygiène & enfant','Maison','Petit-déj & snacks','Viandes & poissons'];
 const DEFAULT_CATALOG_CATEGORY=CATALOG_CATEGORY_ORDER[0];
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
@@ -602,8 +599,8 @@ function sortedGroups(groups){
     return rows.map((group,index)=>({group,index})).sort((a,b)=>{
       const productA=catalogProductFor(a.group.summary),productB=catalogProductFor(b.group.summary);
       const categoryA=CATALOG_CATEGORY_ORDER.indexOf(productA?.category),categoryB=CATALOG_CATEGORY_ORDER.indexOf(productB?.category);
-      const rankA=categoryA>=0&&categoryA<CATALOG_CATEGORY_ORDER.length-1?categoryA:999;
-      const rankB=categoryB>=0&&categoryB<CATALOG_CATEGORY_ORDER.length-1?categoryB:999;
+      const rankA=categoryA>=0&&productA?.category!=='Favoris'?categoryA:999;
+      const rankB=categoryB>=0&&productB?.category!=='Favoris'?categoryB:999;
       return rankA-rankB||a.index-b.index;
     }).map(entry=>entry.group);
   }

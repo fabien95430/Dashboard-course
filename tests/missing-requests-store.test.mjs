@@ -25,8 +25,14 @@ function loadStore(initial={}){
 
 test('les produits gardent les catégories et la normalisation historiques',()=>{
   const {store}=loadStore({'courses-missing-products-v1':JSON.stringify([{name:'  Café   moulu ',category:'Petit-déjeuner'},{name:'Test',category:'Inconnue'},{name:'   '}])});
-  assert.deepEqual(plain(store.readProducts()).map(({name,category})=>({name,category})),[{name:'Café moulu',category:'Petit-déjeuner'},{name:'Test',category:''}]);
+  assert.deepEqual(plain(store.readProducts()).map(({name,category})=>({name,category})),[{name:'Café moulu',category:'Petit-déj & snacks'},{name:'Test',category:''}]);
   assert.equal(store.productCategories.includes('Fruits & Légumes'),true);
+});
+
+test('les anciens rayons fusionnés sont convertis vers leur nouveau rayon',()=>{
+  const legacy=[['Apéritif & snacks','Petit-déj & snacks'],['Petit-déjeuner','Petit-déj & snacks'],['Boulangerie','Épicerie'],['Cuisine','Épicerie'],['Enfant','Hygiène & enfant'],['Hygiène & soins','Hygiène & enfant'],['Maison','Maison'],['constructor','']];
+  const {store}=loadStore({'courses-missing-products-v1':JSON.stringify(legacy.map(([category],index)=>({name:'Produit '+index,category})))});
+  assert.deepEqual(plain(store.readProducts()).map(item=>item.category),legacy.map(([,expected])=>expected));
 });
 
 test('ajouter et supprimer un produit utilise une seule source avec détection des doublons',()=>{
@@ -75,11 +81,12 @@ test('les modules actifs consomment le store sans dupliquer les clés métier',(
 
 test('le service partagé est chargé avant app.js et précaché',()=>{
   const index=read('index.html'),sw=read('sw.js');
-  const storeIndex=index.indexOf('./missing-requests-store.js?v=467');
+  const storeAsset=index.match(/\.\/missing-requests-store\.js\?v=\d+/)?.[0]||'';
+  const storeIndex=storeAsset?index.indexOf(storeAsset):-1;
   const appAsset=index.match(/\.\/app\.js\?v=\d+/)?.[0]||'';
   const appIndex=index.indexOf(appAsset);
   assert.ok(appAsset&&storeIndex>=0&&appIndex>storeIndex);
   assert.ok(sw.includes(appAsset));
-  assert.match(sw,/\.\/missing-requests-store\.js\?v=467/);
+  assert.ok(sw.includes(storeAsset));
   assert.match(source,/Object\.defineProperty\(window,'COURSES_MISSING_REQUESTS',[\s\S]*?configurable:false,[\s\S]*?enumerable:false,[\s\S]*?writable:false/);
 });

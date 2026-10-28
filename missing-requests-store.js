@@ -7,7 +7,9 @@ const KEYS=Object.freeze({
   addedDishes:'courses-missing-dishes-added-v1',
   productImageHints:'courses-missing-product-image-hints-v1'
 });
-const PRODUCT_CATEGORIES=Object.freeze(['','Apéritif & snacks','Boissons','Boulangerie','Cuisine','Enfant','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déjeuner','Viandes & poissons']);
+const PRODUCT_CATEGORIES=Object.freeze(['','Boissons','Épicerie','Frais','Fruits & Légumes','Hygiène & enfant','Maison','Petit-déj & snacks','Viandes & poissons']);
+// Rayons fusionnés : les demandes déjà enregistrées gardent leur catégorie sous le nouveau nom.
+const LEGACY_PRODUCT_CATEGORIES=Object.freeze({'Apéritif & snacks':'Petit-déj & snacks','Petit-déjeuner':'Petit-déj & snacks','Boulangerie':'Épicerie','Cuisine':'Épicerie','Enfant':'Hygiène & enfant','Hygiène & soins':'Hygiène & enfant'});
 const EVENT_NAME='courses-missing-requests-change';
 const PRODUCT_IMAGE_HINT_MAX=140;
 // Liste Home Assistant distincte de la liste de courses utilisée par Ma liste.
@@ -47,7 +49,8 @@ function writeJson(key,value){
 function sanitizeProduct(item,index=0){
   const name=cleanText(item?.name);
   if(!name)return null;
-  const category=PRODUCT_CATEGORIES.includes(item?.category)?item.category:'';
+  const raw=Object.prototype.hasOwnProperty.call(LEGACY_PRODUCT_CATEGORIES,item?.category??'')?LEGACY_PRODUCT_CATEGORIES[item.category]:item?.category;
+  const category=PRODUCT_CATEGORIES.includes(raw)?raw:'';
   return {id:String(item?.id||('legacy-'+index+'-'+normalize(name))),name,category};
 }
 function sanitizeDish(item,index=0){

@@ -16,16 +16,13 @@ const LABEL='Acheté récemment';
 // Fenêtres de disponibilité probables. Elles évitent les doublons mais ne remplacent jamais une DLC.
 // Les plafonds `shelf` restent absolus, même lorsque l'historique apprend une durée plus longue.
 const CATEGORY=Object.freeze({
-  'Apéritif & snacks':{days:18,factor:.72},
   'Boissons':{days:14,factor:.8},
-  'Boulangerie':{days:4,factor:.55,shelf:7},
-  'Cuisine':{days:30,factor:.8},
-  'Enfant':{days:14,factor:.78},
+  'Épicerie':{days:30,factor:.8},
   'Frais':{days:7,factor:.6,shelf:12},
   'Fruits & Légumes':{days:7,factor:.62,shelf:14},
-  'Hygiène & soins':{days:45,factor:.86},
+  'Hygiène & enfant':{days:45,factor:.86},
   'Maison':{days:45,factor:.86},
-  'Petit-déjeuner':{days:30,factor:.82},
+  'Petit-déj & snacks':{days:30,factor:.82},
   'Viandes & poissons':{days:3,factor:.5,shelf:5}
 });
 const SUB=Object.freeze({
@@ -44,7 +41,9 @@ const SUB=Object.freeze({
   'Café & thé':{days:35,factor:.85},'Bières & vins':{days:30,factor:.82},
   'Entretien':{days:60,factor:.88},'Lessive':{days:45,factor:.88},'Vaisselle':{days:45,factor:.88},
   'Papier & sacs':{days:35,factor:.86},'Hygiène':{days:35,factor:.86},
-  'Salle de bain & soins':{days:60,factor:.88},'Enfant':{days:21,factor:.82}
+  'Salle de bain & soins':{days:60,factor:.88},'Enfant':{days:21,factor:.82},
+  // Profils des anciens rayons conservés pour les sous-catégories déplacées par la fusion.
+  'Pâtes à tarte':{days:4,factor:.55,shelf:7},'Produits laitiers':{days:14,factor:.78}
 });
 const PRODUCT=Object.freeze({
   'Lait':{days:6,shelf:7},'Lait entier':{days:6,shelf:7},'Lait demi-écrémé':{days:6,shelf:7},
