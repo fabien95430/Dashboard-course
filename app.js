@@ -94,7 +94,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Infusion verveine":"Infusion verv",
   "Infusion camomille":"Infusion camo",
   "Infusion menthe":"Infusion ment",
-  "Chocolat chaud":"Chocolat ch.",
+
   "Filtres à café":"Filtre à café",
   "Bière sans alcool":"Bière 0%",
 
