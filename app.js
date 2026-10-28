@@ -76,7 +76,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Noix de coco râpée":"Noix coco",
   "Amandes en poudre":"Amandes poud.",
 
-  "Mini saucissons":"Mini sauciss.",
+
   "Nouilles instantanées":"Nouilles inst",
   "Nouilles chinoises":"Nouilles chin",
   "Purée en flocons":"Purée",

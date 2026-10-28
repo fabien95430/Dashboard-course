@@ -126,7 +126,7 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   'Café soluble':'Pot','Thé noir':'Boîte','Thé vert':'Boîte','Chocolat en poudre':'Boîte','Céréales':'Boîte','Miel':'Pot','Pâte à tartiner':'Pot',
   'Bonbons':'Sachet','Chocolat noir':'Tablette','Chocolat au lait':'Tablette',
   'Levure chimique':'Sachet','Levure boulangère':'Sachet','Maïzena':'Boîte','Vanille':'Sachet','Pépites chocolat':'Sachet','Noix de coco râpée':'Sachet','Amandes en poudre':'Sachet','Gélatine':'Paquet',
-  'Olives':'Pot','Crackers':'Paquet','Mini saucissons':'Paquet','Tapenade':'Pot','Houmous':'Pot',
+  'Olives':'Pot','Crackers':'Paquet','Tapenade':'Pot','Houmous':'Pot',
   'Nouilles instantanées':'Paquet','Nouilles chinoises':'Paquet','Tortillas':'Paquet','Couscous':'Paquet','Curry':'Flacon','Lait de coco':'Boîte','Harissa':'Tube','Guacamole':'Pot','Purée en flocons':'Paquet','Bouillon cubes':'Boîte','Soupes en brique':'Brique','Croûtons':'Sachet','Curcuma':'Flacon','Paprika':'Flacon','Chili':'Flacon',
   'Chicorée':'Pot','Matcha':'Boîte','Filtres à café':'Boîte',
   'Éponges magiques':'Paquet','Lingettes ménage':'Paquet','Bicarbonate':'Paquet','Vinaigre ménager':'Bouteille',
