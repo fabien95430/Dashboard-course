@@ -388,15 +388,20 @@ function buildRecipeCustomizationDialog(){
       .recipe-dish-picker{flex:1 1 auto;min-height:0;overflow-y:auto;padding-top:2px!important;padding-bottom:14px!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
       .recipe-dish-picker[hidden]{display:none}
       .recipe-cat-card{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:none!important;overflow:hidden;margin:0 1px}
+      .recipe-customization-dialog{background:#fbf9f3!important}
+      .recipe-customization-dialog .recipe-dish-picker{margin:0 -21px!important;width:calc(100% + 42px)!important;max-width:none!important;box-sizing:border-box;padding:0 0 calc(env(safe-area-inset-bottom) + 18px)!important;border-top:1px solid rgba(39,66,47,.10)}
+      .recipe-customization-dialog .recipe-cat-card{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;margin:0!important}
+      .recipe-customization-dialog .recipe-cat-head,.recipe-customization-dialog .recipe-dish-row{padding-left:20px!important;padding-right:18px!important}
+      .recipe-customization-dialog .recipe-cat+.recipe-cat{border-top:1px solid rgba(39,66,47,.10)}
       .recipe-cat+.recipe-cat{border-top:1px solid rgba(39,66,47,.09)}
       .recipe-cat-head,.recipe-dish-row{width:100%;display:grid;align-items:center;gap:10px;border:0;background:transparent;color:#1b2d21;font:inherit;text-align:left;-webkit-appearance:none;appearance:none}
       .recipe-cat-head{min-height:56px;grid-template-columns:minmax(0,1fr) auto 18px;padding:0 14px 0 16px}
       .recipe-cat-head span{font-size:16.5px;font-weight:600;color:#263f30}
       .recipe-cat-head small{color:#617366;font-size:13px;font-variant-numeric:tabular-nums}
       .recipe-cat.is-open>.recipe-cat-head{background:rgba(221,237,216,.8)}
-      .recipe-cat-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-      .recipe-cat.is-open .recipe-cat-caret{transform:rotate(-90deg)}
-      .recipe-cat-body{position:relative;padding:0;background:transparent}
+      .recipe-cat-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
+      .recipe-cat.is-open .recipe-cat-caret{transform:rotate(90deg)}
+            .recipe-cat-body{position:relative;padding:0;border-top:1px solid rgba(39,66,47,.09);background:transparent}
       .recipe-cat-body::before{display:none}
       .recipe-dish-row{min-height:52px;grid-template-columns:minmax(0,1fr) auto 15px;padding:0 14px 0 16px}
       .recipe-dish-row+.recipe-dish-row{border-top:1px solid rgba(39,66,47,.06)}
@@ -496,7 +501,7 @@ function buildRecipeCustomizationDialog(){
     const category=event.target.closest('[data-recipe-category]');
     if(category){
       const next=category.dataset.recipeCategory||'';
-      recipeCustomizationOpenCategory=next;
+      recipeCustomizationOpenCategory=recipeCustomizationOpenCategory===next?'':next;
       setRecipeCustomizationStep(null,true);
       return;
     }
@@ -504,7 +509,6 @@ function buildRecipeCustomizationDialog(){
     if(button)selectRecipeCustomizationDish(button.dataset.recipeDish||'');
   });
   recipeCustomizationBack.addEventListener('click',()=>{
-    if(!recipeCustomizationDish&&recipeCustomizationOpenCategory){recipeCustomizationOpenCategory='';setRecipeCustomizationStep(null,true);return}
     loadRecipeCustomizationDish('',true);
   });
   recipeCustomizationSearch.addEventListener('input',renderRecipeCustomizationDishOptions);
@@ -555,17 +559,18 @@ function renderRecipeCustomizationPicker(){
   const groups=new Map();
   DISHES.forEach(dish=>{const category=dish.tags?.[0]||'Autres';if(!groups.has(category))groups.set(category,[]);groups.get(category).push(dish)});
   const chevron='<svg class="chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>';
-  const current=groups.has(recipeCustomizationOpenCategory)?recipeCustomizationOpenCategory:'';
-  if(current){
-    recipeCustomizationPicker.innerHTML='<div class="recipe-cat-card"><div class="recipe-cat-body">'+groups.get(current).map(dish=>
-      '<button type="button" class="recipe-dish-row" data-recipe-dish="'+escapeHtml(dish.name)+'"><span>'+escapeHtml(dish.name)+'</span><small>'+dish.ingredients.length+' ingrédient'+(dish.ingredients.length>1?'s':'')+'</small>'+chevron+'</button>'
-    ).join('')+'</div></div>';
-    return;
-  }
-  recipeCustomizationOpenCategory='';
-  recipeCustomizationPicker.innerHTML='<div class="recipe-cat-card">'+[...groups.entries()].map(([category,dishes])=>
-    '<div class="recipe-cat"><button type="button" class="recipe-cat-head" data-recipe-category="'+escapeHtml(category)+'"><span>'+escapeHtml(category)+'</span><small>'+dishes.length+' plat'+(dishes.length>1?'s':'')+'</small>'+chevron.replace('class="chevron"','class="chevron recipe-cat-caret"')+'</button></div>'
-  ).join('')+'</div>';
+  if(!groups.has(recipeCustomizationOpenCategory))recipeCustomizationOpenCategory='';
+  const current=recipeCustomizationOpenCategory;
+  const head=(category,dishes,open)=>'<button type="button" class="recipe-cat-head" data-recipe-category="'+escapeHtml(category)+'" aria-expanded="'+open+'"><span>'+escapeHtml(category)+'</span><small>'+dishes.length+' plat'+(dishes.length>1?'s':'')+'</small>'+chevron.replace('class="chevron"','class="chevron recipe-cat-caret"')+'</button>';
+  /* Une catégorie ouverte masque toutes les autres ; toucher son en-tête ramène au menu des catégories. */
+  const entries=current?[[current,groups.get(current)]]:[...groups.entries()];
+  recipeCustomizationPicker.innerHTML='<div class="recipe-cat-card">'+entries.map(([category,dishes])=>{
+    const open=category===current;
+    return '<div class="recipe-cat'+(open?' is-open':'')+'">'+head(category,dishes,open)+
+      (open?'<div class="recipe-cat-body">'+dishes.map(dish=>
+        '<button type="button" class="recipe-dish-row" data-recipe-dish="'+escapeHtml(dish.name)+'"><span>'+escapeHtml(dish.name)+'</span><small>'+dish.ingredients.length+' ingrédient'+(dish.ingredients.length>1?'s':'')+'</small>'+chevron+'</button>'
+      ).join('')+'</div>':'')+'</div>';
+  }).join('')+'</div>';
 }
 function setRecipeCustomizationStep(dish,keepCategory){
   if(!recipeCustomizationDialog)return;
@@ -573,12 +578,11 @@ function setRecipeCustomizationStep(dish,keepCategory){
   if(!dish&&!keepCategory)recipeCustomizationOpenCategory='';
   if(!dish)renderRecipeCustomizationPicker();
   if(recipeCustomizationPicker){recipeCustomizationPicker.hidden=Boolean(dish);if(!dish)recipeCustomizationPicker.scrollTop=0}
-  const inCategory=!dish&&Boolean(recipeCustomizationOpenCategory);
-  if(recipeCustomizationBack)recipeCustomizationBack.hidden=!dish&&!inCategory;
+  if(recipeCustomizationBack)recipeCustomizationBack.hidden=!dish;
   const title=recipeCustomizationDialog.querySelector('h3');
-  title?.classList.toggle('has-back',Boolean(dish)||inCategory);
+  title?.classList.toggle('has-back',Boolean(dish));
   const label=title?.querySelector('.settings-sheet-title');
-  if(label)label.textContent=dish?.name||(inCategory?recipeCustomizationOpenCategory:'Personnalisation des recettes');
+  if(label)label.textContent=dish?.name||'Personnalisation des recettes';
 }
 function loadRecipeCustomizationDish(name,keepCategory){
   const dish=DISHES.find(item=>item.name===name)||null;

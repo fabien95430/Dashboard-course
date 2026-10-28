@@ -371,10 +371,10 @@ test('v621 : recettes par catégories repliables avec flèche retour, et rafraî
   const dishes=read('dishes-ui.js'),app=read('app.js'),css=read('styles.css'),html=read('index.html');
   assert.doesNotMatch(dishes,/recipe-dish-current|recipeCustomizationCurrent/);
   assert.match(dishes,/data-recipe-category="'\+escapeHtml\(category\)\+'"/);
-  assert.match(dishes,/recipeCustomizationOpenCategory=next;\s*setRecipeCustomizationStep\(null,true\);/);
+  assert.match(dishes,/recipeCustomizationOpenCategory=recipeCustomizationOpenCategory===next\?'':next;\s*setRecipeCustomizationStep\(null,true\);/);
   assert.match(dishes,/recipeCustomizationBack\.className='settings-sheet-back';/);
   assert.match(dishes,/recipeCustomizationBack\.addEventListener\('click',\(\)=>\{[\s\S]*?loadRecipeCustomizationDish\('',true\)/);
-  assert.match(dishes,/label\.textContent=dish\?\.name\|\|\(inCategory\?recipeCustomizationOpenCategory:'Personnalisation des recettes'\);/);
+  assert.match(dishes,/label\.textContent=dish\?\.name\|\|'Personnalisation des recettes';/);
   assert.match(dishes,/\.recipe-cat-head span\{[^}]*font-weight:600/);
   assert.match(html,/<p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience<\/p>/);
   assert.match(html,/class="refresh-done"[^>]*><use href="#i-check">/);
