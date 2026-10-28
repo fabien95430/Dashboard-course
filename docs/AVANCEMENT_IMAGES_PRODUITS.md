@@ -941,3 +941,99 @@ Référence : `ab80641bb9faf975697917e2eb836e3113f01588` (version v598). Une **s
 **EN ATTENTE d'un meilleur visuel :** Coulis de fruit (bouteille au lieu du pot fermé exigé), Philadelphia (pot ouvert), Speculos (halo), Confiture mirabelles (détourage), Pâte feuilletée (halo), Yaourt (opercule ouvert), ainsi que plusieurs petites images Maison et Petit-déjeuner. Sources externes CC0 inspectées : Ingredient Atlas et SwisserDev ; candidats inadéquats rejetés pour fonds opaques ou emballages incorrects. Nouvelle génération renvoyant un collage multi-produits : **REJETÉ**, aucune découpe ni insertion. Aucun recours à l'API OpenAI payante du projet.
 
 **Périmètre de cet audit :** aucun nouveau WebP publié ni candidat déclaré prêt pour production, aucun code, test ou CSS modifié, aucun incrément de version ni changement de cache, Home Assistant ou sécurité. La CI valide le dépôt mais aucun essai physique iPhone ni réseau hors ligne n'est revendiqué.
+
+
+### Inventaire Git précis des 84 visuels non renouvelés — v611
+
+**Instantané source :** `main` `ac9bacde4561a977dbc5447b890dd9f9ee9da808` (version applicative **v611**, changement Catalogue indépendant des images). L'inventaire est dérivé des arbres Git avant v528, du parent et de la compression v537, puis du dernier `main`, en s'appuyant sur les 414 noms/slugs réels de `catalog.js`. **414/414 WebP présents ; 330 images renouvelées distinctes, 61 anciens originaux strictement inchangés, 23 images uniquement recompressées en v537.** Les 84 lignes ci-dessous sont exhaustives pour les non-renouvelés ; les 330 autres ont déjà été renouvelées. Le registre ne duplique pas les décisions déjà prises : il maintient **au moins 24 conservations distinctes** et **au plus 60 autres références sans décision définitive**. Une priorité élevée signale un défaut connu, sans autoriser automatiquement un remplacement.
+
+| Catégorie | Produit | Slug actuel | Octets | Blob Git | Historique | Priorité | Observation / précaution |
+|---|---|---|---:|---|---|---|---|
+| Apéritif & snacks | Kinder Maxi | `kinder-maxi.webp` | 22038 | `03327726f8617b3bd0f2f70654e68d7fa4ca24b7` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Apéritif & snacks | Speculos | `speculos.webp` | 67434 | `a28876eda8f0101bc394b38ac631309a45f31503` | Compression v537 seule | Haute | Halo important autour de l'assiette |
+| Boissons | Bière blanche | `biere-blanche.webp` | 2578 | `c112aa5764a940ef81150fe21a8c84dfe49a7493` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Boissons | Jus de tomate | `jus-de-tomate.webp` | 3674 | `96ea1e30f34d129e02095a654a2489861e22d6a2` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Boissons | Prosecco | `prosecco.webp` | 2682 | `2b22a59c8c2831fa22be5dd34e79aca896e88c63` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Boissons | Rhum | `rhum.webp` | 18284 | `fcc34217f8b349259a9a7f0035c0a18031eded15` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Boissons | Ricard | `ricard.webp` | 22006 | `f2fa5f910cef6d3a9003acc41778a598a7bbcd08` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Boissons | Soda citron | `soda-citron.webp` | 2346 | `5963583dc0f2783ec48d0183297ac3df5a89c7c1` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Boissons | Vin rosé | `vin-rose.webp` | 3046 | `d5e3fe7b5ee3baf21aef0306166e86176ce959d9` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Boulangerie | Pâte brisée | `pate-brisee.webp` | 26696 | `ccb6dd24fa079842f2768ec40390b7e33ab3433d` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Cuisine | Champignons en boîte | `champignons-en-boite.webp` | 4744 | `68c908b6f93e5ae98d9f72040b597abe616ff1e3` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Confiture fraise | `confiture-fraise.webp` | 50636 | `4db25cb72db37463a5d5c7bd48b8cdc5ddbb0f45` | Compression v537 seule | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Confiture mirabelles | `confiture-mirabelles.webp` | 52662 | `571379767da02f0ca355e4852b524bd63f17a8dc` | Compression v537 seule | Haute | Halo autour du bocal |
+| Cuisine | Coulis de fruit | `coulis-de-fruit.webp` | 25910 | `082b104d124f21a38687fa19918e1b85dfb97d25` | Compression v537 seule | Haute | Bouteille au lieu du pot fermé exigé |
+| Cuisine | Croûtons | `croutons.webp` | 4588 | `4a9ef0dbd9df4044998f095fef38c11bda80ed18` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Lait de coco | `lait-de-coco.webp` | 3304 | `33ac91750ecb7c4d90fa8a90870eb41191c035c2` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Noix de coco râpée | `noix-de-coco-rapee.webp` | 4028 | `548a3d672dd7b0d8675b78a6ef4e52ee991803d0` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Pâte feuilletée | `pate-feuilletee.webp` | 59958 | `aba409288ef2f34e77ee64581d857392bcff938b` | Compression v537 seule | Haute | Halo, conserver la pâte crue |
+| Cuisine | Petits pois carottes | `petits-pois-carottes.webp` | 4680 | `193230f82856bd5dc432855b970e1f8081f6a193` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Purée en flocons | `puree-en-flocons.webp` | 4004 | `71306a2b53bb3d508cad3431d5f2a8c12fec07e1` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Raviolis en boîte | `raviolis-en-boite.webp` | 4672 | `0f0fcb58fb73622dc8e6400c48ef2494c7f5dd5c` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Soupes en brique | `soupes-en-brique.webp` | 4152 | `99266ae71d46edd265657474154f0b8ecad13ce1` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Vinaigre balsamique | `vinaigre-balsamique.webp` | 2390 | `6413473a7ebf835e1f99bd2529d90ce30e2f3aad` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Cuisine | Vinaigre de cidre | `vinaigre-de-cidre.webp` | 35956 | `986a21aaeab1ea3335f30d82312a9f043fce7761` | Compression v537 seule | Haute | Halo et accessoires pomme |
+| Enfant | Compotes bébé | `compotes-bebe.webp` | 3448 | `f0010d6ea385601d7608edf452b340fd176a2567` | Original non modifié | Moyenne | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Enfant | Lait infantile | `lait-infantile.webp` | 2994 | `7b3d7ec8393459146e84a4b71b62f0f7f8833adf` | Original non modifié | Moyenne | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Enfant | Sacs à couches | `sacs-a-couches.webp` | 3854 | `cf6a8a5c87a78b7c2ec77cbeb93e3db48d00ca1d` | Original non modifié | Moyenne | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Enfant | Yaourt | `yaourt.webp` | 41440 | `3c71534c5ec8c68218a4510884f93437747ba49d` | Compression v537 seule | Haute | Opercule ouvert |
+| Frais | Cornichon | `cornichon.webp` | 43096 | `a125bbd9f8dc7e0d6d6e491e58c24e12299acbb4` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Frais | Mozzarella râpée | `mozzarella-rapee.webp` | 29408 | `67d61700e9281a27a9d5f72686265bc7bec2d87f` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Frais | Pâte à pizza | `pate-a-pizza.webp` | 43040 | `e6ca3898df5f74ef5afde5ddb43f8d662626c19f` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Frais | Philadelphia | `philadelphia.webp` | 20230 | `77a180fe515e214accf637f795a7356589e4c96d` | Compression v537 seule | Haute | Pot ouvert, couvercle à montrer |
+| Hygiène & soins | Alcool 70 | `alcool-70.webp` | 17442 | `288fa11ccdd291fe56a81df0d4af831855f4c5b4` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Hygiène & soins | Antiseptique | `antiseptique.webp` | 2358 | `dd648a56fea1e3e567c01f6ccd9554857c6c801c` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Hygiène & soins | Baume lèvres | `baume-levres.webp` | 1794 | `7d5d0ffbff7bf04c34966f0129b645c648c75c3e` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Hygiène & soins | Démaquillant | `demaquillant.webp` | 2434 | `ed491738d028ed5d17d2d7fca930d5673a559259` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Hygiène & soins | Mouchoirs poche | `mouchoirs-poche.webp` | 2554 | `b29346ef734405bac0e96aa450ed8826ff3b0325` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Hygiène & soins | Pansements | `pansements.webp` | 4428 | `a792211175502878744de362ed727b2bd58a4369` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Hygiène & soins | Protections hygiéniques | `protections-hygieniques.webp` | 3238 | `c79aedc9a0edfa2988410d999741cdfe4053b7d2` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Amidon | `amidon.webp` | 1756 | `089369f2b4d6282f0718f1ec35cdfcdb1b3cc441` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Bicarbonate | `bicarbonate.webp` | 2930 | `ceff8ec6580edd2af086366a8fdb4d5f06454be1` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Désinfectant | `desinfectant.webp` | 3040 | `b11b6bcfbd7d571e3f80f4b4f2612e3512a167f9` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Désodorisant textile | `desodorisant-textile.webp` | 3180 | `5ed28d1cd98cfc00ead794e1e55d3a094872886e` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Détachant | `detachant.webp` | 2520 | `c0f828590cc375b3f6c5afb1487d1a1b1ebebd28` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Éponges magiques | `eponges-magiques.webp` | 2452 | `57f35457ebdad10b9aa8703e5c39fab21aadadfb` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Essuie-verres | `essuie-verres.webp` | 3460 | `89fa589660e673edab680a8e46a9cb6ffeedaf35` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Filet de lavage | `filet-de-lavage.webp` | 3496 | `f6778ecb045752dbb487b9c83e138eb90cb60c3f` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Grattoirs | `grattoirs.webp` | 3722 | `721a6bf6a640358a797d0cfdd47d4eb173d16c39` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Lave glace | `lave-glace.webp` | 24392 | `f989a93e3b6dcc3ad7bf8deba2e7110a2faf2b3f` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Lingettes anti-décoloration | `lingettes-anti-decoloration.webp` | 3054 | `b64b0ce1c9aa21104cea8df1233f07601ee687bc` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Lingettes ménage | `lingettes-menage.webp` | 3278 | `f5e9f32537a6128d44407dd1690d38a7680ef1d5` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Mouchoirs | `mouchoirs.webp` | 3998 | `b4b4ae5f25a6658f4c83a4357eff2bc69f52a4a3` | Original non modifié | Selon besoin | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Nettoyant lave-vaisselle | `nettoyant-lave-vaisselle.webp` | 4938 | `e49a4329ce120c57299f97c85e541b1eb3b8173a` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Nettoyant machine à laver | `nettoyant-machine-a-laver.webp` | 3470 | `80f032218c7a27f8f5be59d03db5cff94b811d59` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Nettoyant sol | `nettoyant-sol.webp` | 2174 | `10b128189d65fb6c838c88aca083e482459a44b6` | Original non modifié | Moyenne | Petit flacon, garder type nettoyant sol |
+| Maison | Papier cadeau | `papier-cadeau.webp` | 24190 | `e74a0efad1b52e797d830f3064fad5a94c77dbcc` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Papier cuisson | `papier-cuisson.webp` | 3582 | `508d5c25f593dd9f9588dd7f6db51ecc56217aeb` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Pile AAA | `pile-aaa.webp` | 36684 | `22501040e968eca3808bcf6fb3306570ff6a5e2b` | Compression v537 seule | Haute | Halo autour du cylindre |
+| Maison | Piles AA | `piles-aa.webp` | 26788 | `58a7f0ceb454464eb543db08204a5637f210cae9` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Pinces à linge | `pinces-a-linge.webp` | 4826 | `8a1673918cc2ce7e33f4201768ad53a94bb38a0c` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Produit inox | `produit-inox.webp` | 2550 | `cfa99044a70706491d9daa860d0f21e3eecbb453` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Sacs congélation | `sacs-congelation.webp` | 5174 | `2c78be070466e0676224427cdff4194e8f439fe2` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Sacs linge délicat | `sacs-linge-delicat.webp` | 3124 | `bbf49d4009371138b22588afca75ed3f8afbba83` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Sacs poubelle 30L | `sacs-poubelle-30l.webp` | 3000 | `e1ce0a18b7fc1a46e27fa33811e1213b3714d36b` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Sacs poubelle 50L | `sacs-poubelle-50l.webp` | 3048 | `8fd7d4e3a42f0c7c7fac2a3ea5bc6174e248c6d9` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Sacs zip | `sacs-zip.webp` | 3518 | `854de01f88289929b377f7fc38639140f3f5308f` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Sel lave-vaisselle | `sel-lave-vaisselle.webp` | 3552 | `20decb9ce16c9c2f9e51cc87271b799e00e62101` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Maison | Serviettes papier | `serviettes-papier.webp` | 3008 | `7b415fa05c32b030f439e6241e842f3731445f7a` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Tablettes lave-vaisselle | `tablettes-lave-vaisselle.webp` | 4078 | `1071afd1e2eea7d9f43a86305eed3c26b61fbb6a` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Torchons | `torchons.webp` | 3726 | `fa245621009e1d1680134f6d05d3ce0203700655` | Original non modifié | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Maison | Vinaigre ménager | `vinaigre-menager.webp` | 2700 | `0892af3a2c7bc7a5917125aaf1f7facc9df1d000` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Petit-déjeuner | Céréales | `cereales.webp` | 4622 | `9e60a123d9b0ee0f95a094e84d4b5da7fab03190` | Original non modifié | Moyenne | Petit bocal, variété de céréales à conserver |
+| Petit-déjeuner | Granola | `granola.webp` | 55140 | `44c9fbbecbda20e7e7c47f92edd1c4fcf3b8bf86` | Compression v537 seule | Haute | Halo au bord du bol |
+| Petit-déjeuner | Matcha | `matcha.webp` | 3370 | `e8b06cff7e2de215d967580b80d58011410c6dce` | Original non modifié | Moyenne | Petit bol, ne pas confondre avec infusion |
+| Petit-déjeuner | Sirot d’érable | `sirot-d-erable.webp` | 27644 | `5aaf03f6026d7bb759f12287be58767b09f541a8` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Petit-déjeuner | Thé Earl Grey | `the-earl-grey.webp` | 3892 | `446aa9ebc011b8e78ba805c3cb8750e2283bc087` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Petit-déjeuner | Thé fruits rouges | `the-fruits-rouges.webp` | 4004 | `01e5d1c6d25c1b2f0e8dae5dd267c8968c8fa84d` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Petit-déjeuner | Thé noir | `the-noir.webp` | 4116 | `75da2cbd601a38692a3a72e55a77d6e706d61217` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Petit-déjeuner | Thé vert | `the-vert.webp` | 4142 | `3ef78bdba8fd36f79d12c8e18c09374565e24efb` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Viandes & poissons | Pâté | `pate.webp` | 5016 | `7eab33a6ab53f7c8232c04bcd926c9ca8f9a01f9` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Viandes & poissons | Peperroni | `peperroni.webp` | 50496 | `4451443ca2788a1573abe03ba4b7ce7962d747de` | Compression v537 seule | Selon besoin | Fidélité déjà signalée dans le suivi historique ; ne pas recompter |
+| Viandes & poissons | Poisson pané | `poisson-pane.webp` | 3746 | `e6dbda4b697e112e183da567198c04c17c72fe67` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Viandes & poissons | Poisson surgelé | `poisson-surgele.webp` | 3744 | `dfcef4ed906fbc41aa02a5ad448ecc5e77075fff` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+| Viandes & poissons | Saucisses | `saucisses.webp` | 3582 | `3998023794b44915abe3370a63072ce6c2f2ea52` | Original non modifié | Moyenne | À comparer avec un éventuel meilleur WebP 192 px |
+
+**Rejets confirmés au cours de la recherche :** collages et planches même lorsqu'une génération unitaire était demandée ; photos sur fond blanc opaque ; source externe montrant un pot de fromage frais ouvert à la place d'un pot fermé ; source de pansements ressemblant à un rouleau de bande ; sauces, boissons et vinaigres dont la forme ou la variante diffère ; prototypes de coulis trop schématiques. Aucune planche découpée, aucune nouvelle image acceptée pendant ce relevé. L'API OpenAI payante configurée dans l'application n'a pas été appelée.
+
+**Pour le prochain lot de WebP :** ne sélectionner que des améliorations prouvées par comparaison visuelle ancien/nouveau à 192 px sur fonds clair/sauge ; imposer un fichier unitaire, vrai alpha, format exact, marge et centrage, provenance/licences et variantes correctes ; maximum 30 remplacements par commit ; valider `bash scripts/validate_repo.sh` et la suite Node avant publication, puis SHA réel, CI et GitHub Pages. **Ce complément est documentaire uniquement** : 0 nouvelle image publiée, aucun fichier applicatif modifié, version/cache v611 inchangés. Les contrôles sur iPhone physique et hors ligne réel ne sont pas revendiqués.
