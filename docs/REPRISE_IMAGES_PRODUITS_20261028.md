@@ -2,6 +2,23 @@
 
 **Source de vérité de cette file :** historique `docs/AVANCEMENT_IMAGES_PRODUITS.md` (inventaire exhaustif v611, 84 références non renouvelées) ; comparaison ciblée avec les lots v612, v613, v614, v615 et v616 ; `main` de préparation `a8cbd3be4902467b12d951540ccf2b542abbf2c9`.
 
+## Six conservations complémentaires — 28 octobre 2026
+
+**Progression inchangée : 366/414 produits distincts renouvelés (88,4 %).** Sur les 48 non renouvelés, **41 sont conservés** sur décision documentée et **7 restent ouverts**. Ces décisions n'entraînent aucun remplacement de fichier produit.
+
+| Produit | Fichier | Blob d'origine | Justification |
+| --- | --- | --- | --- |
+| Confiture fraise | `confiture-fraise.webp` | `4db25cb72db37463a5d5c7bd48b8cdc5ddbb0f45` | pot fermé 512 × 512 avec contenu fraise et étiquette identifiable |
+| Piles AA | `piles-aa.webp` | `58a7f0ceb454464eb543db08204a5637f210cae9` | lot de piles AA 512 × 512, format et quantité immédiatement identifiables |
+| Grattoirs | `grattoirs.webp` | `721a6bf6a640358a797d0cfdd47d4eb173d16c39` | grattoir de surface avec lame métallique et poignée bleue |
+| Thé noir | `the-noir.webp` | `75da2cbd601a38692a3a72e55a77d6e706d61217` | bocal contenant des feuilles de thé noir, fermé et reconnaissable |
+| Poisson pané | `poisson-pane.webp` | `e6dbda4b697e112e183da567198c04c17c72fe67` | deux bâtonnets de poisson pané, sans accessoire ni autre aliment |
+| Saucisses | `saucisses.webp` | `3998023794b44915abe3370a63072ce6c2f2ea52` | trois saucisses crues ; une source de saucisses grillées serait une mauvaise variante |
+
+Les 7 restant sans décision sont **Éponges magiques, Lingettes anti-décoloration, Produit inox, Sel lave-vaisselle, Vinaigre ménager, Thé Earl Grey et Thé fruits rouges**. Les sources externes proposées pour une partie des 13 produits ouverts ont été rejetées lorsqu'elles montraient un fond blanc opaque ou une variante trompeuse ; une génération illustrant faussement un état de publication GitHub a été écartée. Aucune image provenant de cette génération n'a été intégrée.
+
+**Limite de qualité documentée :** certains fichiers conservés ont seulement 84 × 84 px, malgré une identification correcte sur les vignettes mobiles. Ce classement signifie « ne pas remplacer en l'absence d'un candidat visuellement meilleur » et non « image haute définition neuve ». Si le cahier des charges impose une netteté native à 192 px pour chaque produit, ces anciens fichiers nécessiteront une régénération future de meilleure qualité. Aucune modification des 414 images ni de la logique applicative ; aucun appel à l'API OpenAI payante du projet.
+
 ## Lot v629 — six WebP unitaires (publication conditionnelle)
 
 Six références auparavant non renouvelées passent en remplacement conditionnel : **Sacs congélation, Prosecco, Vin rosé, Démaquillant, Protections hygiéniques et Bière blanche**. Candidats originaux générés via ChatGPT sans API du projet, PNG RGBA 1 produit autonome par visuel, traités en WebP RGBA **384 × 384 px**, avec véritables marges alpha. Contrôle sur **fonds blanc et sauge à 192 px**, comparaison de leurs variantes avec les anciens WebP GitHub. Aucune planche recadrée, aucune image déjà renouvelée ou déjà conservée réouverte ; crédits/détails : `docs/IMAGE_CREDITS_V629.md`.
@@ -34,7 +51,7 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 4. Ne jamais compter un produit deux fois. Un remplacement d'un WebP antérieurement renouvelé peut modifier sa qualité, **pas** le décompte des produits distincts.
 5. Un candidat n'est pas un produit publié. Les tests, licences, crédits, caches/versions, SHA Git, CI et Pages doivent être confirmés avant de modifier un statut. Ne jamais découper une planche ni utiliser l'API OpenAI payante du projet.
 
-## Références encore non renouvelées après v629 (48, publication conditionnelle)
+## Références encore non renouvelées après v629 (48, v629 publiée)
 
 | Catégorie | Produit | WebP | Décision opérationnelle |
 | --- | --- | --- | --- |
@@ -42,7 +59,7 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Boissons | Rhum | `rhum.webp` | `CONSERVER` |
 | Boissons | Ricard | `ricard.webp` | `CONSERVER` |
 | Boulangerie | Pâte brisée | `pate-brisee.webp` | `CONSERVER` |
-| Cuisine | Confiture fraise | `confiture-fraise.webp` | `ATTENDRE_CANDIDAT` |
+| Cuisine | Confiture fraise | `confiture-fraise.webp` | `CONSERVER` |
 | Cuisine | Noix de coco râpée | `noix-de-coco-rapee.webp` | `CONSERVER` |
 | Cuisine | Petits pois carottes | `petits-pois-carottes.webp` | `CONSERVER` |
 | Enfant | Compotes bébé | `compotes-bebe.webp` | `CONSERVER` |
@@ -59,13 +76,13 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Maison | Désinfectant | `desinfectant.webp` | `CONSERVER` |
 | Maison | Éponges magiques | `eponges-magiques.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Essuie-verres | `essuie-verres.webp` | `CONSERVER` |
-| Maison | Grattoirs | `grattoirs.webp` | `ATTENDRE_CANDIDAT` |
+| Maison | Grattoirs | `grattoirs.webp` | `CONSERVER` |
 | Maison | Lave glace | `lave-glace.webp` | `CONSERVER` |
 | Maison | Lingettes anti-décoloration | `lingettes-anti-decoloration.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Lingettes ménage | `lingettes-menage.webp` | `CONSERVER` |
 | Maison | Mouchoirs | `mouchoirs.webp` | `CONSERVER` |
 | Maison | Papier cadeau | `papier-cadeau.webp` | `CONSERVER` |
-| Maison | Piles AA | `piles-aa.webp` | `ATTENDRE_CANDIDAT` |
+| Maison | Piles AA | `piles-aa.webp` | `CONSERVER` |
 | Maison | Pinces à linge | `pinces-a-linge.webp` | `CONSERVER` |
 | Maison | Produit inox | `produit-inox.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Sacs linge délicat | `sacs-linge-delicat.webp` | `CONSERVER` |
@@ -81,11 +98,11 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Petit-déjeuner | Sirot d’érable | `sirot-d-erable.webp` | `CONSERVER` |
 | Petit-déjeuner | Thé Earl Grey | `the-earl-grey.webp` | `ATTENDRE_CANDIDAT` |
 | Petit-déjeuner | Thé fruits rouges | `the-fruits-rouges.webp` | `ATTENDRE_CANDIDAT` |
-| Petit-déjeuner | Thé noir | `the-noir.webp` | `ATTENDRE_CANDIDAT` |
+| Petit-déjeuner | Thé noir | `the-noir.webp` | `CONSERVER` |
 | Viandes & poissons | Pâté | `pate.webp` | `CONSERVER` |
 | Viandes & poissons | Peperroni | `peperroni.webp` | `CONSERVER` |
-| Viandes & poissons | Poisson pané | `poisson-pane.webp` | `ATTENDRE_CANDIDAT` |
-| Viandes & poissons | Saucisses | `saucisses.webp` | `ATTENDRE_CANDIDAT` |
+| Viandes & poissons | Poisson pané | `poisson-pane.webp` | `CONSERVER` |
+| Viandes & poissons | Saucisses | `saucisses.webp` | `CONSERVER` |
 
 ## Provenance et limites
 

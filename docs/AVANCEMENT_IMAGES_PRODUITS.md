@@ -8,6 +8,10 @@
 
 **File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
 
+## Six produits supplémentaires conservés — état à jour au 28 octobre 2026
+
+**366/414 visuels distincts renouvelés (88,4 %), 48 non renouvelés, dont 41 conservations documentées et 7 références sans candidat conforme.** Les 6 nouvelles conservations — Confiture fraise, Piles AA, Grattoirs, Thé noir, Poisson pané, Saucisses — n'ont pas modifié leurs anciens WebP ; voir `docs/REPRISE_IMAGES_PRODUITS_20261028.md` pour les blobs vérifiés. Certaines anciennes vignettes sont encore à 84 px et ne sont pas présentées comme des remplacements haute définition. Ce complément est **uniquement documentaire** : aucune image, fonction, version/cache ou API payante modifiée.
+
 ## Lot v629 — six visuels produits unitaires contrôlés (publication conditionnelle)
 
 **Base :** `4c90dc80fd4fe3a1e6e2c9525a290f29e50cabb0` (v628), aucun des six slugs concernés n'a été renouvelé dans les 360 références précédemment publiées. **6 nouveaux WebP** : Sacs congélation (boîte contenant un sachet zip), Prosecco (bouteille fermée pétillante), Vin rosé (bouteille rosée fermée), Démaquillant (flacon liquide fermé), Protections hygiéniques (paquet scellé), Bière blanche (bouteille capsulée de bière de blé). Générations ChatGPT natives, détourages PNG RGBA traités individuellement, WebP alpha **384 × 384 px**, cadrage 90 %, vérification à **192 px blanc/sauge** et confrontation aux anciens conditionnements. Pas de source externe payante, de collage ni d'élément marque fictive.
