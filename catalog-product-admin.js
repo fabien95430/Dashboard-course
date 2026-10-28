@@ -28,15 +28,19 @@ function randomId(){
   }
   return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 }
+const collator=new Intl.Collator('fr',{sensitivity:'base'});
+let productRows=null,productRowsSource=null;
 function products(){
   const groups=window.COURSES_CATALOG?.groups||{};
+  if(productRows&&productRowsSource===groups)return productRows;
   const rows=[];
   Object.entries(groups).forEach(([category,subgroups])=>{
     Object.entries(subgroups||{}).forEach(([subgroup,names])=>{
       (Array.isArray(names)?names:[]).forEach(name=>rows.push({name:String(name),category,subgroup}));
     });
   });
-  return rows.sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
+  productRows=rows.sort((a,b)=>collator.compare(a.name,b.name));productRowsSource=groups;
+  return productRows;
 }
 function decodeJs(value){return String(value||'').replace(/\\'/g,"'").replace(/\\"/g,'"').replace(/\\\\/g,'\\')}
 function quotedValues(value){return [...String(value||'').matchAll(/'((?:\\.|[^'])*)'/g)].map(match=>decodeJs(match[1]))}
@@ -54,7 +58,7 @@ async function dishes(){
       const ingredients=quotedValues(match[3]);
       rows.push({name:decodeJs(match[1]),category:tags[0]||'Plat',subgroup:ingredients.length+' ingrédient'+(ingredients.length>1?'s':'')});
     }
-    dishRows=rows.sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
+    dishRows=rows.sort((a,b)=>collator.compare(a.name,b.name));
     return dishRows;
   }).finally(()=>{dishRowsPromise=null});
   return dishRowsPromise;
@@ -78,7 +82,8 @@ function setPending(type,name,state){
   if(state)pending[key]=state;else delete pending[key];
   try{localStorage.setItem(PENDING_KEY,JSON.stringify(pending))}catch(_){}
 }
-function pendingFor(type,name){return readPending()[pendingKey(type,name)]||null}
+let pendingSnapshot=null;
+function pendingFor(type,name){return (pendingSnapshot||readPending())[pendingKey(type,name)]||null}
 
 function sharedHaClient(){
   const client=window.COURSES_HA_CLIENT;
@@ -140,7 +145,7 @@ function installStyle(){
   const style=document.createElement('style');
   style.id='courses-product-admin-style';
   style.textContent=`
-    .catalog-remove-panel{display:grid;gap:0;padding-bottom:6px}
+    .catalog-remove-panel{display:grid;align-content:start;gap:0;padding-bottom:6px}
     .catalog-remove-panel[hidden]{display:none!important}
     .courses-product-admin-title{display:flex;justify-content:space-between;align-items:baseline;margin:2px 2px 7px;color:#4c6152;font-size:var(--fs-label);font-weight:600}
     .courses-product-admin-title span{font-weight:400;font-variant-numeric:tabular-nums}
@@ -163,12 +168,14 @@ function installStyle(){
     .courses-product-admin-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
     .is-open>.courses-product-admin-group-head .courses-product-admin-caret,.is-open>.courses-product-admin-row .courses-product-admin-caret{transform:rotate(-90deg)}
     .courses-product-admin-item.is-open{background:rgba(237,247,234,.55)}
-    .courses-product-admin-pending{padding:3px 9px;border-radius:999px;background:rgba(255,149,0,.12);color:#9a5d00;font-size:var(--fs-note);white-space:nowrap}
+    .courses-product-admin-pending{padding:4px 11px;border-radius:999px;background:rgba(255,149,0,.2);color:#7a4700;font-size:var(--fs-note);font-weight:600;white-space:nowrap;flex:none}
     .courses-product-admin-tools{display:grid;gap:8px;padding:0 14px 12px 16px}
+    .courses-product-admin-tools:has(.courses-product-admin-delete){padding-bottom:0}
     .courses-product-admin-group-body .courses-product-admin-tools{padding-left:28px}
     .courses-product-admin-tools.is-confirm{grid-template-columns:1fr 1fr}
     .courses-product-admin-tools p{grid-column:1/-1;margin:0;color:#6c4a45;font-size:14px;line-height:1.4}
     .courses-product-admin-tools button{min-height:42px;padding:0 12px;border:1px solid rgba(178,58,48,.2);border-radius:13px;background:rgba(255,255,255,.78);color:#b23a30;font:inherit;font-size:var(--fs-text);-webkit-appearance:none;appearance:none}
+    .courses-product-admin-tools .courses-product-admin-delete{min-height:44px;padding:0;border:0;border-top:1px solid rgba(39,66,47,.09);border-radius:0;background:transparent;text-align:left}
     .courses-product-admin-tools .courses-product-admin-cancel{border-color:rgba(47,106,73,.18);color:#1f5a3b}
     .courses-product-admin-tools .courses-product-admin-confirm-delete{border-color:transparent;background:#b8433a;color:#fff}
     .courses-product-admin-tools button:disabled{opacity:.45}
@@ -206,10 +213,14 @@ function itemMarkup(item,itemType){
     else tools=confirmMarkup(item,itemType)||'<div class="courses-product-admin-tools"><button class="courses-product-admin-delete" type="button" data-delete-item="'+esc(item.name)+'" data-item-type="'+itemType+'">Retirer du catalogue</button></div>';
   }
   return '<div class="courses-product-admin-item'+(open?' is-open':'')+'" data-item="'+esc(item.name)+'"><button class="courses-product-admin-row" type="button" data-admin-item="'+esc(key)+'" aria-expanded="'+open+'"'+(pending?' disabled':'')+'><span class="courses-product-admin-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(item.subgroup)+'</small></span>'+
-    (pending?'<span class="courses-product-admin-pending">Retrait…</span>':'<span></span>')+'<svg class="courses-product-admin-caret" aria-hidden="true"><use href="#i-chevron"></use></svg></button>'+tools+'</div>';
+    (pending?'<span class="courses-product-admin-pending">Retrait en cours</span>':'<span></span>')+'<svg class="courses-product-admin-caret" aria-hidden="true"><use href="#i-chevron"></use></svg></button>'+tools+'</div>';
 }
-function renderRows(rows,itemType){
+function renderRows(rows,itemType,listOnly=false){
   const {panel}=panelElements();if(!panel)return;
+  pendingSnapshot=readPending();
+  try{renderRowsNow(panel,rows,itemType,listOnly)}finally{pendingSnapshot=null}
+}
+function renderRowsNow(panel,rows,itemType,listOnly){
   const label=itemType==='dish'?'plat':'produit';
   const query=norm(currentQuery);
   let list='';
@@ -225,17 +236,19 @@ function renderRows(rows,itemType){
         (open?'<div class="courses-product-admin-group-body">'+items.map(item=>itemMarkup(item,itemType)).join('')+'</div>':'')+'</div>';
     }).join('');
   }
+  const listEl=panel.querySelector('.courses-product-admin-list');
+  if(listOnly&&listEl){listEl.innerHTML=list;return}
   const keepFocus=document.activeElement?.matches?.('[data-product-admin-search]');
   panel.innerHTML='<div class="courses-product-admin-title">Dans le catalogue<span>'+rows.length+'</span></div>'+
     '<label class="courses-product-admin-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><input type="search" value="'+esc(currentQuery)+'" placeholder="Rechercher un '+label+'" aria-label="Rechercher un '+label+'" autocomplete="off" enterkeyhint="search" data-product-admin-search></label>'+
     '<div class="courses-product-admin-list">'+list+'</div><div class="courses-product-admin-feedback" role="status" aria-live="polite"></div>';
   if(keepFocus){const input=panel.querySelector('[data-product-admin-search]');input?.focus({preventScroll:true});try{input?.setSelectionRange(input.value.length,input.value.length)}catch(_){}}
 }
-async function render(){
+async function render(listOnly=false){
   const {panel}=panelElements();if(!panel)return;
-  if(currentMode==='products'){renderRows(products(),'product');return}
+  if(currentMode==='products'){renderRows(products(),'product',listOnly);return}
   if(!dishRows)panel.innerHTML='<div class="courses-product-admin-feedback">Chargement des plats…</div>';
-  try{renderRows(await dishes(),'dish')}catch(error){panel.innerHTML='<p class="courses-product-admin-empty">'+esc(error?.message||'Impossible de charger les plats.')+'</p>'}
+  try{renderRows(await dishes(),'dish',listOnly)}catch(error){panel.innerHTML='<p class="courses-product-admin-empty">'+esc(error?.message||'Impossible de charger les plats.')+'</p>'}
 }
 function feedback(message,type=''){
   const el=document.querySelector('#catalogRemovePanel .courses-product-admin-feedback');if(!el)return;
@@ -265,7 +278,7 @@ async function confirmDeletion(itemType,name,button){
   try{
     await requestDeletion(itemType,name);
     currentConfirm='';openItem='';await render();
-    feedback('Retrait demandé. GitHub applique la modification en arrière-plan.','ok');
+    feedback('','ok');
   }catch(error){
     button.disabled=false;feedback(String(error?.message||'Suppression impossible.'),'error');
     window.CoursesErrors?.report?.({key:'catalog-delete:'+itemType+':'+norm(name),severity:'error',source:'Catalogue',title:'Suppression de « '+name+' » impossible',message:String(error?.message||'La demande n’a pas pu être envoyée.')});
@@ -314,7 +327,7 @@ function bindUi(){
   uiBound=true;installStyle();
   panel.addEventListener('input',event=>{
     if(event.target.matches('[data-product-admin-search]')){
-      currentQuery=event.target.value;currentConfirm='';openItem='';blockedItem=null;void render();
+      currentQuery=event.target.value;currentConfirm='';openItem='';blockedItem=null;void render(true);
     }
   });
   panel.addEventListener('click',event=>{
