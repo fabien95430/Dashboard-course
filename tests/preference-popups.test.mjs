@@ -333,7 +333,7 @@ test('v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, rec
   const open=dishes.slice(dishes.indexOf('function openRecipeCustomization()'),dishes.indexOf('function saveRecipeCustomization()'));
   assert.match(open,/loadRecipeCustomizationDish\(''\);/);
   assert.doesNotMatch(open,/DISHES\[0\]/);
-  assert.match(dishes,/function setRecipeCustomizationStep\(dish\)\{[\s\S]*?dataset\.step=dish\?'edit':'choose'/);
+  assert.match(dishes,/function setRecipeCustomizationStep\(dish,keepCategory\)\{[\s\S]*?dataset\.step=dish\?'edit':'choose'/);
   assert.match(dishes,/recipeCustomizationPicker\.addEventListener\('click',[\s\S]*?selectRecipeCustomizationDish\(/);
   assert.match(dishes,/\[data-step="choose"\] :is\(\.recipe-customization-list,\.recipe-customization-status,\.recipe-customization-add,\.dialog-actions\)\{display:none!important\}/);
 });
@@ -371,10 +371,10 @@ test('v621 : recettes par catégories repliables avec flèche retour, et rafraî
   const dishes=read('dishes-ui.js'),app=read('app.js'),css=read('styles.css'),html=read('index.html');
   assert.doesNotMatch(dishes,/recipe-dish-current|recipeCustomizationCurrent/);
   assert.match(dishes,/data-recipe-category="'\+escapeHtml\(category\)\+'"/);
-  assert.match(dishes,/recipeCustomizationOpenCategory=recipeCustomizationOpenCategory===next\?'':next;/);
+  assert.match(dishes,/recipeCustomizationOpenCategory=next;\s*setRecipeCustomizationStep\(null,true\);/);
   assert.match(dishes,/recipeCustomizationBack\.className='settings-sheet-back';/);
-  assert.match(dishes,/recipeCustomizationBack\.addEventListener\('click',\(\)=>loadRecipeCustomizationDish\(''\)\)/);
-  assert.match(dishes,/label\.textContent=dish\?\.name\|\|'Personnalisation des recettes';/);
+  assert.match(dishes,/recipeCustomizationBack\.addEventListener\('click',\(\)=>\{[\s\S]*?loadRecipeCustomizationDish\('',true\)/);
+  assert.match(dishes,/label\.textContent=dish\?\.name\|\|\(inCategory\?recipeCustomizationOpenCategory:'Personnalisation des recettes'\);/);
   assert.match(dishes,/\.recipe-cat-head span\{[^}]*font-weight:600/);
   assert.match(html,/<p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience<\/p>/);
   assert.match(html,/class="refresh-done"[^>]*><use href="#i-check">/);

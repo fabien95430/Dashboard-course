@@ -4115,3 +4115,7 @@ body{
   letter-spacing:.8px!important;
   box-shadow:0 0 0 2px #fffdf8,0 0 0 3px rgba(185,154,88,.8),0 12px 22px rgba(40,60,48,.22)!important;
 }
+
+/* ===== UI v636 — la tuile ne bouge pas à l'ouverture du clavier ===== */
+.security-shell.is-password-open .security-modal{top:var(--security-pin-modal,36%)!important}
+.security-shell.is-password-open .security-hero{top:var(--security-pin-hero,4.1%)!important}

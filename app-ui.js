@@ -276,12 +276,21 @@ function syncSecurityKeyboardState(){
   if(!securityKeyboardBaseline)securityKeyboardBaseline=current;
   shell.classList.toggle('is-password-open',securityKeyboardBaseline-current>120);
 }
+function pinSecurityLayout(){
+  const shell=document.querySelector('.security-shell');
+  const modal=shell?.querySelector('.security-modal');
+  const hero=shell?.querySelector('.security-hero');
+  if(!shell||!modal||shell.classList.contains('is-password-open'))return;
+  shell.style.setProperty('--security-pin-modal',modal.offsetTop+'px');
+  if(hero)shell.style.setProperty('--security-pin-hero',hero.offsetTop+'px');
+}
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;
   document.documentElement.dataset.securityKeyboardViewport='1';
   document.addEventListener('focus',event=>{
     if(!isSecurityPasswordField(event.target))return;
     securityKeyboardBaseline=securityViewportHeight();
+    pinSecurityLayout();
     Promise.resolve().then(syncSecurityKeyboardState);
   },true);
   document.addEventListener('blur',event=>{

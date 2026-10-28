@@ -385,20 +385,20 @@ function buildRecipeCustomizationDialog(){
       .recipe-customization-dialog{max-height:calc(100dvh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom)));overflow:hidden}
       .recipe-customization-dialog[open]{display:flex;flex-direction:column}
       .recipe-customization-dialog>h3,.recipe-customization-dialog>.dialog-intro{flex-shrink:0}
-      .recipe-dish-picker{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+      .recipe-dish-picker{flex:1 1 auto;min-height:0;overflow-y:auto;padding-top:2px!important;padding-bottom:14px!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
       .recipe-dish-picker[hidden]{display:none}
-      .recipe-cat-card{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);overflow:hidden}
+      .recipe-cat-card{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:none!important;overflow:hidden;margin:0 1px}
       .recipe-cat+.recipe-cat{border-top:1px solid rgba(39,66,47,.09)}
       .recipe-cat-head,.recipe-dish-row{width:100%;display:grid;align-items:center;gap:10px;border:0;background:transparent;color:#1b2d21;font:inherit;text-align:left;-webkit-appearance:none;appearance:none}
       .recipe-cat-head{min-height:56px;grid-template-columns:minmax(0,1fr) auto 18px;padding:0 14px 0 16px}
       .recipe-cat-head span{font-size:16.5px;font-weight:600;color:#263f30}
       .recipe-cat-head small{color:#617366;font-size:13px;font-variant-numeric:tabular-nums}
       .recipe-cat.is-open>.recipe-cat-head{background:rgba(221,237,216,.8)}
-      .recipe-cat-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
+      .recipe-cat-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
       .recipe-cat.is-open .recipe-cat-caret{transform:rotate(-90deg)}
-      .recipe-cat-body{position:relative;padding:4px 0 6px;border-top:1px solid rgba(39,66,47,.09);background:rgba(240,245,238,.85)}
-      .recipe-cat-body::before{content:"";position:absolute;left:22px;top:12px;bottom:14px;width:2px;border-radius:1px;background:rgba(47,106,73,.22)}
-      .recipe-dish-row{min-height:46px;grid-template-columns:minmax(0,1fr) auto 15px;padding:0 14px 0 38px}
+      .recipe-cat-body{position:relative;padding:0;background:transparent}
+      .recipe-cat-body::before{display:none}
+      .recipe-dish-row{min-height:52px;grid-template-columns:minmax(0,1fr) auto 15px;padding:0 14px 0 16px}
       .recipe-dish-row+.recipe-dish-row{border-top:1px solid rgba(39,66,47,.06)}
       .recipe-dish-row:active{background:rgba(51,106,66,.07)}
       .recipe-dish-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;color:#2c4334}
@@ -496,15 +496,17 @@ function buildRecipeCustomizationDialog(){
     const category=event.target.closest('[data-recipe-category]');
     if(category){
       const next=category.dataset.recipeCategory||'';
-      recipeCustomizationOpenCategory=recipeCustomizationOpenCategory===next?'':next;
-      renderRecipeCustomizationPicker();
-      if(recipeCustomizationOpenCategory)recipeCustomizationPicker.querySelector('.recipe-cat.is-open')?.scrollIntoView({block:'nearest'});
+      recipeCustomizationOpenCategory=next;
+      setRecipeCustomizationStep(null,true);
       return;
     }
     const button=event.target.closest('[data-recipe-dish]');
     if(button)selectRecipeCustomizationDish(button.dataset.recipeDish||'');
   });
-  recipeCustomizationBack.addEventListener('click',()=>loadRecipeCustomizationDish(''));
+  recipeCustomizationBack.addEventListener('click',()=>{
+    if(!recipeCustomizationDish&&recipeCustomizationOpenCategory){recipeCustomizationOpenCategory='';setRecipeCustomizationStep(null,true);return}
+    loadRecipeCustomizationDish('',true);
+  });
   recipeCustomizationSearch.addEventListener('input',renderRecipeCustomizationDishOptions);
   recipeCustomizationSearch.addEventListener('focus',renderRecipeCustomizationDishOptions);
   recipeCustomizationSearch.addEventListener('keydown',event=>{if(event.key==='Escape')hideRecipeCustomizationSuggestions()});
@@ -553,30 +555,36 @@ function renderRecipeCustomizationPicker(){
   const groups=new Map();
   DISHES.forEach(dish=>{const category=dish.tags?.[0]||'Autres';if(!groups.has(category))groups.set(category,[]);groups.get(category).push(dish)});
   const chevron='<svg class="chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>';
-  recipeCustomizationPicker.innerHTML='<div class="recipe-cat-card">'+[...groups.entries()].map(([category,dishes])=>{
-    const open=recipeCustomizationOpenCategory===category;
-    return '<div class="recipe-cat'+(open?' is-open':'')+'"><button type="button" class="recipe-cat-head" data-recipe-category="'+escapeHtml(category)+'" aria-expanded="'+open+'"><span>'+escapeHtml(category)+'</span><small>'+dishes.length+' plat'+(dishes.length>1?'s':'')+'</small><svg class="recipe-cat-caret" aria-hidden="true"><use href="#i-chevron"></use></svg></button>'+
-      (open?'<div class="recipe-cat-body">'+dishes.map(dish=>
-        '<button type="button" class="recipe-dish-row" data-recipe-dish="'+escapeHtml(dish.name)+'"><span>'+escapeHtml(dish.name)+'</span><small>'+dish.ingredients.length+' ingrédient'+(dish.ingredients.length>1?'s':'')+'</small>'+chevron+'</button>'
-      ).join('')+'</div>':'')+'</div>';
-  }).join('')+'</div>';
+  const current=groups.has(recipeCustomizationOpenCategory)?recipeCustomizationOpenCategory:'';
+  if(current){
+    recipeCustomizationPicker.innerHTML='<div class="recipe-cat-card"><div class="recipe-cat-body">'+groups.get(current).map(dish=>
+      '<button type="button" class="recipe-dish-row" data-recipe-dish="'+escapeHtml(dish.name)+'"><span>'+escapeHtml(dish.name)+'</span><small>'+dish.ingredients.length+' ingrédient'+(dish.ingredients.length>1?'s':'')+'</small>'+chevron+'</button>'
+    ).join('')+'</div></div>';
+    return;
+  }
+  recipeCustomizationOpenCategory='';
+  recipeCustomizationPicker.innerHTML='<div class="recipe-cat-card">'+[...groups.entries()].map(([category,dishes])=>
+    '<div class="recipe-cat"><button type="button" class="recipe-cat-head" data-recipe-category="'+escapeHtml(category)+'"><span>'+escapeHtml(category)+'</span><small>'+dishes.length+' plat'+(dishes.length>1?'s':'')+'</small>'+chevron.replace('class="chevron"','class="chevron recipe-cat-caret"')+'</button></div>'
+  ).join('')+'</div>';
 }
-function setRecipeCustomizationStep(dish){
+function setRecipeCustomizationStep(dish,keepCategory){
   if(!recipeCustomizationDialog)return;
   recipeCustomizationDialog.dataset.step=dish?'edit':'choose';
-  if(!dish){recipeCustomizationOpenCategory='';renderRecipeCustomizationPicker()}
+  if(!dish&&!keepCategory)recipeCustomizationOpenCategory='';
+  if(!dish)renderRecipeCustomizationPicker();
   if(recipeCustomizationPicker){recipeCustomizationPicker.hidden=Boolean(dish);if(!dish)recipeCustomizationPicker.scrollTop=0}
-  if(recipeCustomizationBack)recipeCustomizationBack.hidden=!dish;
+  const inCategory=!dish&&Boolean(recipeCustomizationOpenCategory);
+  if(recipeCustomizationBack)recipeCustomizationBack.hidden=!dish&&!inCategory;
   const title=recipeCustomizationDialog.querySelector('h3');
-  title?.classList.toggle('has-back',Boolean(dish));
+  title?.classList.toggle('has-back',Boolean(dish)||inCategory);
   const label=title?.querySelector('.settings-sheet-title');
-  if(label)label.textContent=dish?.name||'Personnalisation des recettes';
+  if(label)label.textContent=dish?.name||(inCategory?recipeCustomizationOpenCategory:'Personnalisation des recettes');
 }
-function loadRecipeCustomizationDish(name){
+function loadRecipeCustomizationDish(name,keepCategory){
   const dish=DISHES.find(item=>item.name===name)||null;
   recipeCustomizationDish=dish;
   recipeCustomizationNeeds={};
-  setRecipeCustomizationStep(dish);
+  setRecipeCustomizationStep(dish,keepCategory);
   if(!dish){
     recipeCustomizationSelection.clear();
     hideRecipeCustomizationIngredientPicker();
