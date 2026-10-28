@@ -4,21 +4,27 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
 const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
-const start=app.indexOf('async function checkForUpdateBeforeUnlock(){');
-const end=app.indexOf('async function refreshFromHeader(',start);
+const start=app.indexOf('const UNLOCK_UPDATE_TIMEOUT_MS=');
+const end=app.indexOf("/* Mise à jour depuis l'en-tête",start);
 assert.ok(start>0&&end>start,'Contrôle de mise à jour au déverrouillage introuvable');
 const checkSource=app.slice(start,end);
 
-function harness({online=true,available=false,shouldFail=false}={}){
+function harness({online=true,available=false,shouldFail=false,hang=false,version=620,storage=new Map()}={}){
   const calls=[];
   const button={disabled:false};
+  const timers=[];
   const context={
     navigator:{onLine:online},
     UI:{securitySubmit:button},
     state:{securityMode:'unlock'},
+    currentAppVersion:()=>version,
+    sessionStorage:{getItem:key=>storage.has(key)?storage.get(key):null,setItem:(key,value)=>storage.set(key,String(value))},
+    setTimeout:(fn)=>{timers.push(fn);return timers.length},
+    clearTimeout:()=>{},
     installLatestAppVersion:async()=>{
       calls.push('check');
       if(shouldFail)throw new Error('réseau indisponible');
+      if(hang)return new Promise(()=>{});
       return available;
     },
     location:{reload:()=>calls.push('reload')},
@@ -28,7 +34,7 @@ function harness({online=true,available=false,shouldFail=false}={}){
     'let unlockVersionChecked=false;let unlockVersionCheckPromise=null;'+checkSource+';checkForUpdateBeforeUnlock',
     context
   );
-  return {check,calls,button};
+  return {check,calls,button,timers,storage};
 }
 
 test('un déverrouillage commence par une vérification de version avant la récupération des jetons',()=>{
@@ -103,4 +109,28 @@ test('sans page à jour disponible, aucun rechargement inutile n est demandé',a
   const {ensure,cache,calls}=shellHarness({cachedVersion:619,networkVersion:619});
   assert.equal(await ensure(cache,620),false);
   assert.deepEqual(calls,['fetch']);
+});
+
+test('un contrôle de version qui ne répond pas ne bloque plus le bouton Connexion',async()=>{
+  const {check,calls,button,timers}=harness({hang:true});
+  const pending=check();
+  assert.equal(button.disabled,true);
+  await Promise.resolve();
+  timers.forEach(fn=>fn());
+  assert.equal(await pending,false);
+  assert.equal(button.disabled,false);
+  assert.equal(calls.includes('reload'),false);
+});
+
+test('après un rechargement de mise à jour resté sur la même version, pas de boucle de rechargement',async()=>{
+  const storage=new Map();
+  const first=harness({available:true,storage});
+  assert.equal(await first.check(),true);
+  const second=harness({available:true,storage});
+  assert.equal(await second.check(),false);
+  assert.deepEqual(second.calls,[]);
+  assert.equal(second.button.disabled,false);
+  const updated=harness({available:false,version:621,storage});
+  assert.equal(await updated.check(),false);
+  assert.deepEqual(updated.calls,['check']);
 });

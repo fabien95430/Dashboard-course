@@ -2960,25 +2960,41 @@ async function installLatestAppVersion(){
     return await ensureCachedShellVersion(await caches.open(cacheName),latest);
   }catch(_){return false}
 }
+// Le contrôle de version au déverrouillage ne doit jamais bloquer la connexion :
+// durée bornée, et un seul rechargement par version (sinon une page encore périmée
+// rechargeait en boucle avec le bouton Connexion désactivé).
+const UNLOCK_UPDATE_TIMEOUT_MS=8000;
+const UNLOCK_UPDATE_RELOAD_KEY='courses-unlock-update-reloaded-from';
+function unlockUpdateAlreadyTried(version){
+  try{return sessionStorage.getItem(UNLOCK_UPDATE_RELOAD_KEY)===String(version)}catch(_){return false}
+}
+function rememberUnlockUpdateReload(version){
+  try{sessionStorage.setItem(UNLOCK_UPDATE_RELOAD_KEY,String(version))}catch(_){}
+}
 async function checkForUpdateBeforeUnlock(){
   if(unlockVersionCheckPromise)return unlockVersionCheckPromise;
   if(unlockVersionChecked||navigator.onLine===false)return false;
   unlockVersionChecked=true;
+  const fromVersion=currentAppVersion();
+  if(unlockUpdateAlreadyTried(fromVersion))return false;
   UI.securitySubmit.disabled=true;
-  let reloading=false;
-  const check=(async()=>{
-    try{
-      if(await installLatestAppVersion()){
-        reloading=true;
-        location.reload();
-        return true;
-      }
-    }catch(error){
-      reloading=false;
+  let reloading=false,timer=null;
+  const install=(async()=>{
+    try{return await installLatestAppVersion()}
+    catch(error){
       console.warn('courses-app: mise à jour automatique',error);
+      return false;
     }
-    return false;
   })();
+  const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve(false),UNLOCK_UPDATE_TIMEOUT_MS)});
+  const check=Promise.race([install,timeout]).then(ready=>{
+    clearTimeout(timer);
+    if(!ready)return false;
+    reloading=true;
+    rememberUnlockUpdateReload(fromVersion);
+    location.reload();
+    return true;
+  });
   unlockVersionCheckPromise=check;
   try{return await check}
   finally{
