@@ -982,6 +982,7 @@ function renderDishSheetIngredients(){
 async function confirmDishAdd(){
   if(!currentDish||busyDish||dishConfirmButton.disabled)return;
   const dish=currentDish;
+  window.CoursesHaptics?.vibrate([12,35,12]);
   const operation=window.COURSES_QUANTITIES.addSelected();
   closeDishSheet();
   busyDish=dish.name;
@@ -994,7 +995,6 @@ async function confirmDishAdd(){
   }finally{
     busyDish='';
   }
-  window.CoursesHaptics?.vibrate(result.added?[12,35,12]:10);
   if(result.failed){showToast('Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
   if(!result.added){showToast('Les quantités nécessaires sont déjà dans Ma liste');return}
   showToast(dish.name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':''));

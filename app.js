@@ -2017,6 +2017,7 @@ async function decrementProduct(name,{deferRefresh=false}={}){
 async function addItem(name,{deferRefresh=false}={}){
   const item=String(name||'').trim();
   if(!item)return;
+  window.CoursesHaptics?.play('add');
   if(state.demo){
     const items=loadJson(DEMO_KEY,[])||[];
     items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});

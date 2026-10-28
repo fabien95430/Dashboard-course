@@ -392,12 +392,13 @@ else bind();
   };
   const PULSE_GAP_MS=70;
   let label=null;
+  let lastAt=0;
 
   function ensureSwitch(){
     if(label||!document.body)return;
     label=document.createElement('label');
     label.setAttribute('aria-hidden','true');
-    label.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden';
+    label.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;opacity:.01;pointer-events:none;overflow:hidden';
     const input=document.createElement('input');
     input.type='checkbox';
     input.setAttribute('switch','');
@@ -409,18 +410,22 @@ else bind();
     ensureSwitch();
     if(label)label.click();
   }
-  function run(pattern){
+  function run(pattern,force){
+    // Un même geste ne joue qu'un retour (le message de confirmation qui suit ne doit pas le doubler).
+    const now=Date.now();
+    if(!force&&now-lastAt<450)return true;
+    lastAt=now;
     try{
       if(typeof navigator.vibrate==='function'){navigator.vibrate(pattern);return true}
       let at=0;
       pattern.forEach((ms,index)=>{
-        if(index%2===0)setTimeout(pulse,at);
+        if(index%2===0){if(at===0)pulse();else setTimeout(pulse,at)}
         at+=Math.max(ms,PULSE_GAP_MS/2);
       });
       return true;
     }catch(_){return false}
   }
-  function play(kind){return run(PATTERNS[kind]||PATTERNS.success)}
+  function play(kind){return run(PATTERNS[kind]||PATTERNS.success,kind==='error')}
   // Séquence libre (nombre ou tableau en millisecondes), pour les gestes déjà réglés finement.
   function vibrate(pattern){
     return run(Array.isArray(pattern)?pattern:[Math.max(1,Number(pattern)||10)]);

@@ -522,6 +522,7 @@ async function confirmWithFeedback(event){
 
   event.preventDefault();
   event.stopImmediatePropagation();
+  window.CoursesHaptics?.vibrate([10,28,10]);
 
   let settled;
   try{
@@ -548,7 +549,6 @@ async function confirmWithFeedback(event){
   }
   const result=outcome.result||{added:0,failed:1,present:0};
   publishDishAddResult(name,ingredients,result);
-  window.CoursesHaptics?.vibrate(result.added?[10,28,10]:8);
   showConfirmationToast(confirmationResultMessage(name,result));
 }
 
