@@ -2,6 +2,16 @@
 
 **Source de vérité de cette file :** historique `docs/AVANCEMENT_IMAGES_PRODUITS.md` (inventaire exhaustif v611, 84 références non renouvelées) ; comparaison ciblée avec les lots v612, v613, v614, v615 et v616 ; `main` de préparation `a8cbd3be4902467b12d951540ccf2b542abbf2c9`.
 
+## Lot v657 — clôture des 3 références ouvertes (publication conditionnelle)
+
+**Base :** `9a73c1063b6868ffa0af504f26a0fe71280d740b` (v656), 370 images renouvelées distinctes et 41 références conservées par décision documentée. Trois fichiers WebP unitaires sont remplacés : `lingettes-anti-decoloration.webp`, `the-earl-grey.webp` et `the-fruits-rouges.webp`, dans la continuité des visuels semi-réalistes et avec le conditionnement inchangé (feuilles anti-décoloration, sachets de thé pyramidaux).
+
+- Trois créations originales locales converties en WebP RGBA **256 × 256 px**, images indépendantes sans marque, sans fond, sans collage ni planche découpée.
+- Anciens visuels **84 × 84 px** conservés dans l'historique Git ; nouveau contrôle du format, des coins transparents et des vignettes **192 × 192 px sur blanc et sauge**. Les références et empreintes sont détaillées dans `docs/IMAGE_CREDITS_V657.md`.
+- Aucun produit précédemment renouvelé ou classé `CONSERVER` n'est repris. Aucune modification métier. Version/cache globale v657.
+- **Projection après publication et succès CI/Pages : 373 produits renouvelés distincts + 41 conservés = 414 / 414 références traitées, zéro en attente.** Cela ne signifie **pas** « 414 images renouvelées » : 41 anciens visuels sont volontairement maintenus.
+- Source de vérité des déploiements : SHA fusionné sur `main`, workflow de validation et workflow Pages ; ne pas assimiler la simple préparation du lot à une publication.
+
 ## Lot v655 — 2 WebP unitaires ciblés (publication conditionnelle)
 
 Deux références autrefois en attente reçoivent un candidat 256 × 256 pixels à canal alpha réel : **Éponges magiques** (un bloc de mousse mélamine blanche, sans accessoire) et **Produit inox** (flacon métallique fermé avec pulvérisateur noir, sans marque). Les deux sont des illustrations semi-réalistes originales produites localement avec SVG, CairoSVG et Pillow, puis converties en WebP transparent. Ancien WebP : 84 × 84 pixels. Miniatures à 192 px sur fonds blanc et sauge vérifiées. Aucun collage ni découpe de planche ; aucune marque ni nom fictif, aucune API OpenAI payante du projet.
@@ -66,7 +76,7 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 4. Ne jamais compter un produit deux fois. Un remplacement d'un WebP antérieurement renouvelé peut modifier sa qualité, **pas** le décompte des produits distincts.
 5. Un candidat n'est pas un produit publié. Les tests, licences, crédits, caches/versions, SHA Git, CI et Pages doivent être confirmés avant de modifier un statut. Ne jamais découper une planche ni utiliser l'API OpenAI payante du projet.
 
-## Références encore non renouvelées après lot v655 (44, publication conditionnelle)
+## Références non renouvelées conservées après v657 (41 ; aucun candidat ouvert, publication conditionnelle)
 
 | Catégorie | Produit | WebP | Décision opérationnelle |
 | --- | --- | --- | --- |
@@ -92,7 +102,6 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Maison | Essuie-verres | `essuie-verres.webp` | `CONSERVER` |
 | Maison | Grattoirs | `grattoirs.webp` | `CONSERVER` |
 | Maison | Lave glace | `lave-glace.webp` | `CONSERVER` |
-| Maison | Lingettes anti-décoloration | `lingettes-anti-decoloration.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Lingettes ménage | `lingettes-menage.webp` | `CONSERVER` |
 | Maison | Mouchoirs | `mouchoirs.webp` | `CONSERVER` |
 | Maison | Papier cadeau | `papier-cadeau.webp` | `CONSERVER` |
@@ -107,8 +116,6 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Maison | Torchons | `torchons.webp` | `CONSERVER` |
 | Petit-déjeuner | Céréales | `cereales.webp` | `CONSERVER` |
 | Petit-déjeuner | Sirot d’érable | `sirot-d-erable.webp` | `CONSERVER` |
-| Petit-déjeuner | Thé Earl Grey | `the-earl-grey.webp` | `ATTENDRE_CANDIDAT` |
-| Petit-déjeuner | Thé fruits rouges | `the-fruits-rouges.webp` | `ATTENDRE_CANDIDAT` |
 | Petit-déjeuner | Thé noir | `the-noir.webp` | `CONSERVER` |
 | Viandes & poissons | Pâté | `pate.webp` | `CONSERVER` |
 | Viandes & poissons | Peperroni | `peperroni.webp` | `CONSERVER` |
