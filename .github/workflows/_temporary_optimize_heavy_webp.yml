@@ -5,6 +5,7 @@ on:
       - agent/optimize-heavy-webp-20261029
     paths:
       - scripts/_temporary_optimize_heavy_webp.py
+      - .github/workflows/_temporary_optimize_heavy_webp.yml
 permissions:
   contents: write
 jobs:
