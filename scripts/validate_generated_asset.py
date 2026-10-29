@@ -9,6 +9,8 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 RESULT_PATH=ROOT / '.courses-dish-result.json'
+# Plafond de sécurité après encodage : les petits visuels visent 40 Ko ou moins.
+PRODUCT_IMAGE_MAX_BYTES=100*1024
 
 
 def save_failure(data: dict, message: str) -> None:
@@ -85,6 +87,8 @@ def main() -> None:
     if (width,height)!=expected:
         label='produit' if item_type=='product' else 'plat'
         save_failure(data,f'Dimensions du visuel {label} invalides: {width}×{height} (attendu {expected[0]}×{expected[1]})')
+    if item_type=='product' and len(image)>PRODUCT_IMAGE_MAX_BYTES:
+        save_failure(data,f'Visuel produit trop lourd: {len(image)} octets (maximum {PRODUCT_IMAGE_MAX_BYTES} octets). Conserver la demande et optimiser le WebP avant publication.')
 
 
 if __name__=='__main__':

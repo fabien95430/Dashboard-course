@@ -18,6 +18,8 @@ PRODUCT_PREFIX = "__courses_product__:"
 IMAGE_HINT_MARKER = "||__courses_image_hint__:"
 IMAGE_HINT_MAX = 140
 PRODUCT_IMAGE_SIZE = "816x816"
+# Compression WebP explicite pour la vignette mobile (pas une garantie de taille en octets).
+PRODUCT_IMAGE_COMPRESSION = 75
 DISPLAY_MODES=(
     "Bouteille","Pot","Poids","Barquette","Sachet","Pièce","Paquet","Boîte","Flacon",
     "Plaquette","Brique","Sac","Tablette","Tube","Rouleau","Paire","Stick","Botte","Unité",
@@ -218,6 +220,7 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
         "Représenter exactement un seul type de produit, isolé sur fond totalement transparent, centré, avec des proportions naturelles et une marge transparente régulière. "
         "Le produit principal doit occuper environ 86 à 92 % de sa plus grande dimension dans le carré et aucun bord important ne doit être coupé. "
         "Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins, petits accessoires secondaires et détails invisibles à petite taille. "
+        "Concevoir une image qui se compresse efficacement en WebP pour une vignette mobile légère : zones régulières, détails utiles uniquement, sans bruit de fond, grain ni effets artificiels. "
         "En l’absence de précision visuelle utilisateur, privilégier le produit lui-même plutôt que son emballage de vente. Si l'objet est reconnaissable sans emballage "
         "(par exemple pile, thermomètre, éponge, rasoir, fruit ou légume), le montrer hors boîte, hors blister, hors sachet et sans étiquette. "
         "N'utiliser un emballage générique que lorsqu'il est réellement indispensable pour identifier le produit, ou lorsqu’une précision visuelle utilisateur le demande; dans ce cas il doit rester simple, "
@@ -237,6 +240,7 @@ def generate_image(name: str, category: str, subgroup: str, image_hint: str, api
             "size":PRODUCT_IMAGE_SIZE,
             "quality":"high",
             "output_format":"webp",
+            "output_compression":PRODUCT_IMAGE_COMPRESSION,
             "background":"transparent",
             "n":1,
         },

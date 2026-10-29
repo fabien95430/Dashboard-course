@@ -135,3 +135,63 @@ test('Ma liste reprend la même image unitaire que le Catalogue sans atlas de se
   assert.match(app,/const productImageSource=name=>'\.\/www\/Items\/'\+productSlug\(name\)\+'\.webp'/);
   assert.match(app,/bindProductImageFallbacks\(el\)/);
 });
+
+
+test('la génération produit fixe la compression WebP tout en conservant le cadrage et la transparence',()=>{
+  const script=read('scripts/integrate_product_openai.py');
+  assert.match(script,/PRODUCT_IMAGE_COMPRESSION = 75/);
+  assert.match(script,/"output_compression":PRODUCT_IMAGE_COMPRESSION/);
+  const program=String.raw`
+import base64, sys
+sys.path.insert(0, 'scripts')
+import integrate_product_openai as product
+requests=[]
+def fake_api(url, payload, key, **kwargs):
+    requests.append(payload)
+    return {'data':[{'b64_json':base64.b64encode(b'RIFF1234WEBPpayload').decode()}]}
+product.base.api_json=fake_api
+result=product.generate_image('Produit test','Boissons','Sodas & sirops','','secret')
+assert result.startswith(b'RIFF')
+assert len(requests)==1
+assert requests[0]['output_format']=='webp'
+assert requests[0]['background']=='transparent'
+assert requests[0]['size']=='816x816'
+assert requests[0]['quality']=='high'
+assert requests[0]['output_compression']==75
+assert 'compresse efficacement en WebP' in requests[0]['prompt']
+`;
+  const run=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
+  assert.equal(run.status,0,run.stderr||run.stdout);
+});
+
+test('la validation refuse un WebP produit trop lourd sans modifier le contrôle des plats',()=>{
+  const program=String.raw`
+import json, sys, tempfile
+from pathlib import Path
+sys.path.insert(0,'scripts')
+import validate_generated_asset as validate
+assert validate.PRODUCT_IMAGE_MAX_BYTES==100*1024
+with tempfile.TemporaryDirectory() as folder:
+    validate.ROOT=Path(folder)
+    validate.RESULT_PATH=Path(folder)/'.courses-dish-result.json'
+    path=Path(folder)/'www'/'Items'/'produit-test.webp'
+    path.parent.mkdir(parents=True)
+    validate.RESULT_PATH.write_text(json.dumps({'ok':True,'filename':path.name}))
+    # WebP VP8X 816x816, dimensions conformes : on teste exclusivement le poids.
+    dimension=(816-1).to_bytes(3,'little')
+    webp=b'RIFF'+bytes(4)+b'WEBP'+b'VP8X'+(10).to_bytes(4,'little')+bytes(4)+dimension+dimension
+    sys.argv=['validate_generated_asset.py','product']
+    path.write_bytes(webp+b'0'*(validate.PRODUCT_IMAGE_MAX_BYTES-len(webp)))
+    validate.main()
+    path.write_bytes(webp+b'0'*(validate.PRODUCT_IMAGE_MAX_BYTES+1-len(webp)))
+    try:
+        validate.main()
+    except RuntimeError as error:
+        assert 'trop lourd' in str(error), error
+    else:
+        raise AssertionError('Le WebP trop lourd est accepté')
+    assert json.loads(validate.RESULT_PATH.read_text())['ok'] is False
+`;
+  const run=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
+  assert.equal(run.status,0,run.stderr||run.stdout);
+});
