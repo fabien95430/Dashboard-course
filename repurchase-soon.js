@@ -139,6 +139,9 @@ function ensureStyles(){
     .repurchase-empty-mark{width:70px;height:70px;margin-bottom:17px;border-radius:50%;display:grid;place-items:center;background:#eef3ef;color:#2b7951;font-size:31px;box-shadow:inset 0 0 0 1px rgba(43,121,81,.05)}
     .repurchase-empty strong{color:#174c36;font-size:20px;line-height:1.1;font-weight:820;letter-spacing:-.03em}
     .repurchase-empty span{max-width:300px;margin-top:7px;font-size:13px;line-height:1.42;font-weight:540}
+    .repurchase-history-status{max-width:300px;margin:22px 0 0;padding:11px 14px;border-radius:14px;background:rgba(255,255,255,.72);border:1px solid rgba(37,61,45,.06);color:#6f7a73;font-size:12.5px;line-height:1.4;font-weight:560}
+    .repurchase-history-status strong{display:block;color:#2b5a43;font-size:13px;line-height:1.3;font-weight:760;letter-spacing:-.01em}
+    .repurchase-history-status small{display:block;margin-top:3px;font-size:12px;line-height:1.35;font-weight:560;color:#7c8780}
     @media(max-width:360px){.repurchase-screen{padding-left:14px;padding-right:14px}.repurchase-row{grid-template-columns:58px minmax(0,1fr) 40px}.repurchase-thumb{width:56px;height:56px}.repurchase-add{width:36px;height:36px}}
     @media(prefers-reduced-motion:reduce){.repurchase-add{transition:none}}
   `;
@@ -169,12 +172,24 @@ function ensureDialog(){
   return dialog;
 }
 
+// Montre que l'historique apprend : achats déjà enregistrés sur cet appareil et derniers produits.
+function historyStatusMarkup(){
+  const summary=intelligence()?.summary?.(3);
+  if(!summary)return '';
+  if(!summary.purchases){
+    return '<p class="repurchase-history-status">Aucun achat enregistré sur cet iPhone pour l’instant. Cochez ✓ les produits achetés dans Ma liste.</p>';
+  }
+  const count=summary.purchases+' achat'+(summary.purchases>1?'s':'')+' enregistré'+(summary.purchases>1?'s':'')+' sur cet iPhone';
+  const recent=summary.recent.length?'<small>Derniers : '+esc(summary.recent.join(', '))+(summary.products>summary.recent.length?'…':'')+'</small>':'';
+  return '<p class="repurchase-history-status"><strong>'+count+'</strong>'+recent+'</p>';
+}
+
 function emptyMarkup(){
   const enabled=intelligence()?.isEnabled?.()!==false;
   if(!enabled){
     return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez l’historique des achats dans Réglages › Gestion de l’application.</span></div>';
   }
-  return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent quand un prochain achat approche.</span></div>';
+  return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent quand un prochain achat approche.</span>'+historyStatusMarkup()+'</div>';
 }
 
 function renderDialog(items=suggestions()){

@@ -370,6 +370,19 @@ function consumeDishAddSettled(event){
   if(!result||Number(result.failed)>0){clearDishPending();return}
   const token=dishPending;clearDishPending();recordDishConsumptions(token);
 }
+// Résumé de l'historique local : nombre d'achats enregistrés et derniers produits, du plus récent au plus ancien.
+function historySummary(limit=3){
+  const rows=Object.entries(state.purchases).map(([key,events])=>({
+    name:META.get(key)?.name||'',
+    count:Array.isArray(events)?events.length:0,
+    lastAt:Array.isArray(events)?Math.max(0,...events.map(event=>Number(event?.at)||0)):0
+  })).filter(row=>row.name&&row.count>0).sort((a,b)=>b.lastAt-a.lastAt);
+  return {
+    purchases:rows.reduce((total,row)=>total+row.count,0),
+    products:rows.length,
+    recent:rows.slice(0,Math.max(0,limit)).map(row=>row.name)
+  };
+}
 function styles(){
   if(document.getElementById('courses-purchase-intelligence-style'))return;
   const style=document.createElement('style');style.id='courses-purchase-intelligence-style';
@@ -450,6 +463,7 @@ function init(){
     stockFor:(name,at=Date.now())=>stockEstimate(name,at),
     isRecent:(name,qty=1)=>Boolean(recent(name,Date.now(),qty)),
     explain:(name,qty=1)=>recent(name,Date.now(),qty)||stockEstimate(name)||profile(name),
+    summary:(limit=3)=>historySummary(limit),
     isEnabled,setEnabled
   });
 }
