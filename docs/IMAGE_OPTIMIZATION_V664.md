@@ -1,0 +1,27 @@
+# Optimisation prudente des WebP produits — v664
+
+Images actives provenant de catalog.js, sans création ni modification du produit.
+Les dimensions, le format WebP et la transparence pixel à pixel sont conservés.
+Comparaison à 192×192 sur fonds blanc et sauge : PSNR >= 40 dB.
+Économie minimale requise : 20 % et 6 000 octets. Sinon, image conservée.
+
+| Slug | Avant (octets) | Après (octets) | Gain | Qualité | PSNR min (dB) | SHA-256 avant | SHA-256 après |
+|---|---:|---:|---:|---:|---:|---|---|
+| bolognaise | 331902 | 45658 | 86.2 % | 82 | 46.6 | 5844a858ba897a291dc75ac0df0ad076b0c0f3f7c173336695ddbc419dba1757 | 89165dec272cab906dc6e9fab662ebdbaeac48653a71c922cba228f6f3aa42a7 |
+| romarin-frais | 100866 | 80644 | 20.0 % | 82 | 41.6 | ea216ce772b5ec0b6f1bbe852d02285d6a788a640391b3a06ed7ed33997a2a0c | 0dcc30b449c89131e7175bc3207e75c139588d36d42e34fdfbef72dcd5734d27 |
+| fenouil | 98132 | 78490 | 20.0 % | 82 | 44.4 | c6c5d2cf08332bb2ec422b4033c7794ee48789b26fac8428e3cf05cb3c29959e | c29689db8e3231dd58beaa15a3ba3e9c6692e1e0f0cc521ee350fbadb52a3d28 |
+| coriandre | 94650 | 72780 | 23.1 % | 82 | 42.5 | 698d71a9bfa9e64d4073618bf29e33b4a2a2bd24414e6d2319e519341c26caf8 | 480b4fc60b9c1e0c39de501ed1d3e7b7164c37898104430fa7d16488aff45c4b |
+| menthe | 88258 | 67608 | 23.4 % | 82 | 41.5 | 8e025b8b874e4321af966248005658bbef8dedf2a990bdfd54c690598ce20c72 | 8c5f2fb9297134055666472a08cc81f4fef08f7e0a8b9af88cfc713fc9f8c5e6 |
+| kiwis | 87408 | 64694 | 26.0 % | 82 | 41.5 | 9602e30fe37f70302e58f7aca45aa948db73c91b005f70865a6b1367a43682af | 13d1ec2d151e089d76fc889e4500458dd7ac981401974b576523e7229d9b6069 |
+| grenade | 85392 | 62514 | 26.8 % | 82 | 41.2 | 3b66ca7446cba56ebd26ea5190fe44ca5482bf633b44711b04404c23c6483c11 | 614cfa0ae06359cc03881f0ac777af5b8d8a7dc9aed22a611711618ed3b020c4 |
+| betteraves | 83808 | 60736 | 27.5 % | 82 | 41.6 | 504513155df6761eb17d80a91b4cb089c5ff2d9ea02b18928fc8c1c1ffc529aa | a40436d54a35560867c6d215533f2a85b5192a319b64a7f8a2eea7e8b53947e6 |
+| pain | 82716 | 60506 | 26.9 % | 82 | 40.7 | 94460e23bb7ae118037384d4591f3456e321fc49bd35c98efbe88dc6910c7e0a | e2ff9b2ac5e7b4169138ac8adf53ba1d168c5519d3cb3fd02491c7c5848dacba |
+| radis | 79668 | 60158 | 24.5 % | 82 | 42.8 | 9f5de3e15f9db489f61ee102a7fe542a339e65d8aa83991b31fa18732328dbee | 32271c35f9a3c17577df956d557bdd4347c53ea3ad9a69da6e9e34ce02c156a7 |
+| roquette | 78814 | 59834 | 24.1 % | 82 | 42.4 | 6d409f6789dd5d59a712a6ad4bb827a163ede2399455ff8fc7617c5d84a26b9e | 73f3a96fb9ed0bdf4452cf3ff8c873139bd8c5fa8934baa30d51e94ba612264f |
+| prunes | 75884 | 52746 | 30.5 % | 82 | 41.1 | 13fc2ce68df21d4d46fa4c527c83d79edcd2c2cda9632adbfa6ee3a69e20cc6d | 1f1bec110e67e7f62ff5d51502e9acfe0a0bb85a6157e555f2eb5791111ef8c3 |
+| persil | 71654 | 53652 | 25.1 % | 82 | 43.8 | 63eedfc7d8d35bb8cd12d24be7751ff21f01b542a5f9d0a76e6b15c73001b902 | f6a21a7db464a46ab843112c138ba2be7d163dadf234745ed345f8ffa986935f |
+| mures | 71554 | 50852 | 28.9 % | 82 | 42.2 | 2039173cbf1c3df7871e1ef7453b552ea7b8eff479a548b253b6cebe599ab173 | bcb77cd14899eb5b48fc2d861602d68ea251ce965413573158fbf31bc0c69fc8 |
+| chou-rouge | 71490 | 51280 | 28.3 % | 82 | 40.2 | b0fa2f3d31c78ef397f1e485ecb7b281030e196d38778f0e0c96de74c9142a42 | 392f3c54bd253bd838cb32e02f6b2ee359c29499d2263af6eb5f32196839888a |
+| gingembre | 70096 | 48496 | 30.8 % | 82 | 42.9 | aa9b287fdda805fe548a1a91cfc8c87ed399af5664c36472d017a8d42d90bb18 | acfa4741d5f4c9f05df933c026afc3ddacd918a17c3dfbafd9e06c0e0437c6e9 |
+
+**Bilan : 16 visuels, 601644 octets économisés.**
