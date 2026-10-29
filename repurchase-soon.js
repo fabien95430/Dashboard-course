@@ -172,7 +172,7 @@ function ensureDialog(){
 function emptyMarkup(){
   const enabled=intelligence()?.isEnabled?.()!==false;
   if(!enabled){
-    return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez l’historique des achats dans Préférences.</span></div>';
+    return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez l’historique des achats dans Réglages › Gestion de l’application.</span></div>';
   }
   return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent quand un prochain achat approche.</span></div>';
 }
@@ -239,6 +239,7 @@ function openDialog(){
 
 function bindEvents(){
   document.addEventListener('courses:list-changed',()=>refresh(true));
+  document.addEventListener('courses:purchase-history-changed',()=>refresh(true));
   document.addEventListener('courses:lock-changed',event=>{
     if(event.detail?.locked){if(dialog?.open)dialog.close();return}
     refresh(true);

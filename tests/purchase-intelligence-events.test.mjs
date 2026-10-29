@@ -46,3 +46,22 @@ test('un plat confirmé débite le stock probabiliste sans dépendre du texte du
   assert.equal(unrelated.cleared,undefined);
   assert.equal(unrelated.recorded,undefined);
 });
+
+test('activer ou désactiver l historique prévient tout de suite le badge À prévoir',()=>{
+  const start=source.indexOf('function setEnabled(value){');
+  const end=source.indexOf('function syncPreferenceToggle(){',start);
+  assert.ok(start>=0&&end>start,'setEnabled introuvable');
+  const events=[],stored=new Map();
+  const context={
+    localStorage:{setItem:(key,value)=>stored.set(key,value)},
+    clearDishPending(){},syncPreferenceToggle(){},scheduleDish(){},
+    CustomEvent:class{constructor(type,init){this.type=type;this.detail=init?.detail}},
+    document:{dispatchEvent:event=>events.push({type:event.type,enabled:event.detail.enabled})}
+  };
+  const setEnabled=vm.runInNewContext(source.slice(start,end)+';setEnabled',context);
+  assert.equal(setEnabled(false),false);
+  assert.equal(setEnabled(true),true);
+  assert.deepEqual(events,[{type:'courses:purchase-history-changed',enabled:false},{type:'courses:purchase-history-changed',enabled:true}]);
+  const repurchase=readFileSync(new URL('../repurchase-soon.js',import.meta.url),'utf8');
+  assert.match(repurchase,/addEventListener\('courses:purchase-history-changed',\(\)=>refresh\(true\)\)/);
+});

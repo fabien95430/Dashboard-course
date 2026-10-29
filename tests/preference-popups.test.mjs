@@ -234,7 +234,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(missing,/Demandez l’ajout d’un produit ou d’un plat\./);
   assert.match(settings,/Documentation, historique et informations\./);
   assert.match(repurchase,/Suggestions selon vos habitudes\. Aucun ajout automatique\./);
-  assert.match(repurchase,/Activez l’historique des achats dans Préférences\./);
+  assert.match(repurchase,/Activez l’historique des achats dans Réglages › Gestion de l’application\./);
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 

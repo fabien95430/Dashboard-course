@@ -126,7 +126,9 @@ function setEnabled(value){
   const enabled=value!==false;
   try{localStorage.setItem(ENABLED_KEY,enabled?'1':'0')}catch(_){}
   if(!enabled)clearDishPending();
-  syncPreferenceToggle();scheduleDish();return enabled;
+  syncPreferenceToggle();scheduleDish();
+  document.dispatchEvent(new CustomEvent('courses:purchase-history-changed',{detail:{enabled}}));
+  return enabled;
 }
 function syncPreferenceToggle(){
   const input=document.getElementById('preferencesPurchaseHistory');
