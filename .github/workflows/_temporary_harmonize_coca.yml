@@ -1,0 +1,39 @@
+name: Temporary Coca bottle harmonization
+on:
+  push:
+    branches:
+      - agent/fix-coca-bottle-20261029
+    paths:
+      - scripts/_temporary_harmonize_coca.py
+      - .github/workflows/_temporary_harmonize_coca.yml
+permissions:
+  contents: write
+jobs:
+  build:
+    if: github.ref == 'refs/heads/agent/fix-coca-bottle-20261029'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install build-only encoder
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Create and validate Coca WebP
+        run: python scripts/_temporary_harmonize_coca.py
+      - name: Run complete repository validation
+        run: bash scripts/validate_repo.sh
+      - name: Commit only the image, remove all temporary tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -f scripts/_temporary_harmonize_coca.py .github/workflows/_temporary_harmonize_coca.yml
+          git add www/Items/coca.webp
+          git diff --cached --check
+          git config user.name 'Course image harmonizer'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Prepare Coca red bottle matching Coca Zero silhouette"
+          git push origin HEAD:refs/heads/agent/fix-coca-bottle-20261029
