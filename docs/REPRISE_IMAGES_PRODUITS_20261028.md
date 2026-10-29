@@ -1,5 +1,8 @@
 # File de reprise ciblée — images produits non renouvelées
 
+**Clôturé au 29 octobre 2026 : 0 référence ouverte.** Le catalogue actif compte **412 produits**, tous dotés de leur WebP ; **371 images actives renouvelées ou créées**, **41 conservées**. Le total historique de 414 intègre trois produits désormais supprimés et ne comprend pas Bolognaise. Source de vérité et vérifications : [`CLOTURE_IMAGES_PRODUITS_20261029.md`](CLOTURE_IMAGES_PRODUITS_20261029.md). Les lignes « publication conditionnelle » et autres compteurs ci-dessous sont conservés comme historique des lots, pas comme statut actuel.
+
+
 **Source de vérité de cette file :** historique `docs/AVANCEMENT_IMAGES_PRODUITS.md` (inventaire exhaustif v611, 84 références non renouvelées) ; comparaison ciblée avec les lots v612, v613, v614, v615 et v616 ; `main` de préparation `a8cbd3be4902467b12d951540ccf2b542abbf2c9`.
 
 ## Lot v657 — clôture des 3 références ouvertes (publication conditionnelle)

@@ -13,3 +13,7 @@
 **Périmètre :** trois nouveaux WebP, quatre fichiers de version/cache (`index.html`, `catalog.js`, `dish-local-images.js`, `sw.js`), le présent crédit et deux documents de suivi. Aucune logique applicative ou ressource produit déjà traitée n'a été modifiée. Les **41 images conservées** restent inchangées et distinctes des **373 renouvelées**.
 
 **Validation requise :** `bash scripts/validate_repo.sh` et `node --test tests/*.test.mjs` via la CI de pull request avant fusion ; recontrôle du SHA de `main`, puis confirmation des workflows de validation et de GitHub Pages après fusion. Aucun test sur iPhone physique n'est revendiqué.
+
+## Vérification post-publication (29 octobre 2026)
+
+Le lot v657 a été fusionné sur `main` au SHA `5659453af41e90ae7d35be434aaf7215292f4edd`. La validation complète et le déploiement Pages ont **réussi** : [CI](https://github.com/fabien95430/Dashboard-course/actions/runs/40887183709) et [Pages](https://github.com/fabien95430/Dashboard-course/actions/runs/40887181315). Les trois blobs WebP décrits dans le tableau sont ceux effectivement présents sur `main`. Voir [`CLOTURE_IMAGES_PRODUITS_20261029.md`](CLOTURE_IMAGES_PRODUITS_20261029.md) pour le périmètre courant de 412 produits. Aucune photographie de fabricant n'est revendiquée et aucun essai iPhone physique n'a été mené.
