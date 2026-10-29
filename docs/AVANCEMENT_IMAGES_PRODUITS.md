@@ -1,5 +1,8 @@
 # Suivi de la bascule des visuels produits
 
+**Clôture vérifiée le 29 octobre 2026 (état actuel de `main`) : 412 produits actifs, 412 WebP correspondants, 371 images actives renouvelées ou créées et 41 conservées, zéro en attente.** Le périmètre historique 414 a changé : trois produits supprimés, Bolognaise ajouté. Voir [`CLOTURE_IMAGES_PRODUITS_20261029.md`](CLOTURE_IMAGES_PRODUITS_20261029.md) pour les vérifications, la CI et Pages. Les bilans de lots ci-dessous restent inchangés pour la traçabilité et ne représentent pas le compteur courant.
+
+
 **Point d'avancement : 28 octobre 2026.** Dépôt source de vérité : `fabien95430/Dashboard-course`, branche `main`. Cette note décrit un état constaté : relire impérativement le code et `AGENTS.md` au moment de reprendre le chantier.
 
 ## Correction de décompte et file anti-doublons (28 octobre 2026)
