@@ -2,6 +2,12 @@
 
 **Source de vérité de cette file :** historique `docs/AVANCEMENT_IMAGES_PRODUITS.md` (inventaire exhaustif v611, 84 références non renouvelées) ; comparaison ciblée avec les lots v612, v613, v614, v615 et v616 ; `main` de préparation `a8cbd3be4902467b12d951540ccf2b542abbf2c9`.
 
+## Lot v655 — 2 WebP unitaires ciblés (publication conditionnelle)
+
+Deux références autrefois en attente reçoivent un candidat 256 × 256 pixels à canal alpha réel : **Éponges magiques** (un bloc de mousse mélamine blanche, sans accessoire) et **Produit inox** (flacon métallique fermé avec pulvérisateur noir, sans marque). Les deux sont des illustrations semi-réalistes originales produites localement avec SVG, CairoSVG et Pillow, puis converties en WebP transparent. Ancien WebP : 84 × 84 pixels. Miniatures à 192 px sur fonds blanc et sauge vérifiées. Aucun collage ni découpe de planche ; aucune marque ni nom fictif, aucune API OpenAI payante du projet.
+
+**Projection uniquement après validation et publication : 370/414 renouvelés distincts, 44 non renouvelés, dont 41 conservés et 3 ouverts.** Les trois derniers à améliorer restent Lingettes anti-décoloration, Thé Earl Grey et Thé fruits rouges. Les essais précédents sur ces trois références, ainsi que les sources externes contenant plusieurs produits ou des fonds opaques, restent rejetés. Voir `docs/IMAGE_CREDITS_V655.md` pour dimensions et blobs. L'historique antérieur est préservé.
+
 ## Lot v637 — deux WebP unitaires, qualité contrôlée (publication conditionnelle)
 
 - **Sel lave-vaisselle** : bocal fermé à bouchon bleu, cristaux blancs visibles, WebP 320 × 320 px avec transparence réelle. Fichier initial 84 × 84 px, blob `20decb9ce16c9c2f9e51cc87271b799e00e62101`, remplacé par `a1e1c4b4340b9bd6f144f431c2385eff310733a3`.
@@ -60,7 +66,7 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 4. Ne jamais compter un produit deux fois. Un remplacement d'un WebP antérieurement renouvelé peut modifier sa qualité, **pas** le décompte des produits distincts.
 5. Un candidat n'est pas un produit publié. Les tests, licences, crédits, caches/versions, SHA Git, CI et Pages doivent être confirmés avant de modifier un statut. Ne jamais découper une planche ni utiliser l'API OpenAI payante du projet.
 
-## Références encore non renouvelées après v637 (46, publication conditionnelle)
+## Références encore non renouvelées après lot v655 (44, publication conditionnelle)
 
 | Catégorie | Produit | WebP | Décision opérationnelle |
 | --- | --- | --- | --- |
@@ -83,7 +89,6 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Hygiène & soins | Mouchoirs poche | `mouchoirs-poche.webp` | `CONSERVER` |
 | Hygiène & soins | Pansements | `pansements.webp` | `CONSERVER` |
 | Maison | Désinfectant | `desinfectant.webp` | `CONSERVER` |
-| Maison | Éponges magiques | `eponges-magiques.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Essuie-verres | `essuie-verres.webp` | `CONSERVER` |
 | Maison | Grattoirs | `grattoirs.webp` | `CONSERVER` |
 | Maison | Lave glace | `lave-glace.webp` | `CONSERVER` |
@@ -93,7 +98,6 @@ Les quatre anciens visuels `nettoyant-lave-vaisselle.webp`, `nettoyant-machine-a
 | Maison | Papier cadeau | `papier-cadeau.webp` | `CONSERVER` |
 | Maison | Piles AA | `piles-aa.webp` | `CONSERVER` |
 | Maison | Pinces à linge | `pinces-a-linge.webp` | `CONSERVER` |
-| Maison | Produit inox | `produit-inox.webp` | `ATTENDRE_CANDIDAT` |
 | Maison | Sacs linge délicat | `sacs-linge-delicat.webp` | `CONSERVER` |
 | Maison | Sacs poubelle 30L | `sacs-poubelle-30l.webp` | `CONSERVER` |
 | Maison | Sacs poubelle 50L | `sacs-poubelle-50l.webp` | `CONSERVER` |

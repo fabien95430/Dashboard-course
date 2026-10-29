@@ -8,6 +8,12 @@
 
 **File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
 
+## Lot v655 — Éponges magiques et Produit inox (publication conditionnelle)
+
+**Base :** `a961f0507dde6756ac101577f50fd55093bb9f55` (version v654). Deux nouveaux WebP natifs avec canal alpha réel **256 × 256 px**, rendus 3D stylisés originaux sans marque : `www/Items/eponges-magiques.webp` et `www/Items/produit-inox.webp`. Anciens fichiers 84 × 84 px ; comparaison ancien/nouveau sur l'identité du produit et contrôle des deux nouvelles miniatures à 192 px sur fond blanc et sauge. Les fichiers sources et le contrôle sont archivés localement, les empreintes WebP et les crédits dans `docs/IMAGE_CREDITS_V655.md`.
+
+**Projection après validation et publication :** **370/414** renouvelés distincts (89,4 %), **44 non renouvelés** = 41 conservés + 3 restant sans candidat conforme. Les références restantes sont Lingettes anti-décoloration, Thé Earl Grey et Thé fruits rouges. Aucune image anciennement validée, aucun code métier ou module d'affichage modifié. Les versions et le cache sont portés à v655.
+
 ## Lot v637 — Sel lave-vaisselle et Vinaigre ménager (publication conditionnelle)
 
 **Base Git :** `aabb502711944952a1b8d71cd5c74e25e1bdeef6` (v636). Deux nouveaux WebP unitaires transparents **320 × 320 px** pour Sel lave-vaisselle et Vinaigre ménager, issus de rendus originaux locaux avec cadrage centré, sans logo ni texte ajouté. Comparaison ciblée des anciens visuels 84 × 84 px avec les nouveaux, et contrôle du rendu de ces nouveaux fichiers à 192 px sur fonds blanc et sauge. Contrôles d'alpha, dimensions et transparence des quatre coins ; blobs et SHA-256 dans `docs/IMAGE_CREDITS_V637.md`.
