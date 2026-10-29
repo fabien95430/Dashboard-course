@@ -4,7 +4,7 @@
 function installMissingProductsFixes(){
   if(!document.querySelector('script[data-missing-products-fixes]')){
     const script=document.createElement('script');
-    script.src='./missing-products-fixes.js?v=653';
+    script.src='./missing-products-fixes.js?v=656';
     script.defer=true;
     script.dataset.missingProductsFixes='1';
     document.head.appendChild(script);

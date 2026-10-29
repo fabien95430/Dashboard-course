@@ -1039,12 +1039,12 @@ html #products .product.is-deferred{display:none!important}
 }
 
 .toast{
-  color:#1f3326;
-  border:1px solid rgba(255,255,255,.72);
-  background:rgba(255,255,255,.66);
-  -webkit-backdrop-filter:blur(22px) saturate(1.8);
-  backdrop-filter:blur(22px) saturate(1.8);
-  box-shadow:0 8px 28px rgba(28,39,31,.16),inset 0 1px 0 rgba(255,255,255,.7);
+  color:#12261a;
+  border:1px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.34);
+  -webkit-backdrop-filter:blur(28px) saturate(190%);
+  backdrop-filter:blur(28px) saturate(190%);
+  box-shadow:0 10px 30px rgba(20,40,28,.14),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(255,255,255,.25);
   font-weight:600;
 }
 
