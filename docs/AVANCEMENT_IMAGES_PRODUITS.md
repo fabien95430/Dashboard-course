@@ -8,6 +8,12 @@
 
 **File de reprise unique : [`docs/REPRISE_IMAGES_PRODUITS_20261028.md`](REPRISE_IMAGES_PRODUITS_20261028.md)**. Elle classe les 59 anciens WebP sans réaudit et évite de rouvrir les produits déjà renouvelés/conservés. Aucun nouveau candidat conforme n'a été publié pendant cette consolidation ; aucune modification de fonctionnalité ni d'image.
 
+## Lot v657 — trois derniers candidats sélectionnés (publication conditionnelle)
+
+À partir du commit `9a73c1063b6868ffa0af504f26a0fe71280d740b` en v656, renouvellement proposé de **Lingettes anti-décoloration, Thé Earl Grey et Thé fruits rouges**. Les trois nouveaux WebP individuels **256 × 256 px**, transparents, sont des rendus semi-réalistes originaux issus de tracés locaux (Pillow), sans marque ni recours à l'API OpenAI payante du projet. Conditionnements inchangés : feuilles de lingettes anti-décoloration et sachets de thé pyramidaux. Le contrôle des vignettes à 192 px sur blanc et sauge, des dimensions et de l'alpha figure dans `docs/IMAGE_CREDITS_V657.md`.
+
+**Si la CI et GitHub Pages réussissent après fusion :** **373/414 images distinctes renouvelées (90,1 %)**, plus **41 images originales conservées par décision documentée**, soit **414/414 produits traités et 0 en attente**. Ces 41 produits ne doivent pas être comptés parmi les renouvellements. Les anciennes versions du compteur demeurent ci-dessous pour la traçabilité ; les fichiers précédemment renouvelés/conservés ne sont pas modifiés dans ce lot. Pas de changement fonctionnel.
+
 ## Lot v655 — Éponges magiques et Produit inox (publication conditionnelle)
 
 **Base :** `a961f0507dde6756ac101577f50fd55093bb9f55` (version v654). Deux nouveaux WebP natifs avec canal alpha réel **256 × 256 px**, rendus 3D stylisés originaux sans marque : `www/Items/eponges-magiques.webp` et `www/Items/produit-inox.webp`. Anciens fichiers 84 × 84 px ; comparaison ancien/nouveau sur l'identité du produit et contrôle des deux nouvelles miniatures à 192 px sur fond blanc et sauge. Les fichiers sources et le contrôle sont archivés localement, les empreintes WebP et les crédits dans `docs/IMAGE_CREDITS_V655.md`.
