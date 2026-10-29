@@ -4087,7 +4087,7 @@ body{
   margin:0!important;
   font:600 27px/1.1 "Baskerville","Iowan Old Style",Georgia,serif!important;
   letter-spacing:-.2px!important;
-  color:#16301f!important;
+  color:#105028!important;
 }
 .security-card-copy{
   margin:3px auto 0!important;
@@ -4114,12 +4114,12 @@ body{
 .security-modal .password-panel .primary,
 #securitySubmit{
   height:48px!important;
-  margin-top:12px!important;
+  margin-top:56px!important;
   border:0!important;
   border-radius:12px!important;
-  background:#3a5646!important;
-  color:#f3ead2!important;
+  background:linear-gradient(180deg,#3a9a45 0%,#2c8239 100%)!important;
+  color:#fffdf4!important;
   font:600 18px/1 "Baskerville","Iowan Old Style",Georgia,serif!important;
   letter-spacing:.8px!important;
-  box-shadow:0 0 0 2px #fffdf8,0 0 0 3px rgba(185,154,88,.8),0 12px 22px rgba(40,60,48,.22)!important;
+  box-shadow:0 0 0 2px #fffdf8,0 0 0 3px rgba(185,154,88,.8),0 12px 22px rgba(30,90,45,.26)!important;
 }

@@ -1559,7 +1559,6 @@ function showSecurity(mode,message=''){
     :'Déverrouillage sécurisé');
   $('#passwordPanel').hidden=false;
   $('#securityConfirmWrap').hidden=!creating;
-  $('#securityHint').hidden=!creating;
   UI.securityPassword.autocomplete=creating?'new-password':'current-password';
   UI.securityPassword.value='';
   UI.securityConfirm.value='';

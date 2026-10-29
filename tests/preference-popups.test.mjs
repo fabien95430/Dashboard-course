@@ -228,7 +228,7 @@ test('les explications de popup restent courtes et essentielles',()=>{
   const settings=read('settings-ui.js');
   const repurchase=read('repurchase-soon.js');
   assert.match(index,/Connexion OAuth sécurisée\. L’autorisation reste chiffrée sur cet appareil\./);
-  assert.match(index,/Mot de passe non enregistré : il déchiffre uniquement l’accès Home Assistant local\./);
+  assert.doesNotMatch(index,/securityHint|Mot de passe non enregistré/);
   assert.match(dishes,/Modifiez ingrédients et quantités pour 2 personnes\./);
   assert.match(dishes,/À ajouter manuellement si besoin\./);
   assert.match(missing,/Demandez l’ajout d’un produit ou d’un plat\./);
