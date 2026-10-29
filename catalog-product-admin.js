@@ -147,7 +147,7 @@ function installStyle(){
   const style=document.createElement('style');
   style.id='courses-product-admin-style';
   style.textContent=`
-    .catalog-remove-panel{display:grid;align-content:start;gap:0;padding-bottom:6px}
+    .catalog-remove-panel{display:block;padding-bottom:6px}
     .catalog-remove-panel[hidden]{display:none!important}
     .courses-product-admin-title{display:flex;justify-content:space-between;align-items:baseline;margin:2px 2px 7px;color:#4c6152;font-size:var(--fs-label);font-weight:600}
     .courses-product-admin-title span{font-weight:400;font-variant-numeric:tabular-nums}

@@ -135,3 +135,9 @@ test('catalogue (Suppression) : Annuler rouge, ligne en retrait rouge franc sans
   assert.match(admin,/if\(row\.dataset\.itemType==='dish'\)return;\s*clearBlockedNote\(\);/);
   assert.doesNotMatch(dishes,/Retirez un produit ou un plat/);
 });
+
+test('catalogue (Suppression) : le panneau reste un bloc pour que la liste défile (pas de grille qui écrase la tuile)',()=>{
+  const admin=readFileSync(new URL('../catalog-product-admin.js',import.meta.url),'utf8');
+  assert.match(admin,/\.catalog-remove-panel\{display:block;padding-bottom:6px\}/);
+  assert.doesNotMatch(admin,/\.catalog-remove-panel\{display:grid/);
+});
