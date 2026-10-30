@@ -155,7 +155,7 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Mozzarella râpée":"Sachet",
   "Sauce burger":"Bouteille",
   "Coulis de fruit":"Bouteille",
-  "Philadelphia":"Pot",
+
   "Speculos":"Paquet",
   "Alcool 70":"Bouteille",
   "Sirot d’érable":"Bouteille",
