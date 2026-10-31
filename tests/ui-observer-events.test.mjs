@@ -23,7 +23,7 @@ test('le marqueur des plats suit les événements métier sans observer le DOM',
   assert.match(marker,/new CustomEvent\('courses:dish-availability-updated'/);
   // Le bouton « Ajouter » appartient à dishes-ui.js : le marqueur suit l'événement de demande d'ajout, sans intercepter le clic.
   assert.match(marker,/document\.addEventListener\('courses:dish-add-requested'/);
-  assert.doesNotMatch(marker,/stopImmediatePropagation|addEventListener\('click'/);
+  assert.doesNotMatch(marker,/stopImmediatePropagation|document\.addEventListener\('click'/);
   const dishes=read('dishes-ui.js');
   assert.match(dishes,/dishConfirmButton\.addEventListener\('click',confirmDishAdd\)/);
   assert.match(dishes,/new CustomEvent\('courses:dish-add-requested'/);

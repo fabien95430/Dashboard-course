@@ -3457,3 +3457,11 @@ body{
   letter-spacing:.8px!important;
   box-shadow:0 0 0 2px #fffdf8,0 0 0 3px rgba(185,154,88,.8),0 12px 22px rgba(30,90,45,.26)!important;
 }
+
+/* ===== v678 — annulation d'un plat ajouté (appui sur le ✓ de la carte) ===== */
+.dish-cancel-dialog{width:min(calc(100% - 40px),360px)}
+.dish-cancel-dialog h3{margin:0 0 8px;font-size:20px}
+.dish-cancel-dialog .dialog-intro{margin:0;color:#5f6b64;font-size:14px;line-height:1.4}
+.dish-cancel-dialog .dialog-actions{margin-top:18px}
+.dish-cancel-dialog .dialog-actions button{height:46px;font-weight:760}
+.dish-cancel-dialog .dialog-actions .dish-cancel-confirm{background:#c8423b;color:#fff}

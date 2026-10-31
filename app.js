@@ -1978,8 +1978,11 @@ async function ensureProductQuantity(name,target){
 }
 // Plats ajoutés partagés entre appareils : chaque article concerné porte dans Home Assistant une
 // note « Plat : Carbonara (4) » (ou « Plats : Carbonara (4), Bolognaise (5) » ; le nombre est le
-// nombre d'ingrédients du plat). La liste reste la seule source : un article acheté emporte sa note.
+// nombre d'ingrédients du plat). Une unité ajoutée à la liste à cause d'un plat porte en plus
+// « Ajouté pour : Carbonara » : c'est la seule que l'annulation du plat retire.
+// La liste reste la seule source : un article acheté emporte sa note.
 const DISH_NOTE_LINE=/^Plats? : (.*)$/m;
+const DISH_OWNER_LINE=/^Ajouté pour : (.*)$/m;
 function parseDishNote(description){
   const match=String(description||'').match(DISH_NOTE_LINE);
   if(!match)return [];
@@ -1988,13 +1991,30 @@ function parseDishNote(description){
     return entry?{name:entry[1],total:Number(entry[2])}:null;
   }).filter(Boolean);
 }
-function withDishNote(description,name,total){
-  const text=String(description||'');
-  const dishes=parseDishNote(text).filter(entry=>entry.name!==name);
-  dishes.push({name,total});
-  const line=(dishes.length>1?'Plats : ':'Plat : ')+dishes.map(entry=>entry.name+' ('+entry.total+')').join(', ');
-  if(DISH_NOTE_LINE.test(text))return text.replace(DISH_NOTE_LINE,()=>line);
+function dishNoteOwner(description){
+  return String(description||'').match(DISH_OWNER_LINE)?.[1]?.trim()||'';
+}
+function setNoteLine(text,pattern,line){
+  if(pattern.test(text))return line?text.replace(pattern,()=>line):text.replace(pattern,'').replace(/\n{2,}/g,'\n').trim();
+  if(!line)return text;
   return text.trim()?text.trimEnd()+'\n'+line:line;
+}
+function writeDishNote(description,dishes,owner){
+  let text=String(description||'');
+  const line=dishes.length?(dishes.length>1?'Plats : ':'Plat : ')+dishes.map(entry=>entry.name+' ('+entry.total+')').join(', '):'';
+  text=setNoteLine(text,DISH_NOTE_LINE,line);
+  text=setNoteLine(text,DISH_OWNER_LINE,owner?'Ajouté pour : '+owner:'');
+  return text;
+}
+function withDishNote(description,name,total,{owner=false}={}){
+  const dishes=parseDishNote(description).filter(entry=>entry.name!==name);
+  dishes.push({name,total});
+  return writeDishNote(description,dishes,dishNoteOwner(description)||(owner?name:''));
+}
+function withoutDishNote(description,name){
+  const dishes=parseDishNote(description).filter(entry=>entry.name!==name);
+  const owner=dishNoteOwner(description);
+  return writeDishNote(description,dishes,owner===name?(dishes[0]?.name||''):owner);
 }
 function listDishNotes(){
   const dishes=new Map();
@@ -2009,16 +2029,22 @@ function listDishNotes(){
   });
   return [...dishes.values()].map(entry=>({name:entry.name,total:entry.total,ingredients:[...entry.ingredients]}));
 }
+function listItemUids(){
+  return state.items.filter(isPendingItem).map(itemUid).filter(Boolean);
+}
 // Ajoute la note du plat à toutes les unités des ingrédients présents dans la liste.
+// before : identifiants présents avant l'ajout du plat ; les autres unités sont « Ajouté pour » ce plat.
 // Renvoie false si la note n'a pas pu être écrite (hors ligne, liste verrouillée, erreur HA).
-async function tagDishItems(dish,ingredients){
+async function tagDishItems(dish,ingredients,{before=null}={}){
   const name=String(dish||'').trim().slice(0,100);
   const keys=new Set((Array.isArray(ingredients)?ingredients:[]).map(value=>norm(value)).filter(Boolean));
   if(!name||!keys.size||state.locked)return false;
   const total=keys.size;
+  const previous=Array.isArray(before)?new Set(before.map(String)):null;
   const concerned=item=>isPendingItem(item)&&keys.has(norm(itemSummary(item)));
+  const noteFor=item=>withDishNote(item.description,name,total,{owner:Boolean(previous&&itemUid(item)&&!previous.has(itemUid(item)))});
   if(state.demo){
-    const items=(loadJson(DEMO_KEY,[])||[]).map(item=>concerned(item)?{...item,description:withDishNote(item.description,name,total)}:item);
+    const items=(loadJson(DEMO_KEY,[])||[]).map(item=>concerned(item)?{...item,description:noteFor(item)}:item);
     saveJson(DEMO_KEY,items);
     state.items=items;
     renderSelectionAndList();
@@ -2030,7 +2056,7 @@ async function tagDishItems(dish,ingredients){
     for(const item of state.items.filter(concerned)){
       const uid=itemUid(item);
       if(!uid)continue;
-      const description=withDishNote(item.description,name,total);
+      const description=noteFor(item);
       if(description===String(item.description||''))continue;
       await todoService('update_item',{item:uid,description});
       changed=true;
@@ -2043,7 +2069,51 @@ async function tagDishItems(dish,ingredients){
     if(changed)await refreshItems();
   }
 }
-window.COURSES_LIST=Object.freeze({getQuantity:productQuantity,ensureQuantity:ensureProductQuantity,dishNotes:listDishNotes,tagDish:tagDishItems});
+// Annule un plat : retire de la liste les unités « Ajouté pour » ce plat qu'aucun autre plat
+// n'utilise ; les autres articles perdent seulement la mention du plat.
+async function cancelDishItems(dish){
+  const name=String(dish||'').trim();
+  const result={removed:0,kept:0,failed:0};
+  if(!name||state.locked)return {...result,failed:1};
+  const concerned=item=>isPendingItem(item)&&parseDishNote(item?.description).some(entry=>entry.name===name);
+  const removable=item=>dishNoteOwner(item.description)===name&&parseDishNote(item.description).every(entry=>entry.name===name);
+  if(state.demo){
+    const items=[];
+    (loadJson(DEMO_KEY,[])||[]).forEach(item=>{
+      if(!concerned(item)){items.push(item);return}
+      if(removable(item)){result.removed+=1;return}
+      result.kept+=1;
+      items.push({...item,description:withoutDishNote(item.description,name)});
+    });
+    saveJson(DEMO_KEY,items);
+    state.items=items;
+    renderSelectionAndList();
+    return result;
+  }
+  if(!state.entity||!socketReady())return {...result,failed:1};
+  let changed=false;
+  try{
+    for(const item of state.items.filter(concerned)){
+      const uid=itemUid(item);
+      if(!uid){result.failed+=1;continue}
+      if(removable(item)){
+        await completeTodoItem(uid);
+        result.removed+=1;
+      }else{
+        await todoService('update_item',{item:uid,description:withoutDishNote(item.description,name)});
+        result.kept+=1;
+      }
+      changed=true;
+    }
+  }catch(error){
+    console.warn('courses-app: annulation du plat',error);
+    result.failed+=1;
+  }finally{
+    if(changed)await refreshItems();
+  }
+  return result;
+}
+window.COURSES_LIST=Object.freeze({getQuantity:productQuantity,ensureQuantity:ensureProductQuantity,dishNotes:listDishNotes,listUids:listItemUids,tagDish:tagDishItems,cancelDish:cancelDishItems});
 async function incrementProduct(name,{deferRefresh=false}={}){
   const item=String(name||'').trim();
   if(!item)return;

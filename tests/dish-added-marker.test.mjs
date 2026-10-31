@@ -31,7 +31,7 @@ test('le vert et le partiel dépendent uniquement de la liste réellement connue
   assert.deepEqual(stateFor({ingredients:['Tagliatelles','Saumon','Crème fraîche','Citron'],listed:['Crème fraîche','Citron']}),{state:'partial',present:2,total:4});
 });
 
-const settleStart=source.indexOf('function commitDishEntry(name,ingredients){');
+const settleStart=source.indexOf('function commitDishEntry(name,ingredients,before=null){');
 const settleEnd=source.indexOf('function scheduleCards(){',settleStart);
 assert.ok(settleStart>=0&&settleEnd>settleStart,'confirmation directe introuvable');
 

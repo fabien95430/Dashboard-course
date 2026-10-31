@@ -494,6 +494,14 @@ function storedCumulativeQuantity(name){
   const aggregate=aggregateContribution(name);
   return quantityForNeed(name,aggregate.total,aggregate.present);
 }
+// Plat annulé : ses quantités ne comptent plus dans le calcul des autres plats.
+function forgetDish(dish){
+  const dishName=String(dish||'').trim();
+  if(!dishName||!Object.prototype.hasOwnProperty.call(dishContributions,dishName))return false;
+  delete dishContributions[dishName];
+  persistDishContributions();
+  return true;
+}
 function reconcileDishContributions(){
   const service=window.COURSES_LIST;
   // Tant que Ma liste affiche son chargement, Home Assistant n'est pas encore une source fiable.
@@ -815,6 +823,7 @@ window.COURSES_QUANTITIES=Object.freeze({
   resetRecipeNeeds,
   getPurchaseLabel:purchaseLabel,
   getCatalogDisplayLabel:catalogDisplayLabel,
+  forgetDish,
   addSelected:addSelectedQuantities,
   setServings,
   bind

@@ -29,7 +29,8 @@ function readLocalEntries(){
     Object.entries(saved).slice(-100).forEach(([name,value])=>{
       const dish=String(name||'').trim().slice(0,100);
       const ingredients=cleanIngredients(value?.ingredients);
-      if(dish&&ingredients.length)clean[dish]={ingredients,at:Number(value?.at)||0};
+      const before=Array.isArray(value?.before)?value.before.map(String).slice(0,500):null;
+      if(dish&&ingredients.length)clean[dish]={ingredients,at:Number(value?.at)||0,...(before?{before}:{})};
     });
     return clean;
   }catch(_){
@@ -67,7 +68,7 @@ function shareLocalEntries(){
       if(!entry.ingredients.some(item=>trustedListNames?.has(normalize(item)))){
         delete localEntries[dish];changed=true;continue;
       }
-      if(await tagDish(dish,entry.ingredients)){delete localEntries[dish];changed=true}
+      if(await tagDish(dish,entry.ingredients,{before:entry.before||null})){delete localEntries[dish];changed=true}
     }
     if(changed){saveLocalEntries();scheduleReconcileList()}
   })().finally(()=>{sharing=null});
@@ -334,15 +335,17 @@ function trackPendingFromButton(button){
     .map(row=>String(row.dataset.ingredient||'').trim())
     .filter(Boolean);
   if(!name||!ingredients.length)return;
-  pending={name,ingredients};
+  // Articles déjà dans la liste avant l'ajout : les autres seront « Ajouté pour » ce plat.
+  const before=window.COURSES_LIST?.listUids?.();
+  pending={name,ingredients,before:Array.isArray(before)?before:null};
   clearTimeout(pendingTimer);
   pendingTimer=setTimeout(clearPending,90000);
 }
-function commitDishEntry(name,ingredients){
+function commitDishEntry(name,ingredients,before=null){
   const dish=String(name||'').trim().slice(0,100);
   const clean=cleanIngredients(ingredients);
   if(!dish||!clean.length)return false;
-  entries[dish]={ingredients:clean,at:Date.now()};
+  entries[dish]={ingredients:clean,at:Date.now(),...(Array.isArray(before)?{before}:{})};
   localEntries[dish]=entries[dish];
   saveLocalEntries();
   trustedListNames=null;
@@ -363,7 +366,7 @@ function consumeDishAddSettled(event){
   const ingredients=Array.isArray(detail.ingredients)&&detail.ingredients.length
     ?detail.ingredients
     :(pending?.name===name?pending.ingredients:[]);
-  commitDishEntry(name,ingredients);
+  commitDishEntry(name,ingredients,pending?.name===name?pending.before:null);
 }
 function scheduleCards(){
   if(cardFrame)return;
@@ -409,5 +412,54 @@ document.addEventListener('courses:dish-add-requested',event=>{
   }
   trackPendingFromButton(addButton);
 });
+// Annulation d'un plat ajouté (appui sur le ✓ de sa carte, publié par dishes-ui.js) :
+// confirmation, puis retrait des seules unités ajoutées pour ce plat (app.js, COURSES_LIST.cancelDish).
+let cancelDish='';
+function showCancelToast(message){
+  const toast=document.getElementById('toast');
+  if(!toast)return;
+  clearTimeout(toast._t);
+  toast.textContent=message;
+  toast.classList.add('is-visible');
+  toast._t=setTimeout(()=>toast.classList.remove('is-visible'),2600);
+}
+function cancelResultMessage(dish,result){
+  if(result.failed)return 'Annulation impossible · réessayez';
+  if(!result.removed)return dish+' retiré · ingrédients gardés dans Ma liste';
+  return dish+' retiré · '+result.removed+' article'+(result.removed>1?'s':'')+' retiré'+(result.removed>1?'s':'')+' de Ma liste';
+}
+async function confirmCancelDish(){
+  const dialog=document.getElementById('dishCancelDialog');
+  const dish=cancelDish;
+  cancelDish='';
+  if(dialog?.open)dialog.close();
+  if(!dish||typeof window.COURSES_LIST?.cancelDish!=='function')return;
+  window.CoursesHaptics?.vibrate([10,28,10]);
+  if(localEntries[dish]){delete localEntries[dish];saveLocalEntries()}
+  delete entries[dish];
+  syncCards();
+  let result;
+  try{result=await window.COURSES_LIST.cancelDish(dish)}catch(_){result={removed:0,kept:0,failed:1}}
+  if(!result.failed)window.COURSES_QUANTITIES?.forgetDish?.(dish);
+  scheduleReconcileList();
+  showCancelToast(cancelResultMessage(dish,result));
+}
+function requestCancelDish(event){
+  const dish=String(event?.detail?.dish||'').trim();
+  const dialog=document.getElementById('dishCancelDialog');
+  if(!dish||!dialog)return;
+  cancelDish=dish;
+  const text=dialog.querySelector('#dishCancelText');
+  if(text)text.textContent=dish+' ne sera plus marqué comme ajouté. Les ingrédients ajoutés pour ce plat sont retirés de Ma liste ; ceux qui y étaient déjà ou qui servent à un autre plat restent.';
+  if(dialog.dataset.bound!=='1'){
+    dialog.dataset.bound='1';
+    dialog.querySelector('[data-dish-cancel="confirm"]')?.addEventListener('click',confirmCancelDish);
+    dialog.querySelector('[data-dish-cancel="keep"]')?.addEventListener('click',()=>{cancelDish='';dialog.close()});
+    dialog.addEventListener('cancel',()=>{cancelDish=''});
+  }
+  window.CoursesHaptics?.vibrate(6);
+  dialog.showModal();
+}
+document.addEventListener('courses:dish-cancel-requested',requestCancelDish);
 bindMarkerEvents();
 })();

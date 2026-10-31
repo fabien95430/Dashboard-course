@@ -882,7 +882,15 @@ function dishCard(dish){
   bindDishImageFallback(cardImage,dish.name);
   const favoriteButton=card.querySelector('.dish-favorite');
   favoriteButton.addEventListener('click',event=>{event.stopPropagation();toggleFavorite(dish.name)});
-  card.addEventListener('click',event=>{if(!event.target.closest('.dish-favorite'))openDishSheet(dish)});
+  card.addEventListener('click',event=>{
+    if(event.target.closest('.dish-favorite'))return;
+    // Plat déjà ajouté (vert ou partiel) : le ✓ demande l'annulation au lieu d'ouvrir la fiche.
+    if(event.target.closest('.dish-add')&&(card.classList.contains('is-added')||card.classList.contains('is-partial'))){
+      document.dispatchEvent(new CustomEvent('courses:dish-cancel-requested',{detail:{dish:dish.name}}));
+      return;
+    }
+    openDishSheet(dish);
+  });
   card.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.dish-favorite')){event.preventDefault();if(!busyDish)openDishSheet(dish)}});
   dishCardCache.set(dish.name,card);
   syncDishFavorite(card,dish.name);
