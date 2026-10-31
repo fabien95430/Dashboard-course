@@ -449,8 +449,12 @@ function requestCancelDish(event){
   const dialog=document.getElementById('dishCancelDialog');
   if(!dish||!dialog)return;
   cancelDish=dish;
-  const text=dialog.querySelector('#dishCancelText');
-  if(text)text.textContent=dish+' ne sera plus marqué comme ajouté. Les ingrédients ajoutés pour ce plat sont retirés de Ma liste ; ceux qui y étaient déjà ou qui servent à un autre plat restent.';
+  const title=dialog.querySelector('#dishCancelTitle');
+  if(title)title.textContent=dish;
+  dialog.setAttribute('aria-label','Retirer '+dish+' ?');
+  const photo=dialog.querySelector('.dish-cancel-photo img');
+  const source=window.COURSES_DISH_FILES?.card?.(dish)||'';
+  if(photo&&source&&photo.getAttribute('src')!==source)photo.src=source;
   if(dialog.dataset.bound!=='1'){
     dialog.dataset.bound='1';
     dialog.querySelector('[data-dish-cancel="confirm"]')?.addEventListener('click',confirmCancelDish);
