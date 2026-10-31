@@ -3,7 +3,7 @@
 
 Chaque photo www/Plats/<nom>.png reste la source :
 - www/Plats/cartes/<nom>.webp (720 px) pour les cartes du Catalogue ;
-- www/Plats/fiches/<nom>.webp (1200 px) pour la photo de la fiche plat (~180 Ko au lieu de ~2,4 Mo).
+- www/Plats/fiches/<nom>.webp (1200 px, qualité 92) pour la photo de la fiche plat (~290 Ko au lieu de ~2,4 Mo).
 Sans copie WebP, l'application reprend automatiquement la photo PNG d'origine (plus lente).
 Nécessite Pillow.
 Usage : python3 scripts/make_dish_cards.py [--force]
@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "www" / "Plats"
 TARGETS = (
     (SOURCE / "cartes", 720, 92),
-    (SOURCE / "fiches", 1200, 85),
+    (SOURCE / "fiches", 1200, 92),
 )
 
 
