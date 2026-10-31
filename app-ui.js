@@ -265,6 +265,21 @@ function scheduleSecurityViewportRestore(){
     restoreSecurityViewportOrigin();
   });
 }
+// Clavier ouvert : la carte remonte juste assez pour que le champ et le bouton Connexion restent
+// au-dessus du clavier et de la barre ˄ ˅ ✓ d'iOS (zone visible = hauteur du visualViewport,
+// la coquille étant déjà recalée sur son haut). Le logo s'efface s'il serait recouvert.
+function applySecurityKeyboardLift(shell,visibleHeight){
+  const modal=shell.querySelector('.security-modal');
+  let lift=0;
+  if(visibleHeight>0&&modal){
+    const bottom=modal.offsetTop+modal.offsetHeight;
+    lift=Math.max(0,Math.min(bottom+14-visibleHeight,modal.offsetTop-14));
+  }
+  lift=Math.round(lift);
+  if(lift)shell.style.setProperty('--security-keyboard-lift',lift+'px');
+  else shell.style.removeProperty('--security-keyboard-lift');
+  shell.classList.toggle('is-keyboard-lift',lift>0);
+}
 function syncSecurityKeyboardState(){
   const shell=document.querySelector('.security-shell');
   if(!shell)return;
@@ -274,13 +289,16 @@ function syncSecurityKeyboardState(){
   syncSecurityViewportPosition();
   if(!visible||!active){
     shell.classList.remove('is-password-open');
+    applySecurityKeyboardLift(shell,0);
     if(!active)securityKeyboardBaseline=0;
     if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
     return;
   }
   const current=securityViewportHeight();
   if(!securityKeyboardBaseline)securityKeyboardBaseline=current;
-  shell.classList.toggle('is-password-open',securityKeyboardBaseline-current>120);
+  const keyboardOpen=securityKeyboardBaseline-current>120;
+  shell.classList.toggle('is-password-open',keyboardOpen);
+  applySecurityKeyboardLift(shell,keyboardOpen?current:0);
 }
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;

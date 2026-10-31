@@ -3512,3 +3512,9 @@ body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behav
   .security-overlay{bottom:auto!important;height:calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;min-height:0!important}
   .security-overlay .security-shell{height:var(--lock-screen-h)!important;padding-bottom:var(--lock-screen-bottom)!important}
 }
+
+/* ===== v690 — clavier ouvert : la carte de connexion remonte au-dessus du clavier iOS ===== */
+/* --security-keyboard-lift est calculé par app-ui.js ; le logo s'efface s'il serait recouvert. */
+.security-shell .security-modal{translate:0 calc(-1 * var(--security-keyboard-lift,0px));transition:translate .22s ease}
+.security-shell .security-hero{transition:opacity .18s ease}
+.security-shell.is-keyboard-lift .security-hero{opacity:0;pointer-events:none}
