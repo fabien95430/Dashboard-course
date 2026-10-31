@@ -23,7 +23,9 @@ test('le lancement reprend le flux direct sans écran de transition supplémenta
   const index=read('index.html');
   const sw=read('sw.js');
   assert.match(index,/<body class="is-launching">/);
-  assert.match(index,/id="securityOverlay" class="overlay security-overlay"/);
+  // v674 : l'écran de connexion est peint dès le premier rendu, avant app.js (pas de fond vide au rechargement de mise à jour).
+  assert.match(index,/id="securityOverlay" class="overlay security-overlay is-visible"/);
+  assert.doesNotMatch(read('styles.css'),/body\.is-launching[^{]*\.security-(?:hero|modal)/);
   assert.doesNotMatch(index,/id="startupCover"/);
   assert.doesNotMatch(index,/startup\/app\.js/);
   assert.doesNotMatch(sw,/startup\/app\.js/);

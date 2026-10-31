@@ -1583,10 +1583,8 @@ body:has(#securityOverlay.is-visible){
   }
 }
 
-/* ===== UI v53 — attendre la fin du zoom de lancement avant l’UI sécurité ===== */
-body.is-launching #securityOverlay.is-visible .security-hero,body.is-launching #securityOverlay.is-visible .security-modal{
-  visibility:hidden!important;
-}
+/* ===== v674 — l'écran de connexion est peint dès le premier rendu (y compris au rechargement de mise à jour) ===== */
+/* #securityOverlay est visible dans le HTML : plus de masquage de lancement, sinon fond seul puis chariot et carte. */
 
 /* ===== UI v56 — même échelle mobile sur Catalogue et Réglages ===== */
 @media(max-width:520px){
