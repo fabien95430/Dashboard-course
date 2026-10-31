@@ -222,3 +222,10 @@ test('l écran de connexion ne défile pas au doigt',()=>{
   assert.match(ui,/getElementById\('securityOverlay'\)\?\.addEventListener\('touchmove',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?\},\{passive:false\}\)/);
   assert.match(styles,/#securityOverlay\.is-visible\{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none\}/);
 });
+
+test('l écran de connexion s accroche à la hauteur physique de l iPhone (pas de saut au rechargement)',()=>{
+  const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  for(const h of [667,812,844,852,874,896,926,932,956])assert.match(styles,new RegExp('\\(device-height:'+h+'px\\)\\{:root\\{--lock-screen-h:'+h+'px;'));
+  assert.match(styles,/\.security-overlay\{bottom:auto!important;height:calc\(var\(--lock-screen-h\) \+ var\(--lock-screen-bottom\)\)!important;min-height:0!important\}/);
+  assert.match(styles,/\.security-overlay \.security-shell\{height:var\(--lock-screen-h\)!important;padding-bottom:var\(--lock-screen-bottom\)!important\}/);
+});

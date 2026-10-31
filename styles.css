@@ -3481,3 +3481,34 @@ body{
 html:has(#securityOverlay.is-visible),
 body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behavior:none!important}
 #securityOverlay.is-visible{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none}
+
+/* ===== v689 — écran de connexion : géométrie fixée sur la hauteur physique de l'iPhone =====
+   Au rechargement d'une mise à jour, iOS peint les premières images avec une zone d'affichage
+   plus courte (~60 px), puis l'agrandit : la carte et le fond, placés en % de la hauteur, sautaient.
+   La hauteur de l'écran physique (device-height, connue dès le premier rendu, comme pour les images
+   de lancement) ne change jamais : l'écran de connexion s'y accroche. Appareil inconnu : rendu inchangé. */
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:667px){:root{--lock-screen-h:667px;--lock-screen-bottom:0px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:736px){:root{--lock-screen-h:736px;--lock-screen-bottom:0px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:812px){:root{--lock-screen-h:812px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:844px){:root{--lock-screen-h:844px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:852px){:root{--lock-screen-h:852px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:874px){:root{--lock-screen-h:874px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:896px){:root{--lock-screen-h:896px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:912px){:root{--lock-screen-h:912px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:926px){:root{--lock-screen-h:926px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:932px){:root{--lock-screen-h:932px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:956px){:root{--lock-screen-h:956px;--lock-screen-bottom:34px}}
+@media (display-mode:standalone) and (orientation:portrait) and (device-height:667px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:736px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:812px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:844px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:852px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:874px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:896px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:912px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:926px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:932px),
+  (display-mode:standalone) and (orientation:portrait) and (device-height:956px){
+  .security-overlay{bottom:auto!important;height:calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;min-height:0!important}
+  .security-overlay .security-shell{height:var(--lock-screen-h)!important;padding-bottom:var(--lock-screen-bottom)!important}
+}
