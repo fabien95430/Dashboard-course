@@ -646,8 +646,6 @@ function setDialogFeedback(target,message,kind='success'){
   target.classList.add('is-visible');
   target._t=setTimeout(()=>clearDialogFeedback(target),3000);
 }
-// v589 — le zoom système d'iOS est terminé avant le premier rendu : fond et interface s'affichent ensemble.
-document.body.classList.remove('is-launching');
 function refreshVisualLock(){
   const blocked=UI.setup.classList.contains('is-visible')||UI.securityOverlay.classList.contains('is-visible');
   const app=$('#app'),changed=app.classList.contains('is-locked')!==blocked;
@@ -2113,6 +2111,8 @@ async function removeOneItem(name,groupHint=null,{deferRefresh=false}={}){
   }
 }
 
+// Une seule implémentation de l'achat / suppression d'un article (mode test, Home Assistant
+// connecté ou hors ligne) : l'ancienne version « en ligne » n'est plus surchargée par la couche hors ligne.
 async function removeGroup(name,row=null,intent='purchase'){
   const item=String(name||'').trim();
   if(!item)return;
@@ -2142,15 +2142,19 @@ async function removeGroup(name,row=null,intent='purchase'){
     const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
     const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
     window.CoursesHaptics?.play('tick');
-    await new Promise(resolve=>setTimeout(resolve,180));
+    await new Promise(resolve=>setTimeout(resolve,260));
+    row.style.maxHeight=row.offsetHeight+'px';
+    void row.offsetHeight;
     row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,180));
+    await new Promise(resolve=>setTimeout(resolve,560));
   }
 
   state.pendingRemoval.add(key);
   const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
+  const previousItems=state.items;
   state.items=state.items.filter(keepOtherItems);
   removeRenderedListRow(row);
+  let queuedOffline=false;
   const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';
 
   try{
@@ -2164,19 +2168,48 @@ async function removeGroup(name,row=null,intent='purchase'){
     }
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
     const uids=group.uids.filter(Boolean);
-    if(!uids.length)throw new Error('Identifiant de l’article indisponible');
-    await Promise.all(uids.map(completeTodoItem));
-    if(isPurchase)publishPurchaseSettled(item,group.count,false);
-    toast(successMessage);
+    const hasQueuedAdds=state.offlinePending.some(action=>action.entity===state.entity&&action.type==='add'&&norm(action.name)===key);
+    if(!uids.length&&!hasQueuedAdds)throw new Error('Identifiant de l’article indisponible');
+    if(!socketReady()){
+      await queueOfflineCompletion(item,uids);
+      queuedOffline=true;
+      if(isPurchase)publishPurchaseSettled(item,group.count,true);
+      toast(successMessage);
+      return;
+    }
+    if(hasQueuedAdds)await queueOfflineCompletion(item,[]);
+    try{
+      if(uids.length)await Promise.all(uids.map(completeTodoItem));
+      if(isPurchase)publishPurchaseSettled(item,group.count,false);
+      toast(successMessage);
+    }catch(error){
+      if(!isTransientHaError(error))throw error;
+      await queueOfflineCompletion(item,uids);
+      queuedOffline=true;
+      if(isPurchase)publishPurchaseSettled(item,group.count,true);
+      toast(successMessage);
+    }
   }catch(error){
+    if(!state.demo&&!queuedOffline&&!socketReady()){
+      state.items=previousItems;
+      renderSelectionAndList();
+    }
     toast('Suppression impossible');
     status('is-error','Erreur',error.message||'Suppression impossible');
   }finally{
     state.purchaseUndo.delete(key);
     state.pendingRemoval.delete(key);
     state.productBusy.delete(key);
-    if(!state.demo)await refreshItems();
-    else syncProductSelection();
+    if(state.demo){
+      syncProductSelection();
+    }else if(queuedOffline){
+      syncProductSelection();
+      showOfflineStatus();
+    }else if(socketReady()){
+      await refreshItems();
+    }else if(state.offlineLoaded){
+      showOfflineStatus();
+    }
   }
 }
 function showNeutralDialog(dialog){
@@ -2298,6 +2331,8 @@ function setMissingProductCategory(category){
   window.CoursesHaptics?.play('tick');
 }
 function addMissingProduct(){
+  // Mode Plats et préparation du mode Produits : missing-products-dishes.js (s'il est chargé).
+  if(window.COURSES_MISSING_ADD?.handle?.())return;
   const name=String(UI.missingProductName.value||'').trim().replace(/\s+/g,' ').slice(0,80);
   if(!name){
     UI.missingProductName.focus();
@@ -2723,97 +2758,6 @@ refreshItems=async function(){
     status('is-error','Courses indisponible',state.error);
   }
 };
-const onlineRemoveGroup=removeGroup;
-removeGroup=async function(name,row=null,intent='purchase'){
-  const item=String(name||'').trim();
-  if(!item)return;
-  if(state.demo)return onlineRemoveGroup(name,row,intent);
-  const key=norm(item);
-  const isPurchase=intent!=='delete';
-  if(state.productBusy.has(key))return;
-  const group=activeGroups().find(entry=>norm(entry.summary)===key);
-  if(!group)return;
-
-  state.productBusy.add(key);
-  let undoToken=null;
-  if(row&&isPurchase){
-    undoToken={cancelled:false};
-    state.purchaseUndo.set(key,undoToken);
-    row.classList.add('is-purchased','is-busy');
-    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
-    const undo=row.querySelector('.undo-purchase');if(undo)undo.hidden=false;
-    window.CoursesHaptics?.play('tick');
-    await new Promise(resolve=>setTimeout(resolve,PURCHASE_HOLD_MS));
-    if(undoToken.cancelled)return;
-    row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,PURCHASE_EXIT_MS));
-    if(undoToken.cancelled)return;
-    state.purchaseUndo.delete(key);
-  }else if(row){
-    row.classList.add('is-deleting','is-busy');
-    const check=row.querySelector('.purchase-check');if(check)check.disabled=true;
-    const more=row.querySelector('.list-row-more');if(more)more.disabled=true;
-    window.CoursesHaptics?.play('tick');
-    await new Promise(resolve=>setTimeout(resolve,260));
-    row.style.maxHeight=row.offsetHeight+'px';
-    void row.offsetHeight;
-    row.classList.add('is-removing');
-    await new Promise(resolve=>setTimeout(resolve,560));
-  }
-
-  state.pendingRemoval.add(key);
-  const keepOtherItems=entry=>!isPendingItem(entry)||norm(itemSummary(entry))!==key;
-  const previousItems=state.items;
-  state.items=state.items.filter(keepOtherItems);
-  removeRenderedListRow(row);
-  let queuedOffline=false;
-  const successMessage=isPurchase?item+' acheté':item+' supprimé de Ma liste';
-
-  try{
-    if(!state.entity)throw new Error('Liste Home Assistant indisponible');
-    const uids=group.uids.filter(Boolean);
-    const hasQueuedAdds=state.offlinePending.some(action=>action.entity===state.entity&&action.type==='add'&&norm(action.name)===key);
-    if(!uids.length&&!hasQueuedAdds)throw new Error('Identifiant de l’article indisponible');
-    if(!socketReady()){
-      await queueOfflineCompletion(item,uids);
-      queuedOffline=true;
-      if(isPurchase)publishPurchaseSettled(item,group.count,true);
-      toast(successMessage);
-      return;
-    }
-    if(hasQueuedAdds)await queueOfflineCompletion(item,[]);
-    try{
-      if(uids.length)await Promise.all(uids.map(completeTodoItem));
-      if(isPurchase)publishPurchaseSettled(item,group.count,false);
-      toast(successMessage);
-    }catch(error){
-      if(!isTransientHaError(error))throw error;
-      await queueOfflineCompletion(item,uids);
-      queuedOffline=true;
-      if(isPurchase)publishPurchaseSettled(item,group.count,true);
-      toast(successMessage);
-    }
-  }catch(error){
-    if(!queuedOffline&&!socketReady()){
-      state.items=previousItems;
-      renderSelectionAndList();
-    }
-    toast('Suppression impossible');
-    status('is-error','Erreur',error.message||'Suppression impossible');
-  }finally{
-    state.purchaseUndo.delete(key);
-    state.pendingRemoval.delete(key);
-    state.productBusy.delete(key);
-    if(queuedOffline){
-      syncProductSelection();
-      showOfflineStatus();
-    }else if(socketReady()){
-      await refreshItems();
-    }else if(state.offlineLoaded){
-      showOfflineStatus();
-    }
-  }
-};
 const onlineWipeMemoryCredentials=wipeMemoryCredentials;
 wipeMemoryCredentials=function(){
   onlineWipeMemoryCredentials();
@@ -3086,7 +3030,6 @@ function bindUiEvents(){
     hideSetup();hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
   };
   UI.refreshBtn.onclick=event=>refreshFromHeader(UI.refreshBtn,event.isTrusted);
-  $('#securitySettingsBtn').onclick=()=>toast('Déverrouille l’application pour accéder aux réglages');
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;
   if(UI.autoLockSelect)UI.autoLockSelect.onchange=()=>setAutoLockMinutes(UI.autoLockSelect.value);

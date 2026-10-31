@@ -344,8 +344,9 @@ def delete_dish(requested: str) -> dict:
     if not found:
         fail('Plat introuvable dans dishes-ui.js')
     name, _ = found
-    child = set_contains(dishes_text, 'CHILD_DISHES', name) or set_contains(local_text, 'CHILD_DISHES', name)
-    special_slug = object_string_value(dishes_text, 'DISH_SPECIAL_SLUGS', name) or object_string_value(local_text, 'SPECIAL_SLUGS', name)
+    # Les tables des noms de fichiers des plats vivent uniquement dans dishes-ui.js.
+    child = set_contains(dishes_text, 'CHILD_DISHES', name)
+    special_slug = object_string_value(dishes_text, 'DISH_SPECIAL_SLUGS', name)
     filename = ('enfant-' if child else '') + (special_slug or base.slugify(name)) + '.png'
 
     dishes_text, name = remove_dish_record(dishes_text, name)
@@ -353,13 +354,6 @@ def delete_dish(requested: str) -> dict:
     dishes_text = remove_object_entry(
         dishes_text,
         'DISH_SPECIAL_SLUGS',
-        name,
-        r"'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"",
-    )
-    local_text = remove_set_value(local_text, 'CHILD_DISHES', name)
-    local_text = remove_object_entry(
-        local_text,
-        'SPECIAL_SLUGS',
         name,
         r"'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"",
     )
@@ -397,6 +391,11 @@ def delete_dish(requested: str) -> dict:
     index_path.write_text(index_text, encoding='utf-8')
     if image_path.exists():
         image_path.unlink()
+    # Copies WebP du plat (vignette de carte et photo de fiche) : retirées avec la photo d'origine.
+    for folder in ('cartes', 'fiches'):
+        copy_path = ROOT / 'www' / 'Plats' / folder / (filename[:-len('.png')] + '.webp')
+        if copy_path.exists():
+            copy_path.unlink()
 
     return {
         'ok': True,

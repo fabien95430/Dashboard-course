@@ -21,7 +21,13 @@ test('le marqueur des plats suit les événements métier sans observer le DOM',
     assert.ok(marker.includes("document.addEventListener('"+event+"'"),event+' absent du marqueur');
   }
   assert.match(marker,/new CustomEvent\('courses:dish-availability-updated'/);
-  assert.match(marker,/document\.addEventListener\('courses:quantities-ready',scheduleConfirmationBinding\)/);
+  // Le bouton « Ajouter » appartient à dishes-ui.js : le marqueur suit l'événement de demande d'ajout, sans intercepter le clic.
+  assert.match(marker,/document\.addEventListener\('courses:dish-add-requested'/);
+  assert.doesNotMatch(marker,/stopImmediatePropagation|addEventListener\('click'/);
+  const dishes=read('dishes-ui.js');
+  assert.match(dishes,/dishConfirmButton\.addEventListener\('click',confirmDishAdd\)/);
+  assert.match(dishes,/new CustomEvent\('courses:dish-add-requested'/);
+  assert.match(dishes,/new CustomEvent\('courses:dish-add-settled'/);
 });
 
 test('les propriétaires publient les rendus de plats et les quantités décorées',()=>{

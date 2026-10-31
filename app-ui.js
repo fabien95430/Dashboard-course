@@ -17,8 +17,6 @@ function syncPageVersions(){
     const style=document.createElement('style');
     style.id='app-version-ui';
     style.textContent=`
-      .catalog-view .page-header h1::after{content:none!important}
-      .dish-card img[src^="https://images.pexels.com/"],.dish-sheet-photo[src^="https://images.pexels.com/"]{visibility:hidden!important}
       .catalog-view .product:not(.is-selected) .badge{font-size:0!important}
       .catalog-view .product:not(.is-selected) .badge::before,.catalog-view .product:not(.is-selected) .badge::after{
         content:'';

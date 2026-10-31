@@ -112,9 +112,14 @@ const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poul
 const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 const ingredientImageSource=name=>'./www/Items/'+dishSlug(name)+'.webp';
 const dishFileName=name=>(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name));
+// Photo d'origine (PNG lourd) : seulement en secours si la copie WebP de la fiche manque.
 const dishPhotoUrl=name=>'./www/Plats/'+dishFileName(name)+'.png';
+// Photo de la fiche (1200 px WebP, ~180 Ko) : affichée à l'ouverture sans attendre un PNG de 2 Mo.
+const dishSheetPhotoUrl=name=>'./www/Plats/fiches/'+dishFileName(name)+'.webp';
 // Vignette légère des cartes (720 px WebP) : prête à s'afficher sans décodage lourd.
 const dishCardPhotoUrl=name=>'./www/Plats/cartes/'+dishFileName(name)+'.webp';
+// Source unique des adresses de visuels de plats (dish-local-images.js les réutilise).
+window.COURSES_DISH_FILES=Object.freeze({fileName:dishFileName,photo:dishPhotoUrl,sheet:dishSheetPhotoUrl,card:dishCardPhotoUrl});
 
 let mode='products';
 let filter='Tous';
@@ -162,7 +167,6 @@ let recipeCustomizationPicker;
 let recipeCustomizationDish=null;
 let recipeCustomizationSelection=new Set();
 let recipeCustomizationNeeds={};
-let toastTimer=0;
 let lensTimer=0;
 let dishGridWarmupScheduled=false;
 let dishGridState='';
@@ -222,10 +226,11 @@ function showToast(message){
   const toast=document.getElementById('toast');
   if(!toast)return;
   window.CoursesHaptics?.forMessage(message);
-  clearTimeout(toastTimer);
+  // Minuteur partagé sur l'élément (#toast._t), comme app.js : un message plus ancien ne masque plus le nouveau.
+  clearTimeout(toast._t);
   toast.textContent=message;
   toast.classList.add('is-visible');
-  toastTimer=setTimeout(()=>toast.classList.remove('is-visible'),2200);
+  toast._t=setTimeout(()=>toast.classList.remove('is-visible'),2200);
 }
 function makeButton(label,value,className){
   const button=document.createElement('button');
@@ -238,7 +243,8 @@ function makeButton(label,value,className){
 function useDishImage(image,name){
   if(!image)return;
   image.dataset.dishImage=name;
-  image.src=dishPhotoUrl(name);
+  delete image.dataset.dishPhotoFallback;
+  image.src=dishSheetPhotoUrl(name);
 }
 function bindDishImageFallback(image,name=''){
   if(!image||image.dataset.dishImageFallbackBound==='1')return;
@@ -250,6 +256,13 @@ function bindDishImageFallback(image,name=''){
     if(name&&current===dishCardPhotoUrl(name)){
       image.dataset.dishCardFallback='1';
       image.src=dishPhotoUrl(name);
+      return;
+    }
+    // Copie WebP de la fiche absente (plat ajouté sans copie) : photo d'origine, puis visuel de secours.
+    const sheetName=image.dataset.dishImage||'';
+    if(sheetName&&current===dishSheetPhotoUrl(sheetName)){
+      image.dataset.dishPhotoFallback='1';
+      image.src=dishPhotoUrl(sheetName);
       return;
     }
     image.src=DISH_PLACEHOLDER;
@@ -870,7 +883,7 @@ function dishCard(dish){
   const favoriteButton=card.querySelector('.dish-favorite');
   favoriteButton.addEventListener('click',event=>{event.stopPropagation();toggleFavorite(dish.name)});
   card.addEventListener('click',event=>{if(!event.target.closest('.dish-favorite'))openDishSheet(dish)});
-  card.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.dish-favorite')){event.preventDefault();openDishSheet(dish)}});
+  card.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.dish-favorite')){event.preventDefault();if(!busyDish)openDishSheet(dish)}});
   dishCardCache.set(dish.name,card);
   syncDishFavorite(card,dish.name);
   return card;
@@ -944,6 +957,9 @@ function openDishSheet(dish){
 }
 function closeDishSheet(){
   if(!dishDialog||busyDish)return;
+  hideDishSheet();
+}
+function hideDishSheet(){
   if(dishDialog.open)dishDialog.close();else dishDialog.removeAttribute('open');
   document.documentElement.classList.remove('dish-sheet-open');
   currentDish=null;
@@ -978,25 +994,94 @@ function renderDishSheetIngredients(){
   dishConfirmButton.querySelector('span').textContent=count?'Ajouter à ma liste':'Sélectionnez un ingrédient';
   document.dispatchEvent(new CustomEvent('courses:dish-ingredients-rendered',{detail:{dish:currentDish.name}}));
 }
+// Validation de la fiche plat : ce module est le seul à gérer le bouton « Ajouter ».
+// Les autres modules se branchent sur des événements au lieu d'intercepter le clic :
+// - courses:dish-add-requested (synchrone, avant l'ajout) : préparation de la sélection ;
+//   un abonné qui modifie la sélection pose detail.retry=true et l'ajout repart à l'image suivante ;
+// - courses:dish-add-settled (après l'ajout) : résultat, pour le marqueur de plat et l'historique d'achats.
+const DISH_CONFIRM_FEEDBACK_MS=1350;
+const waitMs=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function selectedDishIngredients(){
+  return [...dishDialog.querySelectorAll('.dish-ingredient[data-ingredient]')]
+    .filter(row=>row.classList.contains('is-selected')||row.classList.contains('is-already-listed'))
+    .map(row=>String(row.dataset.ingredient||'').trim())
+    .filter(Boolean);
+}
+function publishDishAddResult(name,ingredients,result){
+  document.dispatchEvent(new CustomEvent('courses:dish-add-settled',{detail:{name,ingredients,result}}));
+}
+function dishAddResultMessage(name,result){
+  if(result.failed)return 'Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':'');
+  if(!result.added)return 'Les quantités nécessaires sont déjà dans Ma liste';
+  return name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':'');
+}
+function confirmationLayer(){
+  let layer=dishDialog.querySelector('.dish-confirm-feedback-layer');
+  if(layer)return layer;
+  layer=document.createElement('div');
+  layer.className='dish-confirm-feedback-layer';
+  layer.setAttribute('aria-hidden','true');
+  layer.innerHTML='<span class="dish-confirm-feedback-mark">✓</span><strong>Sélection validée</strong><small>Ajout à Ma liste en cours</small>';
+  dishDialog.appendChild(layer);
+  return layer;
+}
+function startConfirmationFeedback(){
+  confirmationLayer();
+  dishDialog.classList.add('is-confirm-feedback');
+  dishConfirmButton.classList.add('is-busy');
+  dishConfirmButton.disabled=true;
+  const label=dishConfirmButton.querySelector('span');
+  if(label)label.textContent='Sélection validée';
+  dishConfirmButton.querySelector('svg use')?.setAttribute('href','#i-check');
+  window.CoursesHaptics?.vibrate([8,24,8]);
+}
+function endConfirmationFeedback(){
+  dishDialog.classList.remove('is-confirm-feedback');
+  dishDialog.querySelector('.dish-confirm-feedback-layer')?.remove();
+  dishConfirmButton.classList.remove('is-busy');
+  const label=dishConfirmButton.querySelector('span');
+  if(label)label.textContent='Ajouter à ma liste';
+  dishConfirmButton.querySelector('svg use')?.setAttribute('href','#i-cart');
+}
 async function confirmDishAdd(){
   if(!currentDish||busyDish||dishConfirmButton.disabled)return;
   const dish=currentDish;
-  window.CoursesHaptics?.vibrate([12,35,12]);
-  const operation=window.COURSES_QUANTITIES.addSelected();
-  closeDishSheet();
-  busyDish=dish.name;
-  let result;
+  const request={dish:dish.name,button:dishConfirmButton,retry:false};
+  document.dispatchEvent(new CustomEvent('courses:dish-add-requested',{detail:request}));
+  if(request.retry){
+    requestAnimationFrame(()=>{if(currentDish===dish&&!dishConfirmButton.disabled)confirmDishAdd()});
+    return;
+  }
+  if(dishConfirmButton.disabled)return;
+  const addSelected=window.COURSES_QUANTITIES?.addSelected;
+  if(typeof addSelected!=='function')return;
+  const ingredients=selectedDishIngredients();
+  window.CoursesHaptics?.vibrate([10,28,10]);
+  let operation;
   try{
-    result=await operation;
+    operation=Promise.resolve(addSelected()).then(result=>({result}),error=>({error}));
   }catch(error){
+    publishDishAddResult(dish.name,ingredients,null);
     showToast('Ajout impossible');
     return;
-  }finally{
-    busyDish='';
   }
-  if(result.failed){showToast('Ajout partiel · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+' · '+result.failed+' erreur'+(result.failed>1?'s':''));return}
-  if(!result.added){showToast('Les quantités nécessaires sont déjà dans Ma liste');return}
-  showToast(dish.name+' · '+result.added+' unité'+(result.added>1?'s':'')+' ajoutée'+(result.added>1?'s':'')+(result.present?' · '+result.present+' déjà dans Ma liste':''));
+  busyDish=dish.name;
+  document.documentElement.classList.add('is-dish-background-sync');
+  startConfirmationFeedback();
+  await waitMs(DISH_CONFIRM_FEEDBACK_MS);
+  endConfirmationFeedback();
+  hideDishSheet();
+  const outcome=await operation;
+  busyDish='';
+  document.documentElement.classList.remove('is-dish-background-sync');
+  if(outcome.error){
+    publishDishAddResult(dish.name,ingredients,null);
+    showToast('Ajout impossible');
+    return;
+  }
+  const result=outcome.result||{added:0,failed:1,present:0};
+  publishDishAddResult(dish.name,ingredients,result);
+  showToast(dishAddResultMessage(dish.name,result));
 }
 function init(){
   buildUi();

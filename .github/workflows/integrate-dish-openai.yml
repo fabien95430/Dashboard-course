@@ -229,9 +229,13 @@ jobs:
           elif [ "${{ steps.request.outputs.type }}" = "delete_dish" ]; then
             git add catalog.js catalog-quantities.js index.html dishes-ui.js dish-local-images.js sw.js
             image="www/Plats/${{ steps.result.outputs.filename }}"
-            if git ls-files --error-unmatch "$image" >/dev/null 2>&1; then
-              git add -A "$image"
-            fi
+            stem="${{ steps.result.outputs.filename }}"
+            stem="${stem%.png}"
+            for path in "$image" "www/Plats/cartes/$stem.webp" "www/Plats/fiches/$stem.webp"; do
+              if git ls-files --error-unmatch "$path" >/dev/null 2>&1; then
+                git add -A "$path"
+              fi
+            done
             message="v${{ steps.result.outputs.version }}: supprime le plat ${{ steps.request.outputs.name }} du catalogue"
           elif [ "${{ steps.request.outputs.type }}" = "product" ]; then
             git add catalog.js app.js catalog-quantities.js index.html product-item-images.js dish-local-images.js sw.js "www/Items/${{ steps.result.outputs.filename }}"

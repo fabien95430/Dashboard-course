@@ -22,7 +22,9 @@ test('le shell de démarrage reste un document HTML et le service worker reste d
 test('le lancement reprend le flux direct sans écran de transition supplémentaire',()=>{
   const index=read('index.html');
   const sw=read('sw.js');
-  assert.match(index,/<body class="is-launching">/);
+  // Plus de classe de lancement : l'écran de connexion est peint dès le premier rendu (v674-v675).
+  assert.match(index,/<body>/);
+  assert.doesNotMatch(index+read('app.js'),/is-launching/);
   // v674 : l'écran de connexion est peint dès le premier rendu, avant app.js (pas de fond vide au rechargement de mise à jour).
   assert.match(index,/id="securityOverlay" class="overlay security-overlay is-visible"/);
   assert.doesNotMatch(read('styles.css'),/body\.is-launching[^{]*\.security-(?:hero|modal)/);

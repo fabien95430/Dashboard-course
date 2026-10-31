@@ -428,10 +428,8 @@ function consumeRecentDishClick(event){
   },0);
 }
 function bindHistoryEvents(){
-  document.addEventListener('click',event=>{
-    const dishAdd=event.target?.closest?.('#dishDialog .dish-sheet-add');
-    if(dishAdd)watchDishConsumption(dishAdd);
-  },true);
+  // Demande d'ajout publiée par dishes-ui.js (propriétaire du bouton « Ajouter ») : pas d'interception du clic.
+  document.addEventListener('courses:dish-add-requested',event=>watchDishConsumption(event.detail?.button));
   document.addEventListener('courses:purchase-settled',consumePurchaseSettled);
   document.addEventListener('courses:dish-add-settled',consumeDishAddSettled);
 }

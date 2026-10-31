@@ -25,14 +25,16 @@ test('les propriétaires publient les cycles transverses restants',()=>{
 test('les consommateurs P1 écoutent les événements propriétaires au lieu du DOM',()=>{
   const images=read('dish-local-images.js'),appUi=read('app-ui.js'),errors=read('error-center.js'),repurchase=read('repurchase-soon.js');
   const fixes=read('missing-products-fixes.js'),popup=read('missing-products-popup-ui.js'),admin=read('catalog-product-admin.js');
-  assert.match(images,/document\.addEventListener\('courses:dishes-rendered'/);
-  assert.match(images,/document\.addEventListener\('courses:dish-sheet-opened'/);
+  // Les adresses et la chaîne de secours des visuels de plats appartiennent à dishes-ui.js ;
+  // dish-local-images.js ne réécrit plus les images après leur rendu.
+  assert.doesNotMatch(images,/courses:dishes-rendered|courses:dish-sheet-opened/);
+  assert.match(images,/window\.COURSES_DISH_FILES/);
   assert.match(appUi,/document\.addEventListener\('courses:list-rendered'/);
   assert.match(errors,/document\.addEventListener\('courses:status-changed',sync\)/);
   assert.match(errors,/document\.addEventListener\('courses:settings-management-ready',bindUi/);
   assert.match(repurchase,/document\.addEventListener\('courses:lock-changed'/);
   assert.match(fixes,/document\.addEventListener\('courses:missing-requests-rendered',decorateOpenAiButtons\)/);
-  assert.match(popup,/document\.addEventListener\('courses:missing-requests-rendered',queueDecorate\)/);
+  assert.match(popup,/document\.addEventListener\('courses:missing-requests-rendered',decorateRendered\)/);
   assert.match(admin,/document\.addEventListener\('courses:catalog-view-changed',event=>followCatalogView\(event\.detail\)\)/);
 });
 

@@ -8,8 +8,14 @@ const read=file=>readFileSync(new URL(file,root),'utf8');
 test('dish-local-images reste limité aux visuels des plats',()=>{
   const source=read('dish-local-images.js');
   assert.match(source,/function localDishImage\(name\)/);
-  assert.match(source,/function localizeImage\(image,name,card=false\)/);
-  assert.match(source,/function localizeCards\(grid\)/);
+  assert.match(source,/function warmDishImages\(\)/);
+  assert.match(source,/function retryLocalImages\(\)/);
+  // Source unique des noms de fichiers : les tables des plats vivent dans dishes-ui.js seulement.
+  assert.doesNotMatch(source,/CHILD_DISHES|SPECIAL_SLUGS|DISH_PLACEHOLDER/);
+  const dishes=read('dishes-ui.js');
+  assert.match(dishes,/const CHILD_DISHES=new Set/);
+  assert.match(dishes,/window\.COURSES_DISH_FILES=Object\.freeze\(\{fileName:dishFileName,photo:dishPhotoUrl,sheet:dishSheetPhotoUrl,card:dishCardPhotoUrl\}\)/);
+  assert.match(dishes,/const dishSheetPhotoUrl=name=>'\.\/www\/Plats\/fiches\/'\+dishFileName\(name\)\+'\.webp';/);
   for(const forbidden of ['syncPageVersions','securityViewportHeight','syncListEmptyState','installMissingProductsFixes','installProductItemImages','installPurchaseIntelligence'])assert.equal(source.includes(forbidden),false,forbidden+' ne doit plus appartenir aux images de plats');
 });
 

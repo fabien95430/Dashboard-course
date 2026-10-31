@@ -654,27 +654,18 @@ function removeDish(id){
   cancelButton.addEventListener('click',cancelAdd);
   input.addEventListener('input',syncAddButton);
 
-  addButton.addEventListener('click',event=>{
+  // Le bouton « Ajouter » et la touche Entrée appartiennent à app.js (addMissingProduct) : il appelle
+  // ce point d'entrée avant d'ajouter un produit, au lieu d'être intercepté en phase de capture.
+  // Renvoie true quand la demande a été traitée ici (mode Plats).
+  window.COURSES_MISSING_ADD=Object.freeze({handle(){
     if(mode==='products'){
       notifyDuplicateProductAttempt();
       saveProductImageHintDraft();
-      return;
+      return false;
     }
-    event.preventDefault();
-    event.stopImmediatePropagation();
     addDish();
-  },true);
-  input.addEventListener('keydown',event=>{
-    if(event.key!=='Enter')return;
-    if(mode==='products'){
-      notifyDuplicateProductAttempt();
-      saveProductImageHintDraft();
-      return;
-    }
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    addDish();
-  },true);
+    return true;
+  }});
   imageHintInput.addEventListener('keydown',event=>{
     if(mode!=='products'||event.key!=='Enter')return;
     event.preventDefault();

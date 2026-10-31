@@ -1,4 +1,4 @@
-@import url("./dish-detail.css?v=6");
+@import url("./dish-detail.css?v=675");
 
 /* v494 — trait actif uniquement, aucune capsule de fond. */
 .catalog-mode-lens{top:auto!important;bottom:2px!important;height:2px!important;border:0!important;border-radius:1px!important;background:#073e2c!important;box-shadow:none!important;transform:translate3d(var(--catalog-lens-x),0,0) scaleX(var(--catalog-liquid-sx))!important;transition:none!important}
@@ -10,16 +10,12 @@
 
 /* v179 — Nombre de personnes sur la ligne Ingrédients */
 .dish-sheet-head .dish-servings{
-  position:absolute!important;
   z-index:4;
   right:14px;
   bottom:-33px;
-  min-height:30px!important;
-  margin:0!important;
   display:flex!important;
   align-items:center!important;
   justify-content:flex-end!important;
-  gap:5px!important;
 }
 .dish-sheet-head .dish-servings>strong{
   color:#334139!important;
@@ -28,24 +24,8 @@
   font-weight:760!important;
   white-space:nowrap!important;
 }
-.dish-sheet-head .dish-servings-control{
-  height:30px!important;
-  padding:2px!important;
-  grid-template-columns:25px 32px 25px!important;
-  border-radius:15px!important;
-}
-.dish-sheet-head .dish-servings-step{
-  width:25px!important;
-  height:25px!important;
-  border-radius:13px!important;
-  font-size:18px!important;
-}
-.dish-sheet-head .dish-servings-value{
-  width:32px!important;
-  height:25px!important;
-  font-size:14px!important;
-  line-height:25px!important;
-}
+
+
 .dish-sheet-list::before{
   min-height:30px!important;
   margin-bottom:8px!important;
@@ -74,7 +54,7 @@
 }
 
 @media(max-width:390px){
-  .dish-sheet-head .dish-servings{right:11px;bottom:-33px;gap:4px!important}
+  .dish-sheet-head .dish-servings{right:11px;bottom:-33px;}
   .dish-sheet-head .dish-servings>strong{font-size:10px!important}
   .dish-sheet-list::before{padding-right:168px!important;font-size:15px!important}
 }

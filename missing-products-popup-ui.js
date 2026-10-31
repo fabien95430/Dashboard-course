@@ -202,6 +202,12 @@ function queueDecorate(){
   if(decorateFrame)return;
   decorateFrame=requestAnimationFrame(decorate);
 }
+// Rendu des lignes : décoration immédiate, dans la même tâche que le rendu, pour que la ligne
+// s'affiche déjà complète (vignette, flèche, actions) au lieu de se compléter une image plus tard.
+function decorateRendered(){
+  if(decorateFrame){cancelAnimationFrame(decorateFrame);decorateFrame=0}
+  decorate();
+}
 function installStyle(){
   if(document.getElementById('missing-products-popup-ui-style'))return;
   const style=document.createElement('style');
@@ -264,7 +270,7 @@ function bind(){
 }
 
 installStyle();
-document.addEventListener('courses:missing-requests-rendered',queueDecorate);
+document.addEventListener('courses:missing-requests-rendered',decorateRendered);
 document.addEventListener('courses:missing-integration-ui-updated',queueDecorate);
 document.addEventListener('courses:dialog-opened',event=>{
   if(event.detail?.id!=='missingProductsDialog')return;

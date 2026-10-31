@@ -1,4 +1,4 @@
-const CACHE='courses-app-v674-r1';
+const CACHE='courses-app-v675-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 const CORE_VISUALS=[
@@ -7,7 +7,7 @@ const CORE_VISUALS=[
   './www/empty-list-premium-v4.webp?v=305',
   './www/list-header-citrons-v552.webp'
 ];
-const SHELL=["./index.html","./marble-ivory-sage-v517.svg","./styles.css?v=674","./product-item-first-paint.css?v=610","./catalog.js?v=674","./preferences-service.js?v=398","./missing-requests-store.js?v=619","./courses-notifications.js?v=482","./bottom-nav-liquid.js?v=573","./app.js?v=659","./settings-tab-badge.js?v=410","./settings-ui.js?v=657","./error-center.js?v=630","./dishes.css?v=532","./catalog-liquid.css?v=496","./dish-detail.css?v=6","./catalog-liquid.js?v=635","./dishes-ui.js?v=653","./catalog-quantities.js?v=672","./repurchase-soon.js?v=664","./dish-local-images.js?v=674","./app-ui.js?v=653","./runtime-features.js?v=664","./missing-products-fixes.js?v=656","./missing-products-popup-ui.js?v=628","./product-item-images.js?v=610","./catalog-product-admin.js?v=661","./purchase-intelligence.js?v=664","./missing-products-dishes.js?v=654","./missing-products-modern.js?v=635","./dish-added-marker.js?v=653","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];
+const SHELL=["./index.html","./marble-ivory-sage-v517.svg","./styles.css?v=675","./product-item-first-paint.css?v=610","./catalog.js?v=675","./preferences-service.js?v=398","./missing-requests-store.js?v=619","./courses-notifications.js?v=482","./bottom-nav-liquid.js?v=573","./app.js?v=675","./settings-tab-badge.js?v=410","./settings-ui.js?v=675","./error-center.js?v=630","./dishes.css?v=675","./catalog-liquid.css?v=675","./dish-detail.css?v=675","./catalog-liquid.js?v=635","./dishes-ui.js?v=675","./catalog-quantities.js?v=672","./repurchase-soon.js?v=664","./dish-local-images.js?v=675","./app-ui.js?v=675","./runtime-features.js?v=675","./missing-products-fixes.js?v=656","./missing-products-popup-ui.js?v=675","./product-item-images.js?v=610","./catalog-product-admin.js?v=661","./purchase-intelligence.js?v=675","./missing-products-dishes.js?v=675","./missing-products-modern.js?v=635","./dish-added-marker.js?v=675","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];
 const refreshedVisuals=new Set();
 // Fichiers précachés de la version courante (adresses versionnées) : servis depuis le cache, sans attendre le réseau.
 const SHELL_SUFFIXES=SHELL.filter(src=>src!=='./index.html').map(src=>src.slice(1));
@@ -19,7 +19,7 @@ function isPrecachedShellAsset(url){
 const VISUAL_REFRESH_MARK='X-Courses-Refreshed';
 
 function isPersistentVisual(url){
-  return url.pathname.includes('/www/Plats/')
+  return url.pathname.includes('/www/Plats/')&&!isDishOriginalPhoto(url)
     ||url.pathname.includes('/www/Items/')
     ||url.pathname.endsWith('/www/empty-list-premium-v4.webp')
     ||url.pathname.endsWith('/welcome-cart-transparent-v46.png')
@@ -56,12 +56,17 @@ async function seedCoreVisuals(){
 
 // Les photos de plats avaient une adresse changeant à chaque version (?v=) : ces anciennes
 // copies, désormais inutiles, sont retirées une fois pour libérer l'espace.
+// Les photos PNG d'origine (~2,4 Mo chacune) ne servent plus qu'en secours : la fiche affiche
+// sa copie WebP. Elles sont retirées du cache persistant pour qu'il ne grossisse pas sans limite.
+function isDishOriginalPhoto(url){
+  return /\/www\/Plats\/[^/]+\.png$/.test(url.pathname);
+}
 async function pruneVersionedDishVisuals(){
   const cache=await caches.open(VISUAL_CACHE);
   const requests=await cache.keys();
   await Promise.all(requests.filter(request=>{
     const url=new URL(request.url);
-    return url.pathname.includes('/www/Plats/')&&url.search;
+    return url.pathname.includes('/www/Plats/')&&url.search||isDishOriginalPhoto(url);
   }).map(request=>cache.delete(request)));
 }
 
@@ -76,7 +81,19 @@ function refreshVisual(cache,request,hit){
   if(refreshedVisuals.has(key))return Promise.resolve();
   if(hit?.headers?.get(VISUAL_REFRESH_MARK)===CACHE)return Promise.resolve();
   refreshedVisuals.add(key);
-  return fetch(new Request(request,{cache:'reload'})).then(response=>{
+  // Revalidation conditionnelle : un visuel inchangé répond 304 sans corps, au lieu d'être
+  // re-téléchargé en entier à chaque nouvelle version de l'application.
+  const headers=new Headers();
+  const etag=hit?.headers?.get('ETag');
+  const modified=hit?.headers?.get('Last-Modified');
+  if(etag)headers.set('If-None-Match',etag);
+  if(modified)headers.set('If-Modified-Since',modified);
+  const conditional=Boolean(etag||modified);
+  const refresh=conditional
+    ?new Request(request.url,{headers,cache:'no-store',credentials:'same-origin'})
+    :new Request(request,{cache:'reload'});
+  return fetch(refresh).then(response=>{
+    if(response.status===304&&hit)return cache.put(request,markVisualRefreshed(hit.clone()));
     if(!response.ok){
       refreshedVisuals.delete(key);
       return;

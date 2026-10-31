@@ -44,8 +44,8 @@
   const loadDishStyles=()=>{
     if(dishStylesReadyPromise)return dishStylesReadyPromise;
     dishStylesReadyPromise=Promise.all([
-      ensureStylesheet('link[data-catalog-dishes]','./dishes.css?v=532','catalogDishes'),
-      ensureStylesheet('link[data-catalog-liquid]','./catalog-liquid.css?v=496','catalogLiquid')
+      ensureStylesheet('link[data-catalog-dishes]','./dishes.css?v=675','catalogDishes'),
+      ensureStylesheet('link[data-catalog-liquid]','./catalog-liquid.css?v=675','catalogLiquid')
     ]).catch(error=>{
       dishStylesReadyPromise=null;
       throw error;
@@ -72,7 +72,7 @@
   const loadDishAddedMarker=()=>{
     if(document.querySelector('script[data-dish-added-marker]'))return;
     const marker=document.createElement('script');
-    marker.src='./dish-added-marker.js?v=653';
+    marker.src='./dish-added-marker.js?v=675';
     marker.async=false;
     marker.dataset.dishAddedMarker='script';
     document.body.appendChild(marker);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=674';
+    images.src='./dish-local-images.js?v=675';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -104,7 +104,7 @@
     loadDishStyles().then(()=>{
       if(document.querySelector('script[data-catalog-dishes]')){loadLiquid();return}
       const script=document.createElement('script');
-      script.src='./dishes-ui.js?v=653';
+      script.src='./dishes-ui.js?v=675';
       script.async=false;
       script.dataset.catalogDishes='script';
       script.addEventListener('load',loadLiquid,{once:true});
@@ -180,7 +180,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=664';
+    script.src='./runtime-features.js?v=675';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
@@ -192,7 +192,7 @@
   const loadAppUi=()=>{
     if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
     const script=document.createElement('script');
-    script.src='./app-ui.js?v=653';
+    script.src='./app-ui.js?v=675';
     script.async=false;
     script.dataset.appUi='script';
     script.addEventListener('load',loadRuntimeFeatures,{once:true});
