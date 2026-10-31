@@ -285,6 +285,10 @@ function syncSecurityKeyboardState(){
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;
   document.documentElement.dataset.securityKeyboardViewport='1';
+  // Écran de connexion fixe : aucun défilement ni rebond au doigt (iOS ignore souvent overflow:hidden).
+  document.getElementById('securityOverlay')?.addEventListener('touchmove',event=>{
+    if(event.currentTarget.classList.contains('is-visible')&&event.cancelable)event.preventDefault();
+  },{passive:false});
   document.addEventListener('focus',event=>{
     if(!isSecurityPasswordField(event.target))return;
     securityKeyboardBaseline=securityViewportHeight();

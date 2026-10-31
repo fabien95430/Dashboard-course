@@ -215,3 +215,10 @@ test('le retour au premier plan ne réinitialise pas un écran de connexion déj
   const body=app.slice(start,app.indexOf("document.addEventListener('visibilitychange'",start));
   assert.match(body,/if\(state\.locked\)\{[\s\S]*?if\(UI\.securityOverlay\.classList\.contains\('is-visible'\)&&state\.securityMode==='unlock'\)return;\s*showSecurity\('unlock'\);/);
 });
+
+test('l écran de connexion ne défile pas au doigt',()=>{
+  const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
+  const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.match(ui,/getElementById\('securityOverlay'\)\?\.addEventListener\('touchmove',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?\},\{passive:false\}\)/);
+  assert.match(styles,/#securityOverlay\.is-visible\{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none\}/);
+});
