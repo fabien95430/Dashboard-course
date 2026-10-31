@@ -72,7 +72,7 @@
   const loadDishAddedMarker=()=>{
     if(document.querySelector('script[data-dish-added-marker]'))return;
     const marker=document.createElement('script');
-    marker.src='./dish-added-marker.js?v=675';
+    marker.src='./dish-added-marker.js?v=677';
     marker.async=false;
     marker.dataset.dishAddedMarker='script';
     document.body.appendChild(marker);
@@ -84,7 +84,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=676';
+    images.src='./dish-local-images.js?v=677';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});

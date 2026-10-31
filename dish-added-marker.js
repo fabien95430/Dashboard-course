@@ -1,9 +1,15 @@
 (() => {
 'use strict';
 
-const STORAGE='courses-added-dishes-v1';
+// Plats ajoutés : lus depuis les notes « Plat : … » des articles de la liste Home Assistant
+// (window.COURSES_LIST.dishNotes, dans app.js), donc identiques sur tous les appareils.
+// localEntries : plats validés sur cet appareil dont la note n'a pas encore pu être écrite
+// (hors ligne, ou anciennes entrées locales d'avant la v677) ; ils sont partagés dès que possible.
+const LOCAL_STORAGE='courses-added-dishes-v1';
 const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
-let entries=readEntries();
+const localEntries=readLocalEntries();
+let entries={...localEntries};
+let sharing=null;
 let trustedListNames=null;
 let trustedListQuantities=null;
 let pending=null;
@@ -12,25 +18,59 @@ let cardFrame=0;
 let reconcileFrame=0;
 let guardFrame=0;
 
-function readEntries(){
+function cleanIngredients(values){
+  return [...new Set((Array.isArray(values)?values:[]).map(item=>String(item||'').trim()).filter(Boolean))].slice(0,20);
+}
+function readLocalEntries(){
   try{
-    const saved=JSON.parse(localStorage.getItem(STORAGE)||'{}');
+    const saved=JSON.parse(localStorage.getItem(LOCAL_STORAGE)||'{}');
     if(!saved||typeof saved!=='object'||Array.isArray(saved))return {};
     const clean={};
     Object.entries(saved).slice(-100).forEach(([name,value])=>{
       const dish=String(name||'').trim().slice(0,100);
-      const ingredients=Array.isArray(value?.ingredients)
-        ?[...new Set(value.ingredients.map(item=>String(item||'').trim()).filter(Boolean))].slice(0,20)
-        :[];
-      if(dish)clean[dish]={ingredients,at:Number(value?.at)||0};
+      const ingredients=cleanIngredients(value?.ingredients);
+      if(dish&&ingredients.length)clean[dish]={ingredients,at:Number(value?.at)||0};
     });
     return clean;
   }catch(_){
     return {};
   }
 }
-function saveEntries(){
-  try{localStorage.setItem(STORAGE,JSON.stringify(entries))}catch(_){}
+function saveLocalEntries(){
+  try{
+    if(Object.keys(localEntries).length)localStorage.setItem(LOCAL_STORAGE,JSON.stringify(localEntries));
+    else localStorage.removeItem(LOCAL_STORAGE);
+  }catch(_){}
+}
+function rebuildEntries(){
+  const shared={};
+  const notes=window.COURSES_LIST?.dishNotes?.();
+  (Array.isArray(notes)?notes:[]).forEach(note=>{
+    const dish=String(note?.name||'').trim();
+    const ingredients=cleanIngredients(note?.ingredients);
+    if(dish&&ingredients.length)shared[dish]={ingredients,total:Math.max(Number(note.total)||0,ingredients.length)};
+  });
+  entries={...localEntries,...shared};
+}
+// Écrit dans Home Assistant la note des plats encore locaux ; un plat dont plus aucun ingrédient
+// n'est dans la liste est oublié.
+function shareLocalEntries(){
+  const tagDish=window.COURSES_LIST?.tagDish;
+  if(sharing||typeof tagDish!=='function'||trustedListNames===null)return;
+  const dishes=Object.keys(localEntries);
+  if(!dishes.length)return;
+  sharing=(async()=>{
+    let changed=false;
+    for(const dish of dishes){
+      const entry=localEntries[dish];
+      if(!entry)continue;
+      if(!entry.ingredients.some(item=>trustedListNames?.has(normalize(item)))){
+        delete localEntries[dish];changed=true;continue;
+      }
+      if(await tagDish(dish,entry.ingredients)){delete localEntries[dish];changed=true}
+    }
+    if(changed){saveLocalEntries();scheduleReconcileList()}
+  })().finally(()=>{sharing=null});
 }
 function ensureStyle(){
   if(document.getElementById('dish-added-marker-style'))return;
@@ -133,7 +173,7 @@ function ensureStyle(){
 function markerState(name){
   const entry=entries[name];
   if(!entry)return {state:'none',present:0,total:0};
-  const total=entry.ingredients.length;
+  const total=Math.max(Number(entry.total)||0,entry.ingredients.length);
   if(trustedListNames===null||!total)return {state:'none',present:0,total};
   const present=entry.ingredients.reduce((count,item)=>count+(trustedListNames.has(normalize(item))?1:0),0);
   return {
@@ -251,6 +291,7 @@ function syncDialogGuard(){
   publish();
 }
 function reconcileList(){
+  rebuildEntries();
   const state=readListState();
   if(state===null){
     trustedListNames=null;
@@ -262,6 +303,7 @@ function reconcileList(){
   trustedListQuantities=state.quantities;
   syncCards();
   syncDialogGuard();
+  shareLocalEntries();
 }
 function removeListedSelections(dialog){
   const names=[...dialog.querySelectorAll('.dish-ingredient.is-already-listed.is-selected[data-ingredient]')]
@@ -298,10 +340,11 @@ function trackPendingFromButton(button){
 }
 function commitDishEntry(name,ingredients){
   const dish=String(name||'').trim().slice(0,100);
-  const clean=[...new Set((Array.isArray(ingredients)?ingredients:[]).map(item=>String(item||'').trim()).filter(Boolean))].slice(0,20);
+  const clean=cleanIngredients(ingredients);
   if(!dish||!clean.length)return false;
   entries[dish]={ingredients:clean,at:Date.now()};
-  saveEntries();
+  localEntries[dish]=entries[dish];
+  saveLocalEntries();
   trustedListNames=null;
   trustedListQuantities=null;
   syncCards();

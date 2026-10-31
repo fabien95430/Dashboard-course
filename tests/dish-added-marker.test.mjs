@@ -38,10 +38,12 @@ assert.ok(settleStart>=0&&settleEnd>settleStart,'confirmation directe introuvabl
 function settle(detail){
   const context={
     entries:{},
+    localEntries:{},
     trustedListNames:new Set(['ancien']),
     trustedListQuantities:new Map([['ancien',1]]),
     pending:null,
-    saveEntries(){context.saved=(context.saved||0)+1;},
+    cleanIngredients:values=>[...new Set((Array.isArray(values)?values:[]).map(item=>String(item||'').trim()).filter(Boolean))].slice(0,20),
+    saveLocalEntries(){context.saved=(context.saved||0)+1;},
     syncCards(){context.synced=(context.synced||0)+1;},
     clearPending(){context.pending=null;},
     requestAnimationFrame(fn){fn();return 1;},
@@ -60,6 +62,8 @@ test('la confirmation du plat enregistre immédiatement ses ingrédients puis fo
     result:{added:1,failed:0,present:3}
   });
   assert.deepEqual(plain(context.entries['Tagliatelles au saumon'].ingredients),['Tagliatelles','Saumon','Crème fraîche','Citron']);
+  // En attente de partage : la note « Plat : … » est écrite dans Home Assistant à la réconciliation suivante.
+  assert.deepEqual(plain(context.localEntries['Tagliatelles au saumon'].ingredients),['Tagliatelles','Saumon','Crème fraîche','Citron']);
   assert.equal(context.saved,1);
   assert.equal(context.synced,1);
   assert.equal(context.reconciled,1);

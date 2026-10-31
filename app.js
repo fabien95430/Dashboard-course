@@ -1976,7 +1976,74 @@ async function ensureProductQuantity(name,target){
     renderSelectionAndList();
   }
 }
-window.COURSES_LIST=Object.freeze({getQuantity:productQuantity,ensureQuantity:ensureProductQuantity});
+// Plats ajoutés partagés entre appareils : chaque article concerné porte dans Home Assistant une
+// note « Plat : Carbonara (4) » (ou « Plats : Carbonara (4), Bolognaise (5) » ; le nombre est le
+// nombre d'ingrédients du plat). La liste reste la seule source : un article acheté emporte sa note.
+const DISH_NOTE_LINE=/^Plats? : (.*)$/m;
+function parseDishNote(description){
+  const match=String(description||'').match(DISH_NOTE_LINE);
+  if(!match)return [];
+  return match[1].split(', ').map(part=>{
+    const entry=part.trim().match(/^(.*\S) \((\d+)\)$/);
+    return entry?{name:entry[1],total:Number(entry[2])}:null;
+  }).filter(Boolean);
+}
+function withDishNote(description,name,total){
+  const text=String(description||'');
+  const dishes=parseDishNote(text).filter(entry=>entry.name!==name);
+  dishes.push({name,total});
+  const line=(dishes.length>1?'Plats : ':'Plat : ')+dishes.map(entry=>entry.name+' ('+entry.total+')').join(', ');
+  if(DISH_NOTE_LINE.test(text))return text.replace(DISH_NOTE_LINE,()=>line);
+  return text.trim()?text.trimEnd()+'\n'+line:line;
+}
+function listDishNotes(){
+  const dishes=new Map();
+  state.items.filter(isPendingItem).forEach(item=>{
+    const summary=itemSummary(item);
+    parseDishNote(item?.description).forEach(({name,total})=>{
+      if(!dishes.has(name))dishes.set(name,{name,total:0,ingredients:new Set()});
+      const entry=dishes.get(name);
+      entry.total=Math.max(entry.total,total);
+      if(summary)entry.ingredients.add(summary);
+    });
+  });
+  return [...dishes.values()].map(entry=>({name:entry.name,total:entry.total,ingredients:[...entry.ingredients]}));
+}
+// Ajoute la note du plat à toutes les unités des ingrédients présents dans la liste.
+// Renvoie false si la note n'a pas pu être écrite (hors ligne, liste verrouillée, erreur HA).
+async function tagDishItems(dish,ingredients){
+  const name=String(dish||'').trim().slice(0,100);
+  const keys=new Set((Array.isArray(ingredients)?ingredients:[]).map(value=>norm(value)).filter(Boolean));
+  if(!name||!keys.size||state.locked)return false;
+  const total=keys.size;
+  const concerned=item=>isPendingItem(item)&&keys.has(norm(itemSummary(item)));
+  if(state.demo){
+    const items=(loadJson(DEMO_KEY,[])||[]).map(item=>concerned(item)?{...item,description:withDishNote(item.description,name,total)}:item);
+    saveJson(DEMO_KEY,items);
+    state.items=items;
+    renderSelectionAndList();
+    return true;
+  }
+  if(!state.entity||!socketReady())return false;
+  let changed=false;
+  try{
+    for(const item of state.items.filter(concerned)){
+      const uid=itemUid(item);
+      if(!uid)continue;
+      const description=withDishNote(item.description,name,total);
+      if(description===String(item.description||''))continue;
+      await todoService('update_item',{item:uid,description});
+      changed=true;
+    }
+    return true;
+  }catch(error){
+    console.warn('courses-app: note du plat',error);
+    return false;
+  }finally{
+    if(changed)await refreshItems();
+  }
+}
+window.COURSES_LIST=Object.freeze({getQuantity:productQuantity,ensureQuantity:ensureProductQuantity,dishNotes:listDishNotes,tagDish:tagDishItems});
 async function incrementProduct(name,{deferRefresh=false}={}){
   const item=String(name||'').trim();
   if(!item)return;
