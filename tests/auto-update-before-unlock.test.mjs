@@ -230,12 +230,13 @@ test('l écran de connexion s accroche à la hauteur physique de l iPhone (pas d
   assert.match(styles,/\.security-overlay \.security-shell\{height:var\(--lock-screen-h\)!important;padding-bottom:var\(--lock-screen-bottom\)!important\}/);
 });
 
-test('clavier ouvert : la carte de connexion remonte au-dessus du clavier iOS',()=>{
+test('saisie du mot de passe : la carte se place en haut de l écran, au-dessus du clavier iOS',()=>{
   const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
   const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
-  assert.match(ui,/function applySecurityKeyboardLift\(shell,visibleHeight\)/);
-  assert.match(ui,/lift=Math\.max\(0,Math\.min\(bottom\+14-visibleHeight,modal\.offsetTop-14\)\)/);
-  assert.match(ui,/applySecurityKeyboardLift\(shell,keyboardOpen\?current:0\)/);
-  assert.match(styles,/\.security-shell \.security-modal\{translate:0 calc\(-1 \* var\(--security-keyboard-lift,0px\)\);/);
-  assert.match(styles,/\.security-shell\.is-keyboard-lift \.security-hero\{opacity:0;/);
+  assert.match(ui,/function setSecurityTyping\(typing\)/);
+  assert.match(ui,/if\(!isSecurityPasswordField\(event\.target\)\)return;\s*setSecurityTyping\(true\);/);
+  assert.doesNotMatch(ui,/applySecurityKeyboardLift|--security-keyboard-lift/);
+  assert.match(styles,/#securityOverlay \.security-shell\.is-typing \.security-modal\{top:calc\(env\(safe-area-inset-top,0px\) \+ 14px\)!important\}/);
+  assert.match(styles,/#securityOverlay \.security-shell\.is-typing \.security-hero\{opacity:0;/);
+  assert.doesNotMatch(styles,/--security-keyboard-lift/);
 });

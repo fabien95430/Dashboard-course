@@ -265,21 +265,6 @@ function scheduleSecurityViewportRestore(){
     restoreSecurityViewportOrigin();
   });
 }
-// Clavier ouvert : la carte remonte juste assez pour que le champ et le bouton Connexion restent
-// au-dessus du clavier et de la barre ˄ ˅ ✓ d'iOS (zone visible = hauteur du visualViewport,
-// la coquille étant déjà recalée sur son haut). Le logo s'efface s'il serait recouvert.
-function applySecurityKeyboardLift(shell,visibleHeight){
-  const modal=shell.querySelector('.security-modal');
-  let lift=0;
-  if(visibleHeight>0&&modal){
-    const bottom=modal.offsetTop+modal.offsetHeight;
-    lift=Math.max(0,Math.min(bottom+14-visibleHeight,modal.offsetTop-14));
-  }
-  lift=Math.round(lift);
-  if(lift)shell.style.setProperty('--security-keyboard-lift',lift+'px');
-  else shell.style.removeProperty('--security-keyboard-lift');
-  shell.classList.toggle('is-keyboard-lift',lift>0);
-}
 function syncSecurityKeyboardState(){
   const shell=document.querySelector('.security-shell');
   if(!shell)return;
@@ -289,16 +274,19 @@ function syncSecurityKeyboardState(){
   syncSecurityViewportPosition();
   if(!visible||!active){
     shell.classList.remove('is-password-open');
-    applySecurityKeyboardLift(shell,0);
     if(!active)securityKeyboardBaseline=0;
     if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
     return;
   }
   const current=securityViewportHeight();
   if(!securityKeyboardBaseline)securityKeyboardBaseline=current;
-  const keyboardOpen=securityKeyboardBaseline-current>120;
-  shell.classList.toggle('is-password-open',keyboardOpen);
-  applySecurityKeyboardLift(shell,keyboardOpen?current:0);
+  shell.classList.toggle('is-password-open',securityKeyboardBaseline-current>120);
+}
+// Saisie du mot de passe : la carte se place en haut de l'écran (sous l'heure) et le logo s'efface,
+// dès l'arrivée du curseur, pour rester au-dessus du clavier et de la barre ˄ ˅ ✓ d'iOS.
+// Position fixe, sans calcul : iOS ne donne pas une hauteur visible fiable avec sa barre flottante.
+function setSecurityTyping(typing){
+  document.querySelector('.security-shell')?.classList.toggle('is-typing',typing);
 }
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;
@@ -309,11 +297,14 @@ function bindSecurityKeyboardViewport(){
   },{passive:false});
   document.addEventListener('focus',event=>{
     if(!isSecurityPasswordField(event.target))return;
+    setSecurityTyping(true);
     securityKeyboardBaseline=securityViewportHeight();
     Promise.resolve().then(syncSecurityKeyboardState);
   },true);
   document.addEventListener('blur',event=>{
     if(!isSecurityPasswordField(event.target))return;
+    // Passage du champ mot de passe au champ de confirmation : la carte reste en haut.
+    requestAnimationFrame(()=>setSecurityTyping(isSecurityPasswordField()));
     securityKeyboardBaseline=0;
     requestAnimationFrame(syncSecurityKeyboardState);
   },true);
