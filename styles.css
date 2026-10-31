@@ -3512,10 +3512,3 @@ body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behav
   .security-overlay{bottom:auto!important;height:calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;min-height:0!important}
   .security-overlay .security-shell{height:var(--lock-screen-h)!important;padding-bottom:var(--lock-screen-bottom)!important}
 }
-
-/* ===== v691 — saisie du mot de passe : carte en haut de l'écran, logo effacé ===== */
-/* .is-typing est posé par app-ui.js dès que le champ prend le curseur (avant l'arrivée du clavier). */
-#securityOverlay .security-shell .security-modal{transition:top .24s ease}
-#securityOverlay .security-shell .security-hero{transition:opacity .18s ease}
-#securityOverlay .security-shell.is-typing .security-modal{top:calc(env(safe-area-inset-top,0px) + 14px)!important}
-#securityOverlay .security-shell.is-typing .security-hero{opacity:0;pointer-events:none}

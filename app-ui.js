@@ -282,12 +282,6 @@ function syncSecurityKeyboardState(){
   if(!securityKeyboardBaseline)securityKeyboardBaseline=current;
   shell.classList.toggle('is-password-open',securityKeyboardBaseline-current>120);
 }
-// Saisie du mot de passe : la carte se place en haut de l'écran (sous l'heure) et le logo s'efface,
-// dès l'arrivée du curseur, pour rester au-dessus du clavier et de la barre ˄ ˅ ✓ d'iOS.
-// Position fixe, sans calcul : iOS ne donne pas une hauteur visible fiable avec sa barre flottante.
-function setSecurityTyping(typing){
-  document.querySelector('.security-shell')?.classList.toggle('is-typing',typing);
-}
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;
   document.documentElement.dataset.securityKeyboardViewport='1';
@@ -297,14 +291,11 @@ function bindSecurityKeyboardViewport(){
   },{passive:false});
   document.addEventListener('focus',event=>{
     if(!isSecurityPasswordField(event.target))return;
-    setSecurityTyping(true);
     securityKeyboardBaseline=securityViewportHeight();
     Promise.resolve().then(syncSecurityKeyboardState);
   },true);
   document.addEventListener('blur',event=>{
     if(!isSecurityPasswordField(event.target))return;
-    // Passage du champ mot de passe au champ de confirmation : la carte reste en haut.
-    requestAnimationFrame(()=>setSecurityTyping(isSecurityPasswordField()));
     securityKeyboardBaseline=0;
     requestAnimationFrame(syncSecurityKeyboardState);
   },true);
