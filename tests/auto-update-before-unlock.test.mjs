@@ -18,7 +18,7 @@ function harness({online=true,available=false,shouldFail=false,hang=false,versio
     UI:{securitySubmit:button},
     state:{securityMode:'unlock'},
     currentAppVersion:()=>version,
-    sessionStorage:{getItem:key=>storage.has(key)?storage.get(key):null,setItem:(key,value)=>storage.set(key,String(value))},
+    sessionStorage:{getItem:key=>storage.has(key)?storage.get(key):null,setItem:(key,value)=>storage.set(key,String(value)),removeItem:key=>storage.delete(key)},
     setTimeout:(fn)=>{timers.push(fn);return timers.length},
     clearTimeout:()=>{},
     installLatestAppVersion:async()=>{
@@ -38,7 +38,11 @@ function harness({online=true,available=false,shouldFail=false,hang=false,versio
 }
 
 test('un déverrouillage commence par une vérification de version avant la récupération des jetons',()=>{
-  assert.match(app,/function showSecurity\(mode,message=''\)[\s\S]*?if\(mode==='unlock'\)void checkForUpdateBeforeUnlock\(\)/);
+  assert.match(app,/function showSecurity\(mode,message=''\)[\s\S]*?if\(mode==='unlock'\)void gateUnlockOnUpdate\(\);\s*else focusSecurityPassword\(\);/);
+  // Le champ mot de passe ne reçoit le curseur (et la fenêtre d'identifiants iOS) qu'après la vérification.
+  assert.match(app,/async function gateUnlockOnUpdate\(\)\{[\s\S]*?if\(unlockVersionCheckPromise\)setUnlockGate\(true\);\s*const reloading=await checkForUpdateBeforeUnlock\(\);\s*if\(!reloading&&state\.securityMode==='unlock'\)focusSecurityPassword\(\);/);
+  assert.match(app,/input\.readOnly=locked/);
+  assert.match(app,/const UNLOCK_UPDATE_TIMEOUT_MS=4000;/);
   assert.match(app,/if\(state\.securityMode==='unlock'\)\{\s*if\(await unlockVersionCheckPromise\)return;\s*const payload=await decryptVault/);
 });
 
@@ -132,9 +136,14 @@ test('après un rechargement de mise à jour resté sur la même version, pas de
   assert.equal(await second.check(),false);
   assert.deepEqual(second.calls,[]);
   assert.equal(second.button.disabled,false);
+  // Page rechargée sur la nouvelle version : pas de seconde attente, et le repère est effacé.
   const updated=harness({available:false,version:621,storage});
   assert.equal(await updated.check(),false);
-  assert.deepEqual(updated.calls,['check']);
+  assert.deepEqual(updated.calls,[]);
+  assert.equal(storage.size,0);
+  const later=harness({available:false,version:621,storage});
+  assert.equal(await later.check(),false);
+  assert.deepEqual(later.calls,['check']);
 });
 
 test('l adresse de démarrage précachée périmée est corrigée avec index.html',async()=>{

@@ -1563,8 +1563,10 @@ function showSecurity(mode,message=''){
   UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Connexion';
   UI.securityError.textContent='';
   refreshVisualLock();
-  setTimeout(()=>UI.securityPassword.focus(),80);
-  if(mode==='unlock')void checkForUpdateBeforeUnlock();
+  // Déverrouillage : la version est vérifiée AVANT de donner le champ mot de passe (et donc la
+  // fenêtre d'identifiants iOS), pour qu'un rechargement de mise à jour ne la ferme jamais.
+  if(mode==='unlock')void gateUnlockOnUpdate();
+  else focusSecurityPassword();
 }
 function hideSecurity(){
   unlockVersionChecked=false;
@@ -3054,7 +3056,7 @@ async function installLatestAppVersion(){
 // Le contrôle de version au déverrouillage ne doit jamais bloquer la connexion :
 // durée bornée, et un seul rechargement par version (sinon une page encore périmée
 // rechargeait en boucle avec le bouton Connexion désactivé).
-const UNLOCK_UPDATE_TIMEOUT_MS=8000;
+const UNLOCK_UPDATE_TIMEOUT_MS=4000;
 const UNLOCK_UPDATE_RELOAD_KEY='courses-unlock-update-reloaded-from';
 function unlockUpdateAlreadyTried(version){
   try{return sessionStorage.getItem(UNLOCK_UPDATE_RELOAD_KEY)===String(version)}catch(_){return false}
@@ -3062,13 +3064,38 @@ function unlockUpdateAlreadyTried(version){
 function rememberUnlockUpdateReload(version){
   try{sessionStorage.setItem(UNLOCK_UPDATE_RELOAD_KEY,String(version))}catch(_){}
 }
+// Page rechargée juste après une mise à jour : la version vient d'être installée, pas de nouvelle attente.
+function unlockJustUpdated(version){
+  try{
+    const from=sessionStorage.getItem(UNLOCK_UPDATE_RELOAD_KEY);
+    if(!from||from===String(version))return false;
+    sessionStorage.removeItem(UNLOCK_UPDATE_RELOAD_KEY);
+    return true;
+  }catch(_){return false}
+}
+// Pendant la vérification, le champ mot de passe reste verrouillé (pas de curseur, donc pas de
+// fenêtre d'identifiants iOS) et le bouton indique « Vérification… ».
+function setUnlockGate(locked){
+  const input=UI.securityPassword,button=UI.securitySubmit;
+  if(input){input.readOnly=locked;if(locked)input.setAttribute?.('aria-busy','true');else input.removeAttribute?.('aria-busy')}
+  if(button){button.disabled=locked;button.textContent=locked?'Vérification…':'Connexion'}
+}
+function focusSecurityPassword(){
+  setTimeout(()=>{if(UI.securityOverlay?.classList?.contains('is-visible'))UI.securityPassword?.focus?.()},80);
+}
+async function gateUnlockOnUpdate(){
+  // Écran réaffiché pendant une vérification déjà en cours : le champ reste verrouillé jusqu'à sa fin.
+  if(unlockVersionCheckPromise)setUnlockGate(true);
+  const reloading=await checkForUpdateBeforeUnlock();
+  if(!reloading&&state.securityMode==='unlock')focusSecurityPassword();
+}
 async function checkForUpdateBeforeUnlock(){
   if(unlockVersionCheckPromise)return unlockVersionCheckPromise;
   if(unlockVersionChecked||navigator.onLine===false)return false;
   unlockVersionChecked=true;
   const fromVersion=currentAppVersion();
-  if(unlockUpdateAlreadyTried(fromVersion))return false;
-  UI.securitySubmit.disabled=true;
+  if(unlockUpdateAlreadyTried(fromVersion)||unlockJustUpdated(fromVersion))return false;
+  setUnlockGate(true);
   let reloading=false,timer=null;
   const install=(async()=>{
     try{return await installLatestAppVersion()}
@@ -3090,7 +3117,7 @@ async function checkForUpdateBeforeUnlock(){
   try{return await check}
   finally{
     unlockVersionCheckPromise=null;
-    if(!reloading&&state.securityMode==='unlock')UI.securitySubmit.disabled=false;
+    if(!reloading&&state.securityMode==='unlock')setUnlockGate(false);
   }
 }
 /* Mise à jour depuis l'en-tête : l'étape en cours puis le résultat restent écrits sous le titre de Réglages. */
@@ -3270,7 +3297,11 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('online',()=>{
   if(state.demo)return;
-  if(state.locked&&state.securityMode==='unlock'){void checkForUpdateBeforeUnlock();return;}
+  if(state.locked&&state.securityMode==='unlock'){
+    // Retour du réseau : pas de vérification si la saisie du mot de passe a commencé.
+    if(document.activeElement!==UI.securityPassword&&!UI.securityPassword.value)void gateUnlockOnUpdate();
+    return;
+  }
   if(!state.locked&&state.refreshToken&&state.ws?.readyState!==WebSocket.OPEN&&state.ws?.readyState!==WebSocket.CONNECTING)connectFromRefresh();
 });
 window.addEventListener('pagehide',()=>{
