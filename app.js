@@ -3268,6 +3268,10 @@ function resumeForegroundSession(){
   if(!vaultRecord())return;
   if(state.locked){
     status('is-waiting',STATUS_TEXT.lockedTitle,STATUS_TEXT.unlockRequired);
+    // Écran de connexion déjà affiché : ne pas le réinitialiser. La fenêtre d'identifiants iOS
+    // (trousseau, Face ID) fait passer l'app un instant en arrière-plan ; la réafficher vidait le
+    // champ et replaçait le curseur, ce qui rouvrait la fenêtre iOS en boucle.
+    if(UI.securityOverlay.classList.contains('is-visible')&&state.securityMode==='unlock')return;
     showSecurity('unlock');
     return;
   }

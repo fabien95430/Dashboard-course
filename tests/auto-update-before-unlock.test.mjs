@@ -209,3 +209,9 @@ test('la flèche ne tourne plus indéfiniment si la mise à jour ne répond pas'
   assert.deepEqual(stuck.calls,['check','items']);
   assert.equal(stuck.statusEl.textContent,'Mise à jour non terminée · réessayez');
 });
+
+test('le retour au premier plan ne réinitialise pas un écran de connexion déjà affiché',()=>{
+  const start=app.indexOf('function resumeForegroundSession(){');
+  const body=app.slice(start,app.indexOf("document.addEventListener('visibilitychange'",start));
+  assert.match(body,/if\(state\.locked\)\{[\s\S]*?if\(UI\.securityOverlay\.classList\.contains\('is-visible'\)&&state\.securityMode==='unlock'\)return;\s*showSecurity\('unlock'\);/);
+});

@@ -239,8 +239,16 @@ function syncSecurityViewportPosition(){
   const visible=document.getElementById('securityOverlay')?.classList.contains('is-visible');
   if(visible)securityViewportSession=true;
   const offset=visible?securityViewportOffsetTop():0;
-  if(offset)shell.style.top=offset+'px';
-  else shell.style.removeProperty('top');
+  const overlay=document.getElementById('securityOverlay');
+  // Clavier iOS ouvert : l'écran glisse de « offset ». Le bloc de connexion ET le fond suivent
+  // la même compensation, pour que le fond ne bouge pas sous la carte.
+  if(offset){
+    shell.style.top=offset+'px';
+    overlay?.style.setProperty('--security-viewport-offset',offset+'px');
+  }else{
+    shell.style.removeProperty('top');
+    overlay?.style.removeProperty('--security-viewport-offset');
+  }
 }
 function restoreSecurityViewportOrigin(){
   if(document.getElementById('securityOverlay')?.classList.contains('is-visible'))return;

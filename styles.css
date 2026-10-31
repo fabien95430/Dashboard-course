@@ -1101,7 +1101,15 @@ body:has(#securityOverlay.is-visible){
   background-size:cover!important;
   background-repeat:no-repeat!important;
 }
-.security-overlay.is-visible{background-color:transparent!important}
+.security-overlay.is-visible{
+  /* Le fond est peint par l'écran de connexion lui-même, décalé comme le bloc de connexion quand
+     le clavier iOS fait glisser l'écran (--security-viewport-offset, posé par app-ui.js). */
+  background-color:#f6f1e7!important;
+  background-image:url("./welcome-background-v40.webp")!important;
+  background-repeat:no-repeat!important;
+  background-size:cover!important;
+  background-position:center calc(50% + var(--security-viewport-offset,0px))!important;
+}
 .app .tabs{position:relative}
 .app .tabs::after{
   content:"";
