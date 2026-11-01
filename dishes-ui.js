@@ -889,6 +889,9 @@ function dishCard(dish){
       document.dispatchEvent(new CustomEvent('courses:dish-cancel-requested',{detail:{dish:dish.name}}));
       return;
     }
+    // Un clic tactile/souris ne doit pas laisser de focus vert après fermeture de la fiche.
+    // Les activations clavier (detail === 0) conservent le repère :focus-visible.
+    if(event.detail>0)card.blur();
     openDishSheet(dish);
   });
   card.addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&!event.target.closest('.dish-favorite')){event.preventDefault();if(!busyDish)openDishSheet(dish)}});
