@@ -177,9 +177,9 @@ function historyStatusMarkup(){
   const summary=intelligence()?.summary?.(3);
   if(!summary)return '';
   if(!summary.purchases){
-    return '<p class="repurchase-history-status">Aucun achat enregistré sur cet iPhone pour l’instant. Cochez ✓ les produits achetés dans Ma liste.</p>';
+    return '<p class="repurchase-history-status">Aucun achat enregistré pour le moment. Cochez ✓ les produits achetés dans Ma liste.</p>';
   }
-  const count=summary.purchases+' achat'+(summary.purchases>1?'s':'')+' enregistré'+(summary.purchases>1?'s':'')+' sur cet iPhone';
+  const count=summary.purchases+' achat'+(summary.purchases>1?'s':'')+' enregistré'+(summary.purchases>1?'s':'')+' dans l’historique partagé';
   const recent=summary.recent.length?'<small>Derniers : '+esc(summary.recent.join(', '))+(summary.products>summary.recent.length?'…':'')+'</small>':'';
   return '<p class="repurchase-history-status"><strong>'+count+'</strong>'+recent+'</p>';
 }

@@ -55,7 +55,7 @@
   const loadRepurchaseSoon=()=>{
     if(document.querySelector('script[data-repurchase-soon]'))return;
     const script=document.createElement('script');
-    script.src='./repurchase-soon.js?v=664';
+    script.src='./repurchase-soon.js?v=701';
     script.async=false;
     script.dataset.repurchaseSoon='script';
     document.body.appendChild(script);
@@ -180,7 +180,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=675';
+    script.src='./runtime-features.js?v=701';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{

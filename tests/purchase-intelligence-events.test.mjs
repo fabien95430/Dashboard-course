@@ -91,8 +91,74 @@ test('l écran vide de À prévoir montre si les achats sont bien enregistrés',
   const esc=value=>String(value).replace(/</g,'&lt;');
   const markup=summary=>vm.runInNewContext(repurchase.slice(start,end)+';historyStatusMarkup()',{esc,intelligence:()=>summary?{summary:()=>summary}:null});
   assert.equal(markup(null),'');
-  assert.match(markup({purchases:0,products:0,recent:[]}),/Aucun achat enregistré sur cet iPhone pour l’instant\. Cochez ✓ les produits achetés dans Ma liste\./);
-  assert.match(markup({purchases:1,products:1,recent:['Bananes']}),/<strong>1 achat enregistré sur cet iPhone<\/strong><small>Derniers : Bananes<\/small>/);
-  assert.match(markup({purchases:12,products:5,recent:['Lait demi-écrémé','Bananes','Pain']}),/12 achats enregistrés sur cet iPhone<\/strong><small>Derniers : Lait demi-écrémé, Bananes, Pain…<\/small>/);
+  assert.match(markup({purchases:0,products:0,recent:[]}),/Aucun achat enregistré pour le moment\. Cochez ✓ les produits achetés dans Ma liste\./);
+  assert.match(markup({purchases:1,products:1,recent:['Bananes']}),/<strong>1 achat enregistré dans l’historique partagé<\/strong><small>Derniers : Bananes<\/small>/);
+  assert.match(markup({purchases:12,products:5,recent:['Lait demi-écrémé','Bananes','Pain']}),/12 achats enregistrés dans l’historique partagé<\/strong><small>Derniers : Lait demi-écrémé, Bananes, Pain…<\/small>/);
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\.<\/span>'\+historyStatusMarkup\(\)/);
+});
+
+
+test('deux appareils conservent leurs achats distincts dans un même cycle',()=>{
+  const start=source.indexOf('function eventsFor(name){'),end=source.indexOf('function feedbackFor(name)',start);
+  assert.ok(start>0&&end>start);
+  const rows=[{id:'e-iphone',at:1000,firstAt:1000,qty:2,household:4},{id:'e-tablette',at:2000,firstAt:2000,qty:3,household:4}];
+  const cycles=vm.runInNewContext(source.slice(start,end)+';eventsFor("Lait")',{
+    state:{purchases:{lait:rows}},norm:value=>value.toLowerCase(),SAME_TRIP:18*60*60*1000
+  });
+  assert.equal(rows.length,2);
+  assert.equal(cycles.length,1);
+  assert.equal(cycles[0].qty,5);
+  assert.equal(cycles[0].firstAt,1000);
+  assert.equal(cycles[0].at,2000);
+});
+
+test('la fusion Home Assistant conserve les événements locaux et distants sans doublons',()=>{
+  const start=source.indexOf('function sharedEventId('),end=source.indexOf('function readHousehold(){',start);
+  const sharedStart=source.indexOf('function sharedCanonicalEvent('),sharedEnd=source.indexOf('function sharedDescription(entry)',sharedStart);
+  assert.ok(start>0&&end>start&&sharedStart>0&&sharedEnd>sharedStart);
+  const events=[];
+  const state={purchases:{lait:[{id:'e-local',at:2000,firstAt:2000,qty:1,household:4}]},feedback:{},consumptions:{}};
+  const ctx={
+    state,SHARED_TYPES:['purchases','feedback','consumptions'],META:new Map([['lait',{name:'Lait'}]]),
+    HISTORY_DAYS:400,DAY:86400000,readHousehold:()=>4,
+    prune(){},rebuild(){},writeState(){},scheduleDish(){},isEnabled:()=>true,
+    CustomEvent:class{constructor(type,options){this.type=type;this.detail=options.detail}},
+    document:{dispatchEvent:e=>events.push(e)},Date:{now:()=>3000}
+  };
+  vm.runInNewContext(source.slice(start,end)+source.slice(sharedStart,sharedEnd)+';globalThis.mergeSharedRows=mergeSharedRows;globalThis.sharedSnapshot=sharedSnapshot;',ctx);
+  const remote=[{type:'purchases',key:'lait',event:{id:'e-remote',at:1000,firstAt:1000,qty:2,household:4}}];
+  ctx.mergeSharedRows(remote);
+  ctx.mergeSharedRows(remote);
+  assert.equal(state.purchases.lait.length,2);
+  assert.deepEqual([...ctx.sharedSnapshot().keys()].sort(),['purchases|lait|e-local','purchases|lait|e-remote']);
+  assert.equal(events.length,1);
+});
+
+test('la synchronisation réutilise le WebSocket authentifié et la liste de demandes sans toucher à Ma liste',()=>{
+  assert.match(source,/const SHARED_ENTITY='todo\.courses_demandes'/);
+  assert.match(source,/const SHARED_PREFIX='courses-history-v1:'/);
+  assert.match(source,/function sharedConnected\(\)\{return sharedClient\(\)\?\.isConnected\?\.\(\)===true\}/);
+  assert.match(source,/subscribeMissingTodo\(SHARED_ENTITY/);
+  const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
+  assert.match(app,/COURSES_PURCHASE_INTELLIGENCE\?\.connectShared\?\.\(\{newConnection:true\}\)/);
+});
+
+
+test('un plat partagé conserve les consommations associées aux cycles fusionnés',()=>{
+  const start=source.indexOf('function consumedForCycle('),end=source.indexOf('function adaptiveProfile(',start);
+  assert.ok(start>0&&end>start);
+  const items=[{at:1000,firstAt:1000},{at:2000,firstAt:2000}];
+  const context={
+    norm:s=>s.toLowerCase(),state:{purchases:{lait:items}},
+    eventsFor:()=>[{at:2000,firstAt:1000,qty:2}],
+    consumptionsFor:()=>[{cycleAt:1000,qty:1},{cycleAt:2000,qty:2},{cycleAt:3000,qty:7}]
+  };
+  const consumed=vm.runInNewContext(source.slice(start,end)+';consumedForCycle("Lait",1000)',context);
+  assert.equal(consumed,3);
+});
+
+test('la rétention distante ne supprime que les entrées historiques expirées',()=>{
+  assert.match(source,/function expiredSharedHistory\(row\)/);
+  assert.match(source,/SHARED_TYPES\.includes\(payload\.type\)&&META\.has\(payload\.key\)/);
+  assert.match(source,/callService\('todo','remove_item'/);
 });

@@ -2,7 +2,7 @@
 
 Ce document décrit le fonctionnement de l’historique intelligent implémenté dans `purchase-intelligence.js`.
 
-Le moteur ne cherche pas à maintenir un stock comptable exact. Il construit un **stock probabiliste local** afin d’éviter de recommander inutilement un produit récemment acheté, tout en tenant compte de sa durée probable de disponibilité, des quantités, de la taille du foyer, des habitudes observées et des plats déjà planifiés.
+Le moteur ne cherche pas à maintenir un stock comptable exact. Il construit un **stock probabiliste partagé** afin d’éviter de recommander inutilement un produit récemment acheté, tout en tenant compte de sa durée probable de disponibilité, des quantités, de la taille du foyer, des habitudes observées et des plats déjà planifiés.
 
 Il ne remplace jamais une DLC, une DDM, l’étiquette d’un produit ni le jugement de l’utilisateur.
 
@@ -75,7 +75,9 @@ Le format interne courant est en version `3` et contient notamment :
 
 Les événements sont conservés au maximum `400` jours.
 
-Les données restent dans le stockage local du navigateur. Ce module n’envoie pas cet historique vers un backend externe.
+Les données sont conservées localement pour le fonctionnement hors ligne et mutualisées, une fois l’application déverrouillée, via la connexion Home Assistant existante. Les événements sont enregistrés dans `todo.courses_demandes` avec le préfixe dédié `courses-history-v1:` ; les demandes de produits/plats, les autres entrées et la liste prioritaire `todo.courses` sont indépendantes.
+
+À la première connexion de chaque appareil, l’historique local est fusionné sans écrasement dans un journal d’événements distincts. Les nouveaux achats simultanés possèdent chacun un identifiant unique ; le moteur les regroupe seulement lors du calcul des cycles de moins de 18 heures. Le WebSocket déclenche les mises à jour, sans polling. En mode test ou hors ligne, l’historique local reste disponible ; les événements sont transférés à la prochaine connexion autorisée. Le réglage permettant de désactiver l’apprentissage reste propre à chaque appareil.
 
 ## Enregistrement d’un achat
 
@@ -96,9 +98,9 @@ Le comportement hors ligne reste inchangé : une action correctement enregistré
 
 ### Courses rapprochées
 
-Deux validations du même produit espacées de moins de `18` heures sont regroupées dans un même cycle.
+Deux validations du même produit espacées de moins de `18` heures sont regroupées **pour le calcul du profil**, mais restent deux événements distincts dans l’historique partagé afin de ne perdre aucun achat concurrent.
 
-Les quantités sont additionnées.
+Les quantités sont additionnées dans le cycle calculé.
 
 Le cycle possède :
 

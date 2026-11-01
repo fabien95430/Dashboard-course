@@ -1656,6 +1656,7 @@ async function connectAuthorized(token,reuseKnownEntity=false){
   await refreshItems();
   // Réutilise le socket authentifié; la liste partagée est indépendante de Ma liste.
   void MISSING_REQUESTS.connectShared({newConnection:true}).catch(error=>console.warn('courses-app: synchronisation demandes',error));
+  void window.COURSES_PURCHASE_INTELLIGENCE?.connectShared?.({newConnection:true});
   // L'inscription Push n'est automatique que si iOS l'a déjà autorisée.
   void window.COURSES_NOTIFICATIONS?.register().catch(()=>{});
   armIdleLock();

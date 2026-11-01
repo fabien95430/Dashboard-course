@@ -12,6 +12,10 @@ const DAY=86400000;
 const SAME_TRIP=18*60*60*1000;
 const DISH_WATCH_TTL=90000;
 const LABEL='Acheté récemment';
+const SHARED_ENTITY='todo.courses_demandes';
+const SHARED_PREFIX='courses-history-v1:';
+const SHARED_TYPES=['purchases','feedback','consumptions'];
+let sharedReady=false,sharedSubscribed=false,sharedConnecting=null,sharedSyncing=null,sharedDirty=false;
 
 // Fenêtres de disponibilité probables. Elles évitent les doublons mais ne remplacent jamais une DLC.
 // Les plafonds `shelf` restent absolus, même lorsque l'historique apprend une durée plus longue.
@@ -105,6 +109,20 @@ function quantile(values,q=.5){
   return lo===hi?sorted[lo]:sorted[lo]+(sorted[hi]-sorted[lo])*(index-lo);
 }
 function median(values){return quantile(values,.5)}
+
+function sharedEventId(type,key,event){
+  const at=Number(type==='purchases'?(event.firstAt||event.at):event.at)||0;
+  const seed=type+'|'+key+'|'+at+'|'+(type==='consumptions'?(event.cycleAt||'')+'|'+(event.dish||''):'');
+  let hash=2166136261;
+  for(let i=0;i<seed.length;i++){hash^=seed.charCodeAt(i);hash=Math.imul(hash,16777619)}
+  return type[0]+'-'+Math.max(0,Math.floor(at)).toString(36)+'-'+(hash>>>0).toString(36);
+}
+function newSharedEventId(){
+  const bytes=new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return 'e-'+Array.from(bytes,byte=>byte.toString(16).padStart(2,'0')).join('');
+}
+
 function readHousehold(){
   try{
     for(const key of HOUSEHOLD_KEYS){
@@ -172,20 +190,21 @@ function prune(){
       .map(event=>{
         const at=Number(event.at);
         const firstAt=Math.min(at,Number(event.firstAt)||at);
-        return {at,firstAt,qty:Math.max(1,Number(event.qty)||1),household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))};
+        return {id:String(event.id||sharedEventId('purchases',key,event)),at,firstAt,qty:Math.max(1,Number(event.qty)||1),household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))};
       }).sort((a,b)=>a.at-b.at);
     if(events.length)state.purchases[key]=events;else delete state.purchases[key];
   });
   Object.keys(state.feedback).forEach(key=>{
     const events=(Array.isArray(state.feedback[key])?state.feedback[key]:[])
       .filter(event=>Number(event?.at)>=cutoff&&Number(event?.days)>.1)
-      .map(event=>({at:Number(event.at),days:Number(event.days),household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))})).sort((a,b)=>a.at-b.at).slice(-12);
+      .map(event=>({id:String(event.id||sharedEventId('feedback',key,event)),at:Number(event.at),days:Number(event.days),household:Math.max(1,Math.min(12,Math.round(Number(event.household)||readHousehold())))})).sort((a,b)=>a.at-b.at).slice(-12);
     if(events.length)state.feedback[key]=events;else delete state.feedback[key];
   });
   Object.keys(state.consumptions).forEach(key=>{
     const events=(Array.isArray(state.consumptions[key])?state.consumptions[key]:[])
       .filter(event=>Number(event?.at)>=cutoff&&Number(event?.qty)>0&&Number(event?.cycleAt)>0)
       .map(event=>({
+        id:String(event.id||sharedEventId('consumptions',key,event)),
         at:Number(event.at),
         cycleAt:Number(event.cycleAt),
         qty:Math.max(1,Math.ceil(Number(event.qty)||1)),
@@ -201,13 +220,31 @@ function baseRule(meta){
   const product=PRODUCT_RULES.get(norm(meta?.name))||{};
   return {days:Math.max(1,Number(product.days??sub.days??category.days??30)),factor:clamp(Number(product.factor??sub.factor??category.factor??.8),.15,.95),shelf:Number(product.shelf??sub.shelf??category.shelf)||0};
 }
-function eventsFor(name){return state.purchases[norm(name)]||[]}
+// Journal append-only : les achats proches restent distincts et sont regroupés seulement au calcul.
+function eventsFor(name){
+  const rows=(state.purchases[norm(name)]||[]).slice().sort((a,b)=>a.at-b.at);
+  const cycles=[];
+  for(const item of rows){
+    const last=cycles.at(-1);
+    if(last&&item.at-last.at<=SAME_TRIP){
+      last.qty+=Math.max(1,Number(item.qty)||1);
+      last.at=Math.max(last.at,item.at);
+      last.firstAt=Math.min(last.firstAt,Number(item.firstAt)||item.at);
+    }else cycles.push({...item,firstAt:Number(item.firstAt)||item.at,qty:Math.max(1,Number(item.qty)||1)});
+  }
+  return cycles;
+}
 function feedbackFor(name){return state.feedback[norm(name)]||[]}
 function consumptionsFor(name){return state.consumptions[norm(name)]||[]}
 function consumedForCycle(name,cycleAt){
   const cycle=Number(cycleAt)||0;
   if(!cycle)return 0;
-  return consumptionsFor(name).reduce((total,event)=>total+(Number(event.cycleAt)===cycle?Math.max(1,Number(event.qty)||1):0),0);
+  const aliases=new Set([cycle]);
+  const grouped=eventsFor(name).find(item=>Number(item.firstAt)===cycle);
+  if(grouped)(state.purchases[norm(name)]||[]).forEach(item=>{
+    if(item.at>=grouped.firstAt&&item.at<=grouped.at)aliases.add(Number(item.firstAt)||Number(item.at));
+  });
+  return consumptionsFor(name).reduce((total,event)=>total+(aliases.has(Number(event.cycleAt))?Math.max(1,Number(event.qty)||1):0),0);
 }
 function adaptiveProfile(meta,household=readHousehold()){
   const base=baseRule(meta),events=eventsFor(meta.name),intervals=[];
@@ -265,7 +302,7 @@ function rebuild(household=readHousehold()){
 function writeState(){
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}catch(_){}
 }
-function persist(){prune();rebuild();writeState()}
+function persist(){prune();rebuild();writeState();void requestSharedSync()?.catch(()=>{})}
 function ensureModel(){
   const household=readHousehold();
   if(state.household!==household){rebuild(household);writeState()}
@@ -273,15 +310,8 @@ function ensureModel(){
 function record(name,qty=1,at=Date.now()){
   if(!isEnabled())return null;
   const meta=META.get(norm(name));if(!meta)return null;
-  const key=norm(meta.name),events=Array.isArray(state.purchases[key])?state.purchases[key]:[],last=events.at(-1);
-  const merges=Boolean(last&&at-last.at<=SAME_TRIP);
-  if(merges){
-    last.firstAt=Number(last.firstAt)||Number(last.at)||at;
-    last.qty=Math.max(1,Number(last.qty)||1)+Math.max(1,Number(qty)||1);
-    last.at=Math.max(last.at,at);last.household=readHousehold();
-  }else{
-    events.push({at,firstAt:at,qty:Math.max(1,Number(qty)||1),household:readHousehold()});
-  }
+  const key=norm(meta.name),events=Array.isArray(state.purchases[key])?state.purchases[key]:[];
+  events.push({id:newSharedEventId(),at,firstAt:at,qty:Math.max(1,Number(qty)||1),household:readHousehold()});
   state.purchases[key]=events;persist();scheduleDish();return true;
 }
 function recordFeedback(name,at=Date.now()){
@@ -290,7 +320,7 @@ function recordFeedback(name,at=Date.now()){
   const days=(at-last.at)/DAY;if(days<.15)return;
   const key=norm(meta.name),events=Array.isArray(state.feedback[key])?state.feedback[key]:[],previous=events.at(-1);
   if(previous&&at-previous.at<6*60*60*1000)return;
-  events.push({at,days,household:readHousehold()});state.feedback[key]=events.slice(-12);persist();
+  events.push({id:newSharedEventId(),at,days,household:readHousehold()});state.feedback[key]=events.slice(-12);persist();
 }
 function profile(name){ensureModel();return state.products[norm(name)]||null}
 function stockEstimate(name,at=Date.now()){
@@ -348,7 +378,7 @@ function recordDishConsumptions(token,at=Date.now()){
     const qty=Math.min(Math.max(1,Math.ceil(Number(item.qty)||1)),stock.estimatedQty);
     if(qty<=0)return;
     const key=norm(meta.name),events=Array.isArray(state.consumptions[key])?state.consumptions[key]:[];
-    events.push({at,cycleAt,qty,dish:String(token.dish||'').trim().slice(0,100),household:readHousehold()});
+    events.push({id:newSharedEventId(),at,cycleAt,qty,dish:String(token.dish||'').trim().slice(0,100),household:readHousehold()});
     state.consumptions[key]=events.slice(-120);changed=true;
   });
   if(changed){persist();scheduleDish()}
@@ -452,6 +482,169 @@ function bindHousehold(){
     ensureModel();scheduleDish();
   });
 }
+
+// Le journal Home Assistant partage l'historique sans modifier Ma liste ni les demandes manquantes.
+const sharedClient=()=>window.COURSES_HA_CLIENT;
+const sharedConnected=()=>sharedClient()?.isConnected?.()===true;
+function sharedCanonicalEvent(type,key,raw){
+  if(!SHARED_TYPES.includes(type)||!META.has(key)||!raw||typeof raw!=='object')return null;
+  const at=Number(raw.at),cutoff=Date.now()-HISTORY_DAYS*DAY;
+  if(!Number.isFinite(at)||at<cutoff||at>Date.now()+DAY)return null;
+  const id=String(raw.id||sharedEventId(type,key,raw));
+  if(!/^[a-z0-9-]{3,90}$/i.test(id))return null;
+  const household=Math.max(1,Math.min(12,Math.round(Number(raw.household)||readHousehold())));
+  if(type==='purchases'){
+    const firstAt=Math.min(at,Number(raw.firstAt)||at);
+    return {id,at,firstAt,qty:Math.max(1,Math.min(1000,Number(raw.qty)||1)),household};
+  }
+  if(type==='feedback'){
+    const days=Number(raw.days);
+    return Number.isFinite(days)&&days>.1&&days<=400?{id,at,days,household}:null;
+  }
+  const cycleAt=Number(raw.cycleAt),qty=Number(raw.qty);
+  if(!Number.isFinite(cycleAt)||cycleAt<=0||!Number.isFinite(qty)||qty<=0)return null;
+  return {id,at,cycleAt,qty:Math.max(1,Math.min(1000,Math.ceil(qty))),dish:String(raw.dish||'').trim().slice(0,100),household};
+}
+function sharedSnapshot(){
+  const map=new Map();
+  SHARED_TYPES.forEach(type=>Object.entries(state[type]).forEach(([key,events])=>{
+    if(!META.has(key)||!Array.isArray(events))return;
+    events.forEach(event=>{
+      const data=sharedCanonicalEvent(type,key,event);
+      if(data)map.set(type+'|'+key+'|'+data.id,{type,key,event:data});
+    });
+  }));
+  return map;
+}
+function decodeSharedHistory(row){
+  if(row?.status==='completed'||typeof row?.description!=='string'||!row.description.startsWith(SHARED_PREFIX))return null;
+  let payload;
+  try{payload=JSON.parse(row.description.slice(SHARED_PREFIX.length))}catch(_){return null}
+  if(payload?.v!==1||typeof payload.key!=='string'||!META.has(payload.key))return null;
+  const event=sharedCanonicalEvent(payload.type,payload.key,payload.event);
+  if(!event)return null;
+  return {type:payload.type,key:payload.key,event,uid:String(row.uid||''),summary:String(row.summary||'')};
+}
+function preferredSharedEvent(type,left,right){
+  if(type!=='purchases')return left;
+  return {
+    ...left,
+    at:Math.max(left.at,right.at),
+    firstAt:Math.min(left.firstAt,right.firstAt),
+    qty:Math.max(left.qty,right.qty),
+    household:left.at>=right.at?left.household:right.household
+  };
+}
+function mergeSharedRows(rows){
+  const local=sharedSnapshot();
+  let changed=false;
+  rows.forEach(row=>{
+    const id=row.type+'|'+row.key+'|'+row.event.id;
+    const existing=local.get(id);
+    const preferred=existing?preferredSharedEvent(row.type,existing.event,row.event):row.event;
+    if(existing&&JSON.stringify(preferred)===JSON.stringify(existing.event))return;
+    const items=state[row.type][row.key]||[];
+    const index=items.findIndex(item=>item.id===row.event.id);
+    if(index>=0)items[index]=preferred;else items.push(preferred);
+    state[row.type][row.key]=items;
+    local.set(id,{type:row.type,key:row.key,event:preferred});
+    changed=true;
+  });
+  if(changed){
+    prune();rebuild();writeState();scheduleDish();
+    document.dispatchEvent(new CustomEvent('courses:purchase-history-changed',{detail:{enabled:isEnabled(),shared:true}}));
+  }
+}
+function sharedDescription(entry){
+  return SHARED_PREFIX+JSON.stringify({v:1,type:entry.type,key:entry.key,event:entry.event});
+}
+function expiredSharedHistory(row){
+  if(typeof row?.description!=='string'||!row.description.startsWith(SHARED_PREFIX))return false;
+  let payload;
+  try{payload=JSON.parse(row.description.slice(SHARED_PREFIX.length))}catch(_){return false}
+  return payload?.v===1&&SHARED_TYPES.includes(payload.type)&&META.has(payload.key)
+    &&Number.isFinite(Number(payload.event?.at))
+    &&Number(payload.event.at)<Date.now()-HISTORY_DAYS*DAY
+    &&Boolean(row.uid||row.summary);
+}
+async function getSharedHistory(){
+  const result=await sharedClient().request({type:'todo/item/list',entity_id:SHARED_ENTITY});
+  if(!Array.isArray(result?.items))throw new Error('Historique Home Assistant illisible');
+  for(const row of result.items){
+    if(!sharedConnected())return [];
+    if(expiredSharedHistory(row)){
+      await sharedClient().callService('todo','remove_item',{
+        entity_id:SHARED_ENTITY,item:row.uid||row.summary
+      });
+    }
+  }
+  return result.items.map(decodeSharedHistory).filter(Boolean);
+}
+async function performSharedSync(){
+  if(!sharedConnected())return;
+  const remote=await getSharedHistory();
+  if(!sharedConnected())return;
+  mergeSharedRows(remote);
+  const entries=sharedSnapshot();
+  const known=new Map(remote.map(row=>[row.type+'|'+row.key+'|'+row.event.id,row]));
+  for(const [id,entry] of entries){
+    if(!sharedConnected())return;
+    const previous=known.get(id);
+    if(!previous){
+      await sharedClient().callService('todo','add_item',{
+        entity_id:SHARED_ENTITY,item:'Historique : '+entry.event.id,description:sharedDescription(entry)
+      });
+    }else{
+      const preferred=preferredSharedEvent(entry.type,entry.event,previous.event);
+      if(JSON.stringify(preferred)!==JSON.stringify(previous.event)){
+        if(!previous.uid&&!previous.summary)throw new Error('Identifiant historique indisponible');
+        await sharedClient().callService('todo','update_item',{
+          entity_id:SHARED_ENTITY,item:previous.uid||previous.summary,description:sharedDescription({...entry,event:preferred})
+        });
+      }
+    }
+  }
+  // Les notifications WebSocket relancent une fusion, sans polling.
+}
+function requestSharedSync(){
+  sharedDirty=true;
+  if(!sharedReady||!sharedConnected()||sharedSyncing)return sharedSyncing;
+  const job=(async()=>{
+    while(sharedDirty&&sharedConnected()){
+      sharedDirty=false;
+      await performSharedSync();
+    }
+  })();
+  sharedSyncing=job;
+  job.catch(error=>console.warn('courses-app: historique Home Assistant',error)).finally(()=>{
+    if(sharedSyncing===job)sharedSyncing=null;
+  });
+  return job;
+}
+async function connectShared({newConnection=false}={}){
+  if(!sharedConnected())return false;
+  if(newConnection){sharedReady=false;sharedSubscribed=false}
+  if(sharedConnecting)return sharedConnecting;
+  const job=(async()=>{
+    if(!sharedSubscribed){
+      const states=await sharedClient().getStates();
+      if(!sharedConnected())return false;
+      if(!states.some(row=>row.entity_id===SHARED_ENTITY&&row.state!=='unavailable'))return false;
+      await sharedClient().subscribeMissingTodo(SHARED_ENTITY,()=>{
+        if(sharedConnected())void requestSharedSync()?.catch(()=>{});
+      });
+      sharedSubscribed=true;
+    }
+    sharedReady=true;
+    await requestSharedSync();
+    return true;
+  })();
+  sharedConnecting=job;
+  try{return await job}
+  catch(error){console.warn('courses-app: connexion historique Home Assistant',error);return false}
+  finally{if(sharedConnecting===job)sharedConnecting=null}
+}
+
 function init(){
   try{const p=navigator.storage?.persist?.();if(p&&typeof p.catch==='function')p.catch(()=>{})}catch(_){}
   prune();rebuild();writeState();styles();installPreferenceToggle();bindHistoryEvents();bindDishEvents();bindHousehold();
@@ -462,8 +655,10 @@ function init(){
     isRecent:(name,qty=1)=>Boolean(recent(name,Date.now(),qty)),
     explain:(name,qty=1)=>recent(name,Date.now(),qty)||stockEstimate(name)||profile(name),
     summary:(limit=3)=>historySummary(limit),
+    connectShared,
     isEnabled,setEnabled
   });
+  if(sharedConnected())void connectShared().catch(()=>{});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
