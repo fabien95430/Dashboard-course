@@ -137,7 +137,7 @@ test('la fusion Home Assistant conserve les événements locaux et distants sans
 test('la synchronisation réutilise le WebSocket authentifié et la liste de demandes sans toucher à Ma liste',()=>{
   assert.match(source,/const SHARED_ENTITY='todo\.courses_demandes'/);
   assert.match(source,/const SHARED_PREFIX='courses-history-v1:'/);
-  assert.match(source,/function sharedConnected\(\)\{return sharedClient\(\)\?\.isConnected\?\.\(\)===true\}/);
+  assert.match(source,/const sharedConnected=\(\)=>sharedClient\(\)\?\.isConnected\?\.\(\)===true;/);
   assert.match(source,/subscribeMissingTodo\(SHARED_ENTITY/);
   const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
   assert.match(app,/COURSES_PURCHASE_INTELLIGENCE\?\.connectShared\?\.\(\{newConnection:true\}\)/);
