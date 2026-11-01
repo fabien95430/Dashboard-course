@@ -1120,3 +1120,12 @@ Tous deux sont des WebP indépendants de **384 × 384 pixels**, transparents (al
 | Philadelphia | `026d8fd4af53aa583d0b921f292335b449dc480f` | 14 230 |
 
 **Bilan publié : 332/414 renouvelés distincts**, **82/414 non renouvelés**, **au moins 24 évalués et conservés** parmi ces 82, **au moins 356 décisions documentées sans double comptage**, **au plus 58 restant sans décision définitive**. **414 fichiers WebP totalisant 10 471 634 octets**. Version applicative/cache **v612**. Aucun changement à Home Assistant, sécurité, mode test, tuiles, navigation ou synchronisation WebSocket. Les validations CI et Pages sont réelles ; aucune validation physique iPhone ou hors ligne réel n'est revendiquée.
+
+
+### Lot v714 — 13 emballages Épicerie harmonisés (1er novembre 2026)
+
+**Périmètre :** remplacement ciblé des 13 WebP existants du catalogue après approbation de la plaquette « Épicerie — Produits à finaliser ». Les **12 riz et 13 pâtes sèches déjà validés sont conservés bit à bit**, comme les autres produits satisfaisants. Aucune modification des noms de produits, catégories, quantités, mode test, Home Assistant ou sécurité.
+
+**Visuels :** disparition des bols et tas de produits au profit de sachets kraft/crème avec fenêtre de visualisation et bande ocre pour quinoa, couscous et polenta ; boîtes de conserve aux accents vert sauge pour lentilles, haricots rouges et pois chiches ; emballages fermés pour noix de coco râpée, gélatine, levure chimique, pépites chocolat, bouillon cubes et nouilles. Les 13 images ont été isolées de la **plaquette générée et validée par l'utilisateur**, recadrées et optimisées en WebP RGBA individuels 256 × 256, contrôlées en vignette 192 px. Les détails et empreintes sont consignés dans `docs/IMAGE_CREDITS_V714.md`.
+
+**Cache :** passage global à v714, invalidation ciblée des 13 entrées visuelles anciennes uniquement pendant l'activation du nouveau service worker ; le cache des autres items, les URL des riz et des pâtes et la logique de revalidation persistent. Les compteurs historiques de renouvellement (base 414 produits en v612) ne sont pas recalculés sans audit complet du catalogue courant.
