@@ -365,7 +365,7 @@ const DISH_NEEDS_FOR_TWO=Object.freeze({
   'Velouté carottes':{'Carottes':500,'Pommes de terre':200,'Crème fraîche':60,'Oignons jaunes':80},
   'Steak tartare':{'Bœuf':300,'Œufs':2,'Oignons rouges':60},
   'Sushis':{'Saumon':200,'Riz long':160,'Avocat':1,'Concombres':0.5},
-  'Saucisse lentille':{'Saucisses':2,'Lentilles':140,'Carottes':100,'Oignons jaunes':50},
+
   'Crème brûlée':{'Crème liquide':250,'Œufs':3,'Sucre':50,'Vanille':0.5},
   'Pannacotta':{'Crème liquide':400,'Sucre':50,'Vanille':0.5,'Gélatine':3},
   'Riz au lait':{'Lait entier':500,'Riz long':60,'Sucre':40,'Vanille':0.5},

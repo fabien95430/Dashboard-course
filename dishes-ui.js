@@ -88,7 +88,6 @@ const DISHES=Object.freeze([
   {name:'Velouté carottes',photoId:'',tags:['Enfants'],ingredients:['Carottes','Pommes de terre','Crème fraîche','Oignons jaunes']},
   {name:'Steak tartare',photoId:'',tags:['Viandes'],ingredients:['Bœuf','Œufs','Oignons rouges']},
   {name:'Sushis',photoId:'',tags:['Poissons'],ingredients:['Saumon','Riz long','Avocat','Concombres']},
-  {name:'Saucisse lentille',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Lentilles','Carottes','Oignons jaunes']},
   {name:'Crème brûlée',photoId:'',tags:['Végé','Dessert'],ingredients:['Crème liquide','Œufs','Sucre','Vanille']},
   {name:'Pannacotta',photoId:'',tags:['Dessert'],ingredients:['Crème liquide','Sucre','Vanille','Gélatine']},
   {name:'Riz au lait',photoId:'',tags:['Dessert'],ingredients:['Lait entier','Riz long','Sucre','Vanille']},
