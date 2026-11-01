@@ -173,6 +173,12 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Sauce algérienne":'Pot',
   "Sauce samouraï":'Pot',
   "Sauce andalouse":'Pot',
+  "Sauce aigre-douce":'Pot',
+  "Sauce blanche":'Pot',
+  "Sauce curry":'Pot',
+  "Sauce napolitaine":'Pot',
+  "Sauce ranch":'Pot',
+  "Sauce teriyaki":'Pot',
   "Coulis de fruit":"Bouteille",
 
   "Speculos":"Paquet",
