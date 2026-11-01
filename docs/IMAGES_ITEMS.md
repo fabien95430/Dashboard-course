@@ -33,7 +33,7 @@ Le nouvel item doit conserver exactement le langage visuel déjà présent dans 
 - aucun texte ajouté autour du produit ;
 - ne jamais inventer une marque ou un logo.
 
-Le visuel étant destiné à une petite vignette mobile, privilégier des formes lisibles, des volumes simples, des contours nets et des textures sobres. Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins et détails invisibles à petite taille. Réduire les éléments non essentiels facilite aussi la compression WebP, mais **un prompt ne garantit jamais un poids de fichier** : seul le contrôle après encodage est déterminant.
+Le visuel étant destiné à une petite vignette mobile, privilégier des formes lisibles, des volumes simples, des contours nets et des textures sobres. Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins et détails invisibles à petite taille. Réduire les éléments non essentiels facilite aussi la compression WebP. Le prompt automatique **vise 20 à 40 Ko lorsque le produit le permet**, sans sacrifier le rendu 3D premium, la fidélité au produit ni la transparence. **Un prompt ne garantit jamais un poids de fichier** : seul le contrôle après encodage est déterminant.
 
 Pour un produit emballé, garder un emballage simple et générique cohérent avec les items voisins. Ne pas créer de texte lisible ou de marque fictive uniquement pour remplir l’étiquette.
 

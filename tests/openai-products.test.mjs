@@ -159,6 +159,8 @@ assert requests[0]['size']=='816x816'
 assert requests[0]['quality']=='high'
 assert requests[0]['output_compression']==75
 assert 'compresse efficacement en WebP' in requests[0]['prompt']
+assert 'viser un poids final de 20 à 40 Ko' in requests[0]['prompt']
+assert 'le conditionnement demandé et la transparence du fond' in requests[0]['prompt']
 `;
   const run=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
   assert.equal(run.status,0,run.stderr||run.stdout);
