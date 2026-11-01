@@ -148,7 +148,10 @@ test('un ingrédient du catalogue peut être ajouté à une recette personnalis�
   assert.match(source,/recipe-customization-add-button[^\n]*Ajouter un ingrédient/);
   assert.match(source,/const matches=\[\.\.\.CATALOG_NAMES\]/);
   assert.match(source,/recipeCustomizationSelection\.add\(name\)/);
-  assert.match(source,/saved\.map\(String\)\.filter\(name=>CATALOG_NAMES\.has\(name\)\)/);
+  assert.match(source,/saved\.map\(name=>/);
+  assert.match(source,/Speculos':'Spéculoos'/);
+  assert.match(source,/Sirot d’érable':'Sirop d’érable'/);
+  assert.match(source,/\.filter\(name=>CATALOG_NAMES\.has\(name\)\)/);
   assert.match(source,/const selected=recipeIngredientsForDish\(dish,recipeCustomizationSelection\)\.filter\(name=>recipeCustomizationSelection\.has\(name\)\)/);
   assert.match(source,/dishSheetList\.innerHTML=recipeIngredientsForDish\(currentDish\)\.map\(name=>/);
 });

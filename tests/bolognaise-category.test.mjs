@@ -31,25 +31,28 @@ test('le conditionnement et la référence HA restent inchangés',()=>{
   assert.match(app,/todo\.courses/);
 });
 
-test('le cache invalide seulement la nouvelle Bolognaise en plus des précédents visuels',()=>{
+test('le cache invalide les visuels modifiés en conservant Bolognaise',()=>{
   const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
   const line=sw.split('\n').find(line=>line.startsWith('const UPDATED_ITEM_VISUALS='));
   assert.ok(line);
   const assets=JSON.parse(line.split('=')[1].replace(/;$/,''));
-  assert.equal(assets.length,14);
-  assert.equal(new Set(assets).size,14);
-  assert.ok(assets.includes('./www/Items/bolognaise.webp'));
-  assert.match(sw,/const CACHE='courses-app-v715-r1'/);
+  assert.ok(assets.length>=14);
+  assert.equal(new Set(assets).size,assets.length);
+  for(const name of ['bolognaise','cereales','the-noir','granola','pistaches','speculoos']){
+    assert.ok(assets.includes('./www/Items/'+name+'.webp'),'Visuel à invalider absent : '+name);
+  }
 });
 
-test('les trois vues et le cache référencent tous la version v715',()=>{
+test('les trois vues et le cache référencent la même version courante',()=>{
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
   const local=readFileSync(new URL('../dish-local-images.js',import.meta.url),'utf8');
-  assert.equal((html.match(/class="page-version">v715/g)||[]).length,3);
-  assert.match(html,/\.\/catalog\.js\?v=715/);
-  assert.match(sw,/\.\/catalog\.js\?v=715/);
-  assert.match(sw,/\.\/dish-local-images\.js\?v=715/);
-  assert.match(source,/\.\/dish-local-images\.js\?v=715/);
-  assert.match(local,/const APP_VERSION='v715'/);
+  const version=sw.match(/const CACHE='courses-app-(v\d+)-r\d+'/i)?.[1];
+  assert.ok(version,'Version du cache introuvable');
+  assert.equal((html.match(new RegExp('class="page-version">'+version,'g'))||[]).length,3);
+  assert.ok(html.includes('./catalog.js?'+version.replace(/^v/,'v=')));
+  assert.ok(sw.includes('./catalog.js?'+version.replace(/^v/,'v=')));
+  assert.ok(sw.includes('./dish-local-images.js?'+version.replace(/^v/,'v=')));
+  assert.ok(source.includes('./dish-local-images.js?'+version.replace(/^v/,'v=')));
+  assert.ok(local.includes("const APP_VERSION='"+version+"'"));
 });
