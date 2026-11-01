@@ -46,3 +46,12 @@ test('la notification distingue la suppression d un plat',()=>{
   assert.match(source,/deleteDish\?'Plat supprimé'/);
   assert.match(source,/operation:deleting\?'delete':'integrate'/);
 });
+
+test('le balayage vers la gauche retire un plat comme un produit',()=>{
+  const admin=read('catalog-product-admin.js');
+  assert.doesNotMatch(admin,/row\.dataset\.itemType==='dish'\)return;/);
+  assert.match(admin,/void startRemoval\(row\.dataset\.itemType\|\|'product',row\.dataset\.itemName\|\|''\)/);
+  const popup=read('missing-products-dishes.js');
+  assert.match(popup,/Retirez un plat du catalogue\./);
+  assert.doesNotMatch(popup,/Les plats ne se retirent pas/);
+});

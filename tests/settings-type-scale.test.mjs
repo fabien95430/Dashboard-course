@@ -132,7 +132,8 @@ test('catalogue (Suppression) : Annuler rouge, ligne en retrait rouge franc sans
   assert.match(admin,/\.courses-product-admin-undo\{[^}]*color:#D32F2F;/);
   assert.match(admin,/\.is-deleting>\.courses-product-admin-row\{background:#FDECEA\}/);
   assert.match(admin,/\.is-deleting \.courses-product-admin-copy strong\{color:#B71C1C\}/);
-  assert.match(admin,/if\(row\.dataset\.itemType==='dish'\)return;\s*clearBlockedNote\(\);/);
+  assert.match(admin,/const row=event\.target\.closest\('\.courses-product-admin-row'\);if\(!row\)return;\s*clearBlockedNote\(\);/);
+  assert.doesNotMatch(admin,/itemType==='dish'\)return;/);
   assert.doesNotMatch(dishes,/Retirez un produit ou un plat/);
 });
 

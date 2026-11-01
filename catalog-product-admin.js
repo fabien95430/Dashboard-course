@@ -363,7 +363,6 @@ function bindUi(){
   panel.addEventListener('pointerdown',event=>{
     if(event.button!==undefined&&event.button!==0)return;
     const row=event.target.closest('.courses-product-admin-row');if(!row)return;
-    if(row.dataset.itemType==='dish')return;
     clearBlockedNote();
     if(removals.has(row.dataset.adminItem||''))return;
     const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
