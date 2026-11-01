@@ -7,9 +7,9 @@ const KEYS=Object.freeze({
   addedDishes:'courses-missing-dishes-added-v1',
   productImageHints:'courses-missing-product-image-hints-v1'
 });
-const PRODUCT_CATEGORIES=Object.freeze(['','Boissons','Épicerie','Frais','Fruits & Légumes','Hygiène & enfant','Maison','Petit-déj & snacks','Viandes & poissons']);
+const PRODUCT_CATEGORIES=Object.freeze(['','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déj & snacks','Viandes & poissons']);
 // Rayons fusionnés : les demandes déjà enregistrées gardent leur catégorie sous le nouveau nom.
-const LEGACY_PRODUCT_CATEGORIES=Object.freeze({'Apéritif & snacks':'Petit-déj & snacks','Petit-déjeuner':'Petit-déj & snacks','Boulangerie':'Épicerie','Cuisine':'Épicerie','Enfant':'Hygiène & enfant','Hygiène & soins':'Hygiène & enfant'});
+const LEGACY_PRODUCT_CATEGORIES=Object.freeze({'Apéritif & snacks':'Petit-déj & snacks','Petit-déjeuner':'Petit-déj & snacks','Boulangerie':'Épicerie','Cuisine':'Épicerie','Hygiène & enfant':'Hygiène & soins'});
 const EVENT_NAME='courses-missing-requests-change';
 const PRODUCT_IMAGE_HINT_MAX=140;
 // Liste Home Assistant distincte de la liste de courses utilisée par Ma liste.
@@ -49,7 +49,13 @@ function writeJson(key,value){
 function sanitizeProduct(item,index=0){
   const name=cleanText(item?.name);
   if(!name)return null;
-  const raw=Object.prototype.hasOwnProperty.call(LEGACY_PRODUCT_CATEGORIES,item?.category??'')?LEGACY_PRODUCT_CATEGORIES[item.category]:item?.category;
+  const previousCategory=item?.category;
+  let raw=Object.prototype.hasOwnProperty.call(LEGACY_PRODUCT_CATEGORIES,previousCategory??'')?LEGACY_PRODUCT_CATEGORIES[previousCategory]:previousCategory;
+  // Les anciennes demandes « Hygiène & enfant » sont réattribuées suivant catalog.js.
+  if(previousCategory==='Hygiène & enfant'){
+    const childProducts=Object.values(window.COURSES_CATALOG?.groups?.Enfant||{}).flat();
+    if(childProducts.some(product=>normalize(product)===normalize(name)))raw='Enfant';
+  }
   const category=PRODUCT_CATEGORIES.includes(raw)?raw:'';
   return {id:String(item?.id||('legacy-'+index+'-'+normalize(name))),name,category};
 }

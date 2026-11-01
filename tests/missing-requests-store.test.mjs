@@ -16,7 +16,8 @@ function loadStore(initial={}){
   let byte=0;
   const crypto={getRandomValues:array=>{for(let i=0;i<array.length;i++)array[i]=(byte++%255)+1;return array}};
   class CustomEvent{constructor(type,options={}){this.type=type;this.detail=options.detail}}
-  const window={dispatchEvent:event=>{events.push(event);return true}};
+  const catalog=JSON.parse(read('catalog.js').match(/groups:\s*(\{.*?\}),\s*favorites:/s)[1]);
+  const window={COURSES_CATALOG:{groups:catalog},dispatchEvent:event=>{events.push(event);return true}};
   const context={window,localStorage,crypto,CustomEvent,Uint8Array,globalThis:null,Date,Math};
   context.globalThis=context;
   vm.runInNewContext(source,context,{filename:'missing-requests-store.js'});
@@ -30,7 +31,7 @@ test('les produits gardent les catégories et la normalisation historiques',()=>
 });
 
 test('les anciens rayons fusionnés sont convertis vers leur nouveau rayon',()=>{
-  const legacy=[['Apéritif & snacks','Petit-déj & snacks'],['Petit-déjeuner','Petit-déj & snacks'],['Boulangerie','Épicerie'],['Cuisine','Épicerie'],['Enfant','Hygiène & enfant'],['Hygiène & soins','Hygiène & enfant'],['Maison','Maison'],['constructor','']];
+  const legacy=[['Apéritif & snacks','Petit-déj & snacks'],['Petit-déjeuner','Petit-déj & snacks'],['Boulangerie','Épicerie'],['Cuisine','Épicerie'],['Enfant','Enfant'],['Hygiène & soins','Hygiène & soins'],['Hygiène & enfant','Hygiène & soins'],['Maison','Maison'],['constructor','']];
   const {store}=loadStore({'courses-missing-products-v1':JSON.stringify(legacy.map(([category],index)=>({name:'Produit '+index,category})))});
   assert.deepEqual(plain(store.readProducts()).map(item=>item.category),legacy.map(([,expected])=>expected));
 });
@@ -89,4 +90,20 @@ test('le service partagé est chargé avant app.js et précaché',()=>{
   assert.ok(sw.includes(appAsset));
   assert.ok(sw.includes(storeAsset));
   assert.match(source,/Object\.defineProperty\(window,'COURSES_MISSING_REQUESTS',[\s\S]*?configurable:false,[\s\S]*?enumerable:false,[\s\S]*?writable:false/);
+});
+
+test('les anciennes demandes d’hygiène et d’enfant se répartissent sans perdre leurs noms ni identifiants',()=>{
+  const saved=[
+    {id:'req-couches',name:'Couches',category:'Hygiène & enfant'},
+    {id:'req-gel',name:'Gel douche',category:'Hygiène & enfant'},
+    {id:'req-custom',name:'Produit non catégorisé',category:'Hygiène & enfant'},
+    {id:'req-baby',name:'Lait infantile',category:'Enfant'}
+  ];
+  const {store}=loadStore({'courses-missing-products-v1':JSON.stringify(saved)});
+  assert.deepEqual(plain(store.readProducts()).map(({id,name,category})=>({id,name,category})),[
+    {id:'req-couches',name:'Couches',category:'Enfant'},
+    {id:'req-gel',name:'Gel douche',category:'Hygiène & soins'},
+    {id:'req-custom',name:'Produit non catégorisé',category:'Hygiène & soins'},
+    {id:'req-baby',name:'Lait infantile',category:'Enfant'}
+  ]);
 });

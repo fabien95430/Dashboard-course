@@ -24,7 +24,8 @@ const CATEGORY=Object.freeze({
   'Épicerie':{days:30,factor:.8},
   'Frais':{days:7,factor:.6,shelf:12},
   'Fruits & Légumes':{days:7,factor:.62,shelf:14},
-  'Hygiène & enfant':{days:45,factor:.86},
+  'Enfant':{days:45,factor:.86},
+  'Hygiène & soins':{days:45,factor:.86},
   'Maison':{days:45,factor:.86},
   'Petit-déj & snacks':{days:30,factor:.82},
   'Viandes & poissons':{days:3,factor:.5,shelf:5}

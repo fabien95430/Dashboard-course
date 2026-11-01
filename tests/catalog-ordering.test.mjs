@@ -8,10 +8,10 @@ const norm=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize(
 
 test('les catégories du catalogue ne contiennent plus « Tous », placent Favoris en premier et le reste en ordre alphabétique',()=>{
   const app=read('app.js');
-  assert.match(app,/const CATALOG_CATEGORY_ORDER=\['Favoris','Boissons','Épicerie','Frais','Fruits & Légumes','Hygiène & enfant','Maison','Petit-déj & snacks','Viandes & poissons'\]/);
+  assert.match(app,/const CATALOG_CATEGORY_ORDER=\['Favoris','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déj & snacks','Viandes & poissons'\]/);
   assert.match(app,/const rankA=categoryA>=0&&productA\?\.category!=='Favoris'\?categoryA:999;/);
   const requests=read('missing-requests-store.js');
-assert.match(requests,/const PRODUCT_CATEGORIES=Object\.freeze\(\['','Boissons','Épicerie','Frais','Fruits & Légumes','Hygiène & enfant','Maison','Petit-déj & snacks','Viandes & poissons'\]\)/);
+assert.match(requests,/const PRODUCT_CATEGORIES=Object\.freeze\(\['','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déj & snacks','Viandes & poissons'\]\)/);
 assert.match(app,/const MISSING_PRODUCT_CATEGORIES=MISSING_REQUESTS\.productCategories;/);
 });
 
@@ -61,10 +61,12 @@ test('chaque produit appartient à une seule catégorie principale cohérente',(
   assert.equal(locations.get(norm('Pain'))?.category,'Épicerie');
   assert.equal(locations.get(norm('Paprika'))?.category,'Épicerie');
   assert.equal(locations.get(norm('Chips'))?.category,'Petit-déj & snacks');
-  assert.equal(locations.get(norm('Shampoing'))?.category,'Hygiène & enfant');
-  assert.equal(locations.get(norm('Couches'))?.category,'Hygiène & enfant');
+  assert.equal(locations.get(norm('Shampoing'))?.category,'Hygiène & soins');
+  assert.equal(locations.get(norm('Couches'))?.category,'Enfant');
+  assert.equal(locations.get(norm('Yaourt'))?.category,'Frais');
+  assert.equal(locations.get(norm('Yaourt'))?.sub,'Yaourts & desserts');
   assert.equal(locations.get(norm('Café moulu'))?.category,'Petit-déj & snacks');
-  assert.deepEqual(Object.keys(groups),['Boissons','Épicerie','Frais','Fruits & Légumes','Hygiène & enfant','Maison','Petit-déj & snacks','Viandes & poissons']);
+  assert.deepEqual(Object.keys(groups),['Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déj & snacks','Viandes & poissons']);
   assert.equal(locations.get(norm('Piles AA'))?.sub,'Équipement');
   assert.equal(locations.get(norm('Pile AAA'))?.sub,'Équipement');
 });

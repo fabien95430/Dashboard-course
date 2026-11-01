@@ -13,12 +13,13 @@ const CATEGORY_META = {
   'Épicerie': { label:'Épicerie' },
   'Frais': { label:'Frais' },
   'Fruits & Légumes': { label:'Fruits & légumes' },
-  'Hygiène & enfant': { label:'Hygiène & enfant' },
+  'Hygiène & soins': { label:'Hygiène & soins' },
+  'Enfant': { label:'Enfant' },
   'Maison': { label:'Maison' },
   'Petit-déj & snacks': { label:'Petit-déj & snacks' },
   'Viandes & poissons': { label:'Viandes & poissons' }
 };
-const CATALOG_CATEGORY_ORDER=['Favoris','Boissons','Épicerie','Frais','Fruits & Légumes','Hygiène & enfant','Maison','Petit-déj & snacks','Viandes & poissons'];
+const CATALOG_CATEGORY_ORDER=['Favoris','Boissons','Enfant','Épicerie','Frais','Fruits & Légumes','Hygiène & soins','Maison','Petit-déj & snacks','Viandes & poissons'];
 const DEFAULT_CATALOG_CATEGORY=CATALOG_CATEGORY_ORDER[0];
 const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Lait demi-écrémé":"Lait 1/2 écr.",
