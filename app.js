@@ -247,7 +247,11 @@ const UI = Object.freeze({
   savePasswordChange: document.getElementById('savePasswordChange'),
   refreshBtn: document.getElementById('refreshBtn')
 });
-const norm = value => String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const norm = value => {
+  const key=String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+  // Anciens noms toujours présents dans certaines listes Home Assistant : ne pas les renommer à distance.
+  return key==='speculos'?'speculoos':key==='sirot d erable'?'sirop d erable':key;
+};
 const productSlug=value=>String(value||'')
   .toLowerCase()
   .replace(/œ/g,'oe')
@@ -1077,7 +1081,7 @@ function renderList(){
     return categoryHeading+'<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
       '<button class="purchase-check" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'><svg><use href="#i-check"></use></svg></button>'+
       '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
-      '<span class="list-copy"><strong class="list-name">'+esc(group.summary)+'</strong>'+itemDetail+'</span>'+
+      '<span class="list-copy"><strong class="list-name">'+esc(catalogProductFor(group.summary)?.name||group.summary)+'</strong>'+itemDetail+'</span>'+
       quantity+
       '<button class="undo-purchase" type="button" data-name="'+esc(group.summary)+'" hidden>Annuler</button>'+
       '<button class="row-grip list-row-more" type="button" data-name="'+esc(group.summary)+'" aria-label="Afficher la suppression de '+esc(group.summary)+'" aria-expanded="false">•••</button>'+

@@ -190,7 +190,7 @@ function readRecipeCustomizations(){
     DISHES.forEach(dish=>{
       const saved=raw[dish.name];
       if(!Array.isArray(saved))return;
-      const savedNames=[...new Set(saved.map(String).filter(name=>CATALOG_NAMES.has(name)))];
+      const savedNames=[...new Set(saved.map(name=>({'Speculos':'Spéculoos','Sirot d’érable':'Sirop d’érable'}[String(name)]||String(name))).filter(name=>CATALOG_NAMES.has(name)))];
       const selected=new Set(savedNames);
       const extras=savedNames.filter(name=>!dish.ingredients.includes(name));
       clean[dish.name]=[...dish.ingredients.filter(name=>selected.has(name)),...extras];
