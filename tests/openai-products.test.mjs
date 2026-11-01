@@ -170,7 +170,7 @@ import json, sys, tempfile
 from pathlib import Path
 sys.path.insert(0,'scripts')
 import validate_generated_asset as validate
-assert validate.PRODUCT_IMAGE_MAX_BYTES==100*1024
+assert validate.PRODUCT_IMAGE_MAX_BYTES==150*1024
 with tempfile.TemporaryDirectory() as folder:
     validate.ROOT=Path(folder)
     validate.RESULT_PATH=Path(folder)/'.courses-dish-result.json'

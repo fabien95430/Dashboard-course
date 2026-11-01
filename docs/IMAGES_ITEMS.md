@@ -11,7 +11,7 @@ Cette note est la référence pour recréer ou remplacer l’image d’un produi
 - Toutes les catégories utilisent les images unitaires.
 - Si une image unitaire manque ou ne charge pas, l’application utilise uniquement le visuel SVG premium local de secours.
 - Pour les nouveaux visuels produits générés via OpenAI, l’automatisation utilise actuellement **816×816 px**, le plus petit carré valide pour le modèle configuré, tout en optimisant le rendu pour une **petite vignette mobile cible de 192×192 px**.
-- La génération WebP utilise explicitement `output_compression=75`. **Poids cible : 40 Ko ou moins lorsque la complexité du produit le permet ; plafond bloquant : 100 Kio (102 400 octets).** Le contrôle porte sur le poids réel du fichier encodé, pas sur une instruction textuelle au modèle. Un visuel dépassant le plafond est refusé avant publication (aucune nouvelle requête OpenAI automatique).
+- La génération WebP utilise explicitement `output_compression=75`. **Poids cible : 40 Ko ou moins lorsque la complexité du produit le permet ; plafond bloquant : 150 Kio (153 600 octets).** Le contrôle porte sur le poids réel du fichier encodé, pas sur une instruction textuelle au modèle. Un visuel dépassant le plafond est refusé avant publication (aucune nouvelle requête OpenAI automatique).
 
 ## Règle visuelle
 
@@ -123,7 +123,7 @@ L’image n’est validée que si toutes les réponses sont **oui** :
 - l’objet reste-t-il lisible à la petite taille d’une tuile Catalogue ?
 - aucune marque, aucun logo ou texte parasite n’a-t-il été inventé ?
 - le fichier porte-t-il exactement le slug attendu ?
-- le WebP généré respecte-t-il le plafond de 102 400 octets, après encodage et sans fond artificiel ?
+- le WebP généré respecte-t-il le plafond de 153 600 octets, après encodage et sans fond artificiel ?
 - le rendu est-il correct dans Catalogue et Ma liste ?
 - le fallback SVG local reste-t-il lisible si le fichier unitaire échoue ?
 - le mode hors ligne et le cache restent-ils fonctionnels ?
