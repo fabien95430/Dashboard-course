@@ -20,7 +20,7 @@ function installMissingProductsFixes(){
 function installProductItemImages(){
   if(document.querySelector('script[data-product-item-images]'))return;
   const script=document.createElement('script');
-  script.src='./product-item-images.js?v=723';
+  script.src='./product-item-images.js?v=724';
   script.defer=true;
   script.dataset.productItemImages='1';
   document.head.appendChild(script);
