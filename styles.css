@@ -1101,6 +1101,10 @@ body:has(#securityOverlay.is-visible){
   background-size:cover!important;
   background-repeat:no-repeat!important;
 }
+/* v727 — au lancement et au rechargement de mise à jour, iOS peint d'abord une zone d'affichage plus
+   courte puis l'agrandit : la bande du bas, hors de la page, prend la couleur du document. Elle reprend
+   le bois du bas de l'image au lieu du crème, qui dessinait une bande claire en bas de l'écran. */
+html:has(#securityOverlay.is-visible){background-color:#d5ae89!important}
 .security-overlay.is-visible{
   /* Le fond est peint par l'écran de connexion lui-même, décalé comme le bloc de connexion quand
      le clavier iOS fait glisser l'écran (--security-viewport-offset, posé par app-ui.js). */
