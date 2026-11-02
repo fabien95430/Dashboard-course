@@ -120,10 +120,12 @@ function loadVisualScaleCache(){
     const changedSinceCache=!Number.isFinite(cacheVersion)||cacheVersion<722;
     const changedSince724=!Number.isFinite(cacheVersion)||cacheVersion<724;
     const changedSince725=!Number.isFinite(cacheVersion)||cacheVersion<725;
+    const changedSince726=!Number.isFinite(cacheVersion)||cacheVersion<726;
     const changedImages724=['./www/Items/poivrons.webp','./www/Items/asperges.webp','./www/Items/tomates.webp'];
     const changedImages725=['./www/Items/abricots.webp'];
+    const changedImages726=['./www/Items/clementines.webp'];
     Object.entries(stored.items).forEach(([source,values])=>{
-      if((changedSinceCache&&UPDATED_IMAGE_SOURCES_V722.has(source))||(changedSince724&&changedImages724.includes(source))||(changedSince725&&changedImages725.includes(source)))return;
+      if((changedSinceCache&&UPDATED_IMAGE_SOURCES_V722.has(source))||(changedSince724&&changedImages724.includes(source))||(changedSince725&&changedImages725.includes(source))||(changedSince726&&changedImages726.includes(source)))return;
       if(Array.isArray(values)&&values.length===3&&values.every(Number.isFinite)){
         visualScaleCache.set(source,{scale:values[0],shiftX:values[1],shiftY:values[2]});
       }
