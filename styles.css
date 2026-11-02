@@ -3515,4 +3515,10 @@ body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behav
   (display-mode:standalone) and (orientation:portrait) and (device-height:956px){
   .security-overlay{bottom:auto!important;height:calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;min-height:0!important}
   .security-overlay .security-shell{height:var(--lock-screen-h)!important;padding-bottom:var(--lock-screen-bottom)!important}
+  /* v728 — pendant ces premières images, le document est encore plus court que l'écran (812 puis 846 px
+     sur un écran de 874) : son image, mise à l'échelle de cette hauteur, s'arrêtait là et laissait une
+     bande unie en bas. L'image du document prend l'échelle exacte de l'écran de connexion et déborde
+     sous la page jusqu'en bas de l'écran. */
+  html:has(#securityOverlay.is-visible),
+  body:has(#securityOverlay.is-visible){background-size:auto calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;background-position:center top!important}
 }
