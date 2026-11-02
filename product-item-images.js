@@ -108,7 +108,7 @@ function warmProductImages(){
 function loadVisualScaleCache(){
   try{
     const stored=JSON.parse(localStorage.getItem(VISUAL_SCALE_KEY)||'null');
-    if(!stored||!stored.items||typeof stored.items!=='object')return;
+    if(!stored||stored.version!==currentAppVersion()||!stored.items||typeof stored.items!=='object')return;
     Object.entries(stored.items).forEach(([source,values])=>{
       if(Array.isArray(values)&&values.length===3&&values.every(Number.isFinite)){
         visualScaleCache.set(source,{scale:values[0],shiftX:values[1],shiftY:values[2]});
