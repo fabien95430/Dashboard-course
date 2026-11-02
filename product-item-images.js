@@ -129,15 +129,18 @@ function loadVisualScaleCache(){
     const changedSince730=!Number.isFinite(cacheVersion)||cacheVersion<730;
     const changedSince732=!Number.isFinite(cacheVersion)||cacheVersion<732;
     const changedSince733=!Number.isFinite(cacheVersion)||cacheVersion<733;
+    const changedSince734=!Number.isFinite(cacheVersion)||cacheVersion<734;
     const changedImages724=['./www/Items/poivrons.webp','./www/Items/asperges.webp','./www/Items/tomates.webp'];
     const changedImages725=['./www/Items/abricots.webp'];
     const changedImages726=['./www/Items/clementines.webp'];
     const changedImages730=['./www/Items/butternut.webp','./www/Items/courge.webp','./www/Items/navets.webp','./www/Items/echalotes.webp','./www/Items/noisettes.webp','./www/Items/ail.webp','./www/Items/oignons-jaunes.webp'];
     const changedImages729=['./www/Items/nectarines.webp','./www/Items/fruit-de-la-passion.webp','./www/Items/noix-de-coco.webp'];
+    // Les trois nouvelles images sont remesurées sans toucher aux autres cadrages.
+    const changedImages734=['./www/Items/cereales.webp','./www/Items/petits-pots.webp','./www/Items/pop-corn.webp'];
     // Recalculer seulement les cadrages des visuels remplacés en v732.
     const changedImages732=["./www/Items/glace-vanille.webp","./www/Items/lait-infantile.webp","./www/Items/yaourt-a-boire.webp","./www/Items/ricotta.webp","./www/Items/gouda.webp","./www/Items/gnocchis.webp","./www/Items/feta.webp","./www/Items/burrata.webp","./www/Items/savon-mains.webp"];
     Object.entries(stored.items).forEach(([source,values])=>{
-      if((changedSinceCache&&UPDATED_IMAGE_SOURCES_V722.has(source))||(changedSince724&&changedImages724.includes(source))||(changedSince725&&changedImages725.includes(source))||(changedSince726&&changedImages726.includes(source))||(changedSince729&&changedImages729.includes(source))||(changedSince730&&changedImages730.includes(source))||(changedSince732&&changedImages732.includes(source))||(changedSince733&&changedImages730.includes(source)))return;
+      if((changedSinceCache&&UPDATED_IMAGE_SOURCES_V722.has(source))||(changedSince724&&changedImages724.includes(source))||(changedSince725&&changedImages725.includes(source))||(changedSince726&&changedImages726.includes(source))||(changedSince729&&changedImages729.includes(source))||(changedSince730&&changedImages730.includes(source))||(changedSince732&&changedImages732.includes(source))||(changedSince733&&changedImages730.includes(source))||(changedSince734&&changedImages734.includes(source)))return;
       if(Array.isArray(values)&&values.length===3&&values.every(Number.isFinite)){
         visualScaleCache.set(source,{scale:values[0],shiftX:values[1],shiftY:values[2]});
       }
