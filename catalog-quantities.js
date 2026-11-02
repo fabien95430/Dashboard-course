@@ -195,7 +195,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Granola":"Sachet",
   "Lave glace":"Bouteille",
   "Bolognaise":"Pot",
-  "Soignon":"Pièce"
+  "Soignon":"Pièce",
+  "Burrata":"Pot","Ricotta":"Pot","Feta":"Barquette","Gnocchis":"Paquet","Yaourt à boire":"Bouteille"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
@@ -243,7 +244,8 @@ const TECHNICAL_MODE_BY_PRODUCT=Object.freeze({
   'Surimi':'Paquet','Poisson pané':'Boîte','Quiche':'Pièce','Pâtes fraîches':'Paquet','Pâte brisée':'Pièce',
   'Ananas':'Pièce','Mangue':'Pièce','Avocat':'Pièce','Noix de coco':'Pièce','Grenade':'Pièce','Fruit de la passion':'Pièce','Melon':'Pièce',
   'Citrons':'Pièce','Concombres':'Pièce','Brocoli':'Pièce','Chou-fleur':'Pièce','Courge':'Pièce','Potiron':'Pièce','Butternut':'Pièce','Fenouil':'Pièce','Céleri':'Pièce','Artichauts':'Pièce',
-  'Ail':'Pièce','Piments':'Pièce','Citron vert':'Pièce'
+  'Ail':'Pièce','Piments':'Pièce','Citron vert':'Pièce',
+  'Beurre':'Poids','Burrata':'Pot','Ricotta':'Pot','Feta':'Barquette','Gnocchis':'Paquet','Yaourt à boire':'Bouteille'
 });
 
 // Une occurrence synchronisée avec Home Assistant représente 100 g (ou 100 ml)
