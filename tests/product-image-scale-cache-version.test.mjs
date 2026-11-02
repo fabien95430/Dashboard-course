@@ -3,29 +3,39 @@ import {readFileSync} from 'node:fs';
 import test from 'node:test';
 
 const source=readFileSync(new URL('../product-item-images.js',import.meta.url),'utf8');
-const snippet=source.match(/function loadVisualScaleCache\(\)\{[\s\S]*?\n\}\nfunction saveVisualScaleCacheSoon/);
-assert.ok(snippet,'le lecteur du cache existe');
+const cacheReader=source.match(/function loadVisualScaleCache\(\)\{[\s\S]*?\n\}\nfunction saveVisualScaleCacheSoon/);
+const updated=source.match(/const UPDATED_IMAGE_SOURCES_V722=new Set\([\s\S]*?\]\.map\(slug=>'\.\/www\/Items\/'\+slug\+'\.webp'\)\);/);
+assert.ok(cacheReader,'lecteur de cadrage introuvable');
+assert.ok(updated,'les visuels changés doivent être identifiés');
 
-function readScaleCache(data,current){
-  const localStorage={getItem:()=>JSON.stringify(data)};
+function restore(stored,currentVersion){
   const visualScaleCache=new Map();
-  const method=snippet[0].replace(/\nfunction saveVisualScaleCacheSoon$/,'')+'\nloadVisualScaleCache();';
-  new Function('localStorage','visualScaleCache','currentAppVersion','VISUAL_SCALE_KEY',method)(
-    localStorage,visualScaleCache,()=>current,'courses-product-visual-scale-v1'
+  const localStorage={getItem:()=>JSON.stringify(stored)};
+  const code=updated[0]+'\n'+cacheReader[0].replace(/\nfunction saveVisualScaleCacheSoon$/,'')+'\nloadVisualScaleCache();';
+  new Function('localStorage','visualScaleCache','VISUAL_SCALE_KEY','currentAppVersion',code)(
+    localStorage,visualScaleCache,'courses-product-visual-scale-v1',()=>currentVersion
   );
   return visualScaleCache;
 }
-
-test('un cadrage obsolète ne survit pas au changement de WebP',()=>{
-  const cached={version:'v721',items:{'./www/Items/quinoa.webp':[1.45,0,18]}};
-  assert.equal(readScaleCache(cached,'v722').size,0);
+test('les nouveaux WebP sont remesurés sans effacer les cadrages inchangés',()=>{
+  const old={version:'v721',items:{
+    './www/Items/quinoa.webp':[1.45,0,18],
+    './www/Items/riz-basmati.webp':[1.12,0,-2]
+  }};
+  const actual=restore(old,'v723');
+  assert.equal(actual.has('./www/Items/quinoa.webp'),false);
+  assert.deepEqual(actual.get('./www/Items/riz-basmati.webp'),{scale:1.12,shiftX:0,shiftY:-2});
 });
-test('le cadrage de la version actuelle reste utilisable immédiatement',()=>{
-  const source='./www/Items/quinoa.webp';
-  assert.deepEqual(readScaleCache({version:'v722',items:{[source]:[1.14,1.2,-3]}},'v722').get(source),{
-    scale:1.14,shiftX:1.2,shiftY:-3
-  });
+test('les cadrages créés depuis la v722 restent valables en v723',()=>{
+  const current={version:'v722',items:{'./www/Items/quinoa.webp':[1.09,2,-1]}};
+  assert.deepEqual(restore(current,'v723').get('./www/Items/quinoa.webp'),{scale:1.09,shiftX:2,shiftY:-1});
 });
-test('les anciens caches sans version sont ignorés',()=>{
-  assert.equal(readScaleCache({items:{'./www/Items/quinoa.webp':[1.45,0,18]}},'v722').size,0);
+test('les anciens caches sans version invalident seulement les images modifiées',()=>{
+  const legacy={items:{
+    './www/Items/quinoa.webp':[1.45,0,18],
+    './www/Items/spaghetti.webp':[1,0,0]
+  }};
+  const restored=restore(legacy,'v723');
+  assert.equal(restored.has('./www/Items/quinoa.webp'),false);
+  assert.ok(restored.has('./www/Items/spaghetti.webp'));
 });

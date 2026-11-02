@@ -12,8 +12,8 @@ test('les treize visuels Épicerie sont des WebP individuels RGBA sans atlas',()
     assert.equal(bytes.toString('ascii',8,12),'WEBP',slug);
     assert.equal(bytes.toString('ascii',12,16),'VP8X',slug);
     assert.ok(bytes[20]&0x10,'alpha nécessaire pour '+slug);
-    assert.equal(bytes.readUIntLE(24,3)+1,256,slug+' largeur');
-    assert.equal(bytes.readUIntLE(27,3)+1,256,slug+' hauteur');
+    assert.equal(bytes.readUIntLE(24,3)+1,384,slug+' largeur');
+    assert.equal(bytes.readUIntLE(27,3)+1,384,slug+' hauteur');
     assert.ok(statSync(path).size<=153600,slug+' taille');
   }
 });

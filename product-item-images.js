@@ -20,6 +20,13 @@ const warmedSources=new Set();
 const visualScaleCache=new Map();
 const PRODUCT_WARM_VERSION_KEY='courses-product-images-warm-version-v1';
 const VISUAL_SCALE_KEY='courses-product-visual-scale-v1';
+// Seuls ces WebP ont changé d'empreinte en v722. Conserver les cadrages des 445 autres
+// images évite une re-mesure générale et la latence au retour du Catalogue.
+const UPDATED_IMAGE_SOURCES_V722=new Set([
+  'quinoa','couscous','polenta','lentilles','haricots-rouges','pois-chiches',
+  'noix-de-coco-rapee','gelatine','levure-chimique','pepites-chocolat',
+  'bouillon-cubes','nouilles-chinoises','nouilles-instantanees'
+].map(slug=>'./www/Items/'+slug+'.webp'));
 let visualScaleSaveTimer=0;
 
 const slugify=value=>String(value||'')
@@ -108,8 +115,11 @@ function warmProductImages(){
 function loadVisualScaleCache(){
   try{
     const stored=JSON.parse(localStorage.getItem(VISUAL_SCALE_KEY)||'null');
-    if(!stored||stored.version!==currentAppVersion()||!stored.items||typeof stored.items!=='object')return;
+    if(!stored||!stored.items||typeof stored.items!=='object')return;
+    const cacheVersion=Number(String(stored.version||'').replace(/^v/,''));
+    const changedSinceCache=!Number.isFinite(cacheVersion)||cacheVersion<722;
     Object.entries(stored.items).forEach(([source,values])=>{
+      if(changedSinceCache&&UPDATED_IMAGE_SOURCES_V722.has(source))return;
       if(Array.isArray(values)&&values.length===3&&values.every(Number.isFinite)){
         visualScaleCache.set(source,{scale:values[0],shiftX:values[1],shiftY:values[2]});
       }
