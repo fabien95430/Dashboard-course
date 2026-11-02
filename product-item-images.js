@@ -27,6 +27,10 @@ const UPDATED_IMAGE_SOURCES_V722=new Set([
   'noix-de-coco-rapee','gelatine','levure-chimique','pepites-chocolat',
   'bouillon-cubes','nouilles-chinoises','nouilles-instantanees'
 ].map(slug=>'./www/Items/'+slug+'.webp'));
+// Ces sept WebP possèdent une marge de sécurité : conserver le zoom à 1 et le centrage.
+const NO_CROP_SOURCES_V733=new Set([
+  'butternut','courge','navets','echalotes','noisettes','ail','oignons-jaunes'
+].map(slug=>'./www/Items/'+slug+'.webp'));
 let visualScaleSaveTimer=0;
 
 const slugify=value=>String(value||'')
@@ -124,6 +128,7 @@ function loadVisualScaleCache(){
     const changedSince729=!Number.isFinite(cacheVersion)||cacheVersion<729;
     const changedSince730=!Number.isFinite(cacheVersion)||cacheVersion<730;
     const changedSince732=!Number.isFinite(cacheVersion)||cacheVersion<732;
+    const changedSince733=!Number.isFinite(cacheVersion)||cacheVersion<733;
     const changedImages724=['./www/Items/poivrons.webp','./www/Items/asperges.webp','./www/Items/tomates.webp'];
     const changedImages725=['./www/Items/abricots.webp'];
     const changedImages726=['./www/Items/clementines.webp'];
@@ -132,7 +137,7 @@ function loadVisualScaleCache(){
     // Recalculer seulement les cadrages des visuels remplacés en v732.
     const changedImages732=["./www/Items/glace-vanille.webp","./www/Items/lait-infantile.webp","./www/Items/yaourt-a-boire.webp","./www/Items/ricotta.webp","./www/Items/gouda.webp","./www/Items/gnocchis.webp","./www/Items/feta.webp","./www/Items/burrata.webp","./www/Items/savon-mains.webp"];
     Object.entries(stored.items).forEach(([source,values])=>{
-      if((changedSinceCache&&UPDATED_IMAGE_SOURCES_V722.has(source))||(changedSince724&&changedImages724.includes(source))||(changedSince725&&changedImages725.includes(source))||(changedSince726&&changedImages726.includes(source))||(changedSince729&&changedImages729.includes(source))||(changedSince730&&changedImages730.includes(source))||(changedSince732&&changedImages732.includes(source)))return;
+      if((changedSinceCache&&UPDATED_IMAGE_SOURCES_V722.has(source))||(changedSince724&&changedImages724.includes(source))||(changedSince725&&changedImages725.includes(source))||(changedSince726&&changedImages726.includes(source))||(changedSince729&&changedImages729.includes(source))||(changedSince730&&changedImages730.includes(source))||(changedSince732&&changedImages732.includes(source))||(changedSince733&&NO_CROP_SOURCES_V733.has(source)))return;
       if(Array.isArray(values)&&values.length===3&&values.every(Number.isFinite)){
         visualScaleCache.set(source,{scale:values[0],shiftX:values[1],shiftY:values[2]});
       }
@@ -205,11 +210,12 @@ function measureVisualScale(image,source){
     }
     if(maxX<minX||maxY<minY)return null;
     const occupancy=Math.max((maxX-minX+1)/size,(maxY-minY+1)/size);
-    const scale=Math.max(.94,Math.min(1.45,.90/Math.max(.01,occupancy)));
+    const cropSafe=NO_CROP_SOURCES_V733.has(source);
+    const scale=cropSafe?1:Math.max(.94,Math.min(1.45,.90/Math.max(.01,occupancy)));
     const centerX=(minX+maxX+1)/(2*size);
     const centerY=(minY+maxY+1)/(2*size);
-    const shiftX=Math.max(-18,Math.min(18,(.5-centerX)*100*scale));
-    const shiftY=Math.max(-18,Math.min(18,(.5-centerY)*100*scale));
+    const shiftX=cropSafe?0:Math.max(-18,Math.min(18,(.5-centerX)*100*scale));
+    const shiftY=cropSafe?0:Math.max(-18,Math.min(18,(.5-centerY)*100*scale));
     const metrics={
       scale:Math.round(scale*1000)/1000,
       shiftX:Math.round(shiftX*10)/10,
