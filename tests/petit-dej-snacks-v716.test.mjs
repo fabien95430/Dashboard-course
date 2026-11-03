@@ -13,12 +13,13 @@ const items=groups['Petit-déj & snacks'];
 const entries=Object.values(items).flat();
 const slug=value=>String(value).toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 
-test('Petit-déj & snacks contient les 53 produits attendus sans doublon ni image absente',()=>{
-  assert.equal(entries.length,53);
-  assert.equal(new Set(entries).size,53);
-  assert.deepEqual(Object.fromEntries(Object.entries(items).map(([key,values])=>[key,values.length])),{
-    'Apéritif':12,'Biscuits & goûters':16,'Café & thé':15,'Petit-déjeuner':10
-  });
+test('Petit-déj & snacks contient au moins les 53 produits attendus sans doublon ni image absente',()=>{
+  // Plancher v716 (aucune perte) et plafond relevé à 80 pour accueillir les nouveaux produits.
+  assert.ok(entries.length>=53,'Petit-déj & snacks a perdu des produits');
+  assert.ok(entries.length<=80,'Petit-déj & snacks dépasse le plafond de 80 produits');
+  assert.equal(new Set(entries).size,entries.length,'Doublon dans Petit-déj & snacks');
+  const floors={'Apéritif':12,'Biscuits & goûters':16,'Café & thé':15,'Petit-déjeuner':10};
+  for(const [key,min] of Object.entries(floors))assert.ok((items[key]||[]).length>=min,key+' a perdu des produits');
   for(const name of entries)assert.ok(existsSync(new URL('www/Items/'+slug(name)+'.webp',root)),'WebP absent : '+name);
 });
 

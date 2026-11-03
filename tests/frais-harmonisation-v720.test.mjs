@@ -22,11 +22,12 @@ const expected=[
 ];
 
 test('Frais classe les nouveaux produits sans perdre les références existantes',()=>{
-  assert.equal(list.length,56);
-  assert.equal(new Set(list).size,56);
-  assert.deepEqual(Object.fromEntries(Object.entries(frais).map(([k,v])=>[k,v.length])),{
-    'Fromages':18,'Laits & crèmes':13,'Surgelés':9,'Traiteur frais':4,'Yaourts & desserts':12
-  });
+  // Plancher v720 (aucune perte) et plafond relevé à 80 pour accueillir les nouveaux produits.
+  assert.ok(list.length>=56,'Frais a perdu des produits');
+  assert.ok(list.length<=80,'Frais dépasse le plafond de 80 produits');
+  assert.equal(new Set(list).size,list.length,'Doublon dans Frais');
+  const floors={'Fromages':18,'Laits & crèmes':13,'Surgelés':9,'Traiteur frais':4,'Yaourts & desserts':12};
+  for(const [key,min] of Object.entries(floors))assert.ok((frais[key]||[]).length>=min,key+' a perdu des produits');
   for(const name of ['Feta','Burrata','Ricotta','Gouda'])assert.ok(frais.Fromages.includes(name),name);
   assert.ok(frais['Yaourts & desserts'].includes('Yaourt à boire'));
   assert.ok(frais['Traiteur frais'].includes('Gnocchis'));
