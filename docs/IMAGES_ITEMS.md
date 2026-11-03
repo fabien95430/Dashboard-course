@@ -11,7 +11,7 @@ Cette note est la référence pour recréer ou remplacer l’image d’un produi
 - Toutes les catégories utilisent les images unitaires.
 - Si une image unitaire manque ou ne charge pas, l’application utilise uniquement le visuel SVG premium local de secours.
 - Pour les nouveaux visuels produits générés via OpenAI, l’automatisation utilise actuellement **816×816 px**, le plus petit carré valide pour le modèle configuré, tout en optimisant le rendu pour une **petite vignette mobile cible de 192×192 px**.
-- La génération WebP utilise explicitement `output_compression=75`. **Poids cible : 40 Ko ou moins lorsque la complexité du produit le permet ; plafond bloquant : 150 Kio (153 600 octets).** Le contrôle porte sur le poids réel du fichier encodé, pas sur une instruction textuelle au modèle. Un visuel dépassant le plafond est refusé avant publication (aucune nouvelle requête OpenAI automatique).
+- **Toute prochaine image produit doit peser au maximum 15 Ko, soit 15 000 octets, après encodage WebP.** Mesurer le fichier final : une compression configurée ou une instruction au modèle ne garantit pas le poids. Réduire raisonnablement les détails, adapter la résolution et la qualité, puis vérifier la lisibilité et la transparence. Refuser l'intégration si le fichier dépasse 15 000 octets ou si la qualité devient insuffisante. Ne jamais relever silencieusement cette limite. Cette consigne remplace les anciennes cibles de 20–40 Ko pour les prochaines générations ; le plafond technique historique de 153 600 octets ne vaut pas autorisation de dépasser 15 Ko.
 
 ## Règle visuelle
 
@@ -33,7 +33,29 @@ Le nouvel item doit conserver exactement le langage visuel déjà présent dans 
 - aucun texte ajouté autour du produit ;
 - ne jamais inventer une marque ou un logo.
 
-Le visuel étant destiné à une petite vignette mobile, privilégier des formes lisibles, des volumes simples, des contours nets et des textures sobres. Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins et détails invisibles à petite taille. Réduire les éléments non essentiels facilite aussi la compression WebP. Le prompt automatique **vise 20 à 40 Ko lorsque le produit le permet**, sans sacrifier le rendu 3D premium, la fidélité au produit ni la transparence. **Un prompt ne garantit jamais un poids de fichier** : seul le contrôle après encodage est déterminant.
+Le visuel étant destiné à une petite vignette mobile, privilégier des formes lisibles, des volumes simples, des contours nets et des textures sobres. Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins et détails invisibles à petite taille. Réduire les éléments non essentiels facilite une compression WebP à **15 000 octets maximum**, sans sacrifier la fidélité au produit ni la transparence. **Un prompt ne garantit jamais un poids de fichier** : seul le contrôle après encodage est déterminant.
+
+## Harmonisation et palette validée
+
+Avant chaque lot, consulter [l'audit de référence](AUDIT_IMAGES_PRODUITS_2026-11-04.md), sélectionner les références déjà réussies et harmoniser ensemble forme, matériau, couvercle, échelle et couleur des emballages d'une même famille. Ne pas modifier les produits déjà validés uniquement pour uniformiser le catalogue. Préserver notamment les riz bleus et les pâtes beiges.
+
+| Famille | Couleur d'emballage validée |
+| --- | --- |
+| Riz | Bleu existant |
+| Pâtes | Beige existant |
+| Céréales et semoules | Ocre |
+| Légumineuses et conserves | Vert sauge |
+| Sauces tomate | Rouge brique |
+| Sauces crémeuses | Taupe |
+| Sauces épicées | Terracotta |
+| Huiles et vinaigres | Olive doré |
+| Sucres et produits sucrés | Nude rosé |
+| Épices | Brun cannelle |
+| Boulangerie | Beige chaud |
+
+Utiliser une base kraft/crème avec un accent discret et rendre le contenu visible lorsque le conditionnement s'y prête. La palette concerne l'emballage, jamais une recoloration artificielle de l'aliment. Aucun code hexadécimal précis n'a été validé : prendre les fichiers existants comme références. Pour les conserves, privilégier une boîte métallique fermée, une étiquette crème et un accent sauge ; adapter les proportions au produit réel. Les laits gardent la bouteille de famille et leurs distinctions de bouchon déjà validées.
+
+Contrôler les contours sur fond clair **et** foncé, aux tailles de Catalogue et de Ma liste : pas de liseré blanc externe, de halo ni de découpe rognée. Une planche de contrôle est uniquement un outil de revue, jamais un asset utilisé par l'application.
 
 Pour un produit emballé, garder un emballage simple et générique cohérent avec les items voisins. Ne pas créer de texte lisible ou de marque fictive uniquement pour remplir l’étiquette.
 
@@ -123,7 +145,9 @@ L’image n’est validée que si toutes les réponses sont **oui** :
 - l’objet reste-t-il lisible à la petite taille d’une tuile Catalogue ?
 - aucune marque, aucun logo ou texte parasite n’a-t-il été inventé ?
 - le fichier porte-t-il exactement le slug attendu ?
-- le WebP généré respecte-t-il le plafond de 153 600 octets, après encodage et sans fond artificiel ?
+- le WebP final pèse-t-il au maximum **15 000 octets**, après encodage et sans fond artificiel ?
+- les couleurs et le conditionnement respectent-ils la famille et la palette validées ?
+- le contour reste-t-il propre sur fond clair et foncé à petite taille ?
 - le rendu est-il correct dans Catalogue et Ma liste ?
 - le fallback SVG local reste-t-il lisible si le fichier unitaire échoue ?
 - le mode hors ligne et le cache restent-ils fonctionnels ?

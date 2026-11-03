@@ -1,0 +1,87 @@
+# Audit des images produits — 4 novembre 2026
+
+État inspecté : `main`, commit `3d2373dc87ecc34d1be4d205021febdf38f11c7a` (v739). Catalogue : 466 produits. Cette liste décrit cet état ; vérifier le dépôt courant avant chaque intervention.
+
+## Poids et résolution
+
+Les 466 fichiers ont un canal de transparence. Poids minimum : 1 794 octets ; maximum : 80 644 ; médiane : 14 608. Aucun ne dépasse l'ancien plafond de 153 600 octets, mais **229 dépassent 15 000 octets**, dont 66 dépassent 40 000. Cela ne permet donc pas de déclarer tout le catalogue conforme à la consigne utilisateur de 15 Ko.
+
+Pour toute prochaine génération, **15 000 octets maximum par WebP final** est un critère bloquant. Mesurer les fichiers, garder une vraie transparence et vérifier la qualité après compression. La limite et la palette sont consignées dans [IMAGES_ITEMS.md](IMAGES_ITEMS.md).
+
+Dans le précédent lot de neuf, restent au-dessus de 15 Ko : Noisettes (38 972), Noix (33 542), Oignons jaunes (28 888), Pansements (17 814), Tapenade (34 886 octets). Les quatre autres sont sous la limite. Ne pas confondre correction de contour et conformité de poids.
+
+21 fichiers sont encore en 84 × 84 pixels : Compotes bébé, Sacs à couches, Petits pois carottes, Mouchoirs poche, Antiseptique, Baume lèvres, Désinfectant, Lingettes ménage, Pinces à linge, Sacs linge délicat, Mouchoirs, Sacs poubelle 30L, Sacs poubelle 50L, Sacs zip, Serviettes papier, Essuie-verres, Grattoirs, Torchons, Pâté, Poisson pané, Saucisses. Leur résolution appelle une revue, sans prouver à elle seule un défaut de contour.
+
+## Contours à refaire
+
+33 visuels présentent un contour blanc externe de type autocollant lors de la revue visuelle :
+
+| Groupe | Produits |
+| --- | --- |
+| Boissons (1) | Jus d'ananas |
+| Épicerie (7) | Baguette, Pain aux céréales, Pain complet, Pain de mie, Pains burger, Tortillas, Vanille |
+| Frais (6) | Brie, Cheddar, Chèvre, Emmental, Roquefort, Pâtes fraîches |
+| Snacks (5) | Bretzels, Biscuits beurre, Biscuits chocolat, Chocolat au lait, Chocolat noir |
+| Viandes et poissons (14) | Bacon, Chorizo, Jambon blanc, Jambon cru, Cabillaud, Moules, Saumon fumé, Thon frais, Truite, Thon en boîte, Agneau, Côtes de porc, Poulet, Veau |
+
+Trois autres sources atteignent le bord du canevas et nécessitent une vérification des marges : Chili, Vinaigre de vin, Rosette. Ce constat ne prouve pas à lui seul qu'une partie de l'objet manque.
+
+## Harmonisation par famille
+
+Les couleurs déjà validées le 1er novembre sont reprises dans IMAGES_ITEMS.md : riz bleu et pâtes beige à préserver, céréales ocre, conserves sauge, sauces tomate brique, crémeuses taupe, épicées terracotta, huiles/vinaigres olive doré, sucré nude rosé, épices cannelle et boulangerie beige chaud. Aucun nouveau code couleur exact n'est présenté comme validé.
+
+| Famille | Constat et direction |
+| --- | --- |
+| Conserves | Mélange de boîtes ouvertes et fermées, d'étiquettes rouges, crème ou absentes. Références à conserver : Haricots rouges, Lentilles, Pois chiches. Harmoniser les six autres avec métal argenté, étiquette crème, accent sauge et contenu identifiable. |
+| Épices | Paprika a un couvercle gris et une silhouette différents de Curry/Curcuma. Reprendre leur petit bocal fermé avec accent cannelle discret. Préserver le duo Sel/Poivre déjà cohérent. |
+| Sauces | Mayonnaise et Sauce tomate ont des finitions différentes des bocaux dorés de Sauce au poivre/Ranch. Reprendre la silhouette et le couvercle de famille avec accents taupe et brique. Ne pas imposer le même pot aux sauces, aux épices et aux crèmes. |
+| Jus | Mélange de verres, bouteilles et briques. Jus d'ananas cumule contour blanc et style différent. Prendre les bouteilles Pomme/Raisin comme références ; aucune palette spécifique aux jus n'a été validée. |
+| Produits ménagers | Désinfectant, Désodorisant textile et Détachant à rapprocher des trois nettoyants cohérents. Revue à programmer, sans nouvelle palette inventée. |
+| Boulangerie, fromages, snacks | Traiter le contour et l'harmonisation ensemble, en une seule régénération par produit. |
+
+Préserver les familles déjà cohérentes : les laits, les pâtes beiges, les riz bleus, les vins, les bières, les sachets bleus de surgelés, les pots de fruits secs apéritifs et les yaourts. Les formats naturels différents restent possibles : une conserve de thon peut être ronde et celles de sardines/maquereaux rectangulaires.
+
+## Premier lot autorisé : dix produits
+
+| Produit | Fichier | Référence principale | Correction |
+| --- | --- | --- | --- |
+| Champignons en boîte | `champignons-en-boite.webp` | Haricots rouges | Étiquette crème/sauge, boîte fermée |
+| Concentré de tomate | `concentre-de-tomate.webp` | Pois chiches | Petite boîte fermée crème/sauge |
+| Maïs en boîte | `mais-en-boite.webp` | Lentilles | Boîte fermée, contenu représenté sur étiquette |
+| Petits pois carottes | `petits-pois-carottes.webp` | Lentilles | Résolution et boîte crème/sauge |
+| Raviolis en boîte | `raviolis-en-boite.webp` | Haricots rouges | Remplacer l'habillage rouge par la famille sauge |
+| Tomates pelées | `tomates-pelees.webp` | Pois chiches | Boîte fermée crème/sauge |
+| Paprika | `paprika.webp` | Curcuma | Bocal d'épices fermé, finition dorée/cannelle |
+| Mayonnaise | `mayonnaise.webp` | Sauce au poivre | Bocal fermé, accent taupe |
+| Sauce tomate | `sauce-tomate.webp` | Sauce au poivre | Bocal fermé, accent rouge brique |
+| Jus d'ananas | `jus-d-ananas.webp` | Jus de pomme | Bouteille cohérente et suppression du contour blanc |
+
+Ce lot comprend neuf harmonisations et un produit de la liste des 33 contours. Une fois validé, il restera donc 32 produits de cette liste, sous réserve du contrôle effectif des résultats. Les autres anomalies ne sont pas considérées corrigées par ce lot.
+
+### Résultats du premier lot
+
+WebP encodés, transparence et marges vérifiées, revue sur fonds clair/foncé à 192 et 48 pixels. Le calcul réel du cadrage de `product-item-images.js` a été exécuté sur les pixels des dix fichiers : les limites des zones Catalogue et Ma liste sont respectées. Migration du cache v739 vers v740 vérifiée, autres cadrages conservés. Ces contrôles de source et de rendu composé ne remplacent pas un essai interactif sur iPhone ou sur une session Home Assistant réelle, non exécuté ici.
+
+| Produit | Poids final en octets |
+| --- | ---: |
+| Champignons en boîte | 13 860 |
+| Concentré de tomate | 13 272 |
+| Maïs en boîte | 14 868 |
+| Petits pois carottes | 14 856 |
+| Raviolis en boîte | 14 868 |
+| Tomates pelées | 13 736 |
+| Paprika | 14 748 |
+| Mayonnaise | 12 918 |
+| Sauce tomate | 14 788 |
+| Jus d'ananas | 9 558 |
+
+Les dix fichiers satisfont la limite de 15 000 octets. Le validateur des prochaines générations applique aussi cette limite ; son test couvre l'acceptation à 15 000 et le refus à 15 001 octets. Les 32 autres contours et les trois cas de marge restent à traiter. Les chiffres de l'inventaire ci-dessus décrivent v739, avant ce lot.
+
+## Contrôle de chaque livraison
+
+1. Lire le catalogue, le chargeur d'images et les références sur `main`.
+2. Générer un seul produit par image, avec palette, conditionnement et proportions corrects.
+3. Encoder un WebP unitaire et mesurer son poids réel : maximum 15 000 octets.
+4. Examiner l'alpha, les marges, les contours sur fond clair/foncé et la lisibilité aux tailles Catalogue et Ma liste.
+5. Conserver les produits déjà validés et les invariants Home Assistant/sécurité. Ne pas ajouter de dépendance.
+6. Lors de l'intégration, suivre la version globale, l'invalidation du cache, les tests et le commit atomique prescrits par AGENTS.md. Distinguer les contrôles effectués des vérifications qui n'ont pas pu être exécutées.
