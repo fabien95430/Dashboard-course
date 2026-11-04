@@ -303,3 +303,28 @@ Sept fichiers déjà corrects et sous la limite restent conservés. Brioche, Pai
 La correction du cache v753 est conservée : aucune liste cumulative de visuels réintroduite dans sw.js, cache persistant et revalidation conditionnelle inchangés. Seuls les cadrages locaux des cinq images remplacées sont invalidés. Cette livraison clôt la revue de cette catégorie, pas celle de l’ensemble du catalogue.
 
 Validation v754 : 348/348 tests de la branche main actuelle réussis, syntaxe JavaScript et compilation Python valides, `git diff --check` sans erreur. Validateur Bash inchangé ; ses contrôles ont été exécutés séparément faute de `/dev/fd` dans cet environnement. Prochaine catégorie à examiner : Fromages.
+
+## Catégorie Fromages — revue complète v756
+
+Source relue : `b8e2fa544e5d37ec39ea5a435baaeb0eba17c0f8` (v755). Les dix-huit fromages de catalog.js ont été comparés. Dix visuels déjà corrects et sous la limite restent conservés : Brie, Cheddar, Chèvre, Emmental, Fromage râpé, Mozzarella, Mozzarella râpée, Parmesan, Roquefort, Soignon.
+
+Burrata, Feta et Ricotta sont édités avec l’outil intégré pour représenter le fromage seul : tomates, basilic, olives, herbes et huile ajoutés sont retirés. Conserver les couleurs naturelles, textures et formes distinctes ; la croûte blanche naturelle n’est pas un halo à supprimer. Camembert, Comté, Raclette et Reblochon conservent leur dessin et reçoivent un encodage optimisé. Aucun nouvel emballage, texte ou accessoire.
+
+| Produit modifié | Octets finaux | Dimensions |
+| --- | ---: | --- |
+| burrata | 14226 | 384 × 384 |
+| feta | 14858 | 384 × 384 |
+| ricotta | 14776 | 384 × 384 |
+| camembert | 14828 | 256 × 256 |
+| comte | 14646 | 320 × 320 |
+| gouda | 8792 | 384 × 384 |
+| raclette | 13798 | 320 × 320 |
+| reblochon | 14604 | 256 × 256 |
+
+8/8 fichiers modifiés sous 15 000 octets. Les dix-huit images de la catégorie sont désormais sous la limite. Les canevas historiques 384 px de Burrata/Feta/Ricotta/Gouda sont conservés ; Ricotta et Gouda ont un cadrage plus aéré, compensé par le cadrage automatique existant. Contrôles de représentation, contours, transparence, marges et poids, revue sur fonds clair/foncé à 192/48 px. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Les correctifs récents de main sont conservés : cache persistant avec revalidation conditionnelle (v753), aucune liste cumulative réintroduite, affichage court du badge de version (v755). Catalogue et fallback SVG inchangés. Seuls les cadrages des huit images remplacées sont invalidés ; aucune modification HA/sécurité. Les consignes Fromages sont enregistrées dans IMAGES_ITEMS.md. La revue des autres catégories reste à poursuivre.
+
+Le contrôle final de Gouda a révélé une ombre grise externe : elle est retirée par édition avec l’outil intégré, puis le fichier final est réencodé et revérifié.
+
+Validation v756 : 349/349 tests de main réussis, syntaxe JavaScript et compilation Python valides, `git diff --check` sans erreur. Validateur Bash inchangé ; ses mêmes contrôles sont exécutés séparément faute de `/dev/fd`. Prochaine catégorie à examiner : Surgelés.

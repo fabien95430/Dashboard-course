@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — fromages
+
+Revoir les dix-huit produits Fromages ensemble, en conservant leur identité et leur présentation naturelle : pâte, croûte, grains, trous, forme entière/tranches/râpé. Burrata, Feta et Ricotta doivent représenter le fromage seul, sans tomate, basilic, olives, huile ou autre garniture de recette. Préserver les croûtes blanches naturelles ; éliminer les halos et ombres externes. Ne pas uniformiser tous les fromages sur un même pot ou emballage. Conserver les sources déjà réussies et vérifier poids et lisibilité après compression.
+
 ## Conditionnement fidèle — boulangerie
 
 Revoir ensemble les douze produits de Boulangerie de catalog.js, en conservant les présentations validées : pain et tranches, viennoiserie seule, petits pains, galettes en pile. Les différences naturelles de cuisson, mie et graines restent visibles. Ne pas ajouter d’emballage ou recolorer les aliments pour appliquer la palette beige chaud ; cette palette concerne les emballages éventuels. Croissants : supprimer toute ombre de sol ou halo externe, en conservant les creux naturels du feuilletage. Préserver les visuels déjà corrects et vérifier la lisibilité après compression.
