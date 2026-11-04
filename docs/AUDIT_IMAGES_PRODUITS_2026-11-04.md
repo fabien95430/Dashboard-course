@@ -433,3 +433,27 @@ Quatre générations/éditions avec l’outil image natif, WebP finaux 256 px so
 Consignes et prompt automatique complétés. Ajouts limités aux deux noms autorisés, pas de renommage, framework, dépendance, backend, changement de synchronisation, polling, OAuth, WebSocket, coffre, verrouillage ou biométrie. Fallback SVG et logique réseau du service worker inchangés ; cache persistant et badge court préservés.
 
 Validation : 351/351 tests, dont deux tests d’intégration Catalogue/quantités/présence des WebP ; syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Conserves reste en attente.
+
+## Revue de famille Conserves — main v761
+
+Source relue : `6ecf5da34c620c293dc98b9d697e3160b7e8ef9c` (v761). Neuf produits Épicerie → Conserves inspectés ensemble à nouveau. Les corrections v740 sont déjà intégrées ; elles ne sont pas régénérées. Résultat : **neuf visuels conservés, aucun fichier image modifié**.
+
+Cohérence : boîtes métalliques argentées fermées, étiquette crème, bandeau sauge, pictogramme sobre et représentation imprimée du contenu. Champignons émincés, concentré lisse rouge, haricots rouges, lentilles, maïs, petits pois/carottes, pois chiches, raviolis et tomates pelées restent distincts et identifiables. Concentré de tomate conserve sa petite boîte plus basse, adaptée au produit. Aucune nouvelle palette, marque ou représentation inventée.
+
+| Produit | Fichier dans `www/Items/` | Octets mesurés |
+| --- | --- | ---: |
+| Champignons en boîte | `champignons-en-boite.webp` | 13 860 |
+| Concentré de tomate | `concentre-de-tomate.webp` | 13 272 |
+| Haricots rouges | `haricots-rouges.webp` | 12 286 |
+| Lentilles | `lentilles.webp` | 13 790 |
+| Maïs en boîte | `mais-en-boite.webp` | 14 868 |
+| Petits pois carottes | `petits-pois-carottes.webp` | 14 856 |
+| Pois chiches | `pois-chiches.webp` | 12 854 |
+| Raviolis en boîte | `raviolis-en-boite.webp` | 14 868 |
+| Tomates pelées | `tomates-pelees.webp` | 13 736 |
+
+9/9 fichiers sous 15 000 octets. Contrôle visuel sur fonds clair/foncé à 160 et 48 px avec les cadrages calculés selon le code actuel. Lisibilité, contours, reflets métalliques naturels, étiquettes, marges et vraie transparence vérifiés. Calcul réel de measureVisualScale exécuté pour les neuf images : pas de rognage dans les boîtes Ma liste/Catalogue. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Documentation uniquement : aucune image, aucun cadrage, cache, numéro de version ou code de l’application modifié. Catalogue, Home Assistant, sécurité, mode test et mobile conservent exactement l’implémentation v761. La référence de famille est rappelée dans IMAGES_ITEMS.md. Prochaine catégorie à examiner : Monde & pratique.
+
+Validation de cette revue : 351/351 tests réussis, syntaxe JavaScript et `git diff --check` valides. Validateur Bash inchangé ; contrôles exécutés séparément faute de `/dev/fd/63`.

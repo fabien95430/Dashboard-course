@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — conserves
+
+Références existantes conservées après revue main v761 : Haricots rouges, Lentilles et Pois chiches. Les neuf boîtes du sous-groupe Conserves sont déjà assorties : métal argenté, couvercle fermé, étiquette crème, bandeau sauge, pictogramme sobre et représentation imprimée du contenu. Conserver les aliments et couleurs naturels distincts ; ne pas transformer la partie illustrée de l’étiquette en fenêtre vitrée ou aliment physique autour. Concentré de tomate garde une petite boîte plus basse. Préserver ces fichiers s’ils restent conformes ; vérifier cadrage, contours clair/foncé et poids final sous 15 000 octets avant tout remplacement. Ne pas appliquer automatiquement cette forme aux poissons en conserve ni aux bocaux de sauces.
+
 ## Conditionnement fidèle — traiteur frais
 
 Correction utilisateur v759 : Gnocchis désigne ici des pâtes alimentaires en petites coquilles courbes creuses et striées, présentées dans le même paquet beige à grande fenêtre que Conchiglie et Coquillettes, jamais un amas de boulettes de pomme de terre. Cette règle remplace la présentation v758. Pâtes fraîches reste en nid nature ; Pâte à pizza en rouleau emballé transparent ; Quiche entière sans assiette. Aucun déplacement de catégorie ou changement de nom n’est autorisé par cette correction visuelle. Préserver les autres visuels, les marges et la limite finale de 15 000 octets.
