@@ -214,3 +214,19 @@ Référence canonique : le nouveau `jus-d-orange.webp`, dérivé directement de 
 Calcul réel du cadrage Catalogue/Ma liste exécuté sur les pixels des six fichiers : pas de rognage. Migration du cache v747/v748 vérifiée : nouveaux cadrages recalculés, autres images conservées. Noms/groupes du catalogue, fallback SVG et logique réseau du service worker conservés. Version globale et URLs de chargement actualisées selon les conventions existantes. Aucun essai interactif iPhone ou Home Assistant réel. Les règles documentées et le prompt automatique sont actualisés pour les prochaines générations ; le reste du catalogue et les cas de marge historiques restent à examiner séparément.
 
 Validation v748 : 350/350 tests Node réussis, 25 fichiers JavaScript valides, compilation Python et différences Git contrôlées. Le script Bash reste inchangé ; faute de `/dev/fd` dans cet environnement, ses mêmes contrôles ont été exécutés séparément.
+
+## Revue des huiles et vinaigres v749
+
+Source relue : `3153134083e66f7c81e9bea04234ea57733a9973`. Les cinq produits alimentaires ont été comparés : Huile d’olive, Huile de tournesol, Vinaigre balsamique, Vinaigre de cidre et Vinaigre de vin. Les deux huiles ont déjà des flacons assortis à anse/bouchon vert ; leur représentation est conservée, seul l’encodage est optimisé. Les références Balsamique/Cidre sont déjà cohérentes et restent inchangées. Vinaigre de vin était une carafe à bouchon de verre touchant les bords haut/bas : sa présentation est remplacée par une bouteille élancée de la famille des vinaigres, avec bouchon doré et étiquette crème illustrée de raisin, liquide grenat transparent distinct du balsamique et du cidre.
+
+| Produit | Traitement | Avant (octets) | Après (octets) | Dimensions finales |
+| --- | --- | ---: | ---: | --- |
+| Huile d’olive | Source conservée, redimensionnement/encodage WebP standard | 42 110 | 14 144 | 256 × 256 |
+| Huile de tournesol | Source conservée, redimensionnement/encodage WebP standard | 41 142 | 14 920 | 320 × 320 |
+| Vinaigre de vin | Nouvelle représentation avec références Cidre/Balsamique | 8 936 | 12 420 | 384 × 384 |
+
+3/3 fichiers modifiés sous 15 000 octets. Les sources des huiles restent reconnaissables et lisibles à 192/48 px ; pas de régénération ni nouveau dessin pour ces deux produits. Aucun nouvel accessoire ni changement de palette. Transparence, marges et contours examinés sur fonds clair/foncé ; calcul réel du cadrage Catalogue/Ma liste et migration v748/v749 vérifiés. Le cas de marge Vinaigre de vin est corrigé ; **Rosette reste le cas de marge à revoir** parmi les trois cas historiques (Chili déjà corrigé en v741). Cela ne clôt pas la revue du reste du catalogue ou des poids hérités.
+
+Les noms/groupes du catalogue, fallback SVG, logique réseau du service worker et invariants Home Assistant/sécurité sont conservés. Version globale et chargements mis à jour selon les conventions du dépôt. Aucun essai interactif iPhone ou Home Assistant réel. La règle des vinaigres est enregistrée dans IMAGES_ITEMS.md et le prompt automatique pour éviter le retour de la carafe rognée et préserver les deux sous-familles huiles/vinaigres.
+
+Validation v749 : 350/350 tests Node réussis, 25 fichiers JavaScript et compilation Python valides, `git diff --check` sans erreur. Le validateur Bash est inchangé ; ses mêmes contrôles ont été lancés séparément car `/dev/fd` est absent de cet environnement.

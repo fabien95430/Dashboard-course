@@ -65,6 +65,12 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — huiles et vinaigres
+
+Les huiles et les vinaigres restent deux sous-familles : les flacons à anse et bouchon vert de Huile d’olive/Huile de tournesol sont déjà assortis ; conserver leur représentation et leurs couleurs naturelles, en respectant le poids final maximal. Les huiles ne reprennent pas le pot de Mayonnaise.
+
+Pour Vinaigre de vin, reprendre la bouteille élancée de `vinaigre-de-cidre.webp` et le style de `vinaigre-balsamique.webp` : col étroit, épaules arrondies, fermeture vissée, étiquette crème centrale à filet olive doré discret et illustration de raisin. Vinaigre de vin a un liquide transparent grenat/brun rouge, distinct du balsamique presque noir et du cidre ambré. Pas de carafe à bouchon de verre, de bouteille rognée, de texte ou de marque. Les deux références Cidre/Balsamique déjà cohérentes restent conservées. Cette règle ne transforme ni les vinaigres ménagers ni les jus en vinaigres alimentaires.
+
 ## Conditionnement fidèle — jus
 
 **Référence validée : `www/Items/jus-d-orange.webp` v748**, issue de l’aperçu orange accepté par l’utilisateur. Pour les six jus (Orange, Pomme, Raisin, Ananas, Multifruits et Tomate), reprendre cette bouteille en verre fermée, son bouchon métallique doré vissé, ses proportions et sa petite étiquette crème en bas du corps, à coins arrondis et double filet doré-beige discret. Garder la même position et la même taille d’étiquette, le jus restant largement visible. Cette décision remplace la consigne v747 « sans étiquette » et autorise l’illustration du fruit sur l’étiquette.
