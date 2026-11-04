@@ -283,3 +283,23 @@ Source relue : `c2aa17e298a6aa97cb7e485e6e8a2e25897178a5`. Crème épaisse (11 5
 Mascarpone : **11 794 octets**, WebP 384 × 384, alpha transparent et marges vérifiés, revue sur fonds clair/foncé à 192/48 px. Calcul réel de cadrage Catalogue/Ma liste et migration v751/v752 réussis. Catalogue, fallback SVG et logique réseau du service worker inchangés ; aucun essai interactif iPhone/HA réel. Les cinq fichiers de cette revue sont sous 15 000 octets. Consignes et prompt précisés pour la fermeture du mascarpone. Les autres familles restent à examiner.
 
 Validation v752 : 350/350 tests Node réussis, syntaxe JavaScript et compilation Python valides, différences Git contrôlées. Le validateur Bash nécessite `/dev/fd`, absent ici ; contrôles équivalents exécutés séparément sans modifier script ou tests.
+
+## Catégorie Boulangerie — revue complète v754
+
+Source relue : `7cd0781f42ddd8330778dc81e63259d22426d61f` (v753). Les douze produits de Boulangerie ont été comparés : Baguette, Brioche, Croissants, Galettes de blé, Pain, Pain aux céréales, Pain complet, Pain de mie, Pains au chocolat, Pains burger, Pains hot-dog et Wraps. Tortillas, du groupe Monde & pratique, est une référence voisine examinée mais n’est pas comptée comme un treizième produit de Boulangerie.
+
+Sept fichiers déjà corrects et sous la limite restent conservés. Brioche, Pain, Pains au chocolat et Pains hot-dog gardent leur représentation et reçoivent uniquement un encodage optimisé. Croissants est édité avec l’outil intégré pour retirer l’ombre grise externe, sans supprimer les creux naturels du feuilletage. Aucun emballage ou accessoire ajouté. Couleurs de cuisson, mie et graines naturelles conservées.
+
+| Produit modifié | Octets finaux | Dimensions |
+| --- | ---: | --- |
+| brioche | 14734 | 256 × 256 |
+| croissants | 14504 | 320 × 320 |
+| pain | 14096 | 192 × 192 |
+| pains-au-chocolat | 14734 | 256 × 256 |
+| pains-hot-dog | 14950 | 320 × 320 |
+
+5/5 fichiers modifiés sous 15 000 octets ; les douze images de la catégorie sont désormais sous cette limite. Pain utilise une source finale 192 px pour respecter le poids : lisibilité contrôlée à 192 et 48 px. Revue des cinq WebP sur fonds clair/foncé, alpha et marges vérifiés ; calcul réel de cadrage Ma liste/Catalogue et migration v753/v754 réussis. Noms/groupes du catalogue et fallback SVG conservés. Aucun test interactif iPhone ou Home Assistant réel.
+
+La correction du cache v753 est conservée : aucune liste cumulative de visuels réintroduite dans sw.js, cache persistant et revalidation conditionnelle inchangés. Seuls les cadrages locaux des cinq images remplacées sont invalidés. Cette livraison clôt la revue de cette catégorie, pas celle de l’ensemble du catalogue.
+
+Validation v754 : 348/348 tests de la branche main actuelle réussis, syntaxe JavaScript et compilation Python valides, `git diff --check` sans erreur. Validateur Bash inchangé ; ses contrôles ont été exécutés séparément faute de `/dev/fd` dans cet environnement. Prochaine catégorie à examiner : Fromages.

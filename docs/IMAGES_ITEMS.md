@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — boulangerie
+
+Revoir ensemble les douze produits de Boulangerie de catalog.js, en conservant les présentations validées : pain et tranches, viennoiserie seule, petits pains, galettes en pile. Les différences naturelles de cuisson, mie et graines restent visibles. Ne pas ajouter d’emballage ou recolorer les aliments pour appliquer la palette beige chaud ; cette palette concerne les emballages éventuels. Croissants : supprimer toute ombre de sol ou halo externe, en conservant les creux naturels du feuilletage. Préserver les visuels déjà corrects et vérifier la lisibilité après compression.
+
 ## Conditionnement fidèle — yaourts et desserts
 
 Préserver les pots déjà validés et les différences de conditionnement. Riz au lait : petit pot en verre fermé, riz crémeux visible, sans garniture ou parfum non précisé au catalogue. Yaourt à boire : bouteille laitière fermée à bouchon rose ; la fraise peut être illustrée sur la bouteille, mais pas posée physiquement à côté, et aucune ombre de sol ne doit former de halo. Ne pas appliquer le pot Mayonnaise aux desserts, ni uniformiser tous les yaourts sur un même pot au détriment des références approuvées.
