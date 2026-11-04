@@ -151,3 +151,11 @@ Source relue : `23ea778c8f7ffc371806603ef25d998b6bbe19b7`. Les onze derniers pro
 | `veau.webp` | 14740 |
 
 11/11 sous 15 000 octets. Transparence, marges, revue sur fonds clair/foncé à 192 et 48 px, calcul réel de cadrage et migration v743/v744 contrôlés. Catalogue, fallback SVG et logique réseau du service worker inchangés ; aucun test interactif iPhone ou Home Assistant réel. **Les 33 contours de la liste initiale sont désormais traités.** Les deux cas de marge Vinaigre de vin/Rosette, la revue des sources 84 px et les autres harmonisations/poids hérités restent des sujets distincts : cela ne signifie pas que les 466 produits ont tous été régénérés ou ramenés sous 15 Ko.
+
+## Correction de méthode et cohérence de famille v745
+
+Le traitement des 33 contours ne vaut pas validation de la cohérence de tous les produits. La précédente consigne de conservation systématique des formes sources a conservé à tort une truite entière parmi des poissons frais en portions. Source relue : `6e35569bf875b66ff3ac22464a71bf210451c733`. Comparaison visuelle actuelle de Truite, Saumon, Cabillaud et Thon frais : Truite est remplacée par une portion crue à chair rose clair et peau argentée, dans le rendu des portions voisines. Moules, tranches fumées et conserves gardent leur présentation propre.
+
+`truite.webp` : 14 306 octets, alpha transparent, marges et revue sur fonds clair/foncé à 192/48 px ; calcul réel du cadrage et migration v744/v745 contrôlés. Catalogue, fallback SVG et logique réseau du service worker inchangés. Aucun essai interactif iPhone/HA réel.
+
+Désormais chaque lot vérifie et consigne séparément : identité du sujet, forme de vente, préparation, présentation, proportions, accessoires, couleurs/emballage, style de famille, contours et poids. Remplacer l’image si sa représentation est incohérente même avec un contour propre. Ne pas déclarer les 466 produits cohérents sur la seule base des corrections de contour. Cette revue complète reste à poursuivre sur les autres familles et les cas de marge déjà signalés.

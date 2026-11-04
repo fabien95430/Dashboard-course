@@ -15,6 +15,10 @@ Cette note est la référence pour recréer ou remplacer l’image d’un produi
 
 ## Règle visuelle
 
+**L'audit porte sur la cohérence complète de l'image, pas seulement sur son contour.** Avant toute retouche, comparer le sujet, la forme de vente, la préparation (cru/cuit/fumé), les proportions, la présentation, les accessoires, les couleurs et l'emballage avec les produits du même sous-groupe. Une image techniquement propre peut rester incohérente et doit alors être remplacée. Ne pas conserver automatiquement la représentation source : conserver l'identité du produit, mais corriger sa présentation si elle détonne. Séparer le résultat « contour corrigé » du résultat « cohérence de famille validée » dans l'audit.
+
+Pour les poissons frais en portions, utiliser une portion ou un filet cru cohérent avec Saumon et Cabillaud. **Truite : filet/portion de truite, jamais poisson entier avec tête et queue.** Conserver ses couleurs naturelles distinctes. Les moules, les tranches fumées et les poissons en conserve ont leur présentation propre ; ne pas leur imposer un filet. Même principe pour les autres familles : adapter la représentation au produit et à ses voisins, sans inventer de conditionnement ou modifier les noms du catalogue.
+
 Avant toute génération, ouvrir plusieurs items existants de la **même catégorie**, de préférence avec une forme ou un emballage proche du produit à refaire. Ces fichiers sont la référence visuelle prioritaire.
 
 Le nouvel item doit conserver exactement le langage visuel déjà présent dans `www/Items/` :

@@ -215,6 +215,7 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
         f"Vignette produit pour une application de courses: {name}. Catégorie {category}, sous-groupe {subgroup}. "
         +hint+
         "Reprendre fidèlement le langage visuel des produits déjà présents dans le catalogue: rendu 3D semi-réaliste, propre, simple, premium et cohérent avec les autres items existants. "
+        "Contrôler la cohérence complète du sujet et de sa forme de vente avec les produits du même sous-groupe, pas seulement les contours : présentation, préparation cru/cuit/fumé, proportions, accessoires, couleurs et emballage. Remplacer une représentation incohérente même si sa découpe est propre. Pour Truite, représenter une seule portion ou un filet cru de truite à chair rose clair avec peau argentée, dans la famille des portions Saumon/Cabillaud, jamais un poisson entier avec tête et queue. Conserver les présentations propres aux moules, poissons fumés et conserves. "
         "L'image est destinée à une petite vignette mobile avec une cible d'affichage finale de 192×192 px. Elle doit donc rester immédiatement identifiable à cette taille. "
         "Utiliser des formes lisibles, des volumes simples, des contours nets, des textures sobres et uniquement les détails indispensables à l'identification du produit. "
         "Représenter exactement un seul type de produit, isolé sur fond totalement transparent, centré, avec des proportions naturelles et une marge transparente régulière. "

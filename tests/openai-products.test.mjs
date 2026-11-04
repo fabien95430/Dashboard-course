@@ -161,6 +161,8 @@ assert requests[0]['output_compression']==75
 assert 'compresse efficacement en WebP' in requests[0]['prompt']
 assert 'maximum 15 000 octets' in requests[0]['prompt']
 assert 'conserves vert sauge' in requests[0]['prompt']
+assert 'cohérence complète du sujet' in requests[0]['prompt']
+assert 'jamais un poisson entier avec tête et queue' in requests[0]['prompt']
 assert 'www/Items/mayonnaise.webp' in requests[0]['prompt']
 assert 'grande étiquette crème rectangulaire à coins arrondis' in requests[0]['prompt']
 assert 'www/Items/paprika.webp' in requests[0]['prompt']
