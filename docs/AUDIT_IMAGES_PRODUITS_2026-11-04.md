@@ -656,3 +656,29 @@ Source relue : main `4adc2c213c5c6f5de7d5f9c5428bd5cd36bb3f54`. Le sous-groupe �
 Décision : conserver le fichier existant sans réencodage ni génération. Les consignes de famille et le prompt automatique couvrent déjà explicitement Coulis de fruit, aucune duplication nécessaire. Modification documentaire seule, version de l’application maintenue à v768. Catalogue, images, cache, fallback, quantités, Home Assistant, sécurité, mode test et styles mobiles inchangés.
 
 Validation : 353/353 tests réussis et git diff --check réussi. Prochaine catégorie non encore examinée dans cette série : Enfant.
+
+
+## Enfant — v769
+
+Source relue : main `675aa81afcdeb7cc14e797c6d71401c77f3fb42d` (v768). Six produits examinés pour sujet, forme de vente, cohérence des emballages, palette, taille apparente, contour et poids. Références préservées : Couches en pile blanche à motifs bleu pâle et Lingettes bébé en paquet blanc/bleu pâle fermé à rabat ourson.
+
+Trois images générées avec l’outil intégré, sans appel à l’API OpenAI payante du projet :
+
+- Compotes bébé : source 84 px remplacée par la même gourde jaune/rouge à bouchon orange fermé, pomme/banane imprimées, sans fruit physique ni texte. Le changement vise la netteté, sans changer le modèle de vente.
+- Sacs à couches : l’ancien sac rempli noué est remplacé par un rouleau de sacs neufs bleu menthe clair, segment court attaché, perforation et poignées visibles. Présentation du produit à acheter, sans déchet, en accord avec les tons doux des couches/lingettes.
+- Lait infantile : conservation de la boîte cylindrique crème/bleu, couvercle bleu fermé et pictogramme biberon. Suppression du chiffre « 2 » qui précisait un âge absent du nom, de la dosette et de la poudre à côté. Une boîte entière isolée, aucun chiffre ou allégation inventée.
+
+Petits pots : dessin du petit bocal fermé à couvercle doré et purée orange conservé, recadrage/redimensionnement et réencodage seulement. Pas d’étiquette de sauce ajoutée. Couches et Lingettes bébé conservées octet par octet.
+
+| Produit | Avant (octets) | Final (octets) | Canevas final |
+| --- | ---: | ---: | ---: |
+| Compotes bébé | 3 448 | 10 298 | 256 px |
+| Couches | 11 384 | 11 384 | 320 px |
+| Lait infantile | 17 798 | 14 340 | 384 px |
+| Lingettes bébé | 9 236 | 9 236 | 384 px |
+| Petits pots | 18 698 | 14 950 | 384 px |
+| Sacs à couches | 3 854 | 11 460 | 256 px |
+
+6/6 fichiers sous 15 000 octets, poids mesurés après encodage, alpha réel, marges régulières et objet entier. Dimensions historiques 384 × 384 préservées pour Lait infantile et Petits pots conformément aux tests existants. Les deux anciennes sources 84 px sont remplacées par des WebP 256 px. Revue des six produits sur fonds clair/foncé à 160 et 48 px ; petites vignettes lisibles. Cadrage réel exécuté pour les quatre changements : pas de rognage Ma liste/Catalogue. Migration v768/v769 ciblée vérifiée, cadrages des produits inchangés conservés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés pour cette famille. Noms, classement et unités du catalogue inchangés ; fallback SVG, logique réseau/cache persistant du service worker, badge court, sécurité, OAuth, WebSocket, coffre, verrouillage/biométrie, mode test et styles mobiles préservés. Pas d’ajout de dépendance. Validation : 353/353 tests, syntaxe JavaScript, compilation Python et git diff --check réussis. Aucun test modifié. Validateur Bash inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Version globale et URLs synchronisées en v769. Prochaine catégorie : Hygiène & soins, sous-groupe Hygiène.
