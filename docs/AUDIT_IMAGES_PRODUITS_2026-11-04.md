@@ -372,3 +372,27 @@ Les quatre fichiers respectent la limite de 15 000 octets, mesurée après encod
 Consignes et prompt automatique actualisés pour préserver les présentations distinctes et exclure les garnitures/supports des Gnocchis. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, OAuth, WebSocket, coffre, verrouillage, biométrie et mode test inchangés. Invalidation des seuls cadrages Gnocchis/Quiche, aucune liste de visuels ajoutée dans sw.js.
 
 Validation : 349/349 tests réussis, syntaxe JavaScript, compilation Python et `git diff --check` valides. Validateur Bash inchangé ; mêmes contrôles exécutés séparément car `/dev/fd/63` indisponible. Prochaine catégorie à examiner : Conserves.
+
+## Reprise Frais demandée par l’utilisateur — v759
+
+Source relue : main `39407f9a3be2d44e1a5091c3a4cd920a34aa8dd0` (v758). La clôture précédente de Frais est retirée : les tests techniques ne validaient pas suffisamment la représentation et l’échelle. Conserves est suspendu pour traiter les corrections Gnocchis, Gouda, Yaourt, Yaourts fruits et Mascarpone ; Yaourts vanille est harmonisé dans la même famille.
+
+- Gnocchis : pâtes alimentaires sèches en petites coquilles courbes creuses et striées, dans le paquet beige à grande fenêtre de Conchiglie/Coquillettes. La présentation v758 en boulettes de pomme de terre est remplacée. Aucun changement du nom ni de la catégorie dans catalog.js.
+- Gouda : même dessin conservé ; recadrage sur l’objet visible puis redimensionnement et compression. La marge invisible qui le réduisait est supprimée par recadrage standard, sans peindre ni modifier son alpha. Largeur visible après le cadrage automatique : 0,646 → 0,884 de la boîte image, soit environ +37 %.
+- Yaourt, Fruits et Vanille : pot haut crème, couvercle rond, décor bleu et désignation générique assortis à Yaourts nature ; repères de parfum imprimés et bande inférieure bleu/rose/crème doré. Aucune marque ou donnée nutritionnelle inventée. Nature/Grecs/Skyr/Fromage blanc conservés. Fruits : largeur visible après cadrage 0,896 → 0,631, soit environ −30 %. Les trois pots ont une hauteur à moins de 0,011 et une largeur à moins de 0,020 de Nature dans la boîte image.
+- Mascarpone : pot bas large fermé clairement identifié par une étiquette et un couvercle MASCARPONE crème/bleu, avec volute de crème imprimée. La boîte blanche anonyme est remplacée ; aucun bol réel ni crème exposée.
+
+Cinq éditions/générations avec l’outil image intégré, un recadrage/redimensionnement standard du Gouda existant ; aucun appel à l’API OpenAI payante du projet. Les consignes et le prompt automatique sont corrigés pour remplacer les instructions incompatibles de v758.
+
+| Fichier dans `www/Items/` | Avant (octets) | Final (octets) | Canevas |
+| --- | ---: | ---: | ---: |
+| `gnocchis.webp` | 14 372 | 14 370 | 384 px |
+| `gouda.webp` | 8 792 | 14 982 | 384 px |
+| `yaourt.webp` | 13 666 | 14 864 | 384 px |
+| `yaourts-fruits.webp` | 14 930 | 13 610 | 256 px |
+| `yaourts-vanille.webp` | 13 510 | 13 960 | 256 px |
+| `mascarpone.webp` | 11 794 | 13 838 | 256 px |
+
+Les six fichiers finaux respectent 15 000 octets, avec transparence réelle et marges. Les images encodées sont comparées sur fonds clair/foncé à 160 et 48 px avec le zoom et le décalage calculés selon le code réel ; comparaison avec Nature, Grecs, Skyr, Brie et Conchiglie. Mesures d’échelle anciennes/nouvelles vérifiées, aucun rognage dans les boîtes Ma liste/Catalogue. Migration v758/v759 vérifiée pour les six cadrages, autres produits conservés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Validation : 349/349 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA et sécurité inchangés ; aucune nouvelle liste de visuels dans sw.js. La catégorie Conserves reste en attente après cette reprise Frais.

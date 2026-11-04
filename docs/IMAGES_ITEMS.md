@@ -67,13 +67,15 @@ Ne jamais changer volontairement de style graphique. Si les références de la c
 
 ## Conditionnement fidèle — traiteur frais
 
-Conserver les présentations propres des quatre produits : Gnocchis nature seuls en petit amas, sans basilic, sauce, support ou disque de service ; Pâtes fraîches en nid nature ; Pâte à pizza en rouleau emballé transparent ; Quiche entière dorée sans assiette. Les Gnocchis reprennent le rendu sobre des Pâtes fraîches, sans les transformer en pâtes longues. Ne pas imposer un même emballage à toute la catégorie ni ajouter une garniture pour remplir une vignette. Préserver les visuels déjà corrects, les marges et la limite finale de 15 000 octets.
+Correction utilisateur v759 : Gnocchis désigne ici des pâtes alimentaires en petites coquilles courbes creuses et striées, présentées dans le même paquet beige à grande fenêtre que Conchiglie et Coquillettes, jamais un amas de boulettes de pomme de terre. Cette règle remplace la présentation v758. Pâtes fraîches reste en nid nature ; Pâte à pizza en rouleau emballé transparent ; Quiche entière sans assiette. Aucun déplacement de catégorie ou changement de nom n’est autorisé par cette correction visuelle. Préserver les autres visuels, les marges et la limite finale de 15 000 octets.
 
 ## Conditionnement fidèle — surgelés
 
 Pour les sachets de Surgelés, la référence est `haricots-verts-surgeles.webp` : sachet large fermé, bandeau bleu glacier courbe, petit flocon blanc opaque, grande fenêtre transparente et bas bleu. Conserver le contenu naturel distinct : épinards en feuilles, haricots, petits pois, mélange de légumes, poêlée, frites pâles non cuites ou glaçons. Ne pas imposer ce sachet aux glaces : Chocolat et Vanille conservent leurs pots fermés et leurs couleurs propres ; Nuii reste un seul bâtonnet enrobé avec sa morsure, sans traînées horizontales ou ombre externe. Le flocon ne doit pas être un trou transparent. Vérifier les marges, contours et poids après encodage, sur fond clair et foncé.
 
 ## Conditionnement fidèle — fromages
+
+Gouda : conserver le fromage jaune, la cire rouge et les cubes, mais cadrer sur l’objet visible ; une marge invisible trop large ne doit pas le réduire. Comparer sa taille après le zoom automatique avec Brie et les autres fromages. Ne pas limiter le fichier à un petit objet pour satisfaire le poids : ajuster l’encodage sans sacrifier l’échelle.
 
 Revoir les dix-huit produits Fromages ensemble, en conservant leur identité et leur présentation naturelle : pâte, croûte, grains, trous, forme entière/tranches/râpé. Burrata, Feta et Ricotta doivent représenter le fromage seul, sans tomate, basilic, olives, huile ou autre garniture de recette. Préserver les croûtes blanches naturelles ; éliminer les halos et ombres externes. Ne pas uniformiser tous les fromages sur un même pot ou emballage. Conserver les sources déjà réussies et vérifier poids et lisibilité après compression.
 
@@ -82,6 +84,8 @@ Revoir les dix-huit produits Fromages ensemble, en conservant leur identité et 
 Revoir ensemble les douze produits de Boulangerie de catalog.js, en conservant les présentations validées : pain et tranches, viennoiserie seule, petits pains, galettes en pile. Les différences naturelles de cuisson, mie et graines restent visibles. Ne pas ajouter d’emballage ou recolorer les aliments pour appliquer la palette beige chaud ; cette palette concerne les emballages éventuels. Croissants : supprimer toute ombre de sol ou halo externe, en conservant les creux naturels du feuilletage. Préserver les visuels déjà corrects et vérifier la lisibilité après compression.
 
 ## Conditionnement fidèle — yaourts et desserts
+
+Correction utilisateur v759 : Yaourt, Yaourts fruits et Yaourts vanille reprennent le pot haut crème à couvercle rond de `yaourts-nature.webp`, son décor bleu et ses proportions. Même taille apparente après cadrage automatique ; Fruits ne doit pas être un gros pot rose. Différencier par un accent inférieur discret (bleu, rose, crème doré) et une illustration du parfum imprimée sur l’étiquette, jamais un fruit physique. Les seules désignations YAOURT, YAOURT FRUITS et YAOURT VANILLE sont autorisées pour assortir les étiquettes existantes ; aucune marque, pourcentage ou allégation inventée. Nature, Grecs, Skyr et Fromage blanc déjà validés sont conservés.
 
 Préserver les pots déjà validés et les différences de conditionnement. Riz au lait : petit pot en verre fermé, riz crémeux visible, sans garniture ou parfum non précisé au catalogue. Yaourt à boire : bouteille laitière fermée à bouchon rose ; la fraise peut être illustrée sur la bouteille, mais pas posée physiquement à côté, et aucune ombre de sol ne doit former de halo. Ne pas appliquer le pot Mayonnaise aux desserts, ni uniformiser tous les yaourts sur un même pot au détriment des références approuvées.
 
@@ -113,7 +117,7 @@ Ne pas transformer les bidons de lessive ou Javel, les flacons à bec WC, ni les
 
 Pour les produits **« Crème épaisse »** et **« Crème fraîche »** du catalogue (catégorie **Frais → Laits & crèmes**), représenter **un pot de crème fraîche** avec son couvercle, identifiable comme un produit vendu en pot : **jamais une brique, une bouteille ou une gourde**. Le pot est l'unique conditionnement mis en scène, sur fond transparent, sans marque ni texte inventés.
 
-**Mascarpone** : conserver un pot laitier bas et large, avec couvercle opaque fermé clairement identifiable (rebord et languette), sans crème exposée, marque ou texte inventé. Ne pas le transformer en bol de service ou bocal de sauce.
+**Mascarpone** : pot laitier bas et large fermé avec rebord et languette, étiquette et couvercle identifiés MASCARPONE, décor laitier crème/bleu et volute de crème imprimée. Une boîte blanche anonyme est refusée. Cette désignation générique est autorisée, sans marque, pourcentage ou allégation inventée ; aucune crème réelle exposée ni bol de service ou bocal de sauce.
 
 La **« Crème liquide »** est un produit distinct : conserver son conditionnement réel adapté (par exemple une brique), sans lui appliquer automatiquement la règle du pot. Pour les autres crèmes et produits frais, vérifier le conditionnement correspondant au nom exact du produit avant de générer l'image. Rejeter toute image dont l'emballage ne correspond pas au produit.
 
