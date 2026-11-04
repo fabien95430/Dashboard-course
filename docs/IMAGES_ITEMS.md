@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — surgelés
+
+Pour les sachets de Surgelés, la référence est `haricots-verts-surgeles.webp` : sachet large fermé, bandeau bleu glacier courbe, petit flocon blanc opaque, grande fenêtre transparente et bas bleu. Conserver le contenu naturel distinct : épinards en feuilles, haricots, petits pois, mélange de légumes, poêlée, frites pâles non cuites ou glaçons. Ne pas imposer ce sachet aux glaces : Chocolat et Vanille conservent leurs pots fermés et leurs couleurs propres ; Nuii reste un seul bâtonnet enrobé avec sa morsure, sans traînées horizontales ou ombre externe. Le flocon ne doit pas être un trou transparent. Vérifier les marges, contours et poids après encodage, sur fond clair et foncé.
+
 ## Conditionnement fidèle — fromages
 
 Revoir les dix-huit produits Fromages ensemble, en conservant leur identité et leur présentation naturelle : pâte, croûte, grains, trous, forme entière/tranches/râpé. Burrata, Feta et Ricotta doivent représenter le fromage seul, sans tomate, basilic, olives, huile ou autre garniture de recette. Préserver les croûtes blanches naturelles ; éliminer les halos et ombres externes. Ne pas uniformiser tous les fromages sur un même pot ou emballage. Conserver les sources déjà réussies et vérifier poids et lisibilité après compression.

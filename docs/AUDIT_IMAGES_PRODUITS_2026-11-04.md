@@ -328,3 +328,28 @@ Les correctifs récents de main sont conservés : cache persistant avec revalida
 Le contrôle final de Gouda a révélé une ombre grise externe : elle est retirée par édition avec l’outil intégré, puis le fichier final est réencodé et revérifié.
 
 Validation v756 : 349/349 tests de main réussis, syntaxe JavaScript et compilation Python valides, `git diff --check` sans erreur. Validateur Bash inchangé ; ses mêmes contrôles sont exécutés séparément faute de `/dev/fd`. Prochaine catégorie à examiner : Surgelés.
+
+## Surgelés — v757
+
+Source relue : main `7a872989985eeb0a3d51cb949113bb24da845047` (v756). Audit des dix produits Frais → Surgelés de catalog.js ; aucun retour sur les catégories déjà traitées. Huit fichiers modifiés, deux conservés : Glace chocolat (11 332 octets) et Glaçons (10 682 octets). Poisson surgelé appartient à Viandes & poissons → Surgelés et reste hors de ce lot.
+
+Cohérence de famille : Épinards surgelés et Frites surgelées reprennent le sachet large bleu glacier à flocon blanc de Haricots verts surgelés. Épinards reste en feuilles vert foncé et Frites montre des bâtonnets pâles surgelés non cuits. Poêlée de légumes conserve ses courgettes, champignons, carottes, poivrons et oignons, avec un flocon blanc opaque corrigé : la source avait un flocon mal détouré visible sur fond foncé. Les glaces en pots ne deviennent pas des sachets ; Chocolat et Vanille gardent leur forme et leurs couleurs distinctes.
+
+Contours : Glace Nuii régénérée sans les traînées horizontales brunes parasites de la source, en conservant bâton, enrobage, éclats et morsure. Les autres sources déjà cohérentes sont conservées et réencodées. Quatre éditions intégrées avec l’outil image natif : Épinards, Frites, Nuii et Poêlée. Quatre optimisations des sources : Vanille, Haricots, Légumes et Petits pois. Aucun appel à l’API OpenAI payante du projet.
+
+| Fichier dans `www/Items/` | Avant (octets) | Final (octets) | Canevas |
+| --- | ---: | ---: | ---: |
+| `epinards-surgeles.webp` | 5 626 | 14 972 | 256 px |
+| `frites-surgelees.webp` | 31 274 | 14 642 | 256 px |
+| `glace-nuii.webp` | 52 866 | 12 244 | 320 px |
+| `glace-vanille.webp` | 15 442 | 14 138 | 384 px |
+| `haricots-verts-surgeles.webp` | 16 300 | 14 590 | 256 px |
+| `legumes-surgeles.webp` | 16 492 | 14 706 | 256 px |
+| `petits-pois-surgeles.webp` | 16 508 | 14 564 | 256 px |
+| `poelee-de-legumes.webp` | 15 286 | 14 242 | 256 px |
+
+Les dix WebP de la catégorie sont sous 15 000 octets, poids finaux mesurés. Alpha véritable et marges conservés ; dimensions historiques 256 px des références Frais et 384 px de Vanille préservées, Nuii livré en 320 px. Le cadrage existant compense les marges sans ajout de règle de zoom spécifique. Contrôles visuels des fichiers encodés sur fonds clair/foncé à 192 et 48 px ; vérification calculée du cadrage réel Ma liste/Catalogue et de la migration du cache v756 vers v757. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Catalogue (noms/groupes), fallback SVG et logique réseau du service worker inchangés. Seuls les cadrages des huit fichiers remplacés sont invalidés ; cache visuel persistant et badge court préservés. Aucun changement HA, OAuth, WebSocket, coffre, verrouillage, biométrie ou mode test. Consignes enregistrées dans IMAGES_ITEMS.md et dans le prompt automatique : sachets bleus à flocon blanc opaque et contenu distinct, pots et bâtonnet de glace préservés.
+
+Validation : 349/349 tests réussis, syntaxe JavaScript, compilation Python et `git diff --check` valides. Validateur Bash inchangé ; mêmes contrôles exécutés séparément car `/dev/fd/63` indisponible. Prochaine catégorie à examiner : Traiteur frais.
