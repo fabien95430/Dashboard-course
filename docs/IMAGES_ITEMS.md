@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — pâtes, riz et céréales
+
+Préserver les paquets de pâtes beiges à grande fenêtre et discrète zone supérieure, sans nom ajouté. Le contenu doit correspondre à la forme exacte : coquilles, coudes, nœuds, spirales, tubes, plaques, rubans, nids ou fils fins. Les riz gardent le paquet bleu à grande fenêtre et petite zone beige en bas, avec grains longs/ronds et couleurs naturelles propres à chaque variété ; ne pas recolorer le riz. Polenta et Quinoa gardent leur sachet crème/ocre, Boulgour et Semoule leurs sacs kraft/crème déjà validés, sans bol réel ou céréales en vrac à côté. Ne pas régénérer ces références uniquement pour uniformiser les conditionnements. Conserver proportions, marges, lisibilité et poids final de 15 000 octets maximum.
+
 ## Conditionnement fidèle — pâtisserie et cuisine
 
 Préserver les emballages validés des poudres : sacs kraft/crème fermés pour Amandes en poudre, Chapelure, Farine, Levure boulangère et Maïzena ; pas de bol réel ou ingrédient en vrac ajouté. Les illustrations imprimées sur le paquet restent autorisées. Gélatine : boîte crème/ocre fermée, petit pictogramme de flan et illustration imprimée de feuilles de gélatine sèches translucides en éventail ; pas de dessert en cubes rouges ni assiette. Levure chimique conserve ses sachets crème/ocre. Les trois sucres gardent leurs bocaux en verre à couvercle bois, étiquettes et petits tas de sucre déjà validés, avec textures blanc cristallisé/poudre/roux distinctes. Amandes entières reste un petit amas nature ; Pâte feuilletée reste crue pliée ; Vanille conserve le bocal Paprika avec gousses. Ne pas imposer un emballage unique à toute la catégorie, ni régénérer les références correctes pour uniformiser. Vérifier contours, cadrage et poids final de 15 000 octets maximum.

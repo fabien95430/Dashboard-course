@@ -501,3 +501,46 @@ Les cinq autres fichiers sont seulement recadrés/redimensionnés et réencodés
 Consignes et prompt automatique complétés. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Aucune liste de visuels introduite dans sw.js. Deux empreintes d’intégrité Git (Gélatine/Levure chimique) actualisées pour les assets remplacés ; toutes les autres empreintes et assertions de dimensions, transparence et intégrité du test historique restent conservées.
 
 Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Pâtes, riz & céréales.
+
+## Pâtes, riz & céréales — v764
+
+Source relue : main `22719c8221db6460ee6722bd59ad7d79d351cb83` (v763). Vingt-huit produits examinés ensemble. Vingt-sept visuels conservés, identiques octet par octet à main ; seul Quinoa est réencodé de 17 576 à 14 078 octets, en gardant le sachet crème/ocre, son pictogramme et le contenu. Aucun recours à la génération d’image ni à une API payante.
+
+Cohérence de famille : paquets de pâtes beiges à grande fenêtre et formes distinctes (coquilles, coudes, nœuds, spirales, tubes, plaques, rubans, nids et fils). Les onze riz conservent le paquet bleu à grande fenêtre et petite zone beige en bas, grains longs/ronds et teintes naturelles propres. Polenta et Quinoa conservent les sachets crème/ocre, Boulgour et Semoule leurs sacs kraft/crème validés. Aucun bol réel, nouveau contenant ou recoloration imposée.
+
+| Produit | Fichier dans `www/Items/` | Final (octets) |
+| --- | --- | ---: |
+| Boulgour | `boulgour.webp` | 8 950 |
+| Conchiglie | `conchiglie.webp` | 5 018 |
+| Coquillettes | `coquillettes.webp` | 5 708 |
+| Farfalle | `farfalle.webp` | 5 472 |
+| Fusilli | `fusilli.webp` | 6 094 |
+| Lasagnes | `lasagnes.webp` | 3 384 |
+| Linguine | `linguine.webp` | 4 596 |
+| Macaronis | `macaronis.webp` | 6 072 |
+| Orecchiette | `orecchiette.webp` | 6 000 |
+| Penne | `penne.webp` | 5 664 |
+| Polenta | `polenta.webp` | 13 830 |
+| Quinoa | `quinoa.webp` | 14 078 |
+| Rigatoni | `rigatoni.webp` | 4 926 |
+| Riz à sushi | `riz-a-sushi.webp` | 8 212 |
+| Riz arborio | `riz-arborio.webp` | 9 276 |
+| Riz basmati | `riz-basmati.webp` | 8 382 |
+| Riz blanc | `riz-blanc.webp` | 9 374 |
+| Riz complet | `riz-complet.webp` | 7 610 |
+| Riz gluant | `riz-gluant.webp` | 8 956 |
+| Riz jasmin | `riz-jasmin.webp` | 8 194 |
+| Riz long | `riz-long.webp` | 8 470 |
+| Riz noir | `riz-noir.webp` | 11 280 |
+| Riz rouge | `riz-rouge.webp` | 11 802 |
+| Riz sauvage | `riz-sauvage.webp` | 12 092 |
+| Semoule | `semoule.webp` | 8 302 |
+| Spaghetti | `spaghetti.webp` | 3 246 |
+| Tagliatelles | `tagliatelles.webp` | 5 850 |
+| Vermicelles | `vermicelles.webp` | 3 386 |
+
+28/28 fichiers sous 15 000 octets, poids finaux mesurés. Revue de la catégorie sur fonds clair/foncé à 160 et 48 px avec le cadrage automatique existant. Formes, contours, marges, transparence et lisibilité préservés. Calcul réel du cadrage Quinoa exécuté : pas de rognage Ma liste/Catalogue. Migration v763/v764 vérifiée pour Quinoa seulement, autres cadrages conservés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Invalidation Quinoa bornée aux versions d’application v764 et suivantes afin de préserver le comportement historique v722/v723 testé. Empreinte d’intégrité Git de Quinoa actualisée ; les douze autres empreintes, les dimensions 384 px et toutes les assertions du test restent conservées. Aucun autre test modifié.
+
+Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Pâtes à tarte.
