@@ -131,3 +131,23 @@ Source relue : `588c137a745f2637db1f6162b5ad995d5ad3e8ca`. Roquefort, Pâtes fra
 | `jambon-blanc.webp` | 14632 |
 
 10/10 sous 15 000 octets, transparence et marges contrôlées. Revue sur fonds clair/foncé à 192 et 48 px, calcul réel de cadrage et migration v742/v743 vérifiés. Catalogue, fallback SVG et logique réseau du service worker inchangés. Aucun test interactif iPhone ou Home Assistant réel. Il reste **11 contours** : Jambon cru, Cabillaud, Moules, Saumon fumé, Thon frais, Truite, Thon en boîte, Agneau, Côtes de porc, Poulet, Veau. Les cas de marge Vinaigre de vin et Rosette restent distincts.
+
+## Suivi du dernier lot de contours v744
+
+Source relue : `23ea778c8f7ffc371806603ef25d998b6bbe19b7`. Les onze derniers produits Viandes & poissons ont été édités à partir de leurs sources, avec Saumon, Dinde et Maquereaux comme références de famille. Même rendu, éclairage et niveau de détail ; identité, préparation et formes naturelles préservées. Le thon conserve sa boîte ronde ouverte. Aucun nouvel accessoire, emballage, texte ou marque.
+
+| Fichier | Octets |
+| --- | ---: |
+| `jambon-cru.webp` | 14642 |
+| `cabillaud.webp` | 14094 |
+| `moules.webp` | 14704 |
+| `saumon-fume.webp` | 13956 |
+| `thon-frais.webp` | 14500 |
+| `truite.webp` | 14424 |
+| `thon-en-boite.webp` | 14694 |
+| `agneau.webp` | 14294 |
+| `cotes-de-porc.webp` | 14788 |
+| `poulet.webp` | 14978 |
+| `veau.webp` | 14740 |
+
+11/11 sous 15 000 octets. Transparence, marges, revue sur fonds clair/foncé à 192 et 48 px, calcul réel de cadrage et migration v743/v744 contrôlés. Catalogue, fallback SVG et logique réseau du service worker inchangés ; aucun test interactif iPhone ou Home Assistant réel. **Les 33 contours de la liste initiale sont désormais traités.** Les deux cas de marge Vinaigre de vin/Rosette, la revue des sources 84 px et les autres harmonisations/poids hérités restent des sujets distincts : cela ne signifie pas que les 466 produits ont tous été régénérés ou ramenés sous 15 Ko.
