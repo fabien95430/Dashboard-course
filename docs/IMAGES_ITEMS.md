@@ -69,11 +69,19 @@ La **« Crème liquide »** est un produit distinct : conserver son conditionnem
 
 ## Conditionnement fidèle — épices
 
+**Référence canonique validée le 4 novembre 2026 : `www/Items/paprika.webp` (v740).** Pour toutes les épices et assaisonnements secs, reprendre sa forme exacte de petit bocal en verre, son couvercle doré, son cadrage et sa petite étiquette crème centrale en cartouche à double filet brun cannelle. Conserver la taille, la position et les coins décoratifs de cette étiquette, sans texte ni pictogramme. Changer seulement le contenu pour le produit exact. Cette règle remplace l'ancienne conservation du duo Sel/Poivre en moulins et le choix de Curry/Curcuma comme références.
+
+Le périmètre courant est : Curcuma, Curry, Paprika, Poivre, Sel, Chili et Vanille. Chili est ici représenté comme assaisonnement de piment séché ; Vanille conserve des gousses naturelles visibles dans le bocal, sans les remplacer par une poudre inventée. Les herbes fraîches et les piments du rayon Fruits & Légumes gardent leur présentation propre.
+
 Pour les **épices et assaisonnements secs** de `catalog.js`, notamment **Curcuma, Curry, Paprika et Poivre**, représenter **un petit pot à épices rigide avec son couvercle** (bocal ou flacon à épices) : **pas de sachet souple, de paquet cartonné, de brique, de cuillère ni de tas d'épices en vrac**. Lorsque le **Sel** est représenté comme un assaisonnement sec, privilégier également un pot adapté. Le contenu, sa couleur et sa texture doivent correspondre exactement au produit.
 
 Le pot doit être **isolé, centré, sur fond transparent**, dans le style 3D semi-réaliste premium des autres visuels, **sans marque ni texte inventés**. Vérifier le nom exact du produit avant d'appliquer cette règle : ne pas transformer un plat ou une préparation portant un nom d'épice (par exemple « Chili ») en pot à épices sans confirmer qu'il s'agit réellement de l'épice.
 
 ## Conditionnement fidèle — sauces et préparations à tartiner
+
+**Référence canonique validée le 4 novembre 2026 : `www/Items/mayonnaise.webp` (v740).** Toutes les sauces et préparations apparentées utilisent exactement sa forme de bocal en verre aux épaules arrondies, son couvercle doré, son cadrage et sa grande étiquette crème centrale rectangulaire à coins arrondis et double filet fin. Garder la même taille et la même position d'étiquette ; aucun bandeau enveloppant, texte, pictogramme ou nouvelle forme de pot. Changer le contenu selon la recette et seulement la couleur discrète du filet selon la palette validée (taupe, brique, terracotta ou nude rosé). Le bocal de Mayonnaise validé est conservé sans régénération.
+
+Appliquer aussi ce modèle à Bolognaise, Harissa, Guacamole, Houmous, Tapenade et Coulis de fruit. Cornichon, huiles, vinaigres, confitures, miel, crèmes laitières et pâtes à tartiner sucrées ne sont pas assimilés à des sauces par cette consigne.
 
 Pour **toutes les sauces** présentes dans `catalog.js`, imposer un **pot ou bocal rigide avec couvercle**, adapté à la texture du produit : **Sauce barbecue, Sauce burger, Sauce César, Sauce soja, Sauce tomate, Ketchup, Mayonnaise, Moutarde, Pesto, Tabasco et Coulis de fruit**. Étendre cette présentation aux préparations apparentées vendues en pot, comme **Harissa, Guacamole, Houmous et Tapenade**. Même les sauces habituellement commercialisées en flacon doivent être illustrées **en pot**, conformément à la direction visuelle choisie pour le catalogue. **Pas de bouteille, tube, brique, sachet ou sauce déposée seule dans une coupelle.**
 
@@ -81,7 +89,7 @@ Cette consigne concerne les sauces et les préparations assimilées, **pas les h
 
 ## Cohérence de tous les pots
 
-Pour **tous les produits dont le conditionnement imposé est un pot** (crèmes épaisses, crème fraîche, épices, sauces et préparations assimilées), représenter **un seul pot fermé**, isolé et centré, avec un **couvercle clairement visible**. Conserver un style **3D semi-réaliste premium homogène**, des proportions réalistes, une marge transparente régulière et une lisibilité nette à **192 × 192 px**. Adapter la forme, le matériau et la visibilité du contenu au produit : le pot de crème, le pot d'épices et le pot de sauce ne doivent pas être artificiellement identiques. Aucune marque, étiquette à texte inventé, décor, cuillère, support ni collage. Rejeter tout visuel qui ne respecte pas le bon pot ou le contenu exact du produit.
+Pour **tous les produits dont le conditionnement imposé est un pot** (crèmes épaisses, crème fraîche, épices, sauces et préparations assimilées), représenter **un seul pot fermé**, isolé et centré, avec un **couvercle clairement visible**. Conserver un style **3D semi-réaliste premium homogène**, des proportions réalistes, une marge transparente régulière et une lisibilité nette à **192 × 192 px**. À l'intérieur de la famille sauces, conserver strictement le modèle Mayonnaise ; à l'intérieur de la famille épices, conserver strictement le modèle Paprika. Les pots de crème restent distincts de ces deux familles. Aucune marque, étiquette à texte inventé, décor, cuillère, support ni collage. Rejeter tout visuel qui ne respecte pas le bon pot, la bonne étiquette ou le contenu exact du produit.
 
 ## Prompt prêt à réutiliser
 

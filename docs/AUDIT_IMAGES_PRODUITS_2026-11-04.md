@@ -2,6 +2,8 @@
 
 État inspecté : `main`, commit `3d2373dc87ecc34d1be4d205021febdf38f11c7a` (v739). Catalogue : 466 produits. Cette liste décrit cet état ; vérifier le dépôt courant avant chaque intervention.
 
+**Décision utilisateur ultérieure :** après le lot v740, Mayonnaise devient la référence de toutes les sauces et préparations apparentées, Paprika celle de toutes les épices et assaisonnements secs, forme et étiquette incluses. Cette décision remplace les recommandations historiques ci-dessous qui proposaient Sauce au poivre/Curcuma comme modèles et conservaient les moulins Sel/Poivre. Les règles actuelles sont dans IMAGES_ITEMS.md ; les références Mayonnaise/Paprika v740 sont conservées à l'identique.
+
 ## Poids et résolution
 
 Les 466 fichiers ont un canal de transparence. Poids minimum : 1 794 octets ; maximum : 80 644 ; médiane : 14 608. Aucun ne dépasse l'ancien plafond de 153 600 octets, mais **229 dépassent 15 000 octets**, dont 66 dépassent 40 000. Cela ne permet donc pas de déclarer tout le catalogue conforme à la consigne utilisateur de 15 Ko.
@@ -85,3 +87,9 @@ Les dix fichiers satisfont la limite de 15 000 octets. Le validateur des prochai
 4. Examiner l'alpha, les marges, les contours sur fond clair/foncé et la lisibilité aux tailles Catalogue et Ma liste.
 5. Conserver les produits déjà validés et les invariants Home Assistant/sécurité. Ne pas ajouter de dépendance.
 6. Lors de l'intégration, suivre la version globale, l'invalidation du cache, les tests et le commit atomique prescrits par AGENTS.md. Distinguer les contrôles effectués des vérifications qui n'ont pas pu être exécutées.
+
+## Suivi après harmonisation des sauces et épices v741
+
+37 variantes refaites sur les deux références Mayonnaise/Paprika, 39 fichiers de famille sous 15 000 octets chacun. Voir [le relevé détaillé](HARMONISATION_SAUCES_EPICES_2026-11-04.md). Les fichiers sources de Mayonnaise et Paprika v740 sont conservés.
+
+Vanille rejoint les corrections de contour réalisées : sur les 33 constats v739, Jus d’ananas a été corrigé en v740 et Vanille en v741 ; il reste **31 contours** de cette liste. Chili a désormais son bocal d'assaisonnement fermé avec marge ; les deux autres cas de marge à revoir sont Vinaigre de vin et Rosette. Les cinq fichiers du précédent lot de neuf dépassant 15 Ko restent un sujet distinct, sauf Tapenade qui est remplacée et passe sous la limite avec ce lot.

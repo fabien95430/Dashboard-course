@@ -161,6 +161,11 @@ assert requests[0]['output_compression']==75
 assert 'compresse efficacement en WebP' in requests[0]['prompt']
 assert 'maximum 15 000 octets' in requests[0]['prompt']
 assert 'conserves vert sauge' in requests[0]['prompt']
+assert 'www/Items/mayonnaise.webp' in requests[0]['prompt']
+assert 'grande étiquette crème rectangulaire à coins arrondis' in requests[0]['prompt']
+assert 'www/Items/paprika.webp' in requests[0]['prompt']
+assert 'petite étiquette crème centrale en cartouche' in requests[0]['prompt']
+assert 'même si le fichier doit être plus lourd' not in requests[0]['prompt']
 assert 'le conditionnement demandé et la transparence du fond' in requests[0]['prompt']
 `;
   const run=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
