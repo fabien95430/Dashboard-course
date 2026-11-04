@@ -141,7 +141,7 @@ const CATALOG_DISPLAY_NAMES=Object.freeze({
   "Thermomètre piles":"Thermomètre",
   "Lingettes bébé":"Lingette bébé",
   "Lait infantile":"Lait bébé",
-  "Sacs à couches":"Sac à couches",
+
   "Croquettes chat":"Croquettes",
   "Croquettes chien":"Croquettes",
   "Sacs déjections":"Sacs déject.",
