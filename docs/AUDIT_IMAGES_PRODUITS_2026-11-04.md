@@ -414,3 +414,22 @@ Les trois fichiers sont sous 15 000 octets, transparents et lisibles. Comparaiso
 Consigne et prompt automatique remplacés pour conserver cette séparation des familles. Noms/groupes du catalogue, fallback SVG, cache visuel persistant, badge court, logique réseau du service worker, HA, sécurité et mode test inchangés. Migration v759/v760 vérifiée pour les trois cadrages seulement. Aucun essai interactif iPhone ou Home Assistant réel.
 
 Validation : 349/349 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Conserves reste en attente.
+
+## Chocolat et nouveaux parfums — v761
+
+Source relue : main `547134db5d014819a03d0eb2237a6ec5a4ce623a` (v760). Demande utilisateur : inclure Chocolat et autorisation d’ajouter des parfums. Crème dessert chocolat et Crème dessert vanille existent déjà : leurs noms sont conservés et leurs visuels sont harmonisés sur le petit pot à opercule de Yaourts vanille, en gardant les couleurs cacao/crème jaune pâle et une illustration de parfum imprimée. Ne pas créer un doublon « Yaourt chocolat » pour la crème dessert existante.
+
+Deux produits ajoutés dans catalog.js, Frais → Yaourts & desserts : Yaourts citron et Yaourts noix de coco. Images unitaires correspondantes, sans aliment physique autour, texte ni marque. Mode Pot et achat à l’unité hérités du sous-groupe existant, vérifiés avec l’API réelle COURSES_QUANTITIES ; aucune modification du moteur de quantités ni de Home Assistant nécessaire. La liste HA Courses reste prioritaire.
+
+| Fichier dans `www/Items/` | Final (octets) | Action |
+| --- | ---: | --- |
+| `creme-dessert-chocolat.webp` | 10 474 | Harmonisé |
+| `creme-dessert-vanille.webp` | 11 742 | Harmonisé |
+| `yaourts-citron.webp` | 11 092 | Nouveau produit |
+| `yaourts-noix-de-coco.webp` | 11 198 | Nouveau produit |
+
+Quatre générations/éditions avec l’outil image natif, WebP finaux 256 px sous 15 000 octets mesurés, transparence réelle et marges. Contrôle visuel sur fonds clair/foncé à 160 et 48 px avec le zoom/décalage du code existant : hauteur/largeur à moins de 0,04 du Vanille de référence dans la boîte image. Vérification calculée sans rognage Ma liste/Catalogue, migration ciblée du cache v760/v761, autres cadrages conservés. Nature, Grecs, Skyr, Fromage blanc et les yaourts v760 conservés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés. Ajouts limités aux deux noms autorisés, pas de renommage, framework, dépendance, backend, changement de synchronisation, polling, OAuth, WebSocket, coffre, verrouillage ou biométrie. Fallback SVG et logique réseau du service worker inchangés ; cache persistant et badge court préservés.
+
+Validation : 351/351 tests, dont deux tests d’intégration Catalogue/quantités/présence des WebP ; syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Conserves reste en attente.
