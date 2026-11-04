@@ -193,3 +193,24 @@ Contrôle complet : sujet et conditionnement, couleurs naturelles, présentation
 Validation locale : 350/350 tests Node réussis, 25 contrôles de syntaxe JavaScript et compilation Python valides, `git diff --check` sans erreur. Le validateur Bash est bloqué dans cet environnement par l’absence de `/dev/fd` ; ses mêmes contrôles ont été lancés séparément, sans modifier le script ni la CI.
 
 Les règles de cette famille sont ajoutées à IMAGES_ITEMS.md et au prompt de génération pour éviter le retour des briques ou d'illustrations accessoires. Cette livraison ne valide pas la cohérence de tous les produits Boissons ; les autres harmonisations du catalogue, les deux cas de marge Vinaigre de vin/Rosette et les anciens poids hors limite restent à examiner séparément.
+
+## Étiquettes fruitées validées sur les six jus v748
+
+Source relue : `60066dbd023a42961dd69970ea48fe45919c28eb`. L’utilisateur a demandé une référence au fruit pour distinguer les jus et a validé l’aperçu Orange avec une petite étiquette crème illustrée. Cette décision remplace la règle v747 sans étiquette, et autorise le remplacement des six visuels, y compris les anciennes références Pomme/Raisin/Ananas.
+
+Référence canonique : le nouveau `jus-d-orange.webp`, dérivé directement de l’aperçu accepté. Même bouteille en verre, épaules/col/proportions, bouchon doré et petite étiquette basse crème à coins arrondis et double filet discret. Les cinq variantes reprennent cette référence ; Raisin adopte aussi le bouchon doré. Chaque fruit est uniquement imprimé sur l’étiquette ; aucun fruit physique ni texte/marque n’est ajouté. Multifruits utilise un assortiment visuel générique orange/pomme/raisin, sans affirmer de recette ni de proportions. Les couleurs naturelles des boissons restent distinctes.
+
+| Produit | Illustration imprimée | Octets WebP |
+| --- | --- | ---: |
+| Jus d’orange | Orange et demi-orange | 10 686 |
+| Jus de pomme | Pomme et demi-pomme | 11 084 |
+| Jus de raisin | Grappe de raisin | 10 946 |
+| Jus d’ananas | Ananas et tranche | 10 708 |
+| Jus multifruits | Petit assortiment générique | 12 100 |
+| Jus de tomate | Tomate et demi-tomate | 10 814 |
+
+6/6 fichiers unitaires en 384 × 384 px sous 15 000 octets après encodage. Alpha transparent et marges vérifiés, revue sur fonds clair/foncé à 192/48 px. La première variante Multifruits présentait un voile hors de la bouteille : rejetée, nettoyée par édition avec l’outil de génération puis contrôlée à nouveau ; seule la variante corrigée est intégrée. Aucun fond artificiel ni retouche manuelle de l’alpha. L’aperçu Orange accepté est réutilisé sans nouvelle génération.
+
+Calcul réel du cadrage Catalogue/Ma liste exécuté sur les pixels des six fichiers : pas de rognage. Migration du cache v747/v748 vérifiée : nouveaux cadrages recalculés, autres images conservées. Noms/groupes du catalogue, fallback SVG et logique réseau du service worker conservés. Version globale et URLs de chargement actualisées selon les conventions existantes. Aucun essai interactif iPhone ou Home Assistant réel. Les règles documentées et le prompt automatique sont actualisés pour les prochaines générations ; le reste du catalogue et les cas de marge historiques restent à examiner séparément.
+
+Validation v748 : 350/350 tests Node réussis, 25 fichiers JavaScript valides, compilation Python et différences Git contrôlées. Le script Bash reste inchangé ; faute de `/dev/fd` dans cet environnement, ses mêmes contrôles ont été exécutés séparément.
