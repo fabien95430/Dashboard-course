@@ -159,3 +159,21 @@ Le traitement des 33 contours ne vaut pas validation de la cohérence de tous le
 `truite.webp` : 14 306 octets, alpha transparent, marges et revue sur fonds clair/foncé à 192/48 px ; calcul réel du cadrage et migration v744/v745 contrôlés. Catalogue, fallback SVG et logique réseau du service worker inchangés. Aucun essai interactif iPhone/HA réel.
 
 Désormais chaque lot vérifie et consigne séparément : identité du sujet, forme de vente, préparation, présentation, proportions, accessoires, couleurs/emballage, style de famille, contours et poids. Remplacer l’image si sa représentation est incohérente même avec un contour propre. Ne pas déclarer les 466 produits cohérents sur la seule base des corrections de contour. Cette revue complète reste à poursuivre sur les autres familles et les cas de marge déjà signalés.
+
+## Harmonisation des pulvérisateurs ménagers v746
+
+Source relue : `c5186a2b79780387af81bc884b79f1c47dcf5fc1`. Revue de Désinfectant, Désodorisant textile et Détachant avec Nettoyant multi-usages, Nettoyant salle de bain et Nettoyant vitres. Les trois références sont conservées ; seules les trois représentations qui détonnent sont remplacées, sans compléter artificiellement le lot avec des produits déjà cohérents.
+
+| Produit | Constat de cohérence | Correction | Octets WebP |
+| --- | --- | --- | ---: |
+| Désinfectant | Petit atomiseur 84 px, échelle et conditionnement différents des pulvérisateurs voisins | Flacon ménager ergonomique entier, tête blanche et accents rouges, contenu gris clair, étiquette crème | 13 614 |
+| Désodorisant textile | Silhouette proche, mais étiquette illustrée et finition à rapprocher des références | Même flacon de famille, accents lavande, étiquette crème vierge ; dessin de lavande généré puis retiré car aucun parfum n'est précisé au catalogue | 14 318 |
+| Détachant | Rendu plus plat, forme et pictogramme différents | Volume du flacon de famille, tête blanche, accents orange et contenu blanc, étiquette crème | 13 228 |
+
+Contrôle complet : bon produit et bon conditionnement, proportions, présentation, accessoires absents, couleurs existantes reprises, étiquette, style de famille, alpha, marges, contours et poids. Les trois WebP finaux font 384 × 384 px et restent sous 15 000 octets. Génération/édition par outil intégré avec références, encodage WebP standard sans peinture du fond ni remplacement manuel de l'alpha. Revue sur fonds clair/foncé à 192/48 px ; calcul réel du cadrage Catalogue/Ma liste et migration v745/v746 vérifiés. Catalogue, fallback SVG et logique réseau du service worker inchangés ; aucun essai interactif iPhone ou Home Assistant réel.
+
+Validation locale : 350/350 tests Node réussis, syntaxe JavaScript et compilation Python valides, différences Git sans erreur. Le script de validation est bloqué ici par l’absence de `/dev/fd` ; les mêmes vérifications ont été exécutées séparément, sans modification du validateur.
+
+Ce contrôle valide les trois visuels remplacés dans leur sous-groupe, pas l'ensemble des produits Maison. Les anciennes références Nettoyant multi-usages (16 876 octets), Nettoyant salle de bain (17 284) et Nettoyant vitres (16 032) restent inchangées ; leur poids hérité ne vaut pas autorisation de dépasser la limite sur une nouvelle image. Les bidons Javel/lessive et flacons WC ne doivent pas être transformés en pulvérisateurs par simple uniformisation.
+
+Prochain groupe identifié lors de la revue : les jus. Jus d'orange est une brique avec paille, Jus multifruits une brique illustrée et Jus de tomate une bouteille étiquetée/bouchon rouge, contrairement aux bouteilles Pomme/Raisin/Ananas. À harmoniser avec les références de jus, en conservant les couleurs naturelles des boissons ; aucune nouvelle palette d'emballage n'a été validée pour ce groupe. La revue complète du reste du catalogue et les marges Vinaigre de vin/Rosette restent à poursuivre.

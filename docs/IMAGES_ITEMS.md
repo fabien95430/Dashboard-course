@@ -65,6 +65,12 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — pulvérisateurs ménagers
+
+Pour Désinfectant, Désodorisant textile et Détachant, reprendre les proportions du flacon ergonomique et la tête à gâchette blanche de `nettoyant-multi-usages.webp`, avec le rendu des nettoyants salle de bain/vitres. Un seul pulvérisateur ménager entier, de taille apparente comparable à ses voisins ; jamais un petit atomiseur de voyage. Étiquette crème courbe sobre, sans texte, marque ou accessoire. Conserver les distinctions de couleur déjà présentes : rouge/gris clair pour Désinfectant, lavande pour Désodorisant textile, orange/blanc pour Détachant. Il s'agit de repères tirés des sources existantes, pas d'une nouvelle palette imposée à tous les produits ménagers.
+
+Ne pas transformer les bidons de lessive ou Javel, les flacons à bec WC, ni les paquets de poudre en pulvérisateurs : harmoniser dans le bon sous-groupe en respectant l'usage et le conditionnement. Les références de nettoyants déjà cohérentes restent conservées.
+
 ## Conditionnement fidèle — crèmes fraîches
 
 Pour les produits **« Crème épaisse »** et **« Crème fraîche »** du catalogue (catégorie **Frais → Laits & crèmes**), représenter **un pot de crème fraîche** avec son couvercle, identifiable comme un produit vendu en pot : **jamais une brique, une bouteille ou une gourde**. Le pot est l'unique conditionnement mis en scène, sur fond transparent, sans marque ni texte inventés.
