@@ -112,3 +112,22 @@ Source relue : `49f19a5e8951089a1e25e65491ac2c897cff3001`. Dix corrections : six
 | `emmental.webp` | 14968 |
 
 10/10 sous 15 000 octets. Revue des WebP sur fonds clair/foncé à 192 et 48 px, calcul réel du cadrage exécuté, migration v741/v742 vérifiée. Catalogue, fallback SVG et logique réseau du service worker inchangés. Pas de test interactif iPhone ou Home Assistant réel. Il reste **21 contours** de la liste initiale, ainsi que les deux cas de marge Vinaigre de vin et Rosette.
+
+## Suivi du lot contours v743
+
+Source relue : `588c137a745f2637db1f6162b5ad995d5ad3e8ca`. Roquefort, Pâtes fraîches, Bretzels, Biscuits beurre, Biscuits chocolat, Chocolat au lait, Chocolat noir, Bacon, Chorizo et Jambon blanc : suppression des contours externes, présentations conservées sans nouvel emballage ni marque. Édition par outil intégré avec images sources ; Gouda et Blanc de poulet servent aussi de références de famille.
+
+| Fichier | Octets |
+| --- | ---: |
+| `roquefort.webp` | 14918 |
+| `pates-fraiches.webp` | 14996 |
+| `bretzels.webp` | 14936 |
+| `biscuits-beurre.webp` | 14438 |
+| `biscuits-chocolat.webp` | 14168 |
+| `chocolat-au-lait.webp` | 14924 |
+| `chocolat-noir.webp` | 14500 |
+| `bacon.webp` | 13802 |
+| `chorizo.webp` | 13748 |
+| `jambon-blanc.webp` | 14632 |
+
+10/10 sous 15 000 octets, transparence et marges contrôlées. Revue sur fonds clair/foncé à 192 et 48 px, calcul réel de cadrage et migration v742/v743 vérifiés. Catalogue, fallback SVG et logique réseau du service worker inchangés. Aucun test interactif iPhone ou Home Assistant réel. Il reste **11 contours** : Jambon cru, Cabillaud, Moules, Saumon fumé, Thon frais, Truite, Thon en boîte, Agneau, Côtes de porc, Poulet, Veau. Les cas de marge Vinaigre de vin et Rosette restent distincts.
