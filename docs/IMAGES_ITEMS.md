@@ -97,6 +97,8 @@ Ne pas transformer les bidons de lessive ou Javel, les flacons à bec WC, ni les
 
 Pour les produits **« Crème épaisse »** et **« Crème fraîche »** du catalogue (catégorie **Frais → Laits & crèmes**), représenter **un pot de crème fraîche** avec son couvercle, identifiable comme un produit vendu en pot : **jamais une brique, une bouteille ou une gourde**. Le pot est l'unique conditionnement mis en scène, sur fond transparent, sans marque ni texte inventés.
 
+**Mascarpone** : conserver un pot laitier bas et large, avec couvercle opaque fermé clairement identifiable (rebord et languette), sans crème exposée, marque ou texte inventé. Ne pas le transformer en bol de service ou bocal de sauce.
+
 La **« Crème liquide »** est un produit distinct : conserver son conditionnement réel adapté (par exemple une brique), sans lui appliquer automatiquement la règle du pot. Pour les autres crèmes et produits frais, vérifier le conditionnement correspondant au nom exact du produit avant de générer l'image. Rejeter toute image dont l'emballage ne correspond pas au produit.
 
 ## Conditionnement fidèle — épices

@@ -275,3 +275,11 @@ Deux corrections de représentation : Riz au lait conserve son pot en verre ferm
 Validation v751 : 350/350 tests Node réussis, syntaxe JavaScript et compilation Python valides, différences Git sans erreur. Faute de `/dev/fd`, les contrôles du validateur Bash ont été exécutés séparément ; script et tests conservés.
 
 Deux tests historiques sont précisés : distinguer Riz au lait des riz en paquet dans le contrôle d’invalidation, et vérifier la conservation du cache sur la version courante plutôt que figer v732 après remplacement d’un de ses visuels. Les assertions de format, transparence et invalidation restent actives.
+
+## Revue des crèmes et mascarpone v752
+
+Source relue : `c2aa17e298a6aa97cb7e485e6e8a2e25897178a5`. Crème épaisse (11 532 octets), Crème fraîche (11 808), Crème liquide (7 160) et Beurre (7 952) restent conservés : conditionnements adaptés et poids sous la limite. La fermeture du Mascarpone était visuellement ambiguë ; remplacement par un pot bas et large à couvercle opaque, rebord et languette explicites, sans transformer le produit en bocal de sauce.
+
+Mascarpone : **11 794 octets**, WebP 384 × 384, alpha transparent et marges vérifiés, revue sur fonds clair/foncé à 192/48 px. Calcul réel de cadrage Catalogue/Ma liste et migration v751/v752 réussis. Catalogue, fallback SVG et logique réseau du service worker inchangés ; aucun essai interactif iPhone/HA réel. Les cinq fichiers de cette revue sont sous 15 000 octets. Consignes et prompt précisés pour la fermeture du mascarpone. Les autres familles restent à examiner.
+
+Validation v752 : 350/350 tests Node réussis, syntaxe JavaScript et compilation Python valides, différences Git contrôlées. Le validateur Bash nécessite `/dev/fd`, absent ici ; contrôles équivalents exécutés séparément sans modifier script ou tests.
