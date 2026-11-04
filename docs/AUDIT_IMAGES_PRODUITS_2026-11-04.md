@@ -577,3 +577,24 @@ Fraise est conservée comme référence visuelle : bocal haut à facettes arrond
 Consignes et prompt automatique complétés : référence Fraise, confitures distinctes des sauces Mayonnaise. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Aucun test modifié.
 
 Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Sauces & condiments.
+
+
+## Choix supplémentaires de confitures — v767
+
+Source relue : main `f30b78162782ba155e2179addfcd09c158a01baf` (v766). À la demande de l’utilisateur, ajout de sept parfums : Abricot, Cerise, Framboise, Fruits rouges, Mûre, Myrtille et Orange. Le sous-groupe Confitures passe de 2 à 9 produits ; Fraise et Mirabelles sont conservées octet par octet. Tous sont achetés par Pot via catalog-quantities.js, sans changement du calcul des quantités.
+
+Génération avec l’outil image intégré, sans API OpenAI payante du projet. Prompt commun : une seule confiture isolée, fond réellement transparent, reprendre strictement le bocal Fraise (facettes, couvercle vichy fermé, étiquette crème ronde à double filet rouge, nom en cursive rouge), ne changer que le nom, le fruit imprimé et la couleur naturelle de la confiture épaisse cuite. Pas de fruit physique autour, sirop clair, marque, décor ou ombre de sol. Pour Fruits rouges : fraise, framboise, mûre et myrtille imprimées ensemble. Orange représente une marmelade avec fines écorces ; les autres couleurs et fruits correspondent au parfum. Un fichier WebP par produit, aucun atlas.
+
+| Nouveau fichier dans `www/Items/` | Poids final (octets) | Canevas |
+| --- | ---: | ---: |
+| `confiture-abricot.webp` | 13 682 | 256 px |
+| `confiture-framboise.webp` | 14 908 | 256 px |
+| `confiture-cerise.webp` | 14 404 | 256 px |
+| `confiture-mure.webp` | 14 814 | 256 px |
+| `confiture-myrtille.webp` | 14 518 | 256 px |
+| `confiture-orange.webp` | 14 780 | 256 px |
+| `confiture-fruits-rouges.webp` | 13 766 | 256 px |
+
+Les sept fichiers sont mesurés après encodage, tous sous 15 000 octets ; alpha réel, objet entier et marges préservés. Revue des neuf produits sur fonds clair/foncé à 160 et 48 px : hauteurs identiques, différence maximale de largeur apparente inférieure à 0,012 de la boîte image. Calcul réel de measureVisualScale exécuté pour les sept ajouts : pas de rognage dans Ma liste ou Catalogue. Aucun essai interactif iPhone ou session Home Assistant réelle.
+
+Deux nouveaux tests vérifient l’unicité/classement des neuf confitures, le mode Pot et l’existence des WebP transparents sous 15 Ko. Résultat : 353/353 tests réussis ; syntaxe JavaScript, compilation Python et git diff --check réussis. Validateur Bash inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible dans cet environnement. Consignes et prompt automatique de confiture étendus à tous les parfums. Architecture, Home Assistant, OAuth, WebSocket, coffre, verrouillage/biométrie, mode test, cadrage automatique, fallback SVG et logique réseau/cache persistant du service worker inchangés. Versions et URLs de chargement synchronisées en v767. Suite de l’audit : Sauces & condiments.
