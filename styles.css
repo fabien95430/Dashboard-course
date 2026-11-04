@@ -1424,6 +1424,8 @@ body:has(#securityOverlay.is-visible){background-color:#d5ae89!important}
   align-items:flex-end;
   gap:5px;
 }
+.page-version[data-label]{font-size:0!important}
+.page-version[data-label]::after{content:attr(data-label);font-size:10px}
 .page-version{
   display:flex;
   align-items:center;

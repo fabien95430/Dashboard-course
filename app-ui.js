@@ -9,9 +9,17 @@ let securityViewportRestoreFrame=0;
 let retainedListEmptyState=null;
 let listEmptyStateConfirmed=false;
 
+// Libellé court affiché (v755 → v7.55) ; le texte du badge garde le numéro interne lu par les scripts.
+function shortVersionLabel(version){
+  const number=Number(String(version||'').replace(/^v/i,''));
+  if(!Number.isInteger(number)||number<100)return String(version||'');
+  return 'v'+Math.floor(number/100)+'.'+String(number%100).padStart(2,'0');
+}
 function syncPageVersions(){
+  const label=shortVersionLabel(APP_VERSION);
   document.querySelectorAll('.page-version').forEach(badge=>{
     if(badge.textContent!==APP_VERSION)badge.textContent=APP_VERSION;
+    if(badge.dataset.label!==label)badge.dataset.label=label;
   });
   if(!document.getElementById('app-version-ui')){
     const style=document.createElement('style');
