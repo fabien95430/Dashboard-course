@@ -31,6 +31,7 @@ test('recalculer uniquement les neuf métriques du lot 732',()=>{
  const previous=scaleAt('v732',{version:'v731',items});
  for(const s of changed)assert.equal(previous(asset(s)),'',s);
  assert.match(previous(asset('mozzarella')),/--single-product-scale:1.45/);
- const current=scaleAt('v732',{version:'v732',items});
+ const currentVersion=readFileSync(join(root,'dish-local-images.js'),'utf8').match(/const APP_VERSION='(v\d+)'/)[1];
+ const current=scaleAt(currentVersion,{version:currentVersion,items});
  for(const s of changed)assert.match(current(asset(s)),/--single-product-scale:1.45/,s);
 });

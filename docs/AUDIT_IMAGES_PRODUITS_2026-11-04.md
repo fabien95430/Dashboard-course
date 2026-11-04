@@ -256,3 +256,22 @@ Le déploiement v749 précédemment bloqué par une erreur serveur GitHub Pages 
 Calcul réel de cadrage Ma liste/Catalogue et migration v749/v750 contrôlés sur les pixels finaux. Les autres cadrages, noms/groupes du catalogue, fallback SVG, logique réseau du service worker et invariants HA/sécurité sont conservés. Aucun essai interactif iPhone ou Home Assistant réel. Les consignes de charcuterie sont ajoutées à IMAGES_ITEMS.md et au prompt automatique. Les treize fichiers de cette famille sont maintenant sous 15 000 octets, y compris les quatre fichiers conservés.
 
 Validation v750 : 350/350 tests Node réussis, syntaxe des 25 fichiers JavaScript et compilation Python valides, `git diff --check` sans erreur. Les contrôles du validateur Bash ont été exécutés séparément car `/dev/fd` est absent de cet environnement ; script et tests historiques conservés.
+
+## Revue des yaourts et desserts v751
+
+Source relue : `18c22a94e41bc4e6ba4a1c0da5760c4ddb247191`. Comparaison des douze produits : Crème dessert chocolat/vanille, Fromage blanc, Petits-suisses, Riz au lait, Skyr, Yaourt, Yaourt à boire, Yaourts fruits/grecs/nature/vanille. Les huit images déjà validées et sous la limite sont conservées. Les conditionnements restent adaptés au produit, sans imposer le pot des sauces à cette famille.
+
+Deux corrections de représentation : Riz au lait conserve son pot en verre fermé et ses grains crémeux, sans garniture brune non précisée ; Yaourt à boire conserve sa bouteille et son illustration imprimée de fraise, sans fruit physique posé devant ni ombre de sol. Édition par outil intégré avec sources existantes, transparence conservée. Yaourts fruits et Yaourts grecs conservent leur dessin approuvé et reçoivent uniquement un encodage optimisé.
+
+| Produit | Octets finaux | Dimensions |
+| --- | ---: | --- |
+| Riz au lait | 13894 | 320 × 320 |
+| Yaourt à boire | 13796 | 384 × 384 |
+| Yaourts fruits | 14930 | 320 × 320 |
+| Yaourts grecs | 14782 | 256 × 256 |
+
+4/4 fichiers modifiés sous 15 000 octets ; les douze produits du groupe sont désormais sous cette limite. Alpha, marges, représentation, couleurs, accessoires et lisibilité examinés sur fonds clair/foncé à 192/48 px. Calcul réel du cadrage Catalogue/Ma liste et migration v750/v751 vérifiés. Les dimensions imposées par les anciens tests (Yaourt à boire 384 px, Yaourts grecs 256 px) sont conservées. Noms/groupes du catalogue, fallback SVG et logique réseau du service worker inchangés. Aucun essai interactif iPhone ou Home Assistant réel. Consignes de génération mises à jour ; cette revue ne valide pas le reste du catalogue.
+
+Validation v751 : 350/350 tests Node réussis, syntaxe JavaScript et compilation Python valides, différences Git sans erreur. Faute de `/dev/fd`, les contrôles du validateur Bash ont été exécutés séparément ; script et tests conservés.
+
+Deux tests historiques sont précisés : distinguer Riz au lait des riz en paquet dans le contrôle d’invalidation, et vérifier la conservation du cache sur la version courante plutôt que figer v732 après remplacement d’un de ses visuels. Les assertions de format, transparence et invalidation restent actives.

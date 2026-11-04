@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — yaourts et desserts
+
+Préserver les pots déjà validés et les différences de conditionnement. Riz au lait : petit pot en verre fermé, riz crémeux visible, sans garniture ou parfum non précisé au catalogue. Yaourt à boire : bouteille laitière fermée à bouchon rose ; la fraise peut être illustrée sur la bouteille, mais pas posée physiquement à côté, et aucune ombre de sol ne doit former de halo. Ne pas appliquer le pot Mayonnaise aux desserts, ni uniformiser tous les yaourts sur un même pot au détriment des références approuvées.
+
 ## Conditionnement fidèle — charcuteries
 
 Contrôler la famille sans confondre les produits : Blanc de poulet représente des tranches de charcuterie cuites, ivoire à bord doré, jamais des filets crus ni du jambon de porc ; supprimer les herbes décoratives. Rosette représente un saucisson sec à coupe rosée et gros grains de gras blanc, avec quelques tranches, entièrement visible avec marge ; la fleur blanche naturelle du boyau n’est pas un contour d’autocollant à effacer. Préserver les différences de couleur et de texture de Coppa, Mortadelle, Lardons et Peperroni.
