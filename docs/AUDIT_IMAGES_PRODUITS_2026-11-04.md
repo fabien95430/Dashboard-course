@@ -645,3 +645,14 @@ Source relue : main `67247ed96b052c96dda2ecbef65c6442200ef804` (v767). Audit des
 33/33 images sous 15 000 octets, poids finaux mesurés. Consignes et prompt automatique complétés pour préserver le conditionnement des cornichons et distinguer huiles/vinaigres des sauces. Aucun nom, groupe ou mode d’achat modifié. Le catalogue reste identique, ainsi que fallback SVG, logique du service worker, cache persistant, Home Assistant, OAuth, WebSocket, coffre chiffré, verrouillage/biométrie, mode test et styles mobiles. Aucun essai interactif iPhone ou Home Assistant réel.
 
 Validation : 353/353 tests réussis, syntaxe JavaScript, compilation Python, calcul de cadrage et git diff --check réussis. Aucun test modifié. Le validateur Bash reste inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Version globale v768, URLs de chargement synchronisées ; module quantités inchangé conservé en v767. Prochaine catégorie : Sauces sucrées.
+
+
+## Sauces sucrées — audit après v768
+
+Source relue : main `4adc2c213c5c6f5de7d5f9c5428bd5cd36bb3f54`. Le sous-groupe Épicerie → Sauces sucrées contient uniquement Coulis de fruit. Comparaison directe avec la référence Mayonnaise : même bocal fermé en verre, couvercle doré, grande étiquette crème centrale rectangulaire à angles arrondis et double filet fin. Contenu rouge fluide homogène adapté au coulis, distinct de la confiture épaisse en bocal vichy. Pas de fruit physique, texte, marque ou accessoire ajouté.
+
+`www/Items/coulis-de-fruit.webp` : 13 868 octets mesurés, 384 × 384 px, alpha réel de 0 à 255. Contours propres sur fonds clair et foncé ; cadrage réel calculé par measureVisualScale (échelle 1,137, déplacement X −1,2 %, Y −2,4 %) sans rognage Ma liste/Catalogue. Comparaison de silhouette avec Mayonnaise validée. Aucun essai interactif iPhone ou session Home Assistant réelle.
+
+Décision : conserver le fichier existant sans réencodage ni génération. Les consignes de famille et le prompt automatique couvrent déjà explicitement Coulis de fruit, aucune duplication nécessaire. Modification documentaire seule, version de l’application maintenue à v768. Catalogue, images, cache, fallback, quantités, Home Assistant, sécurité, mode test et styles mobiles inchangés.
+
+Validation : 353/353 tests réussis et git diff --check réussi. Prochaine catégorie non encore examinée dans cette série : Enfant.
