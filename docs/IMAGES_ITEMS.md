@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — jus
+
+Pour Jus d’orange, Jus multifruits et Jus de tomate, reprendre la bouteille en verre fermée de `jus-d-ananas.webp` : silhouette, épaules arrondies, col, bouchon métallique doré vissé, cadrage et finition. Ne pas conserver les anciennes briques, paille, illustration de fruits ou étiquette dominante. Un seul contenant, sans marque, texte ou fruit accessoire ; conserver la couleur naturelle et la texture du jus exact (orange, mélange abricot-orangé, tomate rouge). Ne pas inventer de recette précise pour multifruits. Les références Pomme, Raisin et Ananas restent conservées ; cette règle n'impose pas une nouvelle palette à toutes les boissons, ni cette bouteille aux eaux, laits ou sirops.
+
 ## Conditionnement fidèle — pulvérisateurs ménagers
 
 Pour Désinfectant, Désodorisant textile et Détachant, reprendre les proportions du flacon ergonomique et la tête à gâchette blanche de `nettoyant-multi-usages.webp`, avec le rendu des nettoyants salle de bain/vitres. Un seul pulvérisateur ménager entier, de taille apparente comparable à ses voisins ; jamais un petit atomiseur de voyage. Étiquette crème courbe sobre, sans texte, marque ou accessoire. Conserver les distinctions de couleur déjà présentes : rouge/gris clair pour Désinfectant, lavande pour Désodorisant textile, orange/blanc pour Détachant. Il s'agit de repères tirés des sources existantes, pas d'une nouvelle palette imposée à tous les produits ménagers.

@@ -177,3 +177,19 @@ Validation locale : 350/350 tests Node réussis, syntaxe JavaScript et compilati
 Ce contrôle valide les trois visuels remplacés dans leur sous-groupe, pas l'ensemble des produits Maison. Les anciennes références Nettoyant multi-usages (16 876 octets), Nettoyant salle de bain (17 284) et Nettoyant vitres (16 032) restent inchangées ; leur poids hérité ne vaut pas autorisation de dépasser la limite sur une nouvelle image. Les bidons Javel/lessive et flacons WC ne doivent pas être transformés en pulvérisateurs par simple uniformisation.
 
 Prochain groupe identifié lors de la revue : les jus. Jus d'orange est une brique avec paille, Jus multifruits une brique illustrée et Jus de tomate une bouteille étiquetée/bouchon rouge, contrairement aux bouteilles Pomme/Raisin/Ananas. À harmoniser avec les références de jus, en conservant les couleurs naturelles des boissons ; aucune nouvelle palette d'emballage n'a été validée pour ce groupe. La revue complète du reste du catalogue et les marges Vinaigre de vin/Rosette restent à poursuivre.
+
+## Harmonisation des jus v747
+
+Source relue : `b635101f46aecdcf962013548a1aea2d6c449edb`. Les six jus de `catalog.js` ont été comparés : Pomme, Raisin et Ananas sont conservés, Orange, Multifruits et Tomate sont remplacés dans le style de la bouteille Ananas. Le périmètre est bien la famille des jus, pas tous les articles du sous-groupe Eaux & jus.
+
+| Produit | Constat de cohérence | Correction | Octets WebP |
+| --- | --- | --- | ---: |
+| Jus d’orange | Brique avec paille, présentation différente des bouteilles de référence | Bouteille en verre fermée, bouchon doré, jus orangé avec pulpe fine | 10 326 |
+| Jus multifruits | Brique illustrée, emballage dominant et ancien fichier de 20 358 octets | Bouteille de famille, mélange homogène abricot-orangé, sans inventer de recette ni de fruits accessoires | 9 428 |
+| Jus de tomate | Bouteille à bouchon rouge et grande étiquette illustrée | Bouteille de famille à bouchon doré, boisson rouge tomate sans étiquette | 9 110 |
+
+Contrôle complet : sujet et conditionnement, couleurs naturelles, présentation, proportions, absence d'accessoires et de marque/texte, verre/couvercle, style de famille, alpha, marges, contours sur fonds clair/foncé et poids. Les trois fichiers unitaires font 384 × 384 px et pèsent chacun moins de 15 000 octets après encodage. Génération par outil intégré avec références réelles, sans API payante du projet ; encodage WebP standard, transparence conservée sans fond artificiel ni peinture de l'alpha. Revue à 192/48 px, calcul réel du cadrage Ma liste/Catalogue et migration v746/v747 vérifiés. Les noms et groupes du catalogue, le fallback SVG et la logique réseau du service worker sont conservés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Validation locale : 350/350 tests Node réussis, 25 contrôles de syntaxe JavaScript et compilation Python valides, `git diff --check` sans erreur. Le validateur Bash est bloqué dans cet environnement par l’absence de `/dev/fd` ; ses mêmes contrôles ont été lancés séparément, sans modifier le script ni la CI.
+
+Les règles de cette famille sont ajoutées à IMAGES_ITEMS.md et au prompt de génération pour éviter le retour des briques ou d'illustrations accessoires. Cette livraison ne valide pas la cohérence de tous les produits Boissons ; les autres harmonisations du catalogue, les deux cas de marge Vinaigre de vin/Rosette et les anciens poids hors limite restent à examiner séparément.
