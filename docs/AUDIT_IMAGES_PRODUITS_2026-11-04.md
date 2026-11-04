@@ -682,3 +682,32 @@ Petits pots : dessin du petit bocal fermé à couvercle doré et purée orange c
 6/6 fichiers sous 15 000 octets, poids mesurés après encodage, alpha réel, marges régulières et objet entier. Dimensions historiques 384 × 384 préservées pour Lait infantile et Petits pots conformément aux tests existants. Les deux anciennes sources 84 px sont remplacées par des WebP 256 px. Revue des six produits sur fonds clair/foncé à 160 et 48 px ; petites vignettes lisibles. Cadrage réel exécuté pour les quatre changements : pas de rognage Ma liste/Catalogue. Migration v768/v769 ciblée vérifiée, cadrages des produits inchangés conservés. Aucun essai interactif iPhone ou Home Assistant réel.
 
 Consignes et prompt automatique complétés pour cette famille. Noms, classement et unités du catalogue inchangés ; fallback SVG, logique réseau/cache persistant du service worker, badge court, sécurité, OAuth, WebSocket, coffre, verrouillage/biométrie, mode test et styles mobiles préservés. Pas d’ajout de dépendance. Validation : 353/353 tests, syntaxe JavaScript, compilation Python et git diff --check réussis. Aucun test modifié. Validateur Bash inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Version globale et URLs synchronisées en v769. Prochaine catégorie : Hygiène & soins, sous-groupe Hygiène.
+
+
+## Ajout de goûters et aliments Enfant — v770
+
+Source relue : main `19fe7f6c3feb20e181af4e8d7c196f04d6a1e5e8` (v769, déploiement confirmé). Nouvelle demande utilisateur : enrichir Enfant, notamment avec des gâteaux. Six ajouts au sous-groupe existant, qui passe de 6 à 12 produits, sans déplacement ou changement des six références déjà présentes.
+
+Références visuelles inspectées : Céréales (boîte crème avec fenêtre), Madeleines et Biscuits beurre (forme de l’aliment), Lait infantile (palette crème/bleu), Yaourts vanille (petit pot évasé à opercule carré). Six générations par outil image intégré ; aucune API OpenAI payante du projet. Prompt commun : un seul produit fermé, style 3D semi-réaliste existant, crème/bleu pâle, fond transparent, marges régulières, pas d’aliment physique autour, texte, âge, marque ou allégation. Spécificités :
+
+- Gâteaux bébé : sachet à fenêtre, petits gâteaux moelleux dorés, forme de madeleine.
+- Biscuits bébé : même sachet, biscuits courts ovales perforés.
+- Boudoirs bébé : même sachet, longs biscuits en doigts arrondis.
+- Galettes de riz bébé : même sachet, galettes rondes de riz soufflé ivoire, épi de riz imprimé.
+- Céréales infantiles : boîte carton fermée crème/bleu, épi imprimé et petite fenêtre de céréales finement moulues, distincte de la boîte de lait.
+- Desserts lactés bébé : petit pot évasé à opercule carré fermé crème/bleu, simple goutte de lait imprimée, aucun parfum inventé.
+
+| Produit | Fichier dans `www/Items/` | Poids final (octets) | Achat |
+| --- | --- | ---: | --- |
+| Gâteaux bébé | `gateaux-bebe.webp` | 11 794 | Paquet |
+| Biscuits bébé | `biscuits-bebe.webp` | 12 162 | Paquet |
+| Boudoirs bébé | `boudoirs-bebe.webp` | 11 866 | Paquet |
+| Galettes de riz bébé | `galettes-de-riz-bebe.webp` | 13 704 | Paquet |
+| Céréales infantiles | `cereales-infantiles.webp` | 13 126 | Boîte |
+| Desserts lactés bébé | `desserts-lactes-bebe.webp` | 9 418 | Pot |
+
+Six WebP RGBA unitaires 256 × 256 px, tous sous 15 000 octets mesurés après encodage, alpha réel et marges préservés. Revue clair/foncé à 160 et 48 px : famille de sachets assortis, contenus distinguables, formes de boîte/pot conservées. Calcul réel du cadrage automatique sans rognage Ma liste/Catalogue. Les six images précédentes restent identiques octet par octet ; code de cadrage/fallback inchangé. Aucun essai interactif iPhone ou session Home Assistant réelle.
+
+Deux tests ajoutés pour unicité, classement Enfant, modes d’achat Paquet/Boîte/Pot et fichiers WebP transparents sous 15 Ko. Validation : 355/355 tests réussis, syntaxe JavaScript, compilation Python et git diff --check réussis. Consignes et prompt automatique étendus aux nouveaux produits. Versions et URLs de chargement synchronisées en v770. Architecture, cache persistant, logique réseau du service worker, sécurité, OAuth, coffre, verrouillage/biométrie, synchronisation Home Assistant WebSocket, mode test et styles mobiles inchangés. Le validateur Bash reste intact ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible.
+
+Suite de l’audit : Hygiène & soins, sous-groupe Hygiène.
