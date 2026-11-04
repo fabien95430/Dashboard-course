@@ -5,7 +5,6 @@ import test from 'node:test';
 const root=new URL('../',import.meta.url);
 const read=path=>readFileSync(new URL(path,root));
 const catalog=JSON.parse(read('catalog.js').toString('utf8').match(/groups:\s*(\{.*?\}),\s*favorites:/s)[1]);
-const sw=read('sw.js').toString('utf8');
 const imageScript=read('product-item-images.js').toString('utf8');
 const products=[
   {name:'Céréales',slug:'cereales',category:'Petit-déj & snacks'},
@@ -23,15 +22,6 @@ test('trois retouches ciblées sont des WebP transparents 384px et sans image ma
     assert.ok((bytes[20]&0x10)!==0,product.slug+' doit comporter un canal alpha');
     const width=1+bytes.readUIntLE(24,3),height=1+bytes.readUIntLE(27,3);
     assert.deepEqual([width,height],[384,384],product.slug+' doit conserver des marges');
-  }
-});
-
-test('le service worker invalide uniquement une fois chaque visuel corrigé',()=>{
-  const match=sw.match(/const UPDATED_ITEM_VISUALS=(\[[^\n]+\]);/);
-  assert.ok(match);
-  const items=JSON.parse(match[1]);
-  for(const {slug} of products){
-    assert.equal(items.filter(url=>url==='./www/Items/'+slug+'.webp').length,1,slug+' invalidé une fois');
   }
 });
 

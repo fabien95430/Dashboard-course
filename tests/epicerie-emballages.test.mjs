@@ -25,10 +25,3 @@ test('les riz et les pâtes existants restent des fichiers individuels du catalo
   const source=readFileSync(new URL('../product-item-images.js',import.meta.url),'utf8');
   assert.match(source,/return '\.\/www\/Items\/'\+slugify\(name\)\+'\.webp';/);
 });
-
-test('seuls les nouveaux WebP remplacés sont invalidés dans le cache visuel',()=>{
-  const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
-  assert.match(sw,/const UPDATED_ITEM_VISUALS=/);
-  assert.match(sw,/UPDATED_ITEM_VISUALS\.map\(src=>cache\.delete\(src\)\)/);
-  assert.doesNotMatch(sw,/UPDATED_ITEM_VISUALS=[^\n]*(?:riz-(?!au-lait\.webp)|spaghetti|penne\.webp)/);
-});

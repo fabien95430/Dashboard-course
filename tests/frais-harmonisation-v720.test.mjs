@@ -44,8 +44,7 @@ test('Frais classe les nouveaux produits sans perdre les références existantes
 // historiques de v720 restent en 256px et conservent la même validation stricte.
 const regeneratedV732=new Set(['glace-vanille','feta','burrata','ricotta','gouda','yaourt-a-boire','gnocchis']);
 
-test('22 photos Frais sont des WebP transparents individuels conformes et invalidés',()=>{
-  const sw=read('sw.js');
+test('22 photos Frais sont des WebP transparents individuels conformes',()=>{
   for(const [name,slug] of expected){
     assert.ok(list.includes(name),'Produit absent: '+name);
     const relative='www/Items/'+slug+'.webp';
@@ -58,7 +57,6 @@ test('22 photos Frais sont des WebP transparents individuels conformes et invali
     assert.ok((data[20]&0x10)!==0,'Fond transparent absent: '+relative);
     assert.equal(data.readUIntLE(24,3)+1,regeneratedV732.has(slug)?384:256,relative);
     assert.equal(data.readUIntLE(27,3)+1,regeneratedV732.has(slug)?384:256,relative);
-    assert.ok(sw.includes('./'+relative),'Cache visuel non invalidé: '+relative);
   }
 });
 

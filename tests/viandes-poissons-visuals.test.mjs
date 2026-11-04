@@ -31,13 +31,3 @@ test('les illustrations distinctes ne réutilisent plus les anciens visuels',()=
     assert.notDeepEqual(changed,existing,replaced+' doit être distinct de '+reference);
   }
 });
-
-test('le service worker invalide exactement les nouveaux visuels de Viandes & poissons',()=>{
-  const sw=readFileSync(resolve(root,'sw.js'),'utf8');
-  const match=sw.match(/const UPDATED_ITEM_VISUALS=(\[[^\n]+\]);/);
-  assert.ok(match,'liste des visuels mis à jour');
-  const items=JSON.parse(match[1]);
-  for(const slug of Object.values(filenames)){
-    assert.equal(items.filter(item=>item==='./www/Items/'+slug+'.webp').length,1,slug+' invalidé une fois');
-  }
-});

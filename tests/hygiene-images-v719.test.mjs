@@ -4,7 +4,6 @@ import test from 'node:test';
 
 const root=new URL('../',import.meta.url);
 const catalog=readFileSync(new URL('catalog.js',root),'utf8');
-const sw=readFileSync(new URL('sw.js',root),'utf8');
 const names=[
   ['Disques coton','disques-coton.webp'],
   ['Gel hydroalcoolique','gel-hydroalcoolique.webp'],
@@ -26,6 +25,5 @@ test('les trois produits Hygiène & soins conservent leur identité et leur WebP
     assert.ok((data[20]&0x10)!==0,'Alpha absent: '+file);
     assert.equal(data.readUIntLE(24,3)+1,384,'Largeur incorrecte: '+file);
     assert.equal(data.readUIntLE(27,3)+1,384,'Hauteur incorrecte: '+file);
-    assert.ok(sw.includes('./www/Items/'+file),'Invalidation SW absente: '+file);
   }
 });

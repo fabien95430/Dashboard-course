@@ -31,18 +31,6 @@ test('le conditionnement et la référence HA restent inchangés',()=>{
   assert.match(app,/todo\.courses/);
 });
 
-test('le cache invalide les visuels modifiés en conservant Bolognaise',()=>{
-  const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
-  const line=sw.split('\n').find(line=>line.startsWith('const UPDATED_ITEM_VISUALS='));
-  assert.ok(line);
-  const assets=JSON.parse(line.split('=')[1].replace(/;$/,''));
-  assert.ok(assets.length>=14);
-  assert.equal(new Set(assets).size,assets.length);
-  for(const name of ['bolognaise','cereales','the-noir','granola','pistaches','speculoos']){
-    assert.ok(assets.includes('./www/Items/'+name+'.webp'),'Visuel à invalider absent : '+name);
-  }
-});
-
 test('les trois vues et le cache référencent la même version courante',()=>{
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
   const sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');

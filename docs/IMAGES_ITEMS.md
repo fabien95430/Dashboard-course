@@ -163,7 +163,7 @@ Si le produit existe déjà dans `catalog.js` :
 4. contrôler visuellement le résultat ;
 5. remplacer uniquement `www/Items/<slug>.webp` ;
 6. appliquer l’incrément de version globale et de cache exigé par `AGENTS.md` pour toute modification visuelle ;
-7. conserver la logique de cache actuelle et ne pas ajouter de mécanisme spécial par produit sans nécessité ;
+7. conserver la logique de cache actuelle et ne pas ajouter de mécanisme spécial par produit sans nécessité : ne jamais lister de visuels à effacer dans `sw.js` (liste `UPDATED_ITEM_VISUALS` retirée en v753, elle grossissait à chaque version et faisait re-télécharger toutes les vignettes). Une image remplacée est revérifiée par le service worker et s'affiche au plus tard à l'ouverture suivante ;
 8. vérifier Catalogue, Ma liste, affichage compact, mobile et hors ligne.
 
 Une simple régénération visuelle ne doit pas modifier `catalog.js`, Home Assistant, OAuth, WebSocket, le coffre chiffré, le verrouillage ou la biométrie.
