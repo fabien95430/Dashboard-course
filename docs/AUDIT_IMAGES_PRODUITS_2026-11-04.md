@@ -93,3 +93,22 @@ Les dix fichiers satisfont la limite de 15 000 octets. Le validateur des prochai
 37 variantes refaites sur les deux références Mayonnaise/Paprika, 39 fichiers de famille sous 15 000 octets chacun. Voir [le relevé détaillé](HARMONISATION_SAUCES_EPICES_2026-11-04.md). Les fichiers sources de Mayonnaise et Paprika v740 sont conservés.
 
 Vanille rejoint les corrections de contour réalisées : sur les 33 constats v739, Jus d’ananas a été corrigé en v740 et Vanille en v741 ; il reste **31 contours** de cette liste. Chili a désormais son bocal d'assaisonnement fermé avec marge ; les deux autres cas de marge à revoir sont Vinaigre de vin et Rosette. Les cinq fichiers du précédent lot de neuf dépassant 15 Ko restent un sujet distinct, sauf Tapenade qui est remplacée et passe sous la limite avec ce lot.
+
+## Suivi du lot contours v742
+
+Source relue : `49f19a5e8951089a1e25e65491ac2c897cff3001`. Dix corrections : six pains/tortillas et Brie, Cheddar, Chèvre, Emmental. Références de style : Pain et Gouda ; produits conservés sans emballage ajouté. Génération par édition des images avec ces références, suppression du liseré externe en conservant les croûtes naturelles, transparence et marges.
+
+| Fichier | Octets |
+| --- | ---: |
+| `baguette.webp` | 13684 |
+| `pain-aux-cereales.webp` | 14824 |
+| `pain-complet.webp` | 14096 |
+| `pain-de-mie.webp` | 14362 |
+| `pains-burger.webp` | 13848 |
+| `tortillas.webp` | 13792 |
+| `brie.webp` | 13810 |
+| `cheddar.webp` | 14604 |
+| `chevre.webp` | 14664 |
+| `emmental.webp` | 14968 |
+
+10/10 sous 15 000 octets. Revue des WebP sur fonds clair/foncé à 192 et 48 px, calcul réel du cadrage exécuté, migration v741/v742 vérifiée. Catalogue, fallback SVG et logique réseau du service worker inchangés. Pas de test interactif iPhone ou Home Assistant réel. Il reste **21 contours** de la liste initiale, ainsi que les deux cas de marge Vinaigre de vin et Rosette.
