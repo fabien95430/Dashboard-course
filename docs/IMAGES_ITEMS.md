@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — confitures
+
+Référence de famille : Confiture fraise, bocal haut à facettes arrondies, couvercle vichy rouge/blanc fermé, étiquette crème ronde décorative à double filet rouge discret, nom du fruit en cursive rouge et fruit imprimé. Confiture mirabelles reprend exactement la forme, le couvercle, l’étiquette et l’échelle de Fraise, avec confiture ambrée épaisse à morceaux, sans eau transparente ni fruits crus flottants en sirop. Changer seulement le fruit, la couleur naturelle et sa désignation générique ; aucune marque inventée ou fruit physique autour. Ne pas appliquer le bocal Mayonnaise aux confitures. Fraise déjà cohérente est conservée, avec compression si nécessaire ; poids maximal 15 000 octets après encodage et contrôle clair/foncé.
+
 ## Conditionnement fidèle — pâtes à tarte
 
 Pâte brisée représente l’ingrédient cru à dérouler : rouleau de pâte beige ivoire avec papier cuisson visible à une extrémité, dans un emballage transparent fermé, de proportions proches de Pâte à pizza. Jamais un fond de tarte formé/cuit, moule cannelé, quiche ou garniture. Garder le bord spiralé lisible et tout le rouleau visible, sans sol ni ombre externe. Cette règle ne change pas la pâte feuilletée crue pliée déjà validée ni les noms, catégories ou unités de recette. Poids final maximal : 15 000 octets.

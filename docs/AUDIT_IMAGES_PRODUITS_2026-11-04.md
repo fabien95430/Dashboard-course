@@ -560,3 +560,20 @@ WebP final sous 15 000 octets, transparence réelle et marges régulières. Comp
 Consignes et prompt automatique complétés. Noms/groupes du catalogue, unités de recette et mode Pièce de Pâte brisée, fallback SVG, logique réseau du service worker, cache persistant, badge court, Home Assistant, sécurité et mode test inchangés. Aucun test modifié.
 
 Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Confitures.
+
+## Confitures — v766
+
+Source relue : main `0d5a8142987f3318046a0a0f67d607ccc3e8a30f` (v765). Deux produits examinés ensemble : Confiture fraise et Confiture mirabelles. Les deux fichiers dépassaient 15 000 octets.
+
+Fraise est conservée comme référence visuelle : bocal haut à facettes arrondies, couvercle fermé vichy rouge/blanc et étiquette crème ronde décorative, filet rouge, fruit imprimé et désignation en cursive rouge. Son dessin est seulement recadré/redimensionné et réencodé. Mirabelles est éditée avec l’outil image intégré pour reprendre exactement forme, couvercle, étiquette et taille apparente de Fraise, avec désignation Mirabelles et illustration imprimée correspondante. Confiture ambrée épaisse avec morceaux, distincte du rouge de Fraise ; pas de fruits crus entiers dans un sirop clair ni de fruit physique autour. Aucun appel à l’API OpenAI payante du projet.
+
+| Fichier dans `www/Items/` | Avant (octets) | Final (octets) | Canevas |
+| --- | ---: | ---: | ---: |
+| `confiture-fraise.webp` | 50 636 | 14 084 | 256 px |
+| `confiture-mirabelles.webp` | 23 816 | 14 688 | 256 px |
+
+2/2 fichiers sous 15 000 octets mesurés après encodage. Contrôle des fichiers finaux sur fonds clair/foncé à 160 et 48 px avec cadrage automatique : hauteurs identiques, écart de largeur visible inférieur à 0,004 de la boîte image. Alpha réel, marges, lisibilité des étiquettes et contours préservés. Calcul réel Ma liste/Catalogue sans rognage et migration v765/v766 des deux cadrages vérifiés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés : référence Fraise, confitures distinctes des sauces Mayonnaise. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Aucun test modifié.
+
+Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Sauces & condiments.
