@@ -396,3 +396,21 @@ Cinq éditions/générations avec l’outil image intégré, un recadrage/redime
 Les six fichiers finaux respectent 15 000 octets, avec transparence réelle et marges. Les images encodées sont comparées sur fonds clair/foncé à 160 et 48 px avec le zoom et le décalage calculés selon le code réel ; comparaison avec Nature, Grecs, Skyr, Brie et Conchiglie. Mesures d’échelle anciennes/nouvelles vérifiées, aucun rognage dans les boîtes Ma liste/Catalogue. Migration v758/v759 vérifiée pour les six cadrages, autres produits conservés. Aucun essai interactif iPhone ou Home Assistant réel.
 
 Validation : 349/349 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA et sécurité inchangés ; aucune nouvelle liste de visuels dans sw.js. La catégorie Conserves reste en attente après cette reprise Frais.
+
+## Séparation des deux familles de yaourts — v760
+
+Source relue : main `2361d2f4c9711088c1d0d1b17f330d4e93469e67` (v759). Clarification utilisateur : Nature, Grecs et Skyr gardent le modèle crème/bleu ; les autres yaourts doivent suivre l’ancien Vanille. La généralisation v759 du décor bleu à Yaourt, Fruits et Vanille est donc annulée.
+
+Référence exacte : `yaourts-vanille.webp` du commit v758 `39407f9a3be2d44e1a5091c3a4cd920a34aa8dd0`, restauré sans modification d’octets. Petit pot individuel blanc légèrement évasé avec opercule souple carré fermé, crème doré et fleur/gousse de vanille imprimées. Deux variantes générées avec l’outil image intégré : Yaourt blanc, opercule argent et vague bleu pâle sans parfum ; Fruits rose pâle avec fraise imprimée. Aucun texte, couvercle rond rigide ou décor botanique bleu dans ces trois pots.
+
+| Fichier dans `www/Items/` | Final (octets) | Action |
+| --- | ---: | --- |
+| `yaourt.webp` | 14 216 | Pot avec opercule assorti à Vanille |
+| `yaourts-fruits.webp` | 12 558 | Pot avec opercule et fraise imprimée |
+| `yaourts-vanille.webp` | 13 510 | Restauration exacte du Vanille v758 |
+
+Les trois fichiers sont sous 15 000 octets, transparents et lisibles. Comparaison visuelle sur fonds clair/foncé à 160 et 48 px avec le cadrage automatique : hauteur et largeur de Yaourt et Fruits à moins de 0,025 de celles de Vanille dans la boîte image. Pas de rognage dans les boîtes Ma liste/Catalogue. Nature, Grecs, Skyr, Fromage blanc, Gouda, Gnocchis et Mascarpone vérifiés identiques octet par octet à main v759.
+
+Consigne et prompt automatique remplacés pour conserver cette séparation des familles. Noms/groupes du catalogue, fallback SVG, cache visuel persistant, badge court, logique réseau du service worker, HA, sécurité et mode test inchangés. Migration v759/v760 vérifiée pour les trois cadrages seulement. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Validation : 349/349 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Conserves reste en attente.
