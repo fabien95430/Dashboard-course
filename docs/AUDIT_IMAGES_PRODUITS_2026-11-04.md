@@ -230,3 +230,29 @@ Source relue : `3153134083e66f7c81e9bea04234ea57733a9973`. Les cinq produits ali
 Les noms/groupes du catalogue, fallback SVG, logique réseau du service worker et invariants Home Assistant/sécurité sont conservés. Version globale et chargements mis à jour selon les conventions du dépôt. Aucun essai interactif iPhone ou Home Assistant réel. La règle des vinaigres est enregistrée dans IMAGES_ITEMS.md et le prompt automatique pour éviter le retour de la carafe rognée et préserver les deux sous-familles huiles/vinaigres.
 
 Validation v749 : 350/350 tests Node réussis, 25 fichiers JavaScript et compilation Python valides, `git diff --check` sans erreur. Le validateur Bash est inchangé ; ses mêmes contrôles ont été lancés séparément car `/dev/fd` est absent de cet environnement.
+
+## Revue complète des charcuteries v750
+
+Source relue : `b2548c49281dbf6aee1fcef604695ef9aecefe95`. Les treize charcuteries du catalogue ont été comparées. Bacon, Chorizo, Jambon blanc et Jambon cru restent conservés, déjà corrigés et sous la limite. Parmi les neuf autres, trois représentations sont refaites : Rosette (marges insuffisantes et plusieurs gros segments), Pâté (ancienne vignette 84 px en pot à fermeture mécanique), Blanc de poulet (persil décoratif ajouté). Coppa, Lardons, Mortadelle, Peperroni et Rillettes conservent leur représentation et reçoivent un encodage optimisé. Le contrôle final a révélé un halo gris de sol sous Saucisson : il est supprimé par édition avec l’outil de génération, puis la variante est encodée et contrôlée de nouveau.
+
+Rosette reprend le rendu des saucissons secs tout en gardant son identité : coupe rosée à gros grains de gras blanc, boyau à fleur naturelle, un saucisson et deux tranches avec marge. Le blanc naturel du boyau n’est pas un liseré externe à effacer. Blanc de poulet reste une charcuterie en tranches cuites ivoire à bord doré, sans persil ; aucun filet cru ajouté. Pâté reprend le bocal fermé à couvercle doré des Rillettes, avec texture dense finement hachée distincte de leurs fibres. Les préparations en bocal ne reprennent pas le modèle des sauces Mayonnaise. Les différences naturelles entre charcuteries sont conservées plutôt qu’une présentation unique imposée à tous les produits.
+
+Le déploiement v749 précédemment bloqué par une erreur serveur GitHub Pages 502 a finalement réussi après relance (tentative 3). Cette résolution ne nécessite aucun nouveau commit pour v749.
+
+| Produit | Octets finaux | Dimensions |
+| --- | ---: | --- |
+| Rosette | 13 946 | 256 × 256 |
+| Pâté | 14 956 | 320 × 320 |
+| Blanc de poulet | 14 998 | 384 × 384 |
+| Coppa | 14 130 | 192 × 192 |
+| Lardons | 14 634 | 256 × 256 |
+| Mortadelle | 14 226 | 256 × 256 |
+| Peperroni | 14 700 | 256 × 256 |
+| Rillettes | 13 850 | 192 × 192 |
+| Saucisson | 14 656 | 384 × 384 |
+
+9/9 WebP modifiés sous 15 000 octets. Coppa et Rillettes ont nécessité une résolution de 192 px pour conserver les sources détaillées sous cette limite ; leur lisibilité a été examinée à 192 et 48 px, sans cacher cette réduction. Les autres fichiers ont 256, 320 ou 384 px. Blanc de poulet et Saucisson conservent le canevas 384 px imposé par les tests historiques, sans modifier ces tests ; Saucisson utilise une marge plus large et le cadrage automatique existant. Contrôle de la représentation, des couleurs naturelles, des accessoires, des textures de famille, de la transparence et des marges. Revue des neuf fichiers sur fonds clair/foncé ; Saucisson contrôlé à nouveau après retrait du halo. Le dernier cas de marge historique, Rosette, est corrigé : les trois cas Chili/Vinaigre de vin/Rosette ont désormais été traités, ce qui ne vaut pas validation complète du reste du catalogue.
+
+Calcul réel de cadrage Ma liste/Catalogue et migration v749/v750 contrôlés sur les pixels finaux. Les autres cadrages, noms/groupes du catalogue, fallback SVG, logique réseau du service worker et invariants HA/sécurité sont conservés. Aucun essai interactif iPhone ou Home Assistant réel. Les consignes de charcuterie sont ajoutées à IMAGES_ITEMS.md et au prompt automatique. Les treize fichiers de cette famille sont maintenant sous 15 000 octets, y compris les quatre fichiers conservés.
+
+Validation v750 : 350/350 tests Node réussis, syntaxe des 25 fichiers JavaScript et compilation Python valides, `git diff --check` sans erreur. Les contrôles du validateur Bash ont été exécutés séparément car `/dev/fd` est absent de cet environnement ; script et tests historiques conservés.
