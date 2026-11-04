@@ -544,3 +544,19 @@ Cohérence de famille : paquets de pâtes beiges à grande fenêtre et formes di
 Consignes et prompt automatique complétés. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Invalidation Quinoa bornée aux versions d’application v764 et suivantes afin de préserver le comportement historique v722/v723 testé. Empreinte d’intégrité Git de Quinoa actualisée ; les douze autres empreintes, les dimensions 384 px et toutes les assertions du test restent conservées. Aucun autre test modifié.
 
 Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Pâtes à tarte.
+
+## Pâtes à tarte — v765
+
+Source relue : main `efef109515685b7ab3833fb48d50bb7acea71bb1` (v764). Le sous-groupe Épicerie → Pâtes à tarte contient Pâte brisée uniquement. Revue avec Pâte à pizza et Pâte feuilletée comme références de pâtes crues, sans déplacement de catégorie.
+
+La source Pâte brisée représentait un fond de tarte cannelé déjà formé. Elle est remplacée par l’ingrédient cru en rouleau beige ivoire, papier cuisson et bord spiralé visibles, emballage transparent fermé, dans la famille du rouleau de Pâte à pizza. Pas de moule, assiette, croûte cuite ou garniture. Génération avec l’outil image intégré, aucun appel à l’API OpenAI payante du projet. Pâte à pizza et Pâte feuilletée sont conservées, vérifiées identiques octet par octet à main.
+
+| Fichier dans `www/Items/` | Avant (octets) | Final (octets) | Canevas |
+| --- | ---: | ---: | ---: |
+| `pate-brisee.webp` | 26 696 | 11 130 | 320 px |
+
+WebP final sous 15 000 octets, transparence réelle et marges régulières. Comparaison clair/foncé à 160 et 48 px avec cadrage automatique : proportions proches de Pâte à pizza, emballage entier et bord spiralé lisible. Calcul réel Ma liste/Catalogue sans rognage ; migration v764/v765 vérifiée pour ce seul cadrage. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés. Noms/groupes du catalogue, unités de recette et mode Pièce de Pâte brisée, fallback SVG, logique réseau du service worker, cache persistant, badge court, Home Assistant, sécurité et mode test inchangés. Aucun test modifié.
+
+Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Confitures.

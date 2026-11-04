@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — pâtes à tarte
+
+Pâte brisée représente l’ingrédient cru à dérouler : rouleau de pâte beige ivoire avec papier cuisson visible à une extrémité, dans un emballage transparent fermé, de proportions proches de Pâte à pizza. Jamais un fond de tarte formé/cuit, moule cannelé, quiche ou garniture. Garder le bord spiralé lisible et tout le rouleau visible, sans sol ni ombre externe. Cette règle ne change pas la pâte feuilletée crue pliée déjà validée ni les noms, catégories ou unités de recette. Poids final maximal : 15 000 octets.
+
 ## Conditionnement fidèle — pâtes, riz et céréales
 
 Préserver les paquets de pâtes beiges à grande fenêtre et discrète zone supérieure, sans nom ajouté. Le contenu doit correspondre à la forme exacte : coquilles, coudes, nœuds, spirales, tubes, plaques, rubans, nids ou fils fins. Les riz gardent le paquet bleu à grande fenêtre et petite zone beige en bas, avec grains longs/ronds et couleurs naturelles propres à chaque variété ; ne pas recolorer le riz. Polenta et Quinoa gardent leur sachet crème/ocre, Boulgour et Semoule leurs sacs kraft/crème déjà validés, sans bol réel ou céréales en vrac à côté. Ne pas régénérer ces références uniquement pour uniformiser les conditionnements. Conserver proportions, marges, lisibilité et poids final de 15 000 octets maximum.
