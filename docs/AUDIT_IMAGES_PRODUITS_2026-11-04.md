@@ -353,3 +353,22 @@ Les dix WebP de la catégorie sont sous 15 000 octets, poids finaux mesurés. Al
 Catalogue (noms/groupes), fallback SVG et logique réseau du service worker inchangés. Seuls les cadrages des huit fichiers remplacés sont invalidés ; cache visuel persistant et badge court préservés. Aucun changement HA, OAuth, WebSocket, coffre, verrouillage, biométrie ou mode test. Consignes enregistrées dans IMAGES_ITEMS.md et dans le prompt automatique : sachets bleus à flocon blanc opaque et contenu distinct, pots et bâtonnet de glace préservés.
 
 Validation : 349/349 tests réussis, syntaxe JavaScript, compilation Python et `git diff --check` valides. Validateur Bash inchangé ; mêmes contrôles exécutés séparément car `/dev/fd/63` indisponible. Prochaine catégorie à examiner : Traiteur frais.
+
+## Traiteur frais — v758
+
+Source relue : main `80804f0c2989a8eed7621403c023711d1a454c0c` (v757). Quatre produits de catalog.js examinés ensemble : Gnocchis, Pâte à pizza, Pâtes fraîches et Quiche.
+
+Cohérence : Gnocchis régénérés avec l’outil image natif, en conservant les gnocchis nature striés et en retirant le basilic et le disque/support beige ; présentation du produit seul harmonisée sur Pâtes fraîches. Aucun emballage unique imposé à cette catégorie hétérogène : rouleau emballé de Pâte à pizza, nid de Pâtes fraîches et Quiche entière déjà cohérents, conservés. Quiche réencodée sans modification du sujet. Aucun appel à l’API OpenAI payante du projet.
+
+| Fichier dans `www/Items/` | Avant (octets) | Final (octets) | Action |
+| --- | ---: | ---: | --- |
+| `gnocchis.webp` | 21 434 | 14 372 | Retrait garniture/support ; WebP 384 px |
+| `quiche.webp` | 28 530 | 14 738 | Compression ; WebP 256 px |
+| `pate-a-pizza.webp` | 6 384 | 6 384 | Conservé |
+| `pates-fraiches.webp` | 14 996 | 14 996 | Conservé |
+
+Les quatre fichiers respectent la limite de 15 000 octets, mesurée après encodage. Contours, vraie transparence, marges et lisibilité des deux fichiers modifiés revus sur fonds clair/foncé à 192 et 48 px. Cadrage réel Ma liste/Catalogue calculé avec le code existant, sans rognage ; migration du cache v757 vers v758 vérifiée et cadrages des autres produits conservés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique actualisés pour préserver les présentations distinctes et exclure les garnitures/supports des Gnocchis. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, OAuth, WebSocket, coffre, verrouillage, biométrie et mode test inchangés. Invalidation des seuls cadrages Gnocchis/Quiche, aucune liste de visuels ajoutée dans sw.js.
+
+Validation : 349/349 tests réussis, syntaxe JavaScript, compilation Python et `git diff --check` valides. Validateur Bash inchangé ; mêmes contrôles exécutés séparément car `/dev/fd/63` indisponible. Prochaine catégorie à examiner : Conserves.

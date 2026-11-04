@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — traiteur frais
+
+Conserver les présentations propres des quatre produits : Gnocchis nature seuls en petit amas, sans basilic, sauce, support ou disque de service ; Pâtes fraîches en nid nature ; Pâte à pizza en rouleau emballé transparent ; Quiche entière dorée sans assiette. Les Gnocchis reprennent le rendu sobre des Pâtes fraîches, sans les transformer en pâtes longues. Ne pas imposer un même emballage à toute la catégorie ni ajouter une garniture pour remplir une vignette. Préserver les visuels déjà corrects, les marges et la limite finale de 15 000 octets.
+
 ## Conditionnement fidèle — surgelés
 
 Pour les sachets de Surgelés, la référence est `haricots-verts-surgeles.webp` : sachet large fermé, bandeau bleu glacier courbe, petit flocon blanc opaque, grande fenêtre transparente et bas bleu. Conserver le contenu naturel distinct : épinards en feuilles, haricots, petits pois, mélange de légumes, poêlée, frites pâles non cuites ou glaçons. Ne pas imposer ce sachet aux glaces : Chocolat et Vanille conservent leurs pots fermés et leurs couleurs propres ; Nuii reste un seul bâtonnet enrobé avec sa morsure, sans traînées horizontales ou ombre externe. Le flocon ne doit pas être un trou transparent. Vérifier les marges, contours et poids après encodage, sur fond clair et foncé.
