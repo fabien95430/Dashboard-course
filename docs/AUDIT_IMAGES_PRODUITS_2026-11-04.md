@@ -598,3 +598,50 @@ Génération avec l’outil image intégré, sans API OpenAI payante du projet. 
 Les sept fichiers sont mesurés après encodage, tous sous 15 000 octets ; alpha réel, objet entier et marges préservés. Revue des neuf produits sur fonds clair/foncé à 160 et 48 px : hauteurs identiques, différence maximale de largeur apparente inférieure à 0,012 de la boîte image. Calcul réel de measureVisualScale exécuté pour les sept ajouts : pas de rognage dans Ma liste ou Catalogue. Aucun essai interactif iPhone ou session Home Assistant réelle.
 
 Deux nouveaux tests vérifient l’unicité/classement des neuf confitures, le mode Pot et l’existence des WebP transparents sous 15 Ko. Résultat : 353/353 tests réussis ; syntaxe JavaScript, compilation Python et git diff --check réussis. Validateur Bash inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible dans cet environnement. Consignes et prompt automatique de confiture étendus à tous les parfums. Architecture, Home Assistant, OAuth, WebSocket, coffre, verrouillage/biométrie, mode test, cadrage automatique, fallback SVG et logique réseau/cache persistant du service worker inchangés. Versions et URLs de chargement synchronisées en v767. Suite de l’audit : Sauces & condiments.
+
+
+## Sauces & condiments — v768
+
+Source relue : main `67247ed96b052c96dda2ecbef65c6442200ef804` (v767). Audit des 33 produits : sujet, texture, conditionnement, palette, proportions, étiquettes, contours et poids. Les 27 sauces/préparations suivent déjà le modèle Mayonnaise validé : bocal fermé, couvercle doré et étiquette crème centrale à filet fin. Leurs couleurs naturelles et textures restent distinctes. Les deux huiles gardent leurs flacons à anse et bouchon vert ; les trois vinaigres leur bouteille élancée avec fruit imprimé. Les cornichons restent dans leur bocal haut transparent, couvercle vert, saumure et cornichons entiers visibles ; ne pas leur appliquer le modèle Mayonnaise.
+
+32 fichiers conformes sont conservés octet par octet. Cornichon, seul fichier trop lourd, est uniquement recadré/redimensionné et réencodé : 43 096 → 13 598 octets, WebP RGBA 256 px. Aucun visuel généré, aucune retouche des pixels ou de l’alpha source. Contrôle clair/foncé, vues 192/48 px, marges et objet entier préservés. Exécution du cadrage automatique réel : pas de rognage Ma liste/Catalogue. Migration v767/v768 : seul le cadrage Cornichon est recalculé, les autres entrées sont conservées.
+
+| Produit | Fichier dans `www/Items/` | Poids final (octets) |
+| --- | --- | ---: |
+| Bolognaise | `bolognaise.webp` | 14 824 |
+| Cornichon | `cornichon.webp` | 13 598 |
+| Huile d'olive | `huile-d-olive.webp` | 14 144 |
+| Huile de tournesol | `huile-de-tournesol.webp` | 14 920 |
+| Ketchup | `ketchup.webp` | 14 500 |
+| Mayonnaise | `mayonnaise.webp` | 12 918 |
+| Moutarde | `moutarde.webp` | 14 416 |
+| Pesto | `pesto.webp` | 14 688 |
+| Sauce aigre-douce | `sauce-aigre-douce.webp` | 14 346 |
+| Sauce algérienne | `sauce-algerienne.webp` | 14 292 |
+| Sauce andalouse | `sauce-andalouse.webp` | 14 744 |
+| Sauce au poivre | `sauce-au-poivre.webp` | 13 808 |
+| Sauce au roquefort | `sauce-au-roquefort.webp` | 13 622 |
+| Sauce aux champignons | `sauce-aux-champignons.webp` | 14 960 |
+| Sauce barbecue | `sauce-barbecue.webp` | 14 000 |
+| Sauce Béarnaise | `sauce-bearnaise.webp` | 14 944 |
+| Sauce blanche | `sauce-blanche.webp` | 12 698 |
+| Sauce burger | `sauce-burger.webp` | 13 780 |
+| Sauce César | `sauce-cesar.webp` | 14 954 |
+| Sauce curry | `sauce-curry.webp` | 14 530 |
+| Sauce hollandaise | `sauce-hollandaise.webp` | 14 780 |
+| Sauce miel-moutarde | `sauce-miel-moutarde.webp` | 13 668 |
+| Sauce napolitaine | `sauce-napolitaine.webp` | 14 348 |
+| Sauce ranch | `sauce-ranch.webp` | 14 892 |
+| Sauce samouraï | `sauce-samourai.webp` | 14 272 |
+| Sauce soja | `sauce-soja.webp` | 14 120 |
+| Sauce tartare | `sauce-tartare.webp` | 14 044 |
+| Sauce teriyaki | `sauce-teriyaki.webp` | 13 754 |
+| Sauce tomate | `sauce-tomate.webp` | 14 540 |
+| Tabasco | `tabasco.webp` | 13 858 |
+| Vinaigre balsamique | `vinaigre-balsamique.webp` | 11 070 |
+| Vinaigre de cidre | `vinaigre-de-cidre.webp` | 10 726 |
+| Vinaigre de vin | `vinaigre-de-vin.webp` | 12 420 |
+
+33/33 images sous 15 000 octets, poids finaux mesurés. Consignes et prompt automatique complétés pour préserver le conditionnement des cornichons et distinguer huiles/vinaigres des sauces. Aucun nom, groupe ou mode d’achat modifié. Le catalogue reste identique, ainsi que fallback SVG, logique du service worker, cache persistant, Home Assistant, OAuth, WebSocket, coffre chiffré, verrouillage/biométrie, mode test et styles mobiles. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Validation : 353/353 tests réussis, syntaxe JavaScript, compilation Python, calcul de cadrage et git diff --check réussis. Aucun test modifié. Le validateur Bash reste inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Version globale v768, URLs de chargement synchronisées ; module quantités inchangé conservé en v767. Prochaine catégorie : Sauces sucrées.

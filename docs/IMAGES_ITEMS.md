@@ -167,6 +167,10 @@ Pour **toutes les sauces** présentes dans `catalog.js`, imposer un **pot ou boc
 
 Cette consigne concerne les sauces et les préparations assimilées, **pas les huiles ni les vinaigres** : conserver pour ces derniers un conditionnement adapté à leur nature, sauf instruction ultérieure spécifique.
 
+## Conditionnement fidèle — cornichons, huiles et vinaigres
+
+Cornichon garde son bocal haut transparent fermé à couvercle vert, avec cornichons entiers et saumure visibles, sans lui appliquer le bocal Mayonnaise ou une étiquette de sauce. Huiles : préserver les flacons à anse et bouchon vert ; vinaigres : conserver les bouteilles élancées et les illustrations imprimées propres au raisin/cidre. Préserver ces références validées et leurs couleurs naturelles ; réencoder si nécessaire sous 15 000 octets, puis vérifier marges et contours clair/foncé.
+
 ## Cohérence de tous les pots
 
 Pour **tous les produits dont le conditionnement imposé est un pot** (crèmes épaisses, crème fraîche, épices, sauces et préparations assimilées), représenter **un seul pot fermé**, isolé et centré, avec un **couvercle clairement visible**. Conserver un style **3D semi-réaliste premium homogène**, des proportions réalistes, une marge transparente régulière et une lisibilité nette à **192 × 192 px**. À l'intérieur de la famille sauces, conserver strictement le modèle Mayonnaise ; à l'intérieur de la famille épices, conserver strictement le modèle Paprika. Les pots de crème restent distincts de ces deux familles. Aucune marque, étiquette à texte inventé, décor, cuillère, support ni collage. Rejeter tout visuel qui ne respecte pas le bon pot, la bonne étiquette ou le contenu exact du produit.
