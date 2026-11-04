@@ -478,3 +478,26 @@ Contours : Bouillon cubes garde sa boîte crème/ocre et ses illustrations impri
 Consignes et prompt automatique complétés. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Aucune liste de visuels introduite dans sw.js. Les deux empreintes Git de Bouillon/Nouilles instantanées dans le test historique d’intégrité sont actualisées pour les fichiers remplacés ; les onze autres empreintes, les dimensions imposées, les contrôles alpha et toutes les assertions restent conservés.
 
 Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Pâtisserie & cuisine.
+
+## Pâtisserie & cuisine — v763
+
+Source relue : main `52b2d31793a7ca84fe7dc23ab1a2a116b23760e7` (v762). Quinze produits revus ensemble : six fichiers modifiés, neuf conservés (Amandes en poudre, Chapelure, Farine, Levure boulangère, Maïzena, Noix de coco râpée, Pâte feuilletée, Pépites chocolat, Vanille).
+
+Cohérence complète : Gélatine conserve sa boîte crème/ocre et son pictogramme de flan, mais les cubes de dessert rouges avec assiette sont remplacés par une illustration imprimée de feuilles de gélatine sèches translucides en éventail. La représentation montre ainsi l’ingrédient. Édition avec l’outil image intégré, aucun appel à l’API OpenAI payante du projet.
+
+Les cinq autres fichiers sont seulement recadrés/redimensionnés et réencodés : Amandes entières reste nature sans bol ; Levure chimique conserve ses sachets ; les trois sucres gardent leurs bocaux en verre, couvercles bois, étiquettes et petits tas déjà validés, sans nouvelle palette imposée. Les poudres restent en sacs kraft/crème, la pâte feuilletée crue pliée, les pépites et coco râpée en sachets, Vanille en bocal à gousses de la famille Paprika. Pas de contenant unique ni de changement du nom ou de catégorie.
+
+| Fichier dans `www/Items/` | Avant (octets) | Final (octets) | Canevas |
+| --- | ---: | ---: | ---: |
+| `gelatine.webp` | 8 966 | 13 632 | 384 px |
+| `amandes.webp` | 62 062 | 14 408 | 256 px |
+| `levure-chimique.webp` | 15 360 | 13 760 | 384 px |
+| `sucre.webp` | 15 118 | 14 474 | 256 px |
+| `sucre-glace.webp` | 16 506 | 14 560 | 256 px |
+| `sucre-roux.webp` | 16 300 | 14 746 | 256 px |
+
+15/15 fichiers sous 15 000 octets après mesure. Revue de toute la catégorie sur fonds clair/foncé à 160 et 48 px, avec les cadrages automatiques existants. Transparence réelle, marges, détails utiles et distinctions cristallisé/poudre/roux préservés. Calcul réel du cadrage des six fichiers modifiés : pas de rognage Ma liste/Catalogue. Migration v762/v763 vérifiée pour les six cadrages seulement. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Aucune liste de visuels introduite dans sw.js. Deux empreintes d’intégrité Git (Gélatine/Levure chimique) actualisées pour les assets remplacés ; toutes les autres empreintes et assertions de dimensions, transparence et intégrité du test historique restent conservées.
+
+Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Pâtes, riz & céréales.
