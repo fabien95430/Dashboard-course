@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Conditionnement fidèle — monde et pratique
+
+Ce sous-groupe mélange plusieurs familles : ne pas imposer le même contenant à tous. Bouillon cubes garde sa boîte crème/ocre avec casserole et cubes imprimés, sans rectangle de sol ou ombre externe. Lait de coco reprend la boîte métallique de Pois chiches avec étiquette crème, bandeau sauge, pictogramme coco et illustration de noix de coco imprimée, mais son couvercle doit être une surface argentée continue fermée, jamais un intérieur noir ouvert. Croûtons garde son sachet kraft à grande fenêtre ; Couscous son sachet ocre ; Nouilles chinoises et instantanées leurs paquets crème/ocre distincts ; Purée en flocons son sachet ; Soupes sa brique ; Tortillas sa pile nature. Préserver les pots Mayonnaise/Paprika des sauces et épices déjà validées, leurs couleurs naturelles et leurs différences. Contrôler contours, taille réelle après cadrage et 15 000 octets maximum.
+
 ## Conditionnement fidèle — conserves
 
 Références existantes conservées après revue main v761 : Haricots rouges, Lentilles et Pois chiches. Les neuf boîtes du sous-groupe Conserves sont déjà assorties : métal argenté, couvercle fermé, étiquette crème, bandeau sauge, pictogramme sobre et représentation imprimée du contenu. Conserver les aliments et couleurs naturels distincts ; ne pas transformer la partie illustrée de l’étiquette en fenêtre vitrée ou aliment physique autour. Concentré de tomate garde une petite boîte plus basse. Préserver ces fichiers s’ils restent conformes ; vérifier cadrage, contours clair/foncé et poids final sous 15 000 octets avant tout remplacement. Ne pas appliquer automatiquement cette forme aux poissons en conserve ni aux bocaux de sauces.

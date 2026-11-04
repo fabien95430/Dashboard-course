@@ -457,3 +457,24 @@ Cohérence : boîtes métalliques argentées fermées, étiquette crème, bandea
 Documentation uniquement : aucune image, aucun cadrage, cache, numéro de version ou code de l’application modifié. Catalogue, Home Assistant, sécurité, mode test et mobile conservent exactement l’implémentation v761. La référence de famille est rappelée dans IMAGES_ITEMS.md. Prochaine catégorie à examiner : Monde & pratique.
 
 Validation de cette revue : 351/351 tests réussis, syntaxe JavaScript et `git diff --check` valides. Validateur Bash inchangé ; contrôles exécutés séparément faute de `/dev/fd/63`.
+
+## Monde & pratique — v762
+
+Source relue : main `6f9d0b6592af5429dca75122192ca268ad852157` (application v761). Dix-sept produits examinés ensemble, avec leurs familles propres. Quatre fichiers modifiés et treize conservés : Chili, Couscous, Curcuma, Curry, Guacamole, Harissa, Nouilles chinoises, Paprika, Poivre, Purée en flocons, Sel, Soupes en brique, Tortillas.
+
+Cohérence : Lait de coco reprend le cylindre métallique, l’étiquette crème, le bandeau sauge et le pictogramme des conserves ; l’illustration coco reste imprimée. Le candidat initial paraissait ouvert : corrigé avant intégration pour montrer un couvercle argenté continu fermé avec anneau d’ouverture. Les sauces Guacamole/Harissa gardent le modèle Mayonnaise et les épices Chili/Curcuma/Curry/Paprika/Poivre/Sel gardent leur modèle Paprika. Les paquets de céréales/nouilles, la soupe en brique, la purée en sachet et les tortillas nature conservent leurs présentations distinctes. Aucun contenant unique imposé à cette catégorie hétérogène.
+
+Contours : Bouillon cubes garde sa boîte crème/ocre et ses illustrations imprimées, mais l’ombre/rectangle de sol sous la boîte est retiré par édition image. Croûtons et Nouilles instantanées conservent leurs dessins et sont réencodés sous la limite de poids. Deux visuels édités avec l’outil image intégré, deux compressions de sources ; aucun appel à l’API OpenAI payante du projet.
+
+| Fichier dans `www/Items/` | Avant (octets) | Final (octets) | Canevas |
+| --- | ---: | ---: | ---: |
+| `bouillon-cubes.webp` | 9 754 | 14 870 | 384 px |
+| `lait-de-coco.webp` | 23 434 | 14 570 | 320 px |
+| `croutons.webp` | 25 638 | 14 654 | 256 px |
+| `nouilles-instantanees.webp` | 17 978 | 14 690 | 384 px |
+
+17/17 fichiers sous 15 000 octets après mesures. Les quatre WebP finaux sont revus sur fonds clair/foncé à 160 et 48 px avec le cadrage automatique, avec références Couscous, Nouilles chinoises, Purée, Soupes, Pois chiches, Tortillas, Paprika et Guacamole. Transparence réelle, marges et lisibilité conservées, aucun rognage calculé dans les boîtes Ma liste/Catalogue. Migration v761/v762 vérifiée pour les quatre cadrages, autres produits conservés. Aucun essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés. Noms/groupes du catalogue, fallback SVG, logique réseau du service worker, cache persistant, badge court, HA, sécurité et mode test inchangés. Aucune liste de visuels introduite dans sw.js. Les deux empreintes Git de Bouillon/Nouilles instantanées dans le test historique d’intégrité sont actualisées pour les fichiers remplacés ; les onze autres empreintes, les dimensions imposées, les contrôles alpha et toutes les assertions restent conservés.
+
+Validation : 351/351 tests, syntaxe JavaScript, compilation Python et `git diff --check` réussis. Validateur Bash inchangé ; mêmes contrôles exécutés séparément faute de `/dev/fd/63`. Prochaine catégorie à examiner : Pâtisserie & cuisine.
