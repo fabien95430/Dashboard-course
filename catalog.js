@@ -180,7 +180,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=778';
+    script.src='./runtime-features.js?v=780';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
