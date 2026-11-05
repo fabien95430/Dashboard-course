@@ -1129,3 +1129,9 @@ Tous deux sont des WebP indépendants de **384 × 384 pixels**, transparents (al
 **Visuels :** disparition des bols et tas de produits au profit de sachets kraft/crème avec fenêtre de visualisation et bande ocre pour quinoa, couscous et polenta ; boîtes de conserve aux accents vert sauge pour lentilles, haricots rouges et pois chiches ; emballages fermés pour noix de coco râpée, gélatine, levure chimique, pépites chocolat, bouillon cubes et nouilles. Les 13 images ont été isolées de la **plaquette générée et validée par l'utilisateur**, recadrées et optimisées en WebP RGBA individuels 256 × 256, contrôlées en vignette 192 px. Les détails et empreintes sont consignés dans `docs/IMAGE_CREDITS_V714.md`.
 
 **Cache :** passage global à v714, invalidation ciblée des 13 entrées visuelles anciennes uniquement pendant l'activation du nouveau service worker ; le cache des autres items, les URL des riz et des pâtes et la logique de revalidation persistent. Les compteurs historiques de renouvellement (base 414 produits en v612) ne sont pas recalculés sans audit complet du catalogue courant.
+
+
+
+## Correction v777 — dix sachets sans nom
+
+À la demande utilisateur, les dix noix et fruits séchés emballés du lot v776 conservent le sachet kraft à fenêtre et leur petite icône brune au trait, sans aucun nom ni texte sur le paquet. Retouches par génération d’images ChatGPT intégrée, à partir de chaque WebP v776 ; aucun recours à l’API payante. Les noms du catalogue et conditionnements Sachet restent inchangés. Consigne canonique et prompt automatique corrigés. Images unitaires transparentes, encodage final sous 15 000 octets et revue sur fonds clair/foncé.
