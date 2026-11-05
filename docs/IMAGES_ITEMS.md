@@ -304,7 +304,7 @@ Pour les dix sachets de noix et fruits séchés, reprendre strictement le nouvea
 
 ## Bières : silhouette large et repères sans texte — v780
 
-Pour Bière ambrée, Bière aux fruits, Bière blanche, Bière blonde, Bière brune, Bière IPA, Bière sans alcool, Bière triple et Panaché, utiliser une bouteille de 33 cl trapue à corps large, épaules arrondies et col court. Référence de famille : www/Items/biere-blonde.webp v780. Même silhouette, vue frontale, cadrage et petite étiquette crème basse pour les neuf ; un seul produit, sans nom, lettre, chiffre ou marque. Le liquide reste largement visible. Éviter les anciennes bouteilles fines à longue étiquette dont les variantes étaient illisibles en vignette.
+Pour Bière ambrée, Bière aux fruits, Bière blanche, Bière blonde, Bière brune, Bière IPA, Bière triple et Panaché, utiliser une bouteille de 33 cl trapue à corps large, épaules arrondies et col court. Référence de famille : www/Items/biere-blonde.webp v780. Même silhouette, vue frontale, cadrage et petite étiquette crème basse pour les huit ; un seul produit, sans nom, lettre, chiffre ou marque. Le liquide reste largement visible. Éviter les anciennes bouteilles fines à longue étiquette dont les variantes étaient illisibles en vignette.
 
 | Produit | Liquide | Capsule et pictogramme |
 | --- | --- | --- |
@@ -314,18 +314,13 @@ Pour Bière ambrée, Bière aux fruits, Bière blanche, Bière blonde, Bière br
 | Blanche | Paille trouble | Argenté, épi taupe |
 | Brune | Brun châtaigne | Brun cuivré, épi brun |
 | IPA | Or ambré | Vert foncé, houblon |
-| Sans alcool | Or clair | Bleu pétrole, épi cerclé |
 | Triple | Or soutenu | Bleu royal, trois épis |
 | Panaché | Citron pâle trouble | Jaune, tranche de citron |
 
 Conserver des proportions naturelles, une largeur de corps proche de 40 % de la hauteur, le produit entier à environ 90 % de la hauteur du carré et des marges intactes. Les illustrations sont imprimées sur l'étiquette, jamais des accessoires physiques. WebP unitaires 256 × 256 px, transparence réelle, maximum 15 000 octets mesurés. Contrôler les contours et la reconnaissance à 192 px et 48 px sur fonds clair et foncé. Ce modèle ne s'applique pas automatiquement aux vins, spiritueux ou à Ginger beer.
 
-## Autres corrections boissons — v780
+## Whisky : contraste et liquide ambré — v780
 
-Tonic : bouteille de verre légèrement bleuté, corps un peu plus large, contours bleu-gris visibles sur fond clair, bouchon argenté et petite étiquette crème à icône de bulles ; liquide clair, sans texte. Whisky : conserver le flacon large carré et le bouchon de liège, avec liquide ambré translucide et reflets maîtrisés ; éviter une masse centrale noire.
+Conserver le flacon large carré et le bouchon de liège de Whisky. Représenter un liquide ambré translucide avec des reflets maîtrisés, visible sur fond clair et foncé ; éviter une masse centrale noire. Garder le verre sans texte ou marque, le produit entier, les marges et les dimensions 256 × 256 px. WebP maximal 15 000 octets mesurés, revue à 192 et 48 px.
 
-Jus de poire reprend désormais la silhouette, le bouchon doré et la petite étiquette basse du modèle Jus d'orange v748. Liquide jaune poire clair ; poire entière et moitié imprimées sur l'étiquette uniquement.
-
-Les sirops Grenadine, Menthe et Pêche partagent strictement la bouteille cylindrique de Grenadine v780 : mêmes épaules arrondies, col, bouchon doré, cadrage et verre sans étiquette. Seule la couleur du sirop change : rouge rubis, vert menthe ou orange pêche. Ne pas réintroduire trois silhouettes différentes.
-
-Conserver les dimensions contractuelles : 256 × 256 px pour Tonic, Whisky et Jus de poire ; 384 × 384 px pour les trois sirops. Toujours transparence réelle, produit entier, 15 000 octets maximum et revue à 192/48 px sur fonds clair et foncé.
+Périmètre validé de cette correction : sept bières alcoolisées, Panaché et Whisky uniquement. Bière sans alcool, Tonic, les jus et les sirops conservent leurs visuels précédents.
