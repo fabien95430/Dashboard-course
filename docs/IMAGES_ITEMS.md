@@ -301,3 +301,21 @@ Pour les dix noix et fruits séchés emballés du lot v776, conserver le sachet 
 ## Fenêtre intermédiaire validée — v778
 
 Pour les dix sachets de noix et fruits séchés, reprendre strictement le nouveau modèle Dattes v778 validé par l’utilisateur : fenêtre intermédiaire aux coins arrondis, environ la moitié de la hauteur du sachet, haut de fenêtre vers 40 % de la hauteur et bas vers 92 %. Conserver une bande kraft supérieure visible autour de la petite icône brune au trait, centrée entre fermeture et fenêtre, sans nom, mot, lettre ou texte. La fenêtre trop grande essayée avant validation est rejetée. Même silhouette, zip fermé, kraft/crème, bordures et décoration ocre basse pour les dix ; changer seulement le contenu naturel et l’icône. Cette règle remplace les proportions v776/v777. Référence visuelle prioritaire : www/Items/dattes.webp v778. Poids WebP final maximal 15 000 octets, transparence, marges intactes et revue en vignette sur fonds clair/foncé.
+
+## Bières : silhouette large et repères sans texte — v780
+
+Pour Bière ambrée, Bière aux fruits, Bière blanche, Bière blonde, Bière brune, Bière IPA, Bière sans alcool, Bière triple et Panaché, utiliser une bouteille de 33 cl trapue à corps large, épaules arrondies et col court. Référence de famille : www/Items/biere-blonde.webp v780. Même silhouette, vue frontale, cadrage et petite étiquette crème basse pour les neuf ; un seul produit, sans nom, lettre, chiffre ou marque. Le liquide reste largement visible. Éviter les anciennes bouteilles fines à longue étiquette dont les variantes étaient illisibles en vignette.
+
+| Produit | Liquide | Capsule et pictogramme |
+| --- | --- | --- |
+| Blonde | Or lumineux | Doré, épi |
+| Ambrée | Cuivré | Cuivre, épi |
+| Aux fruits | Rouge framboise | Bordeaux, framboise |
+| Blanche | Paille trouble | Argenté, épi taupe |
+| Brune | Brun châtaigne | Brun cuivré, épi brun |
+| IPA | Or ambré | Vert foncé, houblon |
+| Sans alcool | Or clair | Bleu pétrole, épi cerclé |
+| Triple | Or soutenu | Bleu royal, trois épis |
+| Panaché | Citron pâle trouble | Jaune, tranche de citron |
+
+Conserver des proportions naturelles, une largeur de corps proche de 40 % de la hauteur, le produit entier à environ 90 % de la hauteur du carré et des marges intactes. Les illustrations sont imprimées sur l'étiquette, jamais des accessoires physiques. WebP unitaires 256 × 256 px, transparence réelle, maximum 15 000 octets mesurés. Contrôler les contours et la reconnaissance à 192 px et 48 px sur fonds clair et foncé. Ce modèle ne s'applique pas automatiquement aux vins, spiritueux ou à Ginger beer.

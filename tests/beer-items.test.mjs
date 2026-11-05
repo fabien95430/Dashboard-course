@@ -25,7 +25,7 @@ test('la catégorie bières recense exactement les neuf références validées s
   assert.equal(items.filter(name=>name.startsWith('Bière ')||name==='Panaché').length,9);
 });
 
-test('chaque bière utilise un WebP unitaire 256px, transparent et inférieur à 150 Kio',()=>{
+test('chaque bière utilise un WebP unitaire 256px, transparent et de 15 000 octets maximum',()=>{
   const seen=new Set();
   beers.forEach(([name,slug])=>{
     const path='www/Items/'+slug+'.webp';
@@ -36,7 +36,7 @@ test('chaque bière utilise un WebP unitaire 256px, transparent et inférieur à
     assert.ok(file[20]&0x10,name+' sans canal alpha');
     assert.equal(file.readUIntLE(24,3)+1,256,name+' largeur');
     assert.equal(file.readUIntLE(27,3)+1,256,name+' hauteur');
-    assert.ok(file.length>1000&&file.length<=153600,name+' poids');
+    assert.ok(file.length>1000&&file.length<=15000,name+' poids');
     const key=file.toString('base64');
     assert.ok(!seen.has(key),name+' réutilise un visuel identique');
     seen.add(key);
