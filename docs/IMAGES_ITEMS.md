@@ -296,3 +296,8 @@ Choix explicite utilisateur : TOUS EN SACHETS. Les dix produits emballés Noix d
 ## Correction utilisateur — sachets sans texte, v777
 
 Pour les dix noix et fruits séchés emballés du lot v776, conserver le sachet kraft à fenêtre et uniquement la petite icône brune au trait. Aucun nom, texte ou lettre sur le paquet. Cette règle remplace toute autorisation de nom générique des consignes v775/v776 pour ces dix produits.
+
+
+## Fenêtre intermédiaire validée — v778
+
+Pour les dix sachets de noix et fruits séchés, reprendre strictement le nouveau modèle Dattes v778 validé par l’utilisateur : fenêtre intermédiaire aux coins arrondis, environ la moitié de la hauteur du sachet, haut de fenêtre vers 40 % de la hauteur et bas vers 92 %. Conserver une bande kraft supérieure visible autour de la petite icône brune au trait, centrée entre fermeture et fenêtre, sans nom, mot, lettre ou texte. La fenêtre trop grande essayée avant validation est rejetée. Même silhouette, zip fermé, kraft/crème, bordures et décoration ocre basse pour les dix ; changer seulement le contenu naturel et l’icône. Cette règle remplace les proportions v776/v777. Référence visuelle prioritaire : www/Items/dattes.webp v778. Poids WebP final maximal 15 000 octets, transparence, marges intactes et revue en vignette sur fonds clair/foncé.

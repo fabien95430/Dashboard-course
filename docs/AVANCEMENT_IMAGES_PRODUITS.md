@@ -1135,3 +1135,8 @@ Tous deux sont des WebP indépendants de **384 × 384 pixels**, transparents (al
 ## Correction v777 — dix sachets sans nom
 
 À la demande utilisateur, les dix noix et fruits séchés emballés du lot v776 conservent le sachet kraft à fenêtre et leur petite icône brune au trait, sans aucun nom ni texte sur le paquet. Retouches par génération d’images ChatGPT intégrée, à partir de chaque WebP v776 ; aucun recours à l’API payante. Les noms du catalogue et conditionnements Sachet restent inchangés. Consigne canonique et prompt automatique corrigés. Images unitaires transparentes, encodage final sous 15 000 octets et revue sur fonds clair/foncé.
+
+
+## Lot v778 — fenêtre intermédiaire des dix sachets
+
+Modèle Dattes validé par l’utilisateur après ajustement de la taille de fenêtre : environ la moitié de la hauteur du sachet, bande kraft supérieure autour de la petite icône brune, aucun texte. Les neuf autres visuels reprennent le modèle Dattes comme référence prioritaire et leur contenu/icône v777 comme référence produit. Génération intégrée ChatGPT, sans API payante, puis WebP unitaires 256 px sous 15 000 octets mesurés, revue en vignette sur fonds clair/foncé. Noms, catégories et conditionnement Sachet conservés. Consigne canonique et prompt automatique actualisés dans le même lot.
