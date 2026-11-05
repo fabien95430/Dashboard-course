@@ -115,6 +115,22 @@ const DISPLAY_MODE_BY_SUB=Object.freeze({
 });
 
 const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
+  "Emmental râpé":"Sachet",
+  "Parmesan râpé":"Sachet",
+  "Mozzarella en billes":"Sachet",
+  "Pain de mie complet":"Paquet",
+  "Coulis de tomate":"Pot",
+  "Crème dessert caramel":"Pot",
+  "Confiture pêche":"Pot",
+  "Confiture figue":"Pot",
+  "Jus de poire":"Bouteille",
+  "Petites pâtes bébé":"Paquet",
+  "Purée bébé":"Paquet",
+  "Épinards hachés surgelés":"Sachet",
+  "Liquide vaisselle mains sensibles":"Flacon",
+  "Brossettes interdentaires":"Paquet",
+  "Fil dentaire":"Boîte",
+
   'Raisin':'Poids',
   'Côtes de porc':'Pièce','Escalopes de poulet':'Pièce','Filets de poulet':'Pièce','Merguez':'Pièce','Saucisses':'Pièce','Steaks hachés':'Pièce',
   'Cabillaud':'Pièce','Saumon':'Pièce','Thon frais':'Pièce','Truite':'Pièce',

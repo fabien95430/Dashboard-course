@@ -1,6 +1,6 @@
 # Produits à envisager après l’audit du catalogue
 
-Propositions uniquement : ces produits ne sont pas ajoutés automatiquement. Les noms exacts ont été comparés à catalog.js ; certaines familles disposent déjà d’un produit générique. Éviter les doublons avant validation.
+Les quinze propositions ont été validées par l’utilisateur et sont intégrées en v772. Les noms exacts ont été comparés à catalog.js ; certaines familles disposent déjà d’un produit générique. Éviter les doublons avant validation.
 
 | Priorité | Produit proposé | Catégorie cible | Distinction avec l’existant |
 | --- | --- | --- | --- |
@@ -20,4 +20,4 @@ Propositions uniquement : ces produits ne sont pas ajoutés automatiquement. Les
 | Basse | Brossettes interdentaires | Hygiène & soins / Hygiène | Produit distinct des brosses à dents |
 | Basse | Fil dentaire | Hygiène & soins / Hygiène | Complément absent du catalogue actuel |
 
-Pour les ajouts validés : utiliser les conditionnements de famille existants, un WebP transparent individuel, un poids mesuré de 15 000 octets maximum, un mode d’achat explicite et un contrôle clair/foncé dans Ma liste et Catalogue. Les variantes ne doivent pas déplacer les anciens produits ni modifier les ingrédients des recettes existantes.
+Consignes appliquées aux ajouts validés : utiliser les conditionnements de famille existants, un WebP transparent individuel, un poids mesuré de 15 000 octets maximum, un mode d’achat explicite et un contrôle clair/foncé dans Ma liste et Catalogue. Les variantes ne doivent pas déplacer les anciens produits ni modifier les ingrédients des recettes existantes.

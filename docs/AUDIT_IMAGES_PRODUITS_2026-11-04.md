@@ -726,3 +726,32 @@ Revue complémentaire des catégories Boissons, Fruits & Légumes, Hygiène & so
 Migration de résolution explicite : dix fruits/légumes des tests v733/v736 et cinq visuels viande/poisson passent en 256 px. Assertions de dimensions actualisées ; plafond de ces tests renforcé de 153 600 à 15 000 octets. Toutes les assertions alpha, format, présence catalogue, distinction d’images et migrations historiques sont conservées. Nouveau test Céréales Lion : unicité, classement, Boîte, WebP transparent sous 15 Ko. Cadrage automatique réel exécuté pour les 144 changements : aucun rognage dans Ma liste/Catalogue. Cache de cadrage invalidé uniquement pour ces sources en v771, sans purge du cache visuel persistant.
 
 Validation : 356 tests réussis, syntaxe JS, compilation du prompt Python et git diff --check. Validateur Bash inchangé : contrôles équivalents exécutés séparément, /dev/fd/63 indisponible. Aucun essai interactif iPhone ou Home Assistant réel. Sécurité, OAuth, WebSocket, coffre, verrouillage/biométrie, mode test et architecture statique inchangés. Consignes et prompt mis à jour pour préserver les décisions. Propositions seules, sans ajout automatique, dans PROPOSITIONS_PRODUITS_2026-11-05.md.
+
+
+## Quinze propositions validées et intégrées — v772
+
+Source relue : main f6606af6574ce4737980be5838cfe681f7d9e62f (v771). Validation utilisateur des quinze propositions : tous les produits sont ajoutés une seule fois, dans les catégories proposées, sans modification des 482 références précédentes ni de leurs images (identité octet par octet vérifiée). Catalogue final : 497 produits. Purée bébé est distinguée des Petits pots par sa gourde légumes ; mode d’achat Paquet comme les compotes en gourde, dans le vocabulaire de conditionnement existant. Les fromages gardent une présentation naturelle cohérente avec leurs références.
+
+Quinze générations avec l’outil intégré, références locales inspectées, aucun appel à l’API OpenAI payante du projet. Consignes de chaque nouveau produit ajoutées à IMAGES_ITEMS.md et au prompt automatique.
+
+| Produit | Poids WebP (octets) |
+| --- | ---: |
+| Emmental râpé | 14716 |
+| Parmesan râpé | 14274 |
+| Mozzarella en billes | 10036 |
+| Pain de mie complet | 14192 |
+| Coulis de tomate | 9478 |
+| Crème dessert caramel | 12398 |
+| Confiture pêche | 14306 |
+| Confiture figue | 14052 |
+| Jus de poire | 7456 |
+| Petites pâtes bébé | 12572 |
+| Purée bébé | 10158 |
+| Épinards hachés surgelés | 14768 |
+| Liquide vaisselle mains sensibles | 8722 |
+| Brossettes interdentaires | 9506 |
+| Fil dentaire | 9292 |
+
+Tous les nouveaux fichiers sont des WebP RGBA 256 px avec alpha réel, marges et poids maximal mesuré de 15 000 octets. Revue clair/foncé à 160/48 px et exécution du cadrage automatique réel : pas de rognage Ma liste/Catalogue. Deux tests ajoutés pour unicité, classement, conditionnements et images transparentes sous 15 Ko ; test des confitures étendu de neuf à onze parfums, assertions conservées. 358 tests réussis, syntaxe JS, compilation Python et git diff --check. Validateur Bash inchangé, /dev/fd/63 indisponible : contrôles exécutés séparément.
+
+URLs et version synchronisées en v772. Code de cadrage/fallback et logique réseau du service worker identiques à main ; cache persistant conservé. Architecture statique, OAuth, WebSocket, Home Assistant, coffre, verrouillage/biométrie, mode test et styles mobiles préservés. Pas d’essai interactif iPhone ni de session Home Assistant réelle. Liste des propositions marquée intégrée. Relevé global des poids mis à jour pour les 497 références.
