@@ -89,5 +89,57 @@
       247
     ],
     "heightWidthRatio": 2.479
+  },
+  {
+    "name": "biere-sans-alcool",
+    "bytes": 12024,
+    "quality": 94,
+    "dimension": 256,
+    "bbox": [
+      74,
+      13,
+      182,
+      246
+    ],
+    "heightWidthRatio": 2.157
+  },
+  {
+    "name": "rhum",
+    "bytes": 8910,
+    "quality": 94,
+    "dimension": 256,
+    "bbox": [
+      91,
+      8,
+      165,
+      248
+    ],
+    "heightWidthRatio": 3.243
+  },
+  {
+    "name": "ricard",
+    "bytes": 7502,
+    "quality": 94,
+    "dimension": 256,
+    "bbox": [
+      96,
+      12,
+      160,
+      244
+    ],
+    "heightWidthRatio": 3.625
+  },
+  {
+    "name": "tonic",
+    "bytes": 9466,
+    "quality": 94,
+    "dimension": 256,
+    "bbox": [
+      87,
+      14,
+      169,
+      244
+    ],
+    "heightWidthRatio": 2.805
   }
 ]
