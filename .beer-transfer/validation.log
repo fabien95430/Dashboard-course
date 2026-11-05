@@ -1,0 +1,1864 @@
+TAP version 13
+# Subtest: les douze ajouts validés sont uniques, classés et achetés dans leur conditionnement
+ok 1 - les douze ajouts validés sont uniques, classés et achetés dans leur conditionnement
+  ---
+  duration_ms: 8.304162
+  ...
+# Subtest: les douze ajouts disposent de WebP transparents sous 15000 octets
+ok 2 - les douze ajouts disposent de WebP transparents sous 15000 octets
+  ---
+  duration_ms: 2.186278
+  ...
+# Subtest: les treize ajouts validés sont uniques, classés et achetés dans leur conditionnement
+ok 3 - les treize ajouts validés sont uniques, classés et achetés dans leur conditionnement
+  ---
+  duration_ms: 4.689469
+  ...
+# Subtest: les treize ajouts disposent de WebP transparents sous 15000 octets
+ok 4 - les treize ajouts disposent de WebP transparents sous 15000 octets
+  ---
+  duration_ms: 1.45782
+  ...
+# Subtest: les quinze ajouts validés sont uniques, classés et achetés dans leur conditionnement
+ok 5 - les quinze ajouts validés sont uniques, classés et achetés dans leur conditionnement
+  ---
+  duration_ms: 8.617717
+  ...
+# Subtest: les quinze ajouts disposent de WebP transparents sous 15000 octets
+ok 6 - les quinze ajouts disposent de WebP transparents sous 15000 octets
+  ---
+  duration_ms: 2.42269
+  ...
+# Subtest: P3 confie la navigation liquide à son module propriétaire
+ok 7 - P3 confie la navigation liquide à son module propriétaire
+  ---
+  duration_ms: 2.558112
+  ...
+# Subtest: le module de navigation reste découplé de l état métier
+ok 8 - le module de navigation reste découplé de l état métier
+  ---
+  duration_ms: 0.400327
+  ...
+# Subtest: le module est chargé avant app.js et précaché avec sa propre révision
+ok 9 - le module est chargé avant app.js et précaché avec sa propre révision
+  ---
+  duration_ms: 0.489173
+  ...
+# Subtest: le précache ne garde qu une URL active par chemin
+ok 10 - le précache ne garde qu une URL active par chemin
+  ---
+  duration_ms: 1.852385
+  ...
+# Subtest: tout le graphe JS CSS actif est précaché avec son URL exacte
+ok 11 - tout le graphe JS CSS actif est précaché avec son URL exacte
+  ---
+  duration_ms: 6.412723
+  ...
+# Subtest: les anciens modules et marqueurs techniques supprimés ne réapparaissent pas
+ok 12 - les anciens modules et marqueurs techniques supprimés ne réapparaissent pas
+  ---
+  duration_ms: 0.303777
+  ...
+# Subtest: les intégrateurs partagent une déduplication du précache par chemin
+ok 13 - les intégrateurs partagent une déduplication du précache par chemin
+  ---
+  duration_ms: 0.57897
+  ...
+# Subtest: un déverrouillage commence par une vérification de version avant la récupération des jetons
+ok 14 - un déverrouillage commence par une vérification de version avant la récupération des jetons
+  ---
+  duration_ms: 5.394254
+  ...
+# Subtest: une nouvelle version déclenche un seul rechargement avant connexion
+ok 15 - une nouvelle version déclenche un seul rechargement avant connexion
+  ---
+  duration_ms: 2.661035
+  ...
+# Subtest: sans mise à jour ou si le contrôle échoue, le déverrouillage reste possible
+ok 16 - sans mise à jour ou si le contrôle échoue, le déverrouillage reste possible
+  ---
+  duration_ms: 2.997421
+  ...
+# Subtest: la vérification reste ponctuelle et la liste est relue après authentification
+ok 17 - la vérification reste ponctuelle et la liste est relue après authentification
+  ---
+  duration_ms: 0.617682
+  ...
+# Subtest: une page d accueil précachée à jour permet le rechargement immédiat
+ok 18 - une page d accueil précachée à jour permet le rechargement immédiat
+  ---
+  duration_ms: 30.890587
+  ...
+# Subtest: une page d accueil précachée périmée est remplacée avant le rechargement
+ok 19 - une page d accueil précachée périmée est remplacée avant le rechargement
+  ---
+  duration_ms: 6.532877
+  ...
+# Subtest: sans page à jour disponible, aucun rechargement inutile n est demandé
+ok 20 - sans page à jour disponible, aucun rechargement inutile n est demandé
+  ---
+  duration_ms: 1.398478
+  ...
+# Subtest: un contrôle de version qui ne répond pas ne bloque plus le bouton Connexion
+ok 21 - un contrôle de version qui ne répond pas ne bloque plus le bouton Connexion
+  ---
+  duration_ms: 1.223914
+  ...
+# Subtest: après un rechargement de mise à jour resté sur la même version, pas de boucle de rechargement
+ok 22 - après un rechargement de mise à jour resté sur la même version, pas de boucle de rechargement
+  ---
+  duration_ms: 4.184757
+  ...
+# Subtest: l adresse de démarrage précachée périmée est corrigée avec index.html
+ok 23 - l adresse de démarrage précachée périmée est corrigée avec index.html
+  ---
+  duration_ms: 2.911241
+  ...
+# Subtest: les contrôles de version ne sont jamais conservés dans le cache du service worker
+ok 24 - les contrôles de version ne sont jamais conservés dans le cache du service worker
+  ---
+  duration_ms: 0.303436
+  ...
+# Subtest: la flèche distingue version à jour, nouvelle version prête et mise à jour non terminée
+ok 25 - la flèche distingue version à jour, nouvelle version prête et mise à jour non terminée
+  ---
+  duration_ms: 25.813616
+  ...
+# Subtest: la flèche ne tourne plus indéfiniment si la mise à jour ne répond pas
+ok 26 - la flèche ne tourne plus indéfiniment si la mise à jour ne répond pas
+  ---
+  duration_ms: 1.209437
+  ...
+# Subtest: le retour au premier plan ne réinitialise pas un écran de connexion déjà affiché
+ok 27 - le retour au premier plan ne réinitialise pas un écran de connexion déjà affiché
+  ---
+  duration_ms: 0.426245
+  ...
+# Subtest: l écran de connexion ne défile pas au doigt
+ok 28 - l écran de connexion ne défile pas au doigt
+  ---
+  duration_ms: 1.040962
+  ...
+# Subtest: l écran de connexion s accroche à la hauteur physique de l iPhone (pas de saut au rechargement)
+ok 29 - l écran de connexion s accroche à la hauteur physique de l iPhone (pas de saut au rechargement)
+  ---
+  duration_ms: 1.149314
+  ...
+# Subtest: la catégorie bières recense exactement les neuf références validées sans doublon
+ok 30 - la catégorie bières recense exactement les neuf références validées sans doublon
+  ---
+  duration_ms: 2.366335
+  ...
+# Subtest: chaque bière utilise un WebP unitaire 256px, transparent et de 15 000 octets maximum
+ok 31 - chaque bière utilise un WebP unitaire 256px, transparent et de 15 000 octets maximum
+  ---
+  duration_ms: 2.325228
+  ...
+# Subtest: le mode Bouteille et les priorités de Home Assistant restent inchangés
+ok 32 - le mode Bouteille et les priorités de Home Assistant restent inchangés
+  ---
+  duration_ms: 1.033839
+  ...
+# Subtest: le whisky corrigé reste transparent en 256 px sous 15 000 octets
+ok 33 - le whisky corrigé reste transparent en 256 px sous 15 000 octets
+  ---
+  duration_ms: 3.429278
+  ...
+# Subtest: Bolognaise reste un produit unique en Épicerie → Sauces & condiments
+ok 34 - Bolognaise reste un produit unique en Épicerie → Sauces & condiments
+  ---
+  duration_ms: 1.32411
+  ...
+# Subtest: le conditionnement et la référence HA restent inchangés
+ok 35 - le conditionnement et la référence HA restent inchangés
+  ---
+  duration_ms: 2.051958
+  ...
+# Subtest: les trois vues et le cache référencent la même version courante
+ok 36 - les trois vues et le cache référencent la même version courante
+  ---
+  duration_ms: 0.73451
+  ...
+# Subtest: aucune liste de visuels produits n est effacée à chaque mise à jour
+ok 37 - aucune liste de visuels produits n est effacée à chaque mise à jour
+  ---
+  duration_ms: 2.412841
+  ...
+# Subtest: les vignettes produits restent en cache persistant et sont contrôlées par empreinte de contenu
+ok 38 - les vignettes produits restent en cache persistant et sont contrôlées par empreinte de contenu
+  ---
+  duration_ms: 0.289901
+  ...
+# Subtest: l administration du catalogue distingue produits et plats
+ok 39 - l administration du catalogue distingue produits et plats
+  ---
+  duration_ms: 2.81439
+  ...
+# Subtest: la suppression d un plat retire recette, quantités et visuel sans toucher aux produits
+ok 40 - la suppression d un plat retire recette, quantités et visuel sans toucher aux produits
+  ---
+  duration_ms: 0.482089
+  ...
+# Subtest: le workflow traite delete_dish sans génération OpenAI
+ok 41 - le workflow traite delete_dish sans génération OpenAI
+  ---
+  duration_ms: 1.904171
+  ...
+# Subtest: la notification distingue la suppression d un plat
+ok 42 - la notification distingue la suppression d un plat
+  ---
+  duration_ms: 0.435662
+  ...
+# Subtest: le balayage vers la gauche retire un plat comme un produit
+ok 43 - le balayage vers la gauche retire un plat comme un produit
+  ---
+  duration_ms: 0.673696
+  ...
+# Subtest: le sélecteur Catalogue réutilise sa structure entre deux changements de catégorie
+ok 44 - le sélecteur Catalogue réutilise sa structure entre deux changements de catégorie
+  ---
+  duration_ms: 2.366275
+  ...
+# Subtest: Catalogue entre toujours sur Produits et Plats reste une action explicite
+ok 45 - Catalogue entre toujours sur Produits et Plats reste une action explicite
+  ---
+  duration_ms: 2.704675
+  ...
+# Subtest: Ma liste garde la priorité et le Catalogue caché nest plus construit
+ok 46 - Ma liste garde la priorité et le Catalogue caché nest plus construit
+  ---
+  duration_ms: 2.227405
+  ...
+# Subtest: les images produits respectent la visibilité et ne possèdent plus ladministration
+ok 47 - les images produits respectent la visibilité et ne possèdent plus ladministration
+  ---
+  duration_ms: 1.45934
+  ...
+# Subtest: les propriétaires secondaires sont chargés depuis leur vrai contexte
+ok 48 - les propriétaires secondaires sont chargés depuis leur vrai contexte
+  ---
+  duration_ms: 0.561077
+  ...
+# Subtest: le Catalogue possède sa structure finale dès le HTML initial
+ok 49 - le Catalogue possède sa structure finale dès le HTML initial
+  ---
+  duration_ms: 2.263752
+  ...
+# Subtest: les libellés et actions de Ma liste et du Catalogue sont définitifs dès la première frame
+ok 50 - les libellés et actions de Ma liste et du Catalogue sont définitifs dès la première frame
+  ---
+  duration_ms: 0.859333
+  ...
+# Subtest: le bouton À racheter bientôt est seulement branché par son module propriétaire
+ok 51 - le bouton À racheter bientôt est seulement branché par son module propriétaire
+  ---
+  duration_ms: 0.412198
+  ...
+# Subtest: app-ui est branché avant app.js pour enrichir la vraie liste vide sans rendu tardif
+ok 52 - app-ui est branché avant app.js pour enrichir la vraie liste vide sans rendu tardif
+  ---
+  duration_ms: 0.37538
+  ...
+# Subtest: les badges de version sont à côté des h1 dans une ligne de titre commune
+ok 53 - les badges de version sont à côté des h1 dans une ligne de titre commune
+  ---
+  duration_ms: 0.415555
+  ...
+# Subtest: les titres gardent leur géométrie et seul Réglages affiche le badge de version
+ok 54 - les titres gardent leur géométrie et seul Réglages affiche le badge de version
+  ---
+  duration_ms: 1.165725
+  ...
+# Subtest: sur iPhone les en-têtes restent alignés et Produits / Plats dispose de sa propre ligne
+ok 55 - sur iPhone les en-têtes restent alignés et Produits / Plats dispose de sa propre ligne
+  ---
+  duration_ms: 1.6781
+  ...
+# Subtest: sur iPhone la recherche de Ma liste commence exactement au même endroit que celle du Catalogue
+ok 56 - sur iPhone la recherche de Ma liste commence exactement au même endroit que celle du Catalogue
+  ---
+  duration_ms: 0.806223
+  ...
+# Subtest: la progression hachurée de Ma liste reste au-dessus de la recherche sans modifier sa géométrie
+ok 57 - la progression hachurée de Ma liste reste au-dessus de la recherche sans modifier sa géométrie
+  ---
+  duration_ms: 4.017845
+  ...
+# Subtest: la référence visuelle conserve les icônes du menu et la lentille native
+ok 58 - la référence visuelle conserve les icônes du menu et la lentille native
+  ---
+  duration_ms: 0.698122
+  ...
+# Subtest: le Catalogue occupe la première page avec neuf cartes plus grandes, sans bandeau
+ok 59 - le Catalogue occupe la première page avec neuf cartes plus grandes, sans bandeau
+  ---
+  duration_ms: 1.09877
+  ...
+# Subtest: le rail des catégories défile bord à bord et les cartes Produits restent ivoire clair et les boutons + vert forêt
+ok 60 - le rail des catégories défile bord à bord et les cartes Produits restent ivoire clair et les boutons + vert forêt
+  ---
+  duration_ms: 1.622417
+  ...
+# Subtest: les grilles Produits et Plats défilent sous la barre Liquid Glass sans perdre les dernières cartes
+ok 61 - les grilles Produits et Plats défilent sous la barre Liquid Glass sans perdre les dernières cartes
+  ---
+  duration_ms: 2.221645
+  ...
+# Subtest: sélection sauge visible et lettres descendantes non rognées sur les trois vues
+ok 62 - sélection sauge visible et lettres descendantes non rognées sur les trois vues
+  ---
+  duration_ms: 2.556158
+  ...
+# Subtest: le swipe Produits Plats suit directement le doigt et ne change le mode qu à la fin
+ok 63 - le swipe Produits Plats suit directement le doigt et ne change le mode qu à la fin
+  ---
+  duration_ms: 2.16072
+  ...
+# Subtest: un moteur commun remplace les gestions tactiles concurrentes
+ok 64 - un moteur commun remplace les gestions tactiles concurrentes
+  ---
+  duration_ms: 1.566813
+  ...
+# Subtest: clic, glissement et annulation déclenchent une seule sélection par sélecteur
+ok 65 - clic, glissement et annulation déclenchent une seule sélection par sélecteur
+  ---
+  duration_ms: 6.573132
+  ...
+# Subtest: premier Catalogue : rendu après deux frames, jamais sur un onglet quitté
+ok 66 - premier Catalogue : rendu après deux frames, jamais sur un onglet quitté
+  ---
+  duration_ms: 1.978421
+  ...
+# Subtest: grille déjà construite : mise à jour seulement après l arrivée de la pastille
+ok 67 - grille déjà construite : mise à jour seulement après l arrivée de la pastille
+  ---
+  duration_ms: 1.337966
+  ...
+# Subtest: la navigation libère les travaux différés à l arrêt de la pastille
+ok 68 - la navigation libère les travaux différés à l arrêt de la pastille
+  ---
+  duration_ms: 0.3325
+  ...
+# Subtest: le Catalogue masqué garde sa mise en page sans être affiché ni cliquable
+ok 69 - le Catalogue masqué garde sa mise en page sans être affiché ni cliquable
+  ---
+  duration_ms: 0.697131
+  ...
+# Subtest: les catégories du catalogue ne contiennent plus « Tous », placent Favoris en premier et le reste en ordre alphabétique
+ok 70 - les catégories du catalogue ne contiennent plus « Tous », placent Favoris en premier et le reste en ordre alphabétique
+  ---
+  duration_ms: 3.279838
+  ...
+# Subtest: chaque sous-catégorie de catalog.js est stockée en ordre alphabétique
+ok 71 - chaque sous-catégorie de catalog.js est stockée en ordre alphabétique
+  ---
+  duration_ms: 19.475032
+  ...
+# Subtest: Catalogue trie visuellement les catégories normales de A à Z, sans catégorie « Tous »
+ok 72 - Catalogue trie visuellement les catégories normales de A à Z, sans catégorie « Tous »
+  ---
+  duration_ms: 1.545733
+  ...
+# Subtest: les noms longs ont un libellé automatique de 13 caractères maximum
+ok 73 - les noms longs ont un libellé automatique de 13 caractères maximum
+  ---
+  duration_ms: 1.225216
+  ...
+# Subtest: chaque produit appartient à une seule catégorie principale cohérente
+ok 74 - chaque produit appartient à une seule catégorie principale cohérente
+  ---
+  duration_ms: 3.993079
+  ...
+# Subtest: les images unitaires suivent dynamiquement toutes les catégories du catalogue
+ok 75 - les images unitaires suivent dynamiquement toutes les catégories du catalogue
+  ---
+  duration_ms: 0.42887
+  ...
+# Subtest: la grille Produits est montée une fois puis filtrée sans détacher ses cartes
+ok 76 - la grille Produits est montée une fois puis filtrée sans détacher ses cartes
+  ---
+  duration_ms: 2.451324
+  ...
+# Subtest: la bascule Produits Plats conserve la grille et ne simule pas une saisie vide
+ok 77 - la bascule Produits Plats conserve la grille et ne simule pas une saisie vide
+  ---
+  duration_ms: 0.514741
+  ...
+# Subtest: images et quantités ignorent les cartes Produits masquées
+ok 78 - images et quantités ignorent les cartes Produits masquées
+  ---
+  duration_ms: 1.284497
+  ...
+# Subtest: la variante sûre garde content-visibility auto hors des cartes
+ok 79 - la variante sûre garde content-visibility auto hors des cartes
+  ---
+  duration_ms: 0.907483
+  ...
+# Subtest: la grille Plats se prépare en arrière-plan avant le premier affichage
+ok 80 - la grille Plats se prépare en arrière-plan avant le premier affichage
+  ---
+  duration_ms: 0.663828
+  ...
+# Subtest: la lentille Produits Plats garde la même géométrie avant et après le module liquid
+ok 81 - la lentille Produits Plats garde la même géométrie avant et après le module liquid
+  ---
+  duration_ms: 0.573981
+  ...
+# Subtest: v625 : le bouton Réglages ouvre « Catalogue des produits » avec deux vues
+ok 82 - v625 : le bouton Réglages ouvre « Catalogue des produits » avec deux vues
+  ---
+  duration_ms: 3.640562
+  ...
+# Subtest: v625 : le module propriétaire pilote les vues et annonce le changement au catalogue
+ok 83 - v625 : le module propriétaire pilote les vues et annonce le changement au catalogue
+  ---
+  duration_ms: 2.249898
+  ...
+# Subtest: v625 : actions de ligne intégrées, sans menu flottant, OpenAI neutre
+ok 84 - v625 : actions de ligne intégrées, sans menu flottant, OpenAI neutre
+  ---
+  duration_ms: 0.438879
+  ...
+# Subtest: v625 : catégories en grille de 3 colonnes et attribut hidden respecté
+ok 85 - v625 : catégories en grille de 3 colonnes et attribut hidden respecté
+  ---
+  duration_ms: 1.147801
+  ...
+# Subtest: les quantités écoutent des événements propriétaires sans observer le DOM
+ok 86 - les quantités écoutent des événements propriétaires sans observer le DOM
+  ---
+  duration_ms: 3.162059
+  ...
+# Subtest: les propriétaires publient les changements après leurs rendus
+ok 87 - les propriétaires publient les changements après leurs rendus
+  ---
+  duration_ms: 2.279493
+  ...
+# Subtest: la synchronisation globale du catalogue ne publie qu après la mise à jour des cartes
+ok 88 - la synchronisation globale du catalogue ne publie qu après la mise à jour des cartes
+  ---
+  duration_ms: 1.423095
+  ...
+# Subtest: la recherche catalogue diffère le rendu pendant la saisie
+ok 89 - la recherche catalogue diffère le rendu pendant la saisie
+  ---
+  duration_ms: 2.201467
+  ...
+# Subtest: les styles Plats sont prêts avant la création de leur interface
+ok 90 - les styles Plats sont prêts avant la création de leur interface
+  ---
+  duration_ms: 4.762876
+  ...
+# Subtest: le Catalogue ne réintroduit aucune version CSS figée
+ok 91 - le Catalogue ne réintroduit aucune version CSS figée
+  ---
+  duration_ms: 0.508829
+  ...
+# Subtest: Céréales Lion est disponible au Petit-déjeuner, en boîte, avec son WebP transparent sous 15 Ko
+ok 92 - Céréales Lion est disponible au Petit-déjeuner, en boîte, avec son WebP transparent sous 15 Ko
+  ---
+  duration_ms: 3.446199
+  ...
+# Subtest: la CI permanente valide main et les pull requests en lecture seule
+ok 93 - la CI permanente valide main et les pull requests en lecture seule
+  ---
+  duration_ms: 1.934389
+  ...
+# Subtest: le validateur contrôle la syntaxe et toute la suite sans exception
+ok 94 - le validateur contrôle la syntaxe et toute la suite sans exception
+  ---
+  duration_ms: 0.293347
+  ...
+# Subtest: les automatisations valident leur commit rebased avant tout push vers main
+ok 95 - les automatisations valident leur commit rebased avant tout push vers main
+  ---
+  duration_ms: 0.446163
+  ...
+# Subtest: les onze confitures sont uniques, classées ensemble et achetées par pot
+ok 96 - les onze confitures sont uniques, classées ensemble et achetées par pot
+  ---
+  duration_ms: 7.167772
+  ...
+# Subtest: chaque confiture possède son WebP transparent sous 15000 octets
+ok 97 - chaque confiture possède son WebP transparent sous 15000 octets
+  ---
+  duration_ms: 2.214772
+  ...
+# Subtest: les dix produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+ok 98 - les dix produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+  ---
+  duration_ms: 4.194635
+  ...
+# Subtest: les dix produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+ok 99 - les dix produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+  ---
+  duration_ms: 3.519987
+  ...
+# Subtest: les onze produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+ok 100 - les onze produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+  ---
+  duration_ms: 3.177818
+  ...
+# Subtest: catalog.js reste la source du catalogue consommée par app.js
+ok 101 - catalog.js reste la source du catalogue consommée par app.js
+  ---
+  duration_ms: 4.092134
+  ...
+# Subtest: le coffre local conserve les primitives et paramètres de sécurité actuels
+ok 102 - le coffre local conserve les primitives et paramètres de sécurité actuels
+  ---
+  duration_ms: 1.449053
+  ...
+# Subtest: le verrouillage ferme Home Assistant et efface les jetons en mémoire
+ok 103 - le verrouillage ferme Home Assistant et efface les jetons en mémoire
+  ---
+  duration_ms: 1.689051
+  ...
+# Subtest: OAuth ne persiste pas les identifiants Home Assistant en clair
+ok 104 - OAuth ne persiste pas les identifiants Home Assistant en clair
+  ---
+  duration_ms: 2.827034
+  ...
+# Subtest: la synchronisation Home Assistant reste événementielle sans polling permanent
+ok 105 - la synchronisation Home Assistant reste événementielle sans polling permanent
+  ---
+  duration_ms: 1.631995
+  ...
+# Subtest: le mode test reste local et indépendant de la connexion Home Assistant
+ok 106 - le mode test reste local et indépendant de la connexion Home Assistant
+  ---
+  duration_ms: 1.49527
+  ...
+# Subtest: le shell mobile conserve CSP et safe areas iOS
+ok 107 - le shell mobile conserve CSP et safe areas iOS
+  ---
+  duration_ms: 2.608577
+  ...
+# Subtest: le CSS principal ne conserve plus de blocs de declaration vides
+ok 108 - le CSS principal ne conserve plus de blocs de declaration vides
+  ---
+  duration_ms: 55.273005
+  ...
+# Subtest: le nettoyage CSS conserve les safe areas iOS et le plein ecran PWA
+ok 109 - le nettoyage CSS conserve les safe areas iOS et le plein ecran PWA
+  ---
+  duration_ms: 1.009243
+  ...
+# Subtest: la feuille nettoyee garde la meme revision dans la page et le precache
+ok 110 - la feuille nettoyee garde la meme revision dans la page et le precache
+  ---
+  duration_ms: 2.480768
+  ...
+# Subtest: le démarrage critique reste centré sur Ma liste
+ok 111 - le démarrage critique reste centré sur Ma liste
+  ---
+  duration_ms: 3.202364
+  ...
+# Subtest: le Catalogue Produits devient prêt sans charger synchroniquement la branche Plats
+ok 112 - le Catalogue Produits devient prêt sans charger synchroniquement la branche Plats
+  ---
+  duration_ms: 0.229007
+  ...
+# Subtest: les fonctions Plats sont préparées en idle après synchronisation et restent disponibles à l entrée Catalogue
+ok 113 - les fonctions Plats sont préparées en idle après synchronisation et restent disponibles à l entrée Catalogue
+  ---
+  duration_ms: 0.554735
+  ...
+# Subtest: le précache hors ligne conserve les URL réellement chargées pour les fonctions différées
+ok 114 - le précache hors ligne conserve les URL réellement chargées pour les fonctions différées
+  ---
+  duration_ms: 0.56329
+  ...
+# Subtest: le runtime de Ma liste reste prioritaire avant la préparation du Catalogue
+ok 115 - le runtime de Ma liste reste prioritaire avant la préparation du Catalogue
+  ---
+  duration_ms: 0.276526
+  ...
+# Subtest: un état de liste inconnu ne marque jamais un plat comme complet
+ok 116 - un état de liste inconnu ne marque jamais un plat comme complet
+  ---
+  duration_ms: 3.0771
+  ...
+# Subtest: le vert et le partiel dépendent uniquement de la liste réellement connue
+ok 117 - le vert et le partiel dépendent uniquement de la liste réellement connue
+  ---
+  duration_ms: 2.33165
+  ...
+# Subtest: la confirmation du plat enregistre immédiatement ses ingrédients puis force la réconciliation
+ok 118 - la confirmation du plat enregistre immédiatement ses ingrédients puis force la réconciliation
+  ---
+  duration_ms: 1.165464
+  ...
+# Subtest: une confirmation en erreur ne crée pas de faux état local
+ok 119 - une confirmation en erreur ne crée pas de faux état local
+  ---
+  duration_ms: 0.975369
+  ...
+# Subtest: un tap ouvre la fiche sans laisser un contour de focus persistant
+ok 120 - un tap ouvre la fiche sans laisser un contour de focus persistant
+  ---
+  duration_ms: 2.800324
+  ...
+# Subtest: la navigation au clavier conserve le focus visible
+ok 121 - la navigation au clavier conserve le focus visible
+  ---
+  duration_ms: 0.654341
+  ...
+# Subtest: un clic clavier synthétique ou une activation accessible ne perd pas le focus
+ok 122 - un clic clavier synthétique ou une activation accessible ne perd pas le focus
+  ---
+  duration_ms: 0.414233
+  ...
+# Subtest: le marquage des plats ajoutés et le bouton annuler restent inchangés
+ok 123 - le marquage des plats ajoutés et le bouton annuler restent inchangés
+  ---
+  duration_ms: 1.478358
+  ...
+# Subtest: un clic sur le favori ne déclenche ni ouverture ni perte du focus
+ok 124 - un clic sur le favori ne déclenche ni ouverture ni perte du focus
+  ---
+  duration_ms: 0.38028
+  ...
+# Subtest: les cartes de plats utilisent leur vignette prête et leur warmup démarre hors du rendu critique
+ok 125 - les cartes de plats utilisent leur vignette prête et leur warmup démarre hors du rendu critique
+  ---
+  duration_ms: 3.257357
+  ...
+# Subtest: le préchargement Plats reste événementiel et ne revient pas dans le démarrage critique
+ok 126 - le préchargement Plats reste événementiel et ne revient pas dans le démarrage critique
+  ---
+  duration_ms: 1.976217
+  ...
+# Subtest: chaque plat a sa vignette de carte, sinon la carte reprend la photo d origine
+ok 127 - chaque plat a sa vignette de carte, sinon la carte reprend la photo d origine
+  ---
+  duration_ms: 1.668683
+  ...
+# Subtest: le service worker retire les anciennes photos de plats versionnées
+ok 128 - le service worker retire les anciennes photos de plats versionnées
+  ---
+  duration_ms: 0.46127
+  ...
+# Subtest: la fiche plat affiche sa photo WebP légère, avec la photo PNG en secours
+ok 129 - la fiche plat affiche sa photo WebP légère, avec la photo PNG en secours
+  ---
+  duration_ms: 10.138283
+  ...
+# Subtest: les visuels déjà en cache sont revalidés sans être re-téléchargés à chaque version
+ok 130 - les visuels déjà en cache sont revalidés sans être re-téléchargés à chaque version
+  ---
+  duration_ms: 0.491557
+  ...
+# Subtest: la note « Plat : … » s ajoute sans écraser le texte existant et cumule plusieurs plats
+ok 131 - la note « Plat : … » s ajoute sans écraser le texte existant et cumule plusieurs plats
+  ---
+  duration_ms: 4.321953
+  ...
+# Subtest: les plats partagés se lisent depuis les articles encore à acheter
+ok 132 - les plats partagés se lisent depuis les articles encore à acheter
+  ---
+  duration_ms: 1.041833
+  ...
+# Subtest: le marqueur lit la liste partagée : un ingrédient acheté rend le plat partiel sur tous les appareils
+ok 133 - le marqueur lit la liste partagée : un ingrédient acheté rend le plat partiel sur tous les appareils
+  ---
+  duration_ms: 0.963077
+  ...
+# Subtest: app.js écrit la note dans Home Assistant et le marqueur ne garde plus les plats seulement en local
+ok 134 - app.js écrit la note dans Home Assistant et le marqueur ne garde plus les plats seulement en local
+  ---
+  duration_ms: 0.373247
+  ...
+# Subtest: « Ajouté pour » marque seulement les unités ajoutées par le plat et passe au plat suivant à l annulation
+ok 135 - « Ajouté pour » marque seulement les unités ajoutées par le plat et passe au plat suivant à l annulation
+  ---
+  duration_ms: 0.94865
+  ...
+# Subtest: annuler un plat retire seulement ses unités ajoutées que rien d autre n utilise
+ok 136 - annuler un plat retire seulement ses unités ajoutées que rien d autre n utilise
+  ---
+  duration_ms: 10.106377
+  ...
+# Subtest: le ✓ d un plat ajouté demande une annulation confirmée
+ok 137 - le ✓ d un plat ajouté demande une annulation confirmée
+  ---
+  duration_ms: 0.686711
+  ...
+# Subtest: les nouveaux goûters enfant sont uniques et utilisent le bon conditionnement
+ok 138 - les nouveaux goûters enfant sont uniques et utilisent le bon conditionnement
+  ---
+  duration_ms: 2.709334
+  ...
+# Subtest: les six ajouts enfant possèdent des images unitaires transparentes sous 15000 octets
+ok 139 - les six ajouts enfant possèdent des images unitaires transparentes sous 15000 octets
+  ---
+  duration_ms: 2.049213
+  ...
+# Subtest: les treize visuels Épicerie sont des WebP individuels RGBA sans atlas
+ok 140 - les treize visuels Épicerie sont des WebP individuels RGBA sans atlas
+  ---
+  duration_ms: 5.519617
+  ...
+# Subtest: les riz et les pâtes existants restent des fichiers individuels du catalogue
+ok 141 - les riz et les pâtes existants restent des fichiers individuels du catalogue
+  ---
+  duration_ms: 1.740106
+  ...
+# Subtest: les treize images Épicerie sont des WebP alpha 384 px et restent versionnées
+ok 142 - les treize images Épicerie sont des WebP alpha 384 px et restent versionnées
+  ---
+  duration_ms: 4.862801
+  ...
+# Subtest: le centre d erreurs reste chargé sans restaurer le shell de démarrage
+ok 143 - le centre d erreurs reste chargé sans restaurer le shell de démarrage
+  ---
+  duration_ms: 4.398555
+  ...
+# Subtest: le clic Messages d erreur ouvre le centre même si le bouton est créé dynamiquement
+ok 144 - le clic Messages d erreur ouvre le centre même si le bouton est créé dynamiquement
+  ---
+  duration_ms: 0.456873
+  ...
+# Subtest: les anomalies transitoires se referment quand leur cause a disparu
+ok 145 - les anomalies transitoires se referment quand leur cause a disparu
+  ---
+  duration_ms: 0.867257
+  ...
+# Subtest: une intégration réussie résout les anciennes erreurs du même élément
+ok 146 - une intégration réussie résout les anciennes erreurs du même élément
+  ---
+  duration_ms: 0.531782
+  ...
+# Subtest: Frais classe les nouveaux produits sans perdre les références existantes
+ok 147 - Frais classe les nouveaux produits sans perdre les références existantes
+  ---
+  duration_ms: 1.97808
+  ...
+# Subtest: 22 photos Frais sont des WebP transparents individuels conformes
+ok 148 - 22 photos Frais sont des WebP transparents individuels conformes
+  ---
+  duration_ms: 5.053798
+  ...
+# Subtest: conditionnements et doublons Home Assistant préservés lors des déplacements
+ok 149 - conditionnements et doublons Home Assistant préservés lors des déplacements
+  ---
+  duration_ms: 0.693553
+  ...
+# Subtest: WebP Fruits & Légumes v736 256 x 256, transparents et sous 15 Ko
+ok 150 - WebP Fruits & Légumes v736 256 x 256, transparents et sous 15 Ko
+  ---
+  duration_ms: 2.183433
+  ...
+# Subtest: les trois nouvelles images v736 seulement perdent les métriques anciennes
+ok 151 - les trois nouvelles images v736 seulement perdent les métriques anciennes
+  ---
+  duration_ms: 13.694037
+  ...
+# Subtest: les dix fruits secs emballés affichent Sachet dans Catalogue et Ma liste
+ok 152 - les dix fruits secs emballés affichent Sachet dans Catalogue et Ma liste
+  ---
+  duration_ms: 2.188512
+  ...
+# Subtest: sept WebP entiers, 256 px, canal alpha et sous 15 Ko
+ok 153 - sept WebP entiers, 256 px, canal alpha et sous 15 Ko
+  ---
+  duration_ms: 3.592011
+  ...
+# Subtest: v733 invalide seulement les sept cadrages conservés en localStorage
+ok 154 - v733 invalide seulement les sept cadrages conservés en localStorage
+  ---
+  duration_ms: 4.976865
+  ...
+# Subtest: le retour haptique a une seule source et remplace les appels directs à navigator.vibrate
+ok 155 - le retour haptique a une seule source et remplace les appels directs à navigator.vibrate
+  ---
+  duration_ms: 8.261582
+  ...
+# Subtest: les confirmations de produit, plat et réglage déclenchent le retour haptique
+ok 156 - les confirmations de produit, plat et réglage déclenchent le retour haptique
+  ---
+  duration_ms: 1.877141
+  ...
+# Subtest: le type de retour suit le message : erreur, retrait ou succès
+ok 157 - le type de retour suit le message : erreur, retrait ou succès
+  ---
+  duration_ms: 1.694561
+  ...
+# Subtest: app.js expose un client Home Assistant partagé, figé et volontairement étroit
+ok 158 - app.js expose un client Home Assistant partagé, figé et volontairement étroit
+  ---
+  duration_ms: 3.822972
+  ...
+# Subtest: le client partagé respecte verrouillage, mode test et fermeture du socket
+ok 159 - le client partagé respecte verrouillage, mode test et fermeture du socket
+  ---
+  duration_ms: 1.547998
+  ...
+# Subtest: les consommateurs Home Assistant passent par le client partagé
+ok 160 - les consommateurs Home Assistant passent par le client partagé
+  ---
+  duration_ms: 2.678457
+  ...
+# Subtest: aucun JavaScript du dépôt ne remplace WebSocket.prototype.send
+ok 161 - aucun JavaScript du dépôt ne remplace WebSocket.prototype.send
+  ---
+  duration_ms: 16.111308
+  ...
+# Subtest: les trois produits Hygiène & soins conservent leur identité et leur WebP transparent individuel
+ok 162 - les trois produits Hygiène & soins conservent leur identité et leur WebP transparent individuel
+  ---
+  duration_ms: 3.5005
+  ...
+# Subtest: le pipeline visuel préchauffe Produits puis Plats sans timer permanent
+ok 163 - le pipeline visuel préchauffe Produits puis Plats sans timer permanent
+  ---
+  duration_ms: 3.209678
+  ...
+# Subtest: les ouvertures suivantes affichent les Produits sans parcourir le cache visuel
+ok 164 - les ouvertures suivantes affichent les Produits sans parcourir le cache visuel
+  ---
+  duration_ms: 2.364041
+  ...
+# Subtest: les intégrateurs ne forcent plus app-ui vers la version globale quand il n est pas modifié
+ok 165 - les intégrateurs ne forcent plus app-ui vers la version globale quand il n est pas modifié
+  ---
+  duration_ms: 2.47069
+  ...
+# Subtest: l intégrateur produit révisionne catalog-quantities seulement quand il le modifie et précache son URL active
+ok 166 - l intégrateur produit révisionne catalog-quantities seulement quand il le modifie et précache son URL active
+  ---
+  duration_ms: 1.374193
+  ...
+# Subtest: la suppression applique la même règle aux quantités sans forcer les autres modules indépendants
+ok 167 - la suppression applique la même règle aux quantités sans forcer les autres modules indépendants
+  ---
+  duration_ms: 0.466862
+  ...
+# Subtest: Ma liste publie un événement seulement quand son état métier change
+ok 168 - Ma liste publie un événement seulement quand son état métier change
+  ---
+  duration_ms: 3.793887
+  ...
+# Subtest: À racheter bientôt écoute Ma liste sans observer son DOM
+ok 169 - À racheter bientôt écoute Ma liste sans observer son DOM
+  ---
+  duration_ms: 0.445331
+  ...
+# Subtest: ajout de la quantité manquante et second appel sans doublon
+ok 170 - ajout de la quantité manquante et second appel sans doublon
+  ---
+  duration_ms: 6.521784
+  ...
+# Subtest: un échec partiel conserve le succès et libère le verrou produit
+ok 171 - un échec partiel conserve le succès et libère le verrou produit
+  ---
+  duration_ms: 1.435949
+  ...
+# Subtest: une écriture acceptée suivie d’un rafraîchissement obsolète n’est pas répétée
+ok 172 - une écriture acceptée suivie d’un rafraîchissement obsolète n’est pas répétée
+  ---
+  duration_ms: 1.224314
+  ...
+# Subtest: un verrouillage interrompt les écritures restantes
+ok 173 - un verrouillage interrompt les écritures restantes
+  ---
+  duration_ms: 1.570329
+  ...
+# Subtest: un changement de liste interrompt les écritures restantes
+ok 174 - un changement de liste interrompt les écritures restantes
+  ---
+  duration_ms: 1.144825
+  ...
+# Subtest: deux commandes concurrentes ne déclenchent pas deux séries d’ajouts
+ok 175 - deux commandes concurrentes ne déclenchent pas deux séries d’ajouts
+  ---
+  duration_ms: 0.961454
+  ...
+# Subtest: une erreur inattendue libère le verrou et ne relance pas l’ajout
+ok 176 - une erreur inattendue libère le verrou et ne relance pas l’ajout
+  ---
+  duration_ms: 0.976242
+  ...
+# Subtest: un produit inconnu, une quantité invalide ou une session verrouillée ne produit aucune écriture
+ok 177 - un produit inconnu, une quantité invalide ou une session verrouillée ne produit aucune écriture
+  ---
+  duration_ms: 2.479545
+  ...
+# Subtest: le catalogue cumule immédiatement les appuis rapides sur plus et moins
+ok 178 - le catalogue cumule immédiatement les appuis rapides sur plus et moins
+  ---
+  duration_ms: 2.083727
+  ...
+# Subtest: les rafales multi-produits diffèrent les refresh intermédiaires et gardent une seule réconciliation finale
+ok 179 - les rafales multi-produits diffèrent les refresh intermédiaires et gardent une seule réconciliation finale
+  ---
+  duration_ms: 0.597805
+  ...
+# Subtest: les trois points et un glissement révèlent uniquement la corbeille dans la ligne
+ok 180 - les trois points et un glissement révèlent uniquement la corbeille dans la ligne
+  ---
+  duration_ms: 0.608525
+  ...
+# Subtest: la corbeille cachée reste inaccessible au clavier et devient accessible à la demande
+ok 181 - la corbeille cachée reste inaccessible au clavier et devient accessible à la demande
+  ---
+  duration_ms: 1.496752
+  ...
+# Subtest: achat et suppression utilisent des intentions distinctes
+ok 182 - achat et suppression utilisent des intentions distinctes
+  ---
+  duration_ms: 1.860821
+  ...
+# Subtest: la suppression a son propre effet visuel sans état acheté
+ok 183 - la suppression a son propre effet visuel sans état acheté
+  ---
+  duration_ms: 0.242523
+  ...
+# Subtest: le toast global reste sur une seule ligne sur mobile
+ok 184 - le toast global reste sur une seule ligne sur mobile
+  ---
+  duration_ms: 0.195935
+  ...
+# Subtest: Ma liste réutilise les lignes lorsque seule la quantité ou l état occupé change
+ok 185 - Ma liste réutilise les lignes lorsque seule la quantité ou l état occupé change
+  ---
+  duration_ms: 2.302175
+  ...
+# Subtest: le rendu complet reste le repli dès que la structure de Ma liste change
+ok 186 - le rendu complet reste le repli dès que la structure de Ma liste change
+  ---
+  duration_ms: 0.401529
+  ...
+# Subtest: un rafraîchissement Home Assistant passe par le rendu propriétaire optimisé
+ok 187 - un rafraîchissement Home Assistant passe par le rendu propriétaire optimisé
+  ---
+  duration_ms: 0.336749
+  ...
+# Subtest: une suppression partielle invalide la signature de structure
+ok 188 - une suppression partielle invalide la signature de structure
+  ---
+  duration_ms: 0.270635
+  ...
+# Subtest: la version globale visible, le cache et les visuels restent alignés
+ok 189 - la version globale visible, le cache et les visuels restent alignés
+  ---
+  duration_ms: 2.448849
+  ...
+# Subtest: un produit intégré quitte les demandes dès qu il existe dans catalog.js
+ok 190 - un produit intégré quitte les demandes dès qu il existe dans catalog.js
+  ---
+  duration_ms: 2.108464
+  ...
+# Subtest: un plat intégré conserve le contrôle de sa photo locale avant clôture
+ok 191 - un plat intégré conserve le contrôle de sa photo locale avant clôture
+  ---
+  duration_ms: 0.240839
+  ...
+# Subtest: la première connexion fusionne deux téléphones et synchronise ajouts et suppressions
+ok 192 - la première connexion fusionne deux téléphones et synchronise ajouts et suppressions
+  ---
+  duration_ms: 75.954456
+  ...
+# courses-app: demandes Home Assistant Error: Transfert non confirmé : demandes locales conservées
+#     at recoverLocalRequests (missing-requests-store.js:253:11)
+#     at async performSharedSync (missing-requests-store.js:265:45)
+#     at async missing-requests-store.js:293:7
+# Subtest: les opérations locales hors connexion sont transmises à la reconnexion
+ok 193 - les opérations locales hors connexion sont transmises à la reconnexion
+  ---
+  duration_ms: 13.592187
+  ...
+# Subtest: une liste Home Assistant absente ne supprime aucune demande locale
+ok 194 - une liste Home Assistant absente ne supprime aucune demande locale
+  ---
+  duration_ms: 1.702395
+  ...
+# Subtest: v466 récupère 12 demandes malgré un ancien drapeau v465
+ok 195 - v466 récupère 12 demandes malgré un ancien drapeau v465
+  ---
+  duration_ms: 7.886763
+  ...
+# Subtest: une écriture non confirmée conserve les demandes locales
+ok 196 - une écriture non confirmée conserve les demandes locales
+  ---
+  duration_ms: 4.828918
+  ...
+# Subtest: une liste créée après ouverture est redétectée
+ok 197 - une liste créée après ouverture est redétectée
+  ---
+  duration_ms: 2.734782
+  ...
+# Subtest: les produits gardent les catégories et la normalisation historiques
+ok 198 - les produits gardent les catégories et la normalisation historiques
+  ---
+  duration_ms: 5.103079
+  ...
+# Subtest: les anciens rayons fusionnés sont convertis vers leur nouveau rayon
+ok 199 - les anciens rayons fusionnés sont convertis vers leur nouveau rayon
+  ---
+  duration_ms: 1.273075
+  ...
+# Subtest: ajouter et supprimer un produit utilise une seule source avec détection des doublons
+ok 200 - ajouter et supprimer un produit utilise une seule source avec détection des doublons
+  ---
+  duration_ms: 1.988329
+  ...
+# Subtest: les plats pending et ajoutés partagent la détection de doublon et le compteur total
+ok 201 - les plats pending et ajoutés partagent la détection de doublon et le compteur total
+  ---
+  duration_ms: 2.521224
+  ...
+# Subtest: la précision image est liée au nom, limitée et nettoyée avec les produits
+ok 202 - la précision image est liée au nom, limitée et nettoyée avec les produits
+  ---
+  duration_ms: 1.31881
+  ...
+# Subtest: les modules actifs consomment le store sans dupliquer les clés métier
+ok 203 - les modules actifs consomment le store sans dupliquer les clés métier
+  ---
+  duration_ms: 1.437743
+  ...
+# Subtest: le service partagé est chargé avant app.js et précaché
+ok 204 - le service partagé est chargé avant app.js et précaché
+  ---
+  duration_ms: 0.732226
+  ...
+# Subtest: les anciennes demandes d’hygiène et d’enfant se répartissent sans perdre leurs noms ni identifiants
+ok 205 - les anciennes demandes d’hygiène et d’enfant se répartissent sans perdre leurs noms ni identifiants
+  ---
+  duration_ms: 1.327496
+  ...
+# Subtest: Home Assistant enregistre les appareils sans serveur supplémentaire
+ok 206 - Home Assistant enregistre les appareils sans serveur supplémentaire
+  ---
+  duration_ms: 2.392033
+  ...
+# Subtest: fanout Web Push dédoublonne et conserve un abonné unique
+ok 207 - fanout Web Push dédoublonne et conserve un abonné unique
+  ---
+  duration_ms: 0.310429
+  ...
+# Subtest: workflow de diffusion indépendant d OpenAI, secrets masqués
+ok 208 - workflow de diffusion indépendant d OpenAI, secrets masqués
+  ---
+  duration_ms: 0.416257
+  ...
+# Subtest: workflow OpenAI garde le flux original en secours
+ok 209 - workflow OpenAI garde le flux original en secours
+  ---
+  duration_ms: 1.118797
+  ...
+# Subtest: les listes techniques HA ne peuvent pas remplacer Ma liste
+ok 210 - les listes techniques HA ne peuvent pas remplacer Ma liste
+  ---
+  duration_ms: 1.51156
+  ...
+# Subtest: un ajout hors ligne apparaît immédiatement et rejoint la file chiffrée
+ok 211 - un ajout hors ligne apparaît immédiatement et rejoint la file chiffrée
+  ---
+  duration_ms: 6.7006
+  ...
+# Subtest: la reconnexion applique une seule fois un ajout absent de Home Assistant
+ok 212 - la reconnexion applique une seule fois un ajout absent de Home Assistant
+  ---
+  duration_ms: 2.971925
+  ...
+# Subtest: la reconnexion ne duplique pas un ajout déjà confirmé à distance
+ok 213 - la reconnexion ne duplique pas un ajout déjà confirmé à distance
+  ---
+  duration_ms: 1.206571
+  ...
+# Subtest: les opérations hors ligne gardent leur ordre à la reconnexion
+ok 214 - les opérations hors ligne gardent leur ordre à la reconnexion
+  ---
+  duration_ms: 1.166696
+  ...
+# Subtest: supprimer un article ajouté hors ligne annule son ajout différé
+ok 215 - supprimer un article ajouté hors ligne annule son ajout différé
+  ---
+  duration_ms: 1.836556
+  ...
+# Subtest: le retrait unitaire annule en priorité le dernier ajout différé
+ok 216 - le retrait unitaire annule en priorité le dernier ajout différé
+  ---
+  duration_ms: 1.746498
+  ...
+# Subtest: addItem bascule vers la file chiffrée sans WebSocket
+ok 217 - addItem bascule vers la file chiffrée sans WebSocket
+  ---
+  duration_ms: 0.387132
+  ...
+# Subtest: le précache seul couvre les scripts et styles chargés par la page
+ok 218 - le précache seul couvre les scripts et styles chargés par la page
+  ---
+  duration_ms: 58.26767
+  ...
+# Subtest: une annulation OpenAI passe la demande à Annulé et autorise une relance
+ok 219 - une annulation OpenAI passe la demande à Annulé et autorise une relance
+  ---
+  duration_ms: 2.940415
+  ...
+# Subtest: un échec GitHub passe la demande à Erreur et libère immédiatement la relance
+ok 220 - un échec GitHub passe la demande à Erreur et libère immédiatement la relance
+  ---
+  duration_ms: 2.131576
+  ...
+# Subtest: une demande OpenAI orpheline ne peut plus rester bloquée indéfiniment
+ok 221 - une demande OpenAI orpheline ne peut plus rester bloquée indéfiniment
+  ---
+  duration_ms: 0.497638
+  ...
+# Subtest: la vérification des statuts reste événementielle et ne fait pas de polling permanent
+ok 222 - la vérification des statuts reste événementielle et ne fait pas de polling permanent
+  ---
+  duration_ms: 0.602363
+  ...
+# Subtest: une relance OpenAI crée un nouvel identifiant et remplace le statut terminal
+ok 223 - une relance OpenAI crée un nouvel identifiant et remplace le statut terminal
+  ---
+  duration_ms: 0.580994
+  ...
+# Subtest: une relance OpenAI réutilise un checkpoint indépendant du nouvel identifiant de demande
+ok 224 - une relance OpenAI réutilise un checkpoint indépendant du nouvel identifiant de demande
+  ---
+  duration_ms: 1.738904
+  ...
+# Subtest: le cache OpenAI restaure le même binaire sans refaire l appel API
+ok 225 - le cache OpenAI restaure le même binaire sans refaire l appel API
+  ---
+  duration_ms: 104.292569
+  ...
+# Subtest: une image refusée invalide seulement le visuel et conserve les réponses texte
+ok 226 - une image refusée invalide seulement le visuel et conserve les réponses texte
+  ---
+  duration_ms: 0.381041
+  ...
+# Subtest: un produit manquant utilise le même déclencheur OpenAI et le même relais Home Assistant qu’un plat
+ok 227 - un produit manquant utilise le même déclencheur OpenAI et le même relais Home Assistant qu’un plat
+  ---
+  duration_ms: 3.693821
+  ...
+# Subtest: le lancement OpenAI reste visible dans le popup et notifie Courses immédiatement
+ok 228 - le lancement OpenAI reste visible dans le popup et notifie Courses immédiatement
+  ---
+  duration_ms: 0.712179
+  ...
+# Subtest: le workflow OpenAI route les produits vers une intégration WebP avec notification Web Push
+ok 229 - le workflow OpenAI route les produits vers une intégration WebP avec notification Web Push
+  ---
+  duration_ms: 0.722297
+  ...
+# Subtest: les visuels produits OpenAI sont générés au plus petit carré valide et pensés pour une vignette 192 px
+ok 230 - les visuels produits OpenAI sont générés au plus petit carré valide et pensés pour une vignette 192 px
+  ---
+  duration_ms: 0.743598
+  ...
+# Subtest: le classement OpenAI reçoit tout le catalogue et peut créer une sous-catégorie
+ok 231 - le classement OpenAI reçoit tout le catalogue et peut créer une sous-catégorie
+  ---
+  duration_ms: 1.486623
+  ...
+# Subtest: un sous-groupe inventé est reclassé parmi les sous-catégories existantes
+ok 232 - un sous-groupe inventé est reclassé parmi les sous-catégories existantes
+  ---
+  duration_ms: 106.260042
+  ...
+# Subtest: les données Web Push sont masquées avant les actions du workflow
+ok 233 - les données Web Push sont masquées avant les actions du workflow
+  ---
+  duration_ms: 0.433078
+  ...
+# Subtest: une nouvelle tuile produit peut être remplacée par son image unitaire
+ok 234 - une nouvelle tuile produit peut être remplacée par son image unitaire
+  ---
+  duration_ms: 0.43986
+  ...
+# Subtest: Ma liste reprend la même image unitaire que le Catalogue sans atlas de secours
+ok 235 - Ma liste reprend la même image unitaire que le Catalogue sans atlas de secours
+  ---
+  duration_ms: 1.172768
+  ...
+# Subtest: la génération produit fixe la compression WebP tout en conservant le cadrage et la transparence
+ok 236 - la génération produit fixe la compression WebP tout en conservant le cadrage et la transparence
+  ---
+  duration_ms: 70.276797
+  ...
+# Subtest: la validation refuse un WebP produit trop lourd sans modifier le contrôle des plats
+ok 237 - la validation refuse un WebP produit trop lourd sans modifier le contrôle des plats
+  ---
+  duration_ms: 40.228898
+  ...
+# Subtest: un blocage de publication est distingué d un échec de génération OpenAI
+ok 238 - un blocage de publication est distingué d un échec de génération OpenAI
+  ---
+  duration_ms: 1.462348
+  ...
+# Subtest: le premier essai reste En cours et une relance devient Reconstruction
+ok 239 - le premier essai reste En cours et une relance devient Reconstruction
+  ---
+  duration_ms: 2.439241
+  ...
+# Subtest: une intégration OpenAI réussie quitte immédiatement l état en cours
+ok 240 - une intégration OpenAI réussie quitte immédiatement l état en cours
+  ---
+  duration_ms: 1.622116
+  ...
+# Subtest: P1 ne conserve plus de MutationObserver dans les modules applicatifs concernés
+ok 241 - P1 ne conserve plus de MutationObserver dans les modules applicatifs concernés
+  ---
+  duration_ms: 7.032229
+  ...
+# Subtest: les propriétaires publient les cycles transverses restants
+ok 242 - les propriétaires publient les cycles transverses restants
+  ---
+  duration_ms: 1.807261
+  ...
+# Subtest: les consommateurs P1 écoutent les événements propriétaires au lieu du DOM
+ok 243 - les consommateurs P1 écoutent les événements propriétaires au lieu du DOM
+  ---
+  duration_ms: 1.121301
+  ...
+# Subtest: Ma liste attend la confirmation Home Assistant avant le panier premium
+ok 244 - Ma liste attend la confirmation Home Assistant avant le panier premium
+  ---
+  duration_ms: 1.420349
+  ...
+# Subtest: Ma liste réutilise le même panier premium entre vrais rendus vides
+ok 245 - Ma liste réutilise le même panier premium entre vrais rendus vides
+  ---
+  duration_ms: 0.507917
+  ...
+# Subtest: Ma liste conserve Synchronisation tant que Home Assistant na pas confirmé son contenu
+ok 246 - Ma liste conserve Synchronisation tant que Home Assistant na pas confirmé son contenu
+  ---
+  duration_ms: 1.414389
+  ...
+# Subtest: Petit-déj & snacks contient au moins les 53 produits attendus sans doublon ni image absente
+ok 247 - Petit-déj & snacks contient au moins les 53 produits attendus sans doublon ni image absente
+  ---
+  duration_ms: 5.071481
+  ...
+# Subtest: sept produits nouveaux et regroupement Café & thé
+ok 248 - sept produits nouveaux et regroupement Café & thé
+  ---
+  duration_ms: 0.310429
+  ...
+# Subtest: orthographes corrigées et noms historiques HA compatibles
+ok 249 - orthographes corrigées et noms historiques HA compatibles
+  ---
+  duration_ms: 3.848259
+  ...
+# Subtest: les popups de Réglages partagent une coque iOS et le même défilement interne
+ok 250 - les popups de Réglages partagent une coque iOS et le même défilement interne
+  ---
+  duration_ms: 4.3232
+  ...
+# Subtest: le design moderne des produits manquants ne redéfinit plus les dimensions de la coque extérieure
+ok 251 - le design moderne des produits manquants ne redéfinit plus les dimensions de la coque extérieure
+  ---
+  duration_ms: 0.572795
+  ...
+# Subtest: le clavier ne déplace ni ne redimensionne les popups de préférences pendant la saisie
+ok 252 - le clavier ne déplace ni ne redimensionne les popups de préférences pendant la saisie
+  ---
+  duration_ms: 0.678852
+  ...
+# Subtest: le choix d une catégorie produit ne déclenche pas un clic synthétique qui ferme le dialogue
+ok 253 - le choix d une catégorie produit ne déclenche pas un clic synthétique qui ferme le dialogue
+  ---
+  duration_ms: 0.439306
+  ...
+# Subtest: supprimer un produit manquant garde le popup ouvert
+ok 254 - supprimer un produit manquant garde le popup ouvert
+  ---
+  duration_ms: 2.863418
+  ...
+# Subtest: supprimer un plat manquant garde le popup ouvert
+ok 255 - supprimer un plat manquant garde le popup ouvert
+  ---
+  duration_ms: 0.406692
+  ...
+# Subtest: les notifications produit évitent le doublon ajout puis génération et expliquent les refus
+ok 256 - les notifications produit évitent le doublon ajout puis génération et expliquent les refus
+  ---
+  duration_ms: 0.803595
+  ...
+# Subtest: les notifications finales distinguent succès, suppression et étape d échec
+ok 257 - les notifications finales distinguent succès, suppression et étape d échec
+  ---
+  duration_ms: 0.331917
+  ...
+# Subtest: la précision image reste séparée du nom et atteint les deux intégrations produit
+ok 258 - la précision image reste séparée du nom et atteint les deux intégrations produit
+  ---
+  duration_ms: 0.950361
+  ...
+# Subtest: la personnalisation des recettes se réinitialise durablement et s enregistre sans fermer le popup
+ok 259 - la personnalisation des recettes se réinitialise durablement et s enregistre sans fermer le popup
+  ---
+  duration_ms: 0.877519
+  ...
+# Subtest: la recherche des recettes personnalisées reste fermée et vide à l ouverture
+ok 260 - la recherche des recettes personnalisées reste fermée et vide à l ouverture
+  ---
+  duration_ms: 0.812873
+  ...
+# Subtest: un ingrédient du catalogue peut être ajouté à une recette personnalisée puis repris dans la fiche du plat
+ok 261 - un ingrédient du catalogue peut être ajouté à une recette personnalisée puis repris dans la fiche du plat
+  ---
+  duration_ms: 0.838142
+  ...
+# Subtest: les validations restent dans leur popup tant que celui-ci reste ouvert
+ok 262 - les validations restent dans leur popup tant que celui-ci reste ouvert
+  ---
+  duration_ms: 3.90689
+  ...
+# Subtest: les demandes manquantes affichent catégorie et statut compact sur la même ligne
+ok 263 - les demandes manquantes affichent catégorie et statut compact sur la même ligne
+  ---
+  duration_ms: 0.863702
+  ...
+# Subtest: le popup produits et plats manquants conserve l ouverture native et peut toujours se fermer
+ok 264 - le popup produits et plats manquants conserve l ouverture native et peut toujours se fermer
+  ---
+  duration_ms: 1.743927
+  ...
+# Subtest: les décorations du popup sont idempotentes et ne nourrissent plus leurs MutationObserver
+ok 265 - les décorations du popup sont idempotentes et ne nourrissent plus leurs MutationObserver
+  ---
+  duration_ms: 0.688481
+  ...
+# Subtest: les explications de popup restent courtes et essentielles
+ok 266 - les explications de popup restent courtes et essentielles
+  ---
+  duration_ms: 1.457519
+  ...
+# Subtest: les sous-vues de Réglages sans flèche gardent leur navigation et leur fermeture
+ok 267 - les sous-vues de Réglages sans flèche gardent leur navigation et leur fermeture
+  ---
+  duration_ms: 2.871804
+  ...
+# Subtest: les feuilles de Réglages touchent les bords iPhone, sans toucher aux safe areas
+ok 268 - les feuilles de Réglages touchent les bords iPhone, sans toucher aux safe areas
+  ---
+  duration_ms: 1.181
+  ...
+# Subtest: le titre produits manquants conserve son icône et le style des actions est cohérent
+ok 269 - le titre produits manquants conserve son icône et le style des actions est cohérent
+  ---
+  duration_ms: 1.127326
+  ...
+# Subtest: Réglages aligne les éléments internes sur une colonne centrale sobre
+ok 270 - Réglages aligne les éléments internes sur une colonne centrale sobre
+  ---
+  duration_ms: 1.924528
+  ...
+# Subtest: la colonne centrée ne réduit pas la coque bord à bord ni les zones de saisie
+ok 271 - la colonne centrée ne réduit pas la coque bord à bord ni les zones de saisie
+  ---
+  duration_ms: 0.932345
+  ...
+# Subtest: Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent leurs interactions
+ok 272 - Gestion et Messages d erreur réutilisent le trait du Catalogue et gardent leurs interactions
+  ---
+  duration_ms: 1.624655
+  ...
+# Subtest: v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, recettes choisies dans une liste
+ok 273 - v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, recettes choisies dans une liste
+  ---
+  duration_ms: 2.188071
+  ...
+# Subtest: v617 : les sous-écrans de Gestion ont une flèche retour à la place de l icône, sans tuile différée
+ok 274 - v617 : les sous-écrans de Gestion ont une flèche retour à la place de l icône, sans tuile différée
+  ---
+  duration_ms: 1.49971
+  ...
+# Subtest: v618 : Messages d erreur en liste groupée, détails dépliés sur place, sélecteur à deux mots
+ok 275 - v618 : Messages d erreur en liste groupée, détails dépliés sur place, sélecteur à deux mots
+  ---
+  duration_ms: 1.244764
+  ...
+# Subtest: v621 : recettes par catégories repliables avec flèche retour, et rafraîchissement qui affiche son état
+ok 276 - v621 : recettes par catégories repliables avec flèche retour, et rafraîchissement qui affiche son état
+  ---
+  duration_ms: 3.042877
+  ...
+# Subtest: les préférences conservent exactement les valeurs par défaut actuelles
+ok 277 - les préférences conservent exactement les valeurs par défaut actuelles
+  ---
+  duration_ms: 4.237042
+  ...
+# Subtest: la normalisation conserve les règles historiques des quatre préférences
+ok 278 - la normalisation conserve les règles historiques des quatre préférences
+  ---
+  duration_ms: 2.168704
+  ...
+# Subtest: lecture invalide et écriture stockent toujours un objet canonique
+ok 279 - lecture invalide et écriture stockent toujours un objet canonique
+  ---
+  duration_ms: 2.029784
+  ...
+# Subtest: app.js délègue la persistance sans dupliquer le stockage des préférences
+ok 280 - app.js délègue la persistance sans dupliquer le stockage des préférences
+  ---
+  duration_ms: 2.195276
+  ...
+# Subtest: le service est chargé avant app.js et reste dans le shell hors ligne
+ok 281 - le service est chargé avant app.js et reste dans le shell hors ligne
+  ---
+  duration_ms: 0.883882
+  ...
+# Subtest: les nouveaux WebP sont remesurés sans effacer les cadrages inchangés
+ok 282 - les nouveaux WebP sont remesurés sans effacer les cadrages inchangés
+  ---
+  duration_ms: 4.431882
+  ...
+# Subtest: les cadrages créés depuis la v722 restent valables en v723
+ok 283 - les cadrages créés depuis la v722 restent valables en v723
+  ---
+  duration_ms: 2.477936
+  ...
+# Subtest: les anciens caches sans version invalident seulement les images modifiées
+ok 284 - les anciens caches sans version invalident seulement les images modifiées
+  ---
+  duration_ms: 0.379329
+  ...
+# Subtest: v780 remesure les neuf boissons alcoolisées remplacées et conserve les autres cadrages
+ok 285 - v780 remesure les neuf boissons alcoolisées remplacées et conserve les autres cadrages
+  ---
+  duration_ms: 0.720162
+  ...
+# Subtest: aucun ancien atlas produit ni chemin atlas ne subsiste
+ok 286 - aucun ancien atlas produit ni chemin atlas ne subsiste
+  ---
+  duration_ms: 7.215343
+  ...
+# Subtest: chaque produit du catalogue dispose de son WebP unitaire canonique
+ok 287 - chaque produit du catalogue dispose de son WebP unitaire canonique
+  ---
+  duration_ms: 11.711852
+  ...
+# Subtest: Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel
+ok 288 - Ma liste et la fiche plat demandent directement leurs WebP sans délai artificiel
+  ---
+  duration_ms: 1.596039
+  ...
+# Subtest: les dix produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+ok 289 - les dix produits harmonisés respectent la limite utilisateur de 15 Ko et gardent un alpha WebP
+  ---
+  duration_ms: 4.193939
+  ...
+# Subtest: un achat accepté enregistre directement son nom et sa quantité
+ok 290 - un achat accepté enregistre directement son nom et sa quantité
+  ---
+  duration_ms: 5.631959
+  ...
+# Subtest: un plat confirmé débite le stock probabiliste sans dépendre du texte du toast
+ok 291 - un plat confirmé débite le stock probabiliste sans dépendre du texte du toast
+  ---
+  duration_ms: 2.676413
+  ...
+# Subtest: activer ou désactiver l historique prévient tout de suite le badge À prévoir
+ok 292 - activer ou désactiver l historique prévient tout de suite le badge À prévoir
+  ---
+  duration_ms: 1.524179
+  ...
+# Subtest: le résumé de l historique compte les achats et liste les derniers produits
+ok 293 - le résumé de l historique compte les achats et liste les derniers produits
+  ---
+  duration_ms: 2.051095
+  ...
+# Subtest: l écran vide de À prévoir montre si les achats sont bien enregistrés
+ok 294 - l écran vide de À prévoir montre si les achats sont bien enregistrés
+  ---
+  duration_ms: 4.484855
+  ...
+# Subtest: deux appareils conservent leurs achats distincts dans un même cycle
+ok 295 - deux appareils conservent leurs achats distincts dans un même cycle
+  ---
+  duration_ms: 1.133878
+  ...
+# Subtest: la fusion Home Assistant conserve les événements locaux et distants sans doublons
+ok 296 - la fusion Home Assistant conserve les événements locaux et distants sans doublons
+  ---
+  duration_ms: 2.403621
+  ...
+# Subtest: la synchronisation réutilise le WebSocket authentifié et la liste de demandes sans toucher à Ma liste
+ok 297 - la synchronisation réutilise le WebSocket authentifié et la liste de demandes sans toucher à Ma liste
+  ---
+  duration_ms: 1.441238
+  ...
+# Subtest: un plat partagé conserve les consommations associées aux cycles fusionnés
+ok 298 - un plat partagé conserve les consommations associées aux cycles fusionnés
+  ---
+  duration_ms: 1.45818
+  ...
+# Subtest: la rétention distante ne supprime que les entrées historiques expirées
+ok 299 - la rétention distante ne supprime que les entrées historiques expirées
+  ---
+  duration_ms: 0.413405
+  ...
+# Subtest: Pâtes tomate mozzarella: Mozzarella, 4 personnes => 2 unité(s) d'achat
+ok 300 - Pâtes tomate mozzarella: Mozzarella, 4 personnes => 2 unité(s) d'achat
+  ---
+  duration_ms: 1.4275
+  ...
+# Subtest: Penne poulet crème: Poulet, 8 personnes => 10 unité(s) d'achat
+ok 301 - Penne poulet crème: Poulet, 8 personnes => 10 unité(s) d'achat
+  ---
+  duration_ms: 0.230589
+  ...
+# Subtest: Crème brûlée: Crème liquide, 4 personnes => 3 unité(s) d'achat
+ok 302 - Crème brûlée: Crème liquide, 4 personnes => 3 unité(s) d'achat
+  ---
+  duration_ms: 1.418253
+  ...
+# Subtest: Spaghetti carbonara: Œufs, 4 personnes => 1 unité(s) d'achat
+ok 303 - Spaghetti carbonara: Œufs, 4 personnes => 1 unité(s) d'achat
+  ---
+  duration_ms: 0.129031
+  ...
+# Subtest: Spaghetti carbonara: Spaghetti, 4 personnes => 1 unité(s) d'achat
+ok 304 - Spaghetti carbonara: Spaghetti, 4 personnes => 1 unité(s) d'achat
+  ---
+  duration_ms: 0.11798
+  ...
+# Subtest: le besoin au poids conserve les pas de 100 g de la v295
+ok 305 - le besoin au poids conserve les pas de 100 g de la v295
+  ---
+  duration_ms: 0.176383
+  ...
+# Subtest: les portions arrondissent les conditionnements à l’unité supérieure
+ok 306 - les portions arrondissent les conditionnements à l’unité supérieure
+  ---
+  duration_ms: 0.323991
+  ...
+# Subtest: une recette personnalisée ajuste la base de 2 personnes sans changer le moteur d’achat
+ok 307 - une recette personnalisée ajuste la base de 2 personnes sans changer le moteur d’achat
+  ---
+  duration_ms: 0.449616
+  ...
+# Subtest: les libellés audités décrivent le mode d’achat sans exposer les références techniques
+ok 308 - les libellés audités décrivent le mode d’achat sans exposer les références techniques
+  ---
+  duration_ms: 0.446149
+  ...
+# Subtest: le catalogue conserve le conditionnement même quand une quantité de recette est calculée
+ok 309 - le catalogue conserve le conditionnement même quand une quantité de recette est calculée
+  ---
+  duration_ms: 0.257301
+  ...
+# Subtest: les fruits, viandes et poissons vendus à la pièce ont le bon libellé
+ok 310 - les fruits, viandes et poissons vendus à la pièce ont le bon libellé
+  ---
+  duration_ms: 0.248344
+  ...
+# Subtest: chaque produit du catalogue a un conditionnement audité sans grammage arbitraire
+ok 311 - chaque produit du catalogue a un conditionnement audité sans grammage arbitraire
+  ---
+  duration_ms: 0.927315
+  ...
+# Subtest: les lentilles utilisent la quantité spécifique du plat pour 2 personnes
+ok 312 - les lentilles utilisent la quantité spécifique du plat pour 2 personnes
+  ---
+  duration_ms: 0.196453
+  ...
+# Subtest: les références techniques restent séparées des libellés visibles
+ok 313 - les références techniques restent séparées des libellés visibles
+  ---
+  duration_ms: 0.778225
+  ...
+# Subtest: 200 g déjà prévus plus 300 g d un second plat donnent 500 g sur une seule ligne
+ok 314 - 200 g déjà prévus plus 300 g d un second plat donnent 500 g sur une seule ligne
+  ---
+  duration_ms: 7.774662
+  ...
+# Subtest: le cumul se fait sur le besoin brut avant la conversion en paquets
+ok 315 - le cumul se fait sur le besoin brut avant la conversion en paquets
+  ---
+  duration_ms: 2.720058
+  ...
+# Subtest: les recettes natives sont calibrées pour 2 personnes
+ok 316 - les recettes natives sont calibrées pour 2 personnes
+  ---
+  duration_ms: 1.592023
+  ...
+# Subtest: les 88 plats ont tous une quantité spécifique et des ingrédients du catalogue
+ok 317 - les 88 plats ont tous une quantité spécifique et des ingrédients du catalogue
+  ---
+  duration_ms: 1.186932
+  ...
+# Subtest: la réconciliation attend la fin du chargement Home Assistant
+ok 318 - la réconciliation attend la fin du chargement Home Assistant
+  ---
+  duration_ms: 0.255688
+  ...
+# Subtest: WebP transparents 384x384 et sous 150 Kio pour les neuf corrections v732
+ok 319 - WebP transparents 384x384 et sous 150 Kio pour les neuf corrections v732
+  ---
+  duration_ms: 3.744123
+  ...
+# Subtest: recalculer uniquement les neuf métriques du lot 732
+ok 320 - recalculer uniquement les neuf métriques du lot 732
+  ---
+  duration_ms: 20.494648
+  ...
+# Subtest: trois retouches ciblées sont des WebP transparents 384px et sans image manquante
+ok 321 - trois retouches ciblées sont des WebP transparents 384px et sans image manquante
+  ---
+  duration_ms: 3.197217
+  ...
+# Subtest: les nouveaux cadrages sont recalculés sans vider ceux des produits inchangés
+ok 322 - les nouveaux cadrages sont recalculés sans vider ceux des produits inchangés
+  ---
+  duration_ms: 0.326987
+  ...
+# Subtest: toutes les sauces et épices du périmètre restent transparentes et sous 15 000 octets
+ok 323 - toutes les sauces et épices du périmètre restent transparentes et sous 15 000 octets
+  ---
+  duration_ms: 4.904693
+  ...
+# Subtest: les deux références approuvées Mayonnaise et Paprika sont conservées à l’identique
+ok 324 - les deux références approuvées Mayonnaise et Paprika sont conservées à l’identique
+  ---
+  duration_ms: 1.253482
+  ...
+# Subtest: les cadrages antérieurs sont recalculés seulement pour les visuels renouvelés
+ok 325 - les cadrages antérieurs sont recalculés seulement pour les visuels renouvelés
+  ---
+  duration_ms: 9.258588
+  ...
+# Subtest: le déverrouillage stabilise le viewport iOS sans déplacer la saisie
+ok 326 - le déverrouillage stabilise le viewport iOS sans déplacer la saisie
+  ---
+  duration_ms: 2.930528
+  ...
+# Subtest: le popup des demandes ne présente plus les paramètres techniques
+ok 327 - le popup des demandes ne présente plus les paramètres techniques
+  ---
+  duration_ms: 2.045945
+  ...
+# Subtest: Connexion Home Assistant présente les deux statuts sans toucher aux listes
+ok 328 - Connexion Home Assistant présente les deux statuts sans toucher aux listes
+  ---
+  duration_ms: 2.106783
+  ...
+# Subtest: Notifications reste une sous-vue de Gestion de l application et conserve les actions Push
+ok 329 - Notifications reste une sous-vue de Gestion de l application et conserve les actions Push
+  ---
+  duration_ms: 0.651108
+  ...
+# Subtest: le clic Notifications affiche la sous-vue sans laisser le panneau Gestion visible
+ok 330 - le clic Notifications affiche la sous-vue sans laisser le panneau Gestion visible
+  ---
+  duration_ms: 0.56452
+  ...
+# Subtest: le design préserve les safe areas et évite de masquer les panneaux cachés
+ok 331 - le design préserve les safe areas et évite de masquer les panneaux cachés
+  ---
+  duration_ms: 0.915774
+  ...
+# Subtest: Réglages : texte des boutons ≤ sous-titre < titre, et aucun texte sous 13,5 px
+ok 332 - Réglages : texte des boutons ≤ sous-titre < titre, et aucun texte sous 13,5 px
+  ---
+  duration_ms: 2.562601
+  ...
+# Subtest: Réglages : aucune déclaration ne dépasse le sous-titre (hors titre) ni ne passe sous 13,5 px
+ok 333 - Réglages : aucune déclaration ne dépasse le sous-titre (hors titre) ni ne passe sous 13,5 px
+  ---
+  duration_ms: 22.087961
+  ...
+# Subtest: Réglages : les boutons de popup et « Se déconnecter » héritent de l’échelle
+ok 334 - Réglages : les boutons de popup et « Se déconnecter » héritent de l’échelle
+  ---
+  duration_ms: 1.284331
+  ...
+# Subtest: Réglages : les textes de tuiles restent assez courts pour tenir sur une ligne
+ok 335 - Réglages : les textes de tuiles restent assez courts pour tenir sur une ligne
+  ---
+  duration_ms: 0.940181
+  ...
+# Subtest: Catalogue : Annuler et Ajouter ont exactement la même taille et le même alignement
+ok 336 - Catalogue : Annuler et Ajouter ont exactement la même taille et le même alignement
+  ---
+  duration_ms: 0.797473
+  ...
+# Subtest: Catalogue : le message flottant du bas garde sa pose native (marges de 14 px, police système) et reste dans l’écran
+ok 337 - Catalogue : le message flottant du bas garde sa pose native (marges de 14 px, police système) et reste dans l’écran
+  ---
+  duration_ms: 0.770901
+  ...
+# Subtest: Catalogue : les messages du bas tiennent sur une ligne (titres courts, détail limité au nom ou à un compteur)
+ok 338 - Catalogue : les messages du bas tiennent sur une ligne (titres courts, détail limité au nom ou à un compteur)
+  ---
+  duration_ms: 1.233671
+  ...
+# Subtest: recette : compteur sans « ingrédients sur », badges de quantité de largeur identique, ajout collé à la liste
+ok 339 - recette : compteur sans « ingrédients sur », badges de quantité de largeur identique, ajout collé à la liste
+  ---
+  duration_ms: 1.024285
+  ...
+# Subtest: catalogue (Suppression) : Annuler rouge, ligne en retrait rouge franc sans rose, aucun balayage sur les plats
+ok 340 - catalogue (Suppression) : Annuler rouge, ligne en retrait rouge franc sans rose, aucun balayage sur les plats
+  ---
+  duration_ms: 0.558838
+  ...
+# Subtest: catalogue (Suppression) : le panneau reste un bloc pour que la liste défile (pas de grille qui écrase la tuile)
+ok 341 - catalogue (Suppression) : le panneau reste un bloc pour que la liste défile (pas de grille qui écrase la tuile)
+  ---
+  duration_ms: 0.36497
+  ...
+# Subtest: les portions de préférence passent par le propriétaire des quantités
+ok 342 - les portions de préférence passent par le propriétaire des quantités
+  ---
+  duration_ms: 3.009692
+  ...
+# Subtest: l entrée Catalogue a un propriétaire unique et reste événementielle
+ok 343 - l entrée Catalogue a un propriétaire unique et reste événementielle
+  ---
+  duration_ms: 3.49617
+  ...
+# Subtest: sur réseau lent, chaque script et style de la page part du cache sans attendre le réseau
+ok 344 - sur réseau lent, chaque script et style de la page part du cache sans attendre le réseau
+  ---
+  duration_ms: 42.617417
+  ...
+# Subtest: un visuel déjà vérifié pour cette version n est plus re-téléchargé à chaque lancement
+ok 345 - un visuel déjà vérifié pour cette version n est plus re-téléchargé à chaque lancement
+  ---
+  duration_ms: 6.185267
+  ...
+# Subtest: le shell de démarrage reste un document HTML et le service worker reste du JavaScript
+ok 346 - le shell de démarrage reste un document HTML et le service worker reste du JavaScript
+  ---
+  duration_ms: 3.217978
+  ...
+# Subtest: le lancement reprend le flux direct sans écran de transition supplémentaire
+ok 347 - le lancement reprend le flux direct sans écran de transition supplémentaire
+  ---
+  duration_ms: 4.388157
+  ...
+# Subtest: la version courante reste cohérente entre le shell, le cache et les modules visuels
+ok 348 - la version courante reste cohérente entre le shell, le cache et les modules visuels
+  ---
+  duration_ms: 1.183074
+  ...
+# Subtest: dish-local-images reste limité aux visuels des plats
+ok 349 - dish-local-images reste limité aux visuels des plats
+  ---
+  duration_ms: 3.164884
+  ...
+# Subtest: settings-tab-badge reste limité au badge Réglages
+ok 350 - settings-tab-badge reste limité au badge Réglages
+  ---
+  duration_ms: 0.348389
+  ...
+# Subtest: les responsabilités extraites ont des propriétaires explicites
+ok 351 - les responsabilités extraites ont des propriétaires explicites
+  ---
+  duration_ms: 1.924288
+  ...
+# Subtest: P4 conserve un démarrage déterministe puis prépare Produits avant les fonctions secondaires des Plats
+ok 352 - P4 conserve un démarrage déterministe puis prépare Produits avant les fonctions secondaires des Plats
+  ---
+  duration_ms: 1.779426
+  ...
+# Subtest: les images produit suivent les rendus propriétaires sans observer le DOM
+ok 353 - les images produit suivent les rendus propriétaires sans observer le DOM
+  ---
+  duration_ms: 2.004684
+  ...
+# Subtest: le marqueur des plats suit les événements métier sans observer le DOM
+ok 354 - le marqueur des plats suit les événements métier sans observer le DOM
+  ---
+  duration_ms: 1.705953
+  ...
+# Subtest: les propriétaires publient les rendus de plats et les quantités décorées
+ok 355 - les propriétaires publient les rendus de plats et les quantités décorées
+  ---
+  duration_ms: 0.721055
+  ...
+# Subtest: l historique des achats consomme les événements métier sans observer le DOM ni lire les toasts
+ok 356 - l historique des achats consomme les événements métier sans observer le DOM ni lire les toasts
+  ---
+  duration_ms: 0.509563
+  ...
+# Subtest: Ma liste publie l achat accepté avec sa quantité et l état hors ligne
+ok 357 - Ma liste publie l achat accepté avec sa quantité et l état hors ligne
+  ---
+  duration_ms: 0.933879
+  ...
+# Subtest: P1 termine le découplage des états globaux et demandes manquantes
+ok 358 - P1 termine le découplage des états globaux et demandes manquantes
+  ---
+  duration_ms: 1.135943
+  ...
+# Subtest: le badge affiche une version courte sans changer le numéro interne
+ok 359 - le badge affiche une version courte sans changer le numéro interne
+  ---
+  duration_ms: 2.478838
+  ...
+# Subtest: sept visuels Viandes & poissons sont des WebP RGBA de taille maîtrisée sous 15 Ko
+ok 360 - sept visuels Viandes & poissons sont des WebP RGBA de taille maîtrisée sous 15 Ko
+  ---
+  duration_ms: 3.876931
+  ...
+# Subtest: les illustrations distinctes ne réutilisent plus les anciens visuels
+ok 361 - les illustrations distinctes ne réutilisent plus les anciens visuels
+  ---
+  duration_ms: 2.367963
+  ...
+# Subtest: P6 conserve un cache visuel persistant sans remigration des anciens caches
+ok 362 - P6 conserve un cache visuel persistant sans remigration des anciens caches
+  ---
+  duration_ms: 2.296222
+  ...
+# Subtest: les visuels critiques sont toujours seedés et les items/plats restent persistants
+ok 363 - les visuels critiques sont toujours seedés et les items/plats restent persistants
+  ---
+  duration_ms: 0.457481
+  ...
+# Subtest: les empreintes des visuels de sw.js correspondent exactement aux fichiers du dépôt
+ok 364 - les empreintes des visuels de sw.js correspondent exactement aux fichiers du dépôt
+  ---
+  duration_ms: 101.732577
+  ...
+# Subtest: aucune liste manuelle de visuels à invalider n est réintroduite
+ok 365 - aucune liste manuelle de visuels à invalider n est réintroduite
+  ---
+  duration_ms: 0.503441
+  ...
+# Subtest: à la mise à jour, seul le visuel modifié ou supprimé quitte le cache, sans aucun téléchargement
+ok 366 - à la mise à jour, seul le visuel modifié ou supprimé quitte le cache, sans aucun téléchargement
+  ---
+  duration_ms: 31.338779
+  ...
+# Subtest: un visuel à jour est servi du cache, un visuel modifié est téléchargé avant l affichage
+ok 367 - un visuel à jour est servi du cache, un visuel modifié est téléchargé avant l affichage
+  ---
+  duration_ms: 4.354982
+  ...
+# Subtest: hors ligne, l ancienne copie reste affichée plutôt qu une image vide
+ok 368 - hors ligne, l ancienne copie reste affichée plutôt qu une image vide
+  ---
+  duration_ms: 2.413651
+  ...
+# Subtest: Citron et Coco sont disponibles une seule fois dans les yaourts et achetés par pot
+ok 369 - Citron et Coco sont disponibles une seule fois dans les yaourts et achetés par pot
+  ---
+  duration_ms: 2.065453
+  ...
+# Subtest: les quatre parfums disposent de WebP unitaires transparents sous 15000 octets
+ok 370 - les quatre parfums disposent de WebP unitaires transparents sous 15000 octets
+  ---
+  duration_ms: 0.942987
+  ...
+1..370
+# tests 370
+# suites 0
+# pass 370
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2793.140217
