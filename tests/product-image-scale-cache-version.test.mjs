@@ -51,12 +51,12 @@ test('v780 remesure les neuf boissons alcoolisées remplacées et conserve les a
   beers.forEach(slug=>assert.ok(current.has('./www/Items/'+slug+'.webp')));
 });
 
-test('v781 remesure uniquement les onze visuels validés et conserve les cadrages récents',()=>{
+test('v783 remesure uniquement les onze visuels validés et conserve les cadrages récents',()=>{
   const juices=["jus-d-orange","jus-de-pomme","jus-d-ananas","jus-de-raisin","jus-de-tomate","jus-multifruits","jus-de-poire","biere-sans-alcool","rhum","ricard","tonic"];
   const items={...Object.fromEntries(juices.map(slug=>['./www/Items/'+slug+'.webp',[1.1,0,0]])),'./www/Items/vin-rouge.webp':[1.05,0,-1]};
-  const migrated=restore({version:'v780',items},'v781');
+  const migrated=restore({version:'v782',items},'v783');
   juices.forEach(slug=>assert.equal(migrated.has('./www/Items/'+slug+'.webp'),false));
   assert.deepEqual(migrated.get('./www/Items/vin-rouge.webp'),{scale:1.05,shiftX:0,shiftY:-1});
-  const current=restore({version:'v781',items},'v781');
+  const current=restore({version:'v783',items},'v783');
   juices.forEach(slug=>assert.ok(current.has('./www/Items/'+slug+'.webp')));
 });
