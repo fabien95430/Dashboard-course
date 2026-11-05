@@ -3127,20 +3127,20 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v782 — décor transparent à droite, dans l’espace libre au-dessus de la recherche. */
+/* v784 — décor plus discret dans l’espace libre entre le titre et la recherche. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
     position:fixed;
-    inset:env(safe-area-inset-top) 0 auto auto;
-    width:min(74vw,300px);
-    height:148px;
+    inset:calc(env(safe-area-inset-top) + 28px) 8px auto auto;
+    width:min(56vw,228px);
+    height:116px;
     pointer-events:none;
     z-index:0;
     background:url("./www/list-header-poires-v782.webp") right -12px / 100% auto no-repeat;
-    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 66%,transparent 100%);
-    mask-image:linear-gradient(to bottom,#000 0%,#000 66%,transparent 100%);
-    opacity:.96;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 50%,transparent 100%);
+    mask-image:linear-gradient(to bottom,#000 0%,#000 50%,transparent 100%);
+    opacity:.88;
   }
   .app>.list-view.is-active{position:relative;z-index:1}
   .list-view>.list-progress{display:none!important}
