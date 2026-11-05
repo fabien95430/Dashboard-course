@@ -821,3 +821,31 @@ Une génération par outil intégré, sans API payante du projet. Nouveau bocal 
 Revue sur fonds clair/foncé à 160/48 px et calcul réel du cadrage : scale 1.016, shiftX 0, shiftY 0.5, aucun rognage Ma liste/Catalogue. Recalcul du seul cadrage Pécan pour les caches antérieurs à v775 ; pas de purge du cache visuel persistant du service worker. Les 521 autres images sont identiques octet par octet, catalogue inchangé à 522 produits. Consigne de génération corrigée pour prévenir cette dérive.
 
 Validation : 362 tests réussis, syntaxe de tous les JavaScript et compilation Python, git diff --check. Validateur Bash tenté sans modification ; /dev/fd/63 indisponible, contrôles équivalents exécutés séparément. Pas d’essai interactif iPhone ou Home Assistant réel. Version et URLs synchronisées en v775 ; seuls l’asset Pécan, son recalcul de cadrage, versions et documentation/consignes changent. OAuth, Home Assistant, WebSocket, coffre, biométrie, mode test, fallback SVG, réseau du service worker et styles mobiles préservés.
+
+
+## Fruits secs tous en sachets — v776
+
+Source relue : main 0c9a2a483fc4c703724b2c48cbae80c43e3b8435 (v775). Audit visuel de treize références : cinq noix emballées (Cajou, Pistaches, Cacahuètes, Pécan, Brésil), cinq fruits séchés (Dattes, Abricots secs, Raisins secs, Pruneaux, Figues sèches), puis Amandes, Noix et Noisettes nature. Après l’audit, choix explicite de l’utilisateur « Tous en sachets » : dix visuels harmonisés sur le sachet kraft/crème fermé à grande fenêtre de Dattes corrigé. Les trois présentations naturelles restent conservées.
+
+Même silhouette, palette, fermeture, fenêtre, nom générique brun en capitales, petit dessin brun au trait et décoration ocre basse ; seul le contenu exact et son identification changent. Aucun grand fruit coloré. Les bocaux de Cajou, Pistaches, Cacahuètes, Pécan et Brésil sont remplacés par des sachets. Conditionnement affiché/acheté Sachet pour les dix références ; seuls les overrides Pécan/Brésil nécessitaient une correction. Aucun nom, groupe ou dosage de recette changé.
+
+Onze générations par outil intégré sans API payante du projet : cinq fruits séchés, un bocal Brésil écarté après le choix des sachets, puis cinq noix en sachets. Dix assets finaux, aucune image de bocal écartée intégrée.
+
+| Produit | Poids WebP final (octets) | Conditionnement |
+| --- | ---: | --- |
+| Noix de cajou | 12938 | Sachet |
+| Pistaches | 14518 | Sachet |
+| Cacahuètes | 13632 | Sachet |
+| Noix de pécan | 13530 | Sachet |
+| Noix du Brésil | 13664 | Sachet |
+| Dattes | 13474 | Sachet |
+| Abricots secs | 13554 | Sachet |
+| Raisins secs | 13502 | Sachet |
+| Pruneaux | 14640 | Sachet |
+| Figues sèches | 13758 | Sachet |
+
+Tous les fichiers sont WebP RGBA 256 px, alpha réel, marges préservées, sous 15 000 octets mesurés. Contrôle clair/foncé à 160/48 px et calcul du cadrage automatique réel : aucun rognage Ma liste/Catalogue. Relevé global des 522 poids mis à jour ; les 512 autres images sont identiques octet par octet. Consignes et prompt de génération actualisés avec priorité explicite au choix Tous en sachets, remplaçant les bocaux des anciennes consignes.
+
+Validation : 363 tests réussis. Test ajouté pour les dix libellés Sachet d’affichage et d’achat ; attentes Pécan/Brésil mises à jour dans le test des ajouts v774. Syntaxe des 25 JavaScript et compilation Python validées, git diff --check. Validateur Bash tenté sans changement ; /dev/fd/63 indisponible, contrôles équivalents exécutés séparément. Pas d’essai interactif iPhone ou Home Assistant réel.
+
+Version et URLs synchronisées en v776 ; recalcul seulement des dix cadrages concernés pour les caches antérieurs, cache visuel persistant conservé et aucune purge ajoutée au service worker. Catalogue, logique réseau du service worker, fallback SVG, architecture statique, OAuth, Home Assistant, WebSocket, coffre, verrouillage/biométrie, mode test et styles mobiles inchangés.

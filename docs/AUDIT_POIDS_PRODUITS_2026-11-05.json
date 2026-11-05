@@ -3436,7 +3436,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Apéritif",
     "before": 9182,
-    "bytes": 9182
+    "bytes": 13632
   },
   {
     "name": "Chips",
@@ -3482,7 +3482,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Apéritif",
     "before": 7262,
-    "bytes": 7262
+    "bytes": 12938
   },
   {
     "name": "Olives",
@@ -3498,7 +3498,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Apéritif",
     "before": 9652,
-    "bytes": 9652
+    "bytes": 14518
   },
   {
     "name": "Pop-corn",
@@ -4477,7 +4477,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Petit-déjeuner",
     "before": 0,
-    "bytes": 13310
+    "bytes": 13474
   },
   {
     "name": "Abricots secs",
@@ -4485,7 +4485,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Petit-déjeuner",
     "before": 0,
-    "bytes": 13714
+    "bytes": 13554
   },
   {
     "name": "Raisins secs",
@@ -4493,7 +4493,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Petit-déjeuner",
     "before": 0,
-    "bytes": 14780
+    "bytes": 13502
   },
   {
     "name": "Bagels",
@@ -4565,7 +4565,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Apéritif",
     "before": 0,
-    "bytes": 14692
+    "bytes": 13530
   },
   {
     "name": "Noix du Brésil",
@@ -4573,7 +4573,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Apéritif",
     "before": 0,
-    "bytes": 14088
+    "bytes": 13664
   },
   {
     "name": "Pruneaux",
@@ -4581,7 +4581,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Petit-déjeuner",
     "before": 0,
-    "bytes": 13434
+    "bytes": 14640
   },
   {
     "name": "Figues sèches",
@@ -4589,7 +4589,7 @@
     "category": "Petit-déj & snacks",
     "subgroup": "Petit-déjeuner",
     "before": 0,
-    "bytes": 13650
+    "bytes": 13758
   },
   {
     "name": "Crème de marrons",
