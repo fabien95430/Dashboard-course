@@ -115,6 +115,20 @@ const DISPLAY_MODE_BY_SUB=Object.freeze({
 });
 
 const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
+  "Tofu":"Barquette",
+  "Lait de soja":"Bouteille",
+  "Haricots blancs":"Boîte",
+  "Haricots verts en boîte":"Boîte",
+  "Choux de Bruxelles":"Pièce",
+  "Chou blanc":"Pièce",
+  "Pamplemousse":"Pièce",
+  "Pastèque":"Pièce",
+  "Dattes":"Sachet",
+  "Abricots secs":"Sachet",
+  "Raisins secs":"Sachet",
+  "Bagels":"Paquet",
+  "Crème de coco":"Boîte",
+
   "Emmental râpé":"Sachet",
   "Parmesan râpé":"Sachet",
   "Mozzarella en billes":"Sachet",

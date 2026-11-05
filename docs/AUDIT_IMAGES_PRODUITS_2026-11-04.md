@@ -755,3 +755,30 @@ Quinze générations avec l’outil intégré, références locales inspectées,
 Tous les nouveaux fichiers sont des WebP RGBA 256 px avec alpha réel, marges et poids maximal mesuré de 15 000 octets. Revue clair/foncé à 160/48 px et exécution du cadrage automatique réel : pas de rognage Ma liste/Catalogue. Deux tests ajoutés pour unicité, classement, conditionnements et images transparentes sous 15 Ko ; test des confitures étendu de neuf à onze parfums, assertions conservées. 358 tests réussis, syntaxe JS, compilation Python et git diff --check. Validateur Bash inchangé, /dev/fd/63 indisponible : contrôles exécutés séparément.
 
 URLs et version synchronisées en v772. Code de cadrage/fallback et logique réseau du service worker identiques à main ; cache persistant conservé. Architecture statique, OAuth, WebSocket, Home Assistant, coffre, verrouillage/biométrie, mode test et styles mobiles préservés. Pas d’essai interactif iPhone ni de session Home Assistant réelle. Liste des propositions marquée intégrée. Relevé global des poids mis à jour pour les 497 références.
+
+
+## Treize produits validés — v773
+
+Source relue : main c42b36672e24ae0995a64bf321eb374cb78e6772 (v772). Ajout des treize produits choisis par l’utilisateur, sans Lentilles corail ni Pois cassés. Les 497 produits précédents et leurs images sont conservés octet par octet. Catalogue final : 510 références.
+
+Treize générations par outil intégré, sans API OpenAI payante du projet. Références locales inspectées : Feta, Lait d’amande, Pois chiches, Brocoli, Chou rouge, Oranges, Melon, Granola, Pains burger et Lait de coco. Conditionnements et palettes de famille conservés ; contenu exact distinct, pas de marque ou texte ajouté. Fruits séchés assortis en sachets à fenêtre ; fruits/légumes naturels ; conserves fermées crème/sauge. Crème de coco distinguée par une volute imprimée.
+
+| Produit | Poids WebP final (octets) | Achat |
+| --- | ---: | --- |
+| Tofu | 9340 | Barquette |
+| Lait de soja | 6592 | Bouteille |
+| Haricots blancs | 11454 | Boîte |
+| Haricots verts en boîte | 12724 | Boîte |
+| Choux de Bruxelles | 14166 | Pièce |
+| Chou blanc | 14910 | Pièce |
+| Pamplemousse | 14014 | Pièce |
+| Pastèque | 14848 | Pièce |
+| Dattes | 13310 | Sachet |
+| Abricots secs | 13714 | Sachet |
+| Raisins secs | 14780 | Sachet |
+| Bagels | 13008 | Paquet |
+| Crème de coco | 12506 | Boîte |
+
+Treize WebP RGBA 256 px, tous sous 15 000 octets mesurés, alpha réel et marges préservés. Revue clair/foncé à 160/48 px ; calcul réel du cadrage automatique sans rognage Ma liste/Catalogue. Deux tests ajoutés pour unicité, classement, modes d’achat et WebP transparents sous 15 Ko. Validation : 360 tests réussis, syntaxe JavaScript, compilation Python et git diff --check. Validateur Bash intact ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Pas d’essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés, relevé global des 510 poids actualisé. Version et URLs de chargement synchronisées en v773. Aucun changement de la logique du service worker, du cadrage/fallback, de la sécurité, OAuth, WebSocket, coffre, verrouillage/biométrie, mode test, architecture statique ou styles mobiles.

@@ -4406,5 +4406,109 @@
     "subgroup": "Hygiène",
     "before": 0,
     "bytes": 9292
+  },
+  {
+    "name": "Tofu",
+    "slug": "tofu",
+    "category": "Frais",
+    "subgroup": "Traiteur frais",
+    "before": 0,
+    "bytes": 9340
+  },
+  {
+    "name": "Lait de soja",
+    "slug": "lait-de-soja",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 0,
+    "bytes": 6592
+  },
+  {
+    "name": "Haricots blancs",
+    "slug": "haricots-blancs",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 0,
+    "bytes": 11454
+  },
+  {
+    "name": "Haricots verts en boîte",
+    "slug": "haricots-verts-en-boite",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 0,
+    "bytes": 12724
+  },
+  {
+    "name": "Choux de Bruxelles",
+    "slug": "choux-de-bruxelles",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 0,
+    "bytes": 14166
+  },
+  {
+    "name": "Chou blanc",
+    "slug": "chou-blanc",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 0,
+    "bytes": 14910
+  },
+  {
+    "name": "Pamplemousse",
+    "slug": "pamplemousse",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 0,
+    "bytes": 14014
+  },
+  {
+    "name": "Pastèque",
+    "slug": "pasteque",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 0,
+    "bytes": 14848
+  },
+  {
+    "name": "Dattes",
+    "slug": "dattes",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 0,
+    "bytes": 13310
+  },
+  {
+    "name": "Abricots secs",
+    "slug": "abricots-secs",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 0,
+    "bytes": 13714
+  },
+  {
+    "name": "Raisins secs",
+    "slug": "raisins-secs",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 0,
+    "bytes": 14780
+  },
+  {
+    "name": "Bagels",
+    "slug": "bagels",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 0,
+    "bytes": 13008
+  },
+  {
+    "name": "Crème de coco",
+    "slug": "creme-de-coco",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 0,
+    "bytes": 12506
   }
 ]
