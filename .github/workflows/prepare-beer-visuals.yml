@@ -1,4 +1,4 @@
-name: Prepare approved beer visuals
+name: Prepare validated juice visuals
 on:
   push:
     branches: [automation/beer-visuals-20261105]
@@ -19,14 +19,14 @@ jobs:
         with:
           node-version: '20'
       - run: python3 -m pip install Pillow==11.3.0
-      - run: python3 .beer-transfer/prepare.py
+      - run: python3 .juice-transfer/prepare.py
       - run: python3 scripts/update_visual_hashes.py
-      - run: bash scripts/validate_repo.sh > .beer-transfer/validation.log 2>&1
-      - name: Preserve validated previews
+      - run: bash scripts/validate_repo.sh > .juice-transfer/validation.log 2>&1
+      - name: Preserve verification
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add www/Items sw.js .beer-transfer/report.json .beer-transfer/qa.png .beer-transfer/validation.log
-          git diff --cached --quiet || git commit -m "Prepare beer WebP assets and verification"
+          git add www/Items sw.js .juice-transfer
+          git diff --cached --quiet || git commit -m "Prepare seven validated juice WebPs and verification"
           git push origin HEAD:automation/beer-visuals-20261105
