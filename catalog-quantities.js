@@ -115,6 +115,19 @@ const DISPLAY_MODE_BY_SUB=Object.freeze({
 });
 
 const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
+  "Biscottes":"Paquet",
+  "Pain pita":"Paquet",
+  "Pain naan":"Paquet",
+  "Pâte sablée":"Rouleau",
+  "Crème anglaise":"Brique",
+  "Flageolets":"Boîte",
+  "Noix de pécan":"Pot",
+  "Noix du Brésil":"Pot",
+  "Pruneaux":"Sachet",
+  "Figues sèches":"Sachet",
+  "Crème de marrons":"Pot",
+  "Huile de sésame":"Bouteille",
+
   "Tofu":"Barquette",
   "Lait de soja":"Bouteille",
   "Haricots blancs":"Boîte",

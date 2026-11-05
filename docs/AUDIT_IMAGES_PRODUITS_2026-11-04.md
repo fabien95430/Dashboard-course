@@ -782,3 +782,31 @@ Treize générations par outil intégré, sans API OpenAI payante du projet. Ré
 Treize WebP RGBA 256 px, tous sous 15 000 octets mesurés, alpha réel et marges préservés. Revue clair/foncé à 160/48 px ; calcul réel du cadrage automatique sans rognage Ma liste/Catalogue. Deux tests ajoutés pour unicité, classement, modes d’achat et WebP transparents sous 15 Ko. Validation : 360 tests réussis, syntaxe JavaScript, compilation Python et git diff --check. Validateur Bash intact ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Pas d’essai interactif iPhone ou Home Assistant réel.
 
 Consignes et prompt automatique complétés, relevé global des 510 poids actualisé. Version et URLs de chargement synchronisées en v773. Aucun changement de la logique du service worker, du cadrage/fallback, de la sécurité, OAuth, WebSocket, coffre, verrouillage/biométrie, mode test, architecture statique ou styles mobiles.
+
+
+## Douze produits validés — v774
+
+Source relue : main 19690bf2b48ea657789d21cf3c0a966a53416ddc (v773). Ajout des douze produits nommés par l’utilisateur. Flageolets classés en Conserves ; aucun lait végétal supplémentaire non précisé. Les 510 références précédentes et leurs images sont conservées ; images vérifiées octet par octet. Catalogue final : 522 références.
+
+Références locales inspectées : Biscuits beurre, Galettes de blé, Pâte brisée, Crème liquide, Pois chiches, Noix de cajou, Dattes, Beurre de cacahuète et Huile d’olive. Pains reconnaissables, pâte crue roulée, brique de dessert fermée, conserves crème/sauge, noix en pots assortis, fruits séchés en sachets kraft à fenêtre, huile dans le flacon existant. Treize générations par outil intégré, sans API payante du projet : première pâte sablée rejetée pour halo gris, seconde version propre retenue. Aucun autre ancien visuel refait.
+
+| Produit | Poids WebP final (octets) | Achat |
+| --- | ---: | --- |
+| Biscottes | 14440 | Paquet |
+| Pain pita | 14000 | Paquet |
+| Pain naan | 14238 | Paquet |
+| Pâte sablée | 7526 | Rouleau |
+| Crème anglaise | 8210 | Brique |
+| Flageolets | 12440 | Boîte |
+| Noix de pécan | 14606 | Pot |
+| Noix du Brésil | 14088 | Pot |
+| Pruneaux | 13434 | Sachet |
+| Figues sèches | 13650 | Sachet |
+| Crème de marrons | 12820 | Pot |
+| Huile de sésame | 12700 | Bouteille |
+
+Douze WebP RGBA 256 px, alpha réel, marges intactes, chaque fichier sous 15 000 octets mesurés. Revue visuelle sur fonds clair/foncé à 160/48 px ; calcul du cadrage automatique réel vérifié sans rognage dans Ma liste et Catalogue. Relevé global des 522 images actualisé : toutes sous 15 000 octets.
+
+Deux tests ajoutés pour unicité, classement, conditionnements d’achat/affichage et WebP transparents sous 15 Ko. Validation : 362 tests réussis, syntaxe de tous les JavaScript, compilation Python et git diff --check. Validateur Bash inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Pas d’essai interactif iPhone ou Home Assistant réel.
+
+Consignes et prompt automatique complétés. Version et URLs synchronisées en v774. Cadrage, fallback, logique réseau du service worker et cache visuel persistant inchangés. Architecture statique, OAuth, synchronisation WebSocket Home Assistant, coffre, verrouillage/biométrie, mode test, styles mobiles et safe areas préservés.
