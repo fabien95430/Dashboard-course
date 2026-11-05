@@ -1,0 +1,4290 @@
+[
+  {
+    "name": "Bière ambrée",
+    "slug": "biere-ambree",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5472,
+    "bytes": 5472
+  },
+  {
+    "name": "Bière aux fruits",
+    "slug": "biere-aux-fruits",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5480,
+    "bytes": 5480
+  },
+  {
+    "name": "Bière blanche",
+    "slug": "biere-blanche",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5240,
+    "bytes": 5240
+  },
+  {
+    "name": "Bière blonde",
+    "slug": "biere-blonde",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5512,
+    "bytes": 5512
+  },
+  {
+    "name": "Bière brune",
+    "slug": "biere-brune",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5434,
+    "bytes": 5434
+  },
+  {
+    "name": "Bière IPA",
+    "slug": "biere-ipa",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5194,
+    "bytes": 5194
+  },
+  {
+    "name": "Bière sans alcool",
+    "slug": "biere-sans-alcool",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5922,
+    "bytes": 5922
+  },
+  {
+    "name": "Bière triple",
+    "slug": "biere-triple",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 5178,
+    "bytes": 5178
+  },
+  {
+    "name": "Champagne",
+    "slug": "champagne",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 7544,
+    "bytes": 7544
+  },
+  {
+    "name": "Gin",
+    "slug": "gin",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 10272,
+    "bytes": 10272
+  },
+  {
+    "name": "Panaché",
+    "slug": "panache",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 4792,
+    "bytes": 4792
+  },
+  {
+    "name": "Prosecco",
+    "slug": "prosecco",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 10928,
+    "bytes": 10928
+  },
+  {
+    "name": "Rhum",
+    "slug": "rhum",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 18284,
+    "bytes": 6138,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Ricard",
+    "slug": "ricard",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 22006,
+    "bytes": 6940,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Vin blanc",
+    "slug": "vin-blanc",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 7830,
+    "bytes": 7830
+  },
+  {
+    "name": "Vin rosé",
+    "slug": "vin-rose",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 8104,
+    "bytes": 8104
+  },
+  {
+    "name": "Vin rouge",
+    "slug": "vin-rouge",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 6746,
+    "bytes": 6746
+  },
+  {
+    "name": "Whisky",
+    "slug": "whisky",
+    "category": "Boissons",
+    "subgroup": "Bières & vins",
+    "before": 11772,
+    "bytes": 11772
+  },
+  {
+    "name": "Citronnade",
+    "slug": "citronnade",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 20546,
+    "bytes": 14770,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.8
+  },
+  {
+    "name": "Eau aromatisée",
+    "slug": "eau-aromatisee",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 8588,
+    "bytes": 8588
+  },
+  {
+    "name": "Eau gazeuse",
+    "slug": "eau-gazeuse",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 8402,
+    "bytes": 8402
+  },
+  {
+    "name": "Eau plate",
+    "slug": "eau-plate",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 8070,
+    "bytes": 8070
+  },
+  {
+    "name": "Jus d'ananas",
+    "slug": "jus-d-ananas",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 10708,
+    "bytes": 10708
+  },
+  {
+    "name": "Jus d'orange",
+    "slug": "jus-d-orange",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 10686,
+    "bytes": 10686
+  },
+  {
+    "name": "Jus de pomme",
+    "slug": "jus-de-pomme",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 11084,
+    "bytes": 11084
+  },
+  {
+    "name": "Jus de raisin",
+    "slug": "jus-de-raisin",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 10946,
+    "bytes": 10946
+  },
+  {
+    "name": "Jus de tomate",
+    "slug": "jus-de-tomate",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 10814,
+    "bytes": 10814
+  },
+  {
+    "name": "Jus multifruits",
+    "slug": "jus-multifruits",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 12100,
+    "bytes": 12100
+  },
+  {
+    "name": "Lait chocolaté",
+    "slug": "lait-chocolate",
+    "category": "Boissons",
+    "subgroup": "Eaux & jus",
+    "before": 9024,
+    "bytes": 9024
+  },
+  {
+    "name": "Boisson énergétique",
+    "slug": "boisson-energetique",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 8902,
+    "bytes": 8902
+  },
+  {
+    "name": "Coca",
+    "slug": "coca",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 8076,
+    "bytes": 8076
+  },
+  {
+    "name": "Coca zéro",
+    "slug": "coca-zero",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 8364,
+    "bytes": 8364
+  },
+  {
+    "name": "Ginger beer",
+    "slug": "ginger-beer",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 12378,
+    "bytes": 12378
+  },
+  {
+    "name": "Limonade",
+    "slug": "limonade",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 13378,
+    "bytes": 13378
+  },
+  {
+    "name": "Orangeade",
+    "slug": "orangeade",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 14156,
+    "bytes": 14156
+  },
+  {
+    "name": "Sirop de grenadine",
+    "slug": "sirop-de-grenadine",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 12520,
+    "bytes": 12520
+  },
+  {
+    "name": "Sirop de menthe",
+    "slug": "sirop-de-menthe",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 11532,
+    "bytes": 11532
+  },
+  {
+    "name": "Sirop de pêche",
+    "slug": "sirop-de-peche",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 12760,
+    "bytes": 12760
+  },
+  {
+    "name": "Soda citron",
+    "slug": "soda-citron",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 15684,
+    "bytes": 11278,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Tonic",
+    "slug": "tonic",
+    "category": "Boissons",
+    "subgroup": "Sodas & sirops",
+    "before": 9348,
+    "bytes": 9348
+  },
+  {
+    "name": "Biscuits bébé",
+    "slug": "biscuits-bebe",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 12162,
+    "bytes": 12162
+  },
+  {
+    "name": "Boudoirs bébé",
+    "slug": "boudoirs-bebe",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 11866,
+    "bytes": 11866
+  },
+  {
+    "name": "Céréales infantiles",
+    "slug": "cereales-infantiles",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 13126,
+    "bytes": 13126
+  },
+  {
+    "name": "Compotes bébé",
+    "slug": "compotes-bebe",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 10298,
+    "bytes": 10298
+  },
+  {
+    "name": "Couches",
+    "slug": "couches",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 11384,
+    "bytes": 11384
+  },
+  {
+    "name": "Desserts lactés bébé",
+    "slug": "desserts-lactes-bebe",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 9418,
+    "bytes": 9418
+  },
+  {
+    "name": "Galettes de riz bébé",
+    "slug": "galettes-de-riz-bebe",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 13704,
+    "bytes": 13704
+  },
+  {
+    "name": "Gâteaux bébé",
+    "slug": "gateaux-bebe",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 11794,
+    "bytes": 11794
+  },
+  {
+    "name": "Lait infantile",
+    "slug": "lait-infantile",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 14340,
+    "bytes": 14340
+  },
+  {
+    "name": "Lingettes bébé",
+    "slug": "lingettes-bebe",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 9236,
+    "bytes": 9236
+  },
+  {
+    "name": "Petits pots",
+    "slug": "petits-pots",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 14950,
+    "bytes": 14950
+  },
+  {
+    "name": "Sacs à couches",
+    "slug": "sacs-a-couches",
+    "category": "Enfant",
+    "subgroup": "Enfant",
+    "before": 11460,
+    "bytes": 11460
+  },
+  {
+    "name": "Baguette",
+    "slug": "baguette",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 13684,
+    "bytes": 13684
+  },
+  {
+    "name": "Brioche",
+    "slug": "brioche",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14734,
+    "bytes": 14734
+  },
+  {
+    "name": "Croissants",
+    "slug": "croissants",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14504,
+    "bytes": 14504
+  },
+  {
+    "name": "Galettes de blé",
+    "slug": "galettes-de-ble",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14296,
+    "bytes": 14296
+  },
+  {
+    "name": "Pain",
+    "slug": "pain",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14096,
+    "bytes": 14096
+  },
+  {
+    "name": "Pain aux céréales",
+    "slug": "pain-aux-cereales",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14824,
+    "bytes": 14824
+  },
+  {
+    "name": "Pain complet",
+    "slug": "pain-complet",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14096,
+    "bytes": 14096
+  },
+  {
+    "name": "Pain de mie",
+    "slug": "pain-de-mie",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14362,
+    "bytes": 14362
+  },
+  {
+    "name": "Pains au chocolat",
+    "slug": "pains-au-chocolat",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14734,
+    "bytes": 14734
+  },
+  {
+    "name": "Pains burger",
+    "slug": "pains-burger",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 13848,
+    "bytes": 13848
+  },
+  {
+    "name": "Pains hot-dog",
+    "slug": "pains-hot-dog",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14950,
+    "bytes": 14950
+  },
+  {
+    "name": "Wraps",
+    "slug": "wraps",
+    "category": "Épicerie",
+    "subgroup": "Boulangerie",
+    "before": 14296,
+    "bytes": 14296
+  },
+  {
+    "name": "Pâte brisée",
+    "slug": "pate-brisee",
+    "category": "Épicerie",
+    "subgroup": "Pâtes à tarte",
+    "before": 11130,
+    "bytes": 11130
+  },
+  {
+    "name": "Champignons en boîte",
+    "slug": "champignons-en-boite",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 13860,
+    "bytes": 13860
+  },
+  {
+    "name": "Concentré de tomate",
+    "slug": "concentre-de-tomate",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 13272,
+    "bytes": 13272
+  },
+  {
+    "name": "Haricots rouges",
+    "slug": "haricots-rouges",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 12286,
+    "bytes": 12286
+  },
+  {
+    "name": "Lentilles",
+    "slug": "lentilles",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 13790,
+    "bytes": 13790
+  },
+  {
+    "name": "Maïs en boîte",
+    "slug": "mais-en-boite",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 14868,
+    "bytes": 14868
+  },
+  {
+    "name": "Petits pois carottes",
+    "slug": "petits-pois-carottes",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 14856,
+    "bytes": 14856
+  },
+  {
+    "name": "Pois chiches",
+    "slug": "pois-chiches",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 12854,
+    "bytes": 12854
+  },
+  {
+    "name": "Raviolis en boîte",
+    "slug": "raviolis-en-boite",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 14868,
+    "bytes": 14868
+  },
+  {
+    "name": "Tomates pelées",
+    "slug": "tomates-pelees",
+    "category": "Épicerie",
+    "subgroup": "Conserves",
+    "before": 13736,
+    "bytes": 13736
+  },
+  {
+    "name": "Bouillon cubes",
+    "slug": "bouillon-cubes",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14870,
+    "bytes": 14870
+  },
+  {
+    "name": "Chili",
+    "slug": "chili",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14574,
+    "bytes": 14574
+  },
+  {
+    "name": "Couscous",
+    "slug": "couscous",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 13866,
+    "bytes": 13866
+  },
+  {
+    "name": "Croûtons",
+    "slug": "croutons",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14654,
+    "bytes": 14654
+  },
+  {
+    "name": "Curcuma",
+    "slug": "curcuma",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14876,
+    "bytes": 14876
+  },
+  {
+    "name": "Curry",
+    "slug": "curry",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14618,
+    "bytes": 14618
+  },
+  {
+    "name": "Guacamole",
+    "slug": "guacamole",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14816,
+    "bytes": 14816
+  },
+  {
+    "name": "Harissa",
+    "slug": "harissa",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 13990,
+    "bytes": 13990
+  },
+  {
+    "name": "Lait de coco",
+    "slug": "lait-de-coco",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14570,
+    "bytes": 14570
+  },
+  {
+    "name": "Nouilles chinoises",
+    "slug": "nouilles-chinoises",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14786,
+    "bytes": 14786
+  },
+  {
+    "name": "Nouilles instantanées",
+    "slug": "nouilles-instantanees",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14690,
+    "bytes": 14690
+  },
+  {
+    "name": "Paprika",
+    "slug": "paprika",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14748,
+    "bytes": 14748
+  },
+  {
+    "name": "Poivre",
+    "slug": "poivre",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14390,
+    "bytes": 14390
+  },
+  {
+    "name": "Purée en flocons",
+    "slug": "puree-en-flocons",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 9632,
+    "bytes": 9632
+  },
+  {
+    "name": "Sel",
+    "slug": "sel",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 14968,
+    "bytes": 14968
+  },
+  {
+    "name": "Soupes en brique",
+    "slug": "soupes-en-brique",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 13396,
+    "bytes": 13396
+  },
+  {
+    "name": "Tortillas",
+    "slug": "tortillas",
+    "category": "Épicerie",
+    "subgroup": "Monde & pratique",
+    "before": 13792,
+    "bytes": 13792
+  },
+  {
+    "name": "Boulgour",
+    "slug": "boulgour",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 8950,
+    "bytes": 8950
+  },
+  {
+    "name": "Conchiglie",
+    "slug": "conchiglie",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 5018,
+    "bytes": 5018
+  },
+  {
+    "name": "Coquillettes",
+    "slug": "coquillettes",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 5708,
+    "bytes": 5708
+  },
+  {
+    "name": "Farfalle",
+    "slug": "farfalle",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 5472,
+    "bytes": 5472
+  },
+  {
+    "name": "Fusilli",
+    "slug": "fusilli",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 6094,
+    "bytes": 6094
+  },
+  {
+    "name": "Lasagnes",
+    "slug": "lasagnes",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 3384,
+    "bytes": 3384
+  },
+  {
+    "name": "Linguine",
+    "slug": "linguine",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 4596,
+    "bytes": 4596
+  },
+  {
+    "name": "Macaronis",
+    "slug": "macaronis",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 6072,
+    "bytes": 6072
+  },
+  {
+    "name": "Orecchiette",
+    "slug": "orecchiette",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 6000,
+    "bytes": 6000
+  },
+  {
+    "name": "Penne",
+    "slug": "penne",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 5664,
+    "bytes": 5664
+  },
+  {
+    "name": "Polenta",
+    "slug": "polenta",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 13830,
+    "bytes": 13830
+  },
+  {
+    "name": "Quinoa",
+    "slug": "quinoa",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 14078,
+    "bytes": 14078
+  },
+  {
+    "name": "Rigatoni",
+    "slug": "rigatoni",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 4926,
+    "bytes": 4926
+  },
+  {
+    "name": "Riz à sushi",
+    "slug": "riz-a-sushi",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 8212,
+    "bytes": 8212
+  },
+  {
+    "name": "Riz arborio",
+    "slug": "riz-arborio",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 9276,
+    "bytes": 9276
+  },
+  {
+    "name": "Riz basmati",
+    "slug": "riz-basmati",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 8382,
+    "bytes": 8382
+  },
+  {
+    "name": "Riz blanc",
+    "slug": "riz-blanc",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 9374,
+    "bytes": 9374
+  },
+  {
+    "name": "Riz complet",
+    "slug": "riz-complet",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 7610,
+    "bytes": 7610
+  },
+  {
+    "name": "Riz gluant",
+    "slug": "riz-gluant",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 8956,
+    "bytes": 8956
+  },
+  {
+    "name": "Riz jasmin",
+    "slug": "riz-jasmin",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 8194,
+    "bytes": 8194
+  },
+  {
+    "name": "Riz long",
+    "slug": "riz-long",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 8470,
+    "bytes": 8470
+  },
+  {
+    "name": "Riz noir",
+    "slug": "riz-noir",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 11280,
+    "bytes": 11280
+  },
+  {
+    "name": "Riz rouge",
+    "slug": "riz-rouge",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 11802,
+    "bytes": 11802
+  },
+  {
+    "name": "Riz sauvage",
+    "slug": "riz-sauvage",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 12092,
+    "bytes": 12092
+  },
+  {
+    "name": "Semoule",
+    "slug": "semoule",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 8302,
+    "bytes": 8302
+  },
+  {
+    "name": "Spaghetti",
+    "slug": "spaghetti",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 3246,
+    "bytes": 3246
+  },
+  {
+    "name": "Tagliatelles",
+    "slug": "tagliatelles",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 5850,
+    "bytes": 5850
+  },
+  {
+    "name": "Vermicelles",
+    "slug": "vermicelles",
+    "category": "Épicerie",
+    "subgroup": "Pâtes, riz & céréales",
+    "before": 3386,
+    "bytes": 3386
+  },
+  {
+    "name": "Amandes",
+    "slug": "amandes",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 14408,
+    "bytes": 14408
+  },
+  {
+    "name": "Amandes en poudre",
+    "slug": "amandes-en-poudre",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 9000,
+    "bytes": 9000
+  },
+  {
+    "name": "Chapelure",
+    "slug": "chapelure",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 9700,
+    "bytes": 9700
+  },
+  {
+    "name": "Farine",
+    "slug": "farine",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 8630,
+    "bytes": 8630
+  },
+  {
+    "name": "Gélatine",
+    "slug": "gelatine",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 13632,
+    "bytes": 13632
+  },
+  {
+    "name": "Levure boulangère",
+    "slug": "levure-boulangere",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 8616,
+    "bytes": 8616
+  },
+  {
+    "name": "Levure chimique",
+    "slug": "levure-chimique",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 13760,
+    "bytes": 13760
+  },
+  {
+    "name": "Maïzena",
+    "slug": "maizena",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 8246,
+    "bytes": 8246
+  },
+  {
+    "name": "Noix de coco râpée",
+    "slug": "noix-de-coco-rapee",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 12538,
+    "bytes": 12538
+  },
+  {
+    "name": "Pâte feuilletée",
+    "slug": "pate-feuilletee",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 14060,
+    "bytes": 14060
+  },
+  {
+    "name": "Pépites chocolat",
+    "slug": "pepites-chocolat",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 13618,
+    "bytes": 13618
+  },
+  {
+    "name": "Sucre",
+    "slug": "sucre",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 14474,
+    "bytes": 14474
+  },
+  {
+    "name": "Sucre glace",
+    "slug": "sucre-glace",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 14560,
+    "bytes": 14560
+  },
+  {
+    "name": "Sucre roux",
+    "slug": "sucre-roux",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 14746,
+    "bytes": 14746
+  },
+  {
+    "name": "Vanille",
+    "slug": "vanille",
+    "category": "Épicerie",
+    "subgroup": "Pâtisserie & cuisine",
+    "before": 14354,
+    "bytes": 14354
+  },
+  {
+    "name": "Bolognaise",
+    "slug": "bolognaise",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14824,
+    "bytes": 14824
+  },
+  {
+    "name": "Cornichon",
+    "slug": "cornichon",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 13598,
+    "bytes": 13598
+  },
+  {
+    "name": "Huile d'olive",
+    "slug": "huile-d-olive",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14144,
+    "bytes": 14144
+  },
+  {
+    "name": "Huile de tournesol",
+    "slug": "huile-de-tournesol",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14920,
+    "bytes": 14920
+  },
+  {
+    "name": "Ketchup",
+    "slug": "ketchup",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14500,
+    "bytes": 14500
+  },
+  {
+    "name": "Mayonnaise",
+    "slug": "mayonnaise",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 12918,
+    "bytes": 12918
+  },
+  {
+    "name": "Moutarde",
+    "slug": "moutarde",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14416,
+    "bytes": 14416
+  },
+  {
+    "name": "Pesto",
+    "slug": "pesto",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14688,
+    "bytes": 14688
+  },
+  {
+    "name": "Sauce aigre-douce",
+    "slug": "sauce-aigre-douce",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14346,
+    "bytes": 14346
+  },
+  {
+    "name": "Sauce algérienne",
+    "slug": "sauce-algerienne",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14292,
+    "bytes": 14292
+  },
+  {
+    "name": "Sauce andalouse",
+    "slug": "sauce-andalouse",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14744,
+    "bytes": 14744
+  },
+  {
+    "name": "Sauce au poivre",
+    "slug": "sauce-au-poivre",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 13808,
+    "bytes": 13808
+  },
+  {
+    "name": "Sauce au roquefort",
+    "slug": "sauce-au-roquefort",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 13622,
+    "bytes": 13622
+  },
+  {
+    "name": "Sauce aux champignons",
+    "slug": "sauce-aux-champignons",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14960,
+    "bytes": 14960
+  },
+  {
+    "name": "Sauce barbecue",
+    "slug": "sauce-barbecue",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14000,
+    "bytes": 14000
+  },
+  {
+    "name": "Sauce Béarnaise",
+    "slug": "sauce-bearnaise",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14944,
+    "bytes": 14944
+  },
+  {
+    "name": "Sauce blanche",
+    "slug": "sauce-blanche",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 12698,
+    "bytes": 12698
+  },
+  {
+    "name": "Sauce burger",
+    "slug": "sauce-burger",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 13780,
+    "bytes": 13780
+  },
+  {
+    "name": "Sauce César",
+    "slug": "sauce-cesar",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14954,
+    "bytes": 14954
+  },
+  {
+    "name": "Sauce curry",
+    "slug": "sauce-curry",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14530,
+    "bytes": 14530
+  },
+  {
+    "name": "Sauce hollandaise",
+    "slug": "sauce-hollandaise",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14780,
+    "bytes": 14780
+  },
+  {
+    "name": "Sauce miel-moutarde",
+    "slug": "sauce-miel-moutarde",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 13668,
+    "bytes": 13668
+  },
+  {
+    "name": "Sauce napolitaine",
+    "slug": "sauce-napolitaine",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14348,
+    "bytes": 14348
+  },
+  {
+    "name": "Sauce ranch",
+    "slug": "sauce-ranch",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14892,
+    "bytes": 14892
+  },
+  {
+    "name": "Sauce samouraï",
+    "slug": "sauce-samourai",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14272,
+    "bytes": 14272
+  },
+  {
+    "name": "Sauce soja",
+    "slug": "sauce-soja",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14120,
+    "bytes": 14120
+  },
+  {
+    "name": "Sauce tartare",
+    "slug": "sauce-tartare",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14044,
+    "bytes": 14044
+  },
+  {
+    "name": "Sauce teriyaki",
+    "slug": "sauce-teriyaki",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 13754,
+    "bytes": 13754
+  },
+  {
+    "name": "Sauce tomate",
+    "slug": "sauce-tomate",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 14540,
+    "bytes": 14540
+  },
+  {
+    "name": "Tabasco",
+    "slug": "tabasco",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 13858,
+    "bytes": 13858
+  },
+  {
+    "name": "Vinaigre balsamique",
+    "slug": "vinaigre-balsamique",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 11070,
+    "bytes": 11070
+  },
+  {
+    "name": "Vinaigre de cidre",
+    "slug": "vinaigre-de-cidre",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 10726,
+    "bytes": 10726
+  },
+  {
+    "name": "Vinaigre de vin",
+    "slug": "vinaigre-de-vin",
+    "category": "Épicerie",
+    "subgroup": "Sauces & condiments",
+    "before": 12420,
+    "bytes": 12420
+  },
+  {
+    "name": "Confiture abricot",
+    "slug": "confiture-abricot",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 13682,
+    "bytes": 13682
+  },
+  {
+    "name": "Confiture cerise",
+    "slug": "confiture-cerise",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 14404,
+    "bytes": 14404
+  },
+  {
+    "name": "Confiture fraise",
+    "slug": "confiture-fraise",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 14084,
+    "bytes": 14084
+  },
+  {
+    "name": "Confiture framboise",
+    "slug": "confiture-framboise",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 14908,
+    "bytes": 14908
+  },
+  {
+    "name": "Confiture fruits rouges",
+    "slug": "confiture-fruits-rouges",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 13766,
+    "bytes": 13766
+  },
+  {
+    "name": "Confiture mirabelles",
+    "slug": "confiture-mirabelles",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 14688,
+    "bytes": 14688
+  },
+  {
+    "name": "Confiture mûre",
+    "slug": "confiture-mure",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 14814,
+    "bytes": 14814
+  },
+  {
+    "name": "Confiture myrtille",
+    "slug": "confiture-myrtille",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 14518,
+    "bytes": 14518
+  },
+  {
+    "name": "Confiture orange",
+    "slug": "confiture-orange",
+    "category": "Épicerie",
+    "subgroup": "Confitures",
+    "before": 14780,
+    "bytes": 14780
+  },
+  {
+    "name": "Coulis de fruit",
+    "slug": "coulis-de-fruit",
+    "category": "Épicerie",
+    "subgroup": "Sauces sucrées",
+    "before": 13868,
+    "bytes": 13868
+  },
+  {
+    "name": "Brie",
+    "slug": "brie",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 13810,
+    "bytes": 13810
+  },
+  {
+    "name": "Burrata",
+    "slug": "burrata",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14226,
+    "bytes": 14226
+  },
+  {
+    "name": "Camembert",
+    "slug": "camembert",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14828,
+    "bytes": 14828
+  },
+  {
+    "name": "Cheddar",
+    "slug": "cheddar",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14604,
+    "bytes": 14604
+  },
+  {
+    "name": "Chèvre",
+    "slug": "chevre",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14664,
+    "bytes": 14664
+  },
+  {
+    "name": "Comté",
+    "slug": "comte",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14646,
+    "bytes": 14646
+  },
+  {
+    "name": "Emmental",
+    "slug": "emmental",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14968,
+    "bytes": 14968
+  },
+  {
+    "name": "Feta",
+    "slug": "feta",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14858,
+    "bytes": 14858
+  },
+  {
+    "name": "Fromage râpé",
+    "slug": "fromage-rape",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 11390,
+    "bytes": 11390
+  },
+  {
+    "name": "Gouda",
+    "slug": "gouda",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14982,
+    "bytes": 14982
+  },
+  {
+    "name": "Mozzarella",
+    "slug": "mozzarella",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 6610,
+    "bytes": 6610
+  },
+  {
+    "name": "Mozzarella râpée",
+    "slug": "mozzarella-rapee",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 13328,
+    "bytes": 13328
+  },
+  {
+    "name": "Parmesan",
+    "slug": "parmesan",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 8120,
+    "bytes": 8120
+  },
+  {
+    "name": "Raclette",
+    "slug": "raclette",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 13798,
+    "bytes": 13798
+  },
+  {
+    "name": "Reblochon",
+    "slug": "reblochon",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14604,
+    "bytes": 14604
+  },
+  {
+    "name": "Ricotta",
+    "slug": "ricotta",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14776,
+    "bytes": 14776
+  },
+  {
+    "name": "Roquefort",
+    "slug": "roquefort",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 14918,
+    "bytes": 14918
+  },
+  {
+    "name": "Soignon",
+    "slug": "soignon",
+    "category": "Frais",
+    "subgroup": "Fromages",
+    "before": 9090,
+    "bytes": 9090
+  },
+  {
+    "name": "Beurre",
+    "slug": "beurre",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 7952,
+    "bytes": 7952
+  },
+  {
+    "name": "Crème épaisse",
+    "slug": "creme-epaisse",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 11532,
+    "bytes": 11532
+  },
+  {
+    "name": "Crème fraîche",
+    "slug": "creme-fraiche",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 11808,
+    "bytes": 11808
+  },
+  {
+    "name": "Crème liquide",
+    "slug": "creme-liquide",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 7160,
+    "bytes": 7160
+  },
+  {
+    "name": "Lait",
+    "slug": "lait",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 5998,
+    "bytes": 5998
+  },
+  {
+    "name": "Lait d'amande",
+    "slug": "lait-d-amande",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 7988,
+    "bytes": 7988
+  },
+  {
+    "name": "Lait d'avoine",
+    "slug": "lait-d-avoine",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 10966,
+    "bytes": 10966
+  },
+  {
+    "name": "Lait demi-écrémé",
+    "slug": "lait-demi-ecreme",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 8652,
+    "bytes": 8652
+  },
+  {
+    "name": "Lait écrémé",
+    "slug": "lait-ecreme",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 9142,
+    "bytes": 9142
+  },
+  {
+    "name": "Lait entier",
+    "slug": "lait-entier",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 7704,
+    "bytes": 7704
+  },
+  {
+    "name": "Lait sans lactose",
+    "slug": "lait-sans-lactose",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 7462,
+    "bytes": 7462
+  },
+  {
+    "name": "Mascarpone",
+    "slug": "mascarpone",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 13838,
+    "bytes": 13838
+  },
+  {
+    "name": "Œufs",
+    "slug": "oeufs",
+    "category": "Frais",
+    "subgroup": "Laits & crèmes",
+    "before": 8658,
+    "bytes": 8658
+  },
+  {
+    "name": "Épinards surgelés",
+    "slug": "epinards-surgeles",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 14972,
+    "bytes": 14972
+  },
+  {
+    "name": "Frites surgelées",
+    "slug": "frites-surgelees",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 14642,
+    "bytes": 14642
+  },
+  {
+    "name": "Glace chocolat",
+    "slug": "glace-chocolat",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 11332,
+    "bytes": 11332
+  },
+  {
+    "name": "Glace Nuii",
+    "slug": "glace-nuii",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 12244,
+    "bytes": 12244
+  },
+  {
+    "name": "Glace vanille",
+    "slug": "glace-vanille",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 14138,
+    "bytes": 14138
+  },
+  {
+    "name": "Glaçons",
+    "slug": "glacons",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 10682,
+    "bytes": 10682
+  },
+  {
+    "name": "Haricots verts surgelés",
+    "slug": "haricots-verts-surgeles",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 14590,
+    "bytes": 14590
+  },
+  {
+    "name": "Légumes surgelés",
+    "slug": "legumes-surgeles",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 14706,
+    "bytes": 14706
+  },
+  {
+    "name": "Petits pois surgelés",
+    "slug": "petits-pois-surgeles",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 14564,
+    "bytes": 14564
+  },
+  {
+    "name": "Poêlée de légumes",
+    "slug": "poelee-de-legumes",
+    "category": "Frais",
+    "subgroup": "Surgelés",
+    "before": 14242,
+    "bytes": 14242
+  },
+  {
+    "name": "Gnocchis",
+    "slug": "gnocchis",
+    "category": "Frais",
+    "subgroup": "Traiteur frais",
+    "before": 14370,
+    "bytes": 14370
+  },
+  {
+    "name": "Pâte à pizza",
+    "slug": "pate-a-pizza",
+    "category": "Frais",
+    "subgroup": "Traiteur frais",
+    "before": 6384,
+    "bytes": 6384
+  },
+  {
+    "name": "Pâtes fraîches",
+    "slug": "pates-fraiches",
+    "category": "Frais",
+    "subgroup": "Traiteur frais",
+    "before": 14996,
+    "bytes": 14996
+  },
+  {
+    "name": "Quiche",
+    "slug": "quiche",
+    "category": "Frais",
+    "subgroup": "Traiteur frais",
+    "before": 14738,
+    "bytes": 14738
+  },
+  {
+    "name": "Crème dessert chocolat",
+    "slug": "creme-dessert-chocolat",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 10474,
+    "bytes": 10474
+  },
+  {
+    "name": "Crème dessert vanille",
+    "slug": "creme-dessert-vanille",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 11742,
+    "bytes": 11742
+  },
+  {
+    "name": "Fromage blanc",
+    "slug": "fromage-blanc",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 13352,
+    "bytes": 13352
+  },
+  {
+    "name": "Petits-suisses",
+    "slug": "petits-suisses",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 11878,
+    "bytes": 11878
+  },
+  {
+    "name": "Riz au lait",
+    "slug": "riz-au-lait",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 13894,
+    "bytes": 13894
+  },
+  {
+    "name": "Skyr",
+    "slug": "skyr",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 11272,
+    "bytes": 11272
+  },
+  {
+    "name": "Yaourt",
+    "slug": "yaourt",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 14216,
+    "bytes": 14216
+  },
+  {
+    "name": "Yaourt à boire",
+    "slug": "yaourt-a-boire",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 13796,
+    "bytes": 13796
+  },
+  {
+    "name": "Yaourts citron",
+    "slug": "yaourts-citron",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 11092,
+    "bytes": 11092
+  },
+  {
+    "name": "Yaourts fruits",
+    "slug": "yaourts-fruits",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 12558,
+    "bytes": 12558
+  },
+  {
+    "name": "Yaourts grecs",
+    "slug": "yaourts-grecs",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 14782,
+    "bytes": 14782
+  },
+  {
+    "name": "Yaourts nature",
+    "slug": "yaourts-nature",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 12584,
+    "bytes": 12584
+  },
+  {
+    "name": "Yaourts noix de coco",
+    "slug": "yaourts-noix-de-coco",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 11198,
+    "bytes": 11198
+  },
+  {
+    "name": "Yaourts vanille",
+    "slug": "yaourts-vanille",
+    "category": "Frais",
+    "subgroup": "Yaourts & desserts",
+    "before": 13510,
+    "bytes": 13510
+  },
+  {
+    "name": "Abricots",
+    "slug": "abricots",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 19432,
+    "bytes": 13776,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Bananes",
+    "slug": "bananes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 41286,
+    "bytes": 13822,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Citrons",
+    "slug": "citrons",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 50222,
+    "bytes": 14282,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Clémentines",
+    "slug": "clementines",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 26950,
+    "bytes": 14602,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Kiwis",
+    "slug": "kiwis",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 64694,
+    "bytes": 14950,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Nectarines",
+    "slug": "nectarines",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 29096,
+    "bytes": 14838,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Oranges",
+    "slug": "oranges",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 63884,
+    "bytes": 13998,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Pêches",
+    "slug": "peches",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 58800,
+    "bytes": 14826,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Poires",
+    "slug": "poires",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 48538,
+    "bytes": 14160,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Pommes",
+    "slug": "pommes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 59292,
+    "bytes": 14804,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Prunes",
+    "slug": "prunes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 52746,
+    "bytes": 14994,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Raisin",
+    "slug": "raisin",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits classiques",
+    "before": 65538,
+    "bytes": 14612,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Ananas",
+    "slug": "ananas",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 67152,
+    "bytes": 14796,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.88
+  },
+  {
+    "name": "Avocat",
+    "slug": "avocat",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 62504,
+    "bytes": 14976,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.88
+  },
+  {
+    "name": "Cerises",
+    "slug": "cerises",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 53864,
+    "bytes": 14518,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Fraises",
+    "slug": "fraises",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 68110,
+    "bytes": 14462,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Framboises",
+    "slug": "framboises",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 66848,
+    "bytes": 14332,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Fruit de la passion",
+    "slug": "fruit-de-la-passion",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 28264,
+    "bytes": 14846,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Grenade",
+    "slug": "grenade",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 62514,
+    "bytes": 14792,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.88
+  },
+  {
+    "name": "Mangue",
+    "slug": "mangue",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 55012,
+    "bytes": 14938,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Melon",
+    "slug": "melon",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 57330,
+    "bytes": 13908,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Mûres",
+    "slug": "mures",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 50852,
+    "bytes": 14990,
+    "size": 256,
+    "quality": 64,
+    "fill": 0.88
+  },
+  {
+    "name": "Myrtilles",
+    "slug": "myrtilles",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 45868,
+    "bytes": 13632,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Noix de coco",
+    "slug": "noix-de-coco",
+    "category": "Fruits & Légumes",
+    "subgroup": "Fruits rouges & exotiques",
+    "before": 26364,
+    "bytes": 14752,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Aubergines",
+    "slug": "aubergines",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 29346,
+    "bytes": 9444,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Brocoli",
+    "slug": "brocoli",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 47218,
+    "bytes": 14846,
+    "size": 256,
+    "quality": 64,
+    "fill": 0.84
+  },
+  {
+    "name": "Carottes",
+    "slug": "carottes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 39654,
+    "bytes": 14920,
+    "size": 256,
+    "quality": 64,
+    "fill": 0.88
+  },
+  {
+    "name": "Chou-fleur",
+    "slug": "chou-fleur",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 52958,
+    "bytes": 13806,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Concombres",
+    "slug": "concombres",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 47442,
+    "bytes": 14794,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Courgettes",
+    "slug": "courgettes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 40880,
+    "bytes": 10912,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Épinards",
+    "slug": "epinards",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 66262,
+    "bytes": 14946,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.84
+  },
+  {
+    "name": "Haricots verts",
+    "slug": "haricots-verts",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 45736,
+    "bytes": 13794,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Petits pois",
+    "slug": "petits-pois",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 45694,
+    "bytes": 14014,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Poireaux",
+    "slug": "poireaux",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 29434,
+    "bytes": 9596,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Poivrons",
+    "slug": "poivrons",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 17194,
+    "bytes": 12918,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Tomates",
+    "slug": "tomates",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes du quotidien",
+    "before": 23810,
+    "bytes": 13890,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Artichauts",
+    "slug": "artichauts",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 57640,
+    "bytes": 14010,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Asperges",
+    "slug": "asperges",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 16400,
+    "bytes": 12062,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Betteraves",
+    "slug": "betteraves",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 60736,
+    "bytes": 14796,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.88
+  },
+  {
+    "name": "Butternut",
+    "slug": "butternut",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 18114,
+    "bytes": 12170,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Céleri",
+    "slug": "celeri",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 57722,
+    "bytes": 14522,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Champignons",
+    "slug": "champignons",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 55822,
+    "bytes": 13896,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Courge",
+    "slug": "courge",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 29190,
+    "bytes": 13500,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Fenouil",
+    "slug": "fenouil",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 78490,
+    "bytes": 14916,
+    "size": 256,
+    "quality": 52,
+    "fill": 0.72
+  },
+  {
+    "name": "Maïs",
+    "slug": "mais",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 52584,
+    "bytes": 13724,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Navets",
+    "slug": "navets",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 26746,
+    "bytes": 14302,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Potiron",
+    "slug": "potiron",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 64752,
+    "bytes": 13696,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Radis",
+    "slug": "radis",
+    "category": "Fruits & Légumes",
+    "subgroup": "Légumes variés",
+    "before": 60158,
+    "bytes": 14934,
+    "size": 256,
+    "quality": 52,
+    "fill": 0.84
+  },
+  {
+    "name": "Basilic",
+    "slug": "basilic",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 27802,
+    "bytes": 14980,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Chou rouge",
+    "slug": "chou-rouge",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 51280,
+    "bytes": 14864,
+    "size": 256,
+    "quality": 64,
+    "fill": 0.88
+  },
+  {
+    "name": "Ciboulette",
+    "slug": "ciboulette",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 67176,
+    "bytes": 14986,
+    "size": 256,
+    "quality": 52,
+    "fill": 0.88
+  },
+  {
+    "name": "Coriandre",
+    "slug": "coriandre",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 72780,
+    "bytes": 14986,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.72
+  },
+  {
+    "name": "Endives",
+    "slug": "endives",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 17090,
+    "bytes": 12610,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Mâche",
+    "slug": "mache",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 27834,
+    "bytes": 14876,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.88
+  },
+  {
+    "name": "Menthe",
+    "slug": "menthe",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 67608,
+    "bytes": 14968,
+    "size": 256,
+    "quality": 64,
+    "fill": 0.76
+  },
+  {
+    "name": "Persil",
+    "slug": "persil",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 53652,
+    "bytes": 14824,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.84
+  },
+  {
+    "name": "Romarin frais",
+    "slug": "romarin-frais",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 80644,
+    "bytes": 14854,
+    "size": 256,
+    "quality": 68,
+    "fill": 0.64
+  },
+  {
+    "name": "Roquette",
+    "slug": "roquette",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 59834,
+    "bytes": 14896,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.76
+  },
+  {
+    "name": "Salade verte",
+    "slug": "salade-verte",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 67866,
+    "bytes": 14542,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Thym frais",
+    "slug": "thym-frais",
+    "category": "Fruits & Légumes",
+    "subgroup": "Salades & herbes",
+    "before": 69988,
+    "bytes": 14872,
+    "size": 256,
+    "quality": 64,
+    "fill": 0.64
+  },
+  {
+    "name": "Ail",
+    "slug": "ail",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 16374,
+    "bytes": 11634,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Citron vert",
+    "slug": "citron-vert",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 66078,
+    "bytes": 14608,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Échalotes",
+    "slug": "echalotes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 25418,
+    "bytes": 14126,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Gingembre",
+    "slug": "gingembre",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 48496,
+    "bytes": 14492,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Noisettes",
+    "slug": "noisettes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 38972,
+    "bytes": 14814,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Noix",
+    "slug": "noix",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 33542,
+    "bytes": 13380,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Oignons jaunes",
+    "slug": "oignons-jaunes",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 28888,
+    "bytes": 14208,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Oignons rouges",
+    "slug": "oignons-rouges",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 68056,
+    "bytes": 14330,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Olives fraîches",
+    "slug": "olives-fraiches",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 51220,
+    "bytes": 13256,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Patates douces",
+    "slug": "patates-douces",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 51044,
+    "bytes": 13546,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Piments",
+    "slug": "piments",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 38678,
+    "bytes": 13642,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Pommes de terre",
+    "slug": "pommes-de-terre",
+    "category": "Fruits & Légumes",
+    "subgroup": "Pommes de terre & aromates",
+    "before": 44156,
+    "bytes": 13698,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Après-shampoing",
+    "slug": "apres-shampoing",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 9600,
+    "bytes": 9600
+  },
+  {
+    "name": "Brosses à dents",
+    "slug": "brosses-a-dents",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 21250,
+    "bytes": 10802,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Cotons-tiges",
+    "slug": "cotons-tiges",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 21440,
+    "bytes": 14090,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Dentifrice",
+    "slug": "dentifrice",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 8896,
+    "bytes": 8896
+  },
+  {
+    "name": "Déodorant",
+    "slug": "deodorant",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 8278,
+    "bytes": 8278
+  },
+  {
+    "name": "Disques coton",
+    "slug": "disques-coton",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 6102,
+    "bytes": 6102
+  },
+  {
+    "name": "Gel douche",
+    "slug": "gel-douche",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 16650,
+    "bytes": 11004,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Gel hydroalcoolique",
+    "slug": "gel-hydroalcoolique",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 6242,
+    "bytes": 6242
+  },
+  {
+    "name": "Mouchoirs poche",
+    "slug": "mouchoirs-poche",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 2554,
+    "bytes": 2554
+  },
+  {
+    "name": "Papier toilette humide",
+    "slug": "papier-toilette-humide",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 16244,
+    "bytes": 11144,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Savon mains",
+    "slug": "savon-mains",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 16442,
+    "bytes": 14954,
+    "size": 384,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Shampoing",
+    "slug": "shampoing",
+    "category": "Hygiène & soins",
+    "subgroup": "Hygiène",
+    "before": 15708,
+    "bytes": 9482,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Alcool 70",
+    "slug": "alcool-70",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 4072,
+    "bytes": 4072
+  },
+  {
+    "name": "Antiseptique",
+    "slug": "antiseptique",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 2358,
+    "bytes": 2358
+  },
+  {
+    "name": "Baume lèvres",
+    "slug": "baume-levres",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 1794,
+    "bytes": 1794
+  },
+  {
+    "name": "Coton",
+    "slug": "coton",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 14170,
+    "bytes": 14170
+  },
+  {
+    "name": "Crème hydratante",
+    "slug": "creme-hydratante",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 19378,
+    "bytes": 9520,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Crème mains",
+    "slug": "creme-mains",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 8368,
+    "bytes": 8368
+  },
+  {
+    "name": "Démaquillant",
+    "slug": "demaquillant",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 11322,
+    "bytes": 11322
+  },
+  {
+    "name": "Eau micellaire",
+    "slug": "eau-micellaire",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 10178,
+    "bytes": 10178
+  },
+  {
+    "name": "Mousse à raser",
+    "slug": "mousse-a-raser",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 11484,
+    "bytes": 11484
+  },
+  {
+    "name": "Pansements",
+    "slug": "pansements",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 17814,
+    "bytes": 13674,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Protections hygiéniques",
+    "slug": "protections-hygieniques",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 16182,
+    "bytes": 11076,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Rasoirs",
+    "slug": "rasoirs",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 29582,
+    "bytes": 14186,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Thermomètre piles",
+    "slug": "thermometre-piles",
+    "category": "Hygiène & soins",
+    "subgroup": "Salle de bain & soins",
+    "before": 8700,
+    "bytes": 8700
+  },
+  {
+    "name": "Bicarbonate",
+    "slug": "bicarbonate",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 16688,
+    "bytes": 10152,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Désinfectant",
+    "slug": "desinfectant",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 13614,
+    "bytes": 13614
+  },
+  {
+    "name": "Détartrant",
+    "slug": "detartrant",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 15918,
+    "bytes": 9512,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Éponges magiques",
+    "slug": "eponges-magiques",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 4474,
+    "bytes": 4474
+  },
+  {
+    "name": "Javel",
+    "slug": "javel",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 11890,
+    "bytes": 11890
+  },
+  {
+    "name": "Lingettes ménage",
+    "slug": "lingettes-menage",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 3278,
+    "bytes": 3278
+  },
+  {
+    "name": "Nettoyant multi-usages",
+    "slug": "nettoyant-multi-usages",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 16876,
+    "bytes": 10870,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Nettoyant salle de bain",
+    "slug": "nettoyant-salle-de-bain",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 17284,
+    "bytes": 10524,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Nettoyant sol",
+    "slug": "nettoyant-sol",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 13934,
+    "bytes": 13934
+  },
+  {
+    "name": "Nettoyant vitres",
+    "slug": "nettoyant-vitres",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 16032,
+    "bytes": 10258,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Nettoyant WC",
+    "slug": "nettoyant-wc",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 14506,
+    "bytes": 14506
+  },
+  {
+    "name": "Vinaigre ménager",
+    "slug": "vinaigre-menager",
+    "category": "Maison",
+    "subgroup": "Entretien",
+    "before": 7180,
+    "bytes": 7180
+  },
+  {
+    "name": "Pile 9V",
+    "slug": "pile-9v",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 4126,
+    "bytes": 4126
+  },
+  {
+    "name": "Pile AAA",
+    "slug": "pile-aaa",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 5036,
+    "bytes": 5036
+  },
+  {
+    "name": "Piles AA",
+    "slug": "piles-aa",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 5066,
+    "bytes": 5066
+  },
+  {
+    "name": "Piles CR123A",
+    "slug": "piles-cr123a",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 4962,
+    "bytes": 4962
+  },
+  {
+    "name": "Piles CR2025",
+    "slug": "piles-cr2025",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 5388,
+    "bytes": 5388
+  },
+  {
+    "name": "Piles CR2032",
+    "slug": "piles-cr2032",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 4938,
+    "bytes": 4938
+  },
+  {
+    "name": "Piles CR2450",
+    "slug": "piles-cr2450",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 5166,
+    "bytes": 5166
+  },
+  {
+    "name": "Piles LR44",
+    "slug": "piles-lr44",
+    "category": "Maison",
+    "subgroup": "Équipement",
+    "before": 4852,
+    "bytes": 4852
+  },
+  {
+    "name": "Adoucissant",
+    "slug": "adoucissant",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 12940,
+    "bytes": 12940
+  },
+  {
+    "name": "Amidon",
+    "slug": "amidon",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 7086,
+    "bytes": 7086
+  },
+  {
+    "name": "Désodorisant textile",
+    "slug": "desodorisant-textile",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 14318,
+    "bytes": 14318
+  },
+  {
+    "name": "Détachant",
+    "slug": "detachant",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 13228,
+    "bytes": 13228
+  },
+  {
+    "name": "Filet de lavage",
+    "slug": "filet-de-lavage",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 26298,
+    "bytes": 14182,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Lessive capsules",
+    "slug": "lessive-capsules",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 20188,
+    "bytes": 14214,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Lessive liquide",
+    "slug": "lessive-liquide",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 16634,
+    "bytes": 10878,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Lessive poudre",
+    "slug": "lessive-poudre",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 22458,
+    "bytes": 14976,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Lingettes anti-décoloration",
+    "slug": "lingettes-anti-decoloration",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 14086,
+    "bytes": 14086
+  },
+  {
+    "name": "Nettoyant machine à laver",
+    "slug": "nettoyant-machine-a-laver",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 9146,
+    "bytes": 9146
+  },
+  {
+    "name": "Pinces à linge",
+    "slug": "pinces-a-linge",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 4826,
+    "bytes": 4826
+  },
+  {
+    "name": "Sacs linge délicat",
+    "slug": "sacs-linge-delicat",
+    "category": "Maison",
+    "subgroup": "Lessive",
+    "before": 3124,
+    "bytes": 3124
+  },
+  {
+    "name": "Essuie-tout",
+    "slug": "essuie-tout",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 10154,
+    "bytes": 10154
+  },
+  {
+    "name": "Film alimentaire",
+    "slug": "film-alimentaire",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 12882,
+    "bytes": 12882
+  },
+  {
+    "name": "Mouchoirs",
+    "slug": "mouchoirs",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 3998,
+    "bytes": 3998
+  },
+  {
+    "name": "Papier aluminium",
+    "slug": "papier-aluminium",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 6432,
+    "bytes": 6432
+  },
+  {
+    "name": "Papier cadeau",
+    "slug": "papier-cadeau",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 24190,
+    "bytes": 10052,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Papier cuisson",
+    "slug": "papier-cuisson",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 11308,
+    "bytes": 11308
+  },
+  {
+    "name": "Papier toilette",
+    "slug": "papier-toilette",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 13554,
+    "bytes": 13554
+  },
+  {
+    "name": "Sacs congélation",
+    "slug": "sacs-congelation",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 23284,
+    "bytes": 13668,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Sacs poubelle 30L",
+    "slug": "sacs-poubelle-30l",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 3000,
+    "bytes": 3000
+  },
+  {
+    "name": "Sacs poubelle 50L",
+    "slug": "sacs-poubelle-50l",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 3048,
+    "bytes": 3048
+  },
+  {
+    "name": "Sacs zip",
+    "slug": "sacs-zip",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 3518,
+    "bytes": 3518
+  },
+  {
+    "name": "Serviettes papier",
+    "slug": "serviettes-papier",
+    "category": "Maison",
+    "subgroup": "Papier & sacs",
+    "before": 3008,
+    "bytes": 3008
+  },
+  {
+    "name": "Éponges",
+    "slug": "eponges",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 15650,
+    "bytes": 13962,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Essuie-verres",
+    "slug": "essuie-verres",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 3460,
+    "bytes": 3460
+  },
+  {
+    "name": "Gants ménage",
+    "slug": "gants-menage",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 18544,
+    "bytes": 14892,
+    "size": 256,
+    "quality": 52,
+    "fill": 0.84
+  },
+  {
+    "name": "Grattoirs",
+    "slug": "grattoirs",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 3722,
+    "bytes": 3722
+  },
+  {
+    "name": "Liquide rinçage",
+    "slug": "liquide-rincage",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 14668,
+    "bytes": 14668
+  },
+  {
+    "name": "Liquide vaisselle",
+    "slug": "liquide-vaisselle",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 16514,
+    "bytes": 10472,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Nettoyant lave-vaisselle",
+    "slug": "nettoyant-lave-vaisselle",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 9774,
+    "bytes": 9774
+  },
+  {
+    "name": "Produit inox",
+    "slug": "produit-inox",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 3538,
+    "bytes": 3538
+  },
+  {
+    "name": "Sel lave-vaisselle",
+    "slug": "sel-lave-vaisselle",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 9344,
+    "bytes": 9344
+  },
+  {
+    "name": "Tablettes lave-vaisselle",
+    "slug": "tablettes-lave-vaisselle",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 13944,
+    "bytes": 13944
+  },
+  {
+    "name": "Torchons",
+    "slug": "torchons",
+    "category": "Maison",
+    "subgroup": "Vaisselle",
+    "before": 3726,
+    "bytes": 3726
+  },
+  {
+    "name": "Lave glace",
+    "slug": "lave-glace",
+    "category": "Maison",
+    "subgroup": "Entretien auto",
+    "before": 24392,
+    "bytes": 9552,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Biscuits apéritifs",
+    "slug": "biscuits-aperitifs",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 10386,
+    "bytes": 10386
+  },
+  {
+    "name": "Bretzels",
+    "slug": "bretzels",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 14936,
+    "bytes": 14936
+  },
+  {
+    "name": "Cacahuètes",
+    "slug": "cacahuetes",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 9182,
+    "bytes": 9182
+  },
+  {
+    "name": "Chips",
+    "slug": "chips",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 41986,
+    "bytes": 14828,
+    "size": 256,
+    "quality": 72,
+    "fill": 0.88
+  },
+  {
+    "name": "Crackers",
+    "slug": "crackers",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 17590,
+    "bytes": 14886,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Gressins",
+    "slug": "gressins",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 5120,
+    "bytes": 5120
+  },
+  {
+    "name": "Houmous",
+    "slug": "houmous",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 13464,
+    "bytes": 13464
+  },
+  {
+    "name": "Noix de cajou",
+    "slug": "noix-de-cajou",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 7262,
+    "bytes": 7262
+  },
+  {
+    "name": "Olives",
+    "slug": "olives",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 7690,
+    "bytes": 7690
+  },
+  {
+    "name": "Pistaches",
+    "slug": "pistaches",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 9652,
+    "bytes": 9652
+  },
+  {
+    "name": "Pop-corn",
+    "slug": "pop-corn",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 24554,
+    "bytes": 14942,
+    "size": 384,
+    "quality": 64,
+    "fill": 0.68
+  },
+  {
+    "name": "Tapenade",
+    "slug": "tapenade",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Apéritif",
+    "before": 14404,
+    "bytes": 14404
+  },
+  {
+    "name": "Barres céréales",
+    "slug": "barres-cereales",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 15412,
+    "bytes": 14540,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Biscuits beurre",
+    "slug": "biscuits-beurre",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 14438,
+    "bytes": 14438
+  },
+  {
+    "name": "Biscuits chocolat",
+    "slug": "biscuits-chocolat",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 14168,
+    "bytes": 14168
+  },
+  {
+    "name": "Bonbons",
+    "slug": "bonbons",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 13712,
+    "bytes": 13712
+  },
+  {
+    "name": "Brownies",
+    "slug": "brownies",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 41670,
+    "bytes": 14976,
+    "size": 256,
+    "quality": 52,
+    "fill": 0.88
+  },
+  {
+    "name": "Chocolat au lait",
+    "slug": "chocolat-au-lait",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 14924,
+    "bytes": 14924
+  },
+  {
+    "name": "Chocolat blanc",
+    "slug": "chocolat-blanc",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 4694,
+    "bytes": 4694
+  },
+  {
+    "name": "Chocolat noir",
+    "slug": "chocolat-noir",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 14500,
+    "bytes": 14500
+  },
+  {
+    "name": "Compotes gourdes",
+    "slug": "compotes-gourdes",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 24278,
+    "bytes": 11118,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Cookies",
+    "slug": "cookies",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 26688,
+    "bytes": 14878,
+    "size": 256,
+    "quality": 56,
+    "fill": 0.76
+  },
+  {
+    "name": "Crêpes",
+    "slug": "crepes",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 24638,
+    "bytes": 14962,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Gaufres",
+    "slug": "gaufres",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 18192,
+    "bytes": 14712,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Kinder Maxi",
+    "slug": "kinder-maxi",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 22038,
+    "bytes": 9444,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Madeleines",
+    "slug": "madeleines",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 26222,
+    "bytes": 14644,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Muffins",
+    "slug": "muffins",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 14544,
+    "bytes": 14544
+  },
+  {
+    "name": "Spéculoos",
+    "slug": "speculoos",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Biscuits & goûters",
+    "before": 30382,
+    "bytes": 14610,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Café en grains",
+    "slug": "cafe-en-grains",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 20062,
+    "bytes": 14932,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.84
+  },
+  {
+    "name": "Café moulu",
+    "slug": "cafe-moulu",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 36088,
+    "bytes": 14784,
+    "size": 256,
+    "quality": 56,
+    "fill": 0.88
+  },
+  {
+    "name": "Café soluble",
+    "slug": "cafe-soluble",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 34864,
+    "bytes": 14576,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Capsules café",
+    "slug": "capsules-cafe",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 20282,
+    "bytes": 13264,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Chicorée",
+    "slug": "chicoree",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 30116,
+    "bytes": 14578,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Dosettes café",
+    "slug": "dosettes-cafe",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 42080,
+    "bytes": 14238,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Filtres à café",
+    "slug": "filtres-a-cafe",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 14734,
+    "bytes": 14734
+  },
+  {
+    "name": "Infusion camomille",
+    "slug": "infusion-camomille",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 29020,
+    "bytes": 14486,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Infusion menthe",
+    "slug": "infusion-menthe",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 29282,
+    "bytes": 14368,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Infusion verveine",
+    "slug": "infusion-verveine",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 24978,
+    "bytes": 14372,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Matcha",
+    "slug": "matcha",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 5884,
+    "bytes": 5884
+  },
+  {
+    "name": "Thé Earl Grey",
+    "slug": "the-earl-grey",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 26854,
+    "bytes": 14842,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.6
+  },
+  {
+    "name": "Thé fruits rouges",
+    "slug": "the-fruits-rouges",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 26956,
+    "bytes": 14870,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.6
+  },
+  {
+    "name": "Thé noir",
+    "slug": "the-noir",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 8366,
+    "bytes": 8366
+  },
+  {
+    "name": "Thé vert",
+    "slug": "the-vert",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Café & thé",
+    "before": 18566,
+    "bytes": 13752,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Beurre de cacahuète",
+    "slug": "beurre-de-cacahuete",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 8938,
+    "bytes": 8938
+  },
+  {
+    "name": "Céréales",
+    "slug": "cereales",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 21342,
+    "bytes": 14874,
+    "size": 384,
+    "quality": 60,
+    "fill": 0.76
+  },
+  {
+    "name": "Céréales Lion",
+    "slug": "cereales-lion",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 13758,
+    "bytes": 13758,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Chocolat en poudre",
+    "slug": "chocolat-en-poudre",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 7648,
+    "bytes": 7648
+  },
+  {
+    "name": "Flocons d'avoine",
+    "slug": "flocons-d-avoine",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 10466,
+    "bytes": 10466
+  },
+  {
+    "name": "Granola",
+    "slug": "granola",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 9816,
+    "bytes": 9816
+  },
+  {
+    "name": "Miel",
+    "slug": "miel",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 19930,
+    "bytes": 12754,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Muesli",
+    "slug": "muesli",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 9604,
+    "bytes": 9604
+  },
+  {
+    "name": "Pancakes",
+    "slug": "pancakes",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 7014,
+    "bytes": 7014
+  },
+  {
+    "name": "Pâte à tartiner",
+    "slug": "pate-a-tartiner",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 17792,
+    "bytes": 13644,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Sirop d’érable",
+    "slug": "sirop-d-erable",
+    "category": "Petit-déj & snacks",
+    "subgroup": "Petit-déjeuner",
+    "before": 27644,
+    "bytes": 9362,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Bacon",
+    "slug": "bacon",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 13802,
+    "bytes": 13802
+  },
+  {
+    "name": "Blanc de poulet",
+    "slug": "blanc-de-poulet",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14998,
+    "bytes": 14998
+  },
+  {
+    "name": "Chorizo",
+    "slug": "chorizo",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 13748,
+    "bytes": 13748
+  },
+  {
+    "name": "Coppa",
+    "slug": "coppa",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14130,
+    "bytes": 14130
+  },
+  {
+    "name": "Jambon blanc",
+    "slug": "jambon-blanc",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14632,
+    "bytes": 14632
+  },
+  {
+    "name": "Jambon cru",
+    "slug": "jambon-cru",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14642,
+    "bytes": 14642
+  },
+  {
+    "name": "Lardons",
+    "slug": "lardons",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14634,
+    "bytes": 14634
+  },
+  {
+    "name": "Mortadelle",
+    "slug": "mortadelle",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14226,
+    "bytes": 14226
+  },
+  {
+    "name": "Pâté",
+    "slug": "pate",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14956,
+    "bytes": 14956
+  },
+  {
+    "name": "Peperroni",
+    "slug": "peperroni",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14700,
+    "bytes": 14700
+  },
+  {
+    "name": "Rillettes",
+    "slug": "rillettes",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 13850,
+    "bytes": 13850
+  },
+  {
+    "name": "Rosette",
+    "slug": "rosette",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 13946,
+    "bytes": 13946
+  },
+  {
+    "name": "Saucisson",
+    "slug": "saucisson",
+    "category": "Viandes & poissons",
+    "subgroup": "Charcuterie",
+    "before": 14656,
+    "bytes": 14656
+  },
+  {
+    "name": "Cabillaud",
+    "slug": "cabillaud",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 14094,
+    "bytes": 14094
+  },
+  {
+    "name": "Crevettes",
+    "slug": "crevettes",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 56752,
+    "bytes": 13880,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Moules",
+    "slug": "moules",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 14704,
+    "bytes": 14704
+  },
+  {
+    "name": "Poisson pané",
+    "slug": "poisson-pane",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 3746,
+    "bytes": 3746
+  },
+  {
+    "name": "Saumon",
+    "slug": "saumon",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 41910,
+    "bytes": 11910,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Saumon fumé",
+    "slug": "saumon-fume",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 13956,
+    "bytes": 13956
+  },
+  {
+    "name": "Surimi",
+    "slug": "surimi",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 22530,
+    "bytes": 13882,
+    "size": 256,
+    "quality": 84,
+    "fill": 0.88
+  },
+  {
+    "name": "Thon frais",
+    "slug": "thon-frais",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 14500,
+    "bytes": 14500
+  },
+  {
+    "name": "Truite",
+    "slug": "truite",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons & traiteur",
+    "before": 14306,
+    "bytes": 14306
+  },
+  {
+    "name": "Maquereaux",
+    "slug": "maquereaux",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons en conserve",
+    "before": 32796,
+    "bytes": 14790,
+    "size": 256,
+    "quality": 68,
+    "fill": 0.88
+  },
+  {
+    "name": "Sardines",
+    "slug": "sardines",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons en conserve",
+    "before": 36398,
+    "bytes": 14904,
+    "size": 256,
+    "quality": 60,
+    "fill": 0.84
+  },
+  {
+    "name": "Thon en boîte",
+    "slug": "thon-en-boite",
+    "category": "Viandes & poissons",
+    "subgroup": "Poissons en conserve",
+    "before": 14694,
+    "bytes": 14694
+  },
+  {
+    "name": "Poisson surgelé",
+    "slug": "poisson-surgele",
+    "category": "Viandes & poissons",
+    "subgroup": "Surgelés",
+    "before": 38106,
+    "bytes": 14772,
+    "size": 256,
+    "quality": 64,
+    "fill": 0.88
+  },
+  {
+    "name": "Agneau",
+    "slug": "agneau",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 14294,
+    "bytes": 14294
+  },
+  {
+    "name": "Bœuf",
+    "slug": "boeuf",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 66400,
+    "bytes": 14480,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  },
+  {
+    "name": "Côtes de porc",
+    "slug": "cotes-de-porc",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 14788,
+    "bytes": 14788
+  },
+  {
+    "name": "Dinde",
+    "slug": "dinde",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 26066,
+    "bytes": 12818,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Escalopes de poulet",
+    "slug": "escalopes-de-poulet",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 27220,
+    "bytes": 11948,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Filets de poulet",
+    "slug": "filets-de-poulet",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 37694,
+    "bytes": 12944,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Merguez",
+    "slug": "merguez",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 28648,
+    "bytes": 14286,
+    "size": 256,
+    "quality": 76,
+    "fill": 0.88
+  },
+  {
+    "name": "Porc",
+    "slug": "porc",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 29534,
+    "bytes": 8856,
+    "size": 256,
+    "quality": 88,
+    "fill": 0.88
+  },
+  {
+    "name": "Poulet",
+    "slug": "poulet",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 14978,
+    "bytes": 14978
+  },
+  {
+    "name": "Saucisses",
+    "slug": "saucisses",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 3582,
+    "bytes": 3582
+  },
+  {
+    "name": "Steaks hachés",
+    "slug": "steaks-haches",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 34670,
+    "bytes": 14868,
+    "size": 256,
+    "quality": 56,
+    "fill": 0.88
+  },
+  {
+    "name": "Veau",
+    "slug": "veau",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 14740,
+    "bytes": 14740
+  },
+  {
+    "name": "Viande hachée",
+    "slug": "viande-hachee",
+    "category": "Viandes & poissons",
+    "subgroup": "Viandes",
+    "before": 66172,
+    "bytes": 14894,
+    "size": 256,
+    "quality": 80,
+    "fill": 0.88
+  }
+]

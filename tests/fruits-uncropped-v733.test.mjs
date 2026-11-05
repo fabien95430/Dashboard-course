@@ -7,16 +7,16 @@ import vm from 'node:vm';
 const root=join(dirname(fileURLToPath(import.meta.url)),'..');
 const slugs=['butternut','courge','navets','echalotes','noisettes','ail','oignons-jaunes'];
 const src=s=>'./www/Items/'+s+'.webp';
-test('sept WebP entiers, 512 px, canal alpha et sous 150 Kio',()=>{
+test('sept WebP entiers, 256 px, canal alpha et sous 15 Ko',()=>{
   for(const slug of slugs){
     const b=readFileSync(join(root,'www','Items',slug+'.webp'));
     assert.equal(b.toString('ascii',0,4),'RIFF',slug);
     assert.equal(b.toString('ascii',8,12),'WEBP',slug);
     assert.equal(b.toString('ascii',12,16),'VP8X',slug);
     assert.ok((b[20]&16)!==0,slug+' : canal alpha');
-    assert.equal(1+b.readUIntLE(24,3),512,slug);
-    assert.equal(1+b.readUIntLE(27,3),512,slug);
-    assert.ok(b.length<=153600,slug);
+    assert.equal(1+b.readUIntLE(24,3),256,slug);
+    assert.equal(1+b.readUIntLE(27,3),256,slug);
+    assert.ok(b.length<=15000,slug);
   }
 });
 test('v733 invalide seulement les sept cadrages conservés en localStorage',()=>{

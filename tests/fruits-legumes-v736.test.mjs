@@ -9,16 +9,16 @@ const root=join(dirname(fileURLToPath(import.meta.url)),'..');
 const changed=['brocoli','basilic','carottes'];
 const asset=slug=>'./www/Items/'+slug+'.webp';
 
-test('WebP Fruits & Légumes v736 512 x 512, transparents et sous 150 Kio',()=>{
+test('WebP Fruits & Légumes v736 256 x 256, transparents et sous 15 Ko',()=>{
   for(const slug of changed){
     const b=readFileSync(join(root,'www','Items',slug+'.webp'));
     assert.equal(b.toString('ascii',0,4),'RIFF',slug);
     assert.equal(b.toString('ascii',8,12),'WEBP',slug);
     assert.equal(b.toString('ascii',12,16),'VP8X',slug);
     assert.ok((b[20]&16)!==0,slug+': canal alpha requis');
-    assert.equal(1+b.readUIntLE(24,3),512,slug);
-    assert.equal(1+b.readUIntLE(27,3),512,slug);
-    assert.ok(b.length<=153600,slug);
+    assert.equal(1+b.readUIntLE(24,3),256,slug);
+    assert.equal(1+b.readUIntLE(27,3),256,slug);
+    assert.ok(b.length<=15000,slug);
   }
 });
 

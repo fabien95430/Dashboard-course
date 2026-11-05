@@ -65,6 +65,10 @@ Pour un produit emballé, garder un emballage simple et générique cohérent av
 
 Ne jamais changer volontairement de style graphique. Si les références de la catégorie ont un rendu différent de ce qui est décrit ici, **les références existantes priment**.
 
+## Céréales Lion — emballage demandé
+
+Céréales Lion, classé Petit-déj & snacks → Petit-déjeuner, reprend sur demande la boîte crème/bleu pâle de Céréales infantiles : forme carton fermée, angle trois-quarts, épi doré imprimé et grande fenêtre. Contenu distinct de la poudre infantile : morceaux de céréales chocolat bruns et caramel dorés, aucun texte sur la face avant, céréales soufflées courtes triangulaires à lobes arrondis conformes à la référence Nestlé. Aucune inscription LION ou Nestlé : le nom reste uniquement dans le catalogue. Mode d’achat Boîte. Ne pas modifier la boîte de céréales infantiles ni la référence Céréales existante. Image unitaire transparente sous 15 000 octets, marges et contours vérifiés.
+
 ## Conditionnement fidèle — enfant
 
 Goûters ajoutés : Gâteaux bébé, Biscuits bébé, Boudoirs bébé et Galettes de riz bébé partagent un sachet crème fermé à bandeaux bleu pâle, grande fenêtre et petit épi imprimé. Distinguer leur contenu : petits gâteaux moelleux dorés, biscuits courts ovales perforés, boudoirs longs, galettes rondes de riz soufflé ivoire. Aucun aliment physique autour. Céréales infantiles garde une boîte carton crème/bleu fermée avec épi et petite fenêtre de céréales finement moulues, distincte du lait infantile. Desserts lactés bébé reprend le petit pot laitier évasé à opercule carré fermé de Yaourts vanille, crème/bleu pâle, pictogramme goutte de lait, sans parfum inventé. Aucun âge, chiffre, texte ou allégation ajoutés. Modes d’achat : Paquet pour les quatre goûters, Boîte pour les céréales, Pot pour les desserts.
@@ -260,3 +264,7 @@ Si un de ces points échoue, corriger ou régénérer l’image avant intégrati
 - Ne pas ajouter de dépendance runtime.
 - Lire l’état courant de `main` au moment de chaque intervention : cette note décrit la méthode, mais le dépôt reste la source de vérité.
 - Respecter la règle du commit atomique et les règles de version visibles de `AGENTS.md`.
+
+## Compléments de clôture du 5 novembre 2026
+
+Petits pois et Olives fraîches : produit nature en petit amas, cosses ouvertes autorisées pour les petits pois, sans bol ni assiette. Dinde et Escalopes de poulet : morceaux crus seuls, sans herbes ni grains de poivre ajoutés. Préserver les conditionnements et palettes déjà validés des autres familles. Pour les fichiers lourds, adapter raisonnablement la résolution avant encodage, contrôler la lisibilité réelle et conserver les dimensions contractuelles des visuels testés sauf migration explicite documentée. Les dix fruits/légumes des lots v733/v736 passent en 256 px avec plafond renforcé à 15 000 octets ; leur cadrage sans rognage reste contrôlé.
