@@ -61,10 +61,10 @@ test('v783 remesure uniquement les onze visuels validés et conserve les cadrage
   juices.forEach(slug=>assert.ok(current.has('./www/Items/'+slug+'.webp')));
 });
 
-test('v784 remesure uniquement le whisky validé et préserve les autres cadrages',()=>{
+test('v785 remesure uniquement le whisky validé et préserve les autres cadrages',()=>{
   const items={'./www/Items/whisky.webp':[1.1,0,0],'./www/Items/rhum.webp':[1.06,1,-1]};
-  const migrated=restore({version:'v783',items},'v784');
+  const migrated=restore({version:'v784',items},'v785');
   assert.equal(migrated.has('./www/Items/whisky.webp'),false);
   assert.deepEqual(migrated.get('./www/Items/rhum.webp'),{scale:1.06,shiftX:1,shiftY:-1});
-  assert.ok(restore({version:'v784',items},'v784').has('./www/Items/whisky.webp'));
+  assert.ok(restore({version:'v785',items},'v785').has('./www/Items/whisky.webp'));
 });

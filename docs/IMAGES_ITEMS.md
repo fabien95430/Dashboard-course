@@ -341,9 +341,9 @@ Bière sans alcool reprend la bouteille large de la famille bières, capsule ble
 
 L'étiquette porte uniquement le nom : aucun symbole, dessin, pictogramme, fruit, épi, canne à sucre, soleil, blason ou ornement. Garder le produit entier, la transparence réelle, 256 × 256 px et maximum 15 000 octets mesurés, avec revue 192/48 px sur fonds clair et foncé. Ces quatre visuels ont été validés ; le whisky proposé dans la même série a été refusé et reste inchangé dans ce lot.
 
-## Whisky : bouteille large à bouchon noir validée — v784
+## Whisky : bouteille large à bouchon noir validée — v785
 
-L'utilisateur a validé la nouvelle bouteille de Whisky après avoir refusé la proposition haute et étroite. Référence canonique : www/Items/whisky.webp v784. Reprendre strictement son corps rectangulaire large à coins arrondis, ses épaules inclinées, son col court, son petit bouchon noir vissé, son verre épais et son liquide ambré. Ne pas revenir à la carafe à grand bouchon de liège v780 ni à la silhouette haute et fine refusée.
+L'utilisateur a validé la nouvelle bouteille de Whisky après avoir refusé la proposition haute et étroite. Référence canonique : www/Items/whisky.webp v785. Reprendre strictement son corps rectangulaire large à coins arrondis, ses épaules inclinées, son col court, son petit bouchon noir vissé, son verre épais et son liquide ambré. Ne pas revenir à la carafe à grand bouchon de liège v780 ni à la silhouette haute et fine refusée.
 
 Une seule petite étiquette crème basse porte uniquement « WHISKY » en capitales brunes, sans dessin, épi, symbole, logo, blason ou autre texte. Garder les proportions exactes du prototype validé, sans allonger ni tasser la bouteille. Produit entier et centré, fond transparent réel, contours propres à 192/48 px sur fonds clair/foncé, WebP 256 × 256 px et maximum 15 000 octets mesurés.
 
