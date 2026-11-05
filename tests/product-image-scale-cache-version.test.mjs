@@ -39,3 +39,14 @@ test('les anciens caches sans version invalident seulement les images modifiées
   assert.equal(restored.has('./www/Items/quinoa.webp'),false);
   assert.ok(restored.has('./www/Items/spaghetti.webp'));
 });
+
+test('v780 remesure les neuf boissons alcoolisées remplacées et conserve les autres cadrages',()=>{
+  const beers=["biere-ambree","biere-aux-fruits","biere-blanche","biere-blonde","biere-brune","biere-ipa","biere-triple","panache","whisky"];
+  const beerItems=Object.fromEntries(beers.map(slug=>['./www/Items/'+slug+'.webp',[1.1,0,0]]));
+  const items={...beerItems,'./www/Items/coca.webp':[1.08,1,-1]};
+  const migrated=restore({version:'v779',items},'v780');
+  beers.forEach(slug=>assert.equal(migrated.has('./www/Items/'+slug+'.webp'),false));
+  assert.deepEqual(migrated.get('./www/Items/coca.webp'),{scale:1.08,shiftX:1,shiftY:-1});
+  const current=restore({version:'v780',items},'v780');
+  beers.forEach(slug=>assert.ok(current.has('./www/Items/'+slug+'.webp')));
+});
