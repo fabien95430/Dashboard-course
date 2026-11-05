@@ -11,6 +11,7 @@ import sys
 from urllib.parse import unquote
 
 import integrate_dish as base
+import update_visual_hashes
 
 ROOT = base.ROOT
 RESULT_PATH = base.RESULT_PATH
@@ -374,6 +375,7 @@ def integrate_files(name: str, category: str, subgroup: str, display_mode: str, 
     local_path.write_text(local_text,encoding="utf-8")
     sw_path.write_text(sw_text,encoding="utf-8")
     index_path.write_text(index_text,encoding="utf-8")
+    update_visual_hashes.refresh()
     return new_version,filename
 
 

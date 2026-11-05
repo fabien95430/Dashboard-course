@@ -52,7 +52,8 @@ test('sur réseau lent, chaque script et style de la page part du cache sans att
 test('un visuel déjà vérifié pour cette version n est plus re-téléchargé à chaque lancement',async()=>{
   const fetched=[];
   const fetchImpl=async request=>{fetched.push(request.url);return new Response('image',{status:200});};
-  const visual=new URL('www/Items/pommes.webp',origin).href;
+  // Visuel hors empreintes (fond, bannière) : les vignettes produits et plats sont couvertes par tests/visual-hashes.test.mjs.
+  const visual=new URL('www/empty-list-premium-v4.webp',origin).href;
   const tagged=new Map([[visual,new Response('image',{headers:{'X-Courses-Refreshed':cacheName}})]]);
   const first=loadWorker({fetchImpl,visualEntries:tagged});
   const waits=[];

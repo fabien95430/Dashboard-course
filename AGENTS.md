@@ -51,6 +51,12 @@ Avant un commit final, exécuter `bash scripts/validate_repo.sh` lorsque l’env
 
 Toute la suite `tests/*.test.mjs` doit être verte. Aucune baseline en échec ne doit être tolérée par le validateur permanent.
 
+## Cache des visuels
+
+Après tout ajout, remplacement ou suppression d'image dans `www/Items/` ou `www/Plats/{cartes,fiches}/`, lancer `python3 scripts/update_visual_hashes.py` et committer `sw.js` dans le même commit que l'image. Les scripts d'intégration le font déjà ; `tests/visual-hashes.test.mjs` échoue si une empreinte manque.
+
+Ne jamais réintroduire de liste de visuels à invalider dans `sw.js` (ancienne `UPDATED_ITEM_VISUALS`, qui grossissait à chaque version), ni d'invalidation fondée sur ETag/Last-Modified : GitHub Pages remet ces marqueurs à neuf à chaque mise en ligne, ce qui faisait re-télécharger toutes les images et afficher les nouvelles avec une ouverture de retard. Ne pas affaiblir ce test pour faire passer un changement.
+
 ## Visuels des plats
 
 Pour une demande `dish`, le visuel local fait partie de l’intégration lorsqu’il n’existe pas déjà.

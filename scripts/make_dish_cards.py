@@ -15,6 +15,9 @@ from pathlib import Path
 
 from PIL import Image
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import update_visual_hashes  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "www" / "Plats"
 TARGETS = (
@@ -39,6 +42,8 @@ def main() -> int:
             created += 1
             print(f"copie créée : {copy.relative_to(ROOT)}")
     print(f"{created} copie(s) WebP créée(s)")
+    # Empreintes des visuels du service worker : sans elles, les nouvelles copies arriveraient en retard.
+    update_visual_hashes.refresh()
     return 0
 
 

@@ -8,6 +8,7 @@ import re
 import sys
 
 import integrate_dish as base
+import update_visual_hashes
 
 ROOT = base.ROOT
 RESULT_PATH = base.RESULT_PATH
@@ -310,6 +311,7 @@ def delete_product(requested: str) -> dict:
     index_path.write_text(index_text, encoding='utf-8')
     if image_path.exists():
         image_path.unlink()
+    update_visual_hashes.refresh()
 
     return {
         'ok': True,
@@ -396,6 +398,7 @@ def delete_dish(requested: str) -> dict:
         copy_path = ROOT / 'www' / 'Plats' / folder / (filename[:-len('.png')] + '.webp')
         if copy_path.exists():
             copy_path.unlink()
+    update_visual_hashes.refresh()
 
     return {
         'ok': True,
