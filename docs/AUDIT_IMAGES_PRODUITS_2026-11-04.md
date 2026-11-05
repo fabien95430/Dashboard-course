@@ -810,3 +810,14 @@ Douze WebP RGBA 256 px, alpha réel, marges intactes, chaque fichier sous 15 000
 Deux tests ajoutés pour unicité, classement, conditionnements d’achat/affichage et WebP transparents sous 15 Ko. Validation : 362 tests réussis, syntaxe de tous les JavaScript, compilation Python et git diff --check. Validateur Bash inchangé ; contrôles équivalents exécutés séparément car /dev/fd/63 indisponible. Pas d’essai interactif iPhone ou Home Assistant réel.
 
 Consignes et prompt automatique complétés. Version et URLs synchronisées en v774. Cadrage, fallback, logique réseau du service worker et cache visuel persistant inchangés. Architecture statique, OAuth, synchronisation WebSocket Home Assistant, coffre, verrouillage/biométrie, mode test, styles mobiles et safe areas préservés.
+
+
+## Correction Noix de pécan — v775
+
+Source relue : main 7251bc90afe5d473dc2fb663fc4924bb980e8fc4 (v774). L’utilisateur signale que la grosse illustration colorée sur l’étiquette de Pécan ne correspond pas aux autres noix. Comparaison réelle avec Noix de cajou et Pistaches : le couvercle en bois introduit en v774 et l’étiquette sans nom étaient également incohérents.
+
+Une génération par outil intégré, sans API payante du projet. Nouveau bocal dans le modèle Noix de cajou : verre, couvercle métallique doré, étiquette crème avec NOIX DE PÉCAN en capitales brunes et petite pécan monochrome au trait, contenu naturel de pécans brun rouge sillonnées. Aucun grand dessin coloré. WebP RGBA 256 px, alpha réel et marges préservées, 14 692 octets mesurés. Référence finale : www/Items/noix-de-pecan.webp. Prompt : reprendre exactement le bocal Noix de cajou, remplacer uniquement le contenu et la désignation générique, conserver le petit dessin au trait monochrome, refuser l’illustration réaliste colorée et le couvercle bois.
+
+Revue sur fonds clair/foncé à 160/48 px et calcul réel du cadrage : scale 1.016, shiftX 0, shiftY 0.5, aucun rognage Ma liste/Catalogue. Recalcul du seul cadrage Pécan pour les caches antérieurs à v775 ; pas de purge du cache visuel persistant du service worker. Les 521 autres images sont identiques octet par octet, catalogue inchangé à 522 produits. Consigne de génération corrigée pour prévenir cette dérive.
+
+Validation : 362 tests réussis, syntaxe de tous les JavaScript et compilation Python, git diff --check. Validateur Bash tenté sans modification ; /dev/fd/63 indisponible, contrôles équivalents exécutés séparément. Pas d’essai interactif iPhone ou Home Assistant réel. Version et URLs synchronisées en v775 ; seuls l’asset Pécan, son recalcul de cadrage, versions et documentation/consignes changent. OAuth, Home Assistant, WebSocket, coffre, biométrie, mode test, fallback SVG, réseau du service worker et styles mobiles préservés.
