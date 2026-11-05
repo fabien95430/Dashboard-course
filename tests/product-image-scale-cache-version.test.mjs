@@ -40,8 +40,8 @@ test('les anciens caches sans version invalident seulement les images modifiées
   assert.ok(restored.has('./www/Items/spaghetti.webp'));
 });
 
-test('v780 remesure les neuf bières remplacées et conserve les autres cadrages',()=>{
-  const beers=["biere-ambree","biere-aux-fruits","biere-blanche","biere-blonde","biere-brune","biere-ipa","biere-sans-alcool","biere-triple","panache"];
+test('v780 remesure les quinze boissons remplacées et conserve les autres cadrages',()=>{
+  const beers=["biere-ambree","biere-aux-fruits","biere-blanche","biere-blonde","biere-brune","biere-ipa","biere-sans-alcool","biere-triple","panache","tonic","whisky","jus-de-poire","sirop-de-grenadine","sirop-de-menthe","sirop-de-peche"];
   const beerItems=Object.fromEntries(beers.map(slug=>['./www/Items/'+slug+'.webp',[1.1,0,0]]));
   const items={...beerItems,'./www/Items/coca.webp':[1.08,1,-1]};
   const migrated=restore({version:'v779',items},'v780');

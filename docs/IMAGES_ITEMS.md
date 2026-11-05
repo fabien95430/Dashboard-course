@@ -319,3 +319,13 @@ Pour Bière ambrée, Bière aux fruits, Bière blanche, Bière blonde, Bière br
 | Panaché | Citron pâle trouble | Jaune, tranche de citron |
 
 Conserver des proportions naturelles, une largeur de corps proche de 40 % de la hauteur, le produit entier à environ 90 % de la hauteur du carré et des marges intactes. Les illustrations sont imprimées sur l'étiquette, jamais des accessoires physiques. WebP unitaires 256 × 256 px, transparence réelle, maximum 15 000 octets mesurés. Contrôler les contours et la reconnaissance à 192 px et 48 px sur fonds clair et foncé. Ce modèle ne s'applique pas automatiquement aux vins, spiritueux ou à Ginger beer.
+
+## Autres corrections boissons — v780
+
+Tonic : bouteille de verre légèrement bleuté, corps un peu plus large, contours bleu-gris visibles sur fond clair, bouchon argenté et petite étiquette crème à icône de bulles ; liquide clair, sans texte. Whisky : conserver le flacon large carré et le bouchon de liège, avec liquide ambré translucide et reflets maîtrisés ; éviter une masse centrale noire.
+
+Jus de poire reprend désormais la silhouette, le bouchon doré et la petite étiquette basse du modèle Jus d'orange v748. Liquide jaune poire clair ; poire entière et moitié imprimées sur l'étiquette uniquement.
+
+Les sirops Grenadine, Menthe et Pêche partagent strictement la bouteille cylindrique de Grenadine v780 : mêmes épaules arrondies, col, bouchon doré, cadrage et verre sans étiquette. Seule la couleur du sirop change : rouge rubis, vert menthe ou orange pêche. Ne pas réintroduire trois silhouettes différentes.
+
+Conserver les dimensions contractuelles : 256 × 256 px pour Tonic, Whisky et Jus de poire ; 384 × 384 px pour les trois sirops. Toujours transparence réelle, produit entier, 15 000 octets maximum et revue à 192/48 px sur fonds clair et foncé.

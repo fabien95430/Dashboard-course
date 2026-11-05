@@ -122,7 +122,7 @@ function loadVisualScaleCache(){
     if(!stored||!stored.items||typeof stored.items!=='object')return;
     const cacheVersion=Number(String(stored.version||'').replace(/^v/,''));
     const changedSince780=Number(String(currentAppVersion()).replace(/^v/,''))>=780&&(!Number.isFinite(cacheVersion)||cacheVersion<780);
-    const changedImages780=["./www/Items/biere-ambree.webp","./www/Items/biere-aux-fruits.webp","./www/Items/biere-blanche.webp","./www/Items/biere-blonde.webp","./www/Items/biere-brune.webp","./www/Items/biere-ipa.webp","./www/Items/biere-sans-alcool.webp","./www/Items/biere-triple.webp","./www/Items/panache.webp"];
+    const changedImages780=["./www/Items/biere-ambree.webp","./www/Items/biere-aux-fruits.webp","./www/Items/biere-blanche.webp","./www/Items/biere-blonde.webp","./www/Items/biere-brune.webp","./www/Items/biere-ipa.webp","./www/Items/biere-sans-alcool.webp","./www/Items/biere-triple.webp","./www/Items/panache.webp","./www/Items/tonic.webp","./www/Items/whisky.webp","./www/Items/jus-de-poire.webp","./www/Items/sirop-de-grenadine.webp","./www/Items/sirop-de-menthe.webp","./www/Items/sirop-de-peche.webp"];
     const changedSinceCache=!Number.isFinite(cacheVersion)||cacheVersion<722;
     const changedSince724=!Number.isFinite(cacheVersion)||cacheVersion<724;
     const changedSince725=!Number.isFinite(cacheVersion)||cacheVersion<725;

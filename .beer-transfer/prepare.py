@@ -1,19 +1,21 @@
 from PIL import Image, ImageDraw
 from pathlib import Path
 import io, json
-names=["biere-ambree","biere-aux-fruits","biere-blanche","biere-blonde","biere-brune","biere-ipa","biere-sans-alcool","biere-triple","panache"]
+names=["biere-ambree","biere-aux-fruits","biere-blanche","biere-blonde","biere-brune","biere-ipa","biere-sans-alcool","biere-triple","panache","tonic","whisky","jus-de-poire","sirop-de-grenadine","sirop-de-menthe","sirop-de-peche"]
+sizes={"tonic":[256,256],"whisky":[256,256],"jus-de-poire":[256,256],"sirop-de-grenadine":[384,384],"sirop-de-menthe":[384,384],"sirop-de-peche":[384,384]}
 root=Path('.beer-transfer')
 report=[]
-sheet=Image.new('RGB',(1200,780),'#e9e9e9')
+sheet=Image.new('RGB',(1200,1300),'#e9e9e9')
 draw=ImageDraw.Draw(sheet)
 for index,name in enumerate(names):
     source=Image.open(root/(name+'.png')).convert('RGBA')
-    image=source.resize((256,256),Image.Resampling.LANCZOS)
+    image=source.resize(tuple(sizes.get(name,[256,256])),Image.Resampling.LANCZOS)
+    side=image.width
     alpha=image.getchannel('A')
     assert alpha.getextrema()==(0,255),name+' alpha missing'
     bbox=alpha.point(lambda value:255 if value>=24 else 0).getbbox()
-    assert bbox and min(bbox[0],bbox[1],256-bbox[2],256-bbox[3])>=3,(name,bbox)
-    assert (bbox[2]-bbox[0])/(bbox[3]-bbox[1])>=.35,(name,bbox)
+    assert bbox and min(bbox[0],bbox[1],side-bbox[2],side-bbox[3])>=3,(name,bbox)
+    assert (bbox[2]-bbox[0])/(bbox[3]-bbox[1])>=(.28 if name.startswith('sirop-') else .35),(name,bbox)
     encoded=None
     for quality in (94,90,86,82,78,74,70,66,62,58,54,50,46,42,38,34):
         buffer=io.BytesIO()
