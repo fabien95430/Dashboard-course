@@ -51,8 +51,8 @@ test('v780 remesure les neuf boissons alcoolisées remplacées et conserve les a
   beers.forEach(slug=>assert.ok(current.has('./www/Items/'+slug+'.webp')));
 });
 
-test('v781 remesure uniquement les sept jus remplacés et conserve les cadrages récents',()=>{
-  const juices=["jus-d-orange","jus-de-pomme","jus-d-ananas","jus-de-raisin","jus-de-tomate","jus-multifruits","jus-de-poire"];
+test('v781 remesure uniquement les onze visuels validés et conserve les cadrages récents',()=>{
+  const juices=["jus-d-orange","jus-de-pomme","jus-d-ananas","jus-de-raisin","jus-de-tomate","jus-multifruits","jus-de-poire","biere-sans-alcool","rhum","ricard","tonic"];
   const items={...Object.fromEntries(juices.map(slug=>['./www/Items/'+slug+'.webp',[1.1,0,0]])),'./www/Items/vin-rouge.webp':[1.05,0,-1]};
   const migrated=restore({version:'v780',items},'v781');
   juices.forEach(slug=>assert.equal(migrated.has('./www/Items/'+slug+'.webp'),false));

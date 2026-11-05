@@ -122,7 +122,7 @@ function loadVisualScaleCache(){
     if(!stored||!stored.items||typeof stored.items!=='object')return;
     const cacheVersion=Number(String(stored.version||'').replace(/^v/,''));
     const changedSince781=Number(String(currentAppVersion()).replace(/^v/,''))>=781&&(!Number.isFinite(cacheVersion)||cacheVersion<781);
-    const changedImages781=["./www/Items/jus-d-orange.webp","./www/Items/jus-de-pomme.webp","./www/Items/jus-d-ananas.webp","./www/Items/jus-de-raisin.webp","./www/Items/jus-de-tomate.webp","./www/Items/jus-multifruits.webp","./www/Items/jus-de-poire.webp"];
+    const changedImages781=["./www/Items/jus-d-orange.webp","./www/Items/jus-de-pomme.webp","./www/Items/jus-d-ananas.webp","./www/Items/jus-de-raisin.webp","./www/Items/jus-de-tomate.webp","./www/Items/jus-multifruits.webp","./www/Items/jus-de-poire.webp","./www/Items/biere-sans-alcool.webp","./www/Items/rhum.webp","./www/Items/ricard.webp","./www/Items/tonic.webp"];
     const changedSince780=Number(String(currentAppVersion()).replace(/^v/,''))>=780&&(!Number.isFinite(cacheVersion)||cacheVersion<780);
     const changedImages780=["./www/Items/biere-ambree.webp","./www/Items/biere-aux-fruits.webp","./www/Items/biere-blanche.webp","./www/Items/biere-blonde.webp","./www/Items/biere-brune.webp","./www/Items/biere-ipa.webp","./www/Items/biere-triple.webp","./www/Items/panache.webp","./www/Items/whisky.webp"];
     const changedSinceCache=!Number.isFinite(cacheVersion)||cacheVersion<722;

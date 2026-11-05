@@ -1,21 +1,21 @@
 from PIL import Image, ImageDraw
 from pathlib import Path
 import io, json
-names=["jus-d-orange","jus-de-pomme","jus-d-ananas","jus-de-raisin","jus-de-tomate","jus-multifruits","jus-de-poire"]
+names=["jus-d-orange","jus-de-pomme","jus-d-ananas","jus-de-raisin","jus-de-tomate","jus-multifruits","jus-de-poire","biere-sans-alcool","rhum","ricard","tonic"]
 root=Path('.juice-transfer')
 report=[]
-sheet=Image.new('RGB',(1200,780),'#e9e9e9')
+sheet=Image.new('RGB',(1200,1040),'#e9e9e9')
 draw=ImageDraw.Draw(sheet)
 for index,name in enumerate(names):
     source=Image.open(root/(name+'.png')).convert('RGBA')
-    side=256 if name=='jus-de-poire' else 384
+    side=384 if name.startswith('jus-') and name!='jus-de-poire' else 256
     image=source.resize((side,side),Image.Resampling.LANCZOS)
     alpha=image.getchannel('A')
     assert alpha.getextrema()==(0,255),name+' alpha missing'
     bbox=alpha.point(lambda v:255 if v>=24 else 0).getbbox()
     assert bbox and min(bbox[0],bbox[1],side-bbox[2],side-bbox[3])>=3,(name,bbox)
     ratio=(bbox[3]-bbox[1])/(bbox[2]-bbox[0])
-    assert 2.3<=ratio<=2.9,(name,ratio)
+    assert (2.3<=ratio<=2.9 if name.startswith('jus-') else 1.8<=ratio<=4.5),(name,ratio)
     encoded=None
     for quality in (94,90,86,82,78,74,70,66,62,58,54,50,46,42,38,34):
         b=io.BytesIO()

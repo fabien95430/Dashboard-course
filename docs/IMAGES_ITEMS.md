@@ -333,4 +333,10 @@ Reproduire strictement la même silhouette, les proportions, le cadrage, le bouc
 
 Un produit par WebP transparent, entier et centré, contours propres sur fonds clair et foncé à 192 et 48 px. Conserver 384 × 384 px pour les six jus historiques et 256 × 256 px pour Poire ; maximum 15 000 octets mesurés par fichier.
 
-Validation utilisateur obligatoire : présenter un prototype avant toute nouvelle déclinaison de proportions et faire valider le lot avant intégration. Le lot des sept jus v781 a été explicitement validé. Ne pas inclure les cinq autres bouteilles en attente de validation.
+Validation utilisateur obligatoire : présenter un prototype avant toute nouvelle déclinaison de proportions et faire valider le lot avant intégration. Le lot des sept jus v781 a été explicitement validé. Bière 0 %, Rhum, Ricard et Tonic ont ensuite été validés séparément. Le nouveau Whisky reste en attente de validation et ne doit pas être intégré.
+
+## Quatre bouteilles à nom seul validées — v781
+
+Bière sans alcool reprend la bouteille large de la famille bières, capsule bleu pétrole et petite étiquette crème avec uniquement « BIÈRE 0 % ». Rhum : bouteille cylindrique ambrée, bouchon brun bronze, petite étiquette crème « RHUM ». Ricard : silhouette élancée ambrée, capsule et col argentés, une seule étiquette crème « RICARD » en bleu marine ; aucun soleil sur le col ni autre étiquette. Tonic : verre clair légèrement bleuté, bouchon argenté, étiquette crème « TONIC » en bleu ardoise.
+
+L'étiquette porte uniquement le nom : aucun symbole, dessin, pictogramme, fruit, épi, canne à sucre, soleil, blason ou ornement. Garder le produit entier, la transparence réelle, 256 × 256 px et maximum 15 000 octets mesurés, avec revue 192/48 px sur fonds clair et foncé. Ces quatre visuels ont été validés ; le whisky proposé dans la même série a été refusé et reste inchangé dans ce lot.
