@@ -1,0 +1,110 @@
+[
+  {
+    "name": "biere-ambree",
+    "bytes": 11502,
+    "quality": 94,
+    "bbox": [
+      78,
+      15,
+      178,
+      244
+    ],
+    "widthRatio": 0.437
+  },
+  {
+    "name": "biere-aux-fruits",
+    "bytes": 11558,
+    "quality": 94,
+    "bbox": [
+      77,
+      15,
+      178,
+      244
+    ],
+    "widthRatio": 0.441
+  },
+  {
+    "name": "biere-blanche",
+    "bytes": 8562,
+    "quality": 94,
+    "bbox": [
+      78,
+      15,
+      178,
+      244
+    ],
+    "widthRatio": 0.437
+  },
+  {
+    "name": "biere-blonde",
+    "bytes": 11462,
+    "quality": 94,
+    "bbox": [
+      78,
+      15,
+      178,
+      243
+    ],
+    "widthRatio": 0.439
+  },
+  {
+    "name": "biere-brune",
+    "bytes": 11778,
+    "quality": 94,
+    "bbox": [
+      78,
+      14,
+      178,
+      244
+    ],
+    "widthRatio": 0.435
+  },
+  {
+    "name": "biere-ipa",
+    "bytes": 12282,
+    "quality": 94,
+    "bbox": [
+      77,
+      14,
+      179,
+      244
+    ],
+    "widthRatio": 0.443
+  },
+  {
+    "name": "biere-sans-alcool",
+    "bytes": 12728,
+    "quality": 94,
+    "bbox": [
+      77,
+      14,
+      179,
+      244
+    ],
+    "widthRatio": 0.443
+  },
+  {
+    "name": "biere-triple",
+    "bytes": 13360,
+    "quality": 94,
+    "bbox": [
+      77,
+      14,
+      179,
+      243
+    ],
+    "widthRatio": 0.445
+  },
+  {
+    "name": "panache",
+    "bytes": 10836,
+    "quality": 94,
+    "bbox": [
+      77,
+      14,
+      179,
+      244
+    ],
+    "widthRatio": 0.443
+  }
+]
