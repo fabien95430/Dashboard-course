@@ -106,5 +106,77 @@
       244
     ],
     "widthRatio": 0.443
+  },
+  {
+    "name": "tonic",
+    "bytes": 10482,
+    "quality": 94,
+    "bbox": [
+      87,
+      16,
+      170,
+      240
+    ],
+    "widthRatio": 0.371
+  },
+  {
+    "name": "whisky",
+    "bytes": 14732,
+    "quality": 94,
+    "bbox": [
+      61,
+      14,
+      195,
+      242
+    ],
+    "widthRatio": 0.588
+  },
+  {
+    "name": "jus-de-poire",
+    "bytes": 9376,
+    "quality": 94,
+    "bbox": [
+      81,
+      20,
+      175,
+      238
+    ],
+    "widthRatio": 0.431
+  },
+  {
+    "name": "sirop-de-grenadine",
+    "bytes": 13846,
+    "quality": 90,
+    "bbox": [
+      136,
+      27,
+      248,
+      359
+    ],
+    "widthRatio": 0.337
+  },
+  {
+    "name": "sirop-de-menthe",
+    "bytes": 13584,
+    "quality": 90,
+    "bbox": [
+      135,
+      27,
+      249,
+      359
+    ],
+    "widthRatio": 0.343
+  },
+  {
+    "name": "sirop-de-peche",
+    "bytes": 13576,
+    "quality": 90,
+    "bbox": [
+      135,
+      27,
+      249,
+      359
+    ],
+    "widthRatio": 0.343
   }
 ]
