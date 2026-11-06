@@ -31,6 +31,140 @@ const UPDATED_IMAGE_SOURCES_V722=new Set([
 const NO_CROP_SOURCES_V733=new Set([
   'butternut','courge','navets','echalotes','noisettes','ail','oignons-jaunes'
 ].map(slug=>'./www/Items/'+slug+'.webp'));
+// Ajustements validés après l'audit des 522 produits (v786).
+// [Catalogue, Ma liste] : garder les mesures brutes dans le cache pour éviter tout
+// cumul du zoom et appliquer immédiatement les profils aux anciens appareils.
+const PRODUCT_VISUAL_FACTORS=new Map(Object.entries({
+  "bouillon-cubes": [
+    0.9,
+    0.96
+  ],
+  "ricotta": [
+    1.05,
+    1.05
+  ],
+  "glace-nuii": [
+    1.06,
+    1.06
+  ],
+  "myrtilles": [
+    1.06,
+    1.06
+  ],
+  "carottes": [
+    1.06,
+    1.06
+  ],
+  "courgettes": [
+    1.06,
+    1.06
+  ],
+  "haricots-verts": [
+    1.06,
+    1.06
+  ],
+  "poireaux": [
+    1.08,
+    1.08
+  ],
+  "asperges": [
+    1.06,
+    1.06
+  ],
+  "brosses-a-dents": [
+    1.08,
+    1.08
+  ],
+  "fil-dentaire": [
+    0.9,
+    1
+  ],
+  "creme-hydratante": [
+    0.92,
+    1
+  ],
+  "amidon": [
+    1.06,
+    1.06
+  ],
+  "tablettes-lave-vaisselle": [
+    0.92,
+    1
+  ],
+  "barres-cereales": [
+    1.06,
+    1.06
+  ],
+  "cookies": [
+    0.95,
+    1
+  ],
+  "kinder-maxi": [
+    1.06,
+    1.06
+  ],
+  "cafe-moulu": [
+    0.94,
+    1
+  ],
+  "capsules-cafe": [
+    0.75,
+    0.9
+  ],
+  "dosettes-cafe": [
+    0.85,
+    0.95
+  ],
+  "filtres-a-cafe": [
+    0.88,
+    0.96
+  ],
+  "matcha": [
+    0.93,
+    1
+  ],
+  "the-earl-grey": [
+    1.08,
+    1.06
+  ],
+  "the-fruits-rouges": [
+    1.08,
+    1.06
+  ],
+  "the-noir": [
+    0.88,
+    0.96
+  ],
+  "pate": [
+    0.9,
+    0.96
+  ],
+  "rillettes": [
+    0.94,
+    1
+  ],
+  "saucisson": [
+    1.25,
+    1.18
+  ],
+  "saumon": [
+    1.06,
+    1.06
+  ],
+  "truite": [
+    1.06,
+    1.06
+  ],
+  "porc": [
+    1.12,
+    1.08
+  ]
+}).map(([slug,factors])=>['./www/Items/'+slug+'.webp',factors]));
+function visualScaleForView(source,metrics,compact=false){
+  const factors=PRODUCT_VISUAL_FACTORS.get(source);
+  if(!factors)return metrics;
+  return {...metrics,scale:Math.round(metrics.scale*factors[compact?1:0]*1000)/1000};
+}
 let visualScaleSaveTimer=0;
 
 const slugify=value=>String(value||'')
@@ -228,9 +362,11 @@ function saveVisualScaleCacheSoon(){
     try{localStorage.setItem(VISUAL_SCALE_KEY,JSON.stringify({version,items}))}catch(_){}
   },1500);
 }
-function visualScaleStyle(source){
-  const metrics=visualScaleCache.get(source);
-  return metrics?'--single-product-scale:'+metrics.scale+';--single-product-shift-x:'+metrics.shiftX+'%;--single-product-shift-y:'+metrics.shiftY+'%':'';
+function visualScaleStyle(source,compact=false){
+  const cached=visualScaleCache.get(source);
+  if(!cached&&!PRODUCT_VISUAL_FACTORS.has(source))return '';
+  const metrics=visualScaleForView(source,cached||{scale:1,shiftX:0,shiftY:0},compact);
+  return '--single-product-scale:'+metrics.scale+';--single-product-shift-x:'+metrics.shiftX+'%;--single-product-shift-y:'+metrics.shiftY+'%';
 }
 loadVisualScaleCache();
 window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages,visualScaleStyle});
@@ -300,7 +436,9 @@ function measureVisualScale(image,source){
   }catch(_){return null}
 }
 function setVisualScale(image,metrics){
-  image.style.setProperty('--single-product-scale',String(metrics.scale));
+  const compact=image.dataset.singleProductCompact==='1'||Boolean(image.closest('.premium-sprite.is-compact'));
+  const adjusted=visualScaleForView(image.dataset.singleProductSource,metrics,compact);
+  image.style.setProperty('--single-product-scale',String(adjusted.scale));
   image.style.setProperty('--single-product-shift-x',metrics.shiftX+'%');
   image.style.setProperty('--single-product-shift-y',metrics.shiftY+'%');
 }
@@ -360,6 +498,7 @@ function decorateFallback(card,name,source,eager=false){
   fallback.dataset.singleProductPending=source;
   const compact=fallback.classList.contains('is-compact');
   const image=new Image();
+  image.dataset.singleProductCompact=compact?'1':'0';
   image.alt='';
   image.loading=imageLoading(source,eager);
   image.decoding='sync';

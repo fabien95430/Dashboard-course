@@ -32,8 +32,8 @@ function scaleAt(version,stored){
 test('les trois nouvelles images v736 seulement perdent les métriques anciennes',()=>{
   const items=Object.fromEntries([...changed,'radis'].map(s=>[asset(s),[1.35,12,-9]]));
   const previous=scaleAt('v736',{version:'v735',items});
-  for(const slug of changed)assert.equal(previous(asset(slug)),'',slug);
+  for(const slug of changed)assert.equal(previous(asset(slug)),slug==='carottes'?'--single-product-scale:1.06;--single-product-shift-x:0%;--single-product-shift-y:0%':'',slug);
   assert.match(previous(asset('radis')),/--single-product-scale:1.35/);
   const current=scaleAt('v736',{version:'v736',items});
-  for(const slug of changed)assert.match(current(asset(slug)),/--single-product-scale:1.35/,slug);
+  for(const slug of changed)assert.ok(current(asset(slug)).includes('--single-product-scale:'+(slug==='carottes'?'1.431':'1.35')+';'),slug);
 });
