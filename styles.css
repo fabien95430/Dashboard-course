@@ -3127,19 +3127,19 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v784 — décor plus discret dans l’espace libre entre le titre et la recherche. */
+/* v787 — fruits à droite et rameau transparent sous le titre, avant la recherche. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
     position:fixed;
-    inset:calc(env(safe-area-inset-top) + 28px) 8px auto auto;
-    width:min(56vw,228px);
-    height:116px;
+    inset:calc(env(safe-area-inset-top) + 6px) 4px auto auto;
+    width:min(94vw,380px);
+    height:138px;
     pointer-events:none;
     z-index:0;
-    background:url("./www/list-header-poires-v782.webp") right -12px / 100% auto no-repeat;
-    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 50%,transparent 100%);
-    mask-image:linear-gradient(to bottom,#000 0%,#000 50%,transparent 100%);
+    background:url("./www/list-header-pomme-poire-v787.webp") right calc(-1 * min(9vw,36px)) / 100% auto no-repeat;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 78%,transparent 100%);
+    mask-image:linear-gradient(to bottom,#000 0%,#000 78%,transparent 100%);
     opacity:.88;
   }
   .app>.list-view.is-active{position:relative;z-index:1}
