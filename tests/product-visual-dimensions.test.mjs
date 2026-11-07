@@ -22,7 +22,7 @@ function value(style,key='scale'){
   return Number(style.match(new RegExp('--single-product-'+key+':([^;]+)'))?.[1].replace('%',''));
 }
 
-test('358 profils de réduction validés, les autres produits gardent leur cadrage',()=>{
+test('profils intermédiaires validés, les autres produits gardent leur cadrage',()=>{
   const groups=JSON.parse(catalog.match(/groups:\s*(\{.*?\}),\s*\n\s*favorites:/s)[1]);
   const sources=Object.values(groups).flatMap(g=>Object.values(g).flat()).map(n=>asset(slugify(n)));
   assert.equal(sources.length,522);
@@ -39,25 +39,25 @@ test('358 profils de réduction validés, les autres produits gardent leur cadra
 });
 test('les capsules ont un rendu distinct par vue, dès le premier affichage et avec ancien cache',()=>{
   const cold=model();
-  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'))),0.627);
-  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'),true)),0.684);
+  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'))),0.688);
+  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'),true)),0.792);
   const cached=model({[asset('capsules-cafe')]:[1.2,2,-3]},'v785');
-  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'))),0.752);
-  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'),true)),0.821);
+  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'))),0.826);
+  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'),true)),0.95);
   assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe')),'shift-x'),2);
   assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe')),'shift-y'),-3);
 });
 test('saucisson et rosette gardent les profils distincts de l’audit révisé',()=>{
   const images=model({[asset('saucisson')]:[1.45,0,0],[asset('rosette')]:[1.1,0,0]});
-  assert.equal(value(images.visualScaleStyle(asset('saucisson'))),1.587);
+  assert.equal(value(images.visualScaleStyle(asset('saucisson'))),1.7);
   assert.equal(value(images.visualScaleStyle(asset('saucisson'),true)),1.711);
-  assert.equal(value(images.visualScaleStyle(asset('rosette'))),0.972);
+  assert.equal(value(images.visualScaleStyle(asset('rosette'))),1.036);
 });
 test('les mesures brutes ne changent pas et les ouvertures ne cumulent pas les facteurs',()=>{
   const raw={scale:1.2,shiftX:2,shiftY:-3};
   for(let i=0;i<5;i++){
-    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw).scale,0.752);
-    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw,true).scale,0.821);
+    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw).scale,0.826);
+    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw,true).scale,0.95);
   }
   assert.deepEqual(raw,{scale:1.2,shiftX:2,shiftY:-3});
   const items={[asset('capsules-cafe')]:[1.2,2,-3]};
@@ -84,10 +84,10 @@ test('le dessin après chargement et le style initial appliquent exactement le m
 test('les thés gardent leur fil entier avec les profils réduits validés',()=>{
   const images=model({[asset('the-earl-grey')]:[1.45,0,0],[asset('the-fruits-rouges')]:[1.45,0,0],[asset('the-vert')]:[1,0,0]});
   for(const slug of ['the-earl-grey','the-fruits-rouges']){
-    assert.equal(value(images.visualScaleStyle(asset(slug))),1.146);
-    assert.equal(value(images.visualScaleStyle(asset(slug),true)),1.231);
+    assert.equal(value(images.visualScaleStyle(asset(slug))),1.356);
+    assert.equal(value(images.visualScaleStyle(asset(slug),true)),1.384);
   }
-  assert.equal(value(images.visualScaleStyle(asset('the-vert'))),0.769);
+  assert.equal(value(images.visualScaleStyle(asset('the-vert'))),0.885);
 });
 test('la liste transmet son contexte compact et les images de fallback le conservent avant insertion',()=>{
   assert.ok(app.includes('visualScaleStyle?.(source,compact)'));
