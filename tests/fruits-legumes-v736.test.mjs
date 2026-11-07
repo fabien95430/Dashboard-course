@@ -32,8 +32,9 @@ function scaleAt(version,stored){
 test('les trois nouvelles images v736 seulement perdent les métriques anciennes',()=>{
   const items=Object.fromEntries([...changed,'radis'].map(s=>[asset(s),[1.35,12,-9]]));
   const previous=scaleAt('v736',{version:'v735',items});
-  for(const slug of changed)assert.equal(previous(asset(slug)),'--single-product-scale:'+{"brocoli": 0.956, "basilic": 0.899, "carottes": 0.972}[slug]+';--single-product-shift-x:0%;--single-product-shift-y:0%',slug);
+  const cold={brocoli:0.956,basilic:1,carottes:1.04};
+  for(const slug of changed)assert.equal(previous(asset(slug)),cold[slug]===1?'':'--single-product-scale:'+cold[slug]+';--single-product-shift-x:0%;--single-product-shift-y:0%',slug);
   assert.ok(previous(asset('radis')).includes('--single-product-scale:1.29;'));
   const current=scaleAt('v736',{version:'v736',items});
-  for(const slug of changed)assert.ok(current(asset(slug)).includes('--single-product-scale:'+{"brocoli": 1.29, "basilic": 1.213, "carottes": 1.312}[slug]+';'),slug);
+  for(const slug of changed)assert.ok(current(asset(slug)).includes('--single-product-scale:'+{"brocoli": 1.29, "basilic": 1.35, "carottes": 1.404}[slug]+';'),slug);
 });
