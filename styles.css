@@ -3132,7 +3132,7 @@ body{
   .app:has(>.list-view.is-active)::before{
     content:"";
     position:fixed;
-    inset:calc(env(safe-area-inset-top) + 6px) 4px auto auto;
+    inset:calc(env(safe-area-inset-top) + 6px) 18px auto auto;
     width:min(94vw,380px);
     height:138px;
     pointer-events:none;
