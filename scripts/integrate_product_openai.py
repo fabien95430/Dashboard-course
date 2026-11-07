@@ -6,6 +6,10 @@ from __future__ import annotations
 import base64
 import json
 import os
+import shutil
+import subprocess
+import tempfile
+from pathlib import Path
 import re
 import sys
 from urllib.parse import unquote
@@ -261,6 +265,55 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
     )
 
 
+
+PRODUCT_IMAGE_MAX_BYTES = 15_000
+
+
+def optimize_product_webp(image: bytes) -> bytes:
+    """Réencode la génération existante en local, sans deuxième appel à l'API image."""
+    if len(image) <= PRODUCT_IMAGE_MAX_BYTES:
+        return image
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise RuntimeError("WebP trop lourd et optimisation locale impossible : FFmpeg indisponible")
+    # Vignette mobile cible 192 px : ne pas descendre sous 256 px natifs, ni réétirer.
+    candidates = ((816, 80), (512, 75), (384, 75), (384, 65),
+                  (320, 75), (320, 65), (256, 80), (256, 70), (256, 65))
+    last_error = ""
+    with tempfile.TemporaryDirectory(prefix="courses-webp-") as folder:
+        source = Path(folder) / "source.webp"
+        output = Path(folder) / "optimized.webp"
+        source.write_bytes(image)
+        for side, quality in candidates:
+            command = [
+                ffmpeg, "-y", "-nostdin", "-loglevel", "error", "-i", str(source),
+                "-vf", f"scale={side}:{side}:flags=lanczos,format=yuva420p",
+                "-frames:v", "1", "-c:v", "libwebp", "-lossless", "0",
+                "-quality", str(quality), "-compression_level", "6", str(output),
+            ]
+            try:
+                result = subprocess.run(command, capture_output=True, check=False, timeout=90)
+            except (OSError, subprocess.TimeoutExpired) as error:
+                last_error = str(error)
+                continue
+            if result.returncode != 0 or not output.is_file():
+                last_error = result.stderr.decode("utf-8", "replace")[:300] or f"FFmpeg: {result.returncode}"
+                continue
+            candidate = output.read_bytes()
+            if len(candidate) < 21 or candidate[:4] != b"RIFF" or candidate[8:12] != b"WEBP":
+                continue
+            # VP8X: canal alpha requis, notamment sur les contours du produit.
+            if candidate[12:16] != b"VP8X" or not (candidate[20] & 0x10):
+                continue
+            if len(candidate) <= PRODUCT_IMAGE_MAX_BYTES:
+                return candidate
+    detail = f" Dernière erreur: {last_error}" if last_error else ""
+    raise RuntimeError(
+        f"Visuel produit trop lourd ({len(image)} octets). Aucun réencodage WebP transparent "
+        f"et lisible (min. 256 px, qualité 65) ne respecte {PRODUCT_IMAGE_MAX_BYTES} octets.{detail}"
+    )
+
+
 def generate_image(name: str, category: str, subgroup: str, image_hint: str, api_key: str) -> bytes:
     model=os.getenv("COURSES_IMAGE_MODEL","gpt-image-2.5-flare")
     payload=base.api_json(
@@ -287,7 +340,7 @@ def generate_image(name: str, category: str, subgroup: str, image_hint: str, api
         raise RuntimeError("Image OpenAI invalide") from error
     if len(image)<12 or image[:4]!=b"RIFF" or image[8:12]!=b"WEBP":
         raise RuntimeError("Le visuel produit généré n'est pas un WebP valide")
-    return image
+    return optimize_product_webp(image)
 
 
 def current_version() -> int:

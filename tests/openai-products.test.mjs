@@ -174,6 +174,35 @@ assert 'le conditionnement demandé et la transparence du fond' in requests[0]['
   assert.equal(run.status,0,run.stderr||run.stdout);
 });
 
+test('les produits WebP trop lourds sont réencodés localement sans deuxième appel OpenAI',()=>{
+  const script=read('scripts/integrate_product_openai.py');
+  const validator=read('scripts/validate_generated_asset.py');
+  assert.match(script,/def optimize_product_webp\(/);
+  assert.match(script,/shutil\.which\("ffmpeg"\)/);
+  assert.match(script,/return optimize_product_webp\(image\)/);
+  assert.match(validator,/allowed_dimensions=\{\(816,816\)/);
+  const program=String.raw`
+import sys
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+sys.path.insert(0,'scripts')
+import integrate_product_openai as product
+small=b'RIFF1234WEBPpayload'
+assert product.optimize_product_webp(small)==small
+large=small+b'X'*20000
+optimized=b'RIFF1234WEBP'+b'VP8X'+b'0000'+bytes([16])+b'X'*100
+def fake_run(args,**kwargs):
+    assert 'scale=' in ' '.join(args)
+    Path(args[-1]).write_bytes(optimized)
+    return SimpleNamespace(returncode=0,stderr=b'')
+with patch.object(product.shutil,'which',return_value='/bin/ffmpeg'), patch.object(product.subprocess,'run',side_effect=fake_run):
+    assert product.optimize_product_webp(large)==optimized
+`;
+  const run=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
+  assert.equal(run.status,0,run.stderr||run.stdout);
+});
+
 test('la validation refuse un WebP produit trop lourd sans modifier le contrôle des plats',()=>{
   const program=String.raw`
 import json, sys, tempfile

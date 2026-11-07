@@ -75,18 +75,20 @@ def main() -> None:
         if item_type=='product':
             width,height=webp_dimensions(image)
             expected=(816,816)
+            allowed_dimensions={(816,816),(512,512),(384,384),(320,320),(256,256)}
             if path.suffix.lower()!='.webp':
                 raise ValueError('Le visuel produit doit être enregistré en WebP')
         else:
             width,height=png_dimensions(image)
             expected=(1536,1024)
+            allowed_dimensions={expected}
             if path.suffix.lower()!='.png':
                 raise ValueError('Le visuel du plat doit être enregistré en PNG')
     except ValueError as error:
         save_failure(data,str(error))
-    if (width,height)!=expected:
+    if (width,height) not in allowed_dimensions:
         label='produit' if item_type=='product' else 'plat'
-        save_failure(data,f'Dimensions du visuel {label} invalides: {width}×{height} (attendu {expected[0]}×{expected[1]})')
+        save_failure(data,f'Dimensions du visuel {label} invalides: {width}×{height} (formats autorisés: {sorted(allowed_dimensions)})')
     if item_type=='product' and len(image)>PRODUCT_IMAGE_MAX_BYTES:
         save_failure(data,f'Visuel produit trop lourd: {len(image)} octets (maximum {PRODUCT_IMAGE_MAX_BYTES} octets). Conserver la demande et optimiser le WebP avant publication.')
 
