@@ -253,7 +253,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Bolognaise":"Pot",
   "Soignon":"Pièce",
   "Burrata":"Pot","Ricotta":"Pot","Feta":"Barquette","Gnocchis":"Paquet","Yaourt à boire":"Bouteille",
-  "Glace Nuii":"Boîte"
+  "Glace Nuii":"Boîte",
+  "Céréales Trésor":"Boîte"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.

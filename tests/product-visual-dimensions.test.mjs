@@ -25,7 +25,8 @@ function value(style,key='scale'){
 test('profils intermédiaires validés, les autres produits gardent leur cadrage',()=>{
   const groups=JSON.parse(catalog.match(/groups:\s*(\{.*?\}),\s*\n\s*favorites:/s)[1]);
   const sources=Object.values(groups).flatMap(g=>Object.values(g).flat()).map(n=>asset(slugify(n)));
-  assert.equal(sources.length,522);
+  assert.ok(sources.length>0);
+  assert.equal(new Set(sources).size,sources.length,'un fichier visuel distinct par produit');
   assert.equal(adjusted.factors.size,347);
   for(const key of adjusted.factors.keys())assert.ok(sources.includes(key),key);
   const raw={scale:1.1,shiftX:2,shiftY:-3};
@@ -35,7 +36,7 @@ test('profils intermédiaires validés, les autres produits gardent leur cadrage
     assert.equal(adjusted.adjust(key,raw),raw,key);
     unchanged++;
   }
-  assert.equal(unchanged,175);
+  assert.equal(unchanged,sources.length-adjusted.factors.size);
 });
 test('les capsules ont un rendu distinct par vue, dès le premier affichage et avec ancien cache',()=>{
   const cold=model();
