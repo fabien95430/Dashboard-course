@@ -41,13 +41,15 @@ test('les recettes natives sont calibrées pour 2 personnes',()=>{
   assert.match(quantities,/const BASE_SERVINGS=2;/);
 });
 
-test('les 88 plats ont tous une quantité spécifique et des ingrédients du catalogue',()=>{
+test('tous les plats du catalogue ont une quantité spécifique et des ingrédients du catalogue',()=>{
   const dishBlock=dishes.slice(dishes.indexOf('const DISHES='),dishes.indexOf('const FILTERS='));
   const quantityBlock=quantities.slice(quantities.indexOf('const DISH_NEEDS_FOR_TWO='),quantities.indexOf('const BASE_SERVINGS='));
   const dishNames=[...dishBlock.matchAll(/\{name:'([^']+)'/g)].map(match=>match[1]);
   const quantityNames=[...quantityBlock.matchAll(/^\s*'([^']+)':\{/gm)].map(match=>match[1]);
-  assert.equal(dishNames.length,88);
-  assert.deepEqual([...new Set(quantityNames)].sort(),[...dishNames].sort());
+  assert.ok(dishNames.length>0);
+  assert.equal(new Set(dishNames).size,dishNames.length,'pas de plat en doublon');
+  assert.equal(new Set(quantityNames).size,quantityNames.length,'pas de quantité de recette en doublon');
+  assert.deepEqual([...quantityNames].sort(),[...dishNames].sort());
   assert.doesNotMatch(dishBlock,/ingredients:\[[^\]]*'Citron'/);
   for(const name of ['Paprika','Curcuma','Gélatine','Chili','Sauce César','Pâte brisée'])assert.match(catalog,new RegExp(`"${name}"`));
 });
