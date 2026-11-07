@@ -52,10 +52,11 @@ test('les cadrages antérieurs sont recalculés seulement pour les visuels renou
       localStorage:{getItem:key => key==='courses-product-visual-scale-v1' ? JSON.stringify({version,items}) : null}
     });
     const style = window.COURSES_PRODUCT_IMAGES.visualScaleStyle;
+    const factors = new Function(source.slice(source.indexOf('const PRODUCT_VISUAL_FACTORS='),source.indexOf('let visualScaleSaveTimer='))+';return PRODUCT_VISUAL_FACTORS;')();
     for (const slug of slugs) {
-      if (version==='v740' && !canonical.has(slug)) assert.equal(style(asset(slug)),'',slug);
-      else assert.match(style(asset(slug)),/--single-product-scale:1.2/,slug);
+      if (version==='v740' && !canonical.has(slug)) assert.equal(style(asset(slug)), factors.has(asset(slug))?'--single-product-scale:'+Math.round(factors.get(asset(slug))[0]*1000)/1000+';--single-product-shift-x:0%;--single-product-shift-y:0%':'',slug);
+      else assert.ok(style(asset(slug)).includes('--single-product-scale:'+Math.round(1.2*(factors.get(asset(slug))?.[0]||1)*1000)/1000+';'),slug);
     }
-    for (const slug of ['lait','riz-blanc']) assert.match(style(asset(slug)),/--single-product-scale:1.2/,slug);
+    for (const slug of ['lait','riz-blanc']) assert.ok(style(asset(slug)).includes('--single-product-scale:'+Math.round(1.2*(factors.get(asset(slug))?.[0]||1)*1000)/1000+';'),slug);
   }
 });

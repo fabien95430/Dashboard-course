@@ -22,11 +22,11 @@ function value(style,key='scale'){
   return Number(style.match(new RegExp('--single-product-'+key+':([^;]+)'))?.[1].replace('%',''));
 }
 
-test('31 produits validés ont un profil, les 491 autres gardent leur cadrage',()=>{
+test('358 profils de réduction validés, les autres produits gardent leur cadrage',()=>{
   const groups=JSON.parse(catalog.match(/groups:\s*(\{.*?\}),\s*\n\s*favorites:/s)[1]);
   const sources=Object.values(groups).flatMap(g=>Object.values(g).flat()).map(n=>asset(slugify(n)));
   assert.equal(sources.length,522);
-  assert.equal(adjusted.factors.size,31);
+  assert.equal(adjusted.factors.size,359);
   for(const key of adjusted.factors.keys())assert.ok(sources.includes(key),key);
   const raw={scale:1.1,shiftX:2,shiftY:-3};
   let unchanged=0;
@@ -35,29 +35,29 @@ test('31 produits validés ont un profil, les 491 autres gardent leur cadrage',(
     assert.equal(adjusted.adjust(key,raw),raw,key);
     unchanged++;
   }
-  assert.equal(unchanged,491);
+  assert.equal(unchanged,163);
 });
 test('les capsules ont un rendu distinct par vue, dès le premier affichage et avec ancien cache',()=>{
   const cold=model();
-  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'))),.75);
-  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'),true)),.9);
+  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'))),0.627);
+  assert.equal(value(cold.visualScaleStyle(asset('capsules-cafe'),true)),0.684);
   const cached=model({[asset('capsules-cafe')]:[1.2,2,-3]},'v785');
-  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'))),.9);
-  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'),true)),1.08);
+  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'))),0.752);
+  assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe'),true)),0.821);
   assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe')),'shift-x'),2);
   assert.equal(value(cached.visualScaleStyle(asset('capsules-cafe')),'shift-y'),-3);
 });
-test('le saucisson peut dépasser le plafond automatique sans agrandir toute la charcuterie',()=>{
+test('saucisson et rosette gardent les profils distincts de l’audit révisé',()=>{
   const images=model({[asset('saucisson')]:[1.45,0,0],[asset('rosette')]:[1.1,0,0]});
-  assert.equal(value(images.visualScaleStyle(asset('saucisson'))),1.813);
+  assert.equal(value(images.visualScaleStyle(asset('saucisson'))),1.587);
   assert.equal(value(images.visualScaleStyle(asset('saucisson'),true)),1.711);
-  assert.equal(value(images.visualScaleStyle(asset('rosette'))),1.1);
+  assert.equal(value(images.visualScaleStyle(asset('rosette'))),0.972);
 });
 test('les mesures brutes ne changent pas et les ouvertures ne cumulent pas les facteurs',()=>{
   const raw={scale:1.2,shiftX:2,shiftY:-3};
   for(let i=0;i<5;i++){
-    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw).scale,.9);
-    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw,true).scale,1.08);
+    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw).scale,0.752);
+    assert.equal(adjusted.adjust(asset('capsules-cafe'),raw,true).scale,0.821);
   }
   assert.deepEqual(raw,{scale:1.2,shiftX:2,shiftY:-3});
   const items={[asset('capsules-cafe')]:[1.2,2,-3]};
@@ -81,17 +81,28 @@ test('le dessin après chargement et le style initial appliquent exactement le m
     assert.equal(style['--single-product-shift-y'],'-3%');
   }
 });
-test('les deux thés sont agrandis avec leur fil entier, sans modifier le thé vert',()=>{
+test('les thés gardent leur fil entier avec les profils réduits validés',()=>{
   const images=model({[asset('the-earl-grey')]:[1.45,0,0],[asset('the-fruits-rouges')]:[1.45,0,0],[asset('the-vert')]:[1,0,0]});
   for(const slug of ['the-earl-grey','the-fruits-rouges']){
-    assert.equal(value(images.visualScaleStyle(asset(slug))),1.566);
-    assert.equal(value(images.visualScaleStyle(asset(slug),true)),1.537);
+    assert.equal(value(images.visualScaleStyle(asset(slug))),1.146);
+    assert.equal(value(images.visualScaleStyle(asset(slug),true)),1.231);
   }
-  assert.equal(value(images.visualScaleStyle(asset('the-vert'))),1);
+  assert.equal(value(images.visualScaleStyle(asset('the-vert'))),0.769);
 });
 test('la liste transmet son contexte compact et les images de fallback le conservent avant insertion',()=>{
   assert.ok(app.includes('visualScaleStyle?.(source,compact)'));
   assert.ok(source.includes("image.dataset.singleProductCompact=compact?'1':'0'"));
   assert.ok(source.includes('items[source]=[metrics.scale,metrics.shiftX,metrics.shiftY]'));
   assert.equal(model().visualScaleStyle(asset('riz-basmati')),'');
+});
+
+test('les petits formats restent inférieurs aux paquets dans les deux vues',()=>{
+  for(const compact of [false,true]){
+    const base={scale:1,shiftX:0,shiftY:0};
+    const factor=slug=>adjusted.adjust(asset(slug),base,compact).scale;
+    assert.ok(70.2*factor('desserts-lactes-bebe')<50.6*factor('gateaux-bebe'),'largeur du pot enfant inférieure au paquet');
+    assert.ok(66*factor('desserts-lactes-bebe')<70.2*factor('gateaux-bebe'),'hauteur du pot enfant inférieure au paquet');
+    assert.ok(factor('paprika')<factor('mayonnaise'),'épices inférieures aux sauces');
+    assert.ok(factor('mayonnaise')<factor('riz-basmati'),'sauce inférieure au paquet de riz');
+  }
 });

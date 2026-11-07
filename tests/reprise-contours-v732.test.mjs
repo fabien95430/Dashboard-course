@@ -29,9 +29,11 @@ function scaleAt(version,stored){
 test('recalculer uniquement les neuf métriques du lot 732',()=>{
  const items=Object.fromEntries([...changed,'mozzarella'].map(s=>[asset(s),[1.45,18,-18]]));
  const previous=scaleAt('v732',{version:'v731',items});
- for(const s of changed)assert.equal(previous(asset(s)),s==='ricotta'?'--single-product-scale:1.05;--single-product-shift-x:0%;--single-product-shift-y:0%':'',s);
- assert.match(previous(asset('mozzarella')),/--single-product-scale:1.45/);
+ const expected={"glace-vanille": 0.855, "lait-infantile": 0.855, "yaourt-a-boire": 0.769, "ricotta": 0.849, "gouda": 0.855, "gnocchis": 1, "feta": 0.826, "burrata": 0.826, "savon-mains": 0.912};
+ for(const s of changed)assert.equal(previous(asset(s)),expected[s]===1?'':'--single-product-scale:'+expected[s]+';--single-product-shift-x:0%;--single-product-shift-y:0%',s);
+ assert.ok(previous(asset('mozzarella')).includes('--single-product-scale:1.074;'));
  const currentVersion=readFileSync(join(root,'dish-local-images.js'),'utf8').match(/const APP_VERSION='(v\d+)'/)[1];
  const current=scaleAt(currentVersion,{version:currentVersion,items});
- for(const s of changed)assert.ok(current(asset(s)).includes('--single-product-scale:'+(s==='ricotta'?'1.523':'1.45')+';'),s);
+ const warm={"glace-vanille": 1.239, "lait-infantile": 1.239, "yaourt-a-boire": 1.115, "ricotta": 1.23, "gouda": 1.239, "gnocchis": 1.45, "feta": 1.198, "burrata": 1.198, "savon-mains": 1.322};
+ for(const s of changed)assert.ok(current(asset(s)).includes('--single-product-scale:'+warm[s]+';'),s);
 });

