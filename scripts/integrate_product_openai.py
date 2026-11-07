@@ -6,10 +6,9 @@ from __future__ import annotations
 import base64
 import json
 import os
-import shutil
-import subprocess
-import tempfile
-from pathlib import Path
+import ctypes
+import ctypes.util
+import math
 import re
 import sys
 from urllib.parse import unquote
@@ -266,51 +265,111 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
 
 
 
+
 PRODUCT_IMAGE_MAX_BYTES = 15_000
 
 
+def _webp_codec():
+    """Charge la bibliothèque native présente sur le runner, sans paquet Python externe."""
+    name = ctypes.util.find_library("webp")
+    if not name:
+        raise RuntimeError("Codec libwebp indisponible : réencodage WebP local impossible")
+    lib = ctypes.CDLL(name)
+    pointer = ctypes.POINTER(ctypes.c_uint8)
+    lib.WebPDecodeRGBA.argtypes = (
+        pointer, ctypes.c_size_t, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)
+    )
+    lib.WebPDecodeRGBA.restype = pointer
+    lib.WebPEncodeRGBA.argtypes = (
+        pointer, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+        ctypes.c_float, ctypes.POINTER(pointer)
+    )
+    lib.WebPEncodeRGBA.restype = ctypes.c_size_t
+    lib.WebPFree.argtypes = (ctypes.c_void_p,)
+    lib.WebPFree.restype = None
+    return lib
+
+
+def _resample_rgba(raw: bytes, width: int, height: int, side: int) -> bytes:
+    """Bilinear alpha-premultiplied : pas de halo sombre autour du produit."""
+    if width == height == side:
+        return raw
+    pixels = memoryview(raw)
+    output = bytearray(side * side * 4)
+    for y in range(side):
+        fy = (y + 0.5) * height / side - 0.5
+        y0 = max(0, min(height - 1, math.floor(fy)))
+        y1 = max(0, min(height - 1, y0 + 1))
+        wy = max(0.0, min(1.0, fy - y0))
+        for x in range(side):
+            fx = (x + 0.5) * width / side - 0.5
+            x0 = max(0, min(width - 1, math.floor(fx)))
+            x1 = max(0, min(width - 1, x0 + 1))
+            wx = max(0.0, min(1.0, fx - x0))
+            corners = (
+                (y0 * width + x0, (1 - wx) * (1 - wy)),
+                (y0 * width + x1, wx * (1 - wy)),
+                (y1 * width + x0, (1 - wx) * wy),
+                (y1 * width + x1, wx * wy),
+            )
+            alpha_total = 0.0
+            colors = [0.0, 0.0, 0.0]
+            for pixel, weight in corners:
+                if not weight:
+                    continue
+                i = pixel * 4
+                alpha = pixels[i + 3]
+                alpha_total += weight * alpha
+                for channel in range(3):
+                    colors[channel] += weight * alpha * pixels[i + channel]
+            i = (y * side + x) * 4
+            output[i + 3] = max(0, min(255, round(alpha_total)))
+            if alpha_total:
+                for channel in range(3):
+                    output[i + channel] = max(0, min(255, round(colors[channel] / alpha_total)))
+    return bytes(output)
+
+
 def optimize_product_webp(image: bytes) -> bytes:
-    """Réencode la génération existante en local, sans deuxième appel à l'API image."""
+    """Réencode la même génération : aucun nouvel appel API, aucun redimensionnement vers le haut."""
     if len(image) <= PRODUCT_IMAGE_MAX_BYTES:
         return image
-    ffmpeg = shutil.which("ffmpeg")
-    if not ffmpeg:
-        raise RuntimeError("WebP trop lourd et optimisation locale impossible : FFmpeg indisponible")
-    # Vignette mobile cible 192 px : ne pas descendre sous 256 px natifs, ni réétirer.
+    lib = _webp_codec()
+    pointer = ctypes.POINTER(ctypes.c_uint8)
+    source = (ctypes.c_uint8 * len(image)).from_buffer_copy(image)
+    width = ctypes.c_int()
+    height = ctypes.c_int()
+    decoded = lib.WebPDecodeRGBA(source, len(image), ctypes.byref(width), ctypes.byref(height))
+    if not decoded:
+        raise RuntimeError("Le visuel WebP généré ne peut être décodé par libwebp")
+    try:
+        rgba = ctypes.string_at(decoded, width.value * height.value * 4)
+    finally:
+        lib.WebPFree(decoded)
+    if width.value < 256 or height.value < 256:
+        raise RuntimeError("Visuel source insuffisant pour une vignette produit premium")
     candidates = ((816, 80), (512, 75), (384, 75), (384, 65),
                   (320, 75), (320, 65), (256, 80), (256, 70), (256, 65))
-    last_error = ""
-    with tempfile.TemporaryDirectory(prefix="courses-webp-") as folder:
-        source = Path(folder) / "source.webp"
-        output = Path(folder) / "optimized.webp"
-        source.write_bytes(image)
-        for side, quality in candidates:
-            command = [
-                ffmpeg, "-y", "-nostdin", "-loglevel", "error", "-i", str(source),
-                "-vf", f"scale={side}:{side}:flags=lanczos,format=yuva420p",
-                "-frames:v", "1", "-c:v", "libwebp", "-lossless", "0",
-                "-quality", str(quality), "-compression_level", "6", str(output),
-            ]
-            try:
-                result = subprocess.run(command, capture_output=True, check=False, timeout=90)
-            except (OSError, subprocess.TimeoutExpired) as error:
-                last_error = str(error)
-                continue
-            if result.returncode != 0 or not output.is_file():
-                last_error = result.stderr.decode("utf-8", "replace")[:300] or f"FFmpeg: {result.returncode}"
-                continue
-            candidate = output.read_bytes()
-            if len(candidate) < 21 or candidate[:4] != b"RIFF" or candidate[8:12] != b"WEBP":
-                continue
-            # VP8X: canal alpha requis, notamment sur les contours du produit.
-            if candidate[12:16] != b"VP8X" or not (candidate[20] & 0x10):
-                continue
-            if len(candidate) <= PRODUCT_IMAGE_MAX_BYTES:
-                return candidate
-    detail = f" Dernière erreur: {last_error}" if last_error else ""
+    for side, quality in candidates:
+        if side > width.value or side > height.value:
+            continue
+        pixels = _resample_rgba(rgba, width.value, height.value, side)
+        buffer = (ctypes.c_uint8 * len(pixels)).from_buffer_copy(pixels)
+        encoded = pointer()
+        size = lib.WebPEncodeRGBA(buffer, side, side, side * 4, float(quality), ctypes.byref(encoded))
+        if not size or not encoded:
+            continue
+        try:
+            result = ctypes.string_at(encoded, size)
+        finally:
+            lib.WebPFree(encoded)
+        if (len(result) <= PRODUCT_IMAGE_MAX_BYTES and result[:4] == b"RIFF"
+                and result[8:12] == b"WEBP" and result[12:16] == b"VP8X"
+                and result[20] & 0x10):
+            return result
     raise RuntimeError(
-        f"Visuel produit trop lourd ({len(image)} octets). Aucun réencodage WebP transparent "
-        f"et lisible (min. 256 px, qualité 65) ne respecte {PRODUCT_IMAGE_MAX_BYTES} octets.{detail}"
+        f"Visuel produit trop lourd ({len(image)} octets) : aucun réencodage transparent "
+        f"et lisible (min. 256 px, qualité 65) ne respecte {PRODUCT_IMAGE_MAX_BYTES} octets"
     )
 
 
