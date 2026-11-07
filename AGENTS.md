@@ -77,4 +77,6 @@ Ajouter le plat dans `dishes-ui.js` avec sa catégorie et uniquement des ingréd
 
 Un produit utilise une image WebP unitaire dans `www/Items/`. Lire `docs/IMAGES_ITEMS.md` avant toute création ou modification d’un visuel produit.
 
+**Poids des WebP produits : plafond strict de 15 000 octets sur le fichier final.** La taille annoncée dans le prompt et `output_compression` ne sont pas des garanties. Pour une génération automatique, mesurer puis optimiser réellement le WebP localement *avant* de mettre à jour `sw.js` et avant la validation/publication ; conserver la transparence, les contours, les proportions, le rendu premium et la lisibilité à 192 px. Une image trop lourde ne doit pas simplement être renvoyée sans tentative d'optimisation. Si le générateur ne possède pas cette étape, corriger le module propriétaire et ses tests plutôt que relever la limite, désactiver le contrôle ou multiplier les appels payants. Ne jamais faire passer une image dégradée uniquement pour respecter le seuil. En cas d'échec technique ou visuel, conserver la demande en attente et remonter l'erreur précise ; ne pas la marquer résolue.
+
 Ne jamais réintroduire d’atlas, de planche ou de sprite produit. `product-item-images.js` peut harmoniser le cadrage des WebP unitaires, et le SVG premium local reste le seul fallback si une image manque ou échoue.
