@@ -110,3 +110,13 @@ test('un saumon acheté samedi est prévu pour la course suivante, pas dans 2 jo
   profiles.Lessive.lastAt=at(2026,10,1);
   assert.equal(suggestionFor('Lessive',now),null,'fin le 15/11 : elle peut attendre la course du 14/11');
 });
+
+test('les vignettes de À prévoir utilisent le cadrage par produit de Ma liste',()=>{
+  const create=extract('function createRow(item){','// Met à jour le texte');
+  assert.match(create,/window\.COURSES_PRODUCT_IMAGES\?\.visualScaleStyle\?\.\(source,true\)/);
+  assert.match(create,/data-single-product-source="'\+esc\(source\)\+'" data-single-product-compact="1"/);
+  assert.match(create,/window\.COURSES_PRODUCT_IMAGES\?\.frame\?\.\(image\)/);
+  assert.match(source,/\.repurchase-thumb img\{[^}]*scale\(var\(--single-product-scale,1\)\)/);
+  const images=fs.readFileSync(new URL('../product-item-images.js',import.meta.url),'utf8');
+  assert.match(images,/window\.COURSES_PRODUCT_IMAGES=Object\.freeze\(\{warm:warmProductImages,visualScaleStyle,frame:frameProductImage\}\)/);
+});

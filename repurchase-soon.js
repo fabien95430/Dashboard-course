@@ -126,7 +126,7 @@ function ensureStyles(){
       box-shadow:0 8px 22px rgba(39,60,45,.055)
     }
     .repurchase-thumb{width:66px;height:62px;position:relative;display:grid;place-items:center;overflow:hidden}
-    .repurchase-thumb img{width:100%;height:100%;object-fit:contain;display:block;transform:translateY(1px)}
+    .repurchase-thumb img{width:92%;height:92%;object-fit:contain;display:block;transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1));transform-origin:center}
     .repurchase-thumb-fallback{display:none;width:48px;height:48px;border-radius:15px;place-items:center;background:#eef2ed;color:#678071;font-size:17px;font-weight:820}
     .repurchase-thumb.is-fallback img{display:none}.repurchase-thumb.is-fallback .repurchase-thumb-fallback{display:grid}
     .repurchase-copy{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
@@ -206,15 +206,19 @@ function cadenceLabel(item){
 
 function createRow(item){
   const first=Array.from(item.name)[0]?.toUpperCase()||'•';
+  const source='./www/Items/'+slugify(item.name)+'.webp';
+  // Même cadrage par produit que Ma liste (vignette compacte) : tailles homogènes entre produits.
+  const scaleStyle=window.COURSES_PRODUCT_IMAGES?.visualScaleStyle?.(source,true)||'';
   const template=document.createElement('template');
   template.innerHTML='<article class="repurchase-row" data-name="'+esc(item.name)+'">'+
-    '<span class="repurchase-thumb"><img src="./www/Items/'+esc(slugify(item.name))+'.webp" alt="" loading="lazy" decoding="async" draggable="false"><span class="repurchase-thumb-fallback">'+esc(first)+'</span></span>'+
+    '<span class="repurchase-thumb"><img '+(scaleStyle?'style="'+esc(scaleStyle)+'" ':'')+'src="'+esc(source)+'" alt="" loading="lazy" decoding="async" draggable="false" data-single-product-source="'+esc(source)+'" data-single-product-compact="1"><span class="repurchase-thumb-fallback">'+esc(first)+'</span></span>'+
     '<span class="repurchase-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(cadenceLabel(item))+'</small><span class="repurchase-timing '+timingClass(item)+'">'+esc(timingLabel(item))+'</span></span>'+
     '<button class="repurchase-add" type="button" data-name="'+esc(item.name)+'" aria-label="Ajouter '+esc(item.name)+' à Ma liste">+</button>'+
   '</article>';
   const row=template.content.firstElementChild;
   const image=row.querySelector('.repurchase-thumb img');
   image?.addEventListener('error',()=>image.parentElement?.classList.add('is-fallback'),{once:true});
+  if(image)window.COURSES_PRODUCT_IMAGES?.frame?.(image);
   const button=row.querySelector('.repurchase-add');
   button?.addEventListener('click',()=>addSuggested(button));
   return row;

@@ -593,7 +593,15 @@ function visualScaleStyle(source,compact=false){
   return '--single-product-scale:'+metrics.scale+';--single-product-shift-x:'+metrics.shiftX+'%;--single-product-shift-y:'+metrics.shiftY+'%';
 }
 loadVisualScaleCache();
-window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages,visualScaleStyle});
+// Cadrage harmonisé pour une vignette produit hors Catalogue / Ma liste (ex. À prévoir) :
+// l'image porte data-single-product-source ; mesure à la fin du chargement si besoin.
+function frameProductImage(image){
+  const source=image?.dataset?.singleProductSource;
+  if(!source)return;
+  if(image.complete&&image.naturalWidth>0){applyVisualScale(image,source);return}
+  image.addEventListener('load',()=>applyVisualScale(image,source),{once:true});
+}
+window.COURSES_PRODUCT_IMAGES=Object.freeze({warm:warmProductImages,visualScaleStyle,frame:frameProductImage});
 function productCardVisible(card){
   if(!card||card.hidden||products?.classList.contains('is-catalog-mode-hidden'))return false;
   const rect=card.getBoundingClientRect?.();
