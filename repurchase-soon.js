@@ -29,6 +29,21 @@ function intelligence(){return window.COURSES_PURCHASE_INTELLIGENCE||null}
 function listService(){return window.COURSES_LIST||null}
 function appLocked(){return document.getElementById('app')?.classList.contains('is-locked')!==false}
 
+// Les courses se font le week-end : la « prochaine course » est le week-end à venir
+// (celui en cours le samedi et le dimanche), la suivante a lieu une semaine plus tard.
+function nextTripStart(now=Date.now()){
+  const date=new Date(now);
+  date.setHours(0,0,0,0);
+  const day=date.getDay();
+  date.setDate(date.getDate()+(day===0?-1:(6-day)));
+  return date.getTime();
+}
+function followingTripStart(now=Date.now()){
+  const date=new Date(nextTripStart(now));
+  date.setDate(date.getDate()+7);
+  return date.getTime();
+}
+
 function suggestionFor(name,now=Date.now()){
   const api=intelligence(),list=listService();
   if(!api?.isEnabled?.()||!list)return null;
@@ -39,9 +54,9 @@ function suggestionFor(name,now=Date.now()){
   if(!stock)return null;
   const cycle=Math.max(1,Math.round(Number(p.recentDays||p.baseDays)||1));
   const dueRaw=cycle-Number(stock.ageDays||0);
-  const soonWindow=Math.min(7,Math.max(1,Math.round(cycle*.2)));
   const depleted=Number(stock.estimatedQty||0)<=0;
-  if(!depleted&&dueRaw>soonWindow)return null;
+  // Courses hebdomadaires : à prévoir si le produit manquera avant la course suivante.
+  if(!depleted&&now+dueRaw*DAY>=followingTripStart(now))return null;
   const meta=META.get(name)||{};
   return {
     name,
@@ -61,18 +76,9 @@ function suggestions(now=Date.now()){
   });
 }
 
-function timingLabel(item){
-  const days=Math.ceil(item.dueIn);
-  if(days<=0)return 'À racheter';
-  if(days===1)return 'Demain';
-  return 'Dans '+days+' jours';
-}
-function timingClass(item){
-  const days=Math.ceil(item.dueIn);
-  if(days<=0)return 'is-now';
-  if(days<=2)return 'is-close';
-  return 'is-soon';
-}
+// Toutes les suggestions sont pour la prochaine course ; la couleur distingue un produit déjà épuisé.
+function timingLabel(){return 'Prochaine course'}
+function timingClass(item){return Math.ceil(item.dueIn)<=0?'is-now':'is-soon'}
 
 function ensureStyles(){
   if(document.getElementById('courses-repurchase-soon-style'))return;
@@ -192,20 +198,66 @@ function emptyMarkup(){
   return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent quand un prochain achat approche.</span>'+historyStatusMarkup()+'</div>';
 }
 
+// Le cycle est exprimé en courses hebdomadaires plutôt qu'en jours.
+function cadenceLabel(item){
+  const trips=Math.max(1,Math.round(Number(item.cadence||0)/7));
+  return trips===1?'À chaque course':'Toutes les '+trips+' courses';
+}
+
+function createRow(item){
+  const first=Array.from(item.name)[0]?.toUpperCase()||'•';
+  const template=document.createElement('template');
+  template.innerHTML='<article class="repurchase-row" data-name="'+esc(item.name)+'">'+
+    '<span class="repurchase-thumb"><img src="./www/Items/'+esc(slugify(item.name))+'.webp" alt="" loading="lazy" decoding="async" draggable="false"><span class="repurchase-thumb-fallback">'+esc(first)+'</span></span>'+
+    '<span class="repurchase-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(cadenceLabel(item))+'</small><span class="repurchase-timing '+timingClass(item)+'">'+esc(timingLabel(item))+'</span></span>'+
+    '<button class="repurchase-add" type="button" data-name="'+esc(item.name)+'" aria-label="Ajouter '+esc(item.name)+' à Ma liste">+</button>'+
+  '</article>';
+  const row=template.content.firstElementChild;
+  const image=row.querySelector('.repurchase-thumb img');
+  image?.addEventListener('error',()=>image.parentElement?.classList.add('is-fallback'),{once:true});
+  const button=row.querySelector('.repurchase-add');
+  button?.addEventListener('click',()=>addSuggested(button));
+  return row;
+}
+
+// Met à jour le texte d'une ligne conservée sans toucher à sa vignette déjà affichée.
+function updateRow(row,item){
+  const small=row.querySelector('.repurchase-copy small');
+  if(small&&small.textContent!==cadenceLabel(item))small.textContent=cadenceLabel(item);
+  const timing=row.querySelector('.repurchase-timing');
+  if(timing){
+    const className='repurchase-timing '+timingClass(item);
+    if(timing.className!==className)timing.className=className;
+    if(timing.textContent!==timingLabel(item))timing.textContent=timingLabel(item);
+  }
+  const button=row.querySelector('.repurchase-add');
+  if(button?.disabled&&button.textContent==='✓'){button.textContent='+';button.disabled=false}
+}
+
+// Réconcilie les lignes par nom : une ligne déjà présente est réutilisée telle quelle
+// (même <img>), seules les lignes nouvelles sont créées et les disparues retirées.
+function syncRows(root,items,create,update){
+  const existing=new Map();
+  Array.from(root.children).forEach(node=>{
+    const name=node.dataset?.name;
+    if(name&&!existing.has(name))existing.set(name,node);
+    else node.remove();
+  });
+  items.forEach((item,index)=>{
+    let row=existing.get(item.name);
+    if(row){existing.delete(item.name);update(row,item)}
+    else row=create(item);
+    const current=root.children[index]||null;
+    if(current!==row)root.insertBefore(row,current);
+  });
+  existing.forEach(row=>row.remove());
+}
+
 function renderDialog(items=suggestions()){
   const root=ensureDialog().querySelector('.repurchase-list');
   if(!root)return;
   if(!items.length){root.innerHTML=emptyMarkup();return}
-  root.innerHTML=items.map(item=>{
-    const first=Array.from(item.name)[0]?.toUpperCase()||'•';
-    return '<article class="repurchase-row" data-name="'+esc(item.name)+'">'+
-      '<span class="repurchase-thumb"><img src="./www/Items/'+esc(slugify(item.name))+'.webp" alt="" loading="lazy" decoding="async" draggable="false"><span class="repurchase-thumb-fallback">'+esc(first)+'</span></span>'+
-      '<span class="repurchase-copy"><strong>'+esc(item.name)+'</strong><small>Cycle estimé : '+item.cadence+' jour'+(item.cadence>1?'s':'')+'</small><span class="repurchase-timing '+timingClass(item)+'">'+esc(timingLabel(item))+'</span></span>'+
-      '<button class="repurchase-add" type="button" data-name="'+esc(item.name)+'" aria-label="Ajouter '+esc(item.name)+' à Ma liste">+</button>'+
-    '</article>';
-  }).join('');
-  root.querySelectorAll('.repurchase-thumb img').forEach(image=>image.addEventListener('error',()=>image.parentElement?.classList.add('is-fallback'),{once:true}));
-  root.querySelectorAll('.repurchase-add').forEach(button=>button.addEventListener('click',()=>addSuggested(button)));
+  syncRows(root,items,createRow,updateRow);
 }
 
 async function addSuggested(button){
