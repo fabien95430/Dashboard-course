@@ -254,7 +254,7 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Soignon":"Pièce",
   "Burrata":"Pot","Ricotta":"Pot","Feta":"Barquette","Gnocchis":"Paquet","Yaourt à boire":"Bouteille",
   "Glace Nuii":"Boîte",
-  "Céréales Trésor":"Boîte",
+
   "Tomate cerise":"Barquette"
 });
 
