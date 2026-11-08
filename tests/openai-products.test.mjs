@@ -164,6 +164,7 @@ assert 'Sous-groupe' not in requests[0]['prompt']
 assert 'Règle de sous-catégorie' in requests[0]['prompt']
 assert 'Sodas & sirops' in requests[0]['prompt']
 assert 'fond totalement transparent' in requests[0]['prompt']
+assert 'GABARIT INVARIABLE' in requests[0]['prompt']
 assert 'www/Items/mayonnaise.webp' not in requests[0]['prompt']
 assert 'www/Items/paprika.webp' not in requests[0]['prompt']
 assert 'Céréales Lion' not in requests[0]['prompt']
@@ -254,6 +255,11 @@ def p(name,c,sub):
     return product.image_prompt(name,c,sub)
 tresor=p('Céréales Trésor','Petit-déj & snacks','Petit-déjeuner')
 assert 'www/Items/cereales-lion.webp' in tresor and 'BLÉ DORÉ CLAIR' in tresor
+assert 'GABARIT VISUEL INVARIABLE' in tresor
+assert 'même fenêtre arrondie basse' in tresor
+assert 'pas de carton plus étroit' in tresor
+assert 'SEUL CHANGEMENT AUTORISÉ' in tresor
+assert 'www/Items/cereales-lion.webp' not in p('Jus de poire','Boissons','Eaux & jus')
 assert 'fenêtre' in tresor and 'vague bleue' in tresor
 lion=p('Céréales Lion','Petit-déj & snacks','Petit-déjeuner')
 assert 'triangulaires' in lion and 'www/Items/cereales-lion.webp' in lion

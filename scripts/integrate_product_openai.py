@@ -258,7 +258,7 @@ SUBGROUP_VISUAL_GUIDANCE = {
 }
 
 VISUAL_FAMILY_RULES = {
-    "cereal_boxes": "Modèle canonique www/Items/cereales-lion.webp : reproduire même silhouette de boîte haute, largeur, angle trois-quarts, épaisseur du côté gauche, bandeaux bleu pâle DROITS en haut et en bas, grande face crème, grand épi de blé doré en diagonale à gauche, même fenêtre rectangulaire arrondie BASSSE et mêmes marges. Uniquement le contenu de la fenêtre change ; aucune vague bleue, petite illustration supplémentaire, photo de bol, texte ni céréale hors boîte.",
+    "cereal_boxes": "GABARIT VISUEL INVARIABLE de Céréales Lion : carton rectangulaire vertical de mêmes largeur, hauteur et profondeur apparentes ; même angle trois-quarts montrant une bande étroite du CÔTÉ GAUCHE et la grande face avant. Bandeau BLEU PÂLE RECTILIGNE sur le dessus et bandeau bleu pâle rectiligne en bas, sans vague ni décrochement ; corps crème uniforme. GRAND ÉPI DORÉ imprimé en diagonale, partant du bas-gauche de la face et montant vers sa partie haute droite, même emplacement et taille visuelle que sur Lion. Fenêtre rectangulaire aux coins arrondis, dans la moitié basse de la face, mêmes position, largeur, hauteur et marges que sur Lion : jamais fenêtre remontée, agrandie, rétrécie ou collée au bas. La boîte garde la même taille apparente dans la vignette, ni plus fine ni plus petite. CECI N'EST PAS UNE PROPOSITION DE NOUVEAU DESIGN : seule la texture des céréales À L'INTÉRIEUR de la fenêtre peut changer. Aucun épi supplémentaire, vignette de céréales imprimée, aliment posé hors boîte, bol, logo, nom ou inscription.",
     "cereal_plain": "Préserver le modèle de www/Items/cereales.webp : boîte carton beige naturelle avec grand épi doré et fenêtre basse ; flocons dorés dans la fenêtre. Ne pas lui imposer les bandeaux bleus des autres céréales.",
     "baby_cereal": "Conserver le modèle exact de www/Items/cereales-infantiles.webp : boîte crème et bleu pâle à épi doré, fenêtre basse contenant de la poudre céréalière fine, pas de coussins chocolat ni marque.",
     "dried_nuts": "Modèle unique www/Items/dattes.webp v778 : sachet kraft/crème fermé à zip, fenêtre intermédiaire arrondie haut vers 40 % et bas vers 92 % de la hauteur, bande kraft haute visible avec petite icône brune monochrome au trait, décoration ocre discrète basse. Aucun mot, lettre, nom, grand fruit imprimé, bocal ou aliment hors sachet. Seuls contenu naturel et petite icône changent.",
@@ -509,7 +509,7 @@ PRODUCT_VISUAL_FAMILY = {
 }
 
 PRODUCT_VISUAL_EXCEPTIONS = {
-    "Céréales Trésor": "CONTRAINTE PRIORITAIRE : reproduire la forme et les proportions du paquet Céréales Lion, pas un nouveau design. Remplacer UNIQUEMENT les céréales de la fenêtre par des coussins gonflés BLÉ DORÉ CLAIR fourrés de chocolat brun, éventuellement une ou deux pièces fendues DANS la fenêtre. Pas de triangles bruns, vague bleue, épi minuscule, céréales imprimées ou posées hors emballage, ni nom/logo.",
+    "Céréales Trésor": "INSTRUCTION PRIORITAIRE SUR LE VISUEL FINAL : obtenir le paquet de Céréales Lion avec exactement le même cadrage, la même largeur, la même perspective trois-quarts, les deux bandeaux bleu pâle DROITS, le même GRAND ÉPI DORÉ OBLIQUE et la même fenêtre arrondie basse. Ne pas créer une nouvelle boîte : pas de carton plus étroit, autre face latérale, vague bleue, épi vertical, fenêtre déplacée ou décoration de céréales hors fenêtre. SEUL CHANGEMENT AUTORISÉ : remplacer les céréales de la fenêtre par des coussins gonflés BLÉ DORÉ CLAIR, carrés et légèrement bombés, fourrés de chocolat brun ; une ou deux pièces cassées peuvent montrer le chocolat UNIQUEMENT DANS LA FENÊTRE. La couleur extérieure des coussins reste dorée claire, jamais brun chocolat, et aucun texte/nom/logo n'est ajouté.",
     "Céréales Lion": "Conserver les céréales soufflées triangulaires chocolat brun et caramel doré dans la fenêtre du modèle existant, sans modifier la silhouette du paquet ni ajouter de texte.",
     "Crème liquide": "Crème liquide en BRIQUE fermée, jamais pot de crème épaisse ni bocal de sauce.",
     "Crème anglaise": "Brique crème/vanille fermée avec bouchon ; vanille et volute de crème seulement imprimées.",
@@ -581,6 +581,8 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
         "garder son échelle comparable aux autres articles de la MÊME FAMILLE VISUELLE, et non du seul sous-groupe.",
         "Hiérarchie obligatoire : exception produit validée > modèle canonique de famille > "
         "règle de sous-catégorie > style premium général. Une ancienne règle remplacée n'est plus applicable. "
+        "Pour une famille emballée disposant d'un modèle canonique, traiter la forme validée comme un GABARIT INVARIABLE : " 
+        "ne pas proposer un nouveau design, modifier uniquement le contenu ou l'accent explicitement autorisé. "
         "Pour une famille emballée, conserver silhouette, perspective, bandes, étiquette, fenêtre, fermeture et marges "
         "du modèle déjà approuvé. Ne modifier que le contenu ou les accents expressément autorisés. "
         "Aucun objet ou aliment en dehors de son emballage. Aucune inscription, marque ou logo inventés ; "
