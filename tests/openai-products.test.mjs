@@ -160,13 +160,13 @@ assert requests[0]['quality']=='high'
 assert requests[0]['output_compression']==75
 assert 'compresse efficacement en WebP' in requests[0]['prompt']
 assert 'maximum 15 000 octets' in requests[0]['prompt']
-assert 'conserves vert sauge' in requests[0]['prompt']
-assert 'cohérence complète du sujet' in requests[0]['prompt']
-assert 'jamais un poisson entier avec tête et queue' in requests[0]['prompt']
-assert 'www/Items/mayonnaise.webp' in requests[0]['prompt']
-assert 'grande étiquette crème rectangulaire à coins arrondis' in requests[0]['prompt']
-assert 'www/Items/paprika.webp' in requests[0]['prompt']
-assert 'petite étiquette crème centrale en cartouche' in requests[0]['prompt']
+assert 'Sous-groupe' not in requests[0]['prompt']
+assert 'Règle de sous-catégorie' in requests[0]['prompt']
+assert 'Sodas & sirops' in requests[0]['prompt']
+assert 'fond totalement transparent' in requests[0]['prompt']
+assert 'www/Items/mayonnaise.webp' not in requests[0]['prompt']
+assert 'www/Items/paprika.webp' not in requests[0]['prompt']
+assert 'Céréales Lion' not in requests[0]['prompt']
 assert 'même si le fichier doit être plus lourd' not in requests[0]['prompt']
 assert 'le conditionnement demandé et la transparence du fond' in requests[0]['prompt']
 `;
@@ -232,4 +232,60 @@ with tempfile.TemporaryDirectory() as folder:
 `;
   const run=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
   assert.equal(run.status,0,run.stderr||run.stdout);
+});
+
+
+test('les 41 sous-catégories utilisent des règles actives ciblées et les références réellement validées',()=>{
+  const program=String.raw`
+import json, re, sys
+from pathlib import Path
+sys.path.insert(0, 'scripts')
+import integrate_product_openai as product
+_,_,groups=product.load_groups()
+keys={f"{c} / {s}" for c,sub in groups.items() for s in sub}
+assert len(keys)==41
+assert keys==set(product.SUBGROUP_VISUAL_GUIDANCE), (keys-set(product.SUBGROUP_VISUAL_GUIDANCE),set(product.SUBGROUP_VISUAL_GUIDANCE)-keys)
+for c,subgroups in groups.items():
+    for subgroup in subgroups:
+        prompt=product.image_prompt('Produit fictif',c,subgroup)
+        assert product.SUBGROUP_VISUAL_GUIDANCE[f"{c} / {subgroup}"] in prompt
+        assert 'maximum 15 000 octets' in prompt
+def p(name,c,sub):
+    return product.image_prompt(name,c,sub)
+tresor=p('Céréales Trésor','Petit-déj & snacks','Petit-déjeuner')
+assert 'www/Items/cereales-lion.webp' in tresor and 'BLÉ DORÉ CLAIR' in tresor
+assert 'fenêtre' in tresor and 'vague bleue' in tresor
+lion=p('Céréales Lion','Petit-déj & snacks','Petit-déjeuner')
+assert 'triangulaires' in lion and 'www/Items/cereales-lion.webp' in lion
+assert 'BLÉ DORÉ CLAIR' not in lion
+jus=p('Jus de poire','Boissons','Eaux & jus')
+assert 'v783' in jus and 'www/Items/jus-d-orange.webp' in jus and '~2,6' in jus
+assert 'www/Items/biere-blonde.webp' not in jus
+beer=p('Bière blonde','Boissons','Bières & vins')
+assert 'v780' in beer and '33 cl' in beer and 'SANS TEXTE' not in beer
+zero=p('Bière sans alcool','Boissons','Bières & vins')
+assert 'BIÈRE 0 %' in zero and 'www/Items/biere-blonde.webp' not in zero
+whisky=p('Whisky','Boissons','Bières & vins')
+assert 'v785' in whisky and 'bouchon noir' in whisky and 'UNIQUEMENT WHISKY' in whisky
+assert 'bouchon de liège v780' in whisky
+for n,rule in [('Rhum','UNIQUEMENT RHUM'),('Ricard','UNIQUEMENT RICARD'),('Tonic','UNIQUEMENT TONIC')]:
+    assert rule in p(n,'Boissons','Bières & vins' if n!='Tonic' else 'Sodas & sirops')
+dry=p('Noix de pécan','Petit-déj & snacks','Apéritif')
+assert 'www/Items/dattes.webp v778' in dry and 'Aucun mot' in dry
+assert 'bocaux de noix v774' not in dry
+plain=p('Noix','Fruits & Légumes','Pommes de terre & aromates')
+assert 'www/Items/dattes.webp' not in plain
+sauce=p('Sauce au poivre','Épicerie','Sauces & condiments')
+assert 'www/Items/mayonnaise.webp' in sauce and 'SANS TEXTE NI PICTOGRAMME' in sauce
+spice=p('Paprika','Épicerie','Monde & pratique')
+assert 'www/Items/paprika.webp' in spice and 'www/Items/mayonnaise.webp' not in spice
+cream=p('Crème fraîche','Frais','Laits & crèmes')
+assert 'Pot de crème fraîche fermé' in cream and 'www/Items/mayonnaise.webp' not in cream
+assert 'opercule SOUPLE CARRÉ' in p('Yaourts vanille','Frais','Yaourts & desserts')
+assert 'couvercle ROND' in p('Skyr','Frais','Yaourts & desserts')
+assert 'jamais poisson entier' in p('Truite','Viandes & poissons','Poissons & traiteur')
+assert 'www/Items/mayonnaise.webp' not in p('Tomate cerise','Fruits & Légumes','Légumes du quotidien')
+`;
+  const result=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr||result.stdout);
 });

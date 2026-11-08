@@ -209,63 +209,393 @@ Catalogue avec exemples:
             raise RuntimeError(f"Classement produit invalide après nouvelle tentative: {retry_error}") from retry_error
 
 
+
+# Une règle par famille visuelle et par sous-catégorie de catalog.js.
+# Les modèles d'images cités restent des références pour l'agent : l'API images/generations
+# ne reçoit pas les pixels des fichiers www/Items/ en entrée.
+SUBGROUP_VISUAL_GUIDANCE = {
+    "Boissons / Bières & vins": "Sous-groupe mixte : distinguer bouteilles de bière, vins, effervescents et spiritueux. Garder le conditionnement validé du produit précis ; ne jamais appliquer un modèle de bière à un vin ou à un alcool fort.",
+    "Boissons / Eaux & jus": "Distinguer bouteilles d'eau, jus et lait chocolaté. Chaque famille garde sa silhouette canonique ; les fruits des jus sont uniquement imprimés sur les étiquettes.",
+    "Boissons / Sodas & sirops": "Respecter la bouteille ou le flacon propre à chaque boisson : Coca/Coca zéro, citronnade, limonade, ginger beer, tonic et sirops sont des familles distinctes.",
+    "Enfant / Enfant": "Sous-groupe hétérogène : céréales infantiles en boîte crème/bleu, goûters bébé en sachets fermés crème/bleu, lait infantile en boîte cylindrique, compotes en gourde, petits pots en verre, couches et lingettes selon leurs références. Aucun âge, marque ou allégation inventé.",
+    "Épicerie / Boulangerie": "Pains, biscottes et viennoiseries dans leur forme naturelle validée, sans emballage, planche ni assiette ajoutés ; distinguer pita, naan, bagels, pain de mie et croissants par leur texture et leur forme.",
+    "Épicerie / Pâtes à tarte": "Pâte crue roulée, avec papier cuisson et emballage transparent fermé, mêmes proportions que la référence Pâte brisée ; jamais fond de tarte cuit, moule, quiche ni halo plastique.",
+    "Épicerie / Conserves": "Conserves de légumes en métal argenté fermé avec étiquette crème et bandeau sauge, dessin de l'ingrédient imprimé. Le concentré a une boîte plus petite ; ne pas forcer les exceptions comme Coulis de tomate en boîte.",
+    "Épicerie / Monde & pratique": "Sous-groupe mixte : cubes en boîte, nouilles et céréales en paquet, lait de coco en boîte métal fermée, épices en bocal, soupes en brique et tortillas nature. Ne pas imposer un seul contenant.",
+    "Épicerie / Pâtes, riz & céréales": "Pâtes sèches en paquets beige à grande fenêtre sans nom ; riz en paquets bleus à grande fenêtre et petite zone beige basse ; semoule/boulgour en kraft et polenta/quinoa en crème/ocre. Contenu exact visible, sans bol.",
+    "Épicerie / Pâtisserie & cuisine": "Poudres dans sachets kraft/crème fermés, sucres dans bocaux à couvercle bois, gélatine en boîte, pâte feuilletée crue pliée et amandes nature. Ne pas représenter les poudres dans un bol.",
+    "Épicerie / Sauces & condiments": "Les sauces en bocal Mayonnaise, les huiles en flacons à anse et bouchon vert, les vinaigres en bouteilles élancées, Cornichon en bocal vert spécifique. Ne jamais uniformiser ces familles.",
+    "Épicerie / Confitures": "Même bocal à facettes, couvercle vichy rouge/blanc et étiquette ronde que Confiture fraise ; seuls le fruit, la couleur de confiture et l'intitulé générique autorisé changent.",
+    "Épicerie / Sauces sucrées": "Coulis de fruit en bocal de préparation type Mayonnaise, sans bol, assiette, fruit physique ou bouteille inventée.",
+    "Frais / Fromages": "Présentations naturelles cohérentes avec les fromages validés : croûtes et trous préservés, râpés en petits amas, mozzarella en billes en boules. Aucun plateau, condiment ou garniture.",
+    "Frais / Laits & crèmes": "Laits en bouteilles de famille ; crème liquide en brique ; crèmes épaisse/fraîche en pots de crème ; Mascarpone en pot laitier bas fermé. Ne pas appliquer les bocaux de sauces.",
+    "Frais / Surgelés": "Légumes et frites en sachets bleus à flocon opaque selon Haricots verts surgelés. Glaces en pots et Nuii en bâtonnet restent des familles distinctes ; ne pas les transformer en sachets.",
+    "Frais / Traiteur frais": "Familles distinctes : Gnocchis en paquet de pâtes beige à fenêtre, pâte à pizza roulée, pâtes fraîches en nid naturel, quiche entière sans assiette, tofu en barquette fermée.",
+    "Frais / Yaourts & desserts": "Deux familles de yaourts séparées : nature/grecs/skyr en pot crème/bleu rond, yaourt/fruits/vanille et crèmes dessert en petit pot à opercule souple carré. Crème anglaise en brique, riz au lait en verre fermé, yaourt à boire en bouteille.",
+    "Fruits & Légumes / Fruits classiques": "Fruits frais entiers ou avec une coupe naturelle conforme à leur référence ; couleurs réelles, aucune étiquette, corbeille, assiette, sachet ou décoration ajoutés.",
+    "Fruits & Légumes / Fruits rouges & exotiques": "Petits fruits et fruits exotiques dans leur forme naturelle, sans emballage, bol ou garniture ; distinguer fruits frais et fruits secs ensachés du Petit-déjeuner.",
+    "Fruits & Légumes / Légumes du quotidien": "Légumes frais crus, produits entiers et bien cadrés ; une tomate cerise ne ressemble pas à une grosse tomate. Ne pas inventer de cuisson ni plateau.",
+    "Fruits & Légumes / Légumes variés": "Représentations naturelles et différentes des choux, courges, fenouil, asperges et autres légumes ; garder l'objet entier, sans réduction excessive ni emballage.",
+    "Fruits & Légumes / Salades & herbes": "Feuilles, salades et bouquets d'herbes naturels, lisibles à petite taille ; aucune boîte, pot, sachet ou assiette ajoutés.",
+    "Fruits & Légumes / Pommes de terre & aromates": "Ail, oignons, pommes de terre, noix nature et aromates dans leurs formes naturelles ; ne pas leur appliquer les sachets kraft des fruits secs emballés.",
+    "Hygiène & soins / Hygiène": "Conserver la forme exacte de l'article d'hygiène : tube, flacon, disques coton, brosses, brossettes en blister ou fil dentaire en boîte ; pas de bouteille générique commune.",
+    "Hygiène & soins / Salle de bain & soins": "Représenter pots, tubes, protections, thermomètres et flacons selon leur conditionnement réel validé ; aucune marque, chiffre ni allégation de soin inventés.",
+    "Maison / Entretien": "Pulvérisateurs harmonisés pour les nettoyants à gâchette ; Javel, flacons WC, poudres et autres liquides gardent leurs formes propres. Ne pas transformer un bidon en spray.",
+    "Maison / Équipement": "Piles et batteries de formats réellement reconnaissables, hors emballage sauf exception validée ; cadrage cohérent entre petites piles et lots.",
+    "Maison / Lessive": "Lessive liquide/poudre/capsules, adoucissant, détachant et accessoires gardent chacun leur emballage validé ; spray seulement pour produits à gâchette.",
+    "Maison / Papier & sacs": "Rouleaux, paquets, mouchoirs, sacs zip et poubelle gardent leurs silhouettes propres ; aucun sac rempli de déchets, aucun bord coupé.",
+    "Maison / Vaisselle": "Liquides en flacons de famille, produits lave-vaisselle en emballages validés, éponges/grattoirs/torchons naturels ; ne pas imposer la bouteille d'un liquide à un accessoire.",
+    "Maison / Entretien auto": "Bidon de lave-glace automobile adapté au produit ; pas de pulvérisateur ménager inventé.",
+    "Petit-déj & snacks / Apéritif": "Fruits secs en sachets kraft Dattes v778 ; snacks et biscuits gardent leurs propres présentations ; Houmous et Tapenade en bocal de sauce Mayonnaise.",
+    "Petit-déj & snacks / Biscuits & goûters": "Biscuits, tablettes de chocolat, gaufres, crêpes, muffins et compotes en formes distinctes déjà validées ; éviter sachets et assiettes inventés.",
+    "Petit-déj & snacks / Café & thé": "Respecter les formes différentes des capsules, dosettes, grains, moulu, soluble, filtres, thé, matcha et infusions ; ne pas agrandir excessivement les capsules ou uniformiser en pot.",
+    "Petit-déj & snacks / Petit-déjeuner": "Céréales en cartons de famille, Muesli et Granola dans leurs sachets existants, fruits secs dans sachets Dattes v778 ; miel, pancakes, flocons et pâte à tartiner gardent leurs propres références.",
+    "Viandes & poissons / Charcuterie": "Tranches, saucissons, pâtés et terrines selon leur préparation réelle, sans salade, plateau ni garniture ; Pâté reprend le petit bocal fermé de Rillettes.",
+    "Viandes & poissons / Poissons & traiteur": "Poissons frais en filets ou portions selon Saumon/Cabillaud, fumés en tranches ; moules, surimi et poisson pané selon formes propres. Truite jamais entière avec tête.",
+    "Viandes & poissons / Poissons en conserve": "Sardines, maquereaux et thon dans leurs boîtes de poisson spécifiques ; ne pas réutiliser les boîtes crème/sauge des légumineuses.",
+    "Viandes & poissons / Surgelés": "Poisson surgelé dans son conditionnement spécifique déjà présent, jamais automatiquement un sachet bleu de légumes.",
+    "Viandes & poissons / Viandes": "Viandes crues/cuites fidèles au nom et à la coupe, sans herbes, poivre, planche ou garniture inventés ; Dinde et escalopes de poulet crues seules.",
+}
+
+VISUAL_FAMILY_RULES = {
+    "cereal_boxes": "Modèle canonique www/Items/cereales-lion.webp : reproduire même silhouette de boîte haute, largeur, angle trois-quarts, épaisseur du côté gauche, bandeaux bleu pâle DROITS en haut et en bas, grande face crème, grand épi de blé doré en diagonale à gauche, même fenêtre rectangulaire arrondie BASSSE et mêmes marges. Uniquement le contenu de la fenêtre change ; aucune vague bleue, petite illustration supplémentaire, photo de bol, texte ni céréale hors boîte.",
+    "cereal_plain": "Préserver le modèle de www/Items/cereales.webp : boîte carton beige naturelle avec grand épi doré et fenêtre basse ; flocons dorés dans la fenêtre. Ne pas lui imposer les bandeaux bleus des autres céréales.",
+    "baby_cereal": "Conserver le modèle exact de www/Items/cereales-infantiles.webp : boîte crème et bleu pâle à épi doré, fenêtre basse contenant de la poudre céréalière fine, pas de coussins chocolat ni marque.",
+    "dried_nuts": "Modèle unique www/Items/dattes.webp v778 : sachet kraft/crème fermé à zip, fenêtre intermédiaire arrondie haut vers 40 % et bas vers 92 % de la hauteur, bande kraft haute visible avec petite icône brune monochrome au trait, décoration ocre discrète basse. Aucun mot, lettre, nom, grand fruit imprimé, bocal ou aliment hors sachet. Seuls contenu naturel et petite icône changent.",
+    "juice": "Référence canonique www/Items/jus-d-orange.webp v783 : bouteille en verre droite, corps modérément élancé hauteur/largeur ~2,6, épaules arrondies, col court, bouchon doré vissé, petite étiquette crème basse à fruits imprimés et filet discret. Garder même angle, largeur, bouchon, échelle et position de l'étiquette ; seules couleur naturelle du jus et illustration de son fruit changent. Aucun fruit physique, mot, nom, logo ou paille.",
+    "beer": "Référence canonique www/Items/biere-blonde.webp v780 : bouteille de 33 cl trapue et large, épaules arrondies, col court, corps ~40 % de la hauteur totale en largeur, petite étiquette crème basse ; capsule et petit pictogramme imprimé adaptés à la variété. Même silhouette et échelle pour ces huit produits, sans texte ni marque.",
+    "beer_zero": "Conserver la bouteille large de Bière blonde, capsule bleu pétrole, petite étiquette crème portant UNIQUEMENT BIÈRE 0 %, sans fruit, épi, symbole ou autre texte.",
+    "whisky": "Référence canonique www/Items/whisky.webp v785 : corps rectangulaire large à coins arrondis, épaules inclinées, col court, petit bouchon noir vissé, liquide ambré. Petite étiquette crème basse portant UNIQUEMENT WHISKY en capitales brunes ; ne pas revenir au bouchon de liège v780, à une carafe ni à une bouteille haute étroite.",
+    "rhum": "Même bouteille cylindrique ambrée validée, bouchon brun bronze, étiquette crème portant UNIQUEMENT RHUM, sans pictogramme ni autre inscription.",
+    "ricard": "Silhouette élancée ambrée, col et capsule argentés, petite étiquette crème portant UNIQUEMENT RICARD en bleu marine ; pas de soleil ni deuxième étiquette.",
+    "tonic": "Bouteille en verre clair légèrement bleuté à bouchon argenté, étiquette crème portant UNIQUEMENT TONIC en bleu ardoise ; aucun pictogramme ni autre inscription.",
+    "cola": "Conserver précisément les deux bouteilles déjà harmonisées : même silhouette de PET nervuré, même hauteur, même angle, bouchon et bandeau déjà validés. Préserver uniquement les inscriptions de marque déjà présentes sur ces références ; Coca rouge, Coca zéro noir. Ne pas réinterpréter l'emballage.",
+    "jams": "Référence canonique www/Items/confiture-fraise.webp : bocal haut à facettes, couvercle fermé vichy rouge/blanc, étiquette crème ronde à double filet rouge. Même forme, échelle et position ; seul le fruit, sa couleur naturelle, le fruit imprimé et son NOM GÉNÉRIQUE autorisé sur l'étiquette changent. Aucun fruit hors bocal.",
+    "sauces": "Référence canonique www/Items/mayonnaise.webp : reprendre exactement bocal en verre aux épaules arrondies, couvercle doré, grande étiquette crème centrale rectangulaire à coins arrondis avec double filet fin. Garder les proportions, la forme, le cadrage, l'étiquette SANS TEXTE NI PICTOGRAMME. Changer le contenu et l'accent discret selon la sauce ; ne pas inventer flacon souple, tube ou bol. Exclut huiles, vinaigres, confitures, miel, crèmes et pâtes à tartiner sucrées.",
+    "spices": "Référence canonique www/Items/paprika.webp : exactement le même petit bocal rigide en verre, couvercle doré, petite étiquette crème centrale en cartouche à coins décoratifs et double filet brun cannelle SANS TEXTE NI PICTOGRAMME. Seul le contenu exact change : gousses entières pour Vanille, piments séchés pour Chili, ni moulins ni sachets.",
+    "pasta": "Modèle paquet beige de pâtes à grande fenêtre : même forme, volume, palette beige et marges, aucune désignation ni mot ; montrer majoritairement les pâtes de la FORME EXACTE du nom. Pour Gnocchis, petites coquilles creuses striées dans le modèle Conchiglie, jamais des boulettes de pomme de terre.",
+    "rice": "Modèle riz validé : paquet bleu, large fenêtre laissant voir davantage de riz que d'emballage, petite zone beige en bas ; grains et couleurs naturelles propres à la variété, aucun bol, nom ni produit hors paquet.",
+    "grains": "Polenta et Quinoa en sachet crème/ocre existant, Boulgour et Semoule en sachet kraft/crème de leur famille ; même fenêtre et contenu naturel sans bol ni texte inventé.",
+    "flours": "Conserver les emballages poudre de famille en sachets kraft/crème fermés avec une discrète illustration imprimée si déjà validée ; jamais poudre en bol, sac ouvert ou ingrédient physique autour.",
+    "sugar": "Conserver les bocaux à couvercle bois déjà validés avec petits tas de sucre et étiquettes harmonisées : textures blanc cristallisé, poudre fine ou roux distinctes. Ne pas appliquer le bocal des épices.",
+    "preserves": "Boîte métallique argentée fermée, étiquette crème, bandeau sauge, contenu représenté par illustration imprimée. Même finition que Pois chiches/Haricots rouges ; concentré de tomate dans une boîte plus petite. Aucun aliment physique autour.",
+    "baby_snacks": "Même sachet crème fermé avec bandeaux bleu pâle, grande fenêtre et petit épi imprimé ; contenu réel propre au nom, pas d'âge ni texte inventé.",
+    "yogurt_round": "Famille pots crème et bleu pâle à couvercle ROND déjà validés. Garder forme et échelle, ne pas leur imposer l'opercule carré.",
+    "yogurt_square": "Référence www/Items/yaourts-vanille.webp v760 : petit pot blanc évasé à opercule SOUPLE CARRÉ fermé, même angle et proportions. Seules teintes naturelles de parfum et petite illustration imprimée autorisée varient ; aucun fruit physique, pas de texte, pas de couvercle rigide rond. Les crèmes dessert restent bien identifiées comme crèmes dessert.",
+    "fresh_creams": "Pot de crème fraîche fermé avec couvercle clairement visible, distinct des bocaux Mayonnaise/Paprika ; jamais brique ou bouteille.",
+    "mascarpone": "Pot laitier bas et large fermé avec opercule/rebord, décor crème/bleu et seule désignation générique MASCARPONE autorisée ; ni bol de crème exposée ni pot de sauce.",
+    "milk_plant": "Reprendre les bouteilles laitières végétales déjà validées, notamment Lait d'amande pour Lait de soja ; changer seulement l'illustration imprimée de l'ingrédient et la couleur naturelle, pas la silhouette.",
+    "frozen_vegetables": "Référence www/Items/haricots-verts-surgeles.webp : sachet large fermé, bandeau courbe bleu glacier, petit flocon BLANC OPAQUE, grande fenêtre transparente et bas bleu. Montrer le contenu exact ; frites pâles non cuites, épinards hachés en portions et épinards en feuilles distincts.",
+    "sprays": "Référence www/Items/nettoyant-multi-usages.webp : même flacon ménager ergonomique entier et gâchette blanche, étiquette crème courbe sans texte ; seules les couleurs déjà validées changent. Ne pas étendre aux bidons Javel, produits WC ou poudres.",
+    "oils": "Flacon d'huile à anse et bouchon vert de la famille validée, huile naturelle visible, petite illustration imprimée si prévue ; jamais pot de sauce.",
+    "vinegars": "Bouteille de vinaigre élancée fermée et étiquette crème à filet olive doré de la famille validée ; couleurs et illustration de raisin/cidre seulement selon produit, jamais pot Mayonnaise.",
+    "raw_meats": "Représenter de la viande CRUE seule, sans persil, grains de poivre, décor, planche ou assiette ; forme fidèle à la coupe.",
+    "fish_portions": "Poisson FRAIS en filet ou portion crue cohérente avec Saumon et Cabillaud ; Truite à chair rosée et peau argentée, jamais poisson entier avec tête et queue.",
+    "cheese_grated": "Fromage râpé en petit amas naturel isolé, sans sachet, plat ni garniture ; fils longs jaunes pour Emmental, grains ivoire fins pour Parmesan, mozzarella plus blanche.",
+    "tart_dough": "Référence Pâte brisée : rouleau de pâte CRUE avec spirale et papier cuisson, emballage transparent fermé, entièrement visible, sans assiette ni fond de tarte cuit.",
+    "baby_items": "Conserver EXACTEMENT la présentation propre au produit : petites pâtes en sachet crème/bleu, purée en gourde crème/sauge, compotes en gourde jaune/rouge, lait infantile en boîte cylindrique crème/bleu, petits pots en bocal fermé doré, desserts lactés en pot carré crème/bleu, sacs à couches en rouleau bleu menthe neuf. Jamais texte d'âge ni garniture inventée.",
+    "packaged_snacks": "Respecter les sachets kraft/creme de Granola et Muesli déjà validés avec contenu bien visible et proportions de famille ; ne pas utiliser la boîte de Céréales Lion.",
+    "house_batteries": "Représenter les piles naturelles hors boîte ni blister, proportions exactes pour chaque référence, échelle équilibrée dans la grille.",
+}
+
+PRODUCT_VISUAL_FAMILY = {
+    "Céréales Lion": "cereal_boxes",
+    "Céréales Trésor": "cereal_boxes",
+    "Céréales": "cereal_plain",
+    "Céréales infantiles": "baby_cereal",
+    "Noix de cajou": "dried_nuts",
+    "Pistaches": "dried_nuts",
+    "Cacahuètes": "dried_nuts",
+    "Noix de pécan": "dried_nuts",
+    "Noix du Brésil": "dried_nuts",
+    "Dattes": "dried_nuts",
+    "Abricots secs": "dried_nuts",
+    "Raisins secs": "dried_nuts",
+    "Pruneaux": "dried_nuts",
+    "Figues sèches": "dried_nuts",
+    "Jus d'orange": "juice",
+    "Jus de pomme": "juice",
+    "Jus de poire": "juice",
+    "Jus de raisin": "juice",
+    "Jus d'ananas": "juice",
+    "Jus de tomate": "juice",
+    "Jus multifruits": "juice",
+    "Bière ambrée": "beer",
+    "Bière aux fruits": "beer",
+    "Bière blanche": "beer",
+    "Bière blonde": "beer",
+    "Bière brune": "beer",
+    "Bière IPA": "beer",
+    "Bière triple": "beer",
+    "Panaché": "beer",
+    "Bière sans alcool": "beer_zero",
+    "Whisky": "whisky",
+    "Rhum": "rhum",
+    "Ricard": "ricard",
+    "Tonic": "tonic",
+    "Coca": "cola",
+    "Coca zéro": "cola",
+    "Confiture abricot": "jams",
+    "Confiture cerise": "jams",
+    "Confiture figue": "jams",
+    "Confiture fraise": "jams",
+    "Confiture framboise": "jams",
+    "Confiture fruits rouges": "jams",
+    "Confiture mirabelles": "jams",
+    "Confiture mûre": "jams",
+    "Confiture myrtille": "jams",
+    "Confiture orange": "jams",
+    "Confiture pêche": "jams",
+    "Mayonnaise": "sauces",
+    "Ketchup": "sauces",
+    "Moutarde": "sauces",
+    "Pesto": "sauces",
+    "Tabasco": "sauces",
+    "Bolognaise": "sauces",
+    "Harissa": "sauces",
+    "Guacamole": "sauces",
+    "Houmous": "sauces",
+    "Tapenade": "sauces",
+    "Coulis de tomate": "sauces",
+    "Coulis de fruit": "sauces",
+    "Sauce aigre-douce": "sauces",
+    "Sauce algérienne": "sauces",
+    "Sauce andalouse": "sauces",
+    "Sauce au poivre": "sauces",
+    "Sauce au roquefort": "sauces",
+    "Sauce aux champignons": "sauces",
+    "Sauce barbecue": "sauces",
+    "Sauce Béarnaise": "sauces",
+    "Sauce blanche": "sauces",
+    "Sauce burger": "sauces",
+    "Sauce César": "sauces",
+    "Sauce curry": "sauces",
+    "Sauce hollandaise": "sauces",
+    "Sauce miel-moutarde": "sauces",
+    "Sauce napolitaine": "sauces",
+    "Sauce ranch": "sauces",
+    "Sauce samouraï": "sauces",
+    "Sauce soja": "sauces",
+    "Sauce tartare": "sauces",
+    "Sauce teriyaki": "sauces",
+    "Sauce tomate": "sauces",
+    "Curcuma": "spices",
+    "Curry": "spices",
+    "Paprika": "spices",
+    "Poivre": "spices",
+    "Sel": "spices",
+    "Chili": "spices",
+    "Vanille": "spices",
+    "Conchiglie": "pasta",
+    "Coquillettes": "pasta",
+    "Farfalle": "pasta",
+    "Fusilli": "pasta",
+    "Lasagnes": "pasta",
+    "Linguine": "pasta",
+    "Macaronis": "pasta",
+    "Orecchiette": "pasta",
+    "Penne": "pasta",
+    "Rigatoni": "pasta",
+    "Spaghetti": "pasta",
+    "Tagliatelles": "pasta",
+    "Vermicelles": "pasta",
+    "Gnocchis": "pasta",
+    "Riz à sushi": "rice",
+    "Riz arborio": "rice",
+    "Riz basmati": "rice",
+    "Riz blanc": "rice",
+    "Riz complet": "rice",
+    "Riz gluant": "rice",
+    "Riz jasmin": "rice",
+    "Riz long": "rice",
+    "Riz noir": "rice",
+    "Riz rouge": "rice",
+    "Riz sauvage": "rice",
+    "Polenta": "grains",
+    "Quinoa": "grains",
+    "Boulgour": "grains",
+    "Semoule": "grains",
+    "Amandes en poudre": "flours",
+    "Chapelure": "flours",
+    "Farine": "flours",
+    "Levure boulangère": "flours",
+    "Maïzena": "flours",
+    "Noix de coco râpée": "flours",
+    "Sucre": "sugar",
+    "Sucre glace": "sugar",
+    "Sucre roux": "sugar",
+    "Champignons en boîte": "preserves",
+    "Concentré de tomate": "preserves",
+    "Flageolets": "preserves",
+    "Haricots blancs": "preserves",
+    "Haricots rouges": "preserves",
+    "Haricots verts en boîte": "preserves",
+    "Lentilles": "preserves",
+    "Maïs en boîte": "preserves",
+    "Petits pois carottes": "preserves",
+    "Pois chiches": "preserves",
+    "Raviolis en boîte": "preserves",
+    "Tomates pelées": "preserves",
+    "Gâteaux bébé": "baby_snacks",
+    "Biscuits bébé": "baby_snacks",
+    "Boudoirs bébé": "baby_snacks",
+    "Galettes de riz bébé": "baby_snacks",
+    "Yaourts nature": "yogurt_round",
+    "Yaourts grecs": "yogurt_round",
+    "Skyr": "yogurt_round",
+    "Yaourt": "yogurt_square",
+    "Yaourts fruits": "yogurt_square",
+    "Yaourts vanille": "yogurt_square",
+    "Yaourts citron": "yogurt_square",
+    "Yaourts noix de coco": "yogurt_square",
+    "Crème dessert caramel": "yogurt_square",
+    "Crème dessert chocolat": "yogurt_square",
+    "Crème dessert vanille": "yogurt_square",
+    "Crème épaisse": "fresh_creams",
+    "Crème fraîche": "fresh_creams",
+    "Mascarpone": "mascarpone",
+    "Lait d'amande": "milk_plant",
+    "Lait d'avoine": "milk_plant",
+    "Lait de soja": "milk_plant",
+    "Épinards hachés surgelés": "frozen_vegetables",
+    "Épinards surgelés": "frozen_vegetables",
+    "Frites surgelées": "frozen_vegetables",
+    "Haricots verts surgelés": "frozen_vegetables",
+    "Légumes surgelés": "frozen_vegetables",
+    "Petits pois surgelés": "frozen_vegetables",
+    "Poêlée de légumes": "frozen_vegetables",
+    "Désinfectant": "sprays",
+    "Désodorisant textile": "sprays",
+    "Détachant": "sprays",
+    "Nettoyant multi-usages": "sprays",
+    "Nettoyant salle de bain": "sprays",
+    "Nettoyant vitres": "sprays",
+    "Huile d'olive": "oils",
+    "Huile de tournesol": "oils",
+    "Huile de sésame": "oils",
+    "Vinaigre balsamique": "vinegars",
+    "Vinaigre de cidre": "vinegars",
+    "Vinaigre de vin": "vinegars",
+    "Dinde": "raw_meats",
+    "Escalopes de poulet": "raw_meats",
+    "Filets de poulet": "raw_meats",
+    "Truite": "fish_portions",
+    "Saumon": "fish_portions",
+    "Cabillaud": "fish_portions",
+    "Thon frais": "fish_portions",
+    "Emmental râpé": "cheese_grated",
+    "Parmesan râpé": "cheese_grated",
+    "Fromage râpé": "cheese_grated",
+    "Mozzarella râpée": "cheese_grated",
+    "Pâte brisée": "tart_dough",
+    "Pâte sablée": "tart_dough",
+    "Petites pâtes bébé": "baby_items",
+    "Purée bébé": "baby_items",
+    "Compotes bébé": "baby_items",
+    "Lait infantile": "baby_items",
+    "Petits pots": "baby_items",
+    "Desserts lactés bébé": "baby_items",
+    "Sacs à couches": "baby_items",
+    "Granola": "packaged_snacks",
+    "Muesli": "packaged_snacks",
+    "Pile 9V": "house_batteries",
+    "Pile AAA": "house_batteries",
+    "Piles AA": "house_batteries",
+    "Piles CR123A": "house_batteries",
+    "Piles CR2025": "house_batteries",
+    "Piles CR2032": "house_batteries",
+    "Piles CR2450": "house_batteries",
+    "Piles LR44": "house_batteries",
+}
+
+PRODUCT_VISUAL_EXCEPTIONS = {
+    "Céréales Trésor": "CONTRAINTE PRIORITAIRE : reproduire la forme et les proportions du paquet Céréales Lion, pas un nouveau design. Remplacer UNIQUEMENT les céréales de la fenêtre par des coussins gonflés BLÉ DORÉ CLAIR fourrés de chocolat brun, éventuellement une ou deux pièces fendues DANS la fenêtre. Pas de triangles bruns, vague bleue, épi minuscule, céréales imprimées ou posées hors emballage, ni nom/logo.",
+    "Céréales Lion": "Conserver les céréales soufflées triangulaires chocolat brun et caramel doré dans la fenêtre du modèle existant, sans modifier la silhouette du paquet ni ajouter de texte.",
+    "Crème liquide": "Crème liquide en BRIQUE fermée, jamais pot de crème épaisse ni bocal de sauce.",
+    "Crème anglaise": "Brique crème/vanille fermée avec bouchon ; vanille et volute de crème seulement imprimées.",
+    "Coulis de tomate": "Contenu de tomate rouge lisse dans le bocal Mayonnaise ; jamais viande ou pot de conserve.",
+    "Gouda": "Conserver pâte jaune, cire rouge et cubes, sans ombre externe, marges serrées pour une taille cohérente.",
+    "Burrata": "Burrata seule sans tomate, basilic ni huile.",
+    "Feta": "Feta seule sans salade ni olive.",
+    "Ricotta": "Ricotta seule sans garniture.",
+    "Tofu": "Bloc ivoire et cubes en barquette transparente FERMÉE avec bandeau crème/sauge ; aucune garniture.",
+    "Riz au lait": "Petit pot en verre FERMÉ avec riz crémeux visible, sans caramel ni cannelle ajoutés.",
+    "Yaourt à boire": "Bouteille laitière fermée à bouchon rose, fraise uniquement imprimée ; aucun fruit autour.",
+    "Petits pois": "Petits amas de pois nature sans bol ; quelques cosses ouvertes autorisées.",
+    "Olives fraîches": "Olives fraîches en petit amas naturel sans bol ni bocal de sauce.",
+    "Chou blanc": "Tête de chou blanc avec quartier révélant la chair pâle, sans préparation.",
+    "Choux de Bruxelles": "Petits choux verts en groupe et un demi-chou, sans emballage.",
+    "Pastèque": "Fruit entier vert rayé avec un quartier rouge naturel, sans plat.",
+    "Pamplemousse": "Fruit entier et moitié à chair rose, sans bol.",
+    "Pâte feuilletée": "Pâte CRUE pliée sans moule ni quiche.",
+    "Mascarpone": "Conserver l'étiquette générique MASCARPONE du pot laitier, mais aucune marque ou slogan.",
+    "Whisky": "Cette règle v785 remplace explicitement tout ancien whisky à bouchon de liège.",
+    "Bière sans alcool": "BIÈRE 0 % est le seul texte autorisé ; ne pas appliquer la règle sans texte des autres bières.",
+    "Gnocchis": "Produit du catalogue = pâtes sèches en petites coquilles creuses striées dans un paquet beige, PAS des gnocchis de pommes de terre.",
+    "Vinaigre de vin": "Bouteille élancée, liquide grenat/brun rouge translucide distinct du balsamique et du cidre ; bouchon vissé doré et raisin imprimé.",
+    "Crème de coco": "Boîte métal fermée du modèle Lait de coco avec symbole coco et crème imprimée, jamais boîte ouverte.",
+    "Pain de mie complet": "Tranches de pain complet brun dans le rendu de Pain de mie.",
+    "Épinards hachés surgelés": "Contenu en portions compactes d'épinards hachés, pas feuilles entières.",
+    "Liquide vaisselle mains sensibles": "Même flacon que Liquide vaisselle avec liquide rose pâle et étiquette crème, SANS allégation commerciale.",
+    "Brossettes interdentaires": "Petites brossettes en blister crème/bleu fermé et non une brosse à dents géante.",
+    "Fil dentaire": "Petite boîte à fil dentaire blanc/bleu et coupe-fil, pas tube.",
+}
+
+
+def select_visual_family(name: str, category: str, subgroup: str) -> str:
+    """Privilégie la famille réelle de l'article à son sous-groupe de navigation."""
+    known=PRODUCT_VISUAL_FAMILY.get(name)
+    if known:
+        return known
+    if category=="Boissons" and name.startswith("Jus "):
+        return "juice"
+    if category=="Boissons" and name.startswith("Bière "):
+        return "beer"
+    if category=="Épicerie" and name.startswith("Confiture "):
+        return "jams"
+    if category=="Épicerie" and (name.startswith("Sauce ") or name.startswith("Coulis ")):
+        return "sauces"
+    if category=="Épicerie" and name.startswith("Riz "):
+        return "rice"
+    return ""
+
+
 def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") -> str:
+    """Compose seulement les consignes de la sous-catégorie et de la famille concernées."""
+    family=select_visual_family(name,category,subgroup)
+    subgroup_rule=SUBGROUP_VISUAL_GUIDANCE.get(f"{category} / {subgroup}","")
+    family_rule=VISUAL_FAMILY_RULES.get(family,"")
+    product_rule=PRODUCT_VISUAL_EXCEPTIONS.get(name,"")
     hint=(
         f"Précision visuelle prioritaire fournie par l’utilisateur: {image_hint}. "
-        "Respecter précisément cette forme, ce contenant ou cet emballage; cette précision ne modifie jamais le nom du produit. "
+        "Respecter cette précision si elle conserve l'identité du produit, le modèle visuel approuvé et la sécurité. "
         if image_hint else ""
     )
-    return (
-        f"Vignette produit pour une application de courses: {name}. Catégorie {category}, sous-groupe {subgroup}. "
-        +hint+
-        "Reprendre fidèlement le langage visuel des produits déjà présents dans le catalogue: rendu 3D semi-réaliste, propre, simple, premium et cohérent avec les autres items existants. "
-        "Contrôler la cohérence complète du sujet et de sa forme de vente avec les produits du même sous-groupe, pas seulement les contours : présentation, préparation cru/cuit/fumé, proportions, accessoires, couleurs et emballage. Remplacer une représentation incohérente même si sa découpe est propre. Pour Truite, représenter une seule portion ou un filet cru de truite à chair rose clair avec peau argentée, dans la famille des portions Saumon/Cabillaud, jamais un poisson entier avec tête et queue. Conserver les présentations propres aux moules, poissons fumés et conserves. "
-        "L'image est destinée à une petite vignette mobile avec une cible d'affichage finale de 192×192 px. Elle doit donc rester immédiatement identifiable à cette taille. "
-        "Utiliser des formes lisibles, des volumes simples, des contours nets, des textures sobres et uniquement les détails indispensables à l'identification du produit. "
-        "Représenter exactement un seul type de produit, isolé sur fond totalement transparent, centré, avec des proportions naturelles et une marge transparente régulière. "
-        "Le produit principal doit occuper environ 86 à 92 % de sa plus grande dimension dans le carré et aucun bord important ne doit être coupé. "
-        "Éviter les micro-détails, textures photographiques complexes, reflets multiples, bruit visuel, grain, motifs fins, petits accessoires secondaires et détails invisibles à petite taille. "
-        "Concevoir une image qui se compresse efficacement en WebP : maximum 15 000 octets pour le fichier final, à contrôler après encodage, sans sacrifier sa reconnaissance ni son style premium. "
-        "Respecter la palette validée des emballages : riz bleu, pâtes beige, céréales et semoules ocre, légumineuses et conserves vert sauge, sauces tomate rouge brique, sauces crémeuses taupe, sauces épicées terracotta, huiles et vinaigres olive doré, sucres et produits sucrés nude rosé, épices brun cannelle, boulangerie beige chaud. Base kraft ou crème et accent discret ; ne jamais recolorer artificiellement l'aliment. Préserver les références déjà validées de la même famille. Aucun contour blanc d'autocollant ni halo externe. "
-        "Si le produit est une sauce ou une préparation apparentée (Bolognaise, Harissa, Guacamole, Houmous, Tapenade ou Coulis de fruit), la référence canonique est www/Items/mayonnaise.webp : même bocal en verre aux épaules arrondies, même couvercle doré, même grande étiquette crème rectangulaire à coins arrondis, centrale, avec double filet fin, sans texte ni pictogramme. Conserver exactement la forme, les proportions, le cadrage et l'étiquette du modèle ; changer seulement le contenu et la couleur discrète du filet selon la palette. Cette règle ne concerne pas les huiles, vinaigres, cornichons, confitures, miel ou crèmes laitières. "
-        "Céréales Lion reprend explicitement la boîte carton crème/bleu pâle de Céréales infantiles, angle trois-quarts, épi imprimé et grande fenêtre ; remplacer la poudre par des morceaux de céréales chocolat bruns et caramel dorés, ajouter uniquement le aucun texte sur la face avant, céréales soufflées courtes triangulaires à lobes arrondis conformes à la référence Nestlé, sans autre marque, slogan, âge ou allégation. Produit de Petit-déjeuner, distinct des céréales infantiles et de Céréales. "
-        "Petits pois et Olives fraîches se présentent en petit amas nature sans bol ; cosses ouvertes autorisées pour Petits pois. Dinde et Escalopes de poulet restent crues et seules, sans herbe ni poivre ajouté. "
-        "Ajouts validés v772 : Emmental râpé en longs brins jaunes, Parmesan râpé en fins grains ivoire, Mozzarella en billes en petites boules blanches, tous seuls sans garniture. Pain de mie complet en tranches brunes ; Coulis de tomate dans le bocal Mayonnaise rouge lisse ; Crème dessert caramel dans le pot à opercule carré. Confitures pêche/figue et jus de poire reprennent leurs bocaux/bouteilles fruités. Petites pâtes bébé en sachet crème/bleu, Purée bébé en gourde légumes crème/sauge, Épinards hachés surgelés en portions compactes dans le sachet bleu à flocon. Liquide vaisselle mains sensibles garde la forme du flacon avec rose pâle sans allégation. Brossettes en petit blister et fil dentaire en petite boîte à coupe-fil, blanc/bleu sans marque. "
-        "Ajouts v773 : Tofu en barquette transparente fermée crème/sauge ; Lait de soja dans la bouteille Lait d’amande avec soja. Haricots blancs/verts en boîte gardent métal fermé crème/sauge et illustration imprimée distincte. Fruits séchés en sachets kraft à fenêtre sans fruit physique autour. Choux, pamplemousse, pastèque et bagels restent naturels sans garniture ni assiette. Crème de coco reprend Lait de coco fermé avec petit pictogramme de crème imprimé. "
-        "Ajouts v774 : Biscottes en pile de tranches grillées, Pita à poche vide et Naan ovale sans garniture. Pâte sablée crue en rouleau emballé comme Pâte brisée, sans halo de plastique ; Crème anglaise en brique vanille fermée. Flageolets en boîte métal crème/sauge. Brésil dans les bocaux des noix de cajou ; correction v775 pour Noix de pécan : couvercle métallique doré de Noix de cajou, étiquette crème avec petite icône monochrome au trait sans texte (conditionnement remplacé par le sachet v777), jamais grosse illustration colorée ni couvercle bois, Pruneaux/Figues sèches dans les sachets kraft des dattes. Crème de marrons en pot à tartiner fermé ; Huile de sésame dans le flacon à anse vert des huiles, sésame imprimé seulement. Aucun texte ou marque inventé. "
-        "Pour les goûters bébé, Gâteaux bébé, Biscuits bébé, Boudoirs bébé et Galettes de riz bébé partagent le sachet crème à bandeaux bleu pâle, fermé à grande fenêtre et épi imprimé ; contenu respectivement gâteaux moelleux, biscuits ovales courts perforés, longs boudoirs ou galettes rondes de riz soufflé. Céréales infantiles : boîte carton crème/bleu fermée, épi et fenêtre de céréales finement moulues, pas de boîte de lait. Desserts lactés bébé : petit pot évasé à opercule carré fermé du modèle Yaourts vanille, crème/bleu et goutte de lait imprimée, sans parfum inventé. Pas d’âge, texte, allégation, marque ou aliment physique autour. "
-        "Pour Enfant, conserver Couches en pile blanche à motifs bleu pâle et Lingettes bébé en paquet blanc/bleu pâle fermé à rabat ourson. Sacs à couches : petit rouleau de sacs neufs bleu menthe clair avec segment attaché, perforation et poignées, jamais sac rempli noué ou déchet. Lait infantile : boîte cylindrique crème/bleu, couvercle bleu fermé, pictogramme biberon, sans chiffre d’âge non précisé, dosette ou poudre à côté. Compotes bébé : gourde jaune/rouge à bouchon orange fermé, pomme/banane imprimées, aucun fruit physique. Petits pots garde son petit bocal fermé à couvercle doré et purée orange, pas d’étiquette Mayonnaise. Sans marque, texte ou allégation inventés. "
-        "PRIORITÉ v778 FRUITS SECS : choix utilisateur TOUS EN SACHETS. Cajou, Pistaches, Cacahuètes, Pécan, Brésil, Dattes, Abricots secs, Raisins secs, Pruneaux et Figues sèches reprennent exactement Dattes v778 : sachet kraft crème fermé, fenêtre intermédiaire arrondie occupant environ la moitié de la hauteur, haut vers 40% et bas vers 92%, bande kraft supérieure visible autour de la petite icône, jamais une fenêtre géante, petite icône brune monochrome au trait en haut, sans nom, mot, lettre ni texte, décoration ocre en bas à droite. Seuls contenu naturel et icône changent. Le nom reste uniquement dans le catalogue de l’application. Aucun bocal, couvercle, illustration fruitée colorée ou fruit physique autour. Ceci remplace les bocaux v774/v775 et les fruits colorés v773/v774 ; ne pas modifier Amandes, Noix et Noisettes nature. "
-        "Pour les confitures, la référence est www/Items/confiture-fraise.webp : même bocal haut à facettes, couvercle vichy rouge/blanc fermé, étiquette crème ronde décorative à double filet rouge et nom du fruit en cursive rouge. Tous les parfums reprennent exactement forme, étiquette et échelle, confiture épaisse aux couleurs naturelles avec morceaux, fruit imprimé ; Fruits rouges porte un assortiment fraise/framboise/mûre/myrtille imprimé ; pas de fruits crus en sirop ou physiques autour. Changer seulement fruit, couleur naturelle et désignation générique, sans marque. Ne pas appliquer le bocal Mayonnaise aux confitures. "
-        "Pâte brisée représente une pâte CRUE à dérouler en rouleau beige ivoire avec papier cuisson visible à une extrémité et emballage transparent fermé, proportions proches de Pâte à pizza. Jamais un fond de tarte formé/cuit, moule cannelé, quiche ou garniture. Garder bord spiralé, rouleau entier et marges, sans sol ni ombre externe. Ne pas changer la pâte feuilletée crue pliée validée. "
-        "Pour Pâtes, riz & céréales, préserver les paquets de pâtes beiges à grande fenêtre, sans nom ajouté et avec la forme exacte du produit ; les riz gardent leur paquet bleu, grande fenêtre et petite zone beige en bas, avec grains longs/ronds et couleurs naturelles distinctes. Polenta/Quinoa restent en sachets crème/ocre, Boulgour/Semoule en sacs kraft/crème déjà validés, sans bol réel ou aliment en vrac à côté. "
-        "Pour Pâtisserie & cuisine, conserver les sacs kraft/crème fermés des poudres, sans bol réel ; illustrations imprimées autorisées. Gélatine : boîte crème/ocre avec pictogramme de flan et feuilles de gélatine sèches translucides imprimées, jamais dessert en cubes rouges ou assiette. Les sucres gardent leurs bocaux à couvercle bois, étiquettes et petits tas validés, avec textures cristallisée/poudre/roux distinctes ; ne pas les transformer en bocaux à épices. Amandes entières reste nature, pâte feuilletée crue pliée, et Vanille garde son bocal à gousses. "
-        "Pour Monde & pratique, ne pas imposer un contenant unique : Bouillon cubes garde sa boîte crème/ocre et ses cubes imprimés, sans ombre ou rectangle de sol externe. Lait de coco reprend la boîte métallique de Pois chiches, étiquette crème, bandeau sauge, pictogramme coco et noix de coco imprimées, avec un couvercle argenté continu hermétiquement fermé, jamais une cavité noire ouverte. Croûtons reste en sachet kraft à grande fenêtre ; nouilles en paquets crème/ocre distincts, purée en sachet, soupe en brique et tortillas en pile nature. Préserver les pots de sauce et épices validés. "
-        "Pour Traiteur frais, conserver Gnocchis désigne ici les pâtes alimentaires sèches en petites coquilles courbes creuses striées, dans le paquet beige à grande fenêtre de Conchiglie et Coquillettes ; jamais un amas de boulettes de pomme de terre. Pâtes fraîches reste un nid nature. Pâte à pizza reste un rouleau emballé transparent ; Quiche reste entière et dorée sans assiette. Ne pas imposer le même emballage aux quatre produits ni ajouter de garniture décorative. "
-        "Pour les sachets de Surgelés, reprendre www/Items/haricots-verts-surgeles.webp : sachet large fermé, bandeau bleu glacier courbe, petit flocon blanc opaque, grande fenêtre transparente et bas bleu ; conserver le contenu exact, avec frites pâles non cuites et épinards en feuilles. Le flocon ne doit pas être transparent. Les glaces Chocolat et Vanille gardent leurs pots fermés distincts ; Nuii reste un bâtonnet entier avec morsure, sans traînées horizontales ni ombre externe. Ne pas transformer les glaces en sachets. "
-        "Pour Burrata, Feta et Ricotta, représenter le fromage seul, sans tomates, basilic, olives, huile ni autres garnitures ; conserver forme et texture naturelles distinctes. Pour Gouda, préserver pâte jaune, cire rouge et cubes, retirer toute ombre de sol externe et cadrer sur l’objet visible pour éviter un fromage trop petit à cause des marges invisibles. Préserver les autres fromages déjà validés, sans imposer un emballage unique ni effacer les croûtes blanches naturelles. "
-        "Pour Mascarpone, représenter un pot laitier bas et large fermé avec rebord et languette, étiquette et couvercle identifiés MASCARPONE, décor laitier crème/bleu et volute de crème imprimée ; pas de boîte blanche anonyme, crème exposée, bol de service, bocal de sauce, marque, chiffre ou allégation inventée. "
-        "Deux familles de yaourts distinctes : Nature, Grecs et Skyr conservent leurs pots crème/bleu à couvercle rond. Yaourt, Yaourts fruits et Yaourts vanille reprennent le petit pot blanc légèrement évasé à opercule souple carré fermé de www/Items/yaourts-vanille.webp v760 (référence v758 restaurée), mêmes proportions et taille apparente. Yaourt générique : blanc et vague bleu pâle, opercule argent ; Fruits : rose pâle et fraise imprimée ; Vanille : crème doré et fleur/gousse imprimées. Pour ces trois pots, aucun décor botanique bleu, couvercle rond rigide, texte, marque ou fruit physique. Cette règle remplace celle de v759 ; Fromage blanc et les autres desserts restent inchangés. "
-        "Crème dessert chocolat et Crème dessert vanille reprennent le petit pot à opercule souple carré fermé de Yaourts vanille, avec corps cacao ou crème jaune pâle et illustration imprimée ; les conserver comme crèmes dessert. Yaourts citron et Yaourts noix de coco utilisent la même silhouette, accent citron pâle ou ivoire et illustration imprimée du parfum, sans fruit physique, texte ou marque. Garder séparés les modèles Nature/Grecs/Skyr. "
-        "Pour Riz au lait, conserver un petit pot en verre fermé et du riz crémeux visible, sans cannelle, caramel ou garniture non précisée. Pour Yaourt à boire, conserver une bouteille laitière fermée à bouchon rose, avec fraise illustrée seulement sur la bouteille, aucun fruit physique autour ni ombre de sol. Préserver les pots de yaourts/desserts déjà validés ; ne pas leur appliquer le modèle Mayonnaise. "
-        "Pour les charcuteries, Blanc de poulet représente des tranches cuites ivoire à bord doré, sans persil ni autre garniture, jamais du poulet cru ou du jambon de porc. Rosette : un saucisson sec à coupe rosée et gros grains de gras blanc, quelques tranches et marge complète ; conserver la fleur naturelle du boyau. Pâté reprend le petit bocal fermé à couvercle doré de www/Items/rillettes.webp, sans étiquette inventée, mais avec une texture dense finement hachée distincte des rillettes fibreuses. Préserver les présentations propres de Coppa, Mortadelle, Lardons et Peperroni, sans imposer le modèle Mayonnaise aux terrines. "
-        "Cornichon conserve son bocal haut transparent à couvercle vert fermé, cornichons entiers et saumure visibles, sans étiquette de sauce ni bocal Mayonnaise. Pour Vinaigre de vin, reprendre la bouteille élancée de www/Items/vinaigre-de-cidre.webp et le style de www/Items/vinaigre-balsamique.webp : col étroit, épaules arrondies, bouchon vissé doré, étiquette crème centrale à filet olive doré et illustration de raisin sans texte ni marque. Liquide transparent grenat/brun rouge, distinct du balsamique presque noir et du cidre ambré. Jamais une carafe à bouchon de verre ou une bouteille rognée. Les huiles gardent leurs flacons à anse et bouchon vert existants ; ne pas les transformer en pots à sauce, ni appliquer cette règle aux vinaigres ménagers ou jus. "
-        "Pour les six jus Orange, Pomme, Raisin, Ananas, Multifruits et Tomate, la référence canonique est www/Items/jus-d-orange.webp v748 : même bouteille en verre, col, bouchon doré vissé et petite étiquette crème en bas du corps, à coins arrondis et double filet doré-beige discret. Garder exactement sa taille et sa position, avec le jus largement visible. Illustrer le fruit correspondant uniquement sur l’étiquette : orange, pomme, raisin, ananas ou tomate ; pour Multifruits, petit assortiment générique orange/pomme/raisin sans affirmation de recette ni proportions. Conserver les couleurs naturelles des boissons. Aucun fruit physique autour ou dans la bouteille, texte, marque, logo, paille ou brique. Cette consigne remplace la règle précédente sans étiquette et ne concerne pas les eaux, laits ou sirops. "
-        "Pour Désinfectant, Désodorisant textile et Détachant, reprendre le flacon ergonomique à gâchette blanche de www/Items/nettoyant-multi-usages.webp : un pulvérisateur ménager entier, étiquette crème courbe sans texte ni illustration de parfum inventé, proportions cohérentes. Conserver les accents existants rouge/gris clair, lavande et orange/blanc respectivement. Ne pas appliquer cette forme aux bidons, flacons WC ou poudres. "
-        "Si le produit est une épice ou un assaisonnement sec (Curcuma, Curry, Paprika, Poivre, Sel, Chili ou Vanille), la référence canonique est www/Items/paprika.webp : même petit bocal en verre, même couvercle doré, même petite étiquette crème centrale en cartouche à coins décoratifs, double filet brun cannelle, sans texte ni pictogramme. Conserver exactement la forme et l'étiquette ; changer seulement le contenu, avec des gousses naturelles pour Vanille et du piment séché pour Chili. Ne pas appliquer cette règle aux herbes fraîches, piments frais ou produits ménagers. "
-        "Privilégier de grandes zones de couleur régulières, des transitions douces, des ombres simples et peu de reflets ; réserver les textures et petits détails aux caractéristiques indispensables pour reconnaître le produit. "
-        "Préserver les contours nets, les volumes 3D semi-réalistes, les couleurs fidèles, le conditionnement demandé et la transparence du fond, sans dépasser 15 000 octets après encodage. Refuser l'intégration si cette limite ou la qualité ne peut pas être respectée. "
-        "En l’absence de précision visuelle utilisateur, privilégier le produit lui-même plutôt que son emballage de vente. Si l'objet est reconnaissable sans emballage "
-        "(par exemple pile, thermomètre, éponge, rasoir, fruit ou légume), le montrer hors boîte, hors blister, hors sachet et sans étiquette. "
-        "N'utiliser un emballage générique que lorsqu'il est réellement indispensable pour identifier le produit, ou lorsqu’une précision visuelle utilisateur le demande; dans ce cas il doit rester simple, "
-        "sans marque, sans logo, sans texte lisible, visuellement léger et non dominant. Éviter les grands blocs rectangulaires ou les packagings massifs. "
-        "Aucun décor, table, rayon, main, personne, collage, grille ou deuxième type de produit. Aucun texte ajouté autour du produit. "
-        "Le rendu final doit être clair, compact, harmonisé avec les autres icônes du catalogue et parfaitement lisible en petite vignette mobile."
-    )
-
-
-
-
+    return " ".join(part for part in (
+        f"Vignette produit pour une application de courses : {name}. Catégorie {category}, sous-groupe {subgroup}.",
+        "Rendu 3D semi-réaliste premium, lisible en petite vignette mobile cible d'affichage finale de 192×192 px. "
+        "Un seul produit, fond totalement transparent, entièrement visible, centré, formes lisibles, "
+        "textures sobres, contours nets, sans halo ni liseré blanc, aucune table, personne, collage, décor ou accessoire ajouté. "
+        "Le produit principal occupe environ 86 à 92 % de sa plus grande dimension, sans bord coupé ; "
+        "garder son échelle comparable aux autres articles de la MÊME FAMILLE VISUELLE, et non du seul sous-groupe.",
+        "Hiérarchie obligatoire : exception produit validée > modèle canonique de famille > "
+        "règle de sous-catégorie > style premium général. Une ancienne règle remplacée n'est plus applicable. "
+        "Pour une famille emballée, conserver silhouette, perspective, bandes, étiquette, fenêtre, fermeture et marges "
+        "du modèle déjà approuvé. Ne modifier que le contenu ou les accents expressément autorisés. "
+        "Aucun objet ou aliment en dehors de son emballage. Aucune inscription, marque ou logo inventés ; "
+        "conserver uniquement les noms ou marques explicitement autorisés par la famille ou le produit.",
+        "Règle de sous-catégorie : "+subgroup_rule if subgroup_rule else "",
+        "Règle de famille visuelle : "+family_rule if family_rule else "",
+        "Exception produit prioritaire : "+product_rule if product_rule else "",
+        hint,
+        "Concevoir une image qui se compresse efficacement en WebP : maximum 15 000 octets "
+        "pour le fichier final, à contrôler après encodage, sans sacrifier sa reconnaissance ni son style premium. "
+        "Préserver le conditionnement demandé et la transparence du fond, sans rognage, "
+        "vérifier contours et lisibilité à 192 px et 48 px sur fonds clair et foncé. "
+        "Si le poids ou la qualité sont insuffisants, refuser l'intégration.",
+    ) if part)
+ 
+ 
 PRODUCT_IMAGE_MAX_BYTES = 15_000
 
 
