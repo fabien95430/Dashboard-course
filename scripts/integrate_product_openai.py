@@ -576,6 +576,7 @@ def image_prompt(name: str, category: str, subgroup: str, image_hint: str="") ->
         "Rendu 3D semi-réaliste premium, lisible en petite vignette mobile cible d'affichage finale de 192×192 px. "
         "Un seul produit, fond totalement transparent, entièrement visible, centré, formes lisibles, "
         "textures sobres, contours nets, sans halo ni liseré blanc, aucune table, personne, collage, décor ou accessoire ajouté. "
+        "Éviter les micro-détails, textures photographiques complexes, reflets multiples, motifs fins et bruit visuel. "
         "Le produit principal occupe environ 86 à 92 % de sa plus grande dimension, sans bord coupé ; "
         "garder son échelle comparable aux autres articles de la MÊME FAMILLE VISUELLE, et non du seul sous-groupe.",
         "Hiérarchie obligatoire : exception produit validée > modèle canonique de famille > "
