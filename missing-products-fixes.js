@@ -592,20 +592,17 @@ function bindOpenAiUi(){
         openAiCooldown.delete(key);
         decorateOpenAiButtons();
       },OPENAI_COOLDOWN_MS);
-      return;
     }
-    const integrate=event.target.closest?.('[data-integrate-missing-dish],[data-integrate-missing-product]');
-    if(!integrate||integrate.disabled)return;
-    const type=integrate.matches('[data-integrate-missing-product]')?'product':'dish';
-    const id=type==='product'
-      ?String(integrate.dataset.integrateMissingProduct||'')
-      :String(integrate.dataset.integrateMissingDish||'');
-    if(!id)return;
+  },true);
+  // Boutons ChatGPT : missing-products-dishes.js (propriétaire) publie la demande, sans interception du clic ici.
+  document.addEventListener('courses:chatgpt-integration-requested',event=>{
+    const type=event.detail?.type,id=String(event.detail?.id||'');
+    if((type!=='product'&&type!=='dish')||!id)return;
     openAiErrors.delete(cooldownKey(type,id));
     setOpenAiRequestState(type,id,null);
     setRunning(type,id,true);
     queueMicrotask(decorateOpenAiButtons);
-  },true);
+  });
 
   const bindDialog=()=>{
     const dialog=document.getElementById('missingProductsDialog');

@@ -501,16 +501,22 @@ function removeDish(id){
   renderMode();
   window.CoursesHaptics?.vibrate(6);
 }
+  // Ce module possède les boutons ChatGPT : il publie la demande, le suivi « en cours » l'écoute.
+  function publishChatGptIntegration(type,id){
+    document.dispatchEvent(new CustomEvent('courses:chatgpt-integration-requested',{detail:{type,id:String(id||'')}}));
+  }
   function integrateDish(id){
     const item=readDishes().find(entry=>entry.id===id);
     if(!item)return;
     launchChatGpt(buildDishPrompt(item));
+    publishChatGptIntegration('dish',item.id);
     window.CoursesHaptics?.vibrate(10);
   }
   function integrateProduct(id){
     const item=readProducts().find(entry=>entry.id===id);
     if(!item)return;
     launchChatGpt(buildProductPrompt(item));
+    publishChatGptIntegration('product',item.id);
     window.CoursesHaptics?.vibrate(10);
   }
   function enhanceProductRows(){

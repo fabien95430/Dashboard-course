@@ -77,3 +77,12 @@ test('P4 conserve un démarrage déterministe puis prépare Produits avant les f
   assert.ok(index.indexOf(settingsBadgeAsset)<index.indexOf(settingsUiAsset));
   for(const asset of [appUiAsset,runtimeAsset,dishImagesAsset,repurchaseAsset,quantitiesAsset,dishesAsset,liquidAsset,settingsUiAsset,settingsBadgeAsset])assert.ok(sw.includes(asset),asset+' absent du précache');
 });
+
+test('le suivi « en cours » des demandes ChatGPT suit un événement du module propriétaire, sans intercepter son clic',()=>{
+  const owner=read('missing-products-dishes.js'),tracker=read('missing-products-fixes.js');
+  assert.match(owner,/new CustomEvent\('courses:chatgpt-integration-requested',\{detail:\{type,id:String\(id\|\|''\)\}\}\)/);
+  assert.match(owner,/launchChatGpt\(buildDishPrompt\(item\)\);\s*publishChatGptIntegration\('dish',item\.id\);/);
+  assert.match(owner,/launchChatGpt\(buildProductPrompt\(item\)\);\s*publishChatGptIntegration\('product',item\.id\);/);
+  assert.match(tracker,/document\.addEventListener\('courses:chatgpt-integration-requested',event=>\{[\s\S]*?setRunning\(type,id,true\);/);
+  assert.doesNotMatch(tracker,/closest\?\.\('\[data-integrate-missing/,'missing-products-fixes.js ne doit plus intercepter les boutons ChatGPT');
+});
