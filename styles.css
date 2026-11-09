@@ -3178,7 +3178,8 @@ body{
   height:min(78svh,calc(100svh - max(24px,env(safe-area-inset-top)) - env(safe-area-inset-bottom)))!important;
   max-height:calc(100svh - max(24px,env(safe-area-inset-top)))!important;
   box-sizing:border-box!important;
-  padding:43px 21px max(24px,env(safe-area-inset-bottom))!important;
+  --sheet-bottom-inset:max(24px,env(safe-area-inset-bottom));
+  padding:43px 21px var(--sheet-bottom-inset)!important;
   border:1px solid rgba(255,255,255,.48)!important;border-inline:0!important;border-bottom:0!important;
   border-radius:32px 32px 0 0!important;
   background:radial-gradient(ellipse at 6% 16%,rgba(216,232,210,.44),transparent 43%),radial-gradient(ellipse at 90% 88%,rgba(238,215,190,.39),transparent 48%),linear-gradient(155deg,rgba(252,251,247,.99),rgba(244,241,234,.99))!important;
@@ -3293,6 +3294,8 @@ body{
 .settings-sheet#preferencesDialog .preference-dialog-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
 .settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .missing-dishes-list{flex:0 1 auto!important;min-height:0!important;overflow-y:auto!important}
 .settings-sheet#missingProductsDialog .catalog-remove-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+/* v814 — Une liste qui défile en bas d'une feuille descend jusqu'au bord de l'écran : elle passe sous la marge basse de la feuille et la reprend en fin de défilement (barre d'accueil). Source unique de cette marge pour ces listes. */
+.settings-sheet#preferencesDialog .preference-dialog-scroll,.settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .catalog-remove-panel,.settings-sheet.recipe-customization-dialog .recipe-dish-picker{margin-bottom:calc(-1 * var(--sheet-bottom-inset))!important;padding-bottom:calc(var(--sheet-bottom-inset) + 12px)!important;scroll-padding-bottom:calc(var(--sheet-bottom-inset) + 12px)}
 /* v652 — la liste ne pousse plus « Ajouter un ingrédient » en bas : il suit la dernière ligne, les actions restent calées en bas. */
 .settings-sheet.recipe-customization-dialog .recipe-customization-list{flex:0 1 auto!important;min-height:0!important;max-height:none!important}
 .settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto;margin-top:auto!important;padding-top:14px}

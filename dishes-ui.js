@@ -396,11 +396,11 @@ function buildRecipeCustomizationDialog(){
       .recipe-customization-dialog{max-height:calc(100dvh - max(48px,env(safe-area-inset-top)) - max(48px,env(safe-area-inset-bottom)));overflow:hidden}
       .recipe-customization-dialog[open]{display:flex;flex-direction:column}
       .recipe-customization-dialog>h3,.recipe-customization-dialog>.dialog-intro{flex-shrink:0}
-      .recipe-dish-picker{flex:1 1 auto;min-height:0;overflow-y:auto;padding-top:2px!important;padding-bottom:14px!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+      .recipe-dish-picker{flex:1 1 auto;min-height:0;overflow-y:auto;padding-top:2px!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
       .recipe-dish-picker[hidden]{display:none}
       .recipe-cat-card{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:none!important;overflow:hidden;margin:0 1px}
       .recipe-customization-dialog{background:#fbf9f3!important}
-      .recipe-customization-dialog .recipe-dish-picker{margin:0 -21px!important;width:calc(100% + 42px)!important;max-width:none!important;box-sizing:border-box;padding:0 0 calc(env(safe-area-inset-bottom) + 18px)!important;border-top:1px solid rgba(39,66,47,.10)}
+      .recipe-customization-dialog .recipe-dish-picker{margin:0 -21px!important;width:calc(100% + 42px)!important;max-width:none!important;box-sizing:border-box;padding-top:0!important;padding-inline:0!important;border-top:1px solid rgba(39,66,47,.10)}
       .recipe-customization-dialog .recipe-cat-card{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;margin:0!important}
       .recipe-customization-dialog .recipe-cat-head,.recipe-customization-dialog .recipe-dish-row{padding-left:20px!important;padding-right:18px!important}
       .recipe-customization-dialog .recipe-cat+.recipe-cat{border-top:1px solid rgba(39,66,47,.10)}

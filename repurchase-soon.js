@@ -97,7 +97,7 @@ function ensureStyles(){
     .repurchase-dialog::backdrop{background:#f7f7f2}
     .repurchase-screen{
       width:100%;height:100%;box-sizing:border-box;display:flex;flex-direction:column;
-      padding:0 18px max(calc(env(safe-area-inset-bottom) + 16px),24px)
+      padding:0 18px
     }
     .repurchase-head{
       display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;flex:0 0 auto;box-sizing:border-box;
@@ -119,7 +119,7 @@ function ensureStyles(){
       display:flex;gap:10px;align-items:flex-start;background:#edf5ff;color:#315375;font-size:12.5px;line-height:1.35;font-weight:580
     }
     .repurchase-info-mark{width:20px;height:20px;flex:0 0 20px;border-radius:50%;display:grid;place-items:center;background:#2378f2;color:#fff;font-size:12px;font-weight:850}
-    .repurchase-list{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:1px 1px 12px;display:flex;flex-direction:column;gap:10px}
+    .repurchase-list{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:1px 1px max(calc(env(safe-area-inset-bottom) + 28px),36px);display:flex;flex-direction:column;gap:10px}
     .repurchase-row{
       min-height:83px;padding:10px 11px 10px 9px;border:1px solid rgba(37,61,45,.055);border-radius:20px;
       display:grid;grid-template-columns:68px minmax(0,1fr) 43px;align-items:center;gap:9px;background:rgba(255,255,255,.92);
