@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 
-const APP_VERSION='v821';
+const APP_VERSION='v822';
 window.COURSES_APP_VERSION=APP_VERSION;
 
 let warmQueue=[];
