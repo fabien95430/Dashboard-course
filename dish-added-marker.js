@@ -388,6 +388,8 @@ function bindMarkerEvents(){
   // catalog-quantities.js publie cet événement depuis son image d'animation, après la reconstruction des lignes :
   // appliquer l'état « Déjà dans Ma liste » tout de suite, sinon une image s'affiche avec ces lignes encore actives.
   document.addEventListener('courses:dish-quantities-updated',syncDialogGuard);
+  // Appui sur un ingrédient (ligne mise à jour sur place) : recompter sans les lignes déjà dans Ma liste.
+  document.addEventListener('courses:dish-selection-changed',syncDialogGuard);
   document.addEventListener('courses:dish-sheet-opened',scheduleDialogGuard);
   document.addEventListener('courses:quantities-ready',()=>{
     scheduleReconcileList();

@@ -991,16 +991,30 @@ function renderDishSheetIngredients(){
       '<span class="dish-ingredient-check" aria-hidden="true">'+(selected?'✓':'')+'</span>'+ 
       '</button>';
   }).join('');
-  dishSheetList.querySelectorAll('.dish-ingredient').forEach(row=>row.addEventListener('click',()=>{
-    const name=row.dataset.ingredient||'';
-    if(selectedIngredients.has(name))selectedIngredients.delete(name);else selectedIngredients.add(name);
-    renderDishSheetIngredients();
-  }));
+  dishSheetList.querySelectorAll('.dish-ingredient').forEach(row=>row.addEventListener('click',()=>toggleDishIngredient(row)));
+  syncDishSheetSummary();
+  document.dispatchEvent(new CustomEvent('courses:dish-ingredients-rendered',{detail:{dish:currentDish.name}}));
+}
+function syncDishSheetSummary(){
   const count=selectedIngredients.size;
   dishSheetCount.textContent=count+' ingrédient'+(count>1?'s':'');
   dishConfirmButton.disabled=count===0||Boolean(busyDish);
   dishConfirmButton.querySelector('span').textContent=count?'Ajouter à ma liste':'Sélectionnez un ingrédient';
-  document.dispatchEvent(new CustomEvent('courses:dish-ingredients-rendered',{detail:{dish:currentDish.name}}));
+}
+// Un appui ne modifie que sa ligne : les lignes ne sont construites qu'à l'ouverture de la fiche, ce qui conserve
+// ce que les autres modules y ont posé (quantités, « Déjà dans Ma liste », « Acheté récemment ») et les vignettes.
+function toggleDishIngredient(row){
+  if(!currentDish)return;
+  const name=row.dataset.ingredient||'';
+  const selected=!selectedIngredients.has(name);
+  if(selected)selectedIngredients.add(name);else selectedIngredients.delete(name);
+  row.classList.toggle('is-selected',selected);
+  row.setAttribute('aria-pressed',selected?'true':'false');
+  // Tant que catalog-quantities.js n'a pas posé sa quantité, la pastille garde la coche d'origine.
+  const check=row.querySelector('.dish-ingredient-check');
+  if(check&&!row.dataset.dishQuantity)check.textContent=selected?'✓':'';
+  syncDishSheetSummary();
+  document.dispatchEvent(new CustomEvent('courses:dish-selection-changed',{detail:{dish:currentDish.name,ingredient:name,selected}}));
 }
 // Validation de la fiche plat : ce module est le seul à gérer le bouton « Ajouter ».
 // Les autres modules se branchent sur des événements au lieu d'intercepter le clic :
