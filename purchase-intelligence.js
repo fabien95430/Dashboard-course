@@ -424,16 +424,25 @@ function styles(){
     #dishDialog .dish-ingredient-recent{display:block!important;margin-top:1px!important;color:#8b958f!important;font-size:9.8px!important;line-height:1.05!important;font-weight:720!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}`;
   document.head.appendChild(style);
 }
+// dishes-ui.js reconstruit toutes les lignes à chaque clic : les choix « décoché automatiquement »
+// et « recoché par l'utilisateur » sont gardés ici pour la fiche ouverte, puis recopiés sur les nouvelles lignes.
+const dishRows={autoDeselected:new Set(),overrides:new Set()};
+function resetDishRows(){dishRows.autoDeselected.clear();dishRows.overrides.clear()}
+function restoreRowFlags(row,name){
+  if(dishRows.autoDeselected.has(name))row.dataset.recentPurchaseDefault='1';
+  if(dishRows.overrides.has(name))row.dataset.recentPurchaseOverride='1';
+}
 function clearRecent(row,restoreSelection=false){
   const autoDeselected=row.dataset.recentPurchaseDefault==='1',overridden=row.dataset.recentPurchaseOverride==='1';
   row.classList.remove('is-recent-purchase');delete row.dataset.recentPurchase;row.querySelector('.dish-ingredient-recent')?.remove();
   if(restoreSelection&&autoDeselected&&!overridden&&row.getAttribute('aria-pressed')==='false'&&!row.disabled){
-    delete row.dataset.recentPurchaseDefault;row.click();
+    delete row.dataset.recentPurchaseDefault;dishRows.autoDeselected.delete(String(row.dataset.ingredient||''));row.click();
   }
 }
 function decorateDish(){
   const dialog=document.getElementById('dishDialog');if(!dialog?.open)return;
   const rows=[...dialog.querySelectorAll('.dish-ingredient[data-ingredient]')];
+  rows.forEach(row=>restoreRowFlags(row,String(row.dataset.ingredient||'')));
   if(!isEnabled()){rows.forEach(row=>clearRecent(row,true));return}
   rows.forEach(row=>{
     const name=String(row.dataset.ingredient||'');
@@ -443,7 +452,7 @@ function decorateDish(){
     row.classList.add('is-recent-purchase');row.dataset.recentPurchase='1';
     const label=row.querySelector('.dish-ingredient-name');
     if(label&&!label.querySelector('.dish-ingredient-recent')){const note=document.createElement('small');note.className='dish-ingredient-recent';note.textContent=LABEL;label.appendChild(note)}
-    if(row.getAttribute('aria-pressed')==='true'&&row.dataset.recentPurchaseDefault!=='1'){row.dataset.recentPurchaseDefault='1';row.click()}
+    if(row.getAttribute('aria-pressed')==='true'&&row.dataset.recentPurchaseDefault!=='1'){row.dataset.recentPurchaseDefault='1';dishRows.autoDeselected.add(name);row.click()}
   });
 }
 function scheduleDish(){
@@ -453,10 +462,11 @@ function scheduleDish(){
 function consumeRecentDishClick(event){
   if(!event.isTrusted)return;
   const row=event.target?.closest?.('#dishDialog .dish-ingredient.is-recent-purchase');if(!row)return;
-  setTimeout(()=>{
-    if(row.getAttribute('aria-pressed')!=='true')return;
-    const name=String(row.dataset.ingredient||'');row.dataset.recentPurchaseOverride='1';clearRecent(row);recordFeedback(name);
-  },0);
+  // Écoute en capture : la ligne n'est pas encore cochée ni reconstruite par dishes-ui.js.
+  if(row.disabled||row.getAttribute('aria-pressed')!=='false')return;
+  const name=String(row.dataset.ingredient||'');if(!name)return;
+  dishRows.overrides.add(name);row.dataset.recentPurchaseOverride='1';clearRecent(row);
+  setTimeout(()=>recordFeedback(name),0);
 }
 function bindHistoryEvents(){
   // Demande d'ajout publiée par dishes-ui.js (propriétaire du bouton « Ajouter ») : pas d'interception du clic.
@@ -468,6 +478,7 @@ function bindDishEvents(){
   document.addEventListener('courses:dish-ingredients-rendered',scheduleDish);
   document.addEventListener('courses:dish-quantities-updated',scheduleDish);
   document.addEventListener('courses:dish-availability-updated',scheduleDish);
+  document.addEventListener('courses:dish-sheet-opened',resetDishRows);
   document.addEventListener('courses:dish-sheet-opened',scheduleDish);
   document.addEventListener('courses:quantities-ready',scheduleDish);
   document.addEventListener('click',consumeRecentDishClick,true);

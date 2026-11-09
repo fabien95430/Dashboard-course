@@ -162,3 +162,45 @@ test('la rétention distante ne supprime que les entrées historiques expirées'
   assert.match(source,/SHARED_TYPES\.includes\(payload\.type\)&&META\.has\(payload\.key\)/);
   assert.match(source,/callService\('todo','remove_item'/);
 });
+
+test('un ingrédient acheté récemment recoché reste coché quand dishes-ui reconstruit les lignes',()=>{
+  const start=source.indexOf('const dishRows='),end=source.indexOf('function bindHistoryEvents(){',start);
+  assert.ok(start>0&&end>start,'gestion des lignes de la fiche introuvable');
+  const selected=new Set(['Lait']);
+  let rows=[],ctx;
+  class Row{
+    constructor(name){this.dataset={ingredient:name};this.disabled=false;this.classes=new Set();this.pressed=selected.has(name)?'true':'false';
+      this.classList={add:c=>this.classes.add(c),remove:c=>this.classes.delete(c),contains:c=>this.classes.has(c)};}
+    getAttribute(name){return name==='aria-pressed'?this.pressed:null}
+    hasAttribute(){return false}
+    querySelector(){return null}
+    closest(selector){return selector.includes('is-recent-purchase')&&!this.classes.has('is-recent-purchase')?null:this}
+    // Comme dishes-ui.js : le clic bascule la sélection puis reconstruit toutes les lignes, avant la décoration.
+    click(){if(selected.has(this.dataset.ingredient))selected.delete(this.dataset.ingredient);else selected.add(this.dataset.ingredient);render()}
+  }
+  const render=()=>{rows=['Lait','Beurre'].map(name=>new Row(name));ctx.decorateDish()};
+  const feedback=[];
+  ctx={
+    document:{getElementById:()=>({open:true,querySelectorAll:()=>rows})},
+    isEnabled:()=>true,recent:name=>name==='Beurre'?{}:null,rowRequiredQty:()=>1,LABEL:'Acheté récemment',
+    recordFeedback:name=>feedback.push(name),setTimeout:fn=>fn(),requestAnimationFrame:fn=>fn()
+  };
+  vm.runInNewContext(source.slice(start,end)+';Object.assign(globalThis,{decorateDish,consumeRecentDishClick,resetDishRows});',ctx);
+  selected.add('Beurre');render();
+  const beurre=()=>rows.find(row=>row.dataset.ingredient==='Beurre');
+  assert.equal(beurre().pressed,'false','acheté récemment : décoché à l ouverture');
+  assert.ok(beurre().classes.has('is-recent-purchase'));
+
+  const target=beurre();
+  ctx.consumeRecentDishClick({isTrusted:true,target});
+  target.click();
+  assert.equal(beurre().pressed,'true','le choix de l utilisateur survit à la reconstruction');
+  assert.equal(beurre().classes.has('is-recent-purchase'),false);
+  assert.deepEqual(feedback,['Beurre']);
+
+  rows.find(row=>row.dataset.ingredient==='Lait').click();
+  assert.equal(beurre().pressed,'true','un autre clic ne redécoche pas le produit');
+
+  ctx.resetDishRows();selected.add('Beurre');render();
+  assert.equal(beurre().pressed,'false','une nouvelle ouverture repart de l historique');
+});
