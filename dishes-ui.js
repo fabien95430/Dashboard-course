@@ -90,7 +90,6 @@ const DISHES=Object.freeze([
   {name:'Crème brûlée',photoId:'',tags:['Végé','Dessert'],ingredients:['Crème liquide','Œufs','Sucre','Vanille']},
   {name:'Riz au lait',photoId:'',tags:['Dessert'],ingredients:['Lait entier','Riz long','Sucre','Vanille']},
   {name:'Rougail saucisse',photoId:'',tags:['Viandes'],ingredients:['Saucisses','Tomates pelées','Oignons jaunes','Ail','Piments','Riz long','Gingembre','Curcuma']},
-  {name:'Steak tartare',photoId:'',tags:['Viandes','Rapides'],ingredients:['Bœuf','Cornichon','Échalotes','Moutarde','Œufs','Persil']},
 ]);
 window.COURSES_DISH_NAMES=Object.freeze(DISHES.map(dish=>dish.name));
 
