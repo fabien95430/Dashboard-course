@@ -295,3 +295,67 @@ assert 'www/Items/mayonnaise.webp' not in p('Tomate cerise','Fruits & Légumes',
   const result=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
   assert.equal(result.status,0,result.stderr||result.stdout);
 });
+
+
+test('le modèle Céréales Lion est réellement envoyé à OpenAI avec masque et carton verrouillé',()=>{
+  const script=read('scripts/integrate_product_openai.py');
+  assert.match(script,/v1\/images\/edits/);
+  assert.match(script,/def _compose_locked_reference\(/);
+  assert.match(script,/def _assert_locked_exterior\(/);
+  assert.match(script,/def reference_edit_rule\(/);
+  const program=String.raw`
+import sys,base64,struct,zlib
+from pathlib import Path
+sys.path.insert(0,'scripts')
+import integrate_product_openai as p
+rule=p.reference_edit_rule('Céréales Trésor','Petit-déj & snacks','Petit-déjeuner')
+assert rule and rule['reference']=='www/Items/cereales-lion.webp'
+assert p.reference_edit_rule('Céréales Lion','Petit-déj & snacks','Petit-déjeuner') is None
+assert p.reference_edit_rule('Tomate cerise','Fruits & Légumes','Légumes du quotidien') is None
+payload,reference=p._reference_edit_input(rule,'changer seulement les coussins','gpt-image-2.5-flare')
+assert payload['size']=='816x816'
+assert payload['model']=='gpt-image-2.5-flare'
+assert payload['mask']['image_url'].startswith('data:image/png;base64,')
+assert payload['images'][0]['image_url'].startswith('data:image/png;base64,')
+image=base64.b64decode(payload['images'][0]['image_url'].split(',')[1])
+mask=base64.b64decode(payload['mask']['image_url'].split(',')[1])
+assert image[:8]==mask[:8]==b'\x89PNG\r\n\x1a\n'
+assert struct.unpack('>II',mask[16:24])==(816,816)
+def raw_png(data):
+    i=8
+    packed=b''
+    while i<len(data):
+        length=int.from_bytes(data[i:i+4],'big')
+        kind=data[i+4:i+8]
+        if kind==b'IDAT': packed+=data[i+8:i+8+length]
+        i+=length+12
+    return zlib.decompress(packed)
+pixels=raw_png(mask)
+def alpha(x,y):
+    return pixels[y*(816*4+1)+1+x*4+3]
+assert alpha(0,0)==255
+assert alpha(450,520)==0
+assert alpha(600,300)==255
+w,h,source=p._decode_webp(Path('www/Items/cereales-lion.webp').read_bytes())
+assert w==h==256
+edited=bytearray(source)
+for y in range(h):
+    for x in range(w):
+        if p._inside_reference_region(x,y,w,rule['region']):
+            i=(y*w+x)*4
+            edited[i:i+4]=b'\xcc\xaa\x44\xff'
+merged=p._compose_locked_reference(source,bytes(edited),w,rule['region'])
+assert merged!=source
+for x,y in [(0,0),(100,65),(240,245),(42,155)]:
+    i=(y*w+x)*4
+    assert merged[i:i+4]==source[i:i+4],(x,y)
+try:
+    p._compose_locked_reference(source,source,w,rule['region'])
+except RuntimeError as e:
+    assert 'inchangé' in str(e)
+else:
+    raise AssertionError('Image identique acceptée malgré le masque')
+`;
+  const result=spawnSync('python3',['-c',program],{cwd:rootPath,encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr||result.stdout);
+});

@@ -35,6 +35,29 @@ Le script `scripts/integrate_product_openai.py` sélectionne une règle de navig
 
 **Limite du générateur :** le chemin `www/Items/*.webp` dans un prompt n'envoie pas les pixels de référence à l'API `images/generations`. Une formulation stricte ne garantit pas à elle seule l'identité géométrique. Pour tout emballage standardisé, comparer effectivement le rendu généré au fichier canonique **avant publication** et conserver la demande non traitée si cette conformité visuelle n'est pas démontrée. Les tests automatiques vérifient les règles textuelles mais ne remplacent pas une inspection visuelle. Conserver le contrôle final 15 000 octets et la transparence.
 
+## Référence réelle envoyée au modèle — gabarits verrouillés
+
+Pour les familles activées dans `REFERENCE_EDIT_RULES` du script propriétaire
+`scripts/integrate_product_openai.py`, la vraie image WebP canonique est lue
+depuis `www/Items/`, convertie en PNG RGBA, puis envoyée à l'API
+`/v1/images/edits` avec un masque transparent limitant la région modifiable.
+Le script recompose ensuite le résultat sur les pixels de la référence :
+l'extérieur de la zone reste celui de la référence, même si le modèle
+a tenté de le redessiner. Après compression WebP (maximum 15 000 octets),
+la transparence et l'apparence extérieure sont vérifiées ; en cas d'échec
+la demande reste en attente et rien n'est publié.
+
+**Périmètre activé en premier :** les boîtes de la famille `cereal_boxes`,
+avec `www/Items/cereales-lion.webp` comme image canonique, sauf pour
+le produit Céréales Lion lui-même. Le mécanisme n'ajoute ni ne recrée
+automatiquement un produit supprimé du catalogue.
+
+**Autres conserves, paquets et bouteilles :** ne pas généraliser la même
+fenêtre géométrique à des contenants différents. Leur activation exige
+une vraie référence et une zone modifiable validée pour cette famille.
+Les autres familles conservent provisoirement leur génération actuelle.
+Aucun framework, backend ou paquet Python supplémentaire n'est requis.
+
 ## Règle visuelle
 
 **L'audit porte sur la cohérence complète de l'image, pas seulement sur son contour.** Avant toute retouche, comparer le sujet, la forme de vente, la préparation (cru/cuit/fumé), les proportions, la présentation, les accessoires, les couleurs et l'emballage avec les produits du même sous-groupe. Une image techniquement propre peut rester incohérente et doit alors être remplacée. Ne pas conserver automatiquement la représentation source : conserver l'identité du produit, mais corriger sa présentation si elle détonne. Séparer le résultat « contour corrigé » du résultat « cohérence de famille validée » dans l'audit.

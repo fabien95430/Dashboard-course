@@ -10,7 +10,9 @@ import ctypes
 import ctypes.util
 import math
 import re
+import struct
 import sys
+import zlib
 from urllib.parse import unquote
 
 import integrate_dish as base
@@ -706,23 +708,191 @@ def optimize_product_webp(image: bytes) -> bytes:
     )
 
 
+
+# Familles autorisées à réutiliser leurs vrais pixels canoniques : élargir
+# uniquement après validation de la zone modifiable du modèle correspondant.
+REFERENCE_EDIT_RULES = {
+    "cereal_boxes": {
+        "reference": "www/Items/cereales-lion.webp",
+        "region": (0.355, 0.495, 0.755, 0.755),
+    },
+}
+
+
+def reference_edit_rule(name: str, category: str, subgroup: str) -> dict | None:
+    rule=REFERENCE_EDIT_RULES.get(select_visual_family(name,category,subgroup))
+    if rule is None or base.slugify(name)+".webp"==rule["reference"].rsplit("/",1)[-1]:
+        return None
+    return rule
+
+
+def _decode_webp(image: bytes) -> tuple[int,int,bytes]:
+    lib=_webp_codec()
+    raw=(ctypes.c_uint8*len(image)).from_buffer_copy(image)
+    width=ctypes.c_int()
+    height=ctypes.c_int()
+    decoded=lib.WebPDecodeRGBA(raw,len(image),ctypes.byref(width),ctypes.byref(height))
+    if not decoded or width.value<1 or height.value<1:
+        raise RuntimeError("Image de référence ou édition WebP impossible à décoder")
+    try:
+        return width.value,height.value,ctypes.string_at(decoded,width.value*height.value*4)
+    finally:
+        lib.WebPFree(decoded)
+
+
+def _png_rgba(width: int, height: int, rgba: bytes) -> bytes:
+    """PNG RGBA : libwebp existant et standard Python, sans nouveau paquet."""
+    if len(rgba)!=width*height*4:
+        raise RuntimeError("Pixels de référence invalides")
+    def chunk(name: bytes, data: bytes) -> bytes:
+        return struct.pack(">I",len(data))+name+data+struct.pack(">I",zlib.crc32(name+data)&0xffffffff)
+    rows=b"".join(b"\0"+rgba[y*width*4:(y+1)*width*4] for y in range(height))
+    return (b"\x89PNG\r\n\x1a\n"
+            +chunk(b"IHDR",struct.pack(">IIBBBBB",width,height,8,6,0,0,0))
+            +chunk(b"IDAT",zlib.compress(rows,6))
+            +chunk(b"IEND",b""))
+
+
+def _inside_reference_region(x: int, y: int, side: int, region: tuple) -> bool:
+    left,top,right,bottom=(round(value*side) for value in region)
+    if not (left<=x<right and top<=y<bottom):
+        return False
+    radius=max(2,round(min(right-left,bottom-top)*0.06))
+    cx=min(max(x,left+radius),right-radius-1)
+    cy=min(max(y,top+radius),bottom-radius-1)
+    return (x-cx)**2+(y-cy)**2<=radius**2
+
+
+def _reference_edit_mask(side: int, region: tuple) -> bytes:
+    # Image API : alpha transparent dans la zone éditable, opaque ailleurs.
+    rgba=bytearray(b"\xff\xff\xff\xff"*(side*side))
+    for y in range(side):
+        for x in range(side):
+            if _inside_reference_region(x,y,side,region):
+                rgba[(y*side+x)*4+3]=0
+    return bytes(rgba)
+
+
+def _reference_edit_input(rule: dict, prompt: str, model: str) -> tuple[dict,bytes]:
+    path=ROOT/rule["reference"]
+    if not path.is_file():
+        raise RuntimeError("Référence manquante, publication interdite : "+rule["reference"])
+    width,height,rgba=_decode_webp(path.read_bytes())
+    if width!=height or width<256:
+        raise RuntimeError("Référence non carrée ou trop petite, publication interdite")
+    side=int(PRODUCT_IMAGE_SIZE.split("x")[0])
+    source=_resample_rgba(rgba,width,height,side)
+    image=_png_rgba(side,side,source)
+    mask=_png_rgba(side,side,_reference_edit_mask(side,rule["region"]))
+    data_url=lambda data:"data:image/png;base64,"+base64.b64encode(data).decode("ascii")
+    return {
+        "model":model,"images":[{"image_url":data_url(image)}],
+        "mask":{"image_url":data_url(mask)},
+        "prompt":(
+            "L'image fournie EST le GABARIT CANONIQUE. Ne recrée pas le carton. "
+            "Ne modifie ni la boîte, ni les bandeaux, ni le grand épi, "
+            "ni la perspective, ni les marges. Seules les céréales dans "
+            "la fenêtre transparente du masque doivent changer. "+prompt
+        ),
+        "size":PRODUCT_IMAGE_SIZE,"quality":"high","output_format":"webp",
+        "output_compression":PRODUCT_IMAGE_COMPRESSION,
+        "background":"transparent","n":1,
+    },source
+
+
+def _compose_locked_reference(source: bytes, edited: bytes, side: int, region: tuple) -> bytes:
+    """Le carton hors fenêtre reste celui de la référence, même si l'IA dérive."""
+    if len(source)!=side*side*4 or len(edited)!=len(source):
+        raise RuntimeError("Édition incompatible avec les dimensions du gabarit")
+    output=bytearray(source)
+    changed=0
+    visible=0
+    for y in range(side):
+        for x in range(side):
+            if not _inside_reference_region(x,y,side,region):
+                continue
+            i=(y*side+x)*4
+            if source[i+3]<200:
+                continue
+            visible+=1
+            if edited[i+3]<128:
+                raise RuntimeError("Édition transparente à l'intérieur de la fenêtre")
+            for channel in range(3):
+                output[i+channel]=edited[i+channel]
+            if max(abs(edited[i+channel]-source[i+channel]) for channel in range(3))>22:
+                changed+=1
+    if visible==0 or changed<visible*0.02:
+        raise RuntimeError("Contenu de la fenêtre inchangé ou non identifiable")
+    return bytes(output)
+
+
+def _encode_locked_webp(rgba: bytes, side: int) -> bytes:
+    lib=_webp_codec()
+    pixels=(ctypes.c_uint8*len(rgba)).from_buffer_copy(rgba)
+    pointer=ctypes.POINTER(ctypes.c_uint8)
+    output=pointer()
+    size=lib.WebPEncodeRGBA(pixels,side,side,side*4,80.0,ctypes.byref(output))
+    if not size or not output:
+        raise RuntimeError("Encodage du gabarit verrouillé impossible")
+    try:
+        return ctypes.string_at(output,size)
+    finally:
+        lib.WebPFree(output)
+
+
+def _assert_locked_exterior(image: bytes, source: bytes, region: tuple) -> None:
+    """Refuse les dérives importantes du gabarit après compression à 15 Ko."""
+    width,height,out=_decode_webp(image)
+    side=round(math.sqrt(len(source)//4))
+    if width!=height or width<256 or side*side*4!=len(source):
+        raise RuntimeError("Dimensions finales incompatibles avec la référence")
+    comparison=_resample_rgba(out,width,height,side)
+    rgb_error=0.0
+    examined=0
+    alpha_error=0
+    sampled=0
+    for y in range(0,side,3):
+        for x in range(0,side,3):
+            if _inside_reference_region(x,y,side,region):
+                continue
+            sampled+=1
+            i=(y*side+x)*4
+            if abs(comparison[i+3]-source[i+3])>45:
+                alpha_error+=1
+            if source[i+3]>210:
+                examined+=1
+                rgb_error+=sum(abs(comparison[i+channel]-source[i+channel]) for channel in range(3))/3
+    if (sampled and alpha_error/sampled>0.015) or (examined and rgb_error/examined>26):
+        raise RuntimeError("Gabarit modifié après compression, intégration bloquée")
+
+
 def generate_image(name: str, category: str, subgroup: str, image_hint: str, api_key: str) -> bytes:
     model=os.getenv("COURSES_IMAGE_MODEL","gpt-image-2.5-flare")
-    payload=base.api_json(
-        "https://api.openai.com/v1/images/generations",
-        {
-            "model":model,
-            "prompt":image_prompt(name,category,subgroup,image_hint),
-            "size":PRODUCT_IMAGE_SIZE,
-            "quality":"high",
-            "output_format":"webp",
-            "output_compression":PRODUCT_IMAGE_COMPRESSION,
-            "background":"transparent",
-            "n":1,
-        },
-        api_key,
-        timeout=300,
-    )
+    rule=reference_edit_rule(name,category,subgroup)
+    reference_rgba=None
+    if rule:
+        request,reference_rgba=_reference_edit_input(
+            rule,image_prompt(name,category,subgroup,image_hint),model
+        )
+        payload=base.api_json(
+            "https://api.openai.com/v1/images/edits",request,api_key,timeout=300
+        )
+    else:
+        payload=base.api_json(
+            "https://api.openai.com/v1/images/generations",
+            {
+                "model":model,
+                "prompt":image_prompt(name,category,subgroup,image_hint),
+                "size":PRODUCT_IMAGE_SIZE,
+                "quality":"high",
+                "output_format":"webp",
+                "output_compression":PRODUCT_IMAGE_COMPRESSION,
+                "background":"transparent",
+                "n":1,
+            },
+            api_key,
+            timeout=300,
+        )
     encoded=((payload.get("data") or [{}])[0] or {}).get("b64_json")
     if not encoded:
         raise RuntimeError("L'API image n'a retourné aucune image")
@@ -732,6 +902,16 @@ def generate_image(name: str, category: str, subgroup: str, image_hint: str, api
         raise RuntimeError("Image OpenAI invalide") from error
     if len(image)<12 or image[:4]!=b"RIFF" or image[8:12]!=b"WEBP":
         raise RuntimeError("Le visuel produit généré n'est pas un WebP valide")
+    if rule:
+        side=int(PRODUCT_IMAGE_SIZE.split("x")[0])
+        width,height,edited=_decode_webp(image)
+        if (width,height)!=(side,side):
+            raise RuntimeError("L'édition n'a pas la résolution demandée")
+        merged=_compose_locked_reference(reference_rgba,edited,side,rule["region"])
+        image=_encode_locked_webp(merged,side)
+        final=optimize_product_webp(image)
+        _assert_locked_exterior(final,reference_rgba,rule["region"])
+        return final
     return optimize_product_webp(image)
 
 
