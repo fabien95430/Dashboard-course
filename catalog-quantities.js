@@ -346,6 +346,7 @@ const RECIPE_UNITS=Object.freeze({
 });
 
 const DISH_NEEDS_FOR_TWO=Object.freeze({
+  'Steak tartare':{'Bœuf':300,'Cornichon':40,'Échalotes':50,'Moutarde':15,'Œufs':2,'Persil':8},
   'Spaghetti carbonara':{'Spaghetti':200,'Lardons':100,'Œufs':2,'Parmesan':80},
   'Spaghetti bolognaise':{'Spaghetti':200,'Viande hachée':200,'Sauce tomate':200,'Oignons jaunes':100,'Carottes':100,'Ail':1},
   'Penne poulet crème':{'Penne':200,'Poulet':250,'Crème fraîche':100,'Champignons':200,'Parmesan':40},

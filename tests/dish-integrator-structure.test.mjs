@@ -46,3 +46,15 @@ test('la structure DISHES est vérifiée avant les appels OpenAI payants',()=>{
   assert.ok(guard>=0&&guard<metadata&&guard<image);
   assert.equal(script.includes('const FILTERS="'),false);
 });
+
+test('les nouvelles recettes ont une quantité par ingrédient et le fichier est versionné dans le workflow',()=>{
+  const integrator=read('scripts/integrate_dish.py');
+  const workflow=read('.github/workflows/integrate-dish-openai.yml');
+  const quantities=read('catalog-quantities.js');
+  assert.match(integrator,/def insert_dish_needs\(/);
+  assert.match(integrator,/quantities_text = insert_dish_needs\(quantities_text, name, metadata\["needs"\]\)/);
+  assert.ok(integrator.includes('f"./catalog-quantities.js?v={new_version}"'));
+  assert.match(workflow,/git add catalog\.js catalog-quantities\.js index\.html dishes-ui\.js/);
+  assert.match(quantities,/'Steak tartare':\{'Bœuf':300,'Cornichon':40,'Échalotes':50,'Moutarde':15,'Œufs':2,'Persil':8\}/);
+  assert.match(read('catalog.js'),/catalog-quantities\.js\?v=822/);
+});

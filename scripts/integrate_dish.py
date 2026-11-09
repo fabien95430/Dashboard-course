@@ -170,6 +170,7 @@ Réponds UNIQUEMENT par un objet JSON avec exactement ces clés:
 - "tags": tableau de 1 à 3 valeurs parmi {json.dumps(ALLOWED_TAGS, ensure_ascii=False)}
 - "ingredients": tableau de 2 à 8 noms EXACTEMENT copiés depuis la liste de produits autorisés ci-dessous
 - "description": une phrase courte décrivant visuellement le plat et ses ingrédients pour guider une photo culinaire réaliste
+- "needs": objet JSON associant CHAQUE ingrédient à sa quantité numérique pour 2 personnes (g pour les produits au poids, ml pour les liquides, nombre pour les pièces ; exemples "Bœuf": 300 et "Œufs": 2)
 
 N'invente jamais un ingrédient absent de la liste. Choisis une recette simple et cohérente avec le nom du plat.
 Produits autorisés:
@@ -203,7 +204,16 @@ Produits autorisés:
         raise RuntimeError("Ingrédients hors catalog.js: " + ", ".join(invalid))
     if not description:
         description = f"{name} préparé avec " + ", ".join(ingredients)
-    return {"tags": tags, "ingredients": ingredients, "description": description[:500]}
+    raw_needs = metadata.get("needs")
+    if not isinstance(raw_needs, dict) or set(raw_needs) != set(ingredients):
+        raise RuntimeError("Quantités de recette générées invalides ou incomplètes")
+    needs = {}
+    for item in ingredients:
+        value = raw_needs[item]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not (0 < value <= 5000):
+            raise RuntimeError("Quantité de recette invalide pour " + item)
+        needs[item] = round(float(value), 2)
+    return {"tags": tags, "ingredients": ingredients, "description": description[:500], "needs": needs}
 
 
 def image_prompt(name: str, metadata: dict, child: bool) -> str:
@@ -284,13 +294,27 @@ def find_dishes_insert_position(text: str) -> int:
         fail("Fin de DISHES introuvable dans dishes-ui.js")
     return start.end() + end.start()
 
+
+def insert_dish_needs(text: str, name: str, needs: dict[str, float]) -> str:
+    """Add one complete two-person recipe without modifying existing amounts."""
+    start = re.search(r"(?m)^const DISH_NEEDS_FOR_TWO=Object\.freeze\(\{[ \t]*\r?\n", text)
+    if not start or not re.search(r"(?m)^\}\);[ \t]*\r?$", text[start.end():]):
+        fail("DISH_NEEDS_FOR_TWO introuvable dans catalog-quantities.js")
+    entry = "  " + js_quote(name) + ":{" + ",".join(
+        js_quote(item) + ":" + format(amount, "g") for item, amount in needs.items()
+    ) + "},\n"
+    return text[:start.end()] + entry + text[start.end()]
+
+
 def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tuple[int, str]:
     catalog_path = ROOT / "catalog.js"
+    quantities_path = ROOT / "catalog-quantities.js"
     dishes_path = ROOT / "dishes-ui.js"
     local_images_path = ROOT / "dish-local-images.js"
     sw_path = ROOT / "sw.js"
     index_path = ROOT / "index.html"
     catalog_text = catalog_path.read_text(encoding="utf-8")
+    quantities_text = quantities_path.read_text(encoding="utf-8")
     dishes_text = dishes_path.read_text(encoding="utf-8")
     local_text = local_images_path.read_text(encoding="utf-8")
     sw_text = sw_path.read_text(encoding="utf-8")
@@ -304,11 +328,15 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
     entry = "  {name:" + js_quote(name) + ",photoId:'',tags:[" + ",".join(js_quote(tag) for tag in metadata["tags"]) + "],ingredients:[" + ",".join(js_quote(item) for item in metadata["ingredients"]) + "]},"
     position = find_dishes_insert_position(dishes_text)
     dishes_text = dishes_text[:position] + entry + "\n" + dishes_text[position:]
+    quantities_text = insert_dish_needs(quantities_text, name, metadata["needs"])
     if child:
         dishes_text = append_child_set(dishes_text, name)
         local_text = append_child_set(local_text, name)
 
     catalog_text = re.sub(r"(dishes-ui\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
+    catalog_text, quantities_count = re.subn(r"(catalog-quantities\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
+    if quantities_count != 1:
+        fail("Version de catalog-quantities.js introuvable dans catalog.js")
     catalog_text = re.sub(r"(dish-local-images\.js\?v=)\d+", rf"\g<1>{new_version}", catalog_text, count=1)
     local_text = re.sub(r"const APP_VERSION='v\d+'", f"const APP_VERSION='v{new_version}'", local_text, count=1)
     sw_text, count = re.subn(r"const CACHE='courses-app-v\d+-r\d+'", f"const CACHE='courses-app-v{new_version}-r1'", sw_text, count=1)
@@ -316,6 +344,7 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
         fail("Version de cache introuvable dans sw.js")
     sw_text = ensure_shell_assets(sw_text, [
         f"./catalog.js?v={new_version}",
+        f"./catalog-quantities.js?v={new_version}",
         f"./dishes-ui.js?v={new_version}",
         f"./dish-local-images.js?v={new_version}",
     ])
@@ -335,6 +364,7 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
     image_path.parent.mkdir(parents=True, exist_ok=True)
     image_path.write_bytes(image)
     catalog_path.write_text(catalog_text, encoding="utf-8")
+    quantities_path.write_text(quantities_text, encoding="utf-8")
     dishes_path.write_text(dishes_text, encoding="utf-8")
     local_images_path.write_text(local_text, encoding="utf-8")
     sw_path.write_text(sw_text, encoding="utf-8")
@@ -369,6 +399,9 @@ def main() -> None:
 
     # Vérifier la structure avant tout appel OpenAI payant.
     find_dishes_insert_position(dishes_text)
+    quantities_text = (ROOT / "catalog-quantities.js").read_text(encoding="utf-8")
+    if not re.search(r"(?m)^const DISH_NEEDS_FOR_TWO=Object\.freeze\(\{[ \t]*\r?\n", quantities_text):
+        fail("DISH_NEEDS_FOR_TWO introuvable dans catalog-quantities.js")
     if not api_key:
         fail("Secret GitHub OPENAI_API_KEY manquant")
     catalog_names = load_catalog_names()
