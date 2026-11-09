@@ -3127,18 +3127,18 @@ body{
 .catalog-view .page-search input{background:transparent!important}
 .catalog-view #productCount,.catalog-view #dishCount{color:#073e2c!important;opacity:.55;font-size:9.5px!important;font-weight:650!important;letter-spacing:1.4px!important;text-transform:uppercase!important}
 
-/* v791 — rameau prolongé à gauche, extrémité naturelle sans masque sur les feuilles. */
+/* v791 — rameau prolongé à gauche, extrémité naturelle sans masque sur les feuilles. v815 : plus transparent et remonté de 10 px. */
 @media(max-width:520px){
   .app:has(>.list-view.is-active)::before{
     content:"";
     position:fixed;
-    inset:calc(env(safe-area-inset-top) + 6px) 18px auto auto;
+    inset:calc(env(safe-area-inset-top) - 4px) 18px auto auto;
     width:min(94vw,380px);
     height:154px;
     pointer-events:none;
     z-index:0;
     background:url("./www/list-header-pomme-poire-v791.webp") right calc(-1 * min(9vw,36px)) / 100% auto no-repeat;
-    opacity:.88;
+    opacity:.7;
   }
   .app>.list-view.is-active{position:relative;z-index:1}
   .list-view>.list-progress{display:none!important}
