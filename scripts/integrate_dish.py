@@ -272,6 +272,18 @@ def append_child_set(text: str, name: str) -> str:
     return text[: match.start(2)] + updated + text[match.end(2) :]
 
 
+
+
+def find_dishes_insert_position(text: str) -> int:
+    """Find the end of DISHES independently of declarations placed after it."""
+    start = re.search(r"(?m)^const DISHES=Object\.freeze\(\[[ \t]*\r?$", text)
+    if not start:
+        fail("Début de DISHES introuvable dans dishes-ui.js")
+    end = re.search(r"(?m)^\]\);[ \t]*\r?$", text[start.end():])
+    if not end:
+        fail("Fin de DISHES introuvable dans dishes-ui.js")
+    return start.end() + end.start()
+
 def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tuple[int, str]:
     catalog_path = ROOT / "catalog.js"
     dishes_path = ROOT / "dishes-ui.js"
@@ -290,11 +302,8 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
     new_version = int(version_match.group(1)) + 1
 
     entry = "  {name:" + js_quote(name) + ",photoId:'',tags:[" + ",".join(js_quote(tag) for tag in metadata["tags"]) + "],ingredients:[" + ",".join(js_quote(item) for item in metadata["ingredients"]) + "]},"
-    marker = "\n]);\n\nconst FILTERS="
-    position = dishes_text.find(marker)
-    if position < 0:
-        fail("Fin de DISHES introuvable dans dishes-ui.js")
-    dishes_text = dishes_text[:position] + "\n" + entry + dishes_text[position:]
+    position = find_dishes_insert_position(dishes_text)
+    dishes_text = dishes_text[:position] + entry + "\n" + dishes_text[position:]
     if child:
         dishes_text = append_child_set(dishes_text, name)
         local_text = append_child_set(local_text, name)
@@ -358,6 +367,8 @@ def main() -> None:
             }, ensure_ascii=False, indent=2), encoding="utf-8")
             return
 
+    # Vérifier la structure avant tout appel OpenAI payant.
+    find_dishes_insert_position(dishes_text)
     if not api_key:
         fail("Secret GitHub OPENAI_API_KEY manquant")
     catalog_names = load_catalog_names()
