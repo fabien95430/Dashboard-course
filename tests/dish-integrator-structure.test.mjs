@@ -58,3 +58,34 @@ test('les nouvelles recettes ont une quantité par ingrédient et le fichier est
   assert.match(quantities,/'Steak tartare':\{'Bœuf':300,'Cornichon':40,'Échalotes':50,'Moutarde':15,'Œufs':2,'Persil':8\}/);
   assert.match(read('catalog.js'),/catalog-quantities\.js\?v=822/);
 });
+
+test('les générations de plats reçoivent une vraie image de référence et un cadrage adapté aux cartes',()=>{
+  const python=String.raw`
+import sys,base64
+from pathlib import Path
+sys.path.insert(0, str(Path.cwd() / 'scripts'))
+import integrate_dish as dish
+calls=[]
+def stub(url,payload,key,timeout=180):
+    assert url.endswith('/images/edits')
+    assert payload['size']=='1536x1024'
+    assert payload['images'][0]['image_url'].startswith('data:image/png;base64,')
+    assert '80 % centraux' in payload['prompt']
+    assert 'object-fit: cover' in payload['prompt']
+    calls.append(payload)
+    return {'data':[{'b64_json':base64.b64encode(b'generated').decode()}]}
+dish.api_json=stub
+metadata={'tags':['Viandes'],'ingredients':['Bœuf','Œufs'],'description':'Steak tartare'}
+for tags,child,filename in [
+    (['Viandes'],False,'salade-cesar-saumon.png'),
+    (['Enfants'],True,'enfant-pates-jambon.png'),
+    (['Dessert'],False,'enfant-creme-brulee.png'),
+]:
+    metadata['tags']=tags
+    assert dish.generate_image('Nouveau plat',metadata,child,'key')==b'generated'
+    encoded=calls[-1]['images'][0]['image_url'].split(',',1)[1]
+    assert base64.b64decode(encoded)==Path('www/Plats',filename).read_bytes()
+`;
+  const result=spawnSync('python3',['-c',python],{cwd:new URL('../',import.meta.url),encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr||result.stdout);
+});

@@ -10,6 +10,20 @@ Cette note est la source de référence pour recréer de nouvelles images de pla
 - Les lots servent uniquement à organiser le travail ou les commits, jamais à réunir plusieurs plats dans une même image.
 - Ne jamais conserver une génération qui dérive vers un autre plat, duplique des éléments ou mélange plusieurs recettes.
 
+## Références photographiques envoyées au générateur
+
+Le générateur utilise de vraies images locales comme références de style, et non une simple mention textuelle :
+
+- Adultes : www/Plats/salade-cesar-saumon.png.
+- Enfants : www/Plats/enfant-pates-jambon.png.
+- Desserts : www/Plats/enfant-creme-brulee.png.
+
+La référence guide la vaisselle, la lumière, la perspective trois-quarts et le fond ; elle ne doit JAMAIS contaminer les aliments de la nouvelle recette.
+En cas de fichier de référence manquant, l'intégration doit échouer plutôt que produire une image de style inconnu.
+
+L'image source mesure 1536 × 1024, tandis que la carte iPhone la recadre avec object-fit: cover dans un cadre proche de 4:3.
+Garder le plat et l'assiette dans la zone centrale de 80 % de la largeur, avec un bord d'assiette visible et une marge naturelle sur les côtés.
+Examiner le recadrage réel en carte ET en fiche avant publication. Le simple contrôle des dimensions du PNG ne constitue pas une validation visuelle.
 ## Format et cadrage communs
 
 - Photo culinaire réaliste, haute qualité, format horizontal proche de **4:3**.

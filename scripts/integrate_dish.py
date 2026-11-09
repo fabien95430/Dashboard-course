@@ -242,11 +242,33 @@ def image_prompt(name: str, metadata: dict, child: bool) -> str:
 
 def generate_image(name: str, metadata: dict, child: bool, api_key: str) -> bytes:
     model = os.getenv("COURSES_IMAGE_MODEL", "gpt-image-2")
+    # Référence photographique réelle ; un nom de fichier dans le prompt ne suffit pas.
+    if "Dessert" in metadata.get("tags", []):
+        reference_file = "enfant-creme-brulee.png"
+    elif child:
+        reference_file = "enfant-pates-jambon.png"
+    else:
+        reference_file = "salade-cesar-saumon.png"
+    reference_path = ROOT / "www" / "Plats" / reference_file
+    if not reference_path.is_file():
+        fail("Image de référence du thème introuvable: " + reference_file)
+    reference_image = "data:image/png;base64," + base64.b64encode(reference_path.read_bytes()).decode("ascii")
+    framing = (
+        "L'image jointe est une RÉFÉRENCE DE STYLE UNIQUEMENT : retrouve son angle trois-quarts, sa perspective "
+        "légèrement plongeante, sa lumière chaude naturelle, son assiette et son fond de table en bois. "
+        "Ne copie jamais ses ingrédients : la nourriture doit être uniquement celle du plat demandé. "
+        "CADRAGE OBLIGATOIRE POUR LA CARTE IPHONE : fichier source 1536x1024 recadré avec object-fit: cover "
+        "dans un cadre proche de 4:3. Toute l'assiette et le plat doivent tenir dans les 80 % centraux de la largeur. "
+        "L'assiette est centrée, entière ou quasi entière, avec une marge naturelle visible de table sur les côtés. "
+        "Ne prends pas une vue strictement zénithale ; le bord de l'assiette et le volume du plat restent visibles. "
+        "Aucun texte, main, watermark, collage, second plat, bord coupé ou angle différent de la référence."
+    )
     payload = api_json(
-        "https://api.openai.com/v1/images/generations",
+        "https://api.openai.com/v1/images/edits",
         {
             "model": model,
-            "prompt": image_prompt(name, metadata, child),
+            "images": [{"image_url": reference_image}],
+            "prompt": image_prompt(name, metadata, child) + "\n\n" + framing,
             "size": "1536x1024",
             "quality": "high",
             "output_format": "png",
