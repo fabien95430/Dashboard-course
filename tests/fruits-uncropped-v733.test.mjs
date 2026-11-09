@@ -4,6 +4,7 @@ import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import test from 'node:test';
 import vm from 'node:vm';
+import {COURSES_TEXT} from './courses-text.mjs';
 const root=join(dirname(fileURLToPath(import.meta.url)),'..');
 const slugs=['butternut','courge','navets','echalotes','noisettes','ail','oignons-jaunes'];
 const src=s=>'./www/Items/'+s+'.webp';
@@ -20,7 +21,7 @@ test('sept WebP entiers, 256 px, canal alpha et sous 15 Ko',()=>{
   }
 });
 test('v733 invalide seulement les sept cadrages conservés en localStorage',()=>{
- const window={COURSES_CATALOG:{groups:{}},COURSES_APP_VERSION:'v733'};
+ const window={COURSES_TEXT,COURSES_CATALOG:{groups:{}},COURSES_APP_VERSION:'v733'};
  const document={readyState:'loading',addEventListener(){}};
  const items=Object.fromEntries([...slugs,'mozzarella'].map(s=>[src(s),[1.45,18,-18]]));
  const localStorage={getItem(k){return k==='courses-product-visual-scale-v1'?JSON.stringify({version:'v732',items}):null}};

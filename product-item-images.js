@@ -391,13 +391,7 @@ function visualScaleForView(source,metrics,compact=false){
 }
 let visualScaleSaveTimer=0;
 
-const slugify=value=>String(value||'')
-  .toLowerCase()
-  .replace(/œ/g,'oe')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'')
-  .replace(/[^a-z0-9]+/g,'-')
-  .replace(/^-+|-+$/g,'');
+const slugify=window.COURSES_TEXT.slug;
 
 function imageSource(name){
   return './www/Items/'+slugify(name)+'.webp';

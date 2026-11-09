@@ -4,6 +4,7 @@ import {resolve} from 'node:path';
 import test from 'node:test';
 import vm from 'node:vm';
 import {fileURLToPath} from 'node:url';
+import {COURSES_TEXT} from './courses-text.mjs';
 
 const root=resolve(fileURLToPath(new URL('..',import.meta.url)));
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -17,7 +18,7 @@ function loadStore(initial={}){
   const crypto={getRandomValues:array=>{for(let i=0;i<array.length;i++)array[i]=(byte++%255)+1;return array}};
   class CustomEvent{constructor(type,options={}){this.type=type;this.detail=options.detail}}
   const catalog=JSON.parse(read('catalog.js').match(/groups:\s*(\{.*?\}),\s*favorites:/s)[1]);
-  const window={COURSES_CATALOG:{groups:catalog},dispatchEvent:event=>{events.push(event);return true}};
+  const window={COURSES_TEXT,COURSES_CATALOG:{groups:catalog},dispatchEvent:event=>{events.push(event);return true}};
   const context={window,localStorage,crypto,CustomEvent,Uint8Array,globalThis:null,Date,Math};
   context.globalThis=context;
   vm.runInNewContext(source,context,{filename:'missing-requests-store.js'});

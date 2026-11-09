@@ -17,13 +17,7 @@ let refreshFrame=0;
 let booted=false;
 
 const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const slugify=value=>String(value||'')
-  .toLowerCase()
-  .replace(/œ/g,'oe')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'')
-  .replace(/[^a-z0-9]+/g,'-')
-  .replace(/^-+|-+$/g,'');
+const slugify=window.COURSES_TEXT.slug;
 
 function intelligence(){return window.COURSES_PURCHASE_INTELLIGENCE||null}
 function listService(){return window.COURSES_LIST||null}

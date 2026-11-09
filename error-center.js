@@ -20,6 +20,7 @@ function scrub(value,max=900){
     .trim()
     .slice(0,max);
 }
+// Copie volontaire de COURSES_TEXT.key (catalog.js) : le centre d'erreurs doit fonctionner même si catalog.js échoue.
 function normalize(value){
   return String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 }

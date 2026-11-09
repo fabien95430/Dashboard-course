@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
+import {COURSES_TEXT} from './courses-text.mjs';
 
 const src=fs.readFileSync(new URL('../missing-requests-store.js',import.meta.url),'utf8');
 const remote=[];let nextId=1;
@@ -37,7 +38,7 @@ function phone(initial={}){
     }
   };
   const listeners=new Map(),events=[];
-  const window={COURSES_HA_CLIENT:client,
+  const window={COURSES_TEXT,COURSES_HA_CLIENT:client,
     addEventListener(type,fn){(listeners.get(type)||listeners.set(type,[]).get(type)).push(fn)},
     dispatchEvent(event){events.push(event);for(const fn of listeners.get(event.type)||[])fn(event)}
   };

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import vm from 'node:vm';
+import {COURSES_TEXT} from './courses-text.mjs';
 
 const root = new URL('../', import.meta.url);
 const read = name => readFileSync(new URL(name, root), 'utf8');
@@ -45,7 +46,7 @@ test('les cadrages antérieurs sont recalculés seulement pour les visuels renou
   const currentVersion = read('dish-local-images.js').match(/const APP_VERSION='(v\d+)'/)[1];
   for (const version of ['v740',currentVersion]) {
     const items = Object.fromEntries([...slugs,'lait','riz-blanc'].map(slug => [asset(slug),[1.2,2,-3]]));
-    const window = {COURSES_CATALOG:{groups:{}},COURSES_APP_VERSION:currentVersion};
+    const window = {COURSES_TEXT,COURSES_CATALOG:{groups:{}},COURSES_APP_VERSION:currentVersion};
     vm.runInNewContext(source, {
       window,
       document:{readyState:'loading',addEventListener(){}},

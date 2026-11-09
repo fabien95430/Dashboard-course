@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
+import {COURSES_TEXT} from './courses-text.mjs';
 
 const source=readFileSync(new URL('../product-item-images.js',import.meta.url),'utf8');
 const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
@@ -11,7 +12,7 @@ const slugify=name=>name.toLowerCase().replace(/œ/g,'oe').normalize('NFD').repl
 const profiles=source.slice(source.indexOf('const PRODUCT_VISUAL_FACTORS='),source.indexOf('let visualScaleSaveTimer='));
 const adjusted=new Function(profiles+';return {factors:PRODUCT_VISUAL_FACTORS,adjust:visualScaleForView};')();
 function model(items={},storedVersion='v786'){
-  const window={COURSES_CATALOG:{groups:{}},COURSES_APP_VERSION:'v786'};
+  const window={COURSES_TEXT,COURSES_CATALOG:{groups:{}},COURSES_APP_VERSION:'v786'};
   vm.runInNewContext(source,{
     window,document:{readyState:'loading',addEventListener(){}},
     localStorage:{getItem:key=>key==='courses-product-visual-scale-v1'?JSON.stringify({version:storedVersion,items}):null}

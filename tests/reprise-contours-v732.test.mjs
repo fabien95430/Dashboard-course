@@ -4,6 +4,7 @@ import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import test from 'node:test';
 import vm from 'node:vm';
+import {COURSES_TEXT} from './courses-text.mjs';
 const root=join(dirname(fileURLToPath(import.meta.url)),'..');
 const changed=["glace-vanille","lait-infantile","yaourt-a-boire","ricotta","gouda","gnocchis","feta","burrata","savon-mains"];
 const asset=slug=>'./www/Items/'+slug+'.webp';
@@ -20,7 +21,7 @@ test('WebP transparents 384x384 et sous 150 Kio pour les neuf corrections v732',
   }
 });
 function scaleAt(version,stored){
- const window={COURSES_CATALOG:{groups:{Frais:{Divers:['Glace vanille','Mozzarella']}}},COURSES_APP_VERSION:version};
+ const window={COURSES_TEXT,COURSES_CATALOG:{groups:{Frais:{Divers:['Glace vanille','Mozzarella']}}},COURSES_APP_VERSION:version};
  const document={readyState:'loading',addEventListener(){}};
  const localStorage={getItem(k){return k==='courses-product-visual-scale-v1'?JSON.stringify(stored):null}};
  vm.runInNewContext(readFileSync(join(root,'product-item-images.js'),'utf8'),{window,document,localStorage});

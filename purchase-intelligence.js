@@ -91,7 +91,7 @@ const PRODUCT=Object.freeze({
   'Croquettes chat':{days:21},'Croquettes chien':{days:21},'Litière chat':{days:21}
 });
 
-const norm=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const norm=window.COURSES_TEXT.key;
 const META=new Map();
 Object.entries(CATALOG.groups).forEach(([category,subs])=>Object.entries(subs||{}).forEach(([sub,names])=>{
   (Array.isArray(names)?names:[]).forEach(name=>META.set(norm(name),{name,category,sub}));

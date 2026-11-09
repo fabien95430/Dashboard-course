@@ -249,17 +249,11 @@ const UI = Object.freeze({
   refreshBtn: document.getElementById('refreshBtn')
 });
 const norm = value => {
-  const key=String(value || '').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+  const key=window.COURSES_TEXT.key(value);
   // Anciens noms toujours présents dans certaines listes Home Assistant : ne pas les renommer à distance.
   return key==='speculos'?'speculoos':key==='sirot d erable'?'sirop d erable':key;
 };
-const productSlug=value=>String(value||'')
-  .toLowerCase()
-  .replace(/œ/g,'oe')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'')
-  .replace(/[^a-z0-9]+/g,'-')
-  .replace(/^-+|-+$/g,'');
+const productSlug=window.COURSES_TEXT.slug;
 const productImageSource=name=>'./www/Items/'+productSlug(name)+'.webp';
 const esc = value => String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 

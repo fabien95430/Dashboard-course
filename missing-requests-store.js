@@ -28,7 +28,7 @@ function setSharedStatus(state,message){
 }
 const getSharedStatus=()=>({...sharedStatus});
 let sharedEnabled=false,sharedSyncing=null,sharedDirty=false,applyingShared=false;
-const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const normalize=window.COURSES_TEXT.key;
 const cleanText=(value,max=80)=>String(value||'').trim().replace(/\s+/g,' ').slice(0,max);
 const createId=()=>{
   if(globalThis.crypto?.getRandomValues){

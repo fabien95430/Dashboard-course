@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
+import {COURSES_TEXT} from './courses-text.mjs';
 
 const root=new URL('../',import.meta.url);
 const read=path=>readFileSync(new URL(path,root),'utf8');
@@ -39,7 +40,7 @@ test('orthographes corrigées et noms historiques HA compatibles',()=>{
   const app=read('app.js');
   const declaration=app.match(/const norm = value => \{[\s\S]*?\n\};/);
   assert.ok(declaration,'normalisation des noms absente');
-  const context=vm.createContext({});
+  const context=vm.createContext({window:{COURSES_TEXT}});
   vm.runInContext(declaration[0]+';globalThis.normalize=norm;',context);
   assert.equal(context.normalize('Speculos'),context.normalize('Spéculoos'));
   assert.equal(context.normalize('Sirot d’érable'),context.normalize('Sirop d’érable'));

@@ -97,7 +97,7 @@ const FILTERS=['Tous','Favoris','Dessert','Enfants','Pâtes','Poissons','Poulet'
 const STORAGE_FAVORITES='courses-dish-favorites-v1';
 const STORAGE_CUSTOMIZATIONS='courses-dish-customizations-v1';
 const RECIPE_CUSTOMIZATION_SERVINGS=2;
-const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const normalize=window.COURSES_TEXT.key;
 const escapeHtml=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const DISH_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#eef1eb"/><ellipse cx="450" cy="330" rx="250" ry="170" fill="#f8f7f2" stroke="#cbd2c8" stroke-width="12"/><text x="450" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="30" font-weight="700" fill="#708076">Photo indisponible</text></svg>');
 const DISH_SPECIAL_SLUGS=Object.freeze({
@@ -106,7 +106,7 @@ const DISH_SPECIAL_SLUGS=Object.freeze({
   'Poulet pommes de terre au four':'poulet-pommes-de-terre-four'
 });
 const CHILD_DISHES=new Set(['Boulettes riz','Coquillettes jambon','Couscous poulet légumes','Gratin pommes de terre','Pâtes jambon','Purée carotte poulet','Risotto poulet','Saumon brocoli','Steak frites','Velouté carottes','Crème brûlée','Riz au lait']);
-const dishSlug=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const dishSlug=window.COURSES_TEXT.slug;
 const ingredientImageSource=name=>'./www/Items/'+dishSlug(name)+'.webp';
 const dishFileName=name=>(CHILD_DISHES.has(name)?'enfant-':'')+(DISH_SPECIAL_SLUGS[name]||dishSlug(name));
 // Photo d'origine (PNG lourd) : seulement en secours si la copie WebP de la fiche manque.

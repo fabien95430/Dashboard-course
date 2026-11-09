@@ -20,7 +20,7 @@ let dishRowsPromise=null;
 let uiBound=false;
 
 const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const norm=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const norm=window.COURSES_TEXT.key;
 const pendingKey=(type,name)=>type+':'+norm(name);
 
 function randomId(){

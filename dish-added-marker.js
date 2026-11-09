@@ -6,7 +6,7 @@
 // localEntries : plats validés sur cet appareil dont la note n'a pas encore pu être écrite
 // (hors ligne, ou anciennes entrées locales d'avant la v677) ; ils sont partagés dès que possible.
 const LOCAL_STORAGE='courses-added-dishes-v1';
-const normalize=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const normalize=window.COURSES_TEXT.key;
 const localEntries=readLocalEntries();
 let entries={...localEntries};
 let sharing=null;
