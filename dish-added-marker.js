@@ -385,7 +385,9 @@ function bindMarkerEvents(){
   document.addEventListener('courses:dishes-rendered',scheduleCards);
   document.addEventListener('courses:list-rendered',scheduleReconcileList);
   document.addEventListener('courses:list-changed',scheduleReconcileList);
-  document.addEventListener('courses:dish-quantities-updated',scheduleDialogGuard);
+  // catalog-quantities.js publie cet événement depuis son image d'animation, après la reconstruction des lignes :
+  // appliquer l'état « Déjà dans Ma liste » tout de suite, sinon une image s'affiche avec ces lignes encore actives.
+  document.addEventListener('courses:dish-quantities-updated',syncDialogGuard);
   document.addEventListener('courses:dish-sheet-opened',scheduleDialogGuard);
   document.addEventListener('courses:quantities-ready',()=>{
     scheduleReconcileList();

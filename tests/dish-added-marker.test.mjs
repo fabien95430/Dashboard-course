@@ -76,3 +76,24 @@ test('une confirmation en erreur ne crée pas de faux état local',()=>{
   assert.equal(context.entries['Tagliatelles au saumon'],undefined);
   assert.equal(context.saved,undefined);
 });
+
+test('l état « Déjà dans Ma liste » est appliqué dans la même image que les quantités du plat',()=>{
+  const start=source.indexOf('function scheduleCards(){'),end=source.indexOf('function bindMarkerEvents(){',start);
+  const bindEnd=source.indexOf('\n}\n',end)+2;
+  assert.ok(start>0&&end>start&&bindEnd>end,'liaisons du marqueur introuvables');
+  const listeners=new Map(),frames=[];let guards=0;
+  const context={
+    cardFrame:0,reconcileFrame:0,guardFrame:0,
+    ensureStyle(){},syncCards(){},reconcileList(){},syncDialogGuard(){guards+=1},
+    requestAnimationFrame:fn=>{frames.push(fn);return frames.length},
+    document:{addEventListener:(type,fn)=>{if(!listeners.has(type))listeners.set(type,[]);listeners.get(type).push(fn)}}
+  };
+  vm.runInNewContext(source.slice(start,bindEnd)+';bindMarkerEvents();',context);
+  frames.splice(0).forEach(fn=>fn());
+  guards=0;
+  // catalog-quantities.js publie l'événement depuis son image d'animation : un nouvel appel à
+  // requestAnimationFrame repousserait la garde à l'image suivante (ligne active affichée une image).
+  listeners.get('courses:dish-quantities-updated').forEach(fn=>fn());
+  assert.equal(guards,1);
+  assert.equal(frames.length,0);
+});
