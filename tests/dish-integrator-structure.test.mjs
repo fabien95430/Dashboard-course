@@ -56,7 +56,9 @@ test('les nouvelles recettes ont une quantité par ingrédient et le fichier est
   assert.ok(integrator.includes('f"./catalog-quantities.js?v={new_version}"'));
   assert.match(workflow,/git add catalog\.js catalog-quantities\.js index\.html dishes-ui\.js/);
   assert.match(quantities,/'Steak tartare':\{'Bœuf':300,'Cornichon':40,'Échalotes':50,'Moutarde':15,'Œufs':2,'Persil':8\}/);
-  assert.match(read('catalog.js'),/catalog-quantities\.js\?v=822/);
+  const version=read('dish-local-images.js').match(/const APP_VERSION='v(\d+)'/)?.[1];
+  assert.ok(version,'Version de l’application introuvable');
+  assert.match(read('catalog.js'),new RegExp(`catalog-quantities\\.js\\?v=${version}(?!\\d)`));
 });
 
 test('les générations de plats reçoivent une vraie image de référence et un cadrage adapté aux cartes',()=>{
