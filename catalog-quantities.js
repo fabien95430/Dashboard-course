@@ -256,7 +256,8 @@ const DISPLAY_MODE_BY_PRODUCT=Object.freeze({
   "Glace Nuii":"Boîte",
 
   "Tomate cerise":"Barquette",
-  "Céréales Trésor":"Boîte"
+  "Céréales Trésor":"Boîte",
+  "Pulco Citron-Fraise":"Bouteille"
 });
 
 // Modes techniques conservés séparément pour le modèle de doublons Home Assistant.
