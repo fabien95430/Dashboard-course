@@ -1895,7 +1895,9 @@ body{
 @media(max-height:720px){
   .security-modal,
   .security-shell.is-password-open .security-modal{
-    top:35.2%!important;
+    /* Le héros compact occupe 208.3 px depuis top:5.1%. Garder au moins
+       13 px avant la carte lorsque les barres Safari réduisent la hauteur. */
+    top:max(35.2%,calc(5.1% + 222px))!important;
   }
   
 }

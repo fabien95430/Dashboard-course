@@ -1,0 +1,7 @@
+PASS {"dish":"Pâtes tomate mozzarella","ingredient":"Mozzarella","servings":4,"expected":2}
+PASS {"dish":"Penne poulet crème","ingredient":"Poulet","servings":8,"expected":10}
+PASS {"dish":"Crème brûlée","ingredient":"Crème liquide","servings":4,"expected":3}
+PASS {"dish":"Spaghetti carbonara","ingredient":"Œufs","servings":4,"expected":1}
+PASS {"dish":"Spaghetti carbonara","ingredient":"Spaghetti","servings":4,"expected":1}
+PASS {"dish":"Crème brûlée","ingredient":"Crème liquide","servings":4,"expected":3,"initial":1,"hideAdded":true}
+PASS {"dish":"Crème brûlée","ingredient":"Crème liquide","servings":4,"expected":3,"partial":true}
