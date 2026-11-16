@@ -1,0 +1,23 @@
+captured 375 667
+captured 375 812
+captured 390 844
+captured 393 852
+captured 402 874
+captured 420 912
+captured 428 926
+captured 430 932
+captured 440 956
+captured 466 678
+captured 626 890
+AssertionError [ERR_ASSERTION]: 626 products: global scroll
+
+27 !== 0
+
+    at /workspace/Dashboard-course/tests/browser-iphone.cjs:22:109 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 27,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

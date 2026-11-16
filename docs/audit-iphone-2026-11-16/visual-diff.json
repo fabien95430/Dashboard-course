@@ -1,0 +1,1544 @@
+[
+  {
+    "file": "375x667-connection.png",
+    "bbox": [
+      0,
+      14,
+      133,
+      158
+    ],
+    "changedPixels": 132,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-dishes-end.png",
+    "bbox": [
+      136,
+      601,
+      242,
+      658
+    ],
+    "changedPixels": 3146,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-dishes.png",
+    "bbox": [
+      20,
+      142,
+      272,
+      658
+    ],
+    "changedPixels": 14921,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-list-top.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-list.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-lock.png",
+    "bbox": [
+      0,
+      214,
+      375,
+      657
+    ],
+    "changedPixels": 87949,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-missing.png",
+    "bbox": [
+      0,
+      14,
+      133,
+      158
+    ],
+    "changedPixels": 132,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-preferences.png",
+    "bbox": [
+      0,
+      14,
+      133,
+      158
+    ],
+    "changedPixels": 132,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-products-end.png",
+    "bbox": [
+      136,
+      489,
+      242,
+      658
+    ],
+    "changedPixels": 4864,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-products.png",
+    "bbox": [
+      13,
+      36,
+      242,
+      658
+    ],
+    "changedPixels": 7633,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-security.png",
+    "bbox": [
+      0,
+      14,
+      133,
+      158
+    ],
+    "changedPixels": 132,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-settings-end.png",
+    "bbox": [
+      13,
+      36,
+      135,
+      199
+    ],
+    "changedPixels": 540,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-settings.png",
+    "bbox": [
+      13,
+      36,
+      135,
+      200
+    ],
+    "changedPixels": 124,
+    "pixels": 250125
+  },
+  {
+    "file": "375x667-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 250125
+  },
+  {
+    "file": "375x812-connection.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-dishes-end.png",
+    "bbox": [
+      136,
+      746,
+      242,
+      803
+    ],
+    "changedPixels": 3171,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-dishes.png",
+    "bbox": [
+      136,
+      746,
+      242,
+      803
+    ],
+    "changedPixels": 3186,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-list-top.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-list.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-missing.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-preferences.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-products-end.png",
+    "bbox": [
+      13,
+      96,
+      339,
+      803
+    ],
+    "changedPixels": 3245,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-products.png",
+    "bbox": [
+      13,
+      96,
+      339,
+      803
+    ],
+    "changedPixels": 3286,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-security.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-settings-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-settings.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "375x812-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 304500
+  },
+  {
+    "file": "390x844-connection.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-dishes-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-dishes.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-list-top.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-list.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-missing.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-preferences.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-products-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-products.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-security.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-settings-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-settings.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "390x844-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 329160
+  },
+  {
+    "file": "393x852-connection.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-dishes-end.png",
+    "bbox": [
+      152,
+      791,
+      245,
+      843
+    ],
+    "changedPixels": 840,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-dishes.png",
+    "bbox": [
+      114,
+      723,
+      279,
+      843
+    ],
+    "changedPixels": 13307,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-list-top.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-list.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-missing.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-preferences.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-products-end.png",
+    "bbox": [
+      152,
+      290,
+      352,
+      843
+    ],
+    "changedPixels": 4972,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-products.png",
+    "bbox": [
+      152,
+      496,
+      329,
+      852
+    ],
+    "changedPixels": 2830,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-security.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-settings-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-settings.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "393x852-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 334836
+  },
+  {
+    "file": "402x874-connection.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-dishes-end.png",
+    "bbox": [
+      150,
+      813,
+      251,
+      865
+    ],
+    "changedPixels": 1451,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-dishes.png",
+    "bbox": [
+      150,
+      813,
+      251,
+      865
+    ],
+    "changedPixels": 1468,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-list-top.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-list.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-missing.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-preferences.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-products-end.png",
+    "bbox": [
+      150,
+      813,
+      251,
+      865
+    ],
+    "changedPixels": 1452,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-products.png",
+    "bbox": [
+      150,
+      813,
+      251,
+      865
+    ],
+    "changedPixels": 1460,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-security.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-settings-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-settings.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "402x874-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 351348
+  },
+  {
+    "file": "420x912-connection.png",
+    "bbox": [
+      223,
+      6,
+      403,
+      167
+    ],
+    "changedPixels": 2782,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-dishes-end.png",
+    "bbox": [
+      154,
+      851,
+      267,
+      902
+    ],
+    "changedPixels": 971,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-dishes.png",
+    "bbox": [
+      154,
+      851,
+      267,
+      902
+    ],
+    "changedPixels": 973,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-list-top.png",
+    "bbox": [
+      37,
+      851,
+      147,
+      903
+    ],
+    "changedPixels": 917,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-list.png",
+    "bbox": [
+      37,
+      851,
+      147,
+      903
+    ],
+    "changedPixels": 909,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-missing.png",
+    "bbox": [
+      223,
+      6,
+      403,
+      167
+    ],
+    "changedPixels": 2782,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-preferences.png",
+    "bbox": [
+      223,
+      6,
+      403,
+      167
+    ],
+    "changedPixels": 2782,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-products-end.png",
+    "bbox": [
+      154,
+      851,
+      267,
+      902
+    ],
+    "changedPixels": 976,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-products.png",
+    "bbox": [
+      154,
+      851,
+      267,
+      902
+    ],
+    "changedPixels": 981,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-security.png",
+    "bbox": [
+      223,
+      6,
+      403,
+      167
+    ],
+    "changedPixels": 2782,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-settings-end.png",
+    "bbox": [
+      255,
+      36,
+      375,
+      141
+    ],
+    "changedPixels": 2946,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-settings.png",
+    "bbox": [
+      255,
+      36,
+      375,
+      141
+    ],
+    "changedPixels": 2946,
+    "pixels": 383040
+  },
+  {
+    "file": "420x912-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 383040
+  },
+  {
+    "file": "428x926-connection.png",
+    "bbox": [
+      235,
+      4,
+      398,
+      162
+    ],
+    "changedPixels": 2793,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-dishes-end.png",
+    "bbox": [
+      157,
+      860,
+      270,
+      917
+    ],
+    "changedPixels": 1666,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-dishes.png",
+    "bbox": [
+      157,
+      860,
+      270,
+      917
+    ],
+    "changedPixels": 1691,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-list-top.png",
+    "bbox": [
+      42,
+      860,
+      148,
+      917
+    ],
+    "changedPixels": 2018,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-list.png",
+    "bbox": [
+      42,
+      860,
+      148,
+      917
+    ],
+    "changedPixels": 2001,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-missing.png",
+    "bbox": [
+      235,
+      4,
+      398,
+      162
+    ],
+    "changedPixels": 2793,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-preferences.png",
+    "bbox": [
+      235,
+      4,
+      398,
+      162
+    ],
+    "changedPixels": 2793,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-products-end.png",
+    "bbox": [
+      157,
+      860,
+      270,
+      917
+    ],
+    "changedPixels": 1668,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-products.png",
+    "bbox": [
+      157,
+      860,
+      270,
+      917
+    ],
+    "changedPixels": 1679,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-security.png",
+    "bbox": [
+      235,
+      4,
+      398,
+      162
+    ],
+    "changedPixels": 2793,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-settings-end.png",
+    "bbox": [
+      255,
+      36,
+      381,
+      142
+    ],
+    "changedPixels": 3065,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-settings.png",
+    "bbox": [
+      255,
+      36,
+      381,
+      142
+    ],
+    "changedPixels": 3065,
+    "pixels": 396328
+  },
+  {
+    "file": "428x926-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 396328
+  },
+  {
+    "file": "430x932-connection.png",
+    "bbox": [
+      226,
+      9,
+      399,
+      166
+    ],
+    "changedPixels": 2852,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-dishes-end.png",
+    "bbox": [
+      160,
+      871,
+      276,
+      922
+    ],
+    "changedPixels": 553,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-dishes.png",
+    "bbox": [
+      160,
+      117,
+      305,
+      922
+    ],
+    "changedPixels": 616,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-list-top.png",
+    "bbox": [
+      42,
+      871,
+      149,
+      923
+    ],
+    "changedPixels": 486,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-list.png",
+    "bbox": [
+      42,
+      871,
+      149,
+      923
+    ],
+    "changedPixels": 480,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-missing.png",
+    "bbox": [
+      226,
+      9,
+      399,
+      166
+    ],
+    "changedPixels": 2852,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-preferences.png",
+    "bbox": [
+      226,
+      9,
+      399,
+      166
+    ],
+    "changedPixels": 2852,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-products-end.png",
+    "bbox": [
+      13,
+      276,
+      387,
+      922
+    ],
+    "changedPixels": 592,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-products.png",
+    "bbox": [
+      13,
+      95,
+      397,
+      924
+    ],
+    "changedPixels": 1149,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-security.png",
+    "bbox": [
+      226,
+      9,
+      399,
+      166
+    ],
+    "changedPixels": 2852,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-settings-end.png",
+    "bbox": [
+      255,
+      36,
+      383,
+      143
+    ],
+    "changedPixels": 3165,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-settings.png",
+    "bbox": [
+      255,
+      36,
+      383,
+      143
+    ],
+    "changedPixels": 3165,
+    "pixels": 400760
+  },
+  {
+    "file": "430x932-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 400760
+  },
+  {
+    "file": "440x956-connection.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-dishes-end.png",
+    "bbox": [
+      160,
+      890,
+      282,
+      947
+    ],
+    "changedPixels": 3764,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-dishes.png",
+    "bbox": [
+      49,
+      117,
+      310,
+      947
+    ],
+    "changedPixels": 15306,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-list-top.png",
+    "bbox": [
+      34,
+      890,
+      156,
+      947
+    ],
+    "changedPixels": 3716,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-list.png",
+    "bbox": [
+      34,
+      890,
+      156,
+      947
+    ],
+    "changedPixels": 3692,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-missing.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-preferences.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-products-end.png",
+    "bbox": [
+      20,
+      97,
+      392,
+      947
+    ],
+    "changedPixels": 4285,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-products.png",
+    "bbox": [
+      13,
+      97,
+      392,
+      947
+    ],
+    "changedPixels": 4293,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-security.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-settings-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-settings.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "440x956-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 420640
+  },
+  {
+    "file": "466x678-connection.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-dishes-end.png",
+    "bbox": [
+      171,
+      617,
+      295,
+      669
+    ],
+    "changedPixels": 1493,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-dishes.png",
+    "bbox": [
+      150,
+      549,
+      316,
+      669
+    ],
+    "changedPixels": 13759,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-list-top.png",
+    "bbox": [
+      13,
+      89,
+      164,
+      669
+    ],
+    "changedPixels": 2224,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-list.png",
+    "bbox": [
+      13,
+      89,
+      164,
+      669
+    ],
+    "changedPixels": 2219,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-lock.png",
+    "bbox": [
+      18,
+      218,
+      448,
+      657
+    ],
+    "changedPixels": 95369,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-missing.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-preferences.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-products-end.png",
+    "bbox": [
+      171,
+      444,
+      317,
+      669
+    ],
+    "changedPixels": 1499,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-products.png",
+    "bbox": [
+      171,
+      617,
+      317,
+      675
+    ],
+    "changedPixels": 1495,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-security.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-settings-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-settings.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "466x678-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 315948
+  },
+  {
+    "file": "626x890-connection.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 51128,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-dish-detail-end.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-dish-detail.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-dishes-end.png",
+    "bbox": [
+      117,
+      800,
+      514,
+      845
+    ],
+    "changedPixels": 1247,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-dishes.png",
+    "bbox": [
+      91,
+      150,
+      514,
+      849
+    ],
+    "changedPixels": 15185,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-list-empty.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-list-top.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 530834,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-list.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 531307,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-lock.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-missing.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 51075,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-preferences.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 50982,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-products-end.png",
+    "bbox": [
+      117,
+      800,
+      514,
+      845
+    ],
+    "changedPixels": 1247,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-products.png",
+    "bbox": [
+      117,
+      800,
+      514,
+      845
+    ],
+    "changedPixels": 1247,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-security.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 51098,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-settings-end.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 513989,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-settings.png",
+    "bbox": [
+      0,
+      0,
+      626,
+      890
+    ],
+    "changedPixels": 511863,
+    "pixels": 557140
+  },
+  {
+    "file": "626x890-setup.png",
+    "bbox": null,
+    "changedPixels": 0,
+    "pixels": 557140
+  }
+]

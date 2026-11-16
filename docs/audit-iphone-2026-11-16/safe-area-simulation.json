@@ -1,0 +1,154 @@
+[
+  {
+    "width": 375,
+    "height": 812,
+    "top": 50,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 292.3125,
+      "bottom": 628.1875,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 812
+    },
+    "after": {
+      "y": 292.3125,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "top": 47,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 303.828125,
+      "bottom": 639.703125,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 844
+    },
+    "after": {
+      "y": 303.828125,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  },
+  {
+    "width": 393,
+    "height": 852,
+    "top": 59,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 306.71875,
+      "bottom": 642.59375,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 852
+    },
+    "after": {
+      "y": 306.71875,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  },
+  {
+    "width": 402,
+    "height": 874,
+    "top": 62,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 314.625,
+      "bottom": 650.5,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 874
+    },
+    "after": {
+      "y": 314.625,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  },
+  {
+    "width": 420,
+    "height": 912,
+    "top": 62,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 328.3125,
+      "bottom": 664.1875,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 912
+    },
+    "after": {
+      "y": 328.3125,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  },
+  {
+    "width": 428,
+    "height": 926,
+    "top": 47,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 333.359375,
+      "bottom": 669.234375,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 926
+    },
+    "after": {
+      "y": 333.359375,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  },
+  {
+    "width": 430,
+    "height": 932,
+    "top": 59,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 335.515625,
+      "bottom": 671.390625,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 932
+    },
+    "after": {
+      "y": 335.515625,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  },
+  {
+    "width": 440,
+    "height": 956,
+    "top": 62,
+    "bottom": 34,
+    "safeAreaError": "cdpSession.send: Protocol error (Emulation.setSafeAreaInsets): 'Emulation.setSafeAreaInsets' wasn't found",
+    "before": {
+      "y": 344.15625,
+      "bottom": 680.03125,
+      "scrollY": 0,
+      "standalone": false,
+      "overlay": 956
+    },
+    "after": {
+      "y": 344.15625,
+      "scrollY": 0,
+      "scrollX": 0
+    }
+  }
+]

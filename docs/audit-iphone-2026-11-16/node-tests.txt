@@ -1,0 +1,592 @@
+TAP version 13
+# Subtest: tests/ajouts-valides-12.test.mjs
+ok 1 - tests/ajouts-valides-12.test.mjs
+  ---
+  duration_ms: 85.205261
+  type: 'test'
+  ...
+# Subtest: tests/ajouts-valides-13.test.mjs
+ok 2 - tests/ajouts-valides-13.test.mjs
+  ---
+  duration_ms: 62.986161
+  type: 'test'
+  ...
+# Subtest: tests/ajouts-valides-15.test.mjs
+ok 3 - tests/ajouts-valides-15.test.mjs
+  ---
+  duration_ms: 77.500149
+  type: 'test'
+  ...
+# Subtest: tests/app-responsibility-extraction.test.mjs
+ok 4 - tests/app-responsibility-extraction.test.mjs
+  ---
+  duration_ms: 52.251879
+  type: 'test'
+  ...
+# Subtest: tests/asset-graph.test.mjs
+ok 5 - tests/asset-graph.test.mjs
+  ---
+  duration_ms: 63.81546
+  type: 'test'
+  ...
+# Subtest: tests/auto-update-before-unlock.test.mjs
+ok 6 - tests/auto-update-before-unlock.test.mjs
+  ---
+  duration_ms: 151.071378
+  type: 'test'
+  ...
+# Subtest: tests/beer-items.test.mjs
+ok 7 - tests/beer-items.test.mjs
+  ---
+  duration_ms: 49.46837
+  type: 'test'
+  ...
+# Subtest: tests/beverage-visuals.test.mjs
+ok 8 - tests/beverage-visuals.test.mjs
+  ---
+  duration_ms: 56.600462
+  type: 'test'
+  ...
+# Subtest: tests/bolognaise-category.test.mjs
+ok 9 - tests/bolognaise-category.test.mjs
+  ---
+  duration_ms: 70.01766
+  type: 'test'
+  ...
+# Subtest: tests/cache-visuels-items.test.mjs
+ok 10 - tests/cache-visuels-items.test.mjs
+  ---
+  duration_ms: 59.764541
+  type: 'test'
+  ...
+# Subtest: tests/catalog-admin-dish-delete.test.mjs
+ok 11 - tests/catalog-admin-dish-delete.test.mjs
+  ---
+  duration_ms: 80.822745
+  type: 'test'
+  ...
+# Subtest: tests/catalog-category-render-reuse.test.mjs
+ok 12 - tests/catalog-category-render-reuse.test.mjs
+  ---
+  duration_ms: 84.30646
+  type: 'test'
+  ...
+# Subtest: tests/catalog-entry-contract.test.mjs
+ok 13 - tests/catalog-entry-contract.test.mjs
+  ---
+  duration_ms: 73.01889
+  type: 'test'
+  ...
+# Subtest: tests/catalog-first-paint-shell.test.mjs
+ok 14 - tests/catalog-first-paint-shell.test.mjs
+  ---
+  duration_ms: 82.944303
+  type: 'test'
+  ...
+# Subtest: tests/catalog-mode-swipe.test.mjs
+ok 15 - tests/catalog-mode-swipe.test.mjs
+  ---
+  duration_ms: 65.423868
+  type: 'test'
+  ...
+# Subtest: tests/catalog-navigation-latency.test.mjs
+ok 16 - tests/catalog-navigation-latency.test.mjs
+  ---
+  duration_ms: 50.367162
+  type: 'test'
+  ...
+# Subtest: tests/catalog-ordering.test.mjs
+ok 17 - tests/catalog-ordering.test.mjs
+  ---
+  duration_ms: 68.437521
+  type: 'test'
+  ...
+# Subtest: tests/catalog-persistent-grid.test.mjs
+ok 18 - tests/catalog-persistent-grid.test.mjs
+  ---
+  duration_ms: 62.969245
+  type: 'test'
+  ...
+# Subtest: tests/catalog-popup-v625.test.mjs
+ok 19 - tests/catalog-popup-v625.test.mjs
+  ---
+  duration_ms: 46.447938
+  type: 'test'
+  ...
+# Subtest: tests/catalog-quantities-events.test.mjs
+ok 20 - tests/catalog-quantities-events.test.mjs
+  ---
+  duration_ms: 66.201482
+  type: 'test'
+  ...
+# Subtest: tests/catalog-search-performance.test.mjs
+ok 21 - tests/catalog-search-performance.test.mjs
+  ---
+  duration_ms: 51.177699
+  type: 'test'
+  ...
+# Subtest: tests/catalog-style-readiness.test.mjs
+ok 22 - tests/catalog-style-readiness.test.mjs
+  ---
+  duration_ms: 62.024236
+  type: 'test'
+  ...
+# Subtest: tests/cereales-lion.test.mjs
+ok 23 - tests/cereales-lion.test.mjs
+  ---
+  duration_ms: 53.774375
+  type: 'test'
+  ...
+# Subtest: tests/ci-guardrails.test.mjs
+ok 24 - tests/ci-guardrails.test.mjs
+  ---
+  duration_ms: 53.698757
+  type: 'test'
+  ...
+# Subtest: tests/confitures-parfums.test.mjs
+ok 25 - tests/confitures-parfums.test.mjs
+  ---
+  duration_ms: 53.585281
+  type: 'test'
+  ...
+# Subtest: tests/contours-frais-snacks-charcuterie-v743.test.mjs
+ok 26 - tests/contours-frais-snacks-charcuterie-v743.test.mjs
+  ---
+  duration_ms: 80.759681
+  type: 'test'
+  ...
+# Subtest: tests/contours-pains-fromages-v742.test.mjs
+ok 27 - tests/contours-pains-fromages-v742.test.mjs
+  ---
+  duration_ms: 59.626729
+  type: 'test'
+  ...
+# Subtest: tests/contours-viandes-poissons-v744.test.mjs
+ok 28 - tests/contours-viandes-poissons-v744.test.mjs
+  ---
+  duration_ms: 44.848254
+  type: 'test'
+  ...
+# Subtest: tests/core-invariants.test.mjs
+ok 29 - tests/core-invariants.test.mjs
+  ---
+  duration_ms: 80.460301
+  type: 'test'
+  ...
+# Subtest: tests/courses-text.test.mjs
+ok 30 - tests/courses-text.test.mjs
+  ---
+  duration_ms: 73.503854
+  type: 'test'
+  ...
+# Subtest: tests/css-cleanup.test.mjs
+ok 31 - tests/css-cleanup.test.mjs
+  ---
+  duration_ms: 81.51135
+  type: 'test'
+  ...
+# Subtest: tests/deferred-catalog-startup.test.mjs
+ok 32 - tests/deferred-catalog-startup.test.mjs
+  ---
+  duration_ms: 68.282433
+  type: 'test'
+  ...
+# Subtest: tests/dish-added-marker.test.mjs
+ok 33 - tests/dish-added-marker.test.mjs
+  ---
+  duration_ms: 76.262569
+  type: 'test'
+  ...
+# Subtest: tests/dish-card-focus.test.mjs
+ok 34 - tests/dish-card-focus.test.mjs
+  ---
+  duration_ms: 76.636865
+  type: 'test'
+  ...
+# Subtest: tests/dish-image-loading.test.mjs
+ok 35 - tests/dish-image-loading.test.mjs
+  ---
+  duration_ms: 78.585193
+  type: 'test'
+  ...
+# Subtest: tests/dish-integrator-structure.test.mjs
+ok 36 - tests/dish-integrator-structure.test.mjs
+  ---
+  duration_ms: 240.652578
+  type: 'test'
+  ...
+# Subtest: tests/dish-notes-shared.test.mjs
+ok 37 - tests/dish-notes-shared.test.mjs
+  ---
+  duration_ms: 77.125199
+  type: 'test'
+  ...
+# Subtest: tests/enfant-gouters.test.mjs
+ok 38 - tests/enfant-gouters.test.mjs
+  ---
+  duration_ms: 106.744583
+  type: 'test'
+  ...
+# Subtest: tests/epicerie-emballages.test.mjs
+ok 39 - tests/epicerie-emballages.test.mjs
+  ---
+  duration_ms: 55.70754
+  type: 'test'
+  ...
+# Subtest: tests/epicerie-webp-edges.test.mjs
+ok 40 - tests/epicerie-webp-edges.test.mjs
+  ---
+  duration_ms: 93.34831
+  type: 'test'
+  ...
+# Subtest: tests/error-center-loading.test.mjs
+ok 41 - tests/error-center-loading.test.mjs
+  ---
+  duration_ms: 81.35511
+  type: 'test'
+  ...
+# Subtest: tests/frais-harmonisation-v720.test.mjs
+ok 42 - tests/frais-harmonisation-v720.test.mjs
+  ---
+  duration_ms: 88.893777
+  type: 'test'
+  ...
+# Subtest: tests/fruits-legumes-v736.test.mjs
+ok 43 - tests/fruits-legumes-v736.test.mjs
+  ---
+  duration_ms: 95.909949
+  type: 'test'
+  ...
+# Subtest: tests/fruits-secs-sachets.test.mjs
+ok 44 - tests/fruits-secs-sachets.test.mjs
+  ---
+  duration_ms: 59.157218
+  type: 'test'
+  ...
+# Subtest: tests/fruits-uncropped-v733.test.mjs
+ok 45 - tests/fruits-uncropped-v733.test.mjs
+  ---
+  duration_ms: 69.376528
+  type: 'test'
+  ...
+# Subtest: tests/haptics.test.mjs
+ok 46 - tests/haptics.test.mjs
+  ---
+  duration_ms: 67.589112
+  type: 'test'
+  ...
+# Subtest: tests/home-assistant-client.test.mjs
+ok 47 - tests/home-assistant-client.test.mjs
+  ---
+  duration_ms: 123.158244
+  type: 'test'
+  ...
+# Subtest: tests/hygiene-images-v719.test.mjs
+ok 48 - tests/hygiene-images-v719.test.mjs
+  ---
+  duration_ms: 71.206417
+  type: 'test'
+  ...
+# Subtest: tests/image-loading-pipeline.test.mjs
+ok 49 - tests/image-loading-pipeline.test.mjs
+  ---
+  duration_ms: 91.134549
+  type: 'test'
+  ...
+# Subtest: tests/integration-versioning.test.mjs
+ok 50 - tests/integration-versioning.test.mjs
+  ---
+  duration_ms: 65.932052
+  type: 'test'
+  ...
+# Subtest: tests/list-change-events.test.mjs
+ok 51 - tests/list-change-events.test.mjs
+  ---
+  duration_ms: 47.910835
+  type: 'test'
+  ...
+# Subtest: tests/list-quantities.test.mjs
+ok 52 - tests/list-quantities.test.mjs
+  ---
+  duration_ms: 96.511733
+  type: 'test'
+  ...
+# Subtest: tests/list-removal-intent.test.mjs
+ok 53 - tests/list-removal-intent.test.mjs
+  ---
+  duration_ms: 53.247549
+  type: 'test'
+  ...
+# Subtest: tests/list-render-reuse.test.mjs
+ok 54 - tests/list-render-reuse.test.mjs
+  ---
+  duration_ms: 47.302606
+  type: 'test'
+  ...
+# Subtest: tests/list-render-version.test.mjs
+ok 55 - tests/list-render-version.test.mjs
+  ---
+  duration_ms: 45.398501
+  type: 'test'
+  ...
+# Subtest: tests/missing-products-completion.test.mjs
+ok 56 - tests/missing-products-completion.test.mjs
+  ---
+  duration_ms: 46.385018
+  type: 'test'
+  ...
+# Subtest: tests/missing-requests-ha-sync.test.mjs
+ok 57 - tests/missing-requests-ha-sync.test.mjs
+  ---
+  duration_ms: 144.200013
+  type: 'test'
+  ...
+# Subtest: tests/missing-requests-store.test.mjs
+ok 58 - tests/missing-requests-store.test.mjs
+  ---
+  duration_ms: 58.57669
+  type: 'test'
+  ...
+# Subtest: tests/multi-device-notifications.test.mjs
+ok 59 - tests/multi-device-notifications.test.mjs
+  ---
+  duration_ms: 48.875013
+  type: 'test'
+  ...
+# Subtest: tests/notifications-list-isolation.test.mjs
+ok 60 - tests/notifications-list-isolation.test.mjs
+  ---
+  duration_ms: 44.05267
+  type: 'test'
+  ...
+# Subtest: tests/offline-list-add.test.mjs
+ok 61 - tests/offline-list-add.test.mjs
+  ---
+  duration_ms: 61.001652
+  type: 'test'
+  ...
+# Subtest: tests/offline-shell.test.mjs
+ok 62 - tests/offline-shell.test.mjs
+  ---
+  duration_ms: 101.627126
+  type: 'test'
+  ...
+# Subtest: tests/openai-cancellation.test.mjs
+ok 63 - tests/openai-cancellation.test.mjs
+  ---
+  duration_ms: 57.548164
+  type: 'test'
+  ...
+# Subtest: tests/openai-checkpoint.test.mjs
+ok 64 - tests/openai-checkpoint.test.mjs
+  ---
+  duration_ms: 103.531012
+  type: 'test'
+  ...
+# Subtest: tests/openai-products.test.mjs
+ok 65 - tests/openai-products.test.mjs
+  ---
+  duration_ms: 3115.665452
+  type: 'test'
+  ...
+# Subtest: tests/openai-publication-notification.test.mjs
+ok 66 - tests/openai-publication-notification.test.mjs
+  ---
+  duration_ms: 56.419074
+  type: 'test'
+  ...
+# Subtest: tests/openai-reconstruction-status.test.mjs
+ok 67 - tests/openai-reconstruction-status.test.mjs
+  ---
+  duration_ms: 42.378775
+  type: 'test'
+  ...
+# Subtest: tests/openai-success-reconciliation.test.mjs
+ok 68 - tests/openai-success-reconciliation.test.mjs
+  ---
+  duration_ms: 43.681851
+  type: 'test'
+  ...
+# Subtest: tests/p1-observer-completion.test.mjs
+ok 69 - tests/p1-observer-completion.test.mjs
+  ---
+  duration_ms: 57.550483
+  type: 'test'
+  ...
+# Subtest: tests/petit-dej-snacks-v716.test.mjs
+ok 70 - tests/petit-dej-snacks-v716.test.mjs
+  ---
+  duration_ms: 51.752771
+  type: 'test'
+  ...
+# Subtest: tests/preference-popups.test.mjs
+ok 71 - tests/preference-popups.test.mjs
+  ---
+  duration_ms: 78.837776
+  type: 'test'
+  ...
+# Subtest: tests/preferences-service.test.mjs
+ok 72 - tests/preferences-service.test.mjs
+  ---
+  duration_ms: 53.613755
+  type: 'test'
+  ...
+# Subtest: tests/product-image-scale-cache-version.test.mjs
+ok 73 - tests/product-image-scale-cache-version.test.mjs
+  ---
+  duration_ms: 48.634773
+  type: 'test'
+  ...
+# Subtest: tests/product-images-no-atlas.test.mjs
+ok 74 - tests/product-images-no-atlas.test.mjs
+  ---
+  duration_ms: 52.569518
+  type: 'test'
+  ...
+# Subtest: tests/product-visual-dimensions.test.mjs
+ok 75 - tests/product-visual-dimensions.test.mjs
+  ---
+  duration_ms: 71.003099
+  type: 'test'
+  ...
+# Subtest: tests/produits-lot10-v740.test.mjs
+ok 76 - tests/produits-lot10-v740.test.mjs
+  ---
+  duration_ms: 51.696748
+  type: 'test'
+  ...
+# Subtest: tests/purchase-intelligence-events.test.mjs
+ok 77 - tests/purchase-intelligence-events.test.mjs
+  ---
+  duration_ms: 63.229287
+  type: 'test'
+  ...
+# Subtest: tests/quantities.test.mjs
+ok 78 - tests/quantities.test.mjs
+  ---
+  duration_ms: 62.232434
+  type: 'test'
+  ...
+# Subtest: tests/recipe-cumulative-quantities.test.mjs
+ok 79 - tests/recipe-cumulative-quantities.test.mjs
+  ---
+  duration_ms: 56.389603
+  type: 'test'
+  ...
+# Subtest: tests/reprise-contours-v732.test.mjs
+ok 80 - tests/reprise-contours-v732.test.mjs
+  ---
+  duration_ms: 70.735677
+  type: 'test'
+  ...
+# Subtest: tests/repurchase-row-reuse.test.mjs
+ok 81 - tests/repurchase-row-reuse.test.mjs
+  ---
+  duration_ms: 50.961982
+  type: 'test'
+  ...
+# Subtest: tests/retouches-produits-v734.test.mjs
+ok 82 - tests/retouches-produits-v734.test.mjs
+  ---
+  duration_ms: 43.645274
+  type: 'test'
+  ...
+# Subtest: tests/sauces-epices-harmonisation-v741.test.mjs
+ok 83 - tests/sauces-epices-harmonisation-v741.test.mjs
+  ---
+  duration_ms: 59.636089
+  type: 'test'
+  ...
+# Subtest: tests/security-viewport-reset.test.mjs
+ok 84 - tests/security-viewport-reset.test.mjs
+  ---
+  duration_ms: 47.373661
+  type: 'test'
+  ...
+# Subtest: tests/settings-technical-routing.test.mjs
+ok 85 - tests/settings-technical-routing.test.mjs
+  ---
+  duration_ms: 51.272104
+  type: 'test'
+  ...
+# Subtest: tests/settings-type-scale.test.mjs
+ok 86 - tests/settings-type-scale.test.mjs
+  ---
+  duration_ms: 88.06063
+  type: 'test'
+  ...
+# Subtest: tests/settings-ui-events.test.mjs
+ok 87 - tests/settings-ui-events.test.mjs
+  ---
+  duration_ms: 52.961071
+  type: 'test'
+  ...
+# Subtest: tests/sheet-scroll-edge.test.mjs
+ok 88 - tests/sheet-scroll-edge.test.mjs
+  ---
+  duration_ms: 79.976142
+  type: 'test'
+  ...
+# Subtest: tests/startup-cache-first.test.mjs
+ok 89 - tests/startup-cache-first.test.mjs
+  ---
+  duration_ms: 133.351921
+  type: 'test'
+  ...
+# Subtest: tests/startup-shell.test.mjs
+ok 90 - tests/startup-shell.test.mjs
+  ---
+  duration_ms: 50.04413
+  type: 'test'
+  ...
+# Subtest: tests/ui-module-boundaries.test.mjs
+ok 91 - tests/ui-module-boundaries.test.mjs
+  ---
+  duration_ms: 49.767554
+  type: 'test'
+  ...
+# Subtest: tests/ui-observer-events.test.mjs
+ok 92 - tests/ui-observer-events.test.mjs
+  ---
+  duration_ms: 48.514773
+  type: 'test'
+  ...
+# Subtest: tests/version-courte.test.mjs
+ok 93 - tests/version-courte.test.mjs
+  ---
+  duration_ms: 44.576971
+  type: 'test'
+  ...
+# Subtest: tests/viandes-poissons-visuals.test.mjs
+ok 94 - tests/viandes-poissons-visuals.test.mjs
+  ---
+  duration_ms: 54.969375
+  type: 'test'
+  ...
+# Subtest: tests/visual-cache-cleanup.test.mjs
+ok 95 - tests/visual-cache-cleanup.test.mjs
+  ---
+  duration_ms: 46.080416
+  type: 'test'
+  ...
+# Subtest: tests/visual-hashes.test.mjs
+ok 96 - tests/visual-hashes.test.mjs
+  ---
+  duration_ms: 362.304689
+  type: 'test'
+  ...
+# Subtest: tests/yaourts-parfums.test.mjs
+ok 97 - tests/yaourts-parfums.test.mjs
+  ---
+  duration_ms: 47.591167
+  type: 'test'
+  ...
+1..97
+# tests 97
+# suites 0
+# pass 97
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10061.246853

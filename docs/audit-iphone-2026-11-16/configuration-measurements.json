@@ -1,0 +1,222 @@
+[
+  {
+    "width": 375,
+    "height": 667,
+    "name": "recipes",
+    "x": 0,
+    "y": 146.75,
+    "bottom": 667,
+    "horizontalOverflow": 4,
+    "documentOverflow": 0
+  },
+  {
+    "width": 375,
+    "height": 667,
+    "name": "management",
+    "x": 0,
+    "y": 146.75,
+    "bottom": 667,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "recipes",
+    "x": 0,
+    "y": 178.640625,
+    "bottom": 812,
+    "horizontalOverflow": 4,
+    "documentOverflow": 0
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "management",
+    "x": 0,
+    "y": 178.640625,
+    "bottom": 812,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "name": "recipes",
+    "x": 0,
+    "y": 185.6875,
+    "bottom": 844,
+    "horizontalOverflow": 4,
+    "documentOverflow": 0
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "name": "management",
+    "x": 0,
+    "y": 185.6875,
+    "bottom": 844,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 393,
+    "height": 852,
+    "name": "recipes",
+    "x": 0,
+    "y": 187.453125,
+    "bottom": 852,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 393,
+    "height": 852,
+    "name": "management",
+    "x": 0,
+    "y": 187.453125,
+    "bottom": 852,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 402,
+    "height": 874,
+    "name": "recipes",
+    "x": 0,
+    "y": 192.28125,
+    "bottom": 874,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 402,
+    "height": 874,
+    "name": "management",
+    "x": 0,
+    "y": 192.28125,
+    "bottom": 874,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 420,
+    "height": 912,
+    "name": "recipes",
+    "x": 0,
+    "y": 200.640625,
+    "bottom": 912,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 420,
+    "height": 912,
+    "name": "management",
+    "x": 0,
+    "y": 200.640625,
+    "bottom": 912,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 428,
+    "height": 926,
+    "name": "recipes",
+    "x": 0,
+    "y": 203.734375,
+    "bottom": 926,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 428,
+    "height": 926,
+    "name": "management",
+    "x": 0,
+    "y": 203.734375,
+    "bottom": 926,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 430,
+    "height": 932,
+    "name": "recipes",
+    "x": 0,
+    "y": 205.046875,
+    "bottom": 932,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 430,
+    "height": 932,
+    "name": "management",
+    "x": 0,
+    "y": 205.046875,
+    "bottom": 932,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 440,
+    "height": 956,
+    "name": "recipes",
+    "x": 0,
+    "y": 210.328125,
+    "bottom": 956,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 440,
+    "height": 956,
+    "name": "management",
+    "x": 0,
+    "y": 210.328125,
+    "bottom": 956,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 466,
+    "height": 678,
+    "name": "recipes",
+    "x": 0,
+    "y": 149.171875,
+    "bottom": 678,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 466,
+    "height": 678,
+    "name": "management",
+    "x": 0,
+    "y": 149.171875,
+    "bottom": 678,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 626,
+    "height": 890,
+    "name": "recipes",
+    "x": 0,
+    "y": 195.8125,
+    "bottom": 890,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  },
+  {
+    "width": 626,
+    "height": 890,
+    "name": "management",
+    "x": 0,
+    "y": 195.8125,
+    "bottom": 890,
+    "horizontalOverflow": 0,
+    "documentOverflow": 0
+  }
+]
