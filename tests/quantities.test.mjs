@@ -76,6 +76,11 @@ test('le catalogue conserve le conditionnement même quand une quantité de rece
   assert.equal(api.getCatalogDisplayLabel('Fraises'),'Barquette');
   assert.equal(api.getRecipeUnit('Spaghetti'),'g');
   assert.equal(api.getRecipeUnit('Citrons'),'piece');
+  // Fruits à la pièce dans le catalogue : à la pièce dans les plats ; fruits au poids : au gramme.
+  assert.equal(api.getRecipeUnit('Pommes'),'piece');
+  assert.equal(api.getRecipeUnit('Bananes'),'piece');
+  assert.equal(api.getRecipeUnit('Fraises'),'g');
+  assert.equal(api.getRecipeUnit('Baguette'),'g');
 });
 
 test('les fruits, viandes et poissons vendus à la pièce ont le bon libellé',()=>{

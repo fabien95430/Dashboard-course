@@ -132,7 +132,7 @@ function ensureRow(){
     row.id='settingsFamiliesBtn';
     row.className='settings-row';
     row.type='button';
-    row.innerHTML='<span class="settings-icon"><svg><use href="#i-home"></use></svg></span><span class="settings-copy"><strong>Familles</strong><small id="settingsFamiliesSummary">Service famille</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
+    row.innerHTML='<span class="settings-icon settings-icon-families"><svg><use href="#i-home"></use></svg><span id="settingsFamiliesCount" class="settings-count" hidden>0</span></span><span class="settings-copy"><strong>Familles</strong><small id="settingsFamiliesSummary">Service famille</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
     row.addEventListener('click',openFamilies);
   }
   // Juste sous « Gestion de l'application ».
@@ -141,7 +141,19 @@ function ensureRow(){
   else if(row.parentElement!==card)card.appendChild(row);
   return row;
 }
+/* Pastille rouge sur la ligne Familles + signal pour la pastille de l'onglet Réglages. */
+let publishedCount=-1;
+function renderCount(){
+  const count=access()?.credentials()?totalRequests():0;
+  const badge=document.getElementById('settingsFamiliesCount');
+  if(badge){badge.textContent=count>99?'99+':String(count);badge.hidden=count<1}
+  if(count!==publishedCount){
+    publishedCount=count;
+    window.dispatchEvent(new CustomEvent('courses:family-requests-changed',{detail:{count}}));
+  }
+}
 function renderSummary(){
+  renderCount();
   const summary=document.getElementById('settingsFamiliesSummary');
   if(!summary)return;
   if(!access()?.credentials())summary.textContent='Accès à configurer';
@@ -155,6 +167,7 @@ async function refresh(){
   loading=service().adminOverview(credentials).then(overview=>{
     families=buildFamilies(overview);
     lastError='';
+    void service().adminWatchRequests?.(credentials,scheduleRefresh).catch(()=>{});
     return families;
   }).catch(error=>{
     lastError=String(error?.message||'Service famille indisponible');
@@ -374,6 +387,16 @@ function onDialogClick(event){
   if(device&&!device.disabled)void disconnect(node,device);
 }
 
+let refreshTimer=0;
+function scheduleRefresh(){
+  clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(()=>{
+    void refresh().then(()=>{
+      const node=document.getElementById('familyAdminDialog');
+      if(node?.open&&node.dataset.view==='families')renderFamilies(node);
+    }).catch(()=>{});
+  },800);
+}
 function init(){
   if(!ensureRow())return;
   renderSummary();
@@ -384,6 +407,8 @@ function init(){
     else reload();
   });
   document.addEventListener('courses:account-changed',reload);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reload()});
+  reload();
 }
 
 window.COURSES_FAMILY_ADMIN=Object.freeze({buildFamilies,statsFor,modifsFor,familyTitle,open:openFamilies});

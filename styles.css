@@ -3257,8 +3257,7 @@ body{
 .settings-sheet .dialog-feedback.is-visible{white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
 .settings-sheet #preferencesNotificationsPanel .notifications-management-summary{border:1px solid var(--tile-line)!important;background:var(--tile-bg)!important;box-shadow:var(--tile-shadow)!important}
 .settings-sheet .courses-product-admin-item:not(.is-deleting)>.courses-product-admin-row{background:var(--tile-bg)!important;border-color:var(--tile-line)!important;box-shadow:var(--tile-shadow)!important}
-.settings-sheet .recipe-customization-item,.settings-sheet .recipe-customization-ingredient-picker{background:rgba(255,255,255,.49)!important;border-color:rgba(40,70,49,.10)!important;box-shadow:none!important}
-.settings-sheet .recipe-customization-item.is-selected{background:rgba(221,237,216,.73)!important;border-color:rgba(62,124,77,.22)!important}
+.settings-sheet .recipe-customization-ingredient-picker{background:rgba(255,255,255,.49)!important;border-color:rgba(40,70,49,.10)!important;box-shadow:none!important}
 .settings-sheet .recipe-customization-add-button{border-color:rgba(51,108,63,.19)!important;background:rgba(237,247,234,.57)!important;color:#296043!important}
 .settings-sheet .missing-product-row{background:rgba(255,255,255,.50)!important;border-color:rgba(40,70,49,.085)!important;box-shadow:none!important}
 .settings-sheet#missingProductsDialog .missing-products-header{padding-right:0!important;flex:0 0 auto}
@@ -3294,7 +3293,6 @@ html[data-account="family"] #catalogRemovePanel,
 html[data-account="family"] #missingProductsDialog .missing-row-caret,
 html[data-account="family"] #missingProductsDialog .missing-row-tools{display:none!important}
 html[data-account="family"] #missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr)!important;cursor:default}
-.settings-sheet#familyDevicesDialog{height:auto!important}
 .settings-sheet#familyDevicesDialog .connection-sync-line{gap:12px}
 .settings-sheet#familyDevicesDialog .connection-sync-line>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#25392b;font-size:var(--fs-text);font-weight:400}
 .settings-sheet#familyDevicesDialog .connection-sync-line>span:last-child{flex:0 0 auto;font-size:var(--fs-label);color:var(--sheet-muted)}
@@ -3302,7 +3300,6 @@ html[data-account="family"] #missingProductsDialog .missing-product-row.missing-
 .settings-sheet#familyDevicesDialog .family-devices-note{margin:12px 2px 0;color:var(--sheet-muted);font-size:var(--fs-note);line-height:1.4}
 .settings-sheet#familyDevicesDialog .family-devices-note+.family-devices-note{margin-top:4px}
 /* v825 — compte famille : nom de l'appareil à la première connexion. */
-.settings-sheet#familyDeviceDialog{height:auto!important}
 .settings-sheet#familyDeviceDialog .family-device-save{width:100%;min-height:48px;margin:16px 0 6px;border-radius:15px;font:inherit;font-size:var(--fs-text);font-weight:600}
 /* v824 — popup Connexion Home Assistant, état non connecté (remplace l'ancien écran de démarrage). */
 .settings-sheet#connectionDialog .connection-oauth-hint{margin:8px 2px 12px;color:var(--sheet-muted);font-size:var(--fs-note);line-height:1.4}
@@ -3530,7 +3527,6 @@ body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behav
 }
 
 /* v827 — Réglages › Administrateur › Familles (family-admin.js) */
-.settings-sheet#familyAdminDialog{height:auto!important}
 .settings-sheet#familyAdminDialog .connection-sync-line{gap:12px;align-items:center}
 .settings-sheet#familyAdminDialog .connection-sync-line>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#25392b;font-size:var(--fs-text);font-weight:400;text-align:left}
 .settings-sheet#familyAdminDialog .connection-sync-line>span:last-child:not(:first-child){flex:0 0 auto;font-size:var(--fs-label);font-weight:400;color:var(--sheet-muted)}
@@ -3583,3 +3579,4 @@ body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behav
 .settings-sheet#familyAdminDialog .family-confirm-text{grid-column:1/-1;margin:0 0 2px;color:#6c4a45;font-size:var(--fs-text);line-height:1.35}
 html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 @media(prefers-reduced-motion:reduce){.settings-sheet#familyAdminDialog .family-request-caret{transition:none}}
+.settings-view .settings-icon-families{position:relative!important;overflow:visible!important}

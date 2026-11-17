@@ -34,3 +34,10 @@ test('Catalogue famille : demandes seulement, sans dépliage ni outils de géné
   assert.match(read('missing-products-dishes.js'),/'Ajouter des produits et des plats':'Ajouter ou supprimer des produits et des plats'/);
   assert.match(read('app.js'),/function setAccountKind\(kind\)\{[\s\S]*?new CustomEvent\('courses:account-changed'/);
 });
+
+test('popups famille : même hauteur que les autres feuilles de réglages',()=>{
+  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  for(const id of ['familyAdminDialog','familyDevicesDialog','familyDeviceDialog']){
+    assert.doesNotMatch(css,new RegExp('#'+id+'\\s*\\{[^}]*height'),id+' ne doit pas redéfinir la hauteur');
+  }
+});

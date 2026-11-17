@@ -54,8 +54,14 @@ async function syncAppIconBadge(count){
   }catch(_){}
 }
 
+// Demandes des familles (écran admin « Familles », family-admin.js) : comptées dans la pastille.
+let familyRequests=0;
+window.addEventListener('courses:family-requests-changed',event=>{
+  familyRequests=document.documentElement.dataset.account==='family'?0:Math.max(0,Number(event.detail?.count)||0);
+  syncBadge();
+});
 function syncBadge(){
-  const count=Math.max(0,Number(REQUESTS.counts?.().total)||0);
+  const count=Math.max(0,Number(REQUESTS.counts?.().total)||0)+familyRequests;
   badge.textContent=count>99?'99+':String(count);
   badge.style.display=count>0?'grid':'none';
   if(count>0)requestAnimationFrame(positionBadge);

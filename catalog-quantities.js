@@ -487,8 +487,10 @@ function variablePurchaseStepFor(name){
   const recipeUnit=RECIPE_UNITS[name]||'g';
   return recipeUnit===step.unit?step:null;
 }
+// Fruits vendus à la pièce dans le catalogue (Pommes, Bananes, Poires…) : comptés à la pièce dans les plats aussi.
+const RECIPE_PIECE_SUBS=new Set(['Fruits classiques']);
 function recipeUnitFor(name){
-  return RECIPE_UNITS[name]||purchaseReferenceFor(name)?.unit||variablePurchaseStepFor(name)?.unit||'g';
+  return RECIPE_UNITS[name]||purchaseReferenceFor(name)?.unit||(RECIPE_PIECE_SUBS.has(PRODUCT_META.get(name)?.sub)?'piece':'')||variablePurchaseStepFor(name)?.unit||'g';
 }
 function auditPurchaseModes(){
   const missing=[];

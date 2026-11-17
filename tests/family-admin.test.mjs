@@ -102,3 +102,14 @@ test('coffre : l’accès admin du service famille est chiffré avec le reste et
   assert.match(app,/vaultSeal=null;/);
   assert.doesNotMatch(read('family-admin.js'),/Mot de passe de l’application|familyAdminLocal/);
 });
+
+test('demandes des familles : pastille sur la ligne Familles et sur l’onglet Réglages, en direct',()=>{
+  const source=read('family-admin.js');
+  assert.match(source,/id="settingsFamiliesCount" class="settings-count"/);
+  assert.match(source,/courses:family-requests-changed/);
+  assert.match(source,/adminWatchRequests\?\.\(credentials,scheduleRefresh\)/);
+  const badge=read('settings-tab-badge.js');
+  assert.match(badge,/courses:family-requests-changed/);
+  assert.match(badge,/counts\?\.\(\)\.total\)\|\|0\)\+familyRequests/);
+  assert.match(read('family-service.js'),/table:'catalogue_perso'/);
+});

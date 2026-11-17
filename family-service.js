@@ -377,7 +377,20 @@ async function adminRevokeDevice(credentials,id){
   const {error}=await db.from('appareils').update({revoque:true}).eq('id',id);
   if(error)throw error;
 }
-async function adminSignOut(){try{await adminClient?.auth.signOut()}catch(_){}}
+/* Nouvelles demandes en direct (temps réel sur catalogue_perso, lisible par l'admin seulement). */
+let adminRequestsChannel=null;
+async function adminWatchRequests(credentials,onChange){
+  const db=await admin(credentials);
+  if(adminRequestsChannel)return;
+  adminRequestsChannel=db.channel('admin-demandes')
+    .on('postgres_changes',{event:'*',schema:'public',table:'catalogue_perso'},()=>{try{onChange()}catch(_){}})
+    .subscribe();
+}
+async function adminSignOut(){
+  try{if(adminRequestsChannel)await adminClient?.removeChannel(adminRequestsChannel)}catch(_){}
+  adminRequestsChannel=null;
+  try{await adminClient?.auth.signOut()}catch(_){}
+}
 
 const api=Object.freeze({
   config:CONFIG,
@@ -387,7 +400,7 @@ const api=Object.freeze({
   registerDevice,listDevices,touchDevice,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),
-  adminOverview,adminSetRequestStatus,adminRevokeDevice,adminSignOut
+  adminOverview,adminSetRequestStatus,adminRevokeDevice,adminWatchRequests,adminSignOut
 });
 Object.defineProperty(window,'COURSES_FAMILY',{value:api,configurable:false,enumerable:false,writable:false});
 })();
