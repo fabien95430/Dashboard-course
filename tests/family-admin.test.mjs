@@ -26,12 +26,13 @@ test('foyers : regroupés par famille, nommés depuis l’identifiant, sans mél
   const admin=loadAdmin();
   const families=admin.buildFamilies({
     families:[{id:'a',email:'karina@famille.invalid'},{id:'b',email:'stephany.maison@hotmail.fr'},{id:'c',email:'marie@famille.invalid'}],
-    devices:[{id:'d1',famille:'a',nom:'iPhone'}],
+    devices:[{id:'d1',famille:'a',nom:'iPhone'},{id:'d9',famille:'compte-admin',nom:'iPhone admin'}],
     requests:[{id:'r1',famille:'b',type:'plat',nom:'Paëlla'},{id:'r2',famille:'a',type:'produit',nom:'Kombucha'}],
     purchases:[{famille:'a',nom:'Pommes',coche_le:new Date().toISOString()}],
     customizations:[]
   });
   assert.equal(JSON.stringify(families.map(f=>f.name)),JSON.stringify(['Famille Karina','Famille Marie','Famille Stephany']));
+  assert.equal(families.length,3,'le compte admin n’apparaît jamais comme un foyer');
   const dupont=families.find(f=>f.id==='a');
   assert.equal(dupont.devices.length,1);
   assert.equal(dupont.requests.map(r=>r.nom).join(),'Kombucha');

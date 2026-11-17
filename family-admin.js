@@ -96,14 +96,17 @@ function modifsFor(customizations,base=window.COURSES_DISH_BASE||{}){
 }
 function buildFamilies(overview){
   const map=new Map();
+  // Quand familles() répond, seuls ses foyers comptent : l'activité d'un autre compte (le tien, admin) est ignorée.
+  const listed=(overview?.families||[]).length>0;
   const ensure=(id,email)=>{
     const key=String(id||'');if(!key)return null;
+    if(!map.has(key)&&listed&&email===undefined)return null;
     if(!map.has(key))map.set(key,{id:key,email:'',name:'',devices:[],requests:[],purchases:[],customizations:[]});
     const family=map.get(key);
     if(email&&!family.email)family.email=String(email);
     return family;
   };
-  (overview?.families||[]).forEach(row=>ensure(row.id,row.email));
+  (overview?.families||[]).forEach(row=>ensure(row.id,String(row.email||'')));
   (overview?.devices||[]).forEach(row=>ensure(row.famille)?.devices.push(row));
   (overview?.requests||[]).forEach(row=>ensure(row.famille)?.requests.push(row));
   (overview?.purchases||[]).forEach(row=>ensure(row.famille)?.purchases.push(row));
