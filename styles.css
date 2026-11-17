@@ -3281,6 +3281,26 @@ body{
 .settings-sheet .field input:focus-visible,.settings-sheet .field select:focus-visible,.settings-sheet .recipe-customization-search:focus-within,.settings-sheet .courses-product-admin-search:focus-within{outline:2px solid rgba(51,105,72,.23)!important;outline-offset:1px}
 .settings-sheet#missingProductsDialog .missing-products-header>div{width:100%;min-width:0}
 .settings-sheet#connectionDialog .connection-sync-line{gap:12px}
+/* v826 — Réglages version famille (html[data-account="family"], posé par app.js). */
+.settings-family-only{display:none!important}
+html[data-account="family"] .settings-family-only{display:grid!important}
+html[data-account="family"] #settingsConnectionBtn,
+html[data-account="family"] .settings-section:has(#settingsSecurityBtn),
+html[data-account="family"] #settingsAdministratorSection,
+html[data-account="family"] #preferencesErrorMessages,
+html[data-account="family"] #settingsMissingProductsCount,
+html[data-account="family"] #missingProductsDialog .catalog-view-switch,
+html[data-account="family"] #catalogRemovePanel,
+html[data-account="family"] #missingProductsDialog .missing-row-caret,
+html[data-account="family"] #missingProductsDialog .missing-row-tools{display:none!important}
+html[data-account="family"] #missingProductsDialog .missing-product-row.missing-request-row{grid-template-columns:44px minmax(0,1fr)!important;cursor:default}
+.settings-sheet#familyDevicesDialog{height:auto!important}
+.settings-sheet#familyDevicesDialog .connection-sync-line{gap:12px}
+.settings-sheet#familyDevicesDialog .connection-sync-line>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#25392b;font-size:var(--fs-text);font-weight:400}
+.settings-sheet#familyDevicesDialog .connection-sync-line>span:last-child{flex:0 0 auto;font-size:var(--fs-label);color:var(--sheet-muted)}
+.settings-sheet#familyDevicesDialog .connection-sync-line>span.is-current{color:#1f7a4a}
+.settings-sheet#familyDevicesDialog .family-devices-note{margin:12px 2px 0;color:var(--sheet-muted);font-size:var(--fs-note);line-height:1.4}
+.settings-sheet#familyDevicesDialog .family-devices-note+.family-devices-note{margin-top:4px}
 /* v825 — compte famille : nom de l'appareil à la première connexion. */
 .settings-sheet#familyDeviceDialog{height:auto!important}
 .settings-sheet#familyDeviceDialog .family-device-save{width:100%;min-height:48px;margin:16px 0 6px;border-radius:15px;font:inherit;font-size:var(--fs-text);font-weight:600}

@@ -236,6 +236,8 @@ const UI = Object.freeze({
   connectionConnectBtn: document.getElementById('connectionConnectBtn'),
   connectionOAuthHint: document.getElementById('connectionOAuthHint'),
   familyDeviceDialog: document.getElementById('familyDeviceDialog'),
+  familyDevicesDialog: document.getElementById('familyDevicesDialog'),
+  familyDevicesList: document.getElementById('familyDevicesList'),
   familyDeviceName: document.getElementById('familyDeviceName'),
   familyDeviceSave: document.getElementById('familyDeviceSave'),
   familyDeviceFeedback: document.getElementById('familyDeviceFeedback'),
@@ -1443,6 +1445,7 @@ function renderSettingsPage(){
     listSync.dataset.state=connected?'synced':'waiting';
   }
   renderMissingRequestsConnectionStatus();
+  if(state.family)void refreshFamilyDevices();
   const missingCount=$('#settingsMissingProductsCount');
   if(missingCount){
     const count=MISSING_REQUESTS.counts().total;
@@ -1810,12 +1813,46 @@ function enterFamilyMode(info){
   state.family=true;
   enterLocalMode();
   status('','Synchronisé','Liste famille');
-  document.documentElement.dataset.account='family';
+  setAccountKind('family');
   if(info?.needsDeviceName)openFamilyDeviceDialog();
 }
 function leaveFamilyMode(){
   state.family=false;state.demo=false;state.items=[];
-  delete document.documentElement.dataset.account;
+  setAccountKind('');
+}
+/* Variante d'interface du compte (famille ou administrateur) : les modules propriétaires
+   des Réglages et du Catalogue s'y adaptent via l'événement courses:account-changed. */
+function setAccountKind(kind){
+  if(kind)document.documentElement.dataset.account=kind;
+  else delete document.documentElement.dataset.account;
+  document.dispatchEvent(new CustomEvent('courses:account-changed',{detail:{kind:kind||'admin'}}));
+}
+function relativeActivity(value){
+  const time=Date.parse(value||'');
+  if(!Number.isFinite(time))return '';
+  const minutes=Math.max(0,Math.round((Date.now()-time)/60000));
+  if(minutes<2)return 'À l’instant';
+  if(minutes<60)return 'Il y a '+minutes+' min';
+  const hours=Math.round(minutes/60);
+  if(hours<24)return 'Il y a '+hours+' h';
+  const days=Math.round(hours/24);
+  return days<=1?'Hier':'Il y a '+days+' j';
+}
+async function refreshFamilyDevices(){
+  if(!state.family||!window.COURSES_FAMILY)return [];
+  const name=window.COURSES_FAMILY.currentName();
+  const summary=$('#settingsFamilyDevicesSummary');
+  let devices=[];
+  try{devices=await window.COURSES_FAMILY.listDevices()}catch(_){}
+  if(summary)summary.textContent='Famille '+name+(devices.length?' · '+devices.length+' appareil'+(devices.length>1?'s':''):'');
+  return devices;
+}
+async function openFamilyDevices(){
+  const list=UI.familyDevicesList;
+  list.innerHTML='';
+  showNeutralDialog(UI.familyDevicesDialog);
+  const devices=await refreshFamilyDevices();
+  list.innerHTML=devices.length?devices.map(device=>'<div class="connection-sync-line"><span>'+esc(device.nom)+'</span><span'+(device.current?' class="is-current"':'')+'>'+esc(device.current?'Cet appareil':relativeActivity(device.derniere_activite))+'</span></div>').join(''):'<div class="connection-sync-line"><span>Aucun appareil</span><span></span></div>';
 }
 function openFamilyDeviceDialog(){
   const dialog=UI.familyDeviceDialog;
@@ -3304,6 +3341,8 @@ async function refreshFromHeader(button,checkUpdate=false){
 function bindUiEvents(){
   UI.connectionConnectBtn.onclick=beginOAuth;
   UI.familyDeviceSave.onclick=saveFamilyDeviceName;
+  $('#settingsFamilyDevicesBtn').onclick=openFamilyDevices;
+  bindDialogBackdropClose(UI.familyDevicesDialog);
   UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};
   UI.securitySubmit.onclick=completeSecurityAction;
   const syncPasswordOpen=()=>UI.securityShell.classList.toggle('is-password-open',[UI.securityIdentifier,UI.securityPassword,UI.securityConfirm].includes(document.activeElement));

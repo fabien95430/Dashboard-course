@@ -99,6 +99,8 @@ function ensureTools(row,key,type){
       '<button class="missing-row-tool is-danger is-icon" type="button" data-row-tool="ask-delete" aria-label="Supprimer ce '+noun+' : '+escapeHtml(name)+'">'+SVG_MENU_DELETE+'</button>';
 }
 function handleRowClick(event){
+  // Compte famille : pas d'options de génération, donc pas de dépliage des demandes.
+  if(document.documentElement.dataset.account==='family')return;
   const dialog=event.currentTarget;
   const row=event.target.closest?.('[data-missing-product-row],[data-missing-dish-row]');
   if(!row||!dialog.contains(row))return;

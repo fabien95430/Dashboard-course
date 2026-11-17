@@ -30,7 +30,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-pomme-poire-v791.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=825">
+  <link rel="stylesheet" href="./styles.css?v=826">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=610">
 </head>
 <body>
@@ -65,7 +65,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v825</span>
+            <span class="page-version">v826</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -88,7 +88,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v825</span>
+            <span class="page-version">v826</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -124,7 +124,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v825</span>
+            <span class="page-version">v826</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -140,6 +140,11 @@
         <section class="settings-section">
           <h2>Compte</h2>
           <div class="settings-card">
+            <button id="settingsFamilyDevicesBtn" class="settings-row settings-family-only" type="button">
+              <span class="settings-icon"><svg><use href="#i-key"></use></svg></span>
+              <span class="settings-copy"><strong>Appareils connectés</strong><small id="settingsFamilyDevicesSummary">Famille</small></span>
+              <svg class="chevron"><use href="#i-chevron"></use></svg>
+            </button>
             <button id="settingsConnectionBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-home"></use></svg></span>
               <span class="settings-copy"><strong>Connexion Home Assistant</strong><small id="settingsConnectionSummary">Connexion…</small></span>
@@ -259,6 +264,15 @@
     </label>
     <button id="familyDeviceSave" class="primary family-device-save" type="button">Valider</button>
     <p id="familyDeviceFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
+  </dialog>
+
+  <dialog id="familyDevicesDialog" class="dialog connection-dialog family-devices-dialog settings-sheet" tabindex="-1">
+    <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-key"></use></svg></span><span class="settings-sheet-title">Appareils connectés</span></h3>
+    <p class="dialog-intro">Téléphones de la famille.</p>
+    <h4 class="sheet-section-title">Appareils</h4>
+    <div id="familyDevicesList" class="connection-sync-section" aria-label="Appareils connectés"></div>
+    <p class="family-devices-note">Seul l’administrateur peut déconnecter un appareil.</p>
+    <p class="family-devices-note">Vos ajouts et modifications aident à améliorer l’application.</p>
   </dialog>
 
   <dialog id="connectionDialog" class="dialog connection-dialog settings-sheet" tabindex="-1" autofocus>
@@ -441,7 +455,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=825"></script>
+  <script src="./catalog.js?v=826"></script>
   <script src="./product-item-images.js?v=820" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=824"></script>
@@ -449,9 +463,9 @@
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=824" data-app-ui="script"></script>
   <script src="./family-service.js?v=825"></script>
-  <script src="./app.js?v=825"></script>
+  <script src="./app.js?v=826"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
-  <script src="./settings-ui.js?v=821"></script>
+  <script src="./settings-ui.js?v=826"></script>
   <script src="./error-center.js?v=820"></script>
 </body>
 </html>

@@ -103,7 +103,7 @@ if(document.readyState==='loading'){
 'use strict';
 if(document.querySelector('script[data-missing-products-dishes]'))return;
 const script=document.createElement('script');
-script.src='./missing-products-dishes.js?v=821';
+script.src='./missing-products-dishes.js?v=826';
 script.defer=true;
 script.dataset.missingProductsDishes='1';
 document.head.appendChild(script);
@@ -424,6 +424,16 @@ function initAdministratorSettings(){
     preferencesSection.after(adminSection);
   }
   adminSection.querySelector('.settings-card')?.appendChild(managementButton);
+  /* Compte famille : pas de section Administrateur ; Gestion de l'application rejoint
+     la carte Préférences, sous le Catalogue des produits. */
+  const preferencesCard=preferencesSection.querySelector('.settings-card');
+  const placeManagement=kind=>{
+    const target=kind==='family'?preferencesCard:adminSection.querySelector('.settings-card');
+    if(target&&managementButton.parentElement!==target)target.appendChild(managementButton);
+    adminSection.hidden=kind==='family';
+  };
+  placeManagement(document.documentElement.dataset.account==='family'?'family':'admin');
+  document.addEventListener('courses:account-changed',event=>placeManagement(event.detail?.kind));
 
   let errorMessagesButton=document.getElementById('preferencesErrorMessages');
   if(!errorMessagesButton){

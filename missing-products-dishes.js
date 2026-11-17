@@ -273,7 +273,10 @@ function initMissingProductsAndDishes(){
     const title=settingsCopy.querySelector('strong');
     const subtitle=settingsCopy.querySelector('small');
     if(title)title.textContent='Catalogue des produits';
-    if(subtitle)subtitle.textContent='Ajouter ou supprimer des produits et des plats';
+    // Compte famille : demandes d'ajout seulement (l'intégration et la suppression restent à l'admin).
+    const applySubtitle=()=>{if(subtitle)subtitle.textContent=document.documentElement.dataset.account==='family'?'Ajouter des produits et des plats':'Ajouter ou supprimer des produits et des plats'};
+    applySubtitle();
+    document.addEventListener('courses:account-changed',applySubtitle);
   }
   const dialogTitle=dialog.querySelector('.missing-products-header .settings-sheet-title');
   const dialogIntro=dialog.querySelector('.missing-products-header .dialog-intro');
