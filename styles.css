@@ -181,7 +181,7 @@ button{-webkit-tap-highlight-color:transparent}
   overflow:hidden;
 }
 svg{display:block}
-.icon-btn svg,.tab svg,.settings-row svg,.settings-logout svg,.welcome-logo svg,.security-lock-icon svg,.searchbox svg{
+.icon-btn svg,.tab svg,.settings-row svg,.settings-logout svg,.security-lock-icon svg,.searchbox svg{
   width:24px;
   height:24px;
   fill:none;
@@ -823,7 +823,6 @@ html #products .product.is-deferred{display:none!important}
   backdrop-filter:none;
 }
 .overlay.is-visible{display:grid}
-.setup-modal,
 .security-modal,
 .dialog{
   border:1px solid rgba(36,57,43,.055);
@@ -831,12 +830,6 @@ html #products .product.is-deferred{display:none!important}
   color:#111713;
   box-shadow:0 18px 54px rgba(44,61,49,.13);
 }
-.setup-modal{
-  width:min(100%,420px);
-  border-radius:28px;
-  padding:26px;
-}
-.setup-modal .welcome-logo{margin:0 auto 12px}
 .modal h2{color:#0b2b1d}
 .modal>p{color:#7c838b}
 .field>span{color:#6f7780}
@@ -868,22 +861,6 @@ html #products .product.is-deferred{display:none!important}
   margin:11px 0 0;
   color:#747d7b;
   font-size:17px;
-}
-.welcome-logo{
-  width:112px;
-  height:112px;
-  margin:auto;
-  border-radius:30px;
-  display:grid;
-  place-items:center;
-  color:#14783f;
-  background:linear-gradient(145deg,#ecf8e8,#f8fbf4);
-  box-shadow:0 13px 34px rgba(55,107,73,.10);
-}
-.welcome-logo svg{
-  width:70px;
-  height:70px;
-  stroke-width:1.6;
 }
 .security-modal{
   text-align:center;
@@ -945,8 +922,6 @@ html #products .product.is-deferred{display:none!important}
   .searchbox{height:54px;padding:0 16px}
   .searchbox input{font-size:15px}
   .premium-sprite{width:calc(84px * var(--sprite-ratio,1))!important;height:84px!important}
-  .welcome-logo{width:92px;height:92px}
-  .welcome-logo svg{width:58px;height:58px}
 }
 
 /* ===== UI v24 — accueil fidèle à la maquette validée ===== */
@@ -1091,9 +1066,7 @@ html,body{touch-action:pan-x pan-y}
 
 /* iOS installed app: paint the document canvas under the home-indicator area. */
 html{background:#f7f3ec}
-html:has(#setup.is-visible),
 html:has(#securityOverlay.is-visible),
-body:has(#setup.is-visible),
 body:has(#securityOverlay.is-visible){
   background-color:#f6f1e7!important;
   background-image:url("./welcome-background-v40.webp")!important;
@@ -1134,8 +1107,7 @@ body:has(#securityOverlay.is-visible){background-color:#d5ae89!important}
     height:calc(100dvh + env(safe-area-inset-bottom))!important;
     padding-bottom:env(safe-area-inset-bottom)!important;
   }
-  .security-overlay,
-  #setup{
+  .security-overlay{
     top:0!important;
     right:0!important;
     bottom:calc(-1 * env(safe-area-inset-bottom))!important;
@@ -3295,7 +3267,7 @@ body{
 .settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .missing-dishes-list{flex:0 1 auto!important;min-height:0!important;overflow-y:auto!important}
 .settings-sheet#missingProductsDialog .catalog-remove-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 /* v814 — Une liste qui défile en bas d'une feuille descend jusqu'au bord de l'écran : elle passe sous la marge basse de la feuille et la reprend en fin de défilement (barre d'accueil). Source unique de cette marge pour ces listes. */
-.settings-sheet#preferencesDialog .preference-dialog-scroll,.settings-sheet#missingProductsDialog .missing-products-list,.settings-sheet#missingProductsDialog .catalog-remove-panel,.settings-sheet.recipe-customization-dialog .recipe-dish-picker{margin-bottom:calc(-1 * var(--sheet-bottom-inset))!important;padding-bottom:calc(var(--sheet-bottom-inset) + 12px)!important;scroll-padding-bottom:calc(var(--sheet-bottom-inset) + 12px)}
+.settings-sheet#preferencesDialog .preference-dialog-scroll,.settings-sheet#missingProductsDialog .catalog-remove-panel,.settings-sheet.recipe-customization-dialog .recipe-dish-picker{margin-bottom:calc(-1 * var(--sheet-bottom-inset))!important;padding-bottom:calc(var(--sheet-bottom-inset) + 12px)!important;scroll-padding-bottom:calc(var(--sheet-bottom-inset) + 12px)}
 /* v652 — la liste ne pousse plus « Ajouter un ingrédient » en bas : il suit la dernière ligne, les actions restent calées en bas. */
 .settings-sheet.recipe-customization-dialog .recipe-customization-list{flex:0 1 auto!important;min-height:0!important;max-height:none!important}
 .settings-sheet.recipe-customization-dialog .dialog-actions{flex:0 0 auto;margin-top:auto!important;padding-top:14px}
@@ -3309,7 +3281,11 @@ body{
 .settings-sheet .field input:focus-visible,.settings-sheet .field select:focus-visible,.settings-sheet .recipe-customization-search:focus-within,.settings-sheet .courses-product-admin-search:focus-within{outline:2px solid rgba(51,105,72,.23)!important;outline-offset:1px}
 .settings-sheet#missingProductsDialog .missing-products-header>div{width:100%;min-width:0}
 .settings-sheet#connectionDialog .connection-sync-line{gap:12px}
-.settings-sheet#connectionDialog .connection-sync-line>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;color:#25392b;font-size:var(--fs-text);font-weight:400}
+/* v824 — popup Connexion Home Assistant, état non connecté (remplace l'ancien écran de démarrage). */
+.settings-sheet#connectionDialog .connection-oauth-hint{margin:8px 2px 12px;color:var(--sheet-muted);font-size:var(--fs-note);line-height:1.4}
+.settings-sheet#connectionDialog .connection-oauth-hint[hidden],.settings-sheet#connectionDialog .connection-connect-btn[hidden]{display:none}
+.settings-sheet#connectionDialog .connection-connect-btn{width:100%;min-height:48px;margin:0 0 6px;border-radius:15px;font:inherit;font-size:var(--fs-text);font-weight:600}
+.settings-sheet#connectionDialog .connection-sync-line>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#25392b;font-size:var(--fs-text);font-weight:400}
 .settings-sheet#connectionDialog .connection-sync-line>span:last-child{flex:0 0 auto;min-width:0;font-size:var(--fs-label)}
 /* Catalogue des produits v624 : sélecteur Produits / Plats à deux mots (logique du Catalogue), trait sous l'actif. */
 #missingProductsDialog .missing-mode-switch{

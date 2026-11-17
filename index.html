@@ -30,7 +30,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-pomme-poire-v791.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=815">
+  <link rel="stylesheet" href="./styles.css?v=824">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=610">
 </head>
 <body>
@@ -65,7 +65,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v823</span>
+            <span class="page-version">v824</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -88,7 +88,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v823</span>
+            <span class="page-version">v824</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -124,7 +124,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v823</span>
+            <span class="page-version">v824</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -204,22 +204,6 @@
     </nav>
   </main>
 
-  <section id="setup" class="overlay" aria-modal="true">
-    <div class="modal setup-modal">
-      <div class="welcome-logo"><svg><use href="#i-cart"></use></svg></div>
-      <h2>Mes courses</h2>
-      <p>Connecte Home Assistant pour retrouver ta liste sur cet appareil.</p>
-      <label class="field">
-        <span>Adresse Home Assistant / Nabu Casa</span>
-        <input id="haUrlInput" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
-      </label>
-      <p class="hint">Connexion OAuth sécurisée. L’autorisation reste chiffrée sur cet appareil.</p>
-      <button id="connectBtn" class="primary" type="button">Connecter Home Assistant</button>
-      <button id="demoBtn" class="secondary" type="button">Tester sans Home Assistant</button>
-      <div id="setupError" class="setup-error" role="alert"></div>
-    </div>
-  </section>
-
   <section id="securityOverlay" class="overlay security-overlay is-visible" aria-modal="true" aria-labelledby="securityTitle">
     <div class="security-shell">
       <div class="security-hero">
@@ -238,6 +222,10 @@
         <div class="security-ornament" aria-hidden="true"><i></i><b></b><i></i></div>
         <p id="securityText" class="security-dynamic" aria-live="polite"></p>
         <div id="passwordPanel" class="password-panel">
+          <label id="securityIdentifierWrap" class="field" hidden>
+            <span>Identifiant</span>
+            <input id="securityIdentifier" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+          </label>
           <label class="field">
             <span>Mot de passe</span>
             <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false">
@@ -269,6 +257,8 @@
       <span>Adresse Home Assistant</span>
       <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
     </label>
+    <p id="connectionOAuthHint" class="connection-oauth-hint" hidden>Connexion OAuth sécurisée. L’autorisation reste chiffrée sur cet appareil.</p>
+    <button id="connectionConnectBtn" class="primary connection-connect-btn" type="button" hidden>Connecter Home Assistant</button>
     <label class="field connection-list-field">
       <span>Liste Home Assistant</span>
       <select id="connectionEntitySelect">
@@ -440,14 +430,14 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=823"></script>
+  <script src="./catalog.js?v=824"></script>
   <script src="./product-item-images.js?v=820" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
-  <script src="./missing-requests-store.js?v=820"></script>
+  <script src="./missing-requests-store.js?v=824"></script>
   <script src="./courses-notifications.js?v=482"></script>
   <script src="./bottom-nav-liquid.js?v=573"></script>
-  <script src="./app-ui.js?v=755" data-app-ui="script"></script>
-  <script src="./app.js?v=820"></script>
+  <script src="./app-ui.js?v=824" data-app-ui="script"></script>
+  <script src="./app.js?v=824"></script>
   <script src="./settings-tab-badge.js?v=410"></script>
   <script src="./settings-ui.js?v=821"></script>
   <script src="./error-center.js?v=820"></script>

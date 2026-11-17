@@ -179,7 +179,8 @@ const STATUS_TEXT=Object.freeze({
   passwordRequired:'Mot de passe local requis',
   unlockRequired:'Déverrouillage requis',
   manualLockReason:'Verrouillage manuel.',
-  demoConnectHint:'Mode test actif. Connecte Home Assistant pour synchroniser la vraie liste.'
+  demoConnectHint:'Connecte Home Assistant pour synchroniser la vraie liste.',
+  familySoon:'Ce compte famille n’est pas encore disponible sur cet appareil.'
 });
 
 const STORAGE = {
@@ -190,9 +191,13 @@ const STORAGE = {
   entity:'courses-external-entity-v1',
   entityPreference:'courses-external-entity-preference-v1',
   usage:'courses-external-usage-v1',
-  autoLockMinutes:'courses-auto-lock-minutes-v1'
+  autoLockMinutes:'courses-auto-lock-minutes-v1',
+  account:'courses-account-v1'
 };
 const DEMO_KEY = 'courses-external-demo-items-v2';
+// Empreinte SHA-256 de l'identifiant administrateur normalisé (trim + minuscules) : le tri
+// admin / famille se fait localement, sans réseau ni dépendance au service famille.
+const ADMIN_IDENTIFIER_SHA256 = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
 const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
 const OAUTH_TEMP_KEY = 'courses-oauth-temp-v2';
 const LEGACY_OAUTH_STATE_KEY = 'courses-external-oauth-state';
@@ -219,11 +224,12 @@ const UI = Object.freeze({
   connectionDialog: document.getElementById('connectionDialog'),
   connectionDialogFeedback: document.getElementById('connectionDialogFeedback'),
   preferencesDialog: document.getElementById('preferencesDialog'),
-  setup: document.getElementById('setup'),
   securityOverlay: document.getElementById('securityOverlay'),
-  setupError: document.getElementById('setupError'),
   securityConfirm: document.getElementById('securityConfirm'),
-  haUrlInput: document.getElementById('haUrlInput'),
+  securityIdentifier: document.getElementById('securityIdentifier'),
+  securityIdentifierWrap: document.getElementById('securityIdentifierWrap'),
+  connectionConnectBtn: document.getElementById('connectionConnectBtn'),
+  connectionOAuthHint: document.getElementById('connectionOAuthHint'),
   securityShell: document.querySelector('.security-shell'),
   securitySubmit: document.getElementById('securitySubmit'),
   securityError: document.getElementById('securityError'),
@@ -646,19 +652,29 @@ function setDialogFeedback(target,message,kind='success'){
   target._t=setTimeout(()=>clearDialogFeedback(target),3000);
 }
 function refreshVisualLock(){
-  const blocked=UI.setup.classList.contains('is-visible')||UI.securityOverlay.classList.contains('is-visible');
+  const blocked=UI.securityOverlay.classList.contains('is-visible');
   const app=$('#app'),changed=app.classList.contains('is-locked')!==blocked;
   app.classList.toggle('is-locked',blocked);
   if(changed)document.dispatchEvent(new CustomEvent('courses:lock-changed',{detail:{locked:blocked}}));
 }
-function showSetup(message=''){
-  UI.securityOverlay.classList.remove('is-visible');
-  UI.setup.classList.add('is-visible');
-  UI.haUrlInput.value=state.haUrl||normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
-  UI.setupError.textContent=message;
-  refreshVisualLock();
+/* Compte mémorisé sur l'appareil après la première connexion (aucun secret). */
+function rememberedAccount(){const value=loadJson(STORAGE.account,null);return value&&typeof value.id==='string'?value:null}
+function rememberAccount(id,kind){saveJson(STORAGE.account,{id:String(id||''),kind})}
+function forgetAccount(){deleteKey(STORAGE.account)}
+function normalizeIdentifier(value){return String(value||'').trim().toLowerCase()}
+async function sha256Hex(text){
+  const digest=await crypto.subtle.digest('SHA-256',UTF8.encode(text));
+  return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
 }
-function hideSetup(){UI.setup.classList.remove('is-visible');refreshVisualLock()}
+async function isAdminIdentifier(value){
+  const id=normalizeIdentifier(value);
+  return !!id&&await sha256Hex(id)===ADMIN_IDENTIFIER_SHA256;
+}
+/* Page d'accueil unique : la tuile « Accès privé » avec Identifiant + Mot de passe. */
+function showLogin(message=''){
+  showSecurity('login');
+  UI.securityError.textContent=message;
+}
 
 function syncCategorySelection(){
   const el=$('#categories');
@@ -1397,6 +1413,7 @@ function renderView(){
 function renderMissingRequestsConnectionStatus(detail=MISSING_REQUESTS.getSharedStatus?.()){
   const label=document.getElementById('missingSyncStatus');
   if(!label)return;
+  if(state.demo){label.dataset.state='waiting';label.textContent='Non connectée';return}
   label.dataset.state=detail?.state||'waiting';
   label.textContent=detail?.message||'En attente de Home Assistant';
 }
@@ -1407,12 +1424,12 @@ function renderSettingsPage(){
   const connection=$('#settingsConnectionSummary');
   const connectionDot=$('#settingsConnectionDot');
   const connected=!state.locked&&state.ws?.readyState===WebSocket.OPEN;
-  if(connection)connection.textContent=connected?'Connecté':(state.locked?'Verrouillé':'Connexion…');
+  if(connection)connection.textContent=connected?'Connecté':state.demo?'Non connecté':(state.locked?'Verrouillé':'Connexion…');
   if(connection)connection.classList.toggle('is-connected',connected);
   if(connectionDot)connectionDot.classList.toggle('is-online',connected);
   const listSync=$('#connectionListSyncStatus');
   if(listSync){
-    listSync.textContent=connected?'Connectée':state.locked?'Verrouillée':'Connexion…';
+    listSync.textContent=connected?'Connectée':state.demo?'Non connectée':state.locked?'Verrouillée':'Connexion…';
     listSync.dataset.state=connected?'synced':'waiting';
   }
   renderMissingRequestsConnectionStatus();
@@ -1543,8 +1560,10 @@ let unlockVersionCheckPromise=null;
 function showSecurity(mode,message=''){
   const overlay=UI.securityOverlay;
   state.securityMode=mode;
-  UI.setup.classList.remove('is-visible');
   overlay.classList.add('is-visible');
+  const login=mode==='login';
+  UI.securityIdentifierWrap.hidden=!login;
+  if(login)UI.securityIdentifier.value=rememberedAccount()?.id||'';
   const creating=mode==='oauth'||mode==='migrate';
   $('.security-modal').classList.toggle('is-creating',creating);
   UI.securityShell.classList.toggle('is-form-mode',creating);
@@ -1643,7 +1662,7 @@ function scheduleReconnect(){
 async function connectAuthorized(token,reuseKnownEntity=false){
   state.accessToken=token;
   state.locked=false;
-  hideSetup();hideSecurity();
+  hideSecurity();
   status('is-waiting','Connexion…','Home Assistant');
   await connectWs(token);
   clearTimeout(state.reconnectTimer);state.reconnectTimer=null;
@@ -1691,6 +1710,7 @@ async function completeSecurityAction(){
   const confirm=UI.securityConfirm.value;
   const error=UI.securityError,button=UI.securitySubmit;
   error.textContent='';
+  if(state.securityMode==='login'){await completeLogin();return}
   if(state.securityMode==='unlock'){
     const retryMs=unlockRetryMs();
     if(retryMs>0){
@@ -1752,10 +1772,38 @@ async function completeSecurityAction(){
     }
   }finally{button.disabled=false}
 }
+/* Connexion depuis la tuile « Accès privé » : tri local par identifiant. L'administrateur
+   sans coffre sur cet appareil entre en mode local ; il connecte Home Assistant depuis
+   Réglages › Connexion Home Assistant (le coffre est créé au retour OAuth). */
+async function completeLogin(){
+  const identifier=normalizeIdentifier(UI.securityIdentifier.value);
+  const error=UI.securityError,button=UI.securitySubmit;
+  if(!identifier){error.textContent='Entre ton identifiant.';UI.securityIdentifier.focus();return}
+  button.disabled=true;
+  try{
+    if(await isAdminIdentifier(identifier)){
+      rememberAccount(identifier,'admin');
+      enterLocalMode();
+      return;
+    }
+    if(!UI.securityPassword.value){error.textContent='Entre ton mot de passe.';return}
+    error.textContent=STATUS_TEXT.familySoon;
+  }catch(_){
+    error.textContent='Connexion impossible sur ce navigateur.';
+  }finally{button.disabled=false}
+}
+/* Mode local (sans Home Assistant) : liste conservée sur cet appareil. */
+function enterLocalMode(){
+  state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
+  state.loading=false;state.error='';
+  state.items=loadJson(DEMO_KEY,[])||[];
+  hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
+}
 function beginOAuth(){
+  const feedback=UI.connectionDialogFeedback;
+  const value=normalizeHaUrl(UI.connectionHaUrl.value);
+  if(!value){setDialogFeedback(feedback,'Entre une adresse HTTPS Home Assistant valide.','error');return}
   state.demo=false;
-  const value=normalizeHaUrl(UI.haUrlInput.value);
-  if(!value){UI.setupError.textContent='Entre une adresse HTTPS Home Assistant valide.';return}
   state.haUrl=value;
   // Do not persist the HA URL in plaintext. It survives the OAuth round-trip only in this tab.
   deleteKey(STORAGE.haUrl);
@@ -1766,7 +1814,7 @@ function beginOAuth(){
     // Temporary fallback for iOS/PWA OAuth navigation. Contains no credential and is deleted after the callback.
     saveJson(OAUTH_TEMP_KEY,oauthState);
   }catch(_){
-    UI.setupError.textContent='Le stockage temporaire du navigateur est indisponible.';return;
+    setDialogFeedback(feedback,'Le stockage temporaire du navigateur est indisponible.','error');return;
   }
   const authorize=value+'/auth/authorize?client_id='+encodeURIComponent(CLIENT_ID)+'&redirect_uri='+encodeURIComponent(REDIRECT_URI)+'&state='+encodeURIComponent(nonce);
   location.assign(authorize);
@@ -1777,8 +1825,9 @@ async function revoke(){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
   }
   clearLocalConnectionData();
+  forgetAccount();
   UI.settingsDialog.close();
-  showSetup('Autorisation locale supprimée et session Home Assistant révoquée.');
+  showLogin();
 }
 
 function websocketUrl(){const u=new URL(state.haUrl);u.protocol=u.protocol==='https:'?'wss:':'ws:';u.pathname=(u.pathname.replace(/\/$/,'')+'/api/websocket');u.search='';u.hash='';return u.toString()}
@@ -2380,9 +2429,11 @@ function clearPasswordChangeForm(){
   $('#changePasswordBtn').hidden=false;
 }
 function openConnectionSettings(){
-  if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
+  const notConnected=state.demo;
   const urlInput=UI.connectionHaUrl;
   if(urlInput)urlInput.value=state.haUrl||'';
+  UI.connectionConnectBtn.hidden=!notConnected;
+  UI.connectionOAuthHint.hidden=!notConnected;
   const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
   const select=UI.connectionEntitySelect;
   if(select){
@@ -2397,6 +2448,7 @@ function openConnectionSettings(){
   showNeutralDialog(dialog);
 }
 async function saveConnectionSettings(){
+  if(state.demo)return;
   const nextUrl=normalizeHaUrl(UI.connectionHaUrl.value);
   const chosenEntity=UI.connectionEntitySelect.value;
   const nextEntity=chosenEntity||state.entity;
@@ -2413,8 +2465,7 @@ async function saveConnectionSettings(){
     UI.connectionDialog.close();
     await revoke();
     state.haUrl=nextUrl;
-    UI.haUrlInput.value=nextUrl;
-    UI.setupError.textContent='Adresse modifiée : reconnecte Home Assistant.';
+    UI.securityError.textContent='Adresse modifiée : reconnecte Home Assistant depuis Réglages.';
   }else{
     if(changedEntity)await subscribe();
     await refreshItems();armIdleLock();
@@ -2525,7 +2576,7 @@ function savePreferencesSettings(){
 }
 
 function openSettings(){
-  if(state.demo){showSetup(STATUS_TEXT.demoConnectHint);return}
+  if(state.demo){openConnectionSettings();return}
   clearPasswordChangeForm();
   clearDialogFeedback(UI.settingsDialogFeedback);
   if(UI.autoLockSelect)UI.autoLockSelect.value=String(state.autoLockMinutes);
@@ -2928,7 +2979,7 @@ async function init(){
   renderView();
   if(!window.crypto?.subtle){
     state.loading=false;renderList();
-    showSetup('Ce navigateur ne prend pas en charge le chiffrement Web Crypto requis.');
+    showLogin('Ce navigateur ne prend pas en charge le chiffrement Web Crypto requis.');
     status('is-error','Navigateur incompatible','Web Crypto indisponible');
     return;
   }
@@ -2940,7 +2991,7 @@ async function init(){
     const returnedState=params.get('state')||'';
     if(!oauth||oauth.nonce!==returnedState||!normalizeHaUrl(oauth.haUrl)){
       history.replaceState({},'',REDIRECT_URI);
-      showSetup('Retour OAuth invalide ou expiré. Recommence la connexion.');
+      showLogin('Retour OAuth invalide ou expiré. Recommence la connexion depuis Réglages.');
       return;
     }
     state.haUrl=normalizeHaUrl(oauth.haUrl);
@@ -2967,7 +3018,7 @@ async function init(){
     return;
   }
   state.haUrl=normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
-  state.loading=false;renderView();showSetup();status('is-waiting','Configuration requise','Première connexion');
+  state.loading=false;renderView();showLogin();status('is-waiting','Connexion requise','Identifiant et mot de passe');
 }
 
 function currentAppVersion(){
@@ -3081,7 +3132,12 @@ function setUnlockGate(locked){
   if(button){button.disabled=locked;button.textContent=locked?'Vérification…':'Connexion'}
 }
 function focusSecurityPassword(){
-  setTimeout(()=>{if(UI.securityOverlay?.classList?.contains('is-visible'))UI.securityPassword?.focus?.()},80);
+  setTimeout(()=>{
+    if(!UI.securityOverlay?.classList?.contains('is-visible'))return;
+    // Connexion : l'identifiant d'abord s'il n'est pas encore mémorisé.
+    if(!UI.securityIdentifierWrap?.hidden&&!UI.securityIdentifier?.value)UI.securityIdentifier?.focus?.();
+    else UI.securityPassword?.focus?.();
+  },80);
 }
 async function gateUnlockOnUpdate(){
   // Écran réaffiché pendant une vérification déjà en cours : le champ reste verrouillé jusqu'à sa fin.
@@ -3178,21 +3234,16 @@ async function refreshFromHeader(button,checkUpdate=false){
 }
 
 function bindUiEvents(){
-  $('#connectBtn').onclick=beginOAuth;
+  UI.connectionConnectBtn.onclick=beginOAuth;
   UI.securitySubmit.onclick=completeSecurityAction;
-  const syncPasswordOpen=()=>UI.securityShell.classList.toggle('is-password-open',document.activeElement===UI.securityPassword||document.activeElement===UI.securityConfirm);
-  [UI.securityPassword,UI.securityConfirm].forEach(input=>{
+  const syncPasswordOpen=()=>UI.securityShell.classList.toggle('is-password-open',[UI.securityIdentifier,UI.securityPassword,UI.securityConfirm].includes(document.activeElement));
+  [UI.securityIdentifier,UI.securityPassword,UI.securityConfirm].forEach(input=>{
     input.addEventListener('focus',syncPasswordOpen);
     input.addEventListener('blur',()=>requestAnimationFrame(syncPasswordOpen));
   });
   UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+  UI.securityIdentifier.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();UI.securityPassword.focus()}};
   UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
-  $('#demoBtn').onclick=()=>{
-    state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
-    state.loading=false;state.error='';
-    state.items=loadJson(DEMO_KEY,[])||[];
-    hideSetup();hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
-  };
   UI.refreshBtn.onclick=event=>refreshFromHeader(UI.refreshBtn,event.isTrusted);
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;

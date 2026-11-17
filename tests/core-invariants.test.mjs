@@ -48,7 +48,7 @@ test('la synchronisation Home Assistant reste événementielle sans polling perm
 test('le mode test reste local et indépendant de la connexion Home Assistant',()=>{
   const app=read('app.js');
   assert.match(app,/const DEMO_KEY = 'courses-external-demo-items-v2';/);
-  assert.match(app,/\$\('#demoBtn'\)\.onclick=\(\)=>\{[\s\S]*?state\.demo=true;state\.locked=false;[\s\S]*?state\.items=loadJson\(DEMO_KEY,\[\]\)\|\|\[\];/);
+  assert.match(app,/function enterLocalMode\(\)\{[\s\S]*?state\.demo=true;state\.locked=false;[\s\S]*?state\.items=loadJson\(DEMO_KEY,\[\]\)\|\|\[\];/);
   assert.match(app,/if\(state\.demo\)\{[\s\S]*?state\.items=loadJson\(DEMO_KEY,\[\]\)\|\|\[\];/);
 });
 

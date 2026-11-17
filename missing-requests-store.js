@@ -281,7 +281,7 @@ async function performSharedSync(){
   if(!sharedConnected())return;
   if(!sharedActions().length){
     applySharedRows(rows);
-    setSharedStatus('synced','Synchronisé avec Home Assistant');
+    setSharedStatus('synced','Synchronisé');
   }
 }
 function requestSharedSync(){

@@ -9,9 +9,11 @@ test('feuilles des Réglages : les listes du bas défilent jusqu au bord de l é
   assert.match(css,/--sheet-bottom-inset:max\(24px,env\(safe-area-inset-bottom\)\);\s*padding:43px 21px var\(--sheet-bottom-inset\)!important;/);
   const rule=css.match(/([^{}]+)\{margin-bottom:calc\(-1 \* var\(--sheet-bottom-inset\)\)!important;padding-bottom:calc\(var\(--sheet-bottom-inset\) \+ 12px\)!important;/);
   assert.ok(rule,'règle unique de marge basse des listes absente');
-  for(const selector of ['#preferencesDialog .preference-dialog-scroll','#missingProductsDialog .missing-products-list','#missingProductsDialog .catalog-remove-panel','.recipe-customization-dialog .recipe-dish-picker']){
+  for(const selector of ['#preferencesDialog .preference-dialog-scroll','#missingProductsDialog .catalog-remove-panel','.recipe-customization-dialog .recipe-dish-picker']){
     assert.ok(rule[1].includes(selector),selector);
   }
+  // v824 — « À intégrer » est une carte : autant d'espace sous la dernière ligne qu'au-dessus.
+  assert.equal(rule[1].includes('#missingProductsDialog .missing-products-list'),false,'la carte À intégrer ne reçoit pas la marge basse de feuille');
 });
 
 test('feuilles des Réglages : les modules ne remettent pas de marge basse concurrente sur ces listes',()=>{

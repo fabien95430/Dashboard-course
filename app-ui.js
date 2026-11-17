@@ -239,7 +239,7 @@ function securityViewportOffsetTop(){
   return Math.max(0,Math.round(window.visualViewport?.offsetTop||0));
 }
 function isSecurityPasswordField(target=document.activeElement){
-  return target===document.getElementById('securityPassword')||target===document.getElementById('securityConfirm');
+  return target===document.getElementById('securityIdentifier')||target===document.getElementById('securityPassword')||target===document.getElementById('securityConfirm');
 }
 function syncSecurityViewportPosition(){
   const shell=document.querySelector('.security-shell');
