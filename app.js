@@ -179,8 +179,7 @@ const STATUS_TEXT=Object.freeze({
   passwordRequired:'Mot de passe local requis',
   unlockRequired:'Déverrouillage requis',
   manualLockReason:'Verrouillage manuel.',
-  demoConnectHint:'Connecte Home Assistant pour synchroniser la vraie liste.',
-  familySoon:'Ce compte famille n’est pas encore disponible sur cet appareil.'
+  demoConnectHint:'Connecte Home Assistant pour synchroniser la vraie liste.'
 });
 
 const STORAGE = {
@@ -197,6 +196,12 @@ const STORAGE = {
 const DEMO_KEY = 'courses-external-demo-items-v2';
 // Empreinte SHA-256 de l'identifiant administrateur normalisé (trim + minuscules) : le tri
 // admin / famille se fait localement, sans réseau ni dépendance au service famille.
+/* Liste locale (mode local admin ou compte famille) : écriture unique ; en mode famille,
+   le service famille la reflète aussitôt dans Supabase. */
+function saveLocalItems(items){
+  saveJson(DEMO_KEY,items);
+  if(state.family)window.COURSES_FAMILY?.listChanged();
+}
 const ADMIN_IDENTIFIER_SHA256 = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
 const OAUTH_STATE_KEY = 'courses-oauth-state-v2';
 const OAUTH_TEMP_KEY = 'courses-oauth-temp-v2';
@@ -230,6 +235,10 @@ const UI = Object.freeze({
   securityIdentifierWrap: document.getElementById('securityIdentifierWrap'),
   connectionConnectBtn: document.getElementById('connectionConnectBtn'),
   connectionOAuthHint: document.getElementById('connectionOAuthHint'),
+  familyDeviceDialog: document.getElementById('familyDeviceDialog'),
+  familyDeviceName: document.getElementById('familyDeviceName'),
+  familyDeviceSave: document.getElementById('familyDeviceSave'),
+  familyDeviceFeedback: document.getElementById('familyDeviceFeedback'),
   securityShell: document.querySelector('.security-shell'),
   securitySubmit: document.getElementById('securitySubmit'),
   securityError: document.getElementById('securityError'),
@@ -377,6 +386,7 @@ let state={
   reconnectPromise:null,
   intentionalClose:false,
   demo:false,
+  family:false,
   lockTimer:null,
   backgroundLockTimer:null,
   backgroundedAt:0,
@@ -1168,7 +1178,7 @@ function applyDemoListOrder(orderKeys){
     else extras.push(item);
   });
   state.items=[...orderKeys.flatMap(key=>buckets.get(key)||[]),...extras,...completed];
-  saveJson(DEMO_KEY,state.items);
+  saveLocalItems(state.items);
 }
 function applyLocalListMove(orderKeys,movedKey){
   const movedIndex=orderKeys.indexOf(movedKey);
@@ -1787,11 +1797,55 @@ async function completeLogin(){
       return;
     }
     if(!UI.securityPassword.value){error.textContent='Entre ton mot de passe.';return}
-    error.textContent=STATUS_TEXT.familySoon;
-  }catch(_){
-    error.textContent='Connexion impossible sur ce navigateur.';
+    if(!window.COURSES_FAMILY){error.textContent='Service famille indisponible.';return}
+    const info=await window.COURSES_FAMILY.signIn(identifier,UI.securityPassword.value);
+    rememberAccount(identifier,'family');
+    enterFamilyMode(info);
+  }catch(err){
+    error.textContent=err?.message||'Connexion impossible.';
   }finally{button.disabled=false}
 }
+/* Compte famille : liste partagée via le service famille, aucun coffre ni verrouillage. */
+function enterFamilyMode(info){
+  state.family=true;
+  enterLocalMode();
+  status('','Synchronisé','Liste famille');
+  document.documentElement.dataset.account='family';
+  if(info?.needsDeviceName)openFamilyDeviceDialog();
+}
+function leaveFamilyMode(){
+  state.family=false;state.demo=false;state.items=[];
+  delete document.documentElement.dataset.account;
+}
+function openFamilyDeviceDialog(){
+  const dialog=UI.familyDeviceDialog;
+  if(!dialog)return;
+  UI.familyDeviceName.value='';
+  clearDialogFeedback(UI.familyDeviceFeedback);
+  showNeutralDialog(dialog);
+}
+async function saveFamilyDeviceName(){
+  const name=UI.familyDeviceName.value.trim();
+  if(!name){setDialogFeedback(UI.familyDeviceFeedback,'Donne un nom à cet appareil.','error');return}
+  UI.familyDeviceSave.disabled=true;
+  try{
+    await window.COURSES_FAMILY.registerDevice(name);
+    UI.familyDeviceDialog.close();
+    toast('Appareil enregistré');
+  }catch(_){
+    setDialogFeedback(UI.familyDeviceFeedback,'Enregistrement impossible. Réessaie.','error');
+  }finally{UI.familyDeviceSave.disabled=false}
+}
+document.addEventListener('courses:family-list-updated',event=>{
+  if(!state.family)return;
+  state.items=Array.isArray(event.detail?.items)?event.detail.items:[];
+  renderSelectionAndList();
+});
+document.addEventListener('courses:family-revoked',()=>{
+  if(!state.family)return;
+  leaveFamilyMode();forgetAccount();renderView();
+  showLogin('Cet appareil a été déconnecté par l’administrateur.');
+});
 /* Mode local (sans Home Assistant) : liste conservée sur cet appareil. */
 function enterLocalMode(){
   state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
@@ -1820,6 +1874,13 @@ function beginOAuth(){
   location.assign(authorize);
 }
 async function revoke(){
+  if(state.family){
+    await window.COURSES_FAMILY?.signOut();
+    leaveFamilyMode();forgetAccount();
+    UI.settingsDialog.close();renderView();
+    showLogin();
+    return;
+  }
   state.demo=false;
   if(state.refreshToken&&state.haUrl){
     try{await fetch(state.haUrl+'/auth/revoke',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:state.refreshToken})})}catch(_){}
@@ -2096,7 +2157,7 @@ async function tagDishItems(dish,ingredients,{before=null}={}){
   const noteFor=item=>withDishNote(item.description,name,total,{owner:Boolean(previous&&itemUid(item)&&!previous.has(itemUid(item)))});
   if(state.demo){
     const items=(loadJson(DEMO_KEY,[])||[]).map(item=>concerned(item)?{...item,description:noteFor(item)}:item);
-    saveJson(DEMO_KEY,items);
+    saveLocalItems(items);
     state.items=items;
     renderSelectionAndList();
     return true;
@@ -2136,7 +2197,7 @@ async function cancelDishItems(dish){
       result.kept+=1;
       items.push({...item,description:withoutDishNote(item.description,name)});
     });
-    saveJson(DEMO_KEY,items);
+    saveLocalItems(items);
     state.items=items;
     renderSelectionAndList();
     return result;
@@ -2206,7 +2267,7 @@ async function addItem(name,{deferRefresh=false}={}){
   if(state.demo){
     const items=loadJson(DEMO_KEY,[])||[];
     items.push({uid:'demo-'+Date.now()+'-'+Math.random().toString(36).slice(2),summary:item,status:'needs_action'});
-    saveJson(DEMO_KEY,items);state.items=items;recordUsage(item);
+    saveLocalItems(items);state.items=items;recordUsage(item);
     toast(item+' ajouté');renderSelectionAndList();return true;
   }
   if(!state.entity)return;
@@ -2266,7 +2327,7 @@ async function removeOneItem(name,groupHint=null,{deferRefresh=false}={}){
       }
       if(removeIndex<0)return;
       items.splice(removeIndex,1);
-      saveJson(DEMO_KEY,items);state.items=items;
+      saveLocalItems(items);state.items=items;
       toast(item+' -1');renderSelectionAndList();return true;
     }
     if(!state.entity)throw new Error('Liste Home Assistant indisponible');
@@ -2348,7 +2409,7 @@ async function removeGroup(name,row=null,intent='purchase'){
   try{
     if(state.demo){
       const items=(loadJson(DEMO_KEY,[])||[]).filter(keepOtherItems);
-      saveJson(DEMO_KEY,items);
+      saveLocalItems(items);
       state.items=items;
       if(isPurchase)publishPurchaseSettled(item,group.count,false);
       toast(successMessage);
@@ -3018,6 +3079,13 @@ async function init(){
     return;
   }
   state.haUrl=normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
+  if(rememberedAccount()?.kind==='family'&&window.COURSES_FAMILY){
+    // Compte famille : la session reste ouverte, sans redemander le mot de passe.
+    try{
+      const info=await window.COURSES_FAMILY.resume();
+      if(info){enterFamilyMode(info);return}
+    }catch(_){}
+  }
   state.loading=false;renderView();showLogin();status('is-waiting','Connexion requise','Identifiant et mot de passe');
 }
 
@@ -3235,6 +3303,8 @@ async function refreshFromHeader(button,checkUpdate=false){
 
 function bindUiEvents(){
   UI.connectionConnectBtn.onclick=beginOAuth;
+  UI.familyDeviceSave.onclick=saveFamilyDeviceName;
+  UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};
   UI.securitySubmit.onclick=completeSecurityAction;
   const syncPasswordOpen=()=>UI.securityShell.classList.toggle('is-password-open',[UI.securityIdentifier,UI.securityPassword,UI.securityConfirm].includes(document.activeElement));
   [UI.securityIdentifier,UI.securityPassword,UI.securityConfirm].forEach(input=>{

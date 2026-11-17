@@ -3281,6 +3281,9 @@ body{
 .settings-sheet .field input:focus-visible,.settings-sheet .field select:focus-visible,.settings-sheet .recipe-customization-search:focus-within,.settings-sheet .courses-product-admin-search:focus-within{outline:2px solid rgba(51,105,72,.23)!important;outline-offset:1px}
 .settings-sheet#missingProductsDialog .missing-products-header>div{width:100%;min-width:0}
 .settings-sheet#connectionDialog .connection-sync-line{gap:12px}
+/* v825 — compte famille : nom de l'appareil à la première connexion. */
+.settings-sheet#familyDeviceDialog{height:auto!important}
+.settings-sheet#familyDeviceDialog .family-device-save{width:100%;min-height:48px;margin:16px 0 6px;border-radius:15px;font:inherit;font-size:var(--fs-text);font-weight:600}
 /* v824 — popup Connexion Home Assistant, état non connecté (remplace l'ancien écran de démarrage). */
 .settings-sheet#connectionDialog .connection-oauth-hint{margin:8px 2px 12px;color:var(--sheet-muted);font-size:var(--fs-note);line-height:1.4}
 .settings-sheet#connectionDialog .connection-oauth-hint[hidden],.settings-sheet#connectionDialog .connection-connect-btn[hidden]{display:none}

@@ -83,7 +83,7 @@ test('annuler un plat retire seulement ses unités ajoutées que rien d autre n 
     {uid:'4',summary:'Pain',status:'needs_action'}
   ];
   let saved=null;
-  const context={state:{items,demo:true,locked:false},DEMO_KEY:'demo',loadJson:()=>items,saveJson:(key,value)=>{saved=value},renderSelectionAndList(){},
+  const context={state:{items,demo:true,locked:false},DEMO_KEY:'demo',loadJson:()=>items,saveJson:(key,value)=>{saved=value},saveLocalItems:value=>{saved=value},renderSelectionAndList(){},
     isPendingItem:item=>String(item?.status||'needs_action')!=='completed',itemSummary:item=>String(item?.summary||'').trim(),itemUid:item=>String(item?.uid||''),console,result:null};
   vm.runInNewContext(app.slice(start,end)+app.slice(cs,ce)+'\ncancelDishItems("Carbonara").then(value=>{result=value});',context);
   return new Promise(resolve=>setImmediate(resolve)).then(()=>{
