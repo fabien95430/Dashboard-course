@@ -3,6 +3,8 @@
 const ENTITY='todo.courses_notifications',PREFIX='courses-push-v1:',OWN_ID_KEY='courses-push-own-id-v1';
 const VAPID_ENTITY='input_text.courses_vapid_public_key',MAX_DEVICES=12;
 const ha=()=>window.COURSES_HA_CLIENT,connected=()=>!!ha()?.isConnected?.();
+// Compte famille : abonnements rangés dans le service famille (Supabase), avec sa propre clé publique.
+const family=()=>document.documentElement.dataset.account==='family'&&!!window.COURSES_FAMILY?.isActive?.();
 let task=null,status='À activer sur chaque iPhone';
 function setStatus(text){
   status=/Getting push subscription requires a service worker/i.test(String(text||''))
@@ -65,8 +67,13 @@ async function currentPush({ask=false}={}){
   let permission=Notification.permission;
   if(permission==='default'&&ask)permission=await Notification.requestPermission();
   if(permission!=='granted')throw new Error('Notifications refusées dans les réglages iOS');
-  const key=await publicKey(),registration=await navigator.serviceWorker.ready;
+  const key=family()?String(window.COURSES_FAMILY.config.vapidPublicKey||''):await publicKey(),registration=await navigator.serviceWorker.ready;
   let subscription=await registration.pushManager.getSubscription();
+  // Abonnement créé avec une autre clé (changement de compte sur ce téléphone) : on le renouvelle.
+  const current=subscription?.options?.applicationServerKey;
+  if(subscription&&current&&btoa(String.fromCharCode(...new Uint8Array(current))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')!==key){
+    await subscription.unsubscribe();subscription=null;
+  }
   if(!subscription){
     subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:bytesFromKey(key)});
   }
@@ -92,8 +99,21 @@ async function remember(push){
   if(!confirmed)throw new Error('Enregistrement non confirmé par Home Assistant');
   return true;
 }
+async function registerFamily({ask=false}={}){
+  if(!ask&&(!('Notification' in window)||Notification.permission!=='granted')){
+    setStatus('À activer sur chaque iPhone');return false;
+  }
+  try{
+    setStatus('Inscription de cet iPhone…');
+    await window.COURSES_FAMILY.saveSubscription(await currentPush({ask}));
+    const count=await window.COURSES_FAMILY.countSubscriptions();
+    setStatus('Actives · '+count+' appareil'+(count>1?'s':'')+' enregistré'+(count>1?'s':''));
+    return true;
+  }catch(error){setStatus(String(error?.message||'Inscription impossible').slice(0,130));return false}
+}
 async function register({ask=false}={}){
   if(task)return task;
+  if(family()){task=registerFamily({ask});try{return await task}finally{task=null}}
   if(!connected()){setStatus('En attente de Home Assistant');return false}
   if(!ask&&(!('Notification' in window)||Notification.permission!=='granted')){
     setStatus('À activer sur chaque iPhone');return false;
@@ -110,6 +130,7 @@ async function register({ask=false}={}){
   finally{if(task===job)task=null}
 }
 async function recipients(fallback=null){
+  if(family())return [];
   let saved=[];
   try{saved=(await rows()).map(decode).filter(Boolean).map(row=>row.push)}catch(_){}
   if(fallback)saved.push(fallback);
@@ -123,7 +144,7 @@ async function recipients(fallback=null){
   return result;
 }
 async function broadcast({kind,type,name,requestId}){
-  if(!connected())return false;
+  if(family()||!connected())return false;
   try{
     const targets=await recipients();
     if(!targets.length)return false;
@@ -136,6 +157,14 @@ async function broadcast({kind,type,name,requestId}){
   }catch(_){return false}
 }
 async function disable(){
+  if(family()){
+    try{
+      const registration=await navigator.serviceWorker.ready,subscription=await registration.pushManager.getSubscription();
+      if(subscription){await window.COURSES_FAMILY.removeSubscription(subscription.endpoint);await subscription.unsubscribe()}
+      setStatus('Notifications désactivées sur cet iPhone');
+      return true;
+    }catch(error){setStatus(String(error?.message||'Désactivation impossible'));return false}
+  }
   try{
     if(!connected())throw new Error('Home Assistant non connecté');
     const own=(await rows()).map(decode).filter(Boolean).find(row=>row.id===ownId());
@@ -152,6 +181,10 @@ function bind(){
   enable.addEventListener('click',()=>{void register({ask:true})});
   document.getElementById('disableMissingNotifications')?.addEventListener('click',()=>{void disable()});
   setStatus(status);
+  // Compte famille ouvert : réinscription silencieuse si les notifications sont déjà autorisées.
+  document.addEventListener('courses:account-changed',event=>{
+    if(event.detail?.kind==='family')setTimeout(()=>{void register()},1500);
+  });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 Object.defineProperty(window,'COURSES_NOTIFICATIONS',{value:Object.freeze({register,recipients,broadcast,disable,safePush,getStatus:()=>status}),configurable:false,enumerable:false,writable:false});

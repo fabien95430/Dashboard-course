@@ -72,3 +72,18 @@ test('compte famille : session conservée, déconnexion et révocation reviennen
   const revoke=app.match(/async function revoke\(\)\{[\s\S]*?\n\}/)?.[0]||'';
   assert.match(revoke,/if\(state\.family\)\{\s*await window\.COURSES_FAMILY\?\.signOut\(\);/);
 });
+
+test('notifications famille : clé publique propre, abonnements dans le service famille, jamais Home Assistant',()=>{
+  const service=read('family-service.js');
+  const notif=read('courses-notifications.js');
+  assert.match(service,/vapidPublicKey:'B[A-Za-z0-9_-]{80,}'/);
+  assert.match(service,/from\('abonnements'\)\.upsert\(row,\{onConflict:'endpoint'\}\)/);
+  assert.match(service,/appareil:device\.id/);
+  assert.match(notif,/if\(family\(\)\)\{task=registerFamily/);
+  assert.match(notif,/if\(family\(\)\|\|!connected\(\)\)return false/);
+  assert.doesNotMatch(service+read('supabase/functions/notifier/index.ts'),/VAPID_PRIVATE_KEY\s*[:=]\s*['"][A-Za-z0-9_-]{20,}/);
+  const sql=read('supabase/05-famille.sql');
+  assert.match(sql,/create table if not exists public\.abonnements/);
+  assert.match(sql,/after insert on public\.articles/);
+  assert.match(sql,/new\.statut = 'integre'/);
+});

@@ -11,6 +11,8 @@ const CONFIG=Object.freeze({
   // Clé publishable : publique par conception, l'accès aux données est protégé par RLS.
   key:'sb_publishable_OCoP4SmvfqxVPKdJbhdHsA_BFraB-fh',
   emailDomain:'@famille.invalid',
+  // Clé publique Web Push réservée aux téléphones famille (la clé privée est un secret Supabase).
+  vapidPublicKey:'BPONs8dXD96tiHA8HA5LjIb17wPp4Roa8OhK0Jpyhx-8R-TUV00HN1jP3893gsU6JpexdFa0gOLfxDf8cf7ORZg',
   library:'./vendor/supabase.min.js?v=2119'
 });
 const KEYS=Object.freeze({
@@ -140,7 +142,9 @@ async function pushList(){
       const keep=new Set(rows.map(row=>row.id));
       const removed=[...serverRows.keys()].filter(id=>!keep.has(id));
       if(changed.length){
-        const {error}=await db.from('articles').upsert(changed,{onConflict:'id'});
+        // Un nouvel article porte le téléphone qui l'ajoute : la notification va aux autres téléphones du foyer.
+        const payload=changed.map(row=>serverRows.has(row.id)||!device?.id?row:{...row,appareil:device.id});
+        const {error}=await db.from('articles').upsert(payload,{onConflict:'id'});
         if(error)throw error;
         changed.forEach(row=>serverRows.set(row.id,{...serverRows.get(row.id),...row}));
       }
@@ -321,8 +325,34 @@ async function resume(){
   if(!data?.session)return null;
   return startSession(data.session);
 }
+/* ---------- Notifications (abonnements Web Push du foyer) ---------- */
+async function saveSubscription(push){
+  if(!session)throw new Error('Compte famille non connecté');
+  const db=await familyClient();
+  const row={endpoint:String(push.endpoint),p256dh:String(push.p256dh),auth:String(push.auth),appareil:device?.id||null};
+  const {error}=await db.from('abonnements').upsert(row,{onConflict:'endpoint'});
+  if(error)throw new Error('Enregistrement des notifications impossible');
+  return true;
+}
+async function removeSubscription(endpoint){
+  if(!session||!endpoint)return false;
+  const db=await familyClient();
+  const {error}=await db.from('abonnements').delete().eq('endpoint',String(endpoint));
+  return !error;
+}
+async function countSubscriptions(){
+  if(!session)return 0;
+  const db=await familyClient();
+  const {data,error}=await db.from('abonnements').select('id');
+  return error?0:(data||[]).length;
+}
 async function signOut(){
   clearTimeout(localTimer);clearTimeout(pushTimer);
+  try{
+    const registration=await navigator.serviceWorker?.getRegistration?.();
+    const subscription=await registration?.pushManager?.getSubscription?.();
+    if(subscription){await removeSubscription(subscription.endpoint);await subscription.unsubscribe()}
+  }catch(_){}
   try{if(listChannel)await client?.removeChannel(listChannel)}catch(_){}
   try{if(deviceChannel)await client?.removeChannel(deviceChannel)}catch(_){}
   listChannel=null;deviceChannel=null;
@@ -398,6 +428,7 @@ const api=Object.freeze({
   emailFor,displayName,ensureUuids,rowToItem,itemToRow,
   signIn,resume,signOut,listChanged,pushList,
   registerDevice,listDevices,touchDevice,
+  saveSubscription,removeSubscription,countSubscriptions,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),
   adminOverview,adminSetRequestStatus,adminRevokeDevice,adminWatchRequests,adminSignOut

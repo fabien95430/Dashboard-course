@@ -36,6 +36,14 @@ Scripts à exécuter une seule fois, dans l’ordre (SQL Editor › New query �
 2. `supabase/02-famille.sql` — demandes (statut), lecture admin des personnalisations, historique `achats`.
 3. `supabase/03-famille.sql` — notes de plats et ordre de la liste.
 4. `supabase/04-famille.sql` — fonction `familles()` pour les noms des foyers.
+5. `supabase/05-famille.sql` — notifications des familles (abonnements + déclencheurs), après la fonction Edge ci-dessous.
+
+## Notifications des familles
+
+- Clé Web Push **réservée aux familles** : la clé publique est dans `family-service.js`, la clé privée uniquement dans les secrets Supabase (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`). L'administrateur garde sa propre clé (Home Assistant → GitHub).
+- Fonction Edge `notifier` (`supabase/functions/notifier/index.ts`), « Verify JWT » désactivé : appelée par les déclencheurs de `05-famille.sql`.
+- Article ajouté → les autres téléphones du foyer ; demande intégrée → tous les téléphones du foyer.
+- Chaque téléphone famille active les notifications dans Gestion de l’application › Notifications.
 
 Seule la clé **publishable** figure dans le code (`family-service.js`). Ne jamais committer la clé secrète / `service_role`.
 
