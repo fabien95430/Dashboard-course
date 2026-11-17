@@ -1509,6 +1509,13 @@ async function decryptVault(record,password){
   if(!payload?.refresh_token||!normalizeHaUrl(payload?.ha_url))throw new Error('Coffre invalide');
   return payload;
 }
+/* Tant que l'admin est déverrouillé, le coffre peut être rescellé (ajout de l'accès « Familles »)
+   sans redemander le mot de passe déjà saisi à l'ouverture. Effacé au verrouillage. */
+let vaultSeal=null;
+function rememberVaultSeal(password){
+  const secret=String(password||'');
+  vaultSeal=familyAdmin=>storeSecureVault(state.refreshToken,state.haUrl,secret,familyAdmin);
+}
 async function storeSecureVault(refreshToken,haUrl,password,familyAdmin=state.familyAdmin){
   const payload={
     refresh_token:String(refreshToken||''),
@@ -1542,6 +1549,7 @@ function wipeMemoryCredentials(){
   state.accessToken='';
   state.accessTokenExpiresAt=0;
   state.refreshToken='';
+  vaultSeal=null;
   if(!state.demo)state.familyAdmin=null;
   void window.COURSES_FAMILY?.adminSignOut?.();
 }
@@ -1751,6 +1759,7 @@ async function completeSecurityAction(){
       state.haUrl=normalizeHaUrl(payload.ha_url);
       state.refreshToken=String(payload.refresh_token||'');
       state.familyAdmin=payload.family_admin||null;
+      rememberVaultSeal(password);
       state.locked=false;
       hideSecurity();
       await connectFromRefresh();
@@ -1761,6 +1770,7 @@ async function completeSecurityAction(){
       const haUrl=normalizeHaUrl(legacy?.ha_url||localStorage.getItem(STORAGE.haUrl)||state.haUrl);
       if(!legacy?.refresh_token||!haUrl)throw new Error('Ancienne connexion introuvable');
       await storeSecureVault(legacy.refresh_token,haUrl,password);
+      rememberVaultSeal(password);
       state.haUrl=haUrl;state.refreshToken=String(legacy.refresh_token);state.locked=false;
       hideSecurity();
       await connectFromRefresh();
@@ -1772,6 +1782,7 @@ async function completeSecurityAction(){
       const data=await exchangeCodeRaw(code,state.pendingOAuthState);
       if(!data?.refresh_token||!data?.access_token)throw new Error('Réponse OAuth incomplète');
       await storeSecureVault(data.refresh_token,state.haUrl,password);
+      rememberVaultSeal(password);
       state.refreshToken=String(data.refresh_token);
       state.accessToken=String(data.access_token);
       state.accessTokenExpiresAt=Date.now()+Number(data.expires_in||1800)*1000;
@@ -1820,17 +1831,16 @@ async function completeLogin(){
 Object.defineProperty(window,'COURSES_ADMIN_ACCESS',{value:Object.freeze({
   available:()=>!state.family&&!state.locked&&(state.demo||!!vaultRecord()),
   credentials:()=>state.family||state.locked||!state.familyAdmin?null:{...state.familyAdmin},
-  async save(credentials,localPassword){
+  async save(credentials){
     const familyAdmin={email:String(credentials?.email||'').trim().toLowerCase(),password:String(credentials?.password||'')};
     if(!familyAdmin.email||!familyAdmin.password)throw new Error('Entre l’e-mail et le mot de passe du compte administrateur.');
     if(vaultRecord()){
-      const payload=await decryptVault(vaultRecord(),String(localPassword||'')).catch(()=>{throw new Error('Mot de passe local incorrect.')});
-      await storeSecureVault(payload.refresh_token,payload.ha_url,String(localPassword),familyAdmin);
+      if(!vaultSeal)throw new Error('Déverrouille l’application puis réessaie.');
+      await vaultSeal(familyAdmin);
     }
     state.familyAdmin=familyAdmin;
     return true;
-  },
-  needsLocalPassword:()=>!!vaultRecord()
+  }
 }),configurable:false,enumerable:false,writable:false});
 /* Compte famille : liste partagée via le service famille, aucun coffre ni verrouillage. */
 function enterFamilyMode(info){
@@ -2727,6 +2737,7 @@ async function changeLocalPassword(){
   try{
     const payload=await decryptVault(vaultRecord(),current);
     await storeSecureVault(payload.refresh_token,payload.ha_url,next,payload.family_admin||null);
+    rememberVaultSeal(next);
     clearUnlockGuard();
     clearPasswordChangeForm();
     armIdleLock();

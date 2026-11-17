@@ -190,24 +190,22 @@ function header(title,back){
     '<span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-home"></use></svg></span><span class="settings-sheet-title">'+esc(title)+'</span></h3>';
 }
 
+const ADMIN_EMAIL='admin.maison@gmail.com';
 function renderAccess(node,message=''){
-  const local=access()?.needsLocalPassword();
   node.dataset.view='access';
   node.innerHTML=header('Familles')+
-    '<p class="dialog-intro">Compte administrateur du service famille.</p>'+
-    '<label class="field"><span>E-mail</span><input id="familyAdminEmail" type="email" autocomplete="username" autocapitalize="none" spellcheck="false"></label>'+
-    '<label class="field"><span>Mot de passe</span><input id="familyAdminPassword" type="password" autocomplete="current-password"></label>'+
-    (local?'<label class="field"><span>Mot de passe de l’application</span><input id="familyAdminLocal" type="password" autocomplete="off"></label>':'')+
+    '<p class="dialog-intro">Une seule fois : compte admin Supabase.</p>'+
+    '<label class="field"><span>E-mail</span><input id="familyAdminEmail" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" value="'+ADMIN_EMAIL+'"></label>'+
+    '<label class="field"><span>Mot de passe Supabase</span><input id="familyAdminPassword" type="password" autocomplete="current-password"></label>'+
     '<button type="button" class="primary family-admin-save" data-action="save-access">Valider</button>'+
     '<p class="dialog-feedback'+(message?' is-error':'')+'" role="status" aria-live="polite">'+esc(message)+'</p>';
 }
 async function saveAccess(node,button){
   const email=node.querySelector('#familyAdminEmail')?.value||'';
   const password=node.querySelector('#familyAdminPassword')?.value||'';
-  const local=node.querySelector('#familyAdminLocal')?.value||'';
   button.disabled=true;
   try{
-    await access().save({email,password},local);
+    await access().save({email,password});
     await refresh();
     renderFamilies(node);
   }catch(error){

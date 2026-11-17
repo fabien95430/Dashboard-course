@@ -97,4 +97,8 @@ test('coffre : l’accès admin du service famille est chiffré avec le reste et
   assert.match(app,/state\.familyAdmin=payload\.family_admin\|\|null/);
   assert.match(app,/Object\.defineProperty\(window,'COURSES_ADMIN_ACCESS'/);
   assert.doesNotMatch(app,/localStorage\.setItem\([^)]*family_admin/);
+  // Pas de second mot de passe : le coffre est rescellé avec celui de l'ouverture, oublié au verrouillage.
+  assert.match(app,/rememberVaultSeal\(password\)/);
+  assert.match(app,/vaultSeal=null;/);
+  assert.doesNotMatch(read('family-admin.js'),/Mot de passe de l’application|familyAdminLocal/);
 });
