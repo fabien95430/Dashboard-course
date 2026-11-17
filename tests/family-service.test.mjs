@@ -29,6 +29,10 @@ test('identifiant famille : adresse interne @famille.invalid, adresse complète 
   assert.equal(family.emailFor('Stephany.Maison@Hotmail.fr'),'stephany.maison@hotmail.fr');
   assert.equal(family.emailFor(''),'');
   assert.equal(family.displayName('camille@famille.invalid'),'Camille');
+  assert.equal(family.displayName('karina@famille.invalid'),'Karina');
+  assert.equal(family.displayName('Stephany.Maison@Hotmail.fr'),'Stephany');
+  assert.equal(family.displayName('marie-dupont@famille.invalid'),'Marie');
+  assert.equal(family.displayName('famille.marie@famille.invalid'),'Marie');
 });
 
 test('liste famille : chaque article a un identifiant UUID et l aller-retour ligne ↔ article est fidèle',()=>{

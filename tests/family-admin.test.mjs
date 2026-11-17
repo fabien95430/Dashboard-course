@@ -13,6 +13,7 @@ function loadAdmin(extra={}){
     COURSES_TEXT:{key:v=>String(v||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim()},
     COURSES_CATALOG:{groups:{Frais:{Yaourts:['Yaourts nature']},'Fruits & Légumes':{Fruits:['Pommes']}}},
     COURSES_DISH_BASE:{'Penne poulet crème':['Penne','Poulet','Crème fraîche','Champignons','Parmesan']},
+    COURSES_FAMILY:{displayName:id=>{const w=String(id||'').split('@')[0].split(/[._\-\s\d]+/).filter(Boolean);const f=(/^famille$/i.test(w[0]||'')?w[1]:w[0])||'';return f?f[0].toUpperCase()+f.slice(1).toLowerCase():''}},
     ...extra
   };
   sandbox.window=sandbox;
@@ -24,13 +25,13 @@ function loadAdmin(extra={}){
 test('foyers : regroupés par famille, nommés depuis l’identifiant, sans mélange',()=>{
   const admin=loadAdmin();
   const families=admin.buildFamilies({
-    families:[{id:'a',email:'dupont@famille.invalid'},{id:'b',email:'famille.martin@famille.invalid'}],
+    families:[{id:'a',email:'karina@famille.invalid'},{id:'b',email:'stephany.maison@hotmail.fr'},{id:'c',email:'marie@famille.invalid'}],
     devices:[{id:'d1',famille:'a',nom:'iPhone'}],
     requests:[{id:'r1',famille:'b',type:'plat',nom:'Paëlla'},{id:'r2',famille:'a',type:'produit',nom:'Kombucha'}],
     purchases:[{famille:'a',nom:'Pommes',coche_le:new Date().toISOString()}],
     customizations:[]
   });
-  assert.equal(JSON.stringify(families.map(f=>f.name)),JSON.stringify(['Famille Dupont','Famille Martin']));
+  assert.equal(JSON.stringify(families.map(f=>f.name)),JSON.stringify(['Famille Karina','Famille Marie','Famille Stephany']));
   const dupont=families.find(f=>f.id==='a');
   assert.equal(dupont.devices.length,1);
   assert.equal(dupont.requests.map(r=>r.nom).join(),'Kombucha');

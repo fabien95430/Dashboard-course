@@ -15,10 +15,8 @@ const SVG_DISH='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M11 45h42" 
 const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const plural=(n,word)=>n+' '+word+(n>1?'s':'');
 function familyTitle(email){
-  const raw=String(email||'').split('@')[0].replace(/[._-]+/g,' ').trim();
-  if(!raw)return 'Famille';
-  const name=raw.split(/\s+/).map(word=>word.charAt(0).toUpperCase()+word.slice(1)).join(' ');
-  return /^famille\b/i.test(name)?name:'Famille '+name;
+  const name=window.COURSES_FAMILY?.displayName(email)||'';
+  return name?'Famille '+name:'Famille';
 }
 function relativeDays(iso,now=Date.now()){
   const time=Date.parse(iso||'');

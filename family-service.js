@@ -58,9 +58,12 @@ function emailFor(identifier){
   if(!id)return '';
   return id.includes('@')?id:id+CONFIG.emailDomain;
 }
+/* Nom du foyer = premier mot de l'identifiant : « stephany.maison@hotmail.fr » → « Stephany ».
+   Seule implémentation : l'écran admin « Familles » s'en sert aussi. */
 function displayName(identifier){
-  const id=String(identifier||'').split('@')[0].replace(/[._-]+/g,' ').trim();
-  return id?id.charAt(0).toUpperCase()+id.slice(1):'';
+  const words=String(identifier||'').split('@')[0].split(/[._\-\s\d]+/).filter(Boolean);
+  const first=(/^famille$/i.test(words[0]||'')?words[1]:words[0])||'';
+  return first?first.charAt(0).toUpperCase()+first.slice(1).toLowerCase():'';
 }
 function loadLibrary(){
   if(window.supabase?.createClient)return Promise.resolve(window.supabase);
