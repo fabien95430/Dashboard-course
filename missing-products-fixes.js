@@ -368,6 +368,9 @@ async function requiredPushData(){
 async function integrateWithOpenAi(type,id,requestId){
   const item=itemsForType(type).find(entry=>String(entry?.id||'')===String(id||''));
   if(!item)return false;
+  return launchOpenAiIntegration(type,item,requestId);
+}
+async function launchOpenAiIntegration(type,item,requestId){
   const serviceData={
     dish_name:(type==='product'?PRODUCT_PREFIX:'')+String(item.name||''),
     dish_category:type==='product'?productOpenAiCategory(item):String(item.category||''),
@@ -631,4 +634,11 @@ function bindOpenAiUi(){
 }
 
 bindOpenAiUi();
+// Point d'entrée de l'écran « Familles » (family-admin.js) : même intégration OpenAI que « À intégrer ».
+window.COURSES_OPENAI_INTEGRATION=Object.freeze({
+  start(type,item){
+    if((type!=='product'&&type!=='dish')||!item?.name)return Promise.resolve(false);
+    return launchOpenAiIntegration(type,{id:String(item.id||randomId()),name:String(item.name),category:String(item.category||'')},randomId());
+  }
+});
 })();

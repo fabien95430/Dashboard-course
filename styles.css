@@ -3528,3 +3528,58 @@ body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behav
   html:has(#securityOverlay.is-visible),
   body:has(#securityOverlay.is-visible){background-size:auto calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;background-position:center top!important}
 }
+
+/* v827 — Réglages › Administrateur › Familles (family-admin.js) */
+.settings-sheet#familyAdminDialog{height:auto!important}
+.settings-sheet#familyAdminDialog .connection-sync-line{gap:12px;align-items:center}
+.settings-sheet#familyAdminDialog .connection-sync-line>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#25392b;font-size:var(--fs-text);font-weight:400;text-align:left}
+.settings-sheet#familyAdminDialog .connection-sync-line>span:last-child:not(:first-child){flex:0 0 auto;font-size:var(--fs-label);font-weight:400;color:var(--sheet-muted)}
+.settings-sheet#familyAdminDialog .connection-sync-line.is-left{justify-content:flex-start}
+.settings-sheet#familyAdminDialog .family-admin-name{display:flex!important;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left}
+.settings-sheet#familyAdminDialog .family-admin-name small{max-width:100%;font-size:var(--fs-label);font-weight:400;color:var(--sheet-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settings-sheet#familyAdminDialog .family-admin-list{display:flex;flex-direction:column;gap:10px}
+.settings-sheet#familyAdminDialog .family-admin-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px 16px;border:1px solid var(--tile-line);border-radius:18px;background:var(--tile-bg);box-shadow:var(--tile-shadow);font:inherit;font-size:var(--fs-text);font-weight:400;color:#25392b;text-align:left;-webkit-appearance:none;appearance:none}
+.settings-sheet#familyAdminDialog .family-admin-row .chevron{flex:0 0 auto;width:14px;height:14px;fill:none;stroke:#8b968e;stroke-width:2}
+.settings-sheet#familyAdminDialog .family-admin-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;height:42px;margin:0 auto 10px;padding:3px;border-radius:13px;background:rgba(118,128,120,.13)}
+.settings-sheet#familyAdminDialog .family-admin-tab{border:0;border-radius:10px;background:transparent;color:#55655a;font:inherit;font-size:var(--fs-text);white-space:nowrap;-webkit-appearance:none;appearance:none}
+.settings-sheet#familyAdminDialog .family-admin-tab.is-active{background:#fffefb;color:#1b2d21;font-weight:600;box-shadow:0 2px 7px rgba(40,60,46,.12)}
+.settings-sheet#familyAdminDialog .family-admin-action{flex:0 0 auto;font:inherit;font-size:var(--fs-label);line-height:1.2;color:#25392b;background:rgba(33,55,40,.05);border:1px solid rgba(33,55,40,.12);border-radius:999px;padding:6px 11px;white-space:nowrap;-webkit-appearance:none;appearance:none}
+.settings-sheet#familyAdminDialog .family-admin-action.is-danger{color:#a3403c;background:rgba(163,64,60,.07);border-color:rgba(163,64,60,.18)}
+.settings-sheet#familyAdminDialog .family-admin-action.is-confirm{color:#fff;background:#a3403c;border-color:#a3403c}
+.settings-sheet#familyAdminDialog .family-admin-action.is-done{color:var(--sheet-muted);background:transparent;border-color:rgba(33,55,40,.12)}
+.settings-sheet#familyAdminDialog .family-admin-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.settings-sheet#familyAdminDialog .family-admin-kpis>div{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--tile-line);border-radius:18px;background:var(--tile-bg);box-shadow:var(--tile-shadow)}
+.settings-sheet#familyAdminDialog .family-admin-kpis b{font-size:var(--fs-title);font-weight:600;line-height:24px;color:#263f30}
+.settings-sheet#familyAdminDialog .family-admin-kpis small{font-size:var(--fs-label);color:var(--sheet-muted)}
+.settings-sheet#familyAdminDialog .family-admin-empty{margin:12px 2px 0;font-size:var(--fs-note);line-height:1.4;color:var(--sheet-muted)}
+.settings-sheet#familyAdminDialog .family-admin-save{width:100%;min-height:48px;margin:16px 0 6px;border-radius:15px;font:inherit;font-size:var(--fs-text);font-weight:600}
+.settings-sheet#familyAdminDialog .family-request-list{border:1px solid var(--tile-line);border-radius:18px;background:var(--tile-bg);box-shadow:var(--tile-shadow);overflow:hidden}
+.settings-sheet#familyAdminDialog .family-request-row{display:grid;grid-template-columns:44px minmax(0,1fr) 18px;gap:12px;min-height:64px;padding:9px 14px 9px 16px;align-items:center;cursor:pointer}
+.settings-sheet#familyAdminDialog .family-request-row+.family-request-row{border-top:1px solid rgba(39,66,47,.09)}
+.settings-sheet#familyAdminDialog .family-request-row.is-open{background:rgba(237,247,234,.55)}
+.settings-sheet#familyAdminDialog .family-request-thumb{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(54,75,60,.045)}
+.settings-sheet#familyAdminDialog .family-request-thumb svg{width:33px;height:33px;display:block}
+.settings-sheet#familyAdminDialog .family-request-thumb.is-product{background:linear-gradient(145deg,#eef7ed,#e5efe6)}
+.settings-sheet#familyAdminDialog .family-request-thumb.is-dish{background:linear-gradient(145deg,#fff6df,#f8e9c1)}
+.settings-sheet#familyAdminDialog .family-request-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.settings-sheet#familyAdminDialog .family-request-copy strong{color:#1b2d21;font-size:var(--fs-text);font-weight:400;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settings-sheet#familyAdminDialog .family-request-copy small{color:#617366;font-size:var(--fs-note);font-weight:400;line-height:1.2}
+.settings-sheet#familyAdminDialog .family-request-caret{width:16px;height:16px;fill:none;stroke:#8e9990;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transform:rotate(90deg);transition:transform .18s ease}
+.settings-sheet#familyAdminDialog .family-request-row.is-open .family-request-caret{transform:rotate(-90deg)}
+.settings-sheet#familyAdminDialog .family-request-row.is-done{cursor:default}
+.settings-sheet#familyAdminDialog .family-request-row.is-done .family-request-caret{visibility:hidden}
+.settings-sheet#familyAdminDialog .family-request-row.is-done .family-request-copy strong{color:#748078}
+.settings-sheet#familyAdminDialog .family-request-row.is-done .family-request-thumb{filter:saturate(.45);opacity:.72}
+.settings-sheet#familyAdminDialog .family-admin-progress{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;background:rgba(47,106,73,.1);color:#1f5a3b;font-size:var(--fs-note);line-height:1.1;font-weight:500}
+.settings-sheet#familyAdminDialog .family-row-tools{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 44px;gap:8px;padding:2px 0 3px}
+.settings-sheet#familyAdminDialog .family-row-tools[hidden]{display:none!important}
+.settings-sheet#familyAdminDialog .family-row-tools.is-confirm{grid-template-columns:1fr 1fr}
+.settings-sheet#familyAdminDialog .family-row-tool{min-width:0;height:42px;display:flex;align-items:center;justify-content:center;gap:7px;padding:0 8px;border:1px solid rgba(47,106,73,.18);border-radius:13px;background:rgba(255,255,255,.78);color:#1f5a3b;font:inherit;font-size:var(--fs-text);white-space:nowrap;-webkit-appearance:none;appearance:none}
+.settings-sheet#familyAdminDialog .family-row-tool svg{flex:0 0 17px;width:17px;height:17px}
+.settings-sheet#familyAdminDialog .family-row-tool:disabled{opacity:.42}
+.settings-sheet#familyAdminDialog .family-row-tool.is-danger{border-color:rgba(178,58,48,.2);color:#b23a30}
+.settings-sheet#familyAdminDialog .family-row-tool.is-icon{padding:0}
+.settings-sheet#familyAdminDialog .family-row-tool.is-danger-solid{border-color:transparent;background:#b8433a;color:#fff}
+.settings-sheet#familyAdminDialog .family-confirm-text{grid-column:1/-1;margin:0 0 2px;color:#6c4a45;font-size:var(--fs-text);line-height:1.35}
+html[data-account="family"] #settingsFamiliesBtn{display:none!important}
+@media(prefers-reduced-motion:reduce){.settings-sheet#familyAdminDialog .family-request-caret{transition:none}}

@@ -93,6 +93,8 @@ const DISHES=Object.freeze([
   {name:'Steak tartare',photoId:'',tags:['Viandes','Rapides'],ingredients:['Bœuf','Cornichon','Échalotes','Moutarde','Œufs','Persil']},
 ]);
 window.COURSES_DISH_NAMES=Object.freeze(DISHES.map(dish=>dish.name));
+// Ingrédients de base de chaque plat : référence pour les modifications des familles (écran « Familles »).
+window.COURSES_DISH_BASE=Object.freeze(Object.fromEntries(DISHES.map(dish=>[dish.name,Object.freeze([...dish.ingredients])])));
 
 const FILTERS=['Tous','Favoris','Dessert','Enfants','Pâtes','Poissons','Poulet','Rapides','Végé','Viandes'];
 const STORAGE_FAVORITES='courses-dish-favorites-v1';

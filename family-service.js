@@ -360,7 +360,9 @@ async function adminOverview(credentials){
   ]);
   const failed=[devices,requests,custom,purchases].find(result=>result.error);
   if(failed)throw failed.error;
-  return {devices:devices.data||[],requests:requests.data||[],customizations:custom.data||[],purchases:purchases.data||[]};
+  // Liste des foyers (fonction SQL familles(), réservée à l'admin) ; absente → foyers déduits de l'activité.
+  const families=await db.rpc('familles').then(result=>result.error?[]:(result.data||[]),()=>[]);
+  return {families,devices:devices.data||[],requests:requests.data||[],customizations:custom.data||[],purchases:purchases.data||[]};
 }
 async function adminSetRequestStatus(credentials,id,statut){
   const db=await admin(credentials);

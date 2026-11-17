@@ -389,6 +389,7 @@ let state={
   intentionalClose:false,
   demo:false,
   family:false,
+  familyAdmin:null,
   lockTimer:null,
   backgroundLockTimer:null,
   backgroundedAt:0,
@@ -1508,12 +1509,15 @@ async function decryptVault(record,password){
   if(!payload?.refresh_token||!normalizeHaUrl(payload?.ha_url))throw new Error('Coffre invalide');
   return payload;
 }
-async function storeSecureVault(refreshToken,haUrl,password){
-  const secure=await encryptVault({
+async function storeSecureVault(refreshToken,haUrl,password,familyAdmin=state.familyAdmin){
+  const payload={
     refresh_token:String(refreshToken||''),
     ha_url:normalizeHaUrl(haUrl),
     created_at:Date.now()
-  },password);
+  };
+  // Accès administrateur du service famille (écran « Familles ») : rangé dans le coffre.
+  if(familyAdmin?.email&&familyAdmin?.password)payload.family_admin={email:String(familyAdmin.email),password:String(familyAdmin.password)};
+  const secure=await encryptVault(payload,password);
   saveJson(STORAGE.vault,secure);
   // Remove every previous plaintext credential after a successful encrypted write.
   deleteKey(STORAGE.auth);
@@ -1538,6 +1542,8 @@ function wipeMemoryCredentials(){
   state.accessToken='';
   state.accessTokenExpiresAt=0;
   state.refreshToken='';
+  if(!state.demo)state.familyAdmin=null;
+  void window.COURSES_FAMILY?.adminSignOut?.();
 }
 function closeSocket(){
   state.intentionalClose=true;
@@ -1744,6 +1750,7 @@ async function completeSecurityAction(){
       clearUnlockGuard();
       state.haUrl=normalizeHaUrl(payload.ha_url);
       state.refreshToken=String(payload.refresh_token||'');
+      state.familyAdmin=payload.family_admin||null;
       state.locked=false;
       hideSecurity();
       await connectFromRefresh();
@@ -1808,6 +1815,23 @@ async function completeLogin(){
     error.textContent=err?.message||'Connexion impossible.';
   }finally{button.disabled=false}
 }
+/* Accès administrateur au service famille, détenu par le coffre (propriétaire : app.js).
+   Disponible seulement pour l'administrateur déverrouillé. */
+Object.defineProperty(window,'COURSES_ADMIN_ACCESS',{value:Object.freeze({
+  available:()=>!state.family&&!state.locked&&(state.demo||!!vaultRecord()),
+  credentials:()=>state.family||state.locked||!state.familyAdmin?null:{...state.familyAdmin},
+  async save(credentials,localPassword){
+    const familyAdmin={email:String(credentials?.email||'').trim().toLowerCase(),password:String(credentials?.password||'')};
+    if(!familyAdmin.email||!familyAdmin.password)throw new Error('Entre l’e-mail et le mot de passe du compte administrateur.');
+    if(vaultRecord()){
+      const payload=await decryptVault(vaultRecord(),String(localPassword||'')).catch(()=>{throw new Error('Mot de passe local incorrect.')});
+      await storeSecureVault(payload.refresh_token,payload.ha_url,String(localPassword),familyAdmin);
+    }
+    state.familyAdmin=familyAdmin;
+    return true;
+  },
+  needsLocalPassword:()=>!!vaultRecord()
+}),configurable:false,enumerable:false,writable:false});
 /* Compte famille : liste partagée via le service famille, aucun coffre ni verrouillage. */
 function enterFamilyMode(info){
   state.family=true;
@@ -2702,7 +2726,7 @@ async function changeLocalPassword(){
   button.disabled=true;
   try{
     const payload=await decryptVault(vaultRecord(),current);
-    await storeSecureVault(payload.refresh_token,payload.ha_url,next);
+    await storeSecureVault(payload.refresh_token,payload.ha_url,next,payload.family_admin||null);
     clearUnlockGuard();
     clearPasswordChangeForm();
     armIdleLock();

@@ -205,6 +205,15 @@ function buildProductPrompt(item){
     'À la fin, vérifie le résultat puis commit directement sur main avec un message conforme aux versions actuelles.'
   ].join('\n');
 }
+// Point d'entrée de l'écran « Familles » (family-admin.js) : même prompt ChatGPT que « À intégrer ».
+window.COURSES_CHATGPT_INTEGRATION=Object.freeze({
+  start(type,item){
+    if((type!=='product'&&type!=='dish')||!item?.name)return false;
+    const clean={name:String(item.name),category:String(item.category||'')};
+    launchChatGpt(type==='product'?buildProductPrompt(clean):buildDishPrompt(clean));
+    return true;
+  }
+});
 function buildDishPrompt(item){
   const category=item.category||'non précisée';
   return [
