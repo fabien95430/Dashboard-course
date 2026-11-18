@@ -784,9 +784,7 @@ function renderCatalogRequestEmpty(target,type,query,fallback){
   };
 }
 window.COURSES_CATALOG_REQUEST_EMPTY=renderCatalogRequestEmpty;
-/* Clavier fermé (touche OK ou toucher hors des résultats) : la recherche s'efface. Un toucher
-   dans les résultats (ajouter un produit trouvé) ne l'efface pas, pour ne pas décaler la grille. */
-let catalogResultPointerAt=0;
+// Vide la recherche (après « Demander au catalogue »).
 function clearCatalogSearch(){
   if(!UI.productSearch.value&&!state.productQuery)return;
   UI.productSearch.value='';
@@ -3460,13 +3458,6 @@ function bindUiEvents(){
   UI.savePasswordChange.onclick=changeLocalPassword;
   UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
   UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';syncCategorySelection();clearTimeout(UI.productSearch._searchTimer);UI.productSearch._searchTimer=setTimeout(renderProducts,80)};
-  $('#catalogView')?.addEventListener('pointerdown',event=>{if(event.target!==UI.productSearch)catalogResultPointerAt=Date.now()},true);
-  UI.productSearch.addEventListener('blur',()=>{
-    setTimeout(()=>{
-      if(document.activeElement===UI.productSearch||Date.now()-catalogResultPointerAt<700)return;
-      clearCatalogSearch();
-    },220);
-  });
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{
     if(BOTTOM_NAV.shouldIgnoreClick())return;

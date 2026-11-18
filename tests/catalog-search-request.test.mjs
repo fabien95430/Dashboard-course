@@ -13,11 +13,10 @@ test('recherche : aucune catégorie ni filtre de plats sélectionné pendant une
   assert.match(dishes,/if\(!needle\)\{\s*if\(filter==='Favoris'/);
 });
 
-test('recherche : effacée à la fermeture du clavier, sauf toucher dans les résultats',()=>{
+test('recherche : le texte reste quand le clavier se ferme',()=>{
   const app=read('app.js');
-  assert.match(app,/UI\.productSearch\.addEventListener\('blur'/);
-  assert.match(app,/Date\.now\(\)-catalogResultPointerAt<700/);
-  assert.match(app,/function clearCatalogSearch\(\)/);
+  assert.doesNotMatch(app,/UI\.productSearch\.addEventListener\('blur'/);
+  assert.doesNotMatch(app,/catalogResultPointerAt/);
 });
 
 test('recherche sans résultat : raccourci vers Catalogue des produits › Ajout, nom prérempli',()=>{
