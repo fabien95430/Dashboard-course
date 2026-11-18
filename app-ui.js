@@ -272,95 +272,74 @@ function scheduleSecurityViewportRestore(){
     restoreSecurityViewportOrigin();
   });
 }
-/* Clavier iOS : hauteur stable de l'écran (sans clavier) et dernière hauteur de clavier mesurée.
-   Le passage Identifiant → Mot de passe ne remesure rien : la carte reste levée, sans rebond. */
+// Hauteur complète mémorisée : le clavier ne recalcule ni la composition ni le cadrage.
 let securityStableHeight=0;
-let securityKeyboardBlurTimer=0;
-let securityKeyboardIntent=0;
-const SECURITY_KEYBOARD_KEY='courses-keyboard-height-v1';
-function securityLayoutHeight(){
-  securityStableHeight=Math.max(securityStableHeight,Math.round(window.innerHeight||0),isSecurityPasswordField()?0:securityViewportHeight());
-  return securityStableHeight||securityViewportHeight();
-}
-function securityKeyboardHeight(){
-  const measured=securityLayoutHeight()-securityViewportHeight();
-  if(measured>120){
-    try{localStorage.setItem(SECURITY_KEYBOARD_KEY,String(measured))}catch(_){}
-    return measured;
+let securityStableWidth=0;
+function syncSecurityLayoutHeight(){
+  const width=Math.round(window.innerWidth||document.documentElement.clientWidth||0);
+  const installed=window.matchMedia?.('(display-mode:standalone)').matches||window.navigator.standalone===true;
+  const physical=installed?(window.screen?.height||0):0;
+  const height=Math.round(physical||window.innerHeight||securityViewportHeight());
+  if(!securityStableHeight||width!==securityStableWidth){
+    securityStableWidth=width;
+    securityStableHeight=height;
+  }else if(!isSecurityPasswordField()){
+    securityStableHeight=Math.max(securityStableHeight,height);
   }
-  return 0;
+  document.documentElement.style.setProperty('--security-layout-height',securityStableHeight+'px');
+  document.documentElement.dataset.securityCompact=String(securityStableHeight<=740||width>securityStableHeight);
 }
-function syncSecurityKeyboardState(options){
+function syncSecurityKeyboardState(){
   const shell=document.querySelector('.security-shell');
   if(!shell)return;
-  const predict=options?.predict===true;
-  const overlay=document.getElementById('securityOverlay');
-  const visible=Boolean(overlay?.classList.contains('is-visible'));
-  const active=isSecurityPasswordField();
+  syncSecurityLayoutHeight();
   syncSecurityViewportPosition();
-  if(!visible||!active){
-    shell.classList.remove('is-password-open');
-    syncSecurityKeyboardLift(shell,false);
-    if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
-    return;
-  }
-  // Champ touché (ou clavier mesuré ouvert) : la carte monte en haut de l'écran et y reste
-  // tant qu'un champ est actif. Position fixe : même résultat à chaque ouverture.
-  const lifted=predict||shell.classList.contains('is-keyboard-lifted')||securityKeyboardHeight()>0;
-  shell.classList.toggle('is-password-open',lifted);
-  syncSecurityKeyboardLift(shell,lifted);
-}
-/* Clavier ouvert : « mode saisie compact ». La carte passe en haut de l'écran et se réduit
-   (styles.css, .is-keyboard-lifted) : aucune mesure du clavier, même résultat à chaque fois. */
-function syncSecurityKeyboardLift(shell,on){
-  shell.classList.toggle('is-keyboard-lifted',!!on);
+  const visible=Boolean(document.getElementById('securityOverlay')?.classList.contains('is-visible'));
+  const modal=shell.querySelector('.security-modal');
+  // Normalement tout tient au-dessus du clavier. Le paysage, le texte agrandi et les messages
+  // longs restent accessibles en faisant défiler le contenu, sans réduire ou masquer les champs.
+  const available=securityViewportHeight();
+  const scrollable=visible&&modal&&modal.offsetTop+modal.scrollHeight>available;
+  shell.classList.toggle('is-scrollable',Boolean(scrollable));
+  if(scrollable)shell.style.height=available+'px';
+  else{shell.style.removeProperty('height');shell.scrollTop=0}
+  if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
 }
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;
   document.documentElement.dataset.securityKeyboardViewport='1';
-  // Écran de connexion fixe : aucun défilement ni rebond au doigt (iOS ignore souvent overflow:hidden).
+  const modal=document.querySelector('.security-modal');
+  // Les erreurs et le texte agrandi peuvent dépasser sans ouvrir ou fermer le clavier.
+  if(modal&&window.ResizeObserver)new ResizeObserver(syncSecurityKeyboardState).observe(modal);
   document.getElementById('securityOverlay')?.addEventListener('touchmove',event=>{
-    if(event.currentTarget.classList.contains('is-visible')&&event.cancelable)event.preventDefault();
+    const shell=document.querySelector('.security-shell');
+    if(event.currentTarget.classList.contains('is-visible')&&!shell?.classList.contains('is-scrollable')&&event.cancelable)event.preventDefault();
   },{passive:false});
-  // Seul un toucher du champ ouvre le clavier iOS (un focus automatique ne l'ouvre pas) :
-  // la levée anticipée n'a lieu qu'après un toucher.
-  document.addEventListener('pointerdown',event=>{
-    if(!isSecurityPasswordField(event.target))return;
-    securityKeyboardIntent=Date.now();
-    // Champ déjà actif (focus automatique, clavier fermé) : le toucher ouvre le clavier sans nouveau focus.
-    if(event.target===document.activeElement)syncSecurityKeyboardState({predict:true});
-  },true);
   document.addEventListener('focus',event=>{
-    if(!isSecurityPasswordField(event.target))return;
-    clearTimeout(securityKeyboardBlurTimer);
-    syncSecurityKeyboardState({predict:Date.now()-securityKeyboardIntent<1000});
+    if(isSecurityPasswordField(event.target))syncSecurityKeyboardState();
   },true);
   document.addEventListener('blur',event=>{
-    if(!isSecurityPasswordField(event.target))return;
-    // Changement de champ : le clavier reste ouvert, la carte ne redescend pas.
-    clearTimeout(securityKeyboardBlurTimer);
-    securityKeyboardBlurTimer=setTimeout(()=>{if(!isSecurityPasswordField())syncSecurityKeyboardState()},180);
+    if(isSecurityPasswordField(event.target))requestAnimationFrame(syncSecurityKeyboardState);
   },true);
   window.visualViewport?.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
   window.visualViewport?.addEventListener('scroll',syncSecurityKeyboardState,{passive:true});
   window.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
   window.addEventListener('scroll',syncSecurityKeyboardState,{passive:true});
-  window.addEventListener('pageshow',()=>{
-    requestAnimationFrame(syncSecurityKeyboardState);
-  },{passive:true});
+  window.addEventListener('pageshow',()=>requestAnimationFrame(syncSecurityKeyboardState),{passive:true});
   document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState!=='visible')return;
-    requestAnimationFrame(syncSecurityKeyboardState);
+    if(document.visibilityState==='visible')requestAnimationFrame(syncSecurityKeyboardState);
   });
   document.addEventListener('courses:lock-changed',event=>{
-    if(event.detail?.locked!==false||!securityViewportSession)return;
+    if(event.detail?.locked!==false){syncSecurityKeyboardState();return}
+    if(!securityViewportSession)return;
     if(isSecurityPasswordField(document.activeElement))document.activeElement.blur();
     securityViewportSession=false;
     securityViewportRestoring=true;
     scheduleSecurityViewportRestore();
   });
-  requestAnimationFrame(syncSecurityKeyboardState);
+  syncSecurityKeyboardState();
 }
+
 function syncListEmptyState(root){
   if(!root)return;
   const design='premium-v4';

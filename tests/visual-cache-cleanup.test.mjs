@@ -12,7 +12,7 @@ test('P6 conserve un cache visuel persistant sans remigration des anciens caches
 });
 
 test('les visuels critiques sont toujours seedés et les items/plats restent persistants',()=>{
-  for(const asset of ['welcome-cart-transparent-v46.png','welcome-background-v40.webp','www/empty-list-premium-v4.webp'])assert.ok(sw.includes(asset),asset+' absent des visuels critiques');
+  for(const asset of ['welcome-champagne-v841.webp','www/empty-list-premium-v4.webp'])assert.ok(sw.includes(asset),asset+' absent des visuels critiques');
   assert.match(sw,/url\.pathname\.includes\('\/www\/Plats\/'\)/);
   assert.match(sw,/url\.pathname\.includes\('\/www\/Items\/'\)/);
   assert.match(sw,/caches\.open\(CACHE\)\.then\(cache=>cache\.addAll\(SHELL\)\),\s*seedCoreVisuals\(\)/s);

@@ -1607,6 +1607,19 @@ function armIdleLock(){
 }
 let unlockVersionChecked=false;
 let unlockVersionCheckPromise=null;
+function setSecurityPasswordVisible(visible){
+  const input=UI.securityPassword;
+  const focused=document.activeElement===input;
+  const start=input.selectionStart,end=input.selectionEnd;
+  input.type=visible?'text':'password';
+  const toggle=document.getElementById('securityPasswordToggle');
+  toggle.setAttribute('aria-pressed',String(visible));
+  toggle.setAttribute('aria-label',visible?'Masquer le mot de passe':'Afficher le mot de passe');
+  if(focused){
+    input.focus({preventScroll:true});
+    if(start!==null&&end!==null)input.setSelectionRange(start,end);
+  }
+}
 function showSecurity(mode,message=''){
   const overlay=UI.securityOverlay;
   state.securityMode=mode;
@@ -1616,10 +1629,8 @@ function showSecurity(mode,message=''){
   if(login)UI.securityIdentifier.value=rememberedAccount()?.id||'';
   const creating=mode==='oauth'||mode==='migrate';
   $('.security-modal').classList.toggle('is-creating',creating);
-  UI.securityShell.classList.toggle('is-form-mode',creating);
-  UI.securityShell.classList.remove('is-password-open');
-  $('#securityIcon').classList.toggle('is-creating',creating);
-  $('#securityTitle').textContent='Mes courses';
+  $('#securityTitle').textContent='Bonjour';
+  setSecurityPasswordVisible(false);
   $('#securityText').textContent=message||(creating
     ?'Choisis un mot de passe local. Il chiffrera l’autorisation Home Assistant enregistrée sur cet appareil.'
     :'Déverrouillage sécurisé');
@@ -1628,7 +1639,7 @@ function showSecurity(mode,message=''){
   UI.securityPassword.autocomplete=creating?'new-password':'current-password';
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
-  UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Connexion';
+  UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Se connecter';
   UI.securityError.textContent='';
   refreshVisualLock();
   // Déverrouillage : la version est vérifiée AVANT de donner le champ mot de passe (et donc la
@@ -1642,7 +1653,7 @@ function hideSecurity(){
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
   UI.securityError.textContent='';
-  UI.securityShell.classList.remove('is-password-open','is-form-mode');
+  setSecurityPasswordVisible(false);
   refreshVisualLock();
 }
 function lockApp(message='Application verrouillée.'){
@@ -3413,11 +3424,11 @@ function bindUiEvents(){
   bindDialogBackdropClose(UI.familyDevicesDialog);
   UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};
   UI.securitySubmit.onclick=completeSecurityAction;
-  const syncPasswordOpen=()=>UI.securityShell.classList.toggle('is-password-open',[UI.securityIdentifier,UI.securityPassword,UI.securityConfirm].includes(document.activeElement));
-  [UI.securityIdentifier,UI.securityPassword,UI.securityConfirm].forEach(input=>{
-    input.addEventListener('focus',syncPasswordOpen);
-    input.addEventListener('blur',()=>requestAnimationFrame(syncPasswordOpen));
+  const passwordToggle=document.getElementById('securityPasswordToggle');
+  passwordToggle.addEventListener('pointerdown',event=>{
+    if(document.activeElement===UI.securityPassword)event.preventDefault();
   });
+  passwordToggle.onclick=()=>setSecurityPasswordVisible(UI.securityPassword.type==='password');
   UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
   UI.securityIdentifier.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();UI.securityPassword.focus()}};
   UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};

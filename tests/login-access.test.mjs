@@ -56,13 +56,15 @@ test('popup Connexion : statut de synchronisation court et libellé protégé co
   assert.match(read('styles.css'),/\.settings-sheet#connectionDialog \.connection-sync-line>span:first-child\{[^}]*overflow:hidden;text-overflow:ellipsis;/);
 });
 
-test('clavier iOS : mode saisie compact, carte en haut sans mesure du clavier',()=>{
+test('clavier iOS : le formulaire garde sa composition et tous ses éléments visibles',()=>{
   const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
   const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
-  assert.match(ui,/function syncSecurityKeyboardLift\(shell,on\)\{\s*shell\.classList\.toggle\('is-keyboard-lifted',!!on\);\s*\}/);
-  // Passage Identifiant → Mot de passe : la carte reste en haut.
-  assert.doesNotMatch(ui,/securityKeyboardBaseline|--security-keyboard-lift/);
-  assert.match(ui,/syncSecurityKeyboardState\(\{predict:Date\.now\(\)-securityKeyboardIntent<1000\}\)/);
-  assert.match(css,/#securityOverlay \.security-shell\.is-keyboard-lifted \.security-modal\{top:calc\(env\(safe-area-inset-top,0px\) \+ 12px\)!important;bottom:auto!important\}/);
-  assert.match(css,/is-keyboard-lifted #securityIcon,[\s\S]*?is-keyboard-lifted \.security-card-copy,[\s\S]*?is-keyboard-lifted \.security-ornament\{display:none!important\}/);
+  assert.doesNotMatch(ui+css,/is-keyboard-lifted|securityKeyboardIntent|--security-keyboard-lift/);
+  assert.match(ui,/function syncSecurityLayoutHeight\(\)/);
+  assert.match(css,/--security-screen-height:var\(--lock-screen-h,var\(--security-layout-height,100svh\)\)/);
+  assert.match(css,/\.security-modal \.field input\{[\s\S]*?font-size:18px/);
+  const login=read('index.html').split('id="securityOverlay"')[1].split('</section>')[0];
+  assert.doesNotMatch(login,/security-hero|welcome-cart|Mes courses/);
+  assert.match(login,/id="securityTitle">Bonjour/);
+  assert.match(login,/aria-controls="securityPassword" aria-pressed="false"/);
 });

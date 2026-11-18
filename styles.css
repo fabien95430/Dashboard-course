@@ -2,10 +2,6 @@
 *{box-sizing:border-box}html,body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Roboto,Arial,sans-serif;-webkit-tap-highlight-color:transparent}button,input,select{font:inherit}.status{border-radius:13px;display:flex;align-items:center;gap:8px;}.status>span{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(99,230,163,.6)}.status strong{display:block;font-size:10px;color:#7af0b0}.status small{display:block;font-size:7.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px}.status.is-waiting>span{background:#ffbf5a}.status.is-waiting strong{color:#ffd58d}.status.is-error>span{background:#ff6f7a}.status.is-error strong{color:#ff9ca5}.cat{grid-template-rows:25px 14px;place-items:center;}.cat small{font-size:9px;font-weight:700;white-space:nowrap;max-width:72px;overflow:hidden;text-overflow:ellipsis}.searchbox>span{font-size:20px;}.searchbox small{white-space:nowrap}.product{place-items:center;}.sprite{display:block;width:98px;height:98px;max-width:100%;max-height:100%;background-repeat:no-repeat;background-color:transparent;image-rendering:auto}.sprite.is-compact{width:38px;height:38px}.pname{-webkit-box-orient:vertical;-webkit-line-clamp:2;}.empty{height:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:20px}.empty.is-wide{grid-column:1/-1}.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.18);animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.overlay{place-items:center;}.modal{width:min(100%,400px);border:1px solid rgba(255,255,255,.26);border-radius:26px;background:linear-gradient(155deg,rgba(75,51,66,.96),rgba(31,23,30,.97));box-shadow:0 25px 70px rgba(0,0,0,.40),inset 0 1px 0 rgba(255,255,255,.17);padding:24px}.modal h2{text-align:center;margin:8px 0;font-size:24px}.modal>p{text-align:center;font-size:13px;line-height:1.45}.field{display:block;margin-top:15px}.field>span{display:block;margin-bottom:6px;font-size:11px}.field input,.field select{width:100%;height:46px;border-radius:13px;outline:0;padding:0 12px}.hint{font-size:10px!important;text-align:left!important}.primary{height:48px;border-radius:15px;font-weight:800;padding:0 18px}.modal .primary{width:100%;margin-top:14px}.setup-error{min-height:18px;margin-top:8px;font-size:11px;text-align:center}.dialog h3{margin:0 0 10px}.dialog-actions{display:flex;gap:8px;margin-top:14px}.dialog-actions button{flex:1;height:42px;border-radius:12px;border:1px solid var(--line);}.dialog-actions .primary{border:0;}.toast{position:fixed;z-index:70;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translate(-50%,12px);opacity:0;pointer-events:none;padding:9px 14px;border-radius:999px;font-size:12px;width:max-content;max-width:calc(100vw - 24px);box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:.18s}.toast.is-visible{opacity:1;transform:translate(-50%,0)}@media(max-width:370px){.sprite{width:88px;height:88px}.cat{flex-basis:76px}}
 .secondary{width:100%;height:45px;margin-top:9px;border-radius:15px;font-weight:750}
 
-.security-modal .primary{width:100%;margin-top:14px}
-.security-modal .secondary{margin-top:9px}
-.security-modal input[type="password"]{letter-spacing:.04em}
-
 /* Interface mobile : fond plus sobre, liste prioritaire et commandes tactiles */
 
 .cat{min-width:76px;}
@@ -181,7 +177,11 @@ button{-webkit-tap-highlight-color:transparent}
   overflow:hidden;
 }
 svg{display:block}
-.icon-btn svg,.tab svg,.settings-row svg,.settings-logout svg,.security-lock-icon svg,.searchbox svg{
+.icon-btn svg,
+.tab svg,
+.settings-row svg,
+.settings-logout svg,
+.searchbox svg{
   width:24px;
   height:24px;
   fill:none;
@@ -823,7 +823,6 @@ html #products .product.is-deferred{display:none!important}
   backdrop-filter:none;
 }
 .overlay.is-visible{display:grid}
-.security-modal,
 .dialog{
   border:1px solid rgba(36,57,43,.055);
   background:rgba(255,255,255,.94);
@@ -850,35 +849,6 @@ html #products .product.is-deferred{display:none!important}
   color:#182019;
 }
 .setup-error{color:#cf4141}
-
-.security-overlay{z-index:65;}
-.security-shell{
-  flex-direction:column;
-  justify-content:center;
-  gap:22px;
-}
-.security-hero>p{
-  margin:11px 0 0;
-  color:#747d7b;
-  font-size:17px;
-}
-.security-modal{
-  text-align:center;
-}
-.security-lock-icon{
-  border-radius:50%;
-}
-
-.security-modal>p{
-  margin:8px auto 18px;
-  max-width:310px;
-  color:#737b80;
-  font-size:14px;
-  line-height:1.35;
-}
-.password-panel{margin-top:10px;text-align:left}
-.password-panel[hidden]{display:none}
-.security-modal .password-panel .primary{width:100%;}
 
 /* DIALOGUE DE DÉTAIL DES RÉGLAGES */
 .dialog{
@@ -924,171 +894,14 @@ html #products .product.is-deferred{display:none!important}
   .premium-sprite{width:calc(84px * var(--sprite-ratio,1))!important;height:84px!important}
 }
 
-/* ===== UI v24 — accueil fidèle à la maquette validée ===== */
-.security-overlay{
-  place-items:stretch!important;
-}
-.security-shell{
-  min-height:0!important;
-  display:block!important;
-}
-.security-hero{
-  position:absolute;
-  left:0;
-  right:0;
-  text-align:center;
-}
-.welcome-cart-art svg{width:100%;height:100%;overflow:visible}
-
-.security-hero h2{
-  color:#082f1f!important;
-  font-weight:880!important;
-}
-.security-tagline{
-  margin:9px 0 0!important;
-  color:#656b66!important;
-  font-weight:520!important;
-}
-.security-tagline span{color:#40b62b;font-size:17px}
-.security-modal{
-  position:absolute!important;
-  left:50%;
-  transform:translateX(-50%);
-  -webkit-backdrop-filter:blur(10px) saturate(112%);
-  backdrop-filter:blur(10px) saturate(112%);
-}
-
-.security-modal h3{
-  font-weight:840!important;
-}
-.security-card-copy{
-  max-width:290px;
-}
-.security-dynamic{display:none;margin:7px auto 10px!important;color:#747a77!important;font-size:11px!important;line-height:1.3!important}
-.security-modal.is-creating .security-card-copy{display:none}
-.security-modal.is-creating .security-dynamic{display:block}
-
 /* ===== UI v26 — zoom verrouillé ===== */
 html,body{touch-action:pan-x pan-y}
 
 /* ===== UI v27 — visibilité des éléments masqués ===== */
 [hidden]{display:none!important}
 
-/* ===== UI v113 — détails sécurité conservés après consolidation ===== */
-.security-modal .setup-error{min-height:0!important}
-.security-modal .setup-error:empty{display:none!important}
-
-/* ===== UI v36 — référence 2 finale ===== */
-/* Un seul fond de scène sur l'overlay : plus aucun panneau central ni raccord de pseudo-élément. */
-
-.security-shell{
-  position:relative!important;
-  width:min(100%,440px)!important;
-  height:100%!important;
-  margin:0 auto!important;
-  padding:0!important;
-}
-.welcome-cart-art{
-  height:auto!important;
-}
-.welcome-cart-art img{
-  width:100%!important;
-  height:auto!important;
-  display:block!important;
-  border:0;
-}
-.security-hero h2{
-  margin:0!important;
-  font-size:40px!important;
-  line-height:1!important;
-  letter-spacing:-1.45px!important;
-}
-.security-tagline{
-  margin-top:10px!important;
-  font-size:15.5px!important;
-  line-height:1.1!important;
-}
-.security-modal{
-  width:min(78%,352px)!important;
-}
-
-.security-lock-icon svg{
-  width:23px!important;
-  height:23px!important;
-}
-.security-modal h3{
-  font-size:19px!important;
-  line-height:1.08!important;
-}
-.security-card-copy{
-  font-size:12.5px!important;
-  line-height:1.3!important;
-}
-
-.security-shell.is-form-mode .security-modal{
-  top:29.5%!important;
-}
-
-@media(max-height:720px){
-
-  .security-shell.is-form-mode .security-modal{top:27.8%!important}
-  
-}
-
-/* ===== UI v38 — fond généré propre, UI séparée ===== */
-.security-overlay{
-  padding:0!important;
-  overflow:hidden!important;
-  background:#f5f2ea url("./welcome-background-v40.webp") center center / cover no-repeat!important;
-}
-.security-overlay::before,
-.security-overlay::after,
-.security-shell::before{
-  display:none!important;
-  content:none!important;
-  background:none!important;
-  -webkit-mask-image:none!important;
-  mask-image:none!important;
-}
-.security-shell,.security-hero,.security-modal{
-  z-index:2;
-}
-
-/* ===== UI v40 — image générée validée ===== */
-/* Fond décoratif uniquement : toute l'interface reste en HTML/CSS au-dessus. */
-.security-overlay{
-  background-color:#f5f2ea!important;
-  background-image:url("./welcome-background-v40.webp")!important;
-  background-repeat:no-repeat!important;
-  background-position:center center!important;
-  background-size:cover!important;
-}
-
 /* iOS installed app: paint the document canvas under the home-indicator area. */
 html{background:#f7f3ec}
-html:has(#securityOverlay.is-visible),
-body:has(#securityOverlay.is-visible){
-  background-color:#f6f1e7!important;
-  background-image:url("./welcome-background-v40.webp")!important;
-  background-position:center!important;
-  background-size:cover!important;
-  background-repeat:no-repeat!important;
-}
-/* v727/v731 — au lancement et au rechargement de mise à jour, iOS peint d'abord une zone d'affichage plus
-   courte puis l'agrandit : la bande du bas, hors de la page, prend la couleur du fond (document, puis
-   écran de connexion plein écran, échantillonné par iOS). Toutes reprennent le bois du bas de l'image
-   au lieu du crème, qui dessinait une bande claire en bas de l'écran. L'image les couvre entièrement. */
-html:has(#securityOverlay.is-visible),
-body:has(#securityOverlay.is-visible){background-color:#d5ae89!important}
-.security-overlay.is-visible{
-  /* Le fond est peint par l'écran de connexion lui-même, décalé comme le bloc de connexion quand
-     le clavier iOS fait glisser l'écran (--security-viewport-offset, posé par app-ui.js). */
-  background-color:#d5ae89!important;
-  background-image:url("./welcome-background-v40.webp")!important;
-  background-repeat:no-repeat!important;
-  background-size:cover!important;
-  background-position:center calc(50% + var(--security-viewport-offset,0px))!important;
-}
 .app .tabs{position:relative}
 .app .tabs::after{
   content:"";
@@ -1105,18 +918,6 @@ body:has(#securityOverlay.is-visible){background-color:#d5ae89!important}
 @supports (padding-bottom:env(safe-area-inset-bottom)){
   .app{
     height:calc(100dvh + env(safe-area-inset-bottom))!important;
-    padding-bottom:env(safe-area-inset-bottom)!important;
-  }
-  .security-overlay{
-    top:0!important;
-    right:0!important;
-    bottom:calc(-1 * env(safe-area-inset-bottom))!important;
-    left:0!important;
-    height:auto!important;
-    min-height:calc(100dvh + env(safe-area-inset-bottom))!important;
-  }
-  .security-shell{
-    height:calc(100% - env(safe-area-inset-bottom))!important;
     padding-bottom:env(safe-area-inset-bottom)!important;
   }
 }
@@ -1151,26 +952,6 @@ body:has(#securityOverlay.is-visible){background-color:#d5ae89!important}
   .overlay{
     min-height:calc(100dvh + env(safe-area-inset-bottom))!important;
   }
-}
-
-/* ===== UI v46 — alignement exact sur la référence mobile ===== */
-.security-hero{
-  top:6.2%!important;
-}
-.welcome-cart-art{
-  width:198px!important;
-  margin:0 auto -24px!important;
-}
-.welcome-cart-art img{
-  mix-blend-mode:normal!important;
-  background:transparent!important;
-}
-
-@media(max-height:720px){
-  .security-hero{top:5.1%!important}
-  .welcome-cart-art{width:178px!important;margin-bottom:-22px!important}
-  
-  
 }
 
 /* ===== UI v110 — proportions finales de Ma liste sur mobile ===== */
@@ -1856,20 +1637,6 @@ body{
 .preferences-dialog:focus,
 .preferences-dialog:focus-visible{
   outline:none;
-}
-
-/* ===== UI v85 — recentrage après retrait de Face ID ===== */
-.security-modal,
-.security-shell.is-password-open .security-modal{
-  top:36%!important;
-}
-
-@media(max-height:720px){
-  .security-modal,
-  .security-shell.is-password-open .security-modal{
-    top:35.2%!important;
-  }
-  
 }
 
 /* ===== UI v86 — focus neutre des popups + sécurité dédiée ===== */
@@ -3402,77 +3169,6 @@ html[data-account="family"] #missingProductsDialog .missing-product-row.missing-
 
 .settings-sheet:not([open]){display:none!important}
 
-/* ===== UI v633 — écran de connexion : tuile « accès privé », clé dorée, bouton sapin à double filet or ===== */
-.security-modal{
-  min-height:324px!important;
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:center!important;
-  padding:14px 22px 16px!important;
-  border-radius:24px!important;
-  background:rgba(255,253,248,.95)!important;
-  border:1px solid rgba(160,130,70,.35)!important;
-  box-shadow:0 22px 46px rgba(50,60,45,.15),inset 0 0 0 6px #fffdf8,inset 0 0 0 7px rgba(160,130,70,.28)!important;
-}
-.security-modal .security-eyebrow{
-  margin:0 0 4px!important;
-  font:10px/1.2 "Baskerville","Iowan Old Style",Georgia,serif;
-  letter-spacing:3.2px;
-  color:#a58a4f!important;
-  text-align:center;
-}
-.security-lock-icon{
-  width:40px!important;
-  height:40px!important;
-  margin:0 auto 4px!important;
-  display:grid!important;
-  place-items:center;
-  background:transparent!important;
-  border:0!important;
-  color:#9a7f45!important;
-}
-.security-modal .security-lock-icon svg{width:34px!important;height:34px!important;fill:none;stroke:currentColor;stroke-width:1.1}
-.security-modal h3{
-  margin:0!important;
-  font:600 27px/1.1 "Baskerville","Iowan Old Style",Georgia,serif!important;
-  letter-spacing:-.2px!important;
-  color:#105028!important;
-}
-.security-card-copy{
-  margin:3px auto 0!important;
-  font:italic 14px/1.3 "Baskerville","Iowan Old Style",Georgia,serif!important;
-  color:#7a6a45!important;
-}
-.security-ornament{display:flex;align-items:center;justify-content:center;gap:8px;width:62%;margin:8px auto 10px}
-.security-ornament i{flex:1;height:1px;background:rgba(160,130,70,.5)}
-.security-ornament b{width:5px;height:5px;transform:rotate(45deg);background:#b99a58}
-.security-modal .password-panel,
-.security-modal .password-panel .field{margin-top:0!important}
-.security-modal .password-panel .field>span{
-  margin-bottom:5px!important;
-  font:12.5px/1.2 "Baskerville","Iowan Old Style",Georgia,serif;
-  letter-spacing:.3px;
-  color:#6b6a5c!important;
-}
-.security-modal .password-panel .field input{
-  height:46px!important;
-  background:#f6f2e8!important;
-  border:1px solid rgba(160,130,70,.3)!important;
-  border-radius:10px!important;
-}
-.security-modal .password-panel .primary,
-#securitySubmit{
-  height:48px!important;
-  margin-top:56px!important;
-  border:0!important;
-  border-radius:12px!important;
-  background:linear-gradient(180deg,#3a9a45 0%,#2c8239 100%)!important;
-  color:#fffdf4!important;
-  font:600 18px/1 "Baskerville","Iowan Old Style",Georgia,serif!important;
-  letter-spacing:.8px!important;
-  box-shadow:0 0 0 2px #fffdf8,0 0 0 3px rgba(185,154,88,.8),0 12px 22px rgba(30,90,45,.26)!important;
-}
-
 /* ===== v685 — annulation d'un plat ajouté (fenêtre compacte) : photo entière pleine largeur, nom du plat, deux actions discrètes ===== */
 .dish-cancel-dialog{width:min(calc(100% - 96px),260px);padding:0;overflow:hidden;text-align:center;border-radius:22px}
 .dish-cancel-photo{width:100%;margin:0;background:#eef1eb}
@@ -3483,11 +3179,6 @@ html[data-account="family"] #missingProductsDialog .missing-product-row.missing-
 .dish-cancel-dialog .dialog-actions button{height:40px;border:0;border-radius:12px;font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:none}
 .dish-cancel-dialog .dialog-actions button[data-dish-cancel="keep"]{background:rgba(32,46,37,.05);color:#4d5a52}
 .dish-cancel-dialog .dialog-actions .dish-cancel-confirm{background:rgba(200,66,59,.09);color:#b5372f}
-
-/* ===== v688 — écran de connexion fixe : pas de défilement ni de rebond ===== */
-html:has(#securityOverlay.is-visible),
-body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behavior:none!important}
-#securityOverlay.is-visible{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none}
 
 /* ===== v689 — écran de connexion : géométrie fixée sur la hauteur physique de l'iPhone =====
    Au rechargement d'une mise à jour, iOS peint les premières images avec une zone d'affichage
@@ -3505,26 +3196,6 @@ body:has(#securityOverlay.is-visible){overflow:hidden!important;overscroll-behav
 @media (display-mode:standalone) and (orientation:portrait) and (device-height:926px){:root{--lock-screen-h:926px;--lock-screen-bottom:34px}}
 @media (display-mode:standalone) and (orientation:portrait) and (device-height:932px){:root{--lock-screen-h:932px;--lock-screen-bottom:34px}}
 @media (display-mode:standalone) and (orientation:portrait) and (device-height:956px){:root{--lock-screen-h:956px;--lock-screen-bottom:34px}}
-@media (display-mode:standalone) and (orientation:portrait) and (device-height:667px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:736px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:812px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:844px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:852px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:874px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:896px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:912px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:926px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:932px),
-  (display-mode:standalone) and (orientation:portrait) and (device-height:956px){
-  .security-overlay{bottom:auto!important;height:calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;min-height:0!important}
-  .security-overlay .security-shell{height:var(--lock-screen-h)!important;padding-bottom:var(--lock-screen-bottom)!important}
-  /* v728 — pendant ces premières images, le document est encore plus court que l'écran (812 puis 846 px
-     sur un écran de 874) : son image, mise à l'échelle de cette hauteur, s'arrêtait là et laissait une
-     bande unie en bas. L'image du document prend l'échelle exacte de l'écran de connexion et déborde
-     sous la page jusqu'en bas de l'écran. */
-  html:has(#securityOverlay.is-visible),
-  body:has(#securityOverlay.is-visible){background-size:auto calc(var(--lock-screen-h) + var(--lock-screen-bottom))!important;background-position:center top!important}
-}
 
 /* v827 — Réglages › Administrateur › Familles (family-admin.js) */
 .settings-sheet#familyAdminDialog .connection-sync-line{gap:12px;align-items:center}
@@ -3582,18 +3253,6 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .settings-view .settings-icon-families{position:relative!important;overflow:visible!important}
 .settings-sheet#familyDeviceDialog .family-device-signout{width:100%;min-height:48px;margin:0 0 6px;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid var(--tile-line,rgba(33,55,40,.08));border-radius:15px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);color:#2f5a42;font:inherit;font-size:var(--fs-text);font-weight:600;-webkit-appearance:none;appearance:none}
 .settings-sheet#familyDeviceDialog .family-device-signout svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* v833 — clavier iOS : la carte de connexion remonte au-dessus du clavier (app-ui.js) */
-/* v840 — mode saisie compact : champ touché → logo effacé, carte en haut et réduite (clé, phrase et
-   ornement masqués). Position fixe, sans mesure du clavier (app-ui.js, .is-keyboard-lifted). */
-.security-shell .security-modal{transition:top .3s cubic-bezier(.2,.85,.25,1)}
-.security-shell .security-hero{transition:opacity .2s ease}
-#securityOverlay .security-shell.is-keyboard-lifted .security-hero{opacity:0;pointer-events:none}
-#securityOverlay .security-shell.is-keyboard-lifted .security-modal{top:calc(env(safe-area-inset-top,0px) + 12px)!important;bottom:auto!important}
-#securityOverlay .security-shell.is-keyboard-lifted #securityIcon,
-#securityOverlay .security-shell.is-keyboard-lifted .security-card-copy,
-#securityOverlay .security-shell.is-keyboard-lifted .security-ornament{display:none!important}
-#securityOverlay .security-shell.is-keyboard-lifted .security-modal h3{font-size:30px!important;margin:4px 0 6px!important}
-@media(prefers-reduced-motion:reduce){.security-shell .security-modal,.security-shell .security-hero{transition:none}}
 .settings-sheet#familyAdminDialog .family-admin-add{width:100%;min-height:52px;margin-top:10px;border:1px dashed rgba(47,106,73,.32);border-radius:18px;background:rgba(237,247,234,.5);color:#1f5a3b;font:inherit;font-size:var(--fs-text);-webkit-appearance:none;appearance:none}
 .settings-sheet#familyAdminDialog .family-admin-account{border:1px solid var(--tile-line);border-radius:18px;background:var(--tile-bg);box-shadow:var(--tile-shadow);overflow:hidden}
 .settings-sheet#familyAdminDialog .family-admin-account-row{display:block;width:100%;min-height:52px;padding:0 16px;border:0;background:transparent;color:#25392b;font:inherit;font-size:var(--fs-text);text-align:left;-webkit-appearance:none;appearance:none}
@@ -3605,3 +3264,95 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .catalog-search-empty{flex-direction:column;gap:12px;padding:26px 18px;text-align:center}
 .catalog-search-empty .catalog-request-empty-text{margin:0;color:#617366;font-size:var(--fs-text,14px);line-height:1.4;overflow-wrap:anywhere}
 .catalog-search-empty .catalog-request-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:1px dashed rgba(47,106,73,.35);border-radius:15px;background:rgba(237,247,234,.6);color:#1f5a3b;font:inherit;font-size:var(--fs-text,14px);font-weight:600;-webkit-appearance:none;appearance:none}
+
+/* Connexion : géométrie stable, décor plein écran et verre champagne.
+   La hauteur est mémorisée avant le clavier par app-ui.js, jamais dérivée de sa hauteur visible. */
+:root{--security-screen-height:var(--lock-screen-h,var(--security-layout-height,100svh))}
+html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
+  overflow:hidden!important;overscroll-behavior:none!important;
+  background:#d5ae89 url("./welcome-champagne-v841.webp") center top / auto var(--security-screen-height) no-repeat!important;
+}
+.security-overlay{
+  z-index:65;top:0!important;right:0!important;bottom:auto!important;left:0!important;
+  height:calc(var(--security-screen-height) + env(safe-area-inset-bottom,0px))!important;
+  min-height:0!important;padding:0!important;overflow:hidden!important;place-items:stretch!important;
+  overscroll-behavior:none;
+  background:#d5ae89 url("./welcome-champagne-v841.webp") center top / cover no-repeat!important;
+  background-position:center var(--security-viewport-offset,0px)!important;
+}
+.security-shell{
+  position:relative;width:min(100%,460px);height:var(--security-screen-height);
+  margin:0 auto;padding:0;display:block;min-height:0;
+}
+.security-modal{
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:max(calc(env(safe-area-inset-top,0px) + 20px),clamp(24px,calc((var(--security-screen-height) - 660px) * .69),156px));
+  width:calc(100% - 48px);max-width:384px;min-height:0;margin:0;padding:0;
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  color:#103c22;text-align:center;
+}
+.security-ornament{display:flex;align-items:center;justify-content:center;gap:12px;width:52%;height:6px;margin:0 auto 22px}
+.security-ornament i{flex:1;height:1px;background:rgba(155,116,46,.55)}
+.security-ornament b{width:6px;height:6px;transform:rotate(45deg);background:#bd9447}
+.security-modal h3{margin:0;font:600 38px/1.05 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:-.6px;color:#103c22}
+.security-modal .security-card-copy{max-width:none;margin:8px 0 0;font:italic 18px/1.3 "Baskerville","Iowan Old Style",Georgia,serif;color:#29432a}
+.security-dynamic{display:none}
+.security-modal.is-creating .security-card-copy{display:none}
+.security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
+.security-modal .password-panel{margin-top:22px;text-align:left}
+.password-panel[hidden]{display:none}
+.security-modal .field{margin:12px 0 0}
+.security-modal .field:first-child{margin-top:0}
+.security-modal .field>span,.security-password-field>label{
+  display:block;margin:0 0 6px;color:#173e26;font-size:15px;font-weight:500;line-height:18px;letter-spacing:.05px;
+}
+.security-modal .field input{
+  display:block;width:100%;height:48px;padding:0 14px;outline:none;
+  color:#102b1c;font-size:18px;line-height:1.25;letter-spacing:normal;
+  border:1px solid rgba(255,248,225,.76);border-radius:14px;
+  background:rgba(255,244,214,.38);
+  -webkit-backdrop-filter:blur(12px) saturate(110%);backdrop-filter:blur(12px) saturate(110%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 2px 8px rgba(91,64,25,.035);
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+.security-modal .field input:focus{border-color:#36753a;box-shadow:0 0 0 1px rgba(54,117,58,.18),inset 0 1px 0 rgba(255,255,255,.22)}
+.security-modal .field input[type="password"]{letter-spacing:.08em}
+.security-input-wrap{position:relative}
+.security-modal .security-input-wrap input{padding-right:48px}
+.security-password-toggle{
+  position:absolute;right:2px;top:2px;display:grid;place-items:center;width:44px;height:44px;
+  padding:0;border:0;border-radius:12px;background:transparent;color:#7c5a29;cursor:pointer;
+}
+.security-password-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.security-password-toggle .eye-slash{display:none}
+.security-password-toggle[aria-pressed="true"] .eye-slash{display:block}
+.security-password-toggle:focus-visible{outline:2px solid #36753a;outline-offset:-3px}
+.security-modal .password-panel .primary{
+  width:100%;height:54px;margin-top:26px;padding:0 12px;border:0;border-radius:14px;
+  background:linear-gradient(135deg,#2f8a33,#23732c);color:#fffdf4;
+  font:600 22px/1.1 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:.5px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);cursor:pointer;
+}
+.security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
+.security-modal .primary:disabled{opacity:.7;cursor:wait}
+.security-modal .setup-error{min-height:0;margin:10px 0 0;padding:8px 10px;border-radius:10px;background:rgba(255,248,231,.88);color:#8a2825;font-size:14px;line-height:1.35}
+.security-modal .setup-error:empty{display:none}
+/* Petits téléphones : variante choisie sur la hauteur complète, pas à l'ouverture du clavier. */
+html[data-security-compact="true"] .security-modal{top:calc(env(safe-area-inset-top,0px) + 16px)}
+html[data-security-compact="true"] .security-ornament{margin-bottom:14px}
+html[data-security-compact="true"] .security-modal h3{font-size:32px}
+html[data-security-compact="true"] .security-modal .security-card-copy{font-size:16px;margin-top:6px}
+html[data-security-compact="true"] .security-modal .password-panel{margin-top:16px}
+html[data-security-compact="true"] .security-modal .field{margin-top:10px}
+html[data-security-compact="true"] .security-modal .field:first-child{margin-top:0}
+html[data-security-compact="true"] .security-modal .field input{height:44px}
+html[data-security-compact="true"] .security-password-toggle{height:40px;top:2px}
+html[data-security-compact="true"] .security-modal .primary{height:48px;margin-top:18px;font-size:20px}
+/* Paysage, texte agrandi ou erreur longue : le contenu reste accessible au défilement. */
+.security-shell.is-scrollable{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.security-shell.is-scrollable .security-modal{padding-bottom:20px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .security-modal .field input{background:rgba(250,235,201,.88)}
+}
+@media(prefers-reduced-transparency:reduce){.security-modal .field input{background:#f0dfbd;backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){.security-modal .field input{transition:none}}

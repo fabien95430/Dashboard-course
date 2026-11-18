@@ -216,16 +216,18 @@ test('le retour au premier plan ne réinitialise pas un écran de connexion déj
   assert.match(body,/if\(state\.locked\)\{[\s\S]*?if\(UI\.securityOverlay\.classList\.contains\('is-visible'\)&&state\.securityMode==='unlock'\)return;\s*showSecurity\('unlock'\);/);
 });
 
-test('l écran de connexion ne défile pas au doigt',()=>{
+test('l écran de connexion bloque le rebond et autorise le défilement seulement en cas de débordement',()=>{
   const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
   const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   assert.match(ui,/getElementById\('securityOverlay'\)\?\.addEventListener\('touchmove',event=>\{[\s\S]*?event\.preventDefault\(\);[\s\S]*?\},\{passive:false\}\)/);
-  assert.match(styles,/#securityOverlay\.is-visible\{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none\}/);
+  assert.match(ui,/!shell\?\.classList\.contains\('is-scrollable'\)&&event\.cancelable/);
+  assert.match(styles,/\.security-shell\.is-scrollable\{overflow-y:auto;overscroll-behavior:contain/);
 });
 
 test('l écran de connexion s accroche à la hauteur physique de l iPhone (pas de saut au rechargement)',()=>{
   const styles=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   for(const h of [667,812,844,852,874,896,926,932,956])assert.match(styles,new RegExp('\\(device-height:'+h+'px\\)\\{:root\\{--lock-screen-h:'+h+'px;'));
-  assert.match(styles,/\.security-overlay\{bottom:auto!important;height:calc\(var\(--lock-screen-h\) \+ var\(--lock-screen-bottom\)\)!important;min-height:0!important\}/);
-  assert.match(styles,/\.security-overlay \.security-shell\{height:var\(--lock-screen-h\)!important;padding-bottom:var\(--lock-screen-bottom\)!important\}/);
+  assert.match(styles,/--security-screen-height:var\(--lock-screen-h,var\(--security-layout-height,100svh\)\)/);
+  assert.match(styles,/height:calc\(var\(--security-screen-height\) \+ env\(safe-area-inset-bottom,0px\)\)!important/);
+  assert.match(styles,/\.security-shell\{[^}]*height:var\(--security-screen-height\)/);
 });
