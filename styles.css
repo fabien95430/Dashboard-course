@@ -3265,11 +3265,6 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .catalog-search-empty .catalog-request-empty-text{margin:0;color:#617366;font-size:var(--fs-text,14px);line-height:1.4;overflow-wrap:anywhere}
 .catalog-search-empty .catalog-request-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:1px dashed rgba(47,106,73,.35);border-radius:15px;background:rgba(237,247,234,.6);color:#1f5a3b;font:inherit;font-size:var(--fs-text,14px);font-weight:600;-webkit-appearance:none;appearance:none}
 
-/* v845 — polices de la connexion « Bistrot moderne » (embarquées, licence OFL : fonts/) */
-@font-face{font-family:"Courses DM Serif";src:url("./fonts/dm-serif-display-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:"Courses DM Sans";src:url("./fonts/dm-sans-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:"Courses DM Sans";src:url("./fonts/dm-sans-latin-500-normal.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:"Courses DM Sans";src:url("./fonts/dm-sans-latin-600-normal.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
 /* Connexion : géométrie stable, décor plein écran et verre ivoire.
    La hauteur est mémorisée avant le clavier par app-ui.js, jamais dérivée de sa hauteur visible. */
 :root{--security-screen-height:var(--lock-screen-h,var(--security-layout-height,100svh))}
@@ -3300,33 +3295,34 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-ornament{display:flex;align-items:center;justify-content:center;gap:12px;width:52%;height:6px;margin:0 auto 22px}
 .security-ornament i{flex:1;height:1px;background:rgba(129,129,103,.48)}
 .security-ornament b{width:6px;height:6px;transform:rotate(45deg);background:#96906f}
-.security-modal h3{margin:0;font:400 44px/1.05 "Courses DM Serif",Georgia,serif;letter-spacing:-.4px;color:#103c22}
-.security-modal .security-card-copy{max-width:none;margin:8px 0 0;font:400 17px/1.3 "Courses DM Sans",-apple-system,sans-serif;color:#4b5e4c}
+/* v846 — même typographie que les pages de l’app : titres Baskerville, textes système. */
+.security-modal h3{margin:0;font:500 46px/1.05 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:-1.1px;color:#103c22}
+.security-modal .security-card-copy{max-width:none;margin:8px 0 0;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;color:#6f7880}
 .security-dynamic{display:none}
 .security-modal.is-creating .security-card-copy{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
 .security-modal .password-panel{margin-top:22px;text-align:left}
 .password-panel[hidden]{display:none}
-.security-modal .field{margin:12px 0 0}
+.security-modal .field{margin:20px 0 0}
 .security-modal .field:first-child{margin-top:0}
 .security-modal .field>span,.security-password-field>label{
-  display:block;margin:0 0 6px;color:#173e26;font:500 15px/18px "Courses DM Sans",-apple-system,sans-serif;letter-spacing:.05px;
+  display:block;margin:0 0 2px;color:#5b7263;font:700 11.5px/18px -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:2px;text-transform:uppercase;
 }
 .security-modal .field input{
-  display:block;width:100%;height:48px;padding:0 14px;outline:none;
-  color:#102b1c;font:400 18px/1.25 "Courses DM Sans",-apple-system,sans-serif;font-size:18px;letter-spacing:normal;
-  border:1px solid rgba(255,255,250,.8);border-radius:14px;
-  background:rgba(251,249,243,.38);
-  -webkit-backdrop-filter:blur(12px) saturate(110%);backdrop-filter:blur(12px) saturate(110%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 2px 8px rgba(59,75,57,.035);
+  display:block;width:100%;height:46px;padding:0 2px;outline:none;
+  color:#102b1c;font:500 18px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;font-size:18px;letter-spacing:normal;
+  border:0;border-bottom:1.5px solid rgba(27,82,56,.32);border-radius:0;
+  background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;
   transition:border-color .15s ease,box-shadow .15s ease;
 }
-.security-modal .field input:focus{border-color:#36753a;box-shadow:0 0 0 1px rgba(54,117,58,.18),inset 0 1px 0 rgba(255,255,255,.22)}
-.security-modal .field input[type="password"]{letter-spacing:.08em}
+.security-modal .field input:focus{border-bottom-color:#198957;box-shadow:0 1px 0 #198957}
+/* Remplissage automatique iOS : pas de fond jaune, même rendu que la saisie. */
+.security-modal .field input:-webkit-autofill,.security-modal .field input:-webkit-autofill:focus{-webkit-text-fill-color:#102b1c;-webkit-box-shadow:0 0 0 1000px transparent inset;transition:background-color 100000s ease 0s}
+.security-modal .field input[type="password"]{font-size:16px;letter-spacing:.18em}
 .security-input-wrap{position:relative}
 .security-modal .security-input-wrap input{padding-right:48px}
 .security-password-toggle{
-  position:absolute;right:2px;top:2px;display:grid;place-items:center;width:44px;height:44px;
+  position:absolute;right:-8px;top:1px;display:grid;place-items:center;width:44px;height:44px;
   padding:0;border:0;border-radius:12px;background:transparent;color:#7d7558;cursor:pointer;
 }
 .security-password-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
@@ -3334,11 +3330,17 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-password-toggle[aria-pressed="true"] .eye-slash{display:block}
 .security-password-toggle:focus-visible{outline:2px solid #36753a;outline-offset:-3px}
 .security-modal .password-panel .primary{
-  width:100%;height:54px;margin-top:20px;padding:0 12px;border:0;border-radius:14px;
-  background:linear-gradient(135deg,#24683c,#175330);color:#fffdf4;
-  font:600 19px/1.1 "Courses DM Sans",-apple-system,sans-serif;letter-spacing:.2px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);cursor:pointer;
+  width:100%;height:52px;margin-top:30px;padding:0 20px;border:1px solid rgba(10,89,55,.055);border-radius:999px;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  background:linear-gradient(180deg,#198957 0%,#12794c 100%);color:#fff;
+  font:700 16px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:-.012em;
+  box-shadow:0 9px 20px rgba(18,113,69,.17),inset 0 1px 0 rgba(255,255,255,.18);cursor:pointer;
 }
+/* Même chevron que « Ouvrir le catalogue ». */
+.security-modal .password-panel .primary::after{content:"";width:15px;height:15px;flex:0 0 15px;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m7 4 6 6-6 6' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m7 4 6 6-6 6' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.security-modal .password-panel .primary:disabled::after{display:none}
 .security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
 .security-modal .primary:disabled{opacity:.7;cursor:wait}
 .security-modal .setup-error{min-height:0;margin:10px 0 0;padding:8px 10px;border-radius:10px;background:rgba(255,248,231,.88);color:#8a2825;font-size:14px;line-height:1.35}
@@ -3346,7 +3348,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 /* Petits téléphones : variante choisie sur la hauteur complète, pas à l'ouverture du clavier. */
 html[data-security-compact="true"] .security-modal{top:calc(env(safe-area-inset-top,0px) + 16px)}
 html[data-security-compact="true"] .security-ornament{margin-bottom:14px}
-html[data-security-compact="true"] .security-modal h3{font-size:36px}
+html[data-security-compact="true"] .security-modal h3{font-size:38px}
 html[data-security-compact="true"] .security-modal .security-card-copy{font-size:16px;margin-top:6px}
 html[data-security-compact="true"] .security-modal .password-panel{margin-top:16px}
 html[data-security-compact="true"] .security-modal .field{margin-top:10px}

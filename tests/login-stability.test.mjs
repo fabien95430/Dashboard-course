@@ -92,14 +92,14 @@ test('connexion iOS : focus sans défilement automatique, formulaire assez haut 
   assert.match(css,/clamp\(24px,calc\(\(var\(--security-screen-height\) - 660px\) \* \.45\),104px\)/);
 });
 
-test('connexion : polices « Bistrot moderne » embarquées dans le dépôt',()=>{
+test('connexion : cohérente avec l’app (titre Baskerville, champs en ligne, bouton comme « Ouvrir le catalogue »)',()=>{
   const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
-  for(const file of ['dm-serif-display-latin-400-normal','dm-sans-latin-400-normal','dm-sans-latin-500-normal','dm-sans-latin-600-normal']){
-    assert.match(css,new RegExp('url\\("\\./fonts/'+file+'\\.woff2"\\)'));
-    assert.ok(readFileSync(new URL('../fonts/'+file+'.woff2',import.meta.url)).length>10000);
-  }
-  assert.match(css,/\.security-modal h3\{margin:0;font:400 44px\/1\.05 "Courses DM Serif"/);
-  assert.doesNotMatch(css,/Courses Playfair|Courses Montserrat/);
+  assert.match(css,/\.security-modal h3\{margin:0;font:500 46px\/1\.05 "Baskerville"/);
+  assert.match(css,/border:0;border-bottom:1\.5px solid rgba\(27,82,56,\.32\);border-radius:0;/);
+  assert.match(css,/background:linear-gradient\(180deg,#198957 0%,#12794c 100%\)/);
+  // Pas de fond jaune du remplissage automatique iOS.
+  assert.match(css,/\.security-modal \.field input:-webkit-autofill/);
+  assert.doesNotMatch(css,/Courses DM Serif|Courses DM Sans|Courses Playfair|Courses Montserrat/);
 });
 
 test('ouverture : la vérification de mise à jour tourne aussi sur l’écran de connexion',()=>{

@@ -1,4 +1,4 @@
-const CACHE='courses-app-v845-r1';
+const CACHE='courses-app-v846-r1';
 const VISUAL_CACHE='courses-visuals-v2';
 const ERROR_INBOX_CACHE='courses-error-inbox-v1';
 // Empreintes du contenu des visuels persistants (www/Items, www/Plats/cartes, www/Plats/fiches).
@@ -12,7 +12,7 @@ const CORE_VISUALS=[
   './www/empty-list-premium-v4.webp?v=305',
   './www/list-header-pomme-poire-v791.webp'
 ];
-const SHELL=["./index.html","./marble-ivory-sage-v517.svg","./styles.css?v=845","./product-item-first-paint.css?v=610","./catalog.js?v=845","./preferences-service.js?v=398","./missing-requests-store.js?v=824","./courses-notifications.js?v=832","./bottom-nav-liquid.js?v=573","./family-service.js?v=837","./vendor/supabase.min.js?v=2119","./app.js?v=845","./settings-tab-badge.js?v=830","./settings-ui.js?v=827","./error-center.js?v=820","./family-admin.js?v=837","./dishes.css?v=675","./catalog-liquid.css?v=675","./dish-detail.css?v=675","./catalog-liquid.js?v=635","./dishes-ui.js?v=838","./catalog-quantities.js?v=845","./repurchase-soon.js?v=820","./dish-local-images.js?v=845","./app-ui.js?v=843","./runtime-features.js?v=845","./missing-products-fixes.js?v=827","./missing-products-popup-ui.js?v=826","./product-item-images.js?v=820","./catalog-product-admin.js?v=820","./purchase-intelligence.js?v=820","./missing-products-dishes.js?v=838","./missing-products-modern.js?v=635","./dish-added-marker.js?v=820","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];
+const SHELL=["./index.html","./marble-ivory-sage-v517.svg","./styles.css?v=846","./product-item-first-paint.css?v=610","./catalog.js?v=846","./preferences-service.js?v=398","./missing-requests-store.js?v=824","./courses-notifications.js?v=832","./bottom-nav-liquid.js?v=573","./family-service.js?v=837","./vendor/supabase.min.js?v=2119","./app.js?v=845","./settings-tab-badge.js?v=830","./settings-ui.js?v=827","./error-center.js?v=820","./family-admin.js?v=837","./dishes.css?v=675","./catalog-liquid.css?v=675","./dish-detail.css?v=675","./catalog-liquid.js?v=635","./dishes-ui.js?v=838","./catalog-quantities.js?v=846","./repurchase-soon.js?v=820","./dish-local-images.js?v=846","./app-ui.js?v=843","./runtime-features.js?v=846","./missing-products-fixes.js?v=827","./missing-products-popup-ui.js?v=826","./product-item-images.js?v=820","./catalog-product-admin.js?v=820","./purchase-intelligence.js?v=820","./missing-products-dishes.js?v=838","./missing-products-modern.js?v=635","./dish-added-marker.js?v=820","./manifest.webmanifest?v=43","./icon-premium-v40.svg","./icon.svg","./apple-touch-icon.png","./docs/guide-fonctionnement-courses.pdf?v=299"];
 const refreshedVisuals=new Set();
 // Fichiers précachés de la version courante (adresses versionnées) : servis depuis le cache, sans attendre le réseau.
 const SHELL_SUFFIXES=SHELL.filter(src=>src!=='./index.html').map(src=>src.slice(1));
