@@ -683,6 +683,16 @@ function removeDish(id){
     }
     addDish();
     return true;
+  },
+  // Recherche sans résultat (Catalogue) : popup ouvert sur Ajout, bon type, nom déjà rempli ;
+  // il reste la précision et la catégorie à choisir.
+  openWith({type,name}={}){
+    settingsButton.click();
+    setMode(type==='dishes'?'dishes':'products',{animate:false});
+    setStep('form');
+    const typed=String(name||'').trim().slice(0,80);
+    input.value=typed.charAt(0).toLocaleUpperCase('fr')+typed.slice(1);
+    input.dispatchEvent(new Event('input',{bubbles:true}));
   }});
   imageHintInput.addEventListener('keydown',event=>{
     if(mode!=='products'||event.key!=='Enter')return;

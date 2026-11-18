@@ -693,8 +693,10 @@ function showLogin(message=''){
 function syncCategorySelection(){
   const el=$('#categories');
   if(!el)return;
+  // Une recherche couvre tout le catalogue : aucune catégorie n'apparaît sélectionnée pendant la recherche.
+  const searching=!!String(state.productQuery||'').trim();
   el.querySelectorAll('.cat').forEach(button=>{
-    button.classList.toggle('is-active',(button.dataset.category||DEFAULT_CATALOG_CATEGORY)===state.category);
+    button.classList.toggle('is-active',!searching&&(button.dataset.category||DEFAULT_CATALOG_CATEGORY)===state.category);
   });
 }
 function selectCategory(category){
@@ -762,12 +764,33 @@ function ensureProductGrid(el,quantities){
     fragment.appendChild(card);
   });
   productEmptyState=document.createElement('div');
-  productEmptyState.className='empty is-wide';
-  productEmptyState.textContent='Aucun produit ne correspond à cette recherche.';
+  productEmptyState.className='empty is-wide catalog-search-empty';
   productEmptyState.hidden=true;
   fragment.appendChild(productEmptyState);
   el.replaceChildren(fragment);
   productGridReady=true;
+}
+/* Recherche sans résultat : raccourci vers Catalogue des produits › Ajout, nom déjà rempli
+   (missing-products-dishes.js, COURSES_MISSING_ADD.openWith). Partagé avec les plats (dishes-ui.js). */
+function renderCatalogRequestEmpty(target,type,query,fallback){
+  const name=String(query||'').trim();
+  if(!name||!window.COURSES_MISSING_ADD?.openWith){target.textContent=fallback;return}
+  const label=type==='dishes'?'plat':'produit';
+  target.innerHTML='<p class="catalog-request-empty-text">Aucun '+label+' « '+esc(name)+' »</p>'+
+    '<button type="button" class="catalog-request-cta"><span aria-hidden="true">＋</span><span>Demander ce '+label+' au catalogue</span></button>';
+  target.querySelector('.catalog-request-cta').onclick=()=>{
+    window.COURSES_MISSING_ADD.openWith({type,name});
+    clearCatalogSearch();
+  };
+}
+window.COURSES_CATALOG_REQUEST_EMPTY=renderCatalogRequestEmpty;
+/* Clavier fermé (touche OK ou toucher hors des résultats) : la recherche s'efface. Un toucher
+   dans les résultats (ajouter un produit trouvé) ne l'efface pas, pour ne pas décaler la grille. */
+let catalogResultPointerAt=0;
+function clearCatalogSearch(){
+  if(!UI.productSearch.value&&!state.productQuery)return;
+  UI.productSearch.value='';
+  UI.productSearch.dispatchEvent(new Event('input',{bubbles:true}));
 }
 function syncProductGrid(products,quantities){
   const ranks=new Map(products.map((product,index)=>[norm(product.name),index]));
@@ -784,6 +807,7 @@ function syncProductGrid(products,quantities){
   if(productEmptyState){
     productEmptyState.hidden=products.length!==0;
     productEmptyState.style.order=String(products.length);
+    if(!products.length)renderCatalogRequestEmpty(productEmptyState,'products',state.productQuery,'Aucun produit ne correspond à cette recherche.');
   }
   catalogRankedCards=ranked.filter(Boolean);
   if(catalogTailDeferred)applyCatalogTailDeferral();
@@ -3435,7 +3459,14 @@ function bindUiEvents(){
   };
   UI.savePasswordChange.onclick=changeLocalPassword;
   UI.confirmNewLocalPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();changeLocalPassword()}};
-  UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';clearTimeout(UI.productSearch._searchTimer);UI.productSearch._searchTimer=setTimeout(renderProducts,80)};
+  UI.productSearch.oninput=e=>{state.productQuery=e.target.value||'';syncCategorySelection();clearTimeout(UI.productSearch._searchTimer);UI.productSearch._searchTimer=setTimeout(renderProducts,80)};
+  $('#catalogView')?.addEventListener('pointerdown',event=>{if(event.target!==UI.productSearch)catalogResultPointerAt=Date.now()},true);
+  UI.productSearch.addEventListener('blur',()=>{
+    setTimeout(()=>{
+      if(document.activeElement===UI.productSearch||Date.now()-catalogResultPointerAt<700)return;
+      clearCatalogSearch();
+    },220);
+  });
   $('#listSearch').oninput=e=>{state.listQuery=e.target.value||'';renderList()};
   document.querySelectorAll('.tab').forEach(button=>button.onclick=()=>{
     if(BOTTOM_NAV.shouldIgnoreClick())return;

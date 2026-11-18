@@ -337,7 +337,7 @@ function buildUi(){
   buildRecipeCustomizationDialog();
 
   modeSwitch.querySelectorAll('.catalog-mode').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
-  searchInput.addEventListener('input',()=>{if(mode==='dishes'&&!drivingCatalog)renderDishes()});
+  searchInput.addEventListener('input',()=>{renderDishFilters();if(mode==='dishes'&&!drivingCatalog)renderDishes()});
   window.addEventListener('resize',()=>requestAnimationFrame(()=>syncModeLens(false)),{passive:true});
   document.querySelector('.tab[data-view="catalog"]')?.addEventListener('click',()=>requestAnimationFrame(()=>syncModeLens(false)));
   document.addEventListener('courses:view-changed',event=>{
@@ -846,14 +846,18 @@ function syncModeLens(animate=true){
 }
 function renderDishFilters(){
   if(!dishFilters)return;
-  dishFilters.querySelectorAll('.dish-filter').forEach(button=>button.classList.toggle('is-active',button.dataset.value===filter));
+  // Recherche en cours : elle couvre tous les plats, aucun filtre n'apparaît sélectionné.
+  const searching=!!normalize(searchInput?.value||'');
+  dishFilters.querySelectorAll('.dish-filter').forEach(button=>button.classList.toggle('is-active',!searching&&button.dataset.value===filter));
 }
 function visibleDishes(){
   const needle=normalize(searchInput?.value||'');
   return DISHES.filter(dish=>{
-    if(filter==='Favoris'&&!favorites.has(dish.name))return false;
-    if(filter!=='Tous'&&filter!=='Favoris'&&!dish.tags.includes(filter))return false;
-    if(!needle)return true;
+    if(!needle){
+      if(filter==='Favoris'&&!favorites.has(dish.name))return false;
+      if(filter!=='Tous'&&filter!=='Favoris'&&!dish.tags.includes(filter))return false;
+      return true;
+    }
     const hay=normalize([dish.name,...dish.tags,...dish.ingredients].join(' '));
     return needle.split(' ').filter(Boolean).every(token=>hay.includes(token));
   });
@@ -938,8 +942,10 @@ function renderDishes(){
   dishCount.textContent=dishes.length+' plat'+(dishes.length>1?'s':'');
   if(!dishes.length){
     const empty=document.createElement('div');
-    empty.className='dish-empty';
-    empty.textContent=filter==='Favoris'?'Aucun plat favori pour le moment.':'Aucun plat trouvé.';
+    empty.className='dish-empty catalog-search-empty';
+    const query=String(searchInput?.value||'').trim();
+    if(query&&window.COURSES_CATALOG_REQUEST_EMPTY)window.COURSES_CATALOG_REQUEST_EMPTY(empty,'dishes',query,'Aucun plat trouvé.');
+    else empty.textContent=filter==='Favoris'?'Aucun plat favori pour le moment.':'Aucun plat trouvé.';
     dishesGrid.replaceChildren(empty);
     dishGridState='custom';
     notifyDishesRendered(0);
