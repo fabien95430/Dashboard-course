@@ -1947,10 +1947,15 @@ function beginOAuth(){
 }
 async function revoke(){
   if(state.family){
-    await window.COURSES_FAMILY?.signOut();
-    leaveFamilyMode();forgetAccount();
-    UI.settingsDialog.close();renderView();
+    // Page de connexion affichée tout de suite (pas de passage par Ma liste),
+    // la déconnexion du service famille se termine derrière.
+    forgetAccount();
     showLogin();
+    UI.settingsDialog.close();
+    UI.familyDeviceDialog?.close();
+    await window.COURSES_FAMILY?.signOut();
+    leaveFamilyMode();
+    renderView();
     return;
   }
   state.demo=false;
@@ -3378,7 +3383,7 @@ function bindUiEvents(){
   UI.connectionConnectBtn.onclick=beginOAuth;
   UI.familyDeviceSave.onclick=saveFamilyDeviceName;
   // Mauvais identifiant ou téléphone prêté : retour à la page de connexion sans nommer l'appareil.
-  UI.familyDeviceSignOut.onclick=()=>{UI.familyDeviceDialog.close();void revoke()};
+  UI.familyDeviceSignOut.onclick=()=>{void revoke()};
   $('#settingsFamilyDevicesBtn').onclick=openFamilyDevices;
   bindDialogBackdropClose(UI.familyDevicesDialog);
   UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};

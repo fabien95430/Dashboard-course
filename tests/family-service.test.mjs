@@ -70,7 +70,7 @@ test('compte famille : session conservée, déconnexion et révocation reviennen
   assert.match(app,/rememberedAccount\(\)\?\.kind==='family'&&window\.COURSES_FAMILY[\s\S]*?await window\.COURSES_FAMILY\.resume\(\)/);
   assert.match(app,/document\.addEventListener\('courses:family-revoked',\(\)=>\{[\s\S]*?showLogin\('Cet appareil a été déconnecté par l’administrateur\.'\)/);
   const revoke=app.match(/async function revoke\(\)\{[\s\S]*?\n\}/)?.[0]||'';
-  assert.match(revoke,/if\(state\.family\)\{\s*await window\.COURSES_FAMILY\?\.signOut\(\);/);
+  assert.match(revoke,/if\(state\.family\)\{[\s\S]*?showLogin\(\);[\s\S]*?await window\.COURSES_FAMILY\?\.signOut\(\);/);
 });
 
 test('notifications famille : clé publique propre, abonnements dans le service famille, jamais Home Assistant',()=>{

@@ -45,5 +45,7 @@ test('popups famille : même hauteur que les autres feuilles de réglages',()=>{
 test('popup « Cet appareil » : bouton Se déconnecter vers la page de connexion',()=>{
   const html=read('index.html'),app=read('app.js');
   assert.match(html,/id="familyDeviceSignOut"[^>]*>.*Se déconnecter/);
-  assert.match(app,/UI\.familyDeviceSignOut\.onclick=\(\)=>\{UI\.familyDeviceDialog\.close\(\);void revoke\(\)\}/);
+  assert.match(app,/UI\.familyDeviceSignOut\.onclick=\(\)=>\{void revoke\(\)\}/);
+  // Connexion affichée avant la déconnexion réseau : Ma liste ne s'affiche pas entre les deux.
+  assert.match(app,/forgetAccount\(\);\s*showLogin\(\);\s*UI\.settingsDialog\.close\(\);\s*UI\.familyDeviceDialog\?\.close\(\);\s*await window\.COURSES_FAMILY\?\.signOut\(\);/);
 });
