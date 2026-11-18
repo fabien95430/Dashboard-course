@@ -214,7 +214,7 @@ function renderAccess(node,message=''){
     '<label class="field"><span>E-mail</span><input id="familyAdminEmail" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" value="'+ADMIN_EMAIL+'"></label>'+
     '<label class="field"><span>Mot de passe Supabase</span><input id="familyAdminPassword" type="password" autocomplete="current-password"></label>'+
     '<button type="button" class="primary family-admin-save" data-action="save-access">Valider</button>'+
-    '<p class="dialog-feedback'+(message?' is-error':'')+'" role="status" aria-live="polite">'+esc(message)+'</p>';
+    '<p class="dialog-feedback'+(message?' is-error is-visible':'')+'" role="status" aria-live="polite">'+esc(message)+'</p>';
 }
 async function saveAccess(node,button){
   const email=node.querySelector('#familyAdminEmail')?.value||'';
@@ -240,7 +240,70 @@ function renderFamilies(node){
     return '<button type="button" class="family-admin-row" data-family="'+esc(family.id)+'"><span class="family-admin-name">'+esc(family.name)+
       '<small>'+plural(family.devices.length,'appareil')+' · '+plural(pending,'demande')+'</small></span><svg class="chevron" aria-hidden="true"><use href="#i-chevron"></use></svg></button>';
   }).join('')+'</div>';
-  node.innerHTML=header('Familles')+'<p class="dialog-intro">Choisissez un foyer.</p>'+body;
+  const add=lastError&&!families.length?'':'<button type="button" class="family-admin-add" data-action="add-family"><span aria-hidden="true">＋</span> Ajouter un foyer</button>';
+  node.innerHTML=header('Familles')+'<p class="dialog-intro">Choisissez un foyer.</p>'+body+add;
+}
+
+/* ---------- Comptes famille : ajouter, mot de passe, supprimer ---------- */
+function renderAddFamily(node,message=''){
+  node.dataset.view='add';
+  node.innerHTML=header('Nouveau foyer',true)+'<p class="dialog-intro">L’identifiant de connexion est le prénom.</p>'+
+    '<label class="field"><span>Prénom</span><input id="familyAdminNewName" type="text" maxlength="30" autocomplete="off" autocapitalize="words" spellcheck="false"></label>'+
+    '<label class="field"><span>Mot de passe</span><input id="familyAdminNewPassword" type="text" minlength="6" autocomplete="off" autocapitalize="none" spellcheck="false"></label>'+
+    '<button type="button" class="primary family-admin-save" data-action="create-family">Créer le foyer</button>'+
+    '<p class="dialog-feedback'+(message?' is-error is-visible':'')+'" role="status" aria-live="polite">'+esc(message)+'</p>';
+}
+function renderPasswordFamily(node,message=''){
+  const family=families.find(item=>item.id===node.dataset.family);
+  if(!family){renderFamilies(node);return}
+  node.dataset.view='password';
+  node.innerHTML=header(family.name,true)+'<p class="dialog-intro">Nouveau mot de passe du foyer.</p>'+
+    '<label class="field"><span>Mot de passe</span><input id="familyAdminNewPassword" type="text" minlength="6" autocomplete="off" autocapitalize="none" spellcheck="false"></label>'+
+    '<button type="button" class="primary family-admin-save" data-action="save-password">Enregistrer</button>'+
+    '<p class="dialog-feedback'+(message?' is-error is-visible':'')+'" role="status" aria-live="polite">'+esc(message)+'</p>';
+}
+function showFeedback(node,message){
+  const feedback=node.querySelector('.dialog-feedback');
+  if(!feedback)return;
+  feedback.textContent=message;
+  feedback.classList.add('is-error','is-visible');
+}
+async function manage(node,button,payload,done){
+  button.disabled=true;
+  try{
+    await service().adminManageFamily(access().credentials(),payload);
+    await refresh().catch(()=>{});
+    done();
+  }catch(error){
+    showFeedback(node,String(error?.message||'Action impossible'));
+    button.disabled=false;
+  }
+}
+function createFamily(node,button){
+  const prenom=String(node.querySelector('#familyAdminNewName')?.value||'').trim();
+  const password=String(node.querySelector('#familyAdminNewPassword')?.value||'');
+  if(prenom.length<2){renderAddFamily(node,'Entre un prénom.');return}
+  if(password.length<6){
+    showFeedback(node,'Mot de passe : 6 caractères minimum.');
+    return;
+  }
+  void manage(node,button,{action:'create',prenom,password},()=>renderFamilies(node));
+}
+function savePassword(node,button){
+  const password=String(node.querySelector('#familyAdminNewPassword')?.value||'');
+  if(password.length<6){
+    showFeedback(node,'Mot de passe : 6 caractères minimum.');
+    return;
+  }
+  const id=node.dataset.family;
+  void manage(node,button,{action:'password',id,password},()=>renderFamily(node,id,'appareils'));
+}
+function deleteFamily(node,button){
+  if(button.dataset.confirm!=='1'){
+    button.dataset.confirm='1';button.textContent='Confirmer la suppression';button.classList.add('is-confirm');
+    return;
+  }
+  void manage(node,button,{action:'delete',id:node.dataset.family},()=>renderFamilies(node));
 }
 async function openFamilies(){
   const node=dialog();
@@ -282,8 +345,11 @@ function tabBody(family,tab){
     if(!modifs.length)return '<p class="family-admin-empty">Aucun plat modifié.</p>';
     return lines(modifs.map(item=>'<div class="connection-sync-line is-left"><span class="family-admin-name">'+esc(item.dish)+'<small>'+esc(item.detail)+'</small></span></div>'));
   }
-  if(!family.devices.length)return '<p class="family-admin-empty">Aucun appareil connecté.</p>';
-  return lines(family.devices.map(device=>'<div class="connection-sync-line"><span class="family-admin-name">'+esc(device.nom)+'<small>'+esc(activityLabel(device.derniere_activite))+'</small></span><button type="button" class="family-admin-action is-danger" data-device="'+esc(device.id)+'">Déconnecter</button></div>'));
+  const account='<h4 class="sheet-section-title">Compte</h4><div class="family-admin-account">'+
+    '<button type="button" class="family-admin-account-row" data-action="password-family">Changer le mot de passe</button>'+
+    '<button type="button" class="family-admin-account-row is-danger" data-action="delete-family">Supprimer le foyer</button></div>';
+  if(!family.devices.length)return '<p class="family-admin-empty">Aucun appareil connecté.</p>'+account;
+  return lines(family.devices.map(device=>'<div class="connection-sync-line"><span class="family-admin-name">'+esc(device.nom)+'<small>'+esc(activityLabel(device.derniere_activite))+'</small></span><button type="button" class="family-admin-action is-danger" data-device="'+esc(device.id)+'">Déconnecter</button></div>'))+account;
 }
 function renderFamily(node,familyId,tab='demandes'){
   const family=families.find(item=>item.id===familyId);
@@ -377,7 +443,16 @@ function onDialogClick(event){
   if(event.target===node){node.close();return}
   const save=event.target.closest('[data-action="save-access"]');
   if(save){void saveAccess(node,save);return}
-  if(event.target.closest('.family-admin-back')){renderFamilies(node);return}
+  if(event.target.closest('.family-admin-back')){
+    if(node.dataset.view==='password')renderFamily(node,node.dataset.family,'appareils');else renderFamilies(node);
+    return;
+  }
+  const action=event.target.closest('[data-action]')?.dataset.action;
+  if(action==='add-family'){renderAddFamily(node);return}
+  if(action==='create-family'){createFamily(node,event.target.closest('button'));return}
+  if(action==='password-family'){renderPasswordFamily(node);return}
+  if(action==='save-password'){savePassword(node,event.target.closest('button'));return}
+  if(action==='delete-family'){deleteFamily(node,event.target.closest('button'));return}
   const familyRow=event.target.closest('.family-admin-row');
   if(familyRow){renderFamily(node,familyRow.dataset.family,'demandes');try{node.scrollTop=0}catch(_){}return}
   const tab=event.target.closest('.family-admin-tab');

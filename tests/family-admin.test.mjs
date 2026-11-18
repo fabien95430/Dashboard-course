@@ -114,3 +114,19 @@ test('demandes des familles : pastille sur la ligne Familles et sur l’onglet R
   assert.match(badge,/counts\?\.\(\)\.total\)\|\|0\)\+familyRequests/);
   assert.match(read('family-service.js'),/table:'catalogue_perso'/);
 });
+
+test('comptes famille depuis l’app : fonction Edge réservée à l’admin, clé secrète jamais dans le code',()=>{
+  const fn=read('supabase/functions/familles-admin/index.ts');
+  assert.match(fn,/SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(fn,/isAdmin\(auth\.user\.id\)/);
+  assert.match(fn,/email_confirm: true/);
+  assert.match(fn,/Compte administrateur protégé/);
+  assert.doesNotMatch(fn,/sb_secret_|eyJhbGciOi/);
+  const service=read('family-service.js'),ui=read('family-admin.js');
+  assert.match(service,/functions\.invoke\('familles-admin'/);
+  for(const action of ['add-family','create-family','password-family','save-password','delete-family'])assert.match(ui,new RegExp('data-action="'+action+'"'));
+  assert.match(ui,/Confirmer la suppression/);
+  // Messages d'erreur réellement affichés (classe is-visible).
+  assert.match(ui,/feedback\.classList\.add\('is-error','is-visible'\)/);
+  assert.doesNotMatch(ui,/\(message\?' is-error':''\)/);
+});

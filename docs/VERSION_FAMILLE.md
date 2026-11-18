@@ -49,6 +49,10 @@ Seule la clé **publishable** figure dans le code (`family-service.js`). Ne jama
 
 Le workflow `.github/workflows/supabase-keepalive.yml` appelle `ping()` le lundi et le jeudi pour éviter la mise en pause de l’offre gratuite (7 jours sans activité).
 
-## Ajouter une famille
+## Gérer les familles depuis l’app
 
-Authentication › Users › Add user : e-mail `<identifiant>@famille.invalid` (sans accent), mot de passe, « Auto Confirm User ». L’identifiant se partage entre les membres du foyer.
+Réglages › Familles : « Ajouter un foyer » (prénom + mot de passe → compte `<prénom>@famille.invalid` confirmé) ; dans un foyer, onglet Appareils › Compte : « Changer le mot de passe », « Supprimer le foyer » (deux appuis, toutes ses données partent avec le compte).
+
+Fonction Edge `familles-admin` (`supabase/functions/familles-admin/index.ts`), « Verify JWT » **activé** : elle vérifie que l’appelant est dans `admins` et utilise la clé secrète fournie par Supabase côté serveur (jamais dans l’app). Le compte administrateur ne peut être ni modifié ni supprimé par elle.
+
+Sans cette fonction : Authentication › Users › Add user, e-mail `<identifiant>@famille.invalid` (sans accent), « Auto Confirm User ».

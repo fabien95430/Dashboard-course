@@ -1951,6 +1951,9 @@ async function revoke(){
     // la déconnexion du service famille se termine derrière.
     forgetAccount();
     showLogin();
+    // Les popups (au-dessus de tout) ne se ferment qu'une fois l'écran de connexion peint :
+    // aucune image de l'app (Ma liste, Réglages) n'apparaît entre les deux.
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     UI.settingsDialog.close();
     UI.familyDeviceDialog?.close();
     await window.COURSES_FAMILY?.signOut();

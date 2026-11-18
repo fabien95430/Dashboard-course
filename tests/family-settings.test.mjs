@@ -47,5 +47,5 @@ test('popup « Cet appareil » : bouton Se déconnecter vers la page de connexio
   assert.match(html,/id="familyDeviceSignOut"[^>]*>.*Se déconnecter/);
   assert.match(app,/UI\.familyDeviceSignOut\.onclick=\(\)=>\{void revoke\(\)\}/);
   // Connexion affichée avant la déconnexion réseau : Ma liste ne s'affiche pas entre les deux.
-  assert.match(app,/forgetAccount\(\);\s*showLogin\(\);\s*UI\.settingsDialog\.close\(\);\s*UI\.familyDeviceDialog\?\.close\(\);\s*await window\.COURSES_FAMILY\?\.signOut\(\);/);
+  assert.match(app,/forgetAccount\(\);\s*showLogin\(\);[\s\S]*?requestAnimationFrame\(\(\)=>requestAnimationFrame\(resolve\)\)\);\s*UI\.settingsDialog\.close\(\);\s*UI\.familyDeviceDialog\?\.close\(\);\s*await window\.COURSES_FAMILY\?\.signOut\(\);/);
 });

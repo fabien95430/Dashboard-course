@@ -3589,3 +3589,10 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .security-shell.is-keyboard-lifted .security-modal{translate:0 calc(-1 * var(--security-keyboard-lift,0px))}
 .security-shell.is-keyboard-lifted .security-hero{opacity:0}
 @media(prefers-reduced-motion:reduce){.security-shell .security-modal,.security-shell .security-hero{transition:none}}
+.settings-sheet#familyAdminDialog .family-admin-add{width:100%;min-height:52px;margin-top:10px;border:1px dashed rgba(47,106,73,.32);border-radius:18px;background:rgba(237,247,234,.5);color:#1f5a3b;font:inherit;font-size:var(--fs-text);-webkit-appearance:none;appearance:none}
+.settings-sheet#familyAdminDialog .family-admin-account{border:1px solid var(--tile-line);border-radius:18px;background:var(--tile-bg);box-shadow:var(--tile-shadow);overflow:hidden}
+.settings-sheet#familyAdminDialog .family-admin-account-row{display:block;width:100%;min-height:52px;padding:0 16px;border:0;background:transparent;color:#25392b;font:inherit;font-size:var(--fs-text);text-align:left;-webkit-appearance:none;appearance:none}
+.settings-sheet#familyAdminDialog .family-admin-account-row+.family-admin-account-row{border-top:1px solid rgba(39,66,47,.09)}
+.settings-sheet#familyAdminDialog .family-admin-account-row.is-danger{color:#b23a30}
+.settings-sheet#familyAdminDialog .family-admin-account-row.is-confirm{background:#b8433a;color:#fff}
+.settings-sheet#familyAdminDialog .family-admin-account-row:disabled{opacity:.5}

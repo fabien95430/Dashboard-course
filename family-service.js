@@ -407,6 +407,19 @@ async function adminRevokeDevice(credentials,id){
   const {error}=await db.from('appareils').update({revoque:true}).eq('id',id);
   if(error)throw error;
 }
+/* Comptes famille (créer, changer le mot de passe, supprimer) : fonction Edge « familles-admin »,
+   seule détentrice de la clé secrète Supabase ; elle vérifie que l'appelant est administrateur. */
+async function adminManageFamily(credentials,payload){
+  const db=await admin(credentials);
+  const {data,error}=await db.functions.invoke('familles-admin',{body:payload});
+  if(error){
+    let message='Service famille indisponible';
+    try{message=(await error.context?.json?.())?.error||message}catch(_){}
+    throw new Error(message);
+  }
+  if(data?.error)throw new Error(data.error);
+  return data||{};
+}
 /* Nouvelles demandes en direct (temps réel sur catalogue_perso, lisible par l'admin seulement). */
 let adminRequestsChannel=null;
 async function adminWatchRequests(credentials,onChange){
@@ -431,7 +444,7 @@ const api=Object.freeze({
   saveSubscription,removeSubscription,countSubscriptions,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),
-  adminOverview,adminSetRequestStatus,adminRevokeDevice,adminWatchRequests,adminSignOut
+  adminOverview,adminSetRequestStatus,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
 });
 Object.defineProperty(window,'COURSES_FAMILY',{value:api,configurable:false,enumerable:false,writable:false});
 })();
