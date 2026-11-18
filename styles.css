@@ -3265,11 +3265,11 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .catalog-search-empty .catalog-request-empty-text{margin:0;color:#617366;font-size:var(--fs-text,14px);line-height:1.4;overflow-wrap:anywhere}
 .catalog-search-empty .catalog-request-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:1px dashed rgba(47,106,73,.35);border-radius:15px;background:rgba(237,247,234,.6);color:#1f5a3b;font:inherit;font-size:var(--fs-text,14px);font-weight:600;-webkit-appearance:none;appearance:none}
 
-/* v844 — polices de la connexion « Didot chic » (embarquées, licence OFL : fonts/) */
-@font-face{font-family:"Courses Playfair";src:url("./fonts/playfair-display-latin-600-normal.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
-@font-face{font-family:"Courses Playfair";src:url("./fonts/playfair-display-latin-400-italic.woff2") format("woff2");font-weight:400;font-style:italic;font-display:swap}
-@font-face{font-family:"Courses Montserrat";src:url("./fonts/montserrat-latin-500-normal.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:"Courses Montserrat";src:url("./fonts/montserrat-latin-600-normal.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
+/* v845 — polices de la connexion « Bistrot moderne » (embarquées, licence OFL : fonts/) */
+@font-face{font-family:"Courses DM Serif";src:url("./fonts/dm-serif-display-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Courses DM Sans";src:url("./fonts/dm-sans-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Courses DM Sans";src:url("./fonts/dm-sans-latin-500-normal.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Courses DM Sans";src:url("./fonts/dm-sans-latin-600-normal.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
 /* Connexion : géométrie stable, décor plein écran et verre ivoire.
    La hauteur est mémorisée avant le clavier par app-ui.js, jamais dérivée de sa hauteur visible. */
 :root{--security-screen-height:var(--lock-screen-h,var(--security-layout-height,100svh))}
@@ -3300,8 +3300,8 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-ornament{display:flex;align-items:center;justify-content:center;gap:12px;width:52%;height:6px;margin:0 auto 22px}
 .security-ornament i{flex:1;height:1px;background:rgba(129,129,103,.48)}
 .security-ornament b{width:6px;height:6px;transform:rotate(45deg);background:#96906f}
-.security-modal h3{margin:0;font:600 42px/1.05 "Courses Playfair","Didot","Bodoni 72",Georgia,serif;letter-spacing:-.5px;color:#103c22}
-.security-modal .security-card-copy{max-width:none;margin:8px 0 0;font:italic 400 18px/1.3 "Courses Playfair","Didot",Georgia,serif;color:#29432a}
+.security-modal h3{margin:0;font:400 44px/1.05 "Courses DM Serif",Georgia,serif;letter-spacing:-.4px;color:#103c22}
+.security-modal .security-card-copy{max-width:none;margin:8px 0 0;font:400 17px/1.3 "Courses DM Sans",-apple-system,sans-serif;color:#4b5e4c}
 .security-dynamic{display:none}
 .security-modal.is-creating .security-card-copy{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
@@ -3310,11 +3310,11 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-modal .field{margin:12px 0 0}
 .security-modal .field:first-child{margin-top:0}
 .security-modal .field>span,.security-password-field>label{
-  display:block;margin:0 0 6px;color:#173e26;font:600 12px/18px "Courses Montserrat",-apple-system,sans-serif;letter-spacing:1.6px;text-transform:uppercase;
+  display:block;margin:0 0 6px;color:#173e26;font:500 15px/18px "Courses DM Sans",-apple-system,sans-serif;letter-spacing:.05px;
 }
 .security-modal .field input{
   display:block;width:100%;height:48px;padding:0 14px;outline:none;
-  color:#102b1c;font:500 17px/1.25 "Courses Montserrat",-apple-system,sans-serif;font-size:18px;letter-spacing:normal;
+  color:#102b1c;font:400 18px/1.25 "Courses DM Sans",-apple-system,sans-serif;font-size:18px;letter-spacing:normal;
   border:1px solid rgba(255,255,250,.8);border-radius:14px;
   background:rgba(251,249,243,.38);
   -webkit-backdrop-filter:blur(12px) saturate(110%);backdrop-filter:blur(12px) saturate(110%);
@@ -3336,7 +3336,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-modal .password-panel .primary{
   width:100%;height:54px;margin-top:20px;padding:0 12px;border:0;border-radius:14px;
   background:linear-gradient(135deg,#24683c,#175330);color:#fffdf4;
-  font:600 15px/1.1 "Courses Montserrat",-apple-system,sans-serif;letter-spacing:3px;text-transform:uppercase;
+  font:600 19px/1.1 "Courses DM Sans",-apple-system,sans-serif;letter-spacing:.2px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12);cursor:pointer;
 }
 .security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
@@ -3346,7 +3346,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 /* Petits téléphones : variante choisie sur la hauteur complète, pas à l'ouverture du clavier. */
 html[data-security-compact="true"] .security-modal{top:calc(env(safe-area-inset-top,0px) + 16px)}
 html[data-security-compact="true"] .security-ornament{margin-bottom:14px}
-html[data-security-compact="true"] .security-modal h3{font-size:34px}
+html[data-security-compact="true"] .security-modal h3{font-size:36px}
 html[data-security-compact="true"] .security-modal .security-card-copy{font-size:16px;margin-top:6px}
 html[data-security-compact="true"] .security-modal .password-panel{margin-top:16px}
 html[data-security-compact="true"] .security-modal .field{margin-top:10px}

@@ -1644,7 +1644,9 @@ function showSecurity(mode,message=''){
   refreshVisualLock();
   // Déverrouillage : la version est vérifiée AVANT de donner le champ mot de passe (et donc la
   // fenêtre d'identifiants iOS), pour qu'un rechargement de mise à jour ne la ferme jamais.
-  if(mode==='unlock')void gateUnlockOnUpdate();
+  // Ouverture de l'app (connexion ou déverrouillage) : une version plus récente est installée et
+  // affichée tout de suite, au lieu de garder l'ancienne page jusqu'à l'ouverture suivante.
+  if(mode==='unlock'||mode==='login')void gateUnlockOnUpdate();
   else focusSecurityPassword();
 }
 function hideSecurity(){
@@ -3308,10 +3310,17 @@ function unlockJustUpdated(version){
 }
 // Pendant la vérification, le champ mot de passe reste verrouillé (pas de curseur, donc pas de
 // fenêtre d'identifiants iOS) et le bouton indique « Vérification… ».
+let unlockGateLabel='';
 function setUnlockGate(locked){
   const input=UI.securityPassword,button=UI.securitySubmit;
   if(input){input.readOnly=locked;if(locked)input.setAttribute?.('aria-busy','true');else input.removeAttribute?.('aria-busy')}
-  if(button){button.disabled=locked;button.textContent=locked?'Vérification…':'Connexion'}
+  if(button){
+    // Libellé d'origine conservé (« Se connecter », « Chiffrer et continuer »…).
+    if(locked&&!unlockGateLabel)unlockGateLabel=button.textContent||'';
+    button.disabled=locked;
+    button.textContent=locked?'Vérification…':(unlockGateLabel||'Se connecter');
+    if(!locked)unlockGateLabel='';
+  }
 }
 function focusSecurityPassword(){
   setTimeout(()=>{
@@ -3325,7 +3334,7 @@ async function gateUnlockOnUpdate(){
   // Écran réaffiché pendant une vérification déjà en cours : le champ reste verrouillé jusqu'à sa fin.
   if(unlockVersionCheckPromise)setUnlockGate(true);
   const reloading=await checkForUpdateBeforeUnlock();
-  if(!reloading&&state.securityMode==='unlock')focusSecurityPassword();
+  if(!reloading&&(state.securityMode==='unlock'||state.securityMode==='login'))focusSecurityPassword();
 }
 async function checkForUpdateBeforeUnlock(){
   if(unlockVersionCheckPromise)return unlockVersionCheckPromise;
@@ -3355,7 +3364,7 @@ async function checkForUpdateBeforeUnlock(){
   try{return await check}
   finally{
     unlockVersionCheckPromise=null;
-    if(!reloading&&state.securityMode==='unlock')setUnlockGate(false);
+    if(!reloading&&(state.securityMode==='unlock'||state.securityMode==='login'))setUnlockGate(false);
   }
 }
 /* Mise à jour depuis l'en-tête : l'étape en cours puis le résultat restent écrits sous le titre de Réglages. */

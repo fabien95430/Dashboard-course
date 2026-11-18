@@ -38,9 +38,9 @@ function harness({online=true,available=false,shouldFail=false,hang=false,versio
 }
 
 test('un déverrouillage commence par une vérification de version avant la récupération des jetons',()=>{
-  assert.match(app,/function showSecurity\(mode,message=''\)[\s\S]*?if\(mode==='unlock'\)void gateUnlockOnUpdate\(\);\s*else focusSecurityPassword\(\);/);
+  assert.match(app,/function showSecurity\(mode,message=''\)[\s\S]*?if\(mode==='unlock'\|\|mode==='login'\)void gateUnlockOnUpdate\(\);\s*else focusSecurityPassword\(\);/);
   // Le champ mot de passe ne reçoit le curseur (et la fenêtre d'identifiants iOS) qu'après la vérification.
-  assert.match(app,/async function gateUnlockOnUpdate\(\)\{[\s\S]*?if\(unlockVersionCheckPromise\)setUnlockGate\(true\);\s*const reloading=await checkForUpdateBeforeUnlock\(\);\s*if\(!reloading&&state\.securityMode==='unlock'\)focusSecurityPassword\(\);/);
+  assert.match(app,/async function gateUnlockOnUpdate\(\)\{[\s\S]*?if\(unlockVersionCheckPromise\)setUnlockGate\(true\);\s*const reloading=await checkForUpdateBeforeUnlock\(\);\s*if\(!reloading&&\(state\.securityMode==='unlock'\|\|state\.securityMode==='login'\)\)focusSecurityPassword\(\);/);
   assert.match(app,/input\.readOnly=locked/);
   assert.match(app,/const UNLOCK_UPDATE_TIMEOUT_MS=4000;/);
   assert.match(app,/if\(state\.securityMode==='unlock'\)\{\s*if\(await unlockVersionCheckPromise\)return;\s*const payload=await decryptVault/);
