@@ -107,33 +107,6 @@ function syncPageVersions(){
         font-weight:500;
         letter-spacing:-.01em;
       }
-      /* Même bouton que « Connexion » (page d'accueil) : vert profond, coins arrondis, Baskerville. */
-      .list-empty-action{
-        margin-top:19px;
-        min-width:min(62vw,232px);
-        max-width:calc(100vw - 72px);
-        height:48px;
-        padding:0 22px;
-        border:0;
-        border-radius:14px;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        gap:9px;
-        background:linear-gradient(135deg,#24683c,#175330);
-        color:#fffdf4!important;
-        box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 18px rgba(23,83,48,.16);
-        font:600 19px/1 "Baskerville","Iowan Old Style",Georgia,serif;
-        letter-spacing:.4px;
-        cursor:pointer;        -webkit-appearance:none;
-        appearance:none;
-        transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;      }
-      .list-empty-action svg{width:15px;height:15px;flex:0 0 15px}
-      .list-empty-action:active{
-        transform:scale(.978);
-        filter:brightness(.98);
-        box-shadow:0 6px 15px rgba(18,113,69,.14),inset 0 1px 0 rgba(255,255,255,.16);
-      }
       html #dishDialog .dish-confirm-feedback-layer{
         width:min(calc(100vw - 58px),286px)!important;
         padding:26px 24px 23px!important;
@@ -219,7 +192,6 @@ function syncPageVersions(){
       @media(max-height:700px){
         #listItems .list-empty-state{min-height:300px!important;padding-top:8px!important;padding-bottom:20px!important}
         .list-empty-visual{width:min(42vw,165px);margin-bottom:12px}
-        .list-empty-action{margin-top:15px;height:44px;min-width:min(60vw,220px)}
       }
       @media(prefers-reduced-motion:reduce){
         html #dishDialog.is-confirm-feedback .dish-confirm-feedback-layer{animation:none!important;opacity:1!important;transform:translate(-50%,-50%)!important}
@@ -382,14 +354,7 @@ function syncListEmptyState(root){
       <strong>Votre liste est prête</strong>
       <span>Ajoutez vos produits depuis le catalogue</span>
     </div>
-    <button class="list-empty-action" type="button">
-      <span>Ouvrir le catalogue</span>
-      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
   `;
-  empty.querySelector('.list-empty-action')?.addEventListener('click',()=>{
-    document.querySelector('.tab[data-view="catalog"]')?.click();
-  });
   retainedListEmptyState=empty;
 }
 function syncListConfirmation(event){
