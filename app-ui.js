@@ -2,7 +2,6 @@
 'use strict';
 
 const APP_VERSION=String(window.COURSES_APP_VERSION||document.querySelector('.page-version')?.textContent||'').trim();
-let securityKeyboardBaseline=0;
 let securityViewportSession=false;
 let securityViewportRestoring=false;
 let securityViewportRestoreFrame=0;
@@ -273,39 +272,65 @@ function scheduleSecurityViewportRestore(){
     restoreSecurityViewportOrigin();
   });
 }
-function syncSecurityKeyboardState(){
+/* Clavier iOS : hauteur stable de l'écran (sans clavier) et dernière hauteur de clavier mesurée.
+   Le passage Identifiant → Mot de passe ne remesure rien : la carte reste levée, sans rebond. */
+let securityStableHeight=0;
+let securityKeyboardBlurTimer=0;
+let securityKeyboardIntent=0;
+const SECURITY_KEYBOARD_KEY='courses-keyboard-height-v1';
+function securityLayoutHeight(){
+  securityStableHeight=Math.max(securityStableHeight,Math.round(window.innerHeight||0),isSecurityPasswordField()?0:securityViewportHeight());
+  return securityStableHeight||securityViewportHeight();
+}
+function securityKeyboardHeight(){
+  const measured=securityLayoutHeight()-securityViewportHeight();
+  if(measured>120){
+    try{localStorage.setItem(SECURITY_KEYBOARD_KEY,String(measured))}catch(_){}
+    return measured;
+  }
+  return 0;
+}
+function predictedSecurityKeyboardHeight(){
+  let saved=0;
+  try{saved=Number(localStorage.getItem(SECURITY_KEYBOARD_KEY))||0}catch(_){}
+  return saved>120?saved:Math.round(securityLayoutHeight()*.42);
+}
+function syncSecurityKeyboardState(options){
   const shell=document.querySelector('.security-shell');
   if(!shell)return;
+  const predict=options?.predict===true;
   const overlay=document.getElementById('securityOverlay');
   const visible=Boolean(overlay?.classList.contains('is-visible'));
   const active=isSecurityPasswordField();
   syncSecurityViewportPosition();
   if(!visible||!active){
     shell.classList.remove('is-password-open');
-    syncSecurityKeyboardLift(shell,false);
-    if(!active)securityKeyboardBaseline=0;
+    syncSecurityKeyboardLift(shell,0);
     if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
     return;
   }
-  const current=securityViewportHeight();
-  if(!securityKeyboardBaseline)securityKeyboardBaseline=current;
-  const open=securityKeyboardBaseline-current>120;
-  shell.classList.toggle('is-password-open',open);
-  syncSecurityKeyboardLift(shell,open);
+  // Au toucher du champ, la carte se lève tout de suite avec la hauteur de clavier connue
+  // (même mouvement que le clavier), puis s'ajuste à la hauteur réelle.
+  const measured=securityKeyboardHeight();
+  const keyboard=measured||(predict||shell.classList.contains('is-keyboard-lifted')?predictedSecurityKeyboardHeight():0);
+  shell.classList.toggle('is-password-open',keyboard>0);
+  if(keyboard>0)syncSecurityKeyboardLift(shell,keyboard);
 }
 /* Clavier ouvert : la carte « Accès privé » remonte juste au-dessus du clavier
    (identifiant + mot de passe visibles pendant la saisie). */
-function syncSecurityKeyboardLift(shell,open){
+function syncSecurityKeyboardLift(shell,keyboard){
   const modal=shell.querySelector('.security-modal');
-  const previous=parseFloat(shell.style.getPropertyValue('--security-keyboard-lift'))||0;
-  if(!open||!modal){
+  if(!keyboard||!modal){
     shell.style.removeProperty('--security-keyboard-lift');
     shell.classList.remove('is-keyboard-lifted');
     return;
   }
-  const rect=modal.getBoundingClientRect();
-  const top=securityViewportOffsetTop(),bottom=top+securityViewportHeight();
-  const baseTop=rect.top+previous,baseBottom=rect.bottom+previous;
+  // Position de repos de la carte (offsetTop ignore la translation en cours d'animation).
+  const parent=modal.offsetParent||shell;
+  const baseTop=parent.getBoundingClientRect().top+modal.offsetTop;
+  const baseBottom=baseTop+modal.offsetHeight;
+  const offset=securityViewportOffsetTop();
+  const top=offset,bottom=offset+securityLayoutHeight()-keyboard;
   const lift=Math.max(0,Math.min(baseBottom-(bottom-12),baseTop-(top+8)));
   if(lift>1){
     shell.style.setProperty('--security-keyboard-lift',Math.round(lift)+'px');
@@ -322,33 +347,39 @@ function bindSecurityKeyboardViewport(){
   document.getElementById('securityOverlay')?.addEventListener('touchmove',event=>{
     if(event.currentTarget.classList.contains('is-visible')&&event.cancelable)event.preventDefault();
   },{passive:false});
+  // Seul un toucher du champ ouvre le clavier iOS (un focus automatique ne l'ouvre pas) :
+  // la levée anticipée n'a lieu qu'après un toucher.
+  document.addEventListener('pointerdown',event=>{
+    if(!isSecurityPasswordField(event.target))return;
+    securityKeyboardIntent=Date.now();
+    // Champ déjà actif (focus automatique, clavier fermé) : le toucher ouvre le clavier sans nouveau focus.
+    if(event.target===document.activeElement)syncSecurityKeyboardState({predict:true});
+  },true);
   document.addEventListener('focus',event=>{
     if(!isSecurityPasswordField(event.target))return;
-    securityKeyboardBaseline=securityViewportHeight();
-    Promise.resolve().then(syncSecurityKeyboardState);
+    clearTimeout(securityKeyboardBlurTimer);
+    syncSecurityKeyboardState({predict:Date.now()-securityKeyboardIntent<1000});
   },true);
   document.addEventListener('blur',event=>{
     if(!isSecurityPasswordField(event.target))return;
-    securityKeyboardBaseline=0;
-    requestAnimationFrame(syncSecurityKeyboardState);
+    // Changement de champ : le clavier reste ouvert, la carte ne redescend pas.
+    clearTimeout(securityKeyboardBlurTimer);
+    securityKeyboardBlurTimer=setTimeout(()=>{if(!isSecurityPasswordField())syncSecurityKeyboardState()},180);
   },true);
   window.visualViewport?.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
   window.visualViewport?.addEventListener('scroll',syncSecurityKeyboardState,{passive:true});
   window.addEventListener('resize',syncSecurityKeyboardState,{passive:true});
   window.addEventListener('scroll',syncSecurityKeyboardState,{passive:true});
   window.addEventListener('pageshow',()=>{
-    securityKeyboardBaseline=0;
     requestAnimationFrame(syncSecurityKeyboardState);
   },{passive:true});
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState!=='visible')return;
-    securityKeyboardBaseline=0;
     requestAnimationFrame(syncSecurityKeyboardState);
   });
   document.addEventListener('courses:lock-changed',event=>{
     if(event.detail?.locked!==false||!securityViewportSession)return;
     if(isSecurityPasswordField(document.activeElement))document.activeElement.blur();
-    securityKeyboardBaseline=0;
     securityViewportSession=false;
     securityViewportRestoring=true;
     scheduleSecurityViewportRestore();

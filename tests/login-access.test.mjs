@@ -59,7 +59,11 @@ test('popup Connexion : statut de synchronisation court et libellé protégé co
 test('clavier iOS : la carte de connexion remonte pour garder identifiant et mot de passe visibles',()=>{
   const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
   const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
-  assert.match(ui,/function syncSecurityKeyboardLift\(shell,open\)/);
+  assert.match(ui,/function syncSecurityKeyboardLift\(shell,keyboard\)/);
+  // Passage Identifiant → Mot de passe : pas de nouvelle mesure, la carte reste levée.
+  assert.doesNotMatch(ui,/securityKeyboardBaseline/);
+  assert.match(ui,/syncSecurityKeyboardState\(\{predict:Date\.now\(\)-securityKeyboardIntent<1000\}\)/);
   assert.match(ui,/--security-keyboard-lift/);
-  assert.match(css,/\.security-shell\.is-keyboard-lifted \.security-modal\{translate:0 calc\(-1 \* var\(--security-keyboard-lift,0px\)\)/);
+  assert.match(css,/\.security-shell\.is-keyboard-lifted \.security-modal\{translate:0 calc\(-1 \* var\(--security-keyboard-lift,0px\)\)\}/);
+  assert.match(css,/\.security-shell \.security-modal\{transition:translate \.32s/);
 });
