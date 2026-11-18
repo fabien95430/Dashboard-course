@@ -84,3 +84,10 @@ test('l œil conserve la saisie, la sélection et le focus, puis masque à nouve
   assert.match(source,/function showSecurity\([\s\S]*?setSecurityPasswordVisible\(false\)/);
   assert.match(source,/function hideSecurity\([\s\S]*?setSecurityPasswordVisible\(false\)/);
 });
+
+test('connexion iOS : focus sans défilement automatique, formulaire assez haut pour le clavier',()=>{
+  const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
+  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.match(ui,/document\.addEventListener\('touchend',event=>\{[\s\S]*?event\.preventDefault\(\);\s*field\.focus\(\{preventScroll:true\}\);/);
+  assert.match(css,/clamp\(24px,calc\(\(var\(--security-screen-height\) - 660px\) \* \.45\),104px\)/);
+});

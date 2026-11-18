@@ -315,6 +315,15 @@ function bindSecurityKeyboardViewport(){
     const shell=document.querySelector('.security-shell');
     if(event.currentTarget.classList.contains('is-visible')&&!shell?.classList.contains('is-scrollable')&&event.cancelable)event.preventDefault();
   },{passive:false});
+  // Toucher d'un champ : focus sans défilement automatique. iOS ne fait plus glisser l'écran
+  // à l'ouverture du clavier, il n'y a donc plus de recalage (le petit saut aller-retour).
+  document.addEventListener('touchend',event=>{
+    if(event.target.closest?.('button'))return;
+    const field=event.target.closest?.('input')||event.target.closest?.('label')?.querySelector('input');
+    if(!field||!isSecurityPasswordField(field)||document.activeElement===field||!event.cancelable)return;
+    event.preventDefault();
+    field.focus({preventScroll:true});
+  },{capture:true,passive:false});
   document.addEventListener('focus',event=>{
     if(isSecurityPasswordField(event.target))syncSecurityKeyboardState();
   },true);
