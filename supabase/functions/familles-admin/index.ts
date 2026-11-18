@@ -1,11 +1,20 @@
 // Fonction Edge « familles-admin » (Supabase) — gestion des comptes famille depuis l'app.
 // Appelée par l'écran Réglages › Familles avec la session du compte administrateur.
 // Actions : create { prenom, password } · password { id, password } · delete { id }.
-// Garde « Verify JWT » activé (par défaut). SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY
-// sont fournis automatiquement par Supabase : la clé secrète ne quitte jamais le serveur.
+// « Verify JWT » désactivé : la fonction vérifie elle-même la session et le rôle administrateur.
+// SUPABASE_URL et la clé secrète sont fournis automatiquement par Supabase : la clé ne quitte jamais le serveur.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+// Clé secrète serveur : nouvelles clés (SUPABASE_SECRET_KEYS) ou ancienne clé service_role.
+function serverKey() {
+  try {
+    const keys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}');
+    const key = keys.default || Object.values(keys)[0];
+    if (key) return String(key);
+  } catch (_) { /* format inattendu */ }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+}
+const db = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 const ORIGIN = 'https://fabien95430.github.io';

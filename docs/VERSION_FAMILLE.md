@@ -36,7 +36,7 @@ Scripts à exécuter une seule fois, dans l’ordre (SQL Editor › New query �
 2. `supabase/02-famille.sql` — demandes (statut), lecture admin des personnalisations, historique `achats`.
 3. `supabase/03-famille.sql` — notes de plats et ordre de la liste.
 4. `supabase/04-famille.sql` — fonction `familles()` pour les noms des foyers.
-5. `supabase/05-famille.sql` — notifications des familles (abonnements + déclencheurs), après la fonction Edge ci-dessous.
+5. `supabase/05-famille.sql` — notifications des familles (abonnements + déclencheurs), après la fonction Edge ci-dessous. Fait le 18/11/2026, avec les secrets VAPID et les deux fonctions Edge.
 
 ## Notifications des familles
 
@@ -53,6 +53,6 @@ Le workflow `.github/workflows/supabase-keepalive.yml` appelle `ping()` le lundi
 
 Réglages › Familles : « Ajouter un foyer » (prénom + mot de passe → compte `<prénom>@famille.invalid` confirmé) ; dans un foyer, onglet Appareils › Compte : « Changer le mot de passe », « Supprimer le foyer » (deux appuis, toutes ses données partent avec le compte).
 
-Fonction Edge `familles-admin` (`supabase/functions/familles-admin/index.ts`), « Verify JWT » **activé** : elle vérifie que l’appelant est dans `admins` et utilise la clé secrète fournie par Supabase côté serveur (jamais dans l’app). Le compte administrateur ne peut être ni modifié ni supprimé par elle.
+Fonction Edge `familles-admin` (`supabase/functions/familles-admin/index.ts`), « Verify JWT » **désactivé** (les jetons du projet ne sont plus signés par l’ancien secret) : elle vérifie elle-même la session et que l’appelant est dans `admins` et utilise la clé secrète fournie par Supabase côté serveur (jamais dans l’app). Le compte administrateur ne peut être ni modifié ni supprimé par elle.
 
 Sans cette fonction : Authentication › Users › Add user, e-mail `<identifiant>@famille.invalid` (sans accent), « Auto Confirm User ».

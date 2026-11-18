@@ -117,7 +117,7 @@ test('demandes des familles : pastille sur la ligne Familles et sur l’onglet R
 
 test('comptes famille depuis l’app : fonction Edge réservée à l’admin, clé secrète jamais dans le code',()=>{
   const fn=read('supabase/functions/familles-admin/index.ts');
-  assert.match(fn,/SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(fn,/SUPABASE_SECRET_KEYS/);
   assert.match(fn,/isAdmin\(auth\.user\.id\)/);
   assert.match(fn,/email_confirm: true/);
   assert.match(fn,/Compte administrateur protégé/);
