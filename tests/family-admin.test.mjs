@@ -130,3 +130,39 @@ test('comptes famille depuis l’app : fonction Edge réservée à l’admin, cl
   assert.match(ui,/feedback\.classList\.add\('is-error','is-visible'\)/);
   assert.doesNotMatch(ui,/\(message\?' is-error':''\)/);
 });
+
+test('idées et bugs : rangés par foyer, détail type · date · version · appareil',()=>{
+  const admin=loadAdmin();
+  const families=admin.buildFamilies({
+    families:[{id:'a',email:'marie@famille.invalid'},{id:'b',email:'karina@famille.invalid'}],
+    devices:[],requests:[],purchases:[],customizations:[],
+    feedback:[
+      {id:'f1',famille:'a',type:'bug',message:'Le panier ne se vide pas',contexte:{version:'v849',appareil:'iPhone de Marie'},cree_le:new Date().toISOString()},
+      {id:'f9',famille:'compte-admin',type:'idee',message:'Ignoré'}
+    ]
+  });
+  assert.equal(families.find(f=>f.id==='a').feedback.length,1);
+  assert.equal(families.find(f=>f.id==='b').feedback.length,0);
+  assert.equal(families.length,2,'un retour d’un compte non listé ne crée pas de foyer');
+  assert.equal(admin.feedbackDetail(families[1].feedback[0]),'Bug · aujourd’hui · v849 · iPhone de Marie');
+});
+
+test('idées et bugs : envoi depuis Réglages (famille), table protégée, lecture et pastille admin',()=>{
+  const sql=read('supabase/06-famille.sql');
+  assert.match(sql,/create table if not exists public\.retours/);
+  assert.match(sql,/check \(type in \('idee','correction','bug'\)\)/);
+  assert.match(sql,/with check \(famille = auth\.uid\(\) and statut = 'nouveau'\)/);
+  assert.match(sql,/for update to authenticated using \(public\.is_admin\(\)\)/);
+  assert.match(sql,/alter publication supabase_realtime add table public\.retours/);
+  const service=read('family-service.js');
+  assert.match(service,/from\('retours'\)\.insert\(/);
+  assert.match(service,/table:'retours'/);
+  assert.match(service,/adminSetFeedbackStatus/);
+  const html=read('index.html'),app=read('app.js'),ui=read('family-admin.js');
+  assert.match(html,/<section class="settings-section settings-family-only">[\s\S]*?id="settingsFamilyFeedbackBtn"/);
+  assert.match(html,/id="familyFeedbackDialog" class="dialog connection-dialog family-feedback-dialog settings-sheet"/);
+  for(const type of ['idee','correction','bug'])assert.match(html,new RegExp('data-type="'+type+'"'));
+  assert.match(app,/COURSES_FAMILY\.sendFeedback\(\{type:familyFeedbackType,message,contexte:\{version\}\}\)/);
+  assert.match(ui,/function totalRequests\(\)\{return families\.reduce\(\(sum,family\)=>sum\+pendingOf\(family\)\+feedbackOf\(family\),0\)\}/);
+  assert.match(ui,/adminSetFeedbackStatus\(access\(\)\.credentials\(\),feedback\.id,'traite'\)/);
+});

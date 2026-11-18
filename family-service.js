@@ -245,6 +245,27 @@ async function pushRequests(){
   }catch(error){console.warn('courses-family: demandes',error)}
 }
 
+/* ---------- Idées, corrections et bugs (table retours) ---------- */
+const FEEDBACK_TYPES=Object.freeze(['idee','correction','bug']);
+async function sendFeedback({type,message,contexte}={}){
+  if(!session)throw new Error('Compte famille non connecté');
+  const kind=FEEDBACK_TYPES.includes(type)?type:'idee';
+  const text=String(message||'').trim().slice(0,1000);
+  if(text.length<3)throw new Error('Message trop court');
+  const db=await familyClient();
+  const extra={...(contexte&&typeof contexte==='object'?contexte:{})};
+  if(device?.nom)extra.appareil=String(device.nom).slice(0,60);
+  const {error}=await db.from('retours').insert({type:kind,message:text,contexte:extra});
+  if(error)throw error;
+}
+async function listFeedback(){
+  if(!session)return [];
+  const db=await familyClient();
+  const {data,error}=await db.from('retours').select('id,type,message,statut,cree_le').order('cree_le',{ascending:false}).limit(10);
+  if(error)throw error;
+  return data||[];
+}
+
 /* ---------- Historique de courses (achats) ---------- */
 async function recordPurchase(detail){
   if(!session||!detail?.name)return;
@@ -385,21 +406,28 @@ async function admin(credentials){
 async function adminOverview(credentials){
   const db=await admin(credentials);
   const since=new Date(Date.now()-31*864e5).toISOString();
-  const [devices,requests,custom,purchases]=await Promise.all([
+  const [devices,requests,custom,purchases,feedback]=await Promise.all([
     db.from('appareils').select('id,famille,nom,derniere_activite,revoque').eq('revoque',false).order('derniere_activite',{ascending:false}),
     db.from('catalogue_perso').select('id,famille,type,nom,categorie,statut,cree_le').eq('statut','en_attente').order('cree_le',{ascending:false}),
     db.from('personnalisations').select('famille,recette_id,donnees,maj_le'),
-    db.from('achats').select('famille,nom,quantite,categorie,coche_le').gte('coche_le',since).order('coche_le',{ascending:false}).limit(2000)
+    db.from('achats').select('famille,nom,quantite,categorie,coche_le').gte('coche_le',since).order('coche_le',{ascending:false}).limit(2000),
+    // Retours (supabase/06-famille.sql) : table absente → aucun retour, le reste de l'écran fonctionne.
+    Promise.resolve(db.from('retours').select('id,famille,type,message,contexte,statut,cree_le').eq('statut','nouveau').order('cree_le',{ascending:false}).limit(200)).then(result=>result?.error?{data:[]}:result,()=>({data:[]}))
   ]);
   const failed=[devices,requests,custom,purchases].find(result=>result.error);
   if(failed)throw failed.error;
   // Liste des foyers (fonction SQL familles(), réservée à l'admin) ; absente → foyers déduits de l'activité.
   const families=await db.rpc('familles').then(result=>result.error?[]:(result.data||[]),()=>[]);
-  return {families,devices:devices.data||[],requests:requests.data||[],customizations:custom.data||[],purchases:purchases.data||[]};
+  return {families,devices:devices.data||[],requests:requests.data||[],customizations:custom.data||[],purchases:purchases.data||[],feedback:feedback.data||[]};
 }
 async function adminSetRequestStatus(credentials,id,statut){
   const db=await admin(credentials);
   const {error}=await db.from('catalogue_perso').update({statut}).eq('id',id);
+  if(error)throw error;
+}
+async function adminSetFeedbackStatus(credentials,id,statut){
+  const db=await admin(credentials);
+  const {error}=await db.from('retours').update({statut}).eq('id',id);
   if(error)throw error;
 }
 async function adminRevokeDevice(credentials,id){
@@ -420,13 +448,14 @@ async function adminManageFamily(credentials,payload){
   if(data?.error)throw new Error(data.error);
   return data||{};
 }
-/* Nouvelles demandes en direct (temps réel sur catalogue_perso, lisible par l'admin seulement). */
+/* Nouvelles demandes et retours en direct (temps réel sur catalogue_perso et retours, lisibles par l'admin). */
 let adminRequestsChannel=null;
 async function adminWatchRequests(credentials,onChange){
   const db=await admin(credentials);
   if(adminRequestsChannel)return;
   adminRequestsChannel=db.channel('admin-demandes')
     .on('postgres_changes',{event:'*',schema:'public',table:'catalogue_perso'},()=>{try{onChange()}catch(_){}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'retours'},()=>{try{onChange()}catch(_){}})
     .subscribe();
 }
 async function adminSignOut(){
@@ -442,9 +471,10 @@ const api=Object.freeze({
   signIn,resume,signOut,listChanged,pushList,
   registerDevice,listDevices,touchDevice,
   saveSubscription,removeSubscription,countSubscriptions,
+  sendFeedback,listFeedback,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),
-  adminOverview,adminSetRequestStatus,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
+  adminOverview,adminSetRequestStatus,adminSetFeedbackStatus,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
 });
 Object.defineProperty(window,'COURSES_FAMILY',{value:api,configurable:false,enumerable:false,writable:false});
 })();

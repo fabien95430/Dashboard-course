@@ -29,7 +29,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-pomme-poire-v791.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=847">
+  <link rel="stylesheet" href="./styles.css?v=849">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=610">
 </head>
 <body>
@@ -53,6 +53,7 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
     <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="M14 8l4 4-4 4M18 12H8"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="m6.5 7 .8 13h9.4l.8-13"/><path d="M10 11v5M14 11v5"/></symbol>\
+    <symbol id="i-bulb" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2 5 13h6l-1 9 9-12h-6.2l.7-8Z"/></symbol>
   </svg>
 
@@ -64,7 +65,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v848</span>
+            <span class="page-version">v849</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -87,7 +88,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v848</span>
+            <span class="page-version">v849</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -123,7 +124,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v848</span>
+            <span class="page-version">v849</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -183,6 +184,17 @@
                 <span id="settingsMissingProductsCount" class="settings-count" hidden>0</span>
               </span>
               <span class="settings-copy"><strong>Catalogue des produits</strong><small>Ajouter ou retirer produits et plats</small></span>
+              <svg class="chevron"><use href="#i-chevron"></use></svg>
+            </button>
+          </div>
+        </section>
+
+        <section class="settings-section settings-family-only">
+          <h2>Améliorer l’application</h2>
+          <div class="settings-card">
+            <button id="settingsFamilyFeedbackBtn" class="settings-row" type="button">
+              <span class="settings-icon"><svg><use href="#i-bulb"></use></svg></span>
+              <span class="settings-copy"><strong>Idées et bugs</strong><small>Suggestions et problèmes</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
           </div>
@@ -268,6 +280,21 @@
     <div id="familyDevicesList" class="connection-sync-section" aria-label="Appareils connectés"></div>
     <p class="family-devices-note">Seul l’administrateur peut déconnecter un appareil.</p>
     <p class="family-devices-note">Vos ajouts et modifications aident à améliorer l’application.</p>
+  </dialog>
+
+  <dialog id="familyFeedbackDialog" class="dialog connection-dialog family-feedback-dialog settings-sheet" tabindex="-1">
+    <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-bulb"></use></svg></span><span class="settings-sheet-title">Idées et bugs</span></h3>
+    <p class="dialog-intro">Transmis directement à l’administrateur.</p>
+    <div class="family-feedback-types" role="radiogroup" aria-label="Type de retour">
+      <button type="button" role="radio" class="family-feedback-type is-active" aria-checked="true" data-type="idee">Idée</button>
+      <button type="button" role="radio" class="family-feedback-type" aria-checked="false" data-type="correction">Correction</button>
+      <button type="button" role="radio" class="family-feedback-type" aria-checked="false" data-type="bug">Bug</button>
+    </div>
+    <label class="field family-feedback-field"><span>Message</span><textarea id="familyFeedbackMessage" rows="5" maxlength="1000" autocapitalize="sentences" placeholder="Votre idée pour améliorer l’application…"></textarea></label>
+    <button id="familyFeedbackSend" class="primary family-feedback-send" type="button">Envoyer</button>
+    <p id="familyFeedbackStatus" class="dialog-feedback" role="status" aria-live="polite"></p>
+    <h4 class="sheet-section-title">Vos envois</h4>
+    <div id="familyFeedbackList" class="connection-sync-section" aria-label="Vos envois"></div>
   </dialog>
 
   <dialog id="connectionDialog" class="dialog connection-dialog settings-sheet" tabindex="-1" autofocus>
@@ -450,18 +477,18 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=848"></script>
+  <script src="./catalog.js?v=849"></script>
   <script src="./product-item-images.js?v=820" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=824"></script>
   <script src="./courses-notifications.js?v=832"></script>
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=848" data-app-ui="script"></script>
-  <script src="./family-service.js?v=837"></script>
-  <script src="./app.js?v=847"></script>
+  <script src="./family-service.js?v=849"></script>
+  <script src="./app.js?v=849"></script>
   <script src="./settings-tab-badge.js?v=830"></script>
   <script src="./settings-ui.js?v=827"></script>
   <script src="./error-center.js?v=820"></script>
-  <script src="./family-admin.js?v=837"></script>
+  <script src="./family-admin.js?v=849"></script>
 </body>
 </html>

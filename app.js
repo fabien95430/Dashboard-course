@@ -242,6 +242,11 @@ const UI = Object.freeze({
   familyDeviceSave: document.getElementById('familyDeviceSave'),
   familyDeviceSignOut: document.getElementById('familyDeviceSignOut'),
   familyDeviceFeedback: document.getElementById('familyDeviceFeedback'),
+  familyFeedbackDialog: document.getElementById('familyFeedbackDialog'),
+  familyFeedbackMessage: document.getElementById('familyFeedbackMessage'),
+  familyFeedbackSend: document.getElementById('familyFeedbackSend'),
+  familyFeedbackStatus: document.getElementById('familyFeedbackStatus'),
+  familyFeedbackList: document.getElementById('familyFeedbackList'),
   securityShell: document.querySelector('.security-shell'),
   securitySubmit: document.getElementById('securitySubmit'),
   securityError: document.getElementById('securityError'),
@@ -1924,6 +1929,65 @@ async function openFamilyDevices(){
   const devices=await refreshFamilyDevices();
   list.innerHTML=devices.length?devices.map(device=>'<div class="connection-sync-line"><span>'+esc(device.nom)+'</span><span'+(device.current?' class="is-current"':'')+'>'+esc(device.current?'Cet appareil':relativeActivity(device.derniere_activite))+'</span></div>').join(''):'<div class="connection-sync-line"><span>Aucun appareil</span><span></span></div>';
 }
+/* Idées, corrections et bugs (compte famille) : envoyés à l'admin via la table « retours ». */
+const FAMILY_FEEDBACK_TYPES=Object.freeze({
+  idee:{label:'Idée',placeholder:'Votre idée pour améliorer l’application…'},
+  correction:{label:'Correction',placeholder:'Ce qui est à corriger (produit, plat, texte…)'},
+  bug:{label:'Bug',placeholder:'Ce qui ne marche pas, et ce que vous faisiez…'}
+});
+let familyFeedbackType='idee';
+function selectFamilyFeedbackType(type){
+  familyFeedbackType=FAMILY_FEEDBACK_TYPES[type]?type:'idee';
+  UI.familyFeedbackDialog?.querySelectorAll('.family-feedback-type').forEach(button=>{
+    const active=button.dataset.type===familyFeedbackType;
+    button.classList.toggle('is-active',active);
+    button.setAttribute('aria-checked',String(active));
+  });
+  if(UI.familyFeedbackMessage)UI.familyFeedbackMessage.placeholder=FAMILY_FEEDBACK_TYPES[familyFeedbackType].placeholder;
+}
+function setFamilyFeedbackStatus(message,error=false){
+  const node=UI.familyFeedbackStatus;
+  if(!node)return;
+  node.textContent=message||'';
+  node.classList.toggle('is-error',!!error);
+  node.classList.toggle('is-visible',!!message);
+}
+async function renderFamilyFeedbackList(){
+  const list=UI.familyFeedbackList;
+  if(!list||!window.COURSES_FAMILY)return;
+  let rows=[];
+  try{rows=await window.COURSES_FAMILY.listFeedback()}catch(_){}
+  list.innerHTML=rows.length?rows.map(row=>{
+    const done=row.statut==='traite';
+    return '<div class="connection-sync-line family-feedback-line"><span><b>'+esc(FAMILY_FEEDBACK_TYPES[row.type]?.label||'Idée')+'</b> '+esc(row.message)+'</span><span'+(done?' class="is-done"':'')+'>'+(done?'Traité':'Envoyé')+'</span></div>';
+  }).join(''):'<div class="connection-sync-line"><span>Aucun envoi pour le moment</span><span></span></div>';
+}
+function openFamilyFeedback(){
+  if(!UI.familyFeedbackDialog)return;
+  selectFamilyFeedbackType('idee');
+  UI.familyFeedbackMessage.value='';
+  UI.familyFeedbackSend.disabled=false;
+  setFamilyFeedbackStatus('');
+  UI.familyFeedbackList.innerHTML='';
+  showNeutralDialog(UI.familyFeedbackDialog);
+  void renderFamilyFeedbackList();
+}
+async function sendFamilyFeedback(){
+  const message=String(UI.familyFeedbackMessage.value||'').trim();
+  if(message.length<3){setFamilyFeedbackStatus('Écrivez quelques mots.',true);return}
+  UI.familyFeedbackSend.disabled=true;
+  setFamilyFeedbackStatus('');
+  try{
+    const version=document.querySelector('.page-version')?.textContent?.trim()||'';
+    await window.COURSES_FAMILY.sendFeedback({type:familyFeedbackType,message,contexte:{version}});
+    UI.familyFeedbackMessage.value='';
+    UI.familyFeedbackMessage.blur();
+    setFamilyFeedbackStatus('Merci, c’est transmis à l’administrateur.');
+    void renderFamilyFeedbackList();
+  }catch(_){
+    setFamilyFeedbackStatus('Envoi impossible, réessayez.',true);
+  }finally{UI.familyFeedbackSend.disabled=false}
+}
 function openFamilyDeviceDialog(){
   const dialog=UI.familyDeviceDialog;
   if(!dialog)return;
@@ -3431,6 +3495,10 @@ function bindUiEvents(){
   UI.familyDeviceSignOut.onclick=()=>{void revoke()};
   $('#settingsFamilyDevicesBtn').onclick=openFamilyDevices;
   bindDialogBackdropClose(UI.familyDevicesDialog);
+  $('#settingsFamilyFeedbackBtn').onclick=openFamilyFeedback;
+  bindDialogBackdropClose(UI.familyFeedbackDialog);
+  UI.familyFeedbackSend.onclick=()=>{void sendFamilyFeedback()};
+  UI.familyFeedbackDialog.querySelectorAll('.family-feedback-type').forEach(button=>{button.onclick=()=>selectFamilyFeedbackType(button.dataset.type)});
   UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};
   UI.securitySubmit.onclick=completeSecurityAction;
   const passwordToggle=document.getElementById('securityPasswordToggle');

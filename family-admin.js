@@ -2,6 +2,7 @@
 'use strict';
 /* Écran « Familles » (Réglages › Administrateur) — propriétaire unique.
    Foyers → fiche du foyer avec onglets Demandes / Stats / Modifs / Appareils.
+   L'onglet Demandes regroupe les demandes de catalogue et les idées, corrections et bugs (table retours).
    Rien des familles n'entre dans les onglets de l'administrateur : tout reste ici. */
 
 const DAY=864e5;
@@ -10,6 +11,14 @@ const SVG_OPENAI='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7c.
 const SVG_CHATGPT='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M9 6h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_DELETE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6.5 7l.8 13h9.4l.8-13M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_PRODUCT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 20h17v31H12z" fill="#f7f2e8" stroke="#758575" stroke-width="2"/><path d="M15 16h11l3 4H12z" fill="#e8eee6" stroke="#758575" stroke-width="2"/><path d="M38 14h9v7h-9z" fill="#d7dfd4"/><path d="M35 20h15l2 6v25H33V26z" fill="#859583"/><path d="M38 28h9" stroke="#f4f1e9" stroke-width="2.5" stroke-linecap="round"/></svg>';
+const FEEDBACK_LABELS=Object.freeze({idee:'Idée',correction:'Correction',bug:'Bug'});
+const SVG_FEEDBACK=Object.freeze({
+  idee:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4" fill="none" stroke="#2f6a49" stroke-width="1.9" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z" fill="#f3d36b" stroke="#2f6a49" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+  correction:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" fill="#dfe9f6" stroke="#3c5f86" stroke-width="1.7" stroke-linejoin="round"/><path d="m13.5 6.5 4 4" stroke="#3c5f86" stroke-width="1.7"/></svg>',
+  bug:'<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="14" rx="5" ry="6" fill="#f6d9d4" stroke="#a3403c" stroke-width="1.7"/><path d="M12 8v12M7 12H3.5M20.5 12H17M7.5 17.5 4.5 20M16.5 17.5l3 2.5M9 6.5 7.5 4.5M15 6.5l1.5-2" fill="none" stroke="#a3403c" stroke-width="1.7" stroke-linecap="round"/></svg>'
+});
+const SVG_COPY='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.9"/></svg>';
+const SVG_DONE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_DISH='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M11 45h42" stroke="#ad791d" stroke-width="3.5" stroke-linecap="round"/><path d="M16 42c0-13 7-22 16-22s16 9 16 22z" fill="#d6a33d"/><circle cx="32" cy="17" r="3.5" fill="#ad791d"/><path d="M15 42h34" stroke="#9f6c16" stroke-width="3" stroke-linecap="round"/></svg>';
 
 const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -101,7 +110,7 @@ function buildFamilies(overview){
   const ensure=(id,email)=>{
     const key=String(id||'');if(!key)return null;
     if(!map.has(key)&&listed&&email===undefined)return null;
-    if(!map.has(key))map.set(key,{id:key,email:'',name:'',devices:[],requests:[],purchases:[],customizations:[]});
+    if(!map.has(key))map.set(key,{id:key,email:'',name:'',devices:[],requests:[],feedback:[],purchases:[],customizations:[]});
     const family=map.get(key);
     if(email&&!family.email)family.email=String(email);
     return family;
@@ -109,6 +118,7 @@ function buildFamilies(overview){
   (overview?.families||[]).forEach(row=>ensure(row.id,String(row.email||'')));
   (overview?.devices||[]).forEach(row=>ensure(row.famille)?.devices.push(row));
   (overview?.requests||[]).forEach(row=>ensure(row.famille)?.requests.push(row));
+  (overview?.feedback||[]).forEach(row=>ensure(row.famille)?.feedback.push(row));
   (overview?.purchases||[]).forEach(row=>ensure(row.famille)?.purchases.push(row));
   (overview?.customizations||[]).forEach(row=>ensure(row.famille)?.customizations.push(row));
   const list=[...map.values()];
@@ -124,7 +134,9 @@ const requestState=new Map(); // id → {label, done}
 
 function access(){return window.COURSES_ADMIN_ACCESS||null}
 function service(){return window.COURSES_FAMILY||null}
-function totalRequests(){return families.reduce((sum,family)=>sum+family.requests.filter(row=>!requestState.get(row.id)?.done).length,0)}
+function pendingOf(family){return family.requests.filter(row=>!requestState.get(row.id)?.done).length}
+function feedbackOf(family){return (family.feedback||[]).filter(row=>!requestState.get(row.id)?.done).length}
+function totalRequests(){return families.reduce((sum,family)=>sum+pendingOf(family)+feedbackOf(family),0)}
 
 function ensureRow(){
   const card=document.querySelector('#settingsAdministratorSection .settings-card');
@@ -161,7 +173,10 @@ function renderSummary(){
   if(!summary)return;
   if(!access()?.credentials())summary.textContent='Accès à configurer';
   else if(lastError&&!families.length)summary.textContent='Service famille indisponible';
-  else summary.textContent=plural(families.length,'foyer')+' · '+plural(totalRequests(),'demande');
+  else{
+    const ideas=families.reduce((sum,family)=>sum+feedbackOf(family),0);
+    summary.textContent=plural(families.length,'foyer')+' · '+plural(totalRequests()-ideas,'demande')+(ideas?' · '+plural(ideas,'retour'):'');
+  }
 }
 async function refresh(){
   const credentials=access()?.credentials();
@@ -236,9 +251,9 @@ function renderFamilies(node){
   if(lastError&&!families.length)body='<p class="family-admin-empty">Service famille indisponible.</p>';
   else if(!families.length)body='<p class="family-admin-empty">Aucun foyer pour le moment.</p>';
   else body='<div class="family-admin-list">'+families.map(family=>{
-    const pending=family.requests.filter(row=>!requestState.get(row.id)?.done).length;
+    const pending=pendingOf(family),ideas=feedbackOf(family);
     return '<button type="button" class="family-admin-row" data-family="'+esc(family.id)+'"><span class="family-admin-name">'+esc(family.name)+
-      '<small>'+plural(family.devices.length,'appareil')+' · '+plural(pending,'demande')+'</small></span><svg class="chevron" aria-hidden="true"><use href="#i-chevron"></use></svg></button>';
+      '<small>'+plural(family.devices.length,'appareil')+' · '+plural(pending,'demande')+(ideas?' · '+plural(ideas,'retour'):'')+'</small></span><svg class="chevron" aria-hidden="true"><use href="#i-chevron"></use></svg></button>';
   }).join('')+'</div>';
   const add=lastError&&!families.length?'':'<button type="button" class="family-admin-add" data-action="add-family"><span aria-hidden="true">＋</span> Ajouter un foyer</button>';
   node.innerHTML=header('Familles')+'<p class="dialog-intro">Choisissez un foyer.</p>'+body+add;
@@ -320,10 +335,34 @@ function toolsMarkup(name){
     '<button type="button" class="family-row-tool" data-tool="chatgpt" aria-label="Intégrer avec ChatGPT">'+SVG_CHATGPT+'<span>ChatGPT</span></button>'+
     '<button type="button" class="family-row-tool is-danger is-icon" data-tool="ask-refuse" aria-label="Refuser '+esc(name)+'">'+SVG_DELETE+'</button>';
 }
+function feedbackToolsMarkup(){
+  return '<button type="button" class="family-row-tool" data-tool="copy" aria-label="Copier le message">'+SVG_COPY+'<span>Copier</span></button>'+
+    '<button type="button" class="family-row-tool" data-tool="treated" aria-label="Marquer comme traité">'+SVG_DONE+'<span>Traité</span></button>';
+}
+function rowToolsMarkup(row){
+  return row.dataset.feedback?feedbackToolsMarkup():toolsMarkup(row.querySelector('.family-request-copy strong').textContent);
+}
+/* Détail d'un retour : type · date · version · appareil (contexte envoyé par le téléphone). */
+function feedbackDetail(row,now=Date.now()){
+  const context=row?.contexte&&typeof row.contexte==='object'?row.contexte:{};
+  return [FEEDBACK_LABELS[row?.type]||'Idée',relativeDays(row?.cree_le,now),context.version,context.appareil].filter(Boolean).join(' · ');
+}
+function feedbackRows(family){
+  return (family.feedback||[]).map(row=>{
+    const state=requestState.get(row.id),type=FEEDBACK_LABELS[row.type]?row.type:'idee';
+    const detail=state?.label?esc(state.label):esc(feedbackDetail(row));
+    return '<div class="family-request-row family-feedback-row'+(state?.done?' is-done':'')+'" data-feedback="'+esc(row.id)+'" aria-expanded="false" role="button" tabindex="0">'+
+      '<span class="family-request-thumb is-feedback is-'+type+'" aria-hidden="true">'+SVG_FEEDBACK[type]+'</span>'+
+      '<span class="family-request-copy"><strong>'+esc(row.message)+'</strong><small>'+detail+'</small></span>'+
+      '<svg class="family-request-caret" aria-hidden="true"><use href="#i-chevron"></use></svg>'+
+      '<div class="family-row-tools is-feedback" hidden>'+feedbackToolsMarkup()+'</div></div>';
+  }).join('');
+}
 function lines(rows){return '<div class="connection-sync-section">'+rows.join('')+'</div>'}
 function tabBody(family,tab){
   if(tab==='demandes'){
-    if(!family.requests.length)return '<p class="family-admin-empty">Aucune demande pour le moment.</p>';
+    const ideas=(family.feedback||[]).length?'<h4 class="sheet-section-title">Idées et bugs</h4><div class="family-request-list">'+feedbackRows(family)+'</div>':'';
+    if(!family.requests.length)return (ideas?'':'<p class="family-admin-empty">Aucune demande pour le moment.</p>')+ideas;
     return '<div class="family-request-list">'+family.requests.map(row=>{
       const dish=row.type==='plat',state=requestState.get(row.id);
       const detail=state?.label?(state.running?'<span class="family-admin-progress">'+esc(state.label)+'</span>':esc(state.label)):(dish?'Plat':'Produit')+' · '+esc(relativeDays(row.cree_le));
@@ -332,7 +371,7 @@ function tabBody(family,tab){
         '<span class="family-request-copy"><strong>'+esc(row.nom)+'</strong><small>'+detail+'</small></span>'+
         '<svg class="family-request-caret" aria-hidden="true"><use href="#i-chevron"></use></svg>'+
         '<div class="family-row-tools" hidden>'+toolsMarkup(row.nom)+'</div></div>';
-    }).join('')+'</div>';
+    }).join('')+'</div>'+ideas;
   }
   if(tab==='stats'){
     const stats=statsFor(family.purchases);
@@ -367,7 +406,7 @@ function closeOtherRows(node,except){
     if(row===except)return;
     row.classList.remove('is-open');row.setAttribute('aria-expanded','false');
     const tools=row.querySelector('.family-row-tools');
-    tools.hidden=true;tools.className='family-row-tools';tools.innerHTML=toolsMarkup(row.querySelector('.family-request-copy strong').textContent);
+    tools.hidden=true;tools.className='family-row-tools'+(row.dataset.feedback?' is-feedback':'');tools.innerHTML=rowToolsMarkup(row);
   });
 }
 function toggleRequest(row){
@@ -386,8 +425,42 @@ function requestFor(node,row){
 async function settleRequest(request,statut){
   await service().adminSetRequestStatus(access().credentials(),request.id,statut);
 }
+function feedbackFor(node,row){
+  const family=families.find(item=>item.id===node.dataset.family);
+  return family?.feedback?.find(item=>String(item.id)===row.dataset.feedback)||null;
+}
+async function copyText(text){
+  try{await navigator.clipboard.writeText(text);return true}catch(_){}
+  try{
+    const area=document.createElement('textarea');
+    area.value=text;area.setAttribute('readonly','');area.style.cssText='position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(area);area.select();
+    const ok=document.execCommand('copy');area.remove();return ok;
+  }catch(_){return false}
+}
+async function runFeedbackTool(node,tool,row){
+  const feedback=feedbackFor(node,row);
+  if(!feedback)return;
+  const label=row.querySelector('.family-request-copy small');
+  if(tool.dataset.tool==='copy'){
+    const family=families.find(item=>item.id===node.dataset.family);
+    const ok=await copyText((family?.name||'Famille')+' — '+feedbackDetail(feedback)+'\n'+feedback.message);
+    if(label)label.textContent=ok?'Copié':'Copie impossible';
+    return;
+  }
+  row.querySelectorAll('.family-row-tool').forEach(button=>{button.disabled=true});
+  try{
+    await service().adminSetFeedbackStatus(access().credentials(),feedback.id,'traite');
+    requestState.set(feedback.id,{label:'Traité',done:true});
+  }catch(_){
+    requestState.set(feedback.id,{label:'Action impossible, réessaie.'});
+  }
+  if(node.dataset.view==='family'&&node.dataset.family)renderFamily(node,node.dataset.family,'demandes');
+  renderSummary();
+}
 async function runTool(node,tool){
   const row=tool.closest('.family-request-row'),box=tool.closest('.family-row-tools');
+  if(row?.dataset.feedback){await runFeedbackTool(node,tool,row);return}
   const request=requestFor(node,row);
   if(!request)return;
   const kind=tool.dataset.tool,name=request.nom;
@@ -489,6 +562,6 @@ function init(){
   reload();
 }
 
-window.COURSES_FAMILY_ADMIN=Object.freeze({buildFamilies,statsFor,modifsFor,familyTitle,open:openFamilies});
+window.COURSES_FAMILY_ADMIN=Object.freeze({buildFamilies,statsFor,modifsFor,familyTitle,feedbackDetail,open:openFamilies});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

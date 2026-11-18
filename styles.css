@@ -3066,6 +3066,19 @@ html[data-account="family"] #missingProductsDialog .missing-product-row.missing-
 .settings-sheet#familyDevicesDialog .connection-sync-line>span.is-current{color:#1f7a4a}
 .settings-sheet#familyDevicesDialog .family-devices-note{margin:12px 2px 0;color:var(--sheet-muted);font-size:var(--fs-note);line-height:1.4}
 .settings-sheet#familyDevicesDialog .family-devices-note+.family-devices-note{margin-top:4px}
+/* v849 — compte famille : idées, corrections et bugs (Réglages › Améliorer l'application). */
+.settings-sheet#familyFeedbackDialog .family-feedback-types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;height:42px;margin:0 auto 14px;padding:3px;border-radius:13px;background:rgba(118,128,120,.13);box-sizing:border-box}
+.settings-sheet#familyFeedbackDialog .family-feedback-type{border:0;border-radius:10px;background:transparent;color:#55655a;font:inherit;font-size:var(--fs-text);white-space:nowrap;-webkit-appearance:none;appearance:none}
+.settings-sheet#familyFeedbackDialog .family-feedback-type.is-active{background:#fffefb;color:#1b2d21;font-weight:600;box-shadow:0 2px 7px rgba(40,60,46,.12)}
+.settings-sheet#familyFeedbackDialog .family-feedback-field{margin:0}
+.settings-sheet#familyFeedbackDialog .family-feedback-field textarea{display:block;width:100%;min-height:118px;box-sizing:border-box;margin-top:6px;padding:12px 14px;resize:none;border:1px solid rgba(59,83,65,.12);border-radius:14px;background:rgba(255,255,255,.56);color:#25392b;font:inherit;font-size:var(--fs-text);line-height:1.4;box-shadow:inset 0 1px 0 rgba(255,255,255,.63);-webkit-appearance:none;appearance:none}
+.settings-sheet#familyFeedbackDialog .family-feedback-field textarea:focus-visible{outline:2px solid rgba(51,105,72,.23);outline-offset:1px}
+.settings-sheet#familyFeedbackDialog .family-feedback-send{width:100%;margin:14px 0 4px}
+.settings-sheet#familyFeedbackDialog .family-feedback-line{gap:12px;align-items:flex-start}
+.settings-sheet#familyFeedbackDialog .family-feedback-line>span:first-child{flex:1 1 auto;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#25392b;font-size:var(--fs-text);line-height:1.3;text-align:left}
+.settings-sheet#familyFeedbackDialog .family-feedback-line>span:first-child b{font-weight:600;color:#2f5a42}
+.settings-sheet#familyFeedbackDialog .family-feedback-line>span:last-child{flex:0 0 auto;font-size:var(--fs-label);color:var(--sheet-muted)}
+.settings-sheet#familyFeedbackDialog .family-feedback-line>span.is-done{color:#1f7a4a}
 /* v825 — compte famille : nom de l'appareil à la première connexion. */
 .settings-sheet#familyDeviceDialog .family-device-save{width:100%;min-height:48px;margin:16px 0 6px;border-radius:15px;font:inherit;font-size:var(--fs-text);font-weight:600}
 /* v824 — popup Connexion Home Assistant, état non connecté (remplace l'ancien écran de démarrage). */
@@ -3248,6 +3261,14 @@ html[data-account="family"] #missingProductsDialog .missing-product-row.missing-
 .settings-sheet#familyAdminDialog .family-row-tool.is-icon{padding:0}
 .settings-sheet#familyAdminDialog .family-row-tool.is-danger-solid{border-color:transparent;background:#b8433a;color:#fff}
 .settings-sheet#familyAdminDialog .family-confirm-text{grid-column:1/-1;margin:0 0 2px;color:#6c4a45;font-size:var(--fs-text);line-height:1.35}
+.settings-sheet#familyAdminDialog .family-request-list+.sheet-section-title{margin-top:20px!important}
+.settings-sheet#familyAdminDialog .family-request-thumb.is-feedback svg{width:26px;height:26px}
+.settings-sheet#familyAdminDialog .family-request-thumb.is-idee{background:linear-gradient(145deg,#fdf6dc,#f6ebc2)}
+.settings-sheet#familyAdminDialog .family-request-thumb.is-correction{background:linear-gradient(145deg,#eef3fa,#e1e9f4)}
+.settings-sheet#familyAdminDialog .family-request-thumb.is-bug{background:linear-gradient(145deg,#fcefec,#f6e0db)}
+.settings-sheet#familyAdminDialog .family-feedback-row .family-request-copy strong{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.settings-sheet#familyAdminDialog .family-feedback-row.is-open .family-request-copy strong{-webkit-line-clamp:unset;display:block}
+.settings-sheet#familyAdminDialog .family-row-tools.is-feedback{grid-template-columns:1fr 1fr}
 html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 @media(prefers-reduced-motion:reduce){.settings-sheet#familyAdminDialog .family-request-caret{transition:none}}
 .settings-view .settings-icon-families{position:relative!important;overflow:visible!important}
