@@ -92,11 +92,15 @@ test('connexion iOS : focus sans défilement automatique, formulaire assez haut 
   assert.match(css,/clamp\(24px,calc\(\(var\(--security-screen-height\) - 660px\) \* \.45\),104px\)/);
 });
 
-test('connexion : cohérente avec l’app (titre Baskerville, champs en ligne, bouton comme « Ouvrir le catalogue »)',()=>{
+test('connexion : cohérente avec l’app (titre Baskerville, champs en ligne, même bouton que « Ouvrir le catalogue »)',()=>{
   const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   assert.match(css,/\.security-modal h3\{margin:0;font:500 46px\/1\.05 "Baskerville"/);
   assert.match(css,/border:0;border-bottom:1\.5px solid rgba\(27,82,56,\.32\);border-radius:0;/);
-  assert.match(css,/background:linear-gradient\(180deg,#198957 0%,#12794c 100%\)/);
+  // Bouton « Connexion » : vert profond aux coins arrondis, repris par « Ouvrir le catalogue » (Ma liste).
+  assert.match(css,/\.security-modal \.password-panel \.primary\{[\s\S]*?background:linear-gradient\(135deg,#24683c,#175330\)/);
+  const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
+  assert.match(ui,/\.list-empty-action\{[\s\S]*?border-radius:14px;[\s\S]*?background:linear-gradient\(135deg,#24683c,#175330\);/);
+  assert.match(readFileSync(new URL('../index.html',import.meta.url),'utf8'),/id="securitySubmit" class="primary" type="button">Connexion</);
   // Pas de fond jaune du remplissage automatique iOS.
   assert.match(css,/\.security-modal \.field input:-webkit-autofill/);
   assert.doesNotMatch(css,/Courses DM Serif|Courses DM Sans|Courses Playfair|Courses Montserrat/);
@@ -105,7 +109,7 @@ test('connexion : cohérente avec l’app (titre Baskerville, champs en ligne, b
 test('ouverture : la vérification de mise à jour tourne aussi sur l’écran de connexion',()=>{
   const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
   assert.match(app,/if\(mode==='unlock'\|\|mode==='login'\)void gateUnlockOnUpdate\(\);/);
-  assert.match(app,/button\.textContent=locked\?'Vérification…':\(unlockGateLabel\|\|'Se connecter'\);/);
+  assert.match(app,/button\.textContent=locked\?'Vérification…':\(unlockGateLabel\|\|'Connexion'\);/);
   // Le bouton est rendu sur l'écran de connexion aussi (sinon il restait sur « Vérification… »).
   assert.match(app,/if\(!reloading&&\(state\.securityMode==='unlock'\|\|state\.securityMode==='login'\)\)setUnlockGate\(false\);/);
 });

@@ -91,7 +91,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=846';
+    images.src='./dish-local-images.js?v=847';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -122,7 +122,7 @@
     if(window.COURSES_QUANTITIES){loadDishes();return}
     if(document.querySelector('script[data-catalog-quantities]'))return;
     const quantities=document.createElement('script');
-    quantities.src='./catalog-quantities.js?v=846';
+    quantities.src='./catalog-quantities.js?v=847';
     quantities.async=false;
     quantities.dataset.catalogQuantities='script';
     quantities.addEventListener('load',loadDishes,{once:true});
@@ -187,7 +187,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=846';
+    script.src='./runtime-features.js?v=847';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
@@ -199,7 +199,7 @@
   const loadAppUi=()=>{
     if(document.querySelector('script[data-app-ui]')){loadRuntimeFeatures();return}
     const script=document.createElement('script');
-    script.src='./app-ui.js?v=843';
+    script.src='./app-ui.js?v=847';
     script.async=false;
     script.dataset.appUi='script';
     script.addEventListener('load',loadRuntimeFeatures,{once:true});

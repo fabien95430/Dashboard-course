@@ -1639,7 +1639,7 @@ function showSecurity(mode,message=''){
   UI.securityPassword.autocomplete=creating?'new-password':'current-password';
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
-  UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Se connecter';
+  UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Connexion';
   UI.securityError.textContent='';
   refreshVisualLock();
   // Déverrouillage : la version est vérifiée AVANT de donner le champ mot de passe (et donc la
@@ -3315,10 +3315,10 @@ function setUnlockGate(locked){
   const input=UI.securityPassword,button=UI.securitySubmit;
   if(input){input.readOnly=locked;if(locked)input.setAttribute?.('aria-busy','true');else input.removeAttribute?.('aria-busy')}
   if(button){
-    // Libellé d'origine conservé (« Se connecter », « Chiffrer et continuer »…).
+    // Libellé d'origine conservé (« Connexion », « Chiffrer et continuer »…).
     if(locked&&!unlockGateLabel)unlockGateLabel=button.textContent||'';
     button.disabled=locked;
-    button.textContent=locked?'Vérification…':(unlockGateLabel||'Se connecter');
+    button.textContent=locked?'Vérification…':(unlockGateLabel||'Connexion');
     if(!locked)unlockGateLabel='';
   }
 }

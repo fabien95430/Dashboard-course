@@ -3317,7 +3317,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 }
 .security-modal .field input:focus{border-bottom-color:#198957;box-shadow:0 1px 0 #198957}
 /* Remplissage automatique iOS : pas de fond jaune, même rendu que la saisie. */
-.security-modal .field input:-webkit-autofill,.security-modal .field input:-webkit-autofill:focus{-webkit-text-fill-color:#102b1c;-webkit-box-shadow:0 0 0 1000px transparent inset;transition:background-color 100000s ease 0s}
+.security-modal .field input:-webkit-autofill,.security-modal .field input:-webkit-autofill:hover,.security-modal .field input:-webkit-autofill:focus,.security-modal .field input:autofill{-webkit-text-fill-color:#102b1c;caret-color:#102b1c;-webkit-background-clip:text;background-clip:text;-webkit-box-shadow:0 0 0 1000px transparent inset;box-shadow:none;transition:background-color 100000s ease 0s}
 .security-modal .field input[type="password"]{font-size:16px;letter-spacing:.18em}
 .security-input-wrap{position:relative}
 .security-modal .security-input-wrap input{padding-right:48px}
@@ -3330,17 +3330,11 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-password-toggle[aria-pressed="true"] .eye-slash{display:block}
 .security-password-toggle:focus-visible{outline:2px solid #36753a;outline-offset:-3px}
 .security-modal .password-panel .primary{
-  width:100%;height:52px;margin-top:30px;padding:0 20px;border:1px solid rgba(10,89,55,.055);border-radius:999px;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  background:linear-gradient(180deg,#198957 0%,#12794c 100%);color:#fff;
-  font:700 16px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:-.012em;
-  box-shadow:0 9px 20px rgba(18,113,69,.17),inset 0 1px 0 rgba(255,255,255,.18);cursor:pointer;
+  width:100%;height:54px;margin-top:30px;padding:0 12px;border:0;border-radius:14px;
+  background:linear-gradient(135deg,#24683c,#175330);color:#fffdf4;
+  font:600 22px/1.1 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:.5px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);cursor:pointer;
 }
-/* Même chevron que « Ouvrir le catalogue ». */
-.security-modal .password-panel .primary::after{content:"";width:15px;height:15px;flex:0 0 15px;background:currentColor;
-  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m7 4 6 6-6 6' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
-  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m7 4 6 6-6 6' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
-.security-modal .password-panel .primary:disabled::after{display:none}
 .security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
 .security-modal .primary:disabled{opacity:.7;cursor:wait}
 .security-modal .setup-error{min-height:0;margin:10px 0 0;padding:8px 10px;border-radius:10px;background:rgba(255,248,231,.88);color:#8a2825;font-size:14px;line-height:1.35}

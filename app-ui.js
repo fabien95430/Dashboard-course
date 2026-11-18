@@ -107,25 +107,24 @@ function syncPageVersions(){
         font-weight:500;
         letter-spacing:-.01em;
       }
+      /* Même bouton que « Connexion » (page d'accueil) : vert profond, coins arrondis, Baskerville. */
       .list-empty-action{
         margin-top:19px;
         min-width:min(62vw,232px);
         max-width:calc(100vw - 72px);
-        height:44px;
-        padding:0 20px;
-        border:1px solid rgba(10,89,55,.055);
-        border-radius:999px;
+        height:48px;
+        padding:0 22px;
+        border:0;
+        border-radius:14px;
         display:inline-flex;
         align-items:center;
         justify-content:center;
         gap:9px;
-        background:linear-gradient(180deg,#198957 0%,#12794c 100%);
-        color:#fff!important;
-        box-shadow:0 9px 20px rgba(18,113,69,.17),inset 0 1px 0 rgba(255,255,255,.18);
-        font-size:14px;
-        line-height:1;
-        font-weight:760;
-        letter-spacing:-.012em;
+        background:linear-gradient(135deg,#24683c,#175330);
+        color:#fffdf4!important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 18px rgba(23,83,48,.16);
+        font:600 19px/1 "Baskerville","Iowan Old Style",Georgia,serif;
+        letter-spacing:.4px;
         cursor:pointer;        -webkit-appearance:none;
         appearance:none;
         transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;      }
@@ -220,7 +219,7 @@ function syncPageVersions(){
       @media(max-height:700px){
         #listItems .list-empty-state{min-height:300px!important;padding-top:8px!important;padding-bottom:20px!important}
         .list-empty-visual{width:min(42vw,165px);margin-bottom:12px}
-        .list-empty-action{margin-top:15px;height:42px;min-width:min(60vw,220px)}
+        .list-empty-action{margin-top:15px;height:44px;min-width:min(60vw,220px)}
       }
       @media(prefers-reduced-motion:reduce){
         html #dishDialog.is-confirm-feedback .dish-confirm-feedback-layer{animation:none!important;opacity:1!important;transform:translate(-50%,-50%)!important}
