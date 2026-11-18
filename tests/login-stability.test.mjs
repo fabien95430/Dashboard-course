@@ -91,3 +91,13 @@ test('connexion iOS : focus sans défilement automatique, formulaire assez haut 
   assert.match(ui,/document\.addEventListener\('touchend',event=>\{[\s\S]*?event\.preventDefault\(\);\s*field\.focus\(\{preventScroll:true\}\);/);
   assert.match(css,/clamp\(24px,calc\(\(var\(--security-screen-height\) - 660px\) \* \.45\),104px\)/);
 });
+
+test('connexion : polices « Didot chic » embarquées dans le dépôt',()=>{
+  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  for(const file of ['playfair-display-latin-600-normal','playfair-display-latin-400-italic','montserrat-latin-500-normal','montserrat-latin-600-normal']){
+    assert.match(css,new RegExp('url\\("\\./fonts/'+file+'\\.woff2"\\)'));
+    assert.ok(readFileSync(new URL('../fonts/'+file+'.woff2',import.meta.url)).length>10000);
+  }
+  assert.match(css,/\.security-modal h3\{margin:0;font:600 42px\/1\.05 "Courses Playfair"/);
+  assert.match(css,/font:600 15px\/1\.1 "Courses Montserrat",-apple-system,sans-serif;letter-spacing:3px;text-transform:uppercase;/);
+});
