@@ -282,13 +282,38 @@ function syncSecurityKeyboardState(){
   syncSecurityViewportPosition();
   if(!visible||!active){
     shell.classList.remove('is-password-open');
+    syncSecurityKeyboardLift(shell,false);
     if(!active)securityKeyboardBaseline=0;
     if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
     return;
   }
   const current=securityViewportHeight();
   if(!securityKeyboardBaseline)securityKeyboardBaseline=current;
-  shell.classList.toggle('is-password-open',securityKeyboardBaseline-current>120);
+  const open=securityKeyboardBaseline-current>120;
+  shell.classList.toggle('is-password-open',open);
+  syncSecurityKeyboardLift(shell,open);
+}
+/* Clavier ouvert : la carte « Accès privé » remonte juste au-dessus du clavier
+   (identifiant + mot de passe visibles pendant la saisie). */
+function syncSecurityKeyboardLift(shell,open){
+  const modal=shell.querySelector('.security-modal');
+  const previous=parseFloat(shell.style.getPropertyValue('--security-keyboard-lift'))||0;
+  if(!open||!modal){
+    shell.style.removeProperty('--security-keyboard-lift');
+    shell.classList.remove('is-keyboard-lifted');
+    return;
+  }
+  const rect=modal.getBoundingClientRect();
+  const top=securityViewportOffsetTop(),bottom=top+securityViewportHeight();
+  const baseTop=rect.top+previous,baseBottom=rect.bottom+previous;
+  const lift=Math.max(0,Math.min(baseBottom-(bottom-12),baseTop-(top+8)));
+  if(lift>1){
+    shell.style.setProperty('--security-keyboard-lift',Math.round(lift)+'px');
+    shell.classList.add('is-keyboard-lifted');
+  }else{
+    shell.style.removeProperty('--security-keyboard-lift');
+    shell.classList.remove('is-keyboard-lifted');
+  }
 }
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;

@@ -41,3 +41,9 @@ test('popups famille : même hauteur que les autres feuilles de réglages',()=>{
     assert.doesNotMatch(css,new RegExp('#'+id+'\\s*\\{[^}]*height'),id+' ne doit pas redéfinir la hauteur');
   }
 });
+
+test('popup « Cet appareil » : bouton Se déconnecter vers la page de connexion',()=>{
+  const html=read('index.html'),app=read('app.js');
+  assert.match(html,/id="familyDeviceSignOut"[^>]*>.*Se déconnecter/);
+  assert.match(app,/UI\.familyDeviceSignOut\.onclick=\(\)=>\{UI\.familyDeviceDialog\.close\(\);void revoke\(\)\}/);
+});

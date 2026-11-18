@@ -240,6 +240,7 @@ const UI = Object.freeze({
   familyDevicesList: document.getElementById('familyDevicesList'),
   familyDeviceName: document.getElementById('familyDeviceName'),
   familyDeviceSave: document.getElementById('familyDeviceSave'),
+  familyDeviceSignOut: document.getElementById('familyDeviceSignOut'),
   familyDeviceFeedback: document.getElementById('familyDeviceFeedback'),
   securityShell: document.querySelector('.security-shell'),
   securitySubmit: document.getElementById('securitySubmit'),
@@ -3376,6 +3377,8 @@ async function refreshFromHeader(button,checkUpdate=false){
 function bindUiEvents(){
   UI.connectionConnectBtn.onclick=beginOAuth;
   UI.familyDeviceSave.onclick=saveFamilyDeviceName;
+  // Mauvais identifiant ou téléphone prêté : retour à la page de connexion sans nommer l'appareil.
+  UI.familyDeviceSignOut.onclick=()=>{UI.familyDeviceDialog.close();void revoke()};
   $('#settingsFamilyDevicesBtn').onclick=openFamilyDevices;
   bindDialogBackdropClose(UI.familyDevicesDialog);
   UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};

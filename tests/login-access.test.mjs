@@ -55,3 +55,11 @@ test('popup Connexion : statut de synchronisation court et libellé protégé co
   assert.match(read('missing-requests-store.js'),/setSharedStatus\('synced','Synchronisé'\);/);
   assert.match(read('styles.css'),/\.settings-sheet#connectionDialog \.connection-sync-line>span:first-child\{[^}]*overflow:hidden;text-overflow:ellipsis;/);
 });
+
+test('clavier iOS : la carte de connexion remonte pour garder identifiant et mot de passe visibles',()=>{
+  const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
+  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.match(ui,/function syncSecurityKeyboardLift\(shell,open\)/);
+  assert.match(ui,/--security-keyboard-lift/);
+  assert.match(css,/\.security-shell\.is-keyboard-lifted \.security-modal\{translate:0 calc\(-1 \* var\(--security-keyboard-lift,0px\)\)/);
+});
