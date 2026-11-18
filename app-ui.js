@@ -290,11 +290,6 @@ function securityKeyboardHeight(){
   }
   return 0;
 }
-function predictedSecurityKeyboardHeight(){
-  let saved=0;
-  try{saved=Number(localStorage.getItem(SECURITY_KEYBOARD_KEY))||0}catch(_){}
-  return saved>120?saved:Math.round(securityLayoutHeight()*.42);
-}
 function syncSecurityKeyboardState(options){
   const shell=document.querySelector('.security-shell');
   if(!shell)return;
@@ -305,22 +300,32 @@ function syncSecurityKeyboardState(options){
   syncSecurityViewportPosition();
   if(!visible||!active){
     shell.classList.remove('is-password-open');
-    syncSecurityKeyboardLift(shell,0);
+    syncSecurityKeyboardLift(shell,false);
     if(!visible&&securityViewportRestoring)scheduleSecurityViewportRestore();
     return;
   }
-  // Au toucher du champ, la carte se lève tout de suite avec la hauteur de clavier connue
-  // (même mouvement que le clavier), puis s'ajuste à la hauteur réelle.
-  const measured=securityKeyboardHeight();
-  const keyboard=measured||(predict||shell.classList.contains('is-keyboard-lifted')?predictedSecurityKeyboardHeight():0);
-  shell.classList.toggle('is-password-open',keyboard>0);
-  if(keyboard>0)syncSecurityKeyboardLift(shell,keyboard);
+  // Champ touché (ou clavier mesuré ouvert) : la carte monte en haut de l'écran et y reste
+  // tant qu'un champ est actif. Position fixe : même résultat à chaque ouverture.
+  const lifted=predict||shell.classList.contains('is-keyboard-lifted')||securityKeyboardHeight()>0;
+  shell.classList.toggle('is-password-open',lifted);
+  syncSecurityKeyboardLift(shell,lifted);
 }
-/* Clavier ouvert : la carte « Accès privé » remonte juste au-dessus du clavier
+function securitySafeTop(){
+  let probe=document.getElementById('securitySafeTopProbe');
+  if(!probe){
+    probe=document.createElement('div');
+    probe.id='securitySafeTopProbe';
+    probe.setAttribute('aria-hidden','true');
+    probe.style.cssText='position:fixed;left:0;top:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+    document.body.appendChild(probe);
+  }
+  return Math.round(probe.getBoundingClientRect().height)||0;
+}
+/* Clavier ouvert : la carte « Accès privé » se place en haut de l'écran, au-dessus du clavier
    (identifiant + mot de passe visibles pendant la saisie). */
-function syncSecurityKeyboardLift(shell,keyboard){
+function syncSecurityKeyboardLift(shell,on){
   const modal=shell.querySelector('.security-modal');
-  if(!keyboard||!modal){
+  if(!on||!modal){
     shell.style.removeProperty('--security-keyboard-lift');
     shell.classList.remove('is-keyboard-lifted');
     return;
@@ -328,17 +333,10 @@ function syncSecurityKeyboardLift(shell,keyboard){
   // Position de repos de la carte (offsetTop ignore la translation en cours d'animation).
   const parent=modal.offsetParent||shell;
   const baseTop=parent.getBoundingClientRect().top+modal.offsetTop;
-  const baseBottom=baseTop+modal.offsetHeight;
-  const offset=securityViewportOffsetTop();
-  const top=offset,bottom=offset+securityLayoutHeight()-keyboard;
-  const lift=Math.max(0,Math.min(baseBottom-(bottom-12),baseTop-(top+8)));
-  if(lift>1){
-    shell.style.setProperty('--security-keyboard-lift',Math.round(lift)+'px');
-    shell.classList.add('is-keyboard-lifted');
-  }else{
-    shell.style.removeProperty('--security-keyboard-lift');
-    shell.classList.remove('is-keyboard-lifted');
-  }
+  const target=securityViewportOffsetTop()+Math.max(16,securitySafeTop()+10);
+  const lift=Math.max(0,Math.round(baseTop-target));
+  shell.style.setProperty('--security-keyboard-lift',lift+'px');
+  shell.classList.add('is-keyboard-lifted');
 }
 function bindSecurityKeyboardViewport(){
   if(document.documentElement.dataset.securityKeyboardViewport==='1')return;
