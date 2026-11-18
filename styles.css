@@ -3583,11 +3583,16 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .settings-sheet#familyDeviceDialog .family-device-signout{width:100%;min-height:48px;margin:0 0 6px;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid var(--tile-line,rgba(33,55,40,.08));border-radius:15px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);color:#2f5a42;font:inherit;font-size:var(--fs-text);font-weight:600;-webkit-appearance:none;appearance:none}
 .settings-sheet#familyDeviceDialog .family-device-signout svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* v833 — clavier iOS : la carte de connexion remonte au-dessus du clavier (app-ui.js) */
-/* Même courbe que le clavier iOS : montée et descente fluides, dans les deux sens. */
-.security-shell .security-modal{transition:translate .32s cubic-bezier(.2,.85,.25,1)}
-.security-shell .security-hero{transition:opacity .22s ease}
-.security-shell.is-keyboard-lifted .security-modal{translate:0 calc(-1 * var(--security-keyboard-lift,0px))}
-.security-shell.is-keyboard-lifted .security-hero{opacity:0}
+/* v840 — mode saisie compact : champ touché → logo effacé, carte en haut et réduite (clé, phrase et
+   ornement masqués). Position fixe, sans mesure du clavier (app-ui.js, .is-keyboard-lifted). */
+.security-shell .security-modal{transition:top .3s cubic-bezier(.2,.85,.25,1)}
+.security-shell .security-hero{transition:opacity .2s ease}
+#securityOverlay .security-shell.is-keyboard-lifted .security-hero{opacity:0;pointer-events:none}
+#securityOverlay .security-shell.is-keyboard-lifted .security-modal{top:calc(env(safe-area-inset-top,0px) + 12px)!important;bottom:auto!important}
+#securityOverlay .security-shell.is-keyboard-lifted #securityIcon,
+#securityOverlay .security-shell.is-keyboard-lifted .security-card-copy,
+#securityOverlay .security-shell.is-keyboard-lifted .security-ornament{display:none!important}
+#securityOverlay .security-shell.is-keyboard-lifted .security-modal h3{font-size:30px!important;margin:4px 0 6px!important}
 @media(prefers-reduced-motion:reduce){.security-shell .security-modal,.security-shell .security-hero{transition:none}}
 .settings-sheet#familyAdminDialog .family-admin-add{width:100%;min-height:52px;margin-top:10px;border:1px dashed rgba(47,106,73,.32);border-radius:18px;background:rgba(237,247,234,.5);color:#1f5a3b;font:inherit;font-size:var(--fs-text);-webkit-appearance:none;appearance:none}
 .settings-sheet#familyAdminDialog .family-admin-account{border:1px solid var(--tile-line);border-radius:18px;background:var(--tile-bg);box-shadow:var(--tile-shadow);overflow:hidden}

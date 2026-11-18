@@ -56,16 +56,13 @@ test('popup Connexion : statut de synchronisation court et libellé protégé co
   assert.match(read('styles.css'),/\.settings-sheet#connectionDialog \.connection-sync-line>span:first-child\{[^}]*overflow:hidden;text-overflow:ellipsis;/);
 });
 
-test('clavier iOS : la carte de connexion remonte pour garder identifiant et mot de passe visibles',()=>{
+test('clavier iOS : mode saisie compact, carte en haut sans mesure du clavier',()=>{
   const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
   const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
-  assert.match(ui,/function syncSecurityKeyboardLift\(shell,on\)/);
-  // Position fixe en haut de l'écran : même résultat à chaque ouverture, sans dépendre de la mesure du clavier.
-  assert.match(ui,/const target=securityViewportOffsetTop\(\)\+Math\.max\(16,securitySafeTop\(\)\+10\)/);
-  // Passage Identifiant → Mot de passe : pas de nouvelle mesure, la carte reste levée.
-  assert.doesNotMatch(ui,/securityKeyboardBaseline/);
+  assert.match(ui,/function syncSecurityKeyboardLift\(shell,on\)\{\s*shell\.classList\.toggle\('is-keyboard-lifted',!!on\);\s*\}/);
+  // Passage Identifiant → Mot de passe : la carte reste en haut.
+  assert.doesNotMatch(ui,/securityKeyboardBaseline|--security-keyboard-lift/);
   assert.match(ui,/syncSecurityKeyboardState\(\{predict:Date\.now\(\)-securityKeyboardIntent<1000\}\)/);
-  assert.match(ui,/--security-keyboard-lift/);
-  assert.match(css,/\.security-shell\.is-keyboard-lifted \.security-modal\{translate:0 calc\(-1 \* var\(--security-keyboard-lift,0px\)\)\}/);
-  assert.match(css,/\.security-shell \.security-modal\{transition:translate \.32s/);
+  assert.match(css,/#securityOverlay \.security-shell\.is-keyboard-lifted \.security-modal\{top:calc\(env\(safe-area-inset-top,0px\) \+ 12px\)!important;bottom:auto!important\}/);
+  assert.match(css,/is-keyboard-lifted #securityIcon,[\s\S]*?is-keyboard-lifted \.security-card-copy,[\s\S]*?is-keyboard-lifted \.security-ornament\{display:none!important\}/);
 });
