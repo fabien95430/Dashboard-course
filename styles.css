@@ -3290,14 +3290,14 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 :root{--security-screen-height:var(--lock-screen-h,var(--security-layout-height,100svh))}
 html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   overflow:hidden!important;overscroll-behavior:none!important;
-  background:#f4f0e8 url("./welcome-ivory-sage-v843.webp") center top / auto var(--security-screen-height) no-repeat!important;
+  background:#f4f0e8 url("./welcome-kitchen-sage-v855.webp") center top / auto var(--security-screen-height) no-repeat!important;
 }
 .security-overlay{
   z-index:65;top:0!important;right:0!important;bottom:auto!important;left:0!important;
   height:calc(var(--security-screen-height) + env(safe-area-inset-bottom,0px))!important;
   min-height:0!important;padding:0!important;overflow:hidden!important;place-items:stretch!important;
   overscroll-behavior:none;
-  background:#f4f0e8 url("./welcome-ivory-sage-v843.webp") center top / cover no-repeat!important;
+  background:#f4f0e8 url("./welcome-kitchen-sage-v855.webp") center top / cover no-repeat!important;
   background-position:center var(--security-viewport-offset,0px)!important;
 }
 .security-shell{
