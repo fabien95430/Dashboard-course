@@ -1,5 +1,12 @@
 (() => {
   'use strict';
+  // Fond de Ma liste décodé pendant l'écran de connexion : il s'affiche dès le déverrouillage.
+  try{
+    const listBackground=new Image();
+    listBackground.src='./marble-ivory-sage-v852.jpg';
+    listBackground.decode?.().catch(()=>{});
+    window.COURSES_LIST_BACKGROUND=listBackground;
+  }catch(_){}
   // Seule implémentation des clés de noms : comparaison (key) et nom des fichiers images (slug).
   // catalog.js est le premier script chargé : tous les modules peuvent s'en servir.
   const fold=value=>String(value||'').toLowerCase().replace(/œ/g,'oe').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -91,7 +98,7 @@
   const loadDishLocalImages=()=>{
     if(document.querySelector('script[data-dish-local-images]')){onDishLocalImagesReady();return}
     const images=document.createElement('script');
-    images.src='./dish-local-images.js?v=851';
+    images.src='./dish-local-images.js?v=852';
     images.async=false;
     images.dataset.dishLocalImages='script';
     images.addEventListener('load',onDishLocalImagesReady,{once:true});
@@ -122,7 +129,7 @@
     if(window.COURSES_QUANTITIES){loadDishes();return}
     if(document.querySelector('script[data-catalog-quantities]'))return;
     const quantities=document.createElement('script');
-    quantities.src='./catalog-quantities.js?v=851';
+    quantities.src='./catalog-quantities.js?v=852';
     quantities.async=false;
     quantities.dataset.catalogQuantities='script';
     quantities.addEventListener('load',loadDishes,{once:true});
@@ -155,6 +162,19 @@
     productCatalogStarted=true;
     markProductCatalogReady();
   };
+  /* Écran de connexion ou de déverrouillage affiché : aucune préparation du catalogue (12 000
+     éléments, images) ne tourne pendant la saisie de l'identifiant et du mot de passe — Safari
+     n'a pas requestIdleCallback, ces tâches passaient donc entre deux frappes. Elles démarrent
+     dès que l'application est déverrouillée. */
+  const whenUnlocked=run=>{
+    if(!document.getElementById('securityOverlay')?.classList.contains('is-visible')){run();return}
+    const onLockChanged=event=>{
+      if(event.detail?.locked!==false)return;
+      document.removeEventListener('courses:lock-changed',onLockChanged);
+      run();
+    };
+    document.addEventListener('courses:lock-changed',onLockChanged);
+  };
   const startCatalogView=()=>{
     startProductCatalog();
     if(!catalogExtrasStarted){
@@ -166,8 +186,10 @@
   document.addEventListener('courses:status-changed',event=>{
     const title=event.detail?.title;
     if(title==='Synchronisé'||title==='Mode test'){
-      startProductCatalog();
-      scheduleDishFeaturesWarmup();
+      whenUnlocked(()=>{
+        startProductCatalog();
+        scheduleDishFeaturesWarmup();
+      });
     }
   });
   document.addEventListener('courses:product-images-idle',()=>{
@@ -187,7 +209,7 @@
       return;
     }
     const script=document.createElement('script');
-    script.src='./runtime-features.js?v=851';
+    script.src='./runtime-features.js?v=852';
     script.async=false;
     script.dataset.runtimeFeatures='script';
     script.addEventListener('load',()=>{
@@ -209,10 +231,10 @@
   // d'achat) se prépare quand même au repos, pour qu'il soit complet dès sa première image.
   const scheduleStartupWarmup=()=>{
     const run=()=>{startProductCatalog();scheduleDishFeaturesWarmup();};
-    const idle=()=>{
+    const idle=()=>whenUnlocked(()=>{
       if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:800});
       else setTimeout(run,300);
-    };
+    });
     if(document.readyState==='complete')idle();
     else window.addEventListener('load',idle,{once:true});
   };

@@ -89,3 +89,18 @@ test('le runtime de Ma liste reste prioritaire avant la préparation du Catalogu
   const runtimeStart=source.indexOf('const loadRuntimeFeatures=()=>{');
   assert.ok(productStart>=0&&runtimeStart>productStart);
 });
+test('aucune préparation du catalogue ne tourne pendant la saisie sur l écran de connexion',()=>{
+  assert.match(source,/const whenUnlocked=run=>\{[\s\S]*securityOverlay[\s\S]*is-visible[\s\S]*locked!==false[\s\S]*courses:lock-changed/);
+  assert.match(source,/const idle=\(\)=>whenUnlocked\(\(\)=>\{/);
+  assert.match(source,/title==='Mode test'\)\{\s*whenUnlocked\(\(\)=>\{\s*startProductCatalog\(\);/);
+});
+
+test('le fond de Ma liste est une image déjà calculée, préchargée et décodée avant le déverrouillage',()=>{
+  const css=read('styles.css');
+  const html=read('index.html');
+  assert.match(css,/body\{[^}]*url\("\.\/marble-ivory-sage-v852\.jpg"\)/);
+  assert.doesNotMatch(css,/marble-ivory-sage-v517\.svg/);
+  assert.match(html,/rel="preload" as="image" href="\.\/marble-ivory-sage-v852\.jpg"/);
+  assert.match(source,/listBackground\.src='\.\/marble-ivory-sage-v852\.jpg';\s*listBackground\.decode/);
+});
+
