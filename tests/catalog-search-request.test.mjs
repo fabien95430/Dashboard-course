@@ -21,7 +21,7 @@ test('recherche : le texte reste quand le clavier se ferme',()=>{
 
 test('recherche sans résultat : raccourci vers Catalogue des produits › Ajout, nom prérempli',()=>{
   const app=read('app.js'),dishes=read('dishes-ui.js'),missing=read('missing-products-dishes.js');
-  assert.match(app,/Demander ce '\+label\+' au catalogue/);
+  assert.match(app,/Ajouter ce '\+label\+'<\/span>/);
   assert.match(app,/window\.COURSES_MISSING_ADD\.openWith\(\{type,name\}\)/);
   assert.match(dishes,/COURSES_CATALOG_REQUEST_EMPTY\(empty,'dishes',query/);
   assert.match(missing,/openWith\(\{type,name\}=\{\}\)\{\s*settingsButton\.click\(\);\s*setMode\(type==='dishes'\?'dishes':'products'/);

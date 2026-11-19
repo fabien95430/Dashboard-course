@@ -3282,9 +3282,9 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .settings-sheet#familyAdminDialog .family-admin-account-row.is-confirm{background:#b8433a;color:#fff}
 .settings-sheet#familyAdminDialog .family-admin-account-row:disabled{opacity:.5}
 /* v838 — recherche sans résultat : raccourci vers Catalogue des produits › Ajout */
-.catalog-search-empty{flex-direction:column;gap:12px;padding:26px 18px;text-align:center}
+.catalog-search-empty{height:auto;flex-direction:column;justify-content:flex-start;gap:12px;padding:26px 18px;text-align:center}
 .catalog-search-empty .catalog-request-empty-text{margin:0;color:#617366;font-size:var(--fs-text,14px);line-height:1.4;overflow-wrap:anywhere}
-.catalog-search-empty .catalog-request-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:1px dashed rgba(47,106,73,.35);border-radius:15px;background:rgba(237,247,234,.6);color:#1f5a3b;font:inherit;font-size:var(--fs-text,14px);font-weight:600;-webkit-appearance:none;appearance:none}
+.catalog-search-empty .catalog-request-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border:0;border-radius:24px;background:#4f7a60;color:#fff;font:inherit;font-size:15px;font-weight:650;white-space:nowrap;box-shadow:0 6px 16px rgba(47,77,55,.16);-webkit-appearance:none;appearance:none}.catalog-search-empty .catalog-request-cta:active{transform:scale(.975)}
 
 /* Connexion : géométrie stable, décor plein écran et verre ivoire.
    La hauteur est mémorisée avant le clavier par app-ui.js, jamais dérivée de sa hauteur visible. */

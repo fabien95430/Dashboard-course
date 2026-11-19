@@ -782,7 +782,7 @@ function renderCatalogRequestEmpty(target,type,query,fallback){
   if(!name||!window.COURSES_MISSING_ADD?.openWith){target.textContent=fallback;return}
   const label=type==='dishes'?'plat':'produit';
   target.innerHTML='<p class="catalog-request-empty-text">Aucun '+label+' « '+esc(name)+' »</p>'+
-    '<button type="button" class="catalog-request-cta"><span aria-hidden="true">＋</span><span>Demander ce '+label+' au catalogue</span></button>';
+    '<button type="button" class="catalog-request-cta"><span aria-hidden="true">＋</span><span>Ajouter ce '+label+'</span></button>';
   target.querySelector('.catalog-request-cta').onclick=()=>{
     window.COURSES_MISSING_ADD.openWith({type,name});
     clearCatalogSearch();

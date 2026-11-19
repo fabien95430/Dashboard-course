@@ -942,8 +942,9 @@ function renderDishes(){
   dishCount.textContent=dishes.length+' plat'+(dishes.length>1?'s':'');
   if(!dishes.length){
     const empty=document.createElement('div');
-    empty.className='dish-empty catalog-search-empty';
     const query=String(searchInput?.value||'').trim();
+    // Recherche sans résultat : même bloc que les produits (app.js, productEmptyState).
+    empty.className=query?'empty is-wide catalog-search-empty':'dish-empty';
     if(query&&window.COURSES_CATALOG_REQUEST_EMPTY)window.COURSES_CATALOG_REQUEST_EMPTY(empty,'dishes',query,'Aucun plat trouvé.');
     else empty.textContent=filter==='Favoris'?'Aucun plat favori pour le moment.':'Aucun plat trouvé.';
     dishesGrid.replaceChildren(empty);
