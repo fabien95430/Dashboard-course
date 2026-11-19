@@ -104,3 +104,12 @@ test('le fond de Ma liste est une image déjà calculée, préchargée et décod
   assert.match(source,/listBackground\.src='\.\/marble-ivory-sage-v852\.jpg';\s*listBackground\.decode/);
 });
 
+
+test('l icône de l écran d accueil iPhone est un PNG 180 × 180 valide déclaré dans la page',()=>{
+  const html=read('index.html');
+  assert.match(html,/<link rel="apple-touch-icon" href="\.\/apple-touch-icon\.png\?v=\d+">/);
+  const png=fs.readFileSync(new URL('../apple-touch-icon.png',import.meta.url));
+  assert.equal(png.subarray(1,4).toString('latin1'),'PNG');
+  assert.equal(png.readUInt32BE(16),180);
+  assert.equal(png.readUInt32BE(20),180);
+});

@@ -11,6 +11,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
   <link rel="manifest" href="./manifest.webmanifest?v=43">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <!-- Icône de l'écran d'accueil iPhone : PNG opaque 180 × 180 (iOS ignore l'icône SVG du manifeste). -->
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=853">
   <!-- v590 — écran de lancement iOS : le fond de l'écran de déverrouillage, cadré comme en standalone, remplace l'écran noir. -->
   <link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./www/startup/launch-1320x2868.jpg?v=843">
   <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./www/startup/launch-1290x2796.jpg?v=843">
@@ -31,7 +33,7 @@
   <!-- Fond de Ma liste : image déjà calculée (le SVG à filtres était recalculé par Safari au déverrouillage, d'où le fond en retard). -->
   <link rel="preload" as="image" href="./marble-ivory-sage-v852.jpg">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=852">
+  <link rel="stylesheet" href="./styles.css?v=853">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=610">
 </head>
 <body>
@@ -67,7 +69,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v852</span>
+            <span class="page-version">v853</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -90,7 +92,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v852</span>
+            <span class="page-version">v853</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -126,7 +128,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v852</span>
+            <span class="page-version">v853</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -478,18 +480,18 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=852"></script>
+  <script src="./catalog.js?v=853"></script>
   <script src="./product-item-images.js?v=820" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=824"></script>
   <script src="./courses-notifications.js?v=832"></script>
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=848" data-app-ui="script"></script>
-  <script src="./family-service.js?v=852"></script>
-  <script src="./app.js?v=852"></script>
+  <script src="./family-service.js?v=853"></script>
+  <script src="./app.js?v=853"></script>
   <script src="./settings-tab-badge.js?v=830"></script>
   <script src="./settings-ui.js?v=827"></script>
   <script src="./error-center.js?v=820"></script>
-  <script src="./family-admin.js?v=852"></script>
+  <script src="./family-admin.js?v=853"></script>
 </body>
 </html>
