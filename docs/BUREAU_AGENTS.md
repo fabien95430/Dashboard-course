@@ -94,10 +94,19 @@ Le code de la scène de maquette est dans `maquette-scene.js`. C'est une référ
 - Mouvement fluide et vidéo en boucle.
 - Style photo réaliste : remplacé par le cartoon 3D aux couleurs de l'app.
 
+## Étape 1 : l'écran Bureau sans agents (v858)
+
+- `bureau-ui.js`, propriétaire de l'écran ; styles dans `styles.css` (section v858) ; lecture `adminBureau()` dans `family-service.js`.
+- Ligne **Bureau** sous « Familles » ; pastille = dossiers à valider (toujours 0 tant qu'aucun agent ne prépare de dossier).
+- Dossiers = idées et corrections (table `retours`, aucune nouvelle table) : nouveau → **En cours** (étape « Reçu »), traité → **Terminés**. « À valider » attend les agents.
+- Fiche : frise Reçu → Trieur → Développeur → Testeur (agents « Pas encore en service »), boutons **Marquer traité** et **Copier**. « Mettre en ligne / Répondre / Refuser » arriveront avec les agents.
+- Scène : `www/Bureau/01-piece-vide.png` + les 3 postes au repos (02 à 04), convertis en WebP par `scripts/make_bureau_images.py` dans `www/Bureau/webp/` (~124 Ko au total) : pièce détourée posée sans cadre ni fond sur le popup, ombre de contact sous les postes, placés en pourcentages dans `styles.css`. Aucun badge sur la scène : l’état (point doré, « en préparation ») est dans le sous-titre du popup.
+- Pas encore utilisés : variantes frappe / tête (05 à 10) et coursier (11, 12), réservés aux agents en service.
+- Le temps réel `retours` passe par le canal admin unique, partagé avec Familles.
+
 ## En attente
 
-- Les 12 images ChatGPT, à vérifier (angle, échelle, détourage, DA) avant intégration.
-- Le feu vert pour l'étape 1, l'écran Bureau sans agents. Captures montrées avant toute mise en ligne.
+- Variantes 05 à 12 : vérifier le scintillement en alternance avant de les animer.
 - Décisions du plan à prendre :
   - heure du passage du soir (proposé : 21 h) ;
   - plafond de dossiers par soir (proposé : 5) ;

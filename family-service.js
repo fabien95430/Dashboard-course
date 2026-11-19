@@ -448,19 +448,34 @@ async function adminManageFamily(credentials,payload){
   if(data?.error)throw new Error(data.error);
   return data||{};
 }
-/* Nouvelles demandes et retours en direct (temps réel sur catalogue_perso et retours, lisibles par l'admin). */
+/* Bureau (Réglages › Administrateur › Bureau) : tous les retours récents, nouveaux et traités, avec la liste des foyers. */
+async function adminBureau(credentials){
+  const db=await admin(credentials);
+  const [feedback,families]=await Promise.all([
+    db.from('retours').select('id,famille,type,message,contexte,statut,cree_le,traite_le').order('cree_le',{ascending:false}).limit(100),
+    db.rpc('familles').then(result=>result.error?[]:(result.data||[]),()=>[])
+  ]);
+  if(feedback.error)throw feedback.error;
+  return {feedback:feedback.data||[],families};
+}
+/* Nouvelles demandes et retours en direct (temps réel sur catalogue_perso et retours, lisibles par l'admin).
+   Un seul canal, partagé par les écrans admin (Familles, Bureau). */
 let adminRequestsChannel=null;
+const adminRequestListeners=new Set();
+function notifyAdminRequests(){adminRequestListeners.forEach(listener=>{try{listener()}catch(_){}})}
 async function adminWatchRequests(credentials,onChange){
   const db=await admin(credentials);
+  if(typeof onChange==='function')adminRequestListeners.add(onChange);
   if(adminRequestsChannel)return;
   adminRequestsChannel=db.channel('admin-demandes')
-    .on('postgres_changes',{event:'*',schema:'public',table:'catalogue_perso'},()=>{try{onChange()}catch(_){}})
-    .on('postgres_changes',{event:'*',schema:'public',table:'retours'},()=>{try{onChange()}catch(_){}})
+    .on('postgres_changes',{event:'*',schema:'public',table:'catalogue_perso'},notifyAdminRequests)
+    .on('postgres_changes',{event:'*',schema:'public',table:'retours'},notifyAdminRequests)
     .subscribe();
 }
 async function adminSignOut(){
   try{if(adminRequestsChannel)await adminClient?.removeChannel(adminRequestsChannel)}catch(_){}
   adminRequestsChannel=null;
+  adminRequestListeners.clear();
   try{await adminClient?.auth.signOut()}catch(_){}
 }
 
@@ -474,7 +489,7 @@ const api=Object.freeze({
   sendFeedback,listFeedback,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),
-  adminOverview,adminSetRequestStatus,adminSetFeedbackStatus,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
+  adminOverview,adminBureau,adminSetRequestStatus,adminSetFeedbackStatus,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
 });
 Object.defineProperty(window,'COURSES_FAMILY',{value:api,configurable:false,enumerable:false,writable:false});
 })();

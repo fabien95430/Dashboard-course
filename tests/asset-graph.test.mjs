@@ -36,8 +36,8 @@ test('le précache ne garde qu une URL active par chemin',()=>{
   const shell=shellAssets();
   const paths=shell.map(assetPath);
   assert.equal(new Set(paths).size,paths.length,'Le SHELL contient plusieurs versions du même fichier');
-  // 39 : + service famille et sa bibliothèque embarquée (v825), écran admin Familles (v827) ; toujours une seule URL par chemin.
-  assert.ok(shell.length<=39,'Le SHELL ne doit plus accumuler les anciennes générations');
+  // 40 : + service famille et sa bibliothèque embarquée (v825), écran admin Familles (v827), écran admin Bureau (v858) ; toujours une seule URL par chemin.
+  assert.ok(shell.length<=40,'Le SHELL ne doit plus accumuler les anciennes générations');
 });
 
 test('tout le graphe JS CSS actif est précaché avec son URL exacte',()=>{
