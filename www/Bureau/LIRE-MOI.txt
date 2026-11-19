@@ -1,0 +1,14 @@
+Bureau — série DA application, proposition à valider
+12 PNG haute définition générés avec imagegen intégré à partir des 5 références du dépôt.
+01 : fond de pièce. 02–04 : postes de repos. 05–10 : variantes frappe / tête. 11–12 : pas du coursier.
+Les 11 éléments isolés ont un canal alpha réel. Les PNG originaux sont conservés sans retouche ni conversion.
+
+Contrôle avant intégration :
+- Les dimensions de certaines variantes Développeur et Testeur diffèrent de 1 pixel de leur base.
+- Les postes ont des marges transparentes et tailles de sujet différentes : caler leur échelle visuelle et leurs points d'ancrage au montage.
+- La génération conserve une proximité visuelle, sans garantir une identité pixel par pixel hors des mains ou de la tête. Vérifier le scintillement en alternant les images.
+- Le Trieur arrive très près du bord inférieur du canevas.
+- Vérifier les contours sur le fond final.
+- L'objectif d'environ 1 Mo concerne la future version WebP optimisée, pas ces masters PNG.
+Aucun fichier de l'application n'a été remplacé ni publié.
+Le manifeste indique tailles, poids et limites du sujet alpha > 128. Prompts complets dans prompts.json.
