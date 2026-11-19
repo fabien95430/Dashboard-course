@@ -25,6 +25,8 @@ Images de référence dans `docs/bureau/` :
 - `maquette-piece.webp` : la pièce ;
 - `maquette-personnages.webp` : les 3 personnages.
 
+Les 5 images de référence à joindre dans ChatGPT sont dans `docs/bureau/references/` : `ref-da-application.png`, `ref-bureau-scene.png`, `ref-poste-trieur.png`, `ref-poste-developpeur.png`, `ref-poste-testeur.png`.
+
 Le code de la scène de maquette est dans `maquette-scene.js`. C'est une référence de cadrage et de disposition : ce fichier n'est pas chargé par l'app.
 
 ### Accès
