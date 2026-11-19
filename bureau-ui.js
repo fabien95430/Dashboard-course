@@ -8,7 +8,7 @@
    La scène assemble la pièce et les trois postes au repos (images ChatGPT, cadrage de la maquette validée). */
 
 const DAY=864e5;
-const TABS=Object.freeze([['valider','À valider'],['cours','En cours'],['termines','Terminés']]);
+const TABS=Object.freeze([['cours','En cours'],['valider','À valider'],['termines','Terminés']]);
 const AGENTS=Object.freeze([
   {id:'trieur',name:'Trieur',color:'#8F87E3'},
   {id:'testeur',name:'Testeur',color:'#2BAE84'},
@@ -91,47 +91,54 @@ function sceneImage(file,cls){
 }
 /* Pile de ton bureau : un dossier de plus par dossier à valider (6 au plus), posé sur la pile de l'image. */
 const PILE_MAX=6;
-
-function pileCount(){return Math.min(dossiers.valider.length+(demo&&demoAt(demo.ms).filed?1:0),PILE_MAX)}
+function pileCount(){return Math.min(validerCount(),PILE_MAX)}
 function pileMarkup(count){
   let pile='';
   for(let k=1;k<=count;k++)pile+=sceneImage('dossier','bureau-pile-dossier is-'+k);
   return pile;
 }
-/* Bulle de parole ; quand son texte change, les lettres apparaissent de la première à la dernière. */
+
+/* Ce que fait chaque agent : une courte phrase juste au-dessus de sa tête, avec une coche quand il a fini (jusqu'à ta validation).
+   head : tête en % de la scène ; lift : écart au-dessus de la tête (px) ; shift : part de l'étiquette à gauche de la tête (%),
+   pour que les trois phrases ne se chevauchent pas (le Trieur, au fond, un peu plus haut). */
+const LEADS=Object.freeze({
+  trieur:{head:[53.5,33.6],lift:16,shift:50},
+  testeur:{head:[37.5,39.8],lift:6,shift:85},
+  developpeur:{head:[71.5,44.8],lift:6,shift:30}
+});
 const TYPE_MS=45;      // une lettre
-function badgeMarkup(agent,typing=false){
-  const state=agentState(agent.id),text=agentText(agent.id);
-  // Les espaces restent du texte simple : la bulle peut passer à la ligne entre deux mots.
+function labelMarkup(agent,typing=false){
+  const state=agentState(agent.id),text=agentText(agent.id),lead=LEADS[agent.id];
   const letters=typing?[...text].map(letter=>letter===' '?' ':'<span>'+esc(letter)+'</span>').join(''):esc(text);
-  return '<span class="bureau-badge is-'+agent.id+(state==='busy'?' is-busy':'')+(state==='done'?' is-done':'')+(typing?' is-typing':'')+'" style="--agent:'+agent.color+'" aria-label="'+esc(text)+'"'+(typing?' data-since="'+Math.round(demo?.ms||0)+'"':'')+'><i aria-hidden="true"></i><b aria-hidden="true">'+letters+'</b></span>';
+  return '<span class="bureau-label is-'+agent.id+' is-'+state+(typing?' is-typing':'')+'" style="--agent:'+agent.color+';left:'+lead.head[0]+'%;top:calc('+lead.head[1]+'% - '+lead.lift+'px);transform:translate(-'+lead.shift+'%,-100%)" aria-label="'+esc(agent.name+' : '+text)+'"'+(typing?' data-since="'+Math.round(demo?.ms||0)+'"':'')+'>'+(state==='done'?'<i aria-hidden="true">'+SVG_DONE+'</i>':'')+'<b aria-hidden="true">'+letters+'</b></span>';
 }
-function typeLetters(badge){
-  const letters=badge.querySelectorAll('b span');
-  const shown=Math.floor(((demo?.ms||0)-Number(badge.dataset.since||0))/TYPE_MS)+1;
+function typeLetters(label){
+  const letters=label.querySelectorAll('b span');
+  const shown=Math.floor(((demo?.ms||0)-Number(label.dataset.since||0))/TYPE_MS)+1;
   letters.forEach((letter,index)=>letter.classList.toggle('is-on',index<shown));
-  if(shown>=letters.length)badge.classList.remove('is-typing');
+  if(shown>=letters.length)label.classList.remove('is-typing');
 }
 function sceneMarkup(){
   // Ordre d'affichage = profondeur : Trieur au fond, puis Testeur (gauche) et Développeur (droite).
-  return '<div class="bureau-scene-art" role="img" aria-label="Le bureau des agents'+(dossiers.valider.length?', '+dossiers.valider.length+' dossiers à valider':'')+'">'+sceneImage('piece','bureau-room')+
+  return '<div class="bureau-scene-art" role="img" aria-label="Le bureau des agents'+(validerCount()?', '+validerCount()+' dossiers à valider':'')+'">'+sceneImage('piece','bureau-room')+
     AGENTS.map(agent=>'<span class="bureau-poste is-'+agent.id+'" data-frame="repos">'+sceneImage(agent.id+'-repos','is-repos')+'</span>').join('')+
-    '<span class="bureau-pile">'+pileMarkup(pileCount())+'</span>'+AGENTS.map(badgeMarkup).join('')+'</div>';
+    '<span class="bureau-pile">'+pileMarkup(pileCount())+'</span>'+AGENTS.map(agent=>labelMarkup(agent)).join('')+'</div>'+
+    playButton();
 }
 
 /* ---------- Actions (démonstration en attendant les agents) ----------
    Une demande traitée en 10 secondes : le Trieur trie, le Développeur code, le Testeur teste,
-   puis le dossier arrive sur la pile de ton bureau. Seul l'agent au travail bouge (image par image :
-   repos / frappe / tête inclinée) ; les bulles et les lignes des agents suivent l'étape.
-   Rien n'est enregistré. Coupé à la fermeture du popup, au verrouillage et si « réduire les animations » est actif. */
+   puis le dossier arrive sur la pile de ton bureau et dans « À valider ». Seul l'agent au travail bouge
+   (image par image : repos / frappe / tête inclinée). Les phrases gardent leur coche tant que le dossier
+   n'est pas validé. Rien n'est enregistré ni mis en ligne. Coupé à la fermeture du popup pendant le
+   traitement, au verrouillage et si « réduire les animations » est actif. */
 const POSTE_MS=480;    // une image de poste
 const POSTE_CYCLE=Object.freeze(['frappe','repos','frappe','repos','frappe','repos','tete','tete','repos']);
 const POSTE_PHASE=Object.freeze({trieur:0,testeur:3,developpeur:6});
 const DEMO_STEPS=Object.freeze([['trieur',3000],['developpeur',6500],['testeur',9500]]);
-const DEMO_END=12500;  // le dossier reste sur la pile un instant, puis tout revient au repos
 const ACTIVITIES=Object.freeze({trieur:'Trie le courrier',developpeur:'Code la version',testeur:'Lance les tests'});
 const DONE=Object.freeze({trieur:'Dossier trié',developpeur:'Version prête',testeur:'Tests verts'});
-let demo=null;
+let demo=null;         // {start, ms, timer, finished}
 
 function reducedMotion(){try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(_){return false}}
 function posteFrame(id,ms){
@@ -142,12 +149,21 @@ function demoAt(ms){
   const index=DEMO_STEPS.findIndex(([,until])=>ms<until);
   const active=index<0?null:DEMO_STEPS[index][0];
   const done=DEMO_STEPS.slice(0,index<0?DEMO_STEPS.length:index).map(([id])=>id);
-  return {active,done,filed:index<0,ended:ms>=DEMO_END};
+  return {active,done,filed:index<0};
 }
+/* Dossier de démonstration, à valider une fois la démonstration finie. */
+function demoDossier(){
+  return demo?.finished?{id:'demo',demo:true,type:'idee',title:'Trier les plats par temps',message:'Pouvoir trier les plats par temps de préparation',family:'Démonstration',received:demo.received,treated:'',version:'',device:'',stage:'pret',stageLabel:'Prêt'}:null;
+}
+function validerList(){return demo?.finished?[demoDossier(),...dossiers.valider]:dossiers.valider}
+function validerCount(){return validerList().length}
 function agentState(id){
-  if(!demo)return 'wait';
-  const step=demoAt(demo.ms);
-  return step.active===id?'busy':step.done.includes(id)?'done':'wait';
+  if(demo&&!demo.finished){
+    const step=demoAt(demo.ms);
+    return step.active===id?'busy':step.done.includes(id)?'done':'wait';
+  }
+  // Leur part est faite : ils gardent la coche tant que le dossier n'est pas validé.
+  return validerCount()?'done':'wait';
 }
 function agentText(id){
   const state=agentState(id);
@@ -168,38 +184,45 @@ function ensureDemoLayers(scene){
   return Promise.all(loads);
 }
 function ready(img){return !!img&&img.complete&&img.naturalWidth>0}
-function paintDemo(node,scene){
+function paintDemo(scene){
   AGENTS.forEach(agent=>{
+    const state=agentState(agent.id);
     const poste=scene.querySelector('.bureau-poste.is-'+agent.id);
     if(poste){
-      const frame=agentState(agent.id)==='busy'?posteFrame(agent.id,demo.ms):'repos';
+      const frame=state==='busy'?posteFrame(agent.id,demo.ms):'repos';
       poste.dataset.frame=frame==='repos'||ready(poste.querySelector('.is-'+frame))?frame:'repos';
     }
-    const badge=scene.querySelector('.bureau-badge.is-'+agent.id);
-    if(badge&&badge.getAttribute('aria-label')!==agentText(agent.id))badge.outerHTML=badgeMarkup(agent,true);
-    const typing=scene.querySelector('.bureau-badge.is-typing.is-'+agent.id);
+    const label=scene.querySelector('.bureau-label.is-'+agent.id);
+    if(label&&!label.classList.contains('is-'+state)){
+      label.outerHTML=labelMarkup(agent,true);
+    }
+    const typing=scene.querySelector('.bureau-label.is-typing.is-'+agent.id);
     if(typing)typeLetters(typing);
-    const row=node.querySelector('.bureau-agent[data-agent="'+agent.id+'"] small');
-    if(row&&row.textContent!==agentText(agent.id))row.textContent=agentText(agent.id);
   });
   const pile=scene.querySelector('.bureau-pile');
   if(pile&&pile.children.length!==pileCount())pile.innerHTML=pileMarkup(pileCount());
 }
 function demoTick(){
-  if(!demo)return;
+  if(!demo||demo.finished)return;
   const node=document.getElementById('bureauDialog');
   if(!node?.open||reducedMotion()){stopDemo();return}
   demo.ms=performance.now()-demo.start;
-  if(demoAt(demo.ms).ended){stopDemo();return}
   const scene=node.querySelector('.bureau-scene-art');
+  if(demoAt(demo.ms).filed&&!scene?.querySelector('.bureau-label.is-typing')){
+    // Fini : le dossier attend ta validation dans « À valider ».
+    clearInterval(demo.timer);
+    demo.finished=true;demo.received=new Date().toISOString();
+    if(node.dataset.view==='bureau')renderBureau(node,'valider');
+    return;
+  }
   if(scene){
     if(!scene.dataset.demo){scene.dataset.demo='1';void ensureDemoLayers(scene)}
-    paintDemo(node,scene);
+    paintDemo(scene);
   }
 }
 async function startDemo(node){
   if(demo||reducedMotion())return;
-  demo={start:0,ms:0,timer:0};
+  demo={start:0,ms:0,timer:0,finished:false};
   const scene=node.querySelector('.bureau-scene-art');
   if(scene){scene.dataset.demo='1';await ensureDemoLayers(scene)}
   if(!demo)return;
@@ -214,6 +237,14 @@ function stopDemo(){
   demo=null;
   const node=document.getElementById('bureauDialog');
   if(node?.open&&node.dataset.view==='bureau')renderBureau(node);
+}
+/* Fermeture du popup : une démonstration en cours s'arrête ; un dossier de démonstration fini reste à valider. */
+function onDialogClose(){if(demo&&!demo.finished)stopDemo()}
+const SVG_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>';
+const SVG_STOP='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>';
+function playButton(){
+  if(reducedMotion())return '';
+  return '<button type="button" class="bureau-play" data-action="demo" aria-pressed="'+(!!demo)+'" aria-label="'+(demo?'Arrêter la démonstration':'Lancer les actions')+'">'+(demo?SVG_STOP:SVG_PLAY)+'</button>';
 }
 
 /* ---------- Interface ---------- */
@@ -279,7 +310,7 @@ function dialog(){
   node.className='dialog connection-dialog settings-sheet bureau-sheet';
   node.tabIndex=-1;
   node.addEventListener('click',onDialogClick);
-  node.addEventListener('close',stopDemo);
+  node.addEventListener('close',onDialogClose);
   node.addEventListener('keydown',event=>{
     if((event.key==='Enter'||event.key===' ')&&event.target.classList?.contains('bureau-dossier')){event.preventDefault();renderDossier(node,event.target.dataset.dossier)}
   });
@@ -298,17 +329,6 @@ function header(title,back){
   return '<h3'+(back?' class="has-back"':'')+'>'+(back?'<button type="button" class="settings-sheet-back bureau-back" aria-label="Retour au bureau"><svg aria-hidden="true"><use href="#i-chevron"></use></svg></button>':'')+
     '<span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-briefcase"></use></svg></span><span class="settings-sheet-title">'+esc(title)+'</span></h3>';
 }
-function agentsMarkup(){
-  return '<div class="bureau-agents">'+TIMELINE.map(id=>AGENTS.find(agent=>agent.id===id)).map(agent=>
-    '<div class="bureau-agent" data-agent="'+agent.id+'"><span class="bureau-agent-dot" style="--agent:'+agent.color+'" aria-hidden="true"></span><strong>'+agent.name+'</strong><small>'+agentText(agent.id)+'</small></div>'
-  ).join('')+'</div>';
-}
-const SVG_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>';
-const SVG_STOP='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>';
-function demoButton(){
-  if(reducedMotion())return '';
-  return '<button type="button" class="secondary bureau-demo" data-action="demo" aria-pressed="'+(!!demo)+'">'+(demo?SVG_STOP+'<span>Arrêter les actions</span>':SVG_PLAY+'<span>Lancer les actions</span>')+'</button>';
-}
 function dossierRow(dossier){
   return '<div class="bureau-dossier" role="button" tabindex="0" data-dossier="'+esc(dossier.id)+'">'+
     '<span class="bureau-dossier-icon is-'+dossier.type+'" aria-hidden="true">'+SVG_TYPE[dossier.type]+'</span>'+
@@ -323,23 +343,25 @@ const EMPTY=Object.freeze({
 function renderBureau(node,tab){
   node.dataset.view='bureau';
   delete node.dataset.dossier;
-  const current=tab||node.dataset.tab||(dossiers.valider.length?'valider':'cours');
+  const current=tab||node.dataset.tab||(validerCount()?'valider':'cours');
   node.dataset.tab=current;
-  const list=dossiers[current]||[];
+  const list=current==='valider'?validerList():dossiers[current]||[];
   let body;
   if(!loaded&&lastError)body='<p class="bureau-empty">Service famille indisponible.</p>';
   else if(!loaded)body='<p class="bureau-empty">Chargement…</p>';
   else body=list.length?'<div class="bureau-dossiers">'+list.map(dossierRow).join('')+'</div>':'<p class="bureau-empty">'+EMPTY[current]+'</p>';
   node.innerHTML=header('Bureau')+'<p class="dialog-intro bureau-intro"><i class="bureau-status-dot" aria-hidden="true"></i>3 agents · en préparation</p>'+
     '<div class="bureau-scene">'+sceneMarkup()+'</div>'+
-    agentsMarkup()+demoButton()+
     '<div class="bureau-tabs" role="tablist">'+TABS.map(([id,label])=>{
-      const count=(dossiers[id]||[]).length;
-      return '<button type="button" role="tab" class="bureau-tab'+(id===current?' is-active':'')+'" aria-selected="'+(id===current)+'" data-tab="'+id+'">'+label+(id!=='termines'&&count?' · '+count:'')+'</button>';
+      // « À valider » : pastille rouge de notification ; « En cours » : nombre à la suite.
+      const count=id==='valider'?validerCount():(dossiers[id]||[]).length;
+      const extra=id==='valider'?(count?'<span class="bureau-tab-count" aria-label="'+count+' à valider">'+(count>99?'99+':count)+'</span>':''):id==='cours'&&count?' · '+count:'';
+      return '<button type="button" role="tab" class="bureau-tab'+(id===current?' is-active':'')+'" aria-selected="'+(id===current)+'" data-tab="'+id+'">'+label+extra+'</button>';
     }).join('')+'</div>'+body;
 }
 
 function findDossier(id){
+  if(id==='demo')return demoDossier();
   for(const key of Object.keys(dossiers)){const found=dossiers[key].find(item=>item.id===id);if(found)return found}
   return null;
 }
@@ -355,7 +377,17 @@ function renderDossier(node,id,message=''){
   const received=[dayLabel(dossier.received),timeLabel(dossier.received),dossier.device].filter(Boolean).join(' · ');
   const done=dossier.stage==='traite';
   let steps=step(SVG_MAIL,'#2f6a49','Reçu',received,'<p class="bureau-step-bubble">« '+esc(dossier.message)+' »</p>'+(dossier.version?'<p class="bureau-step-note">Version '+esc(dossier.version)+'</p>':''));
-  TIMELINE.map(id=>AGENTS.find(agent=>agent.id===id)).forEach(agent=>{steps+=step(SVG_PERSON,agent.color,agent.name,done?'Non concerné':'Pas encore en service','',true)});
+  TIMELINE.map(id=>AGENTS.find(agent=>agent.id===id)).forEach(agent=>{
+    if(dossier.demo)steps+=step(SVG_DONE,agent.color,agent.name,DONE[agent.id],'');
+    else steps+=step(SVG_PERSON,agent.color,agent.name,done?'Non concerné':'Pas encore en service','',true);
+  });
+  if(dossier.demo){
+    node.innerHTML=header(dossier.title,true)+'<p class="dialog-intro">Démonstration · prêt à valider</p>'+
+      '<ol class="bureau-timeline">'+steps+'</ol>'+
+      '<div class="bureau-actions is-single"><button type="button" class="primary" data-action="validate-demo">'+SVG_DONE+'<span>Valider</span></button></div>'+
+      '<p class="bureau-step-note bureau-demo-note">Démonstration : rien n’est mis en ligne.</p>';
+    return;
+  }
   if(done)steps+=step(SVG_DONE,'#2f6a49','Traité',[dayLabel(dossier.treated),timeLabel(dossier.treated)].filter(Boolean).join(' · '),'');
   const pending=pendingIds.has(dossier.id);
   const actions=done?'':'<div class="bureau-actions">'+
@@ -403,6 +435,7 @@ function onDialogClick(event){
   if(tab){renderBureau(node,tab.dataset.tab);return}
   const action=event.target.closest('[data-action]');
   if(action?.dataset.action==='demo'){if(demo)stopDemo();else void startDemo(node);return}
+  if(action?.dataset.action==='validate-demo'){demo=null;renderBureau(node,'cours');try{node.scrollTop=0}catch(_){}return}
   if(action){if(!action.disabled)void runAction(node,action.dataset.action);return}
   const row=event.target.closest('.bureau-dossier');
   if(row){renderDossier(node,row.dataset.dossier);try{node.scrollTop=0}catch(_){}}
@@ -411,7 +444,7 @@ async function openBureau(){
   // Accès admin pas encore configuré : l'écran Familles le demande (même compte Supabase).
   if(!access()?.credentials()){window.COURSES_FAMILY_ADMIN?.open?.();return}
   const node=dialog();
-  renderBureau(node,dossiers.valider.length?'valider':'cours');
+  renderBureau(node,validerCount()?'valider':'cours');
   show(node);
   try{await refresh()}catch(_){}
   if(node.open&&node.dataset.view==='bureau')renderBureau(node);
@@ -444,6 +477,6 @@ function init(){
   reload();
 }
 
-window.COURSES_BUREAU=Object.freeze({buildDossiers,dayLabel,posteFrame,demoAt,open:openBureau});
+window.COURSES_BUREAU=Object.freeze({buildDossiers,dayLabel,posteFrame,demoAt,LEADS,open:openBureau});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
