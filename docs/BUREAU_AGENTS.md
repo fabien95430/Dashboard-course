@@ -101,12 +101,14 @@ Le code de la scène de maquette est dans `maquette-scene.js`. C'est une référ
 - Dossiers = idées et corrections (table `retours`, aucune nouvelle table) : nouveau → **En cours** (étape « Reçu »), traité → **Terminés**. « À valider » attend les agents.
 - Fiche : frise Reçu → Trieur → Développeur → Testeur (agents « Pas encore en service »), boutons **Marquer traité** et **Copier**. « Mettre en ligne / Répondre / Refuser » arriveront avec les agents.
 - Scène : `www/Bureau/01-piece-vide.png` + les 3 postes au repos (02 à 04), convertis en WebP par `scripts/make_bureau_images.py` dans `www/Bureau/webp/` (~124 Ko au total) : pièce détourée posée sans cadre ni fond sur le popup, ombre de contact sous les postes, placés en pourcentages dans `styles.css`. Aucun badge sur la scène : l’état (point doré, « en préparation ») est dans le sous-titre du popup.
-- Pas encore utilisés : variantes frappe / tête (05 à 10) et coursier (11, 12), réservés aux agents en service.
+- Bouton **Lancer les actions** (v859) : une demande traitée en 10 s, pour voir le Bureau vivre en attendant les agents. Le Trieur trie (0–3 s), le Développeur code (3–6,5 s), le Testeur teste (6,5–9,5 s), puis un dossier arrive sur la pile de ton bureau ; tout revient au repos à 12,5 s. Seul l'agent au travail bouge (repos / frappe / tête inclinée, 480 ms par image) ; bulles et lignes passent de « En attente » à l'action puis à « Dossier trié », « Version prête », « Tests verts ». Rien n'est enregistré. Les variantes ne reprennent que les mains ou la tête (zones dans `scripts/make_bureau_images.py`) : bureaux, chaises et écrans restent fixes. Coupé à la fermeture, au verrouillage et si « réduire les animations » est actif (bouton masqué).
+- **Bulles de parole** façon bande dessinée au-dessus de la tête de chaque agent : ovale translucide, pointe courbe vers la tête (plus longue pour le Trieur, au fond). Quand la phrase change, elle s'écrit de la première à la dernière lettre (45 ms par lettre). Phrases : « En attente » au repos ; « Trie le courrier », « Code la version », « Lance les tests » quand ils travaillent.
+- **Pile de ton bureau** : un dossier de plus (`www/Bureau/webp/dossier.webp`, découpé dans la pièce) par dossier à valider, 6 au plus.
+- Coursier retiré (images 11 et 12 non utilisées).
 - Le temps réel `retours` passe par le canal admin unique, partagé avec Familles.
 
 ## En attente
 
-- Variantes 05 à 12 : vérifier le scintillement en alternance avant de les animer.
 - Décisions du plan à prendre :
   - heure du passage du soir (proposé : 21 h) ;
   - plafond de dossiers par soir (proposé : 5) ;

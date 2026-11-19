@@ -89,8 +89,43 @@ test('bureau : scène en images WebP légères tirées des PNG d’origine',asyn
     assert.ok(existsSync(url),file+'.webp présent');
     total+=statSync(url).size;
   }
-  assert.ok(total<250000,'scène sous 250 Ko ('+total+' octets)');
+  assert.ok(total<150000,'scène au repos sous 150 Ko ('+total+' octets)');
   for(const file of ['01-piece-vide','02-trieur-repos','03-developpeur-repos','04-testeur-repos'])assert.ok(existsSync(new URL('../www/Bureau/'+file+'.png',import.meta.url)),'source '+file+'.png conservée');
   assert.match(read('scripts/make_bureau_images.py'),/POSTE_WIDTH = 360/);
   assert.match(read('styles.css'),/\.bureau-poste\.is-trieur\{left:[\d.]+%;top:[\d.]+%\}/);
+});
+
+test('bureau : actions en démonstration — postes image par image, badges d’étape, pile de dossiers',()=>{
+  const bureau=loadBureau();
+  // Postes : alternance repos / frappe / tête, décalée d'un poste à l'autre.
+  const frames=['trieur','testeur','developpeur'].map(id=>bureau.posteFrame(id,0));
+  assert.equal(new Set(frames).size>1,true,'les trois postes ne bougent pas en même temps');
+  for(let ms=0;ms<10000;ms+=480)assert.match(bureau.posteFrame('trieur',ms),/^(repos|frappe|tete)$/);
+  const ui=read('bureau-ui.js'),css=read('styles.css');
+  assert.match(ui,/node\.addEventListener\('close',stopDemo\)/,'coupé à la fermeture du popup');
+  assert.match(ui,/prefers-reduced-motion: reduce/,'coupé si réduire les animations');
+  assert.match(ui,/function forget\(\)\{\n  stopDemo\(\);/,'coupé au verrouillage');
+  assert.match(ui,/data-action="demo"/);
+  assert.match(ui,/const ACTIVITIES=Object\.freeze\(\{trieur:'Trie le courrier',developpeur:'Code la version',testeur:'Lance les tests'\}\)/,'phrases courtes des badges');
+  assert.match(css,/\.bureau-badge\{[^}]*backdrop-filter:blur\(6px\)/,'bulles translucides');
+  assert.match(css,/\.bureau-badge::after\{content:"";position:absolute;top:calc\(100% - 2px\)/,'bulle avec pointe courbe');
+  assert.match(css,/\.bureau-badge\{[^}]*border-radius:50%/,'bulle ovale');
+  assert.match(ui,/function typeLetters\(badge\)/,'texte qui s’écrit lettre par lettre');
+  assert.doesNotMatch(ui+css,/coursier|courier/,'pas de livreur');
+  // Badge d'étape au-dessus de chaque agent.
+  for(const id of ['trieur','developpeur','testeur'])assert.match(css,new RegExp('\\.bureau-badge\\.is-'+id+'\\{(--tail:[\\d.]+%;)?(--tail-h:\\d+px;)?left:[\\d.]+%;top:[\\d.]+%'));
+  // Pile : un dossier par dossier à valider, 6 au plus.
+  assert.match(ui,/function pileCount\(\)\{return Math\.min\(dossiers\.valider\.length\+\(demo&&demoAt\(demo\.ms\)\.filed\?1:0\),PILE_MAX\)\}/);
+  // Démonstration : une demande en 10 s — Trieur, puis Développeur, puis Testeur, puis dossier sur la pile.
+  const at=ms=>{const step=bureau.demoAt(ms);return [step.active,step.done.join('+'),step.filed,step.ended].join('|')};
+  assert.equal(at(0),'trieur||false|false');
+  assert.equal(at(4000),'developpeur|trieur|false|false');
+  assert.equal(at(8000),'testeur|trieur+developpeur|false|false');
+  assert.equal(at(10000),'|trieur+developpeur+testeur|true|false');
+  assert.equal(at(13000).endsWith('|true|true'),true,'fin de la démonstration');
+  assert.match(ui,/const PILE_MAX=6;/);
+  for(let k=1;k<=6;k++)assert.match(css,new RegExp('\\.bureau-pile-dossier\\.is-'+k+'\\{left:'));
+  for(const file of ['trieur-frappe','trieur-tete','developpeur-frappe','developpeur-tete','testeur-frappe','testeur-tete','dossier']){
+    assert.ok(read('www/Bureau/webp/'+file+'.webp').length>0,file);
+  }
 });

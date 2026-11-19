@@ -86,11 +86,134 @@ function buildDossiers(rows,families,now=Date.now()){
 /* ---------- Scène : la pièce et les trois postes (images www/Bureau/webp, faites par scripts/make_bureau_images.py) ---------- */
 const SCENE_IMAGES='./www/Bureau/webp/';
 const SCENE_VERSION='858';
+function sceneImage(file,cls){
+  return '<img class="'+cls+'" src="'+SCENE_IMAGES+file+'.webp?v='+SCENE_VERSION+'" alt="" decoding="async" draggable="false">';
+}
+/* Pile de ton bureau : un dossier de plus par dossier à valider (6 au plus), posé sur la pile de l'image. */
+const PILE_MAX=6;
+
+function pileCount(){return Math.min(dossiers.valider.length+(demo&&demoAt(demo.ms).filed?1:0),PILE_MAX)}
+function pileMarkup(count){
+  let pile='';
+  for(let k=1;k<=count;k++)pile+=sceneImage('dossier','bureau-pile-dossier is-'+k);
+  return pile;
+}
+/* Bulle de parole ; quand son texte change, les lettres apparaissent de la première à la dernière. */
+const TYPE_MS=45;      // une lettre
+function badgeMarkup(agent,typing=false){
+  const state=agentState(agent.id),text=agentText(agent.id);
+  // Les espaces restent du texte simple : la bulle peut passer à la ligne entre deux mots.
+  const letters=typing?[...text].map(letter=>letter===' '?' ':'<span>'+esc(letter)+'</span>').join(''):esc(text);
+  return '<span class="bureau-badge is-'+agent.id+(state==='busy'?' is-busy':'')+(state==='done'?' is-done':'')+(typing?' is-typing':'')+'" style="--agent:'+agent.color+'" aria-label="'+esc(text)+'"'+(typing?' data-since="'+Math.round(demo?.ms||0)+'"':'')+'><i aria-hidden="true"></i><b aria-hidden="true">'+letters+'</b></span>';
+}
+function typeLetters(badge){
+  const letters=badge.querySelectorAll('b span');
+  const shown=Math.floor(((demo?.ms||0)-Number(badge.dataset.since||0))/TYPE_MS)+1;
+  letters.forEach((letter,index)=>letter.classList.toggle('is-on',index<shown));
+  if(shown>=letters.length)badge.classList.remove('is-typing');
+}
 function sceneMarkup(){
-  const img=(file,cls)=>'<img class="'+cls+'" src="'+SCENE_IMAGES+file+'.webp?v='+SCENE_VERSION+'" alt="" decoding="async" draggable="false">';
   // Ordre d'affichage = profondeur : Trieur au fond, puis Testeur (gauche) et Développeur (droite).
-  return '<div class="bureau-scene-art" role="img" aria-label="Le bureau des agents">'+img('piece','bureau-room')+
-    AGENTS.map(agent=>img(agent.id+'-repos','bureau-poste is-'+agent.id)).join('')+'</div>';
+  return '<div class="bureau-scene-art" role="img" aria-label="Le bureau des agents'+(dossiers.valider.length?', '+dossiers.valider.length+' dossiers à valider':'')+'">'+sceneImage('piece','bureau-room')+
+    AGENTS.map(agent=>'<span class="bureau-poste is-'+agent.id+'" data-frame="repos">'+sceneImage(agent.id+'-repos','is-repos')+'</span>').join('')+
+    '<span class="bureau-pile">'+pileMarkup(pileCount())+'</span>'+AGENTS.map(badgeMarkup).join('')+'</div>';
+}
+
+/* ---------- Actions (démonstration en attendant les agents) ----------
+   Une demande traitée en 10 secondes : le Trieur trie, le Développeur code, le Testeur teste,
+   puis le dossier arrive sur la pile de ton bureau. Seul l'agent au travail bouge (image par image :
+   repos / frappe / tête inclinée) ; les bulles et les lignes des agents suivent l'étape.
+   Rien n'est enregistré. Coupé à la fermeture du popup, au verrouillage et si « réduire les animations » est actif. */
+const POSTE_MS=480;    // une image de poste
+const POSTE_CYCLE=Object.freeze(['frappe','repos','frappe','repos','frappe','repos','tete','tete','repos']);
+const POSTE_PHASE=Object.freeze({trieur:0,testeur:3,developpeur:6});
+const DEMO_STEPS=Object.freeze([['trieur',3000],['developpeur',6500],['testeur',9500]]);
+const DEMO_END=12500;  // le dossier reste sur la pile un instant, puis tout revient au repos
+const ACTIVITIES=Object.freeze({trieur:'Trie le courrier',developpeur:'Code la version',testeur:'Lance les tests'});
+const DONE=Object.freeze({trieur:'Dossier trié',developpeur:'Version prête',testeur:'Tests verts'});
+let demo=null;
+
+function reducedMotion(){try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(_){return false}}
+function posteFrame(id,ms){
+  return POSTE_CYCLE[(Math.floor(ms/POSTE_MS)+(POSTE_PHASE[id]||0))%POSTE_CYCLE.length];
+}
+/* Étape de la démonstration à l'instant ms : agent au travail, agents qui ont fini, dossier posé. */
+function demoAt(ms){
+  const index=DEMO_STEPS.findIndex(([,until])=>ms<until);
+  const active=index<0?null:DEMO_STEPS[index][0];
+  const done=DEMO_STEPS.slice(0,index<0?DEMO_STEPS.length:index).map(([id])=>id);
+  return {active,done,filed:index<0,ended:ms>=DEMO_END};
+}
+function agentState(id){
+  if(!demo)return 'wait';
+  const step=demoAt(demo.ms);
+  return step.active===id?'busy':step.done.includes(id)?'done':'wait';
+}
+function agentText(id){
+  const state=agentState(id);
+  return state==='busy'?ACTIVITIES[id]:state==='done'?DONE[id]:'En attente';
+}
+function ensureDemoLayers(scene){
+  const loads=[];
+  AGENTS.forEach(agent=>{
+    const poste=scene.querySelector('.bureau-poste.is-'+agent.id);
+    if(!poste)return;
+    ['frappe','tete'].forEach(kind=>{
+      if(poste.querySelector('.is-'+kind))return;
+      poste.insertAdjacentHTML('beforeend',sceneImage(agent.id+'-'+kind,'is-'+kind));
+      const img=poste.lastElementChild;
+      loads.push(img.decode?img.decode().catch(()=>{}):Promise.resolve());
+    });
+  });
+  return Promise.all(loads);
+}
+function ready(img){return !!img&&img.complete&&img.naturalWidth>0}
+function paintDemo(node,scene){
+  AGENTS.forEach(agent=>{
+    const poste=scene.querySelector('.bureau-poste.is-'+agent.id);
+    if(poste){
+      const frame=agentState(agent.id)==='busy'?posteFrame(agent.id,demo.ms):'repos';
+      poste.dataset.frame=frame==='repos'||ready(poste.querySelector('.is-'+frame))?frame:'repos';
+    }
+    const badge=scene.querySelector('.bureau-badge.is-'+agent.id);
+    if(badge&&badge.getAttribute('aria-label')!==agentText(agent.id))badge.outerHTML=badgeMarkup(agent,true);
+    const typing=scene.querySelector('.bureau-badge.is-typing.is-'+agent.id);
+    if(typing)typeLetters(typing);
+    const row=node.querySelector('.bureau-agent[data-agent="'+agent.id+'"] small');
+    if(row&&row.textContent!==agentText(agent.id))row.textContent=agentText(agent.id);
+  });
+  const pile=scene.querySelector('.bureau-pile');
+  if(pile&&pile.children.length!==pileCount())pile.innerHTML=pileMarkup(pileCount());
+}
+function demoTick(){
+  if(!demo)return;
+  const node=document.getElementById('bureauDialog');
+  if(!node?.open||reducedMotion()){stopDemo();return}
+  demo.ms=performance.now()-demo.start;
+  if(demoAt(demo.ms).ended){stopDemo();return}
+  const scene=node.querySelector('.bureau-scene-art');
+  if(scene){
+    if(!scene.dataset.demo){scene.dataset.demo='1';void ensureDemoLayers(scene)}
+    paintDemo(node,scene);
+  }
+}
+async function startDemo(node){
+  if(demo||reducedMotion())return;
+  demo={start:0,ms:0,timer:0};
+  const scene=node.querySelector('.bureau-scene-art');
+  if(scene){scene.dataset.demo='1';await ensureDemoLayers(scene)}
+  if(!demo)return;
+  demo.start=performance.now();
+  if(node.dataset.view==='bureau')renderBureau(node);
+  demoTick();
+  demo.timer=setInterval(demoTick,TYPE_MS);
+}
+function stopDemo(){
+  if(!demo)return;
+  clearInterval(demo.timer);
+  demo=null;
+  const node=document.getElementById('bureauDialog');
+  if(node?.open&&node.dataset.view==='bureau')renderBureau(node);
 }
 
 /* ---------- Interface ---------- */
@@ -156,6 +279,7 @@ function dialog(){
   node.className='dialog connection-dialog settings-sheet bureau-sheet';
   node.tabIndex=-1;
   node.addEventListener('click',onDialogClick);
+  node.addEventListener('close',stopDemo);
   node.addEventListener('keydown',event=>{
     if((event.key==='Enter'||event.key===' ')&&event.target.classList?.contains('bureau-dossier')){event.preventDefault();renderDossier(node,event.target.dataset.dossier)}
   });
@@ -176,8 +300,14 @@ function header(title,back){
 }
 function agentsMarkup(){
   return '<div class="bureau-agents">'+TIMELINE.map(id=>AGENTS.find(agent=>agent.id===id)).map(agent=>
-    '<div class="bureau-agent"><span class="bureau-agent-dot" style="--agent:'+agent.color+'" aria-hidden="true"></span><strong>'+agent.name+'</strong><small>En attente</small></div>'
+    '<div class="bureau-agent" data-agent="'+agent.id+'"><span class="bureau-agent-dot" style="--agent:'+agent.color+'" aria-hidden="true"></span><strong>'+agent.name+'</strong><small>'+agentText(agent.id)+'</small></div>'
   ).join('')+'</div>';
+}
+const SVG_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>';
+const SVG_STOP='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>';
+function demoButton(){
+  if(reducedMotion())return '';
+  return '<button type="button" class="secondary bureau-demo" data-action="demo" aria-pressed="'+(!!demo)+'">'+(demo?SVG_STOP+'<span>Arrêter les actions</span>':SVG_PLAY+'<span>Lancer les actions</span>')+'</button>';
 }
 function dossierRow(dossier){
   return '<div class="bureau-dossier" role="button" tabindex="0" data-dossier="'+esc(dossier.id)+'">'+
@@ -202,7 +332,7 @@ function renderBureau(node,tab){
   else body=list.length?'<div class="bureau-dossiers">'+list.map(dossierRow).join('')+'</div>':'<p class="bureau-empty">'+EMPTY[current]+'</p>';
   node.innerHTML=header('Bureau')+'<p class="dialog-intro bureau-intro"><i class="bureau-status-dot" aria-hidden="true"></i>3 agents · en préparation</p>'+
     '<div class="bureau-scene">'+sceneMarkup()+'</div>'+
-    agentsMarkup()+
+    agentsMarkup()+demoButton()+
     '<div class="bureau-tabs" role="tablist">'+TABS.map(([id,label])=>{
       const count=(dossiers[id]||[]).length;
       return '<button type="button" role="tab" class="bureau-tab'+(id===current?' is-active':'')+'" aria-selected="'+(id===current)+'" data-tab="'+id+'">'+label+(id!=='termines'&&count?' · '+count:'')+'</button>';
@@ -272,6 +402,7 @@ function onDialogClick(event){
   const tab=event.target.closest('.bureau-tab');
   if(tab){renderBureau(node,tab.dataset.tab);return}
   const action=event.target.closest('[data-action]');
+  if(action?.dataset.action==='demo'){if(demo)stopDemo();else void startDemo(node);return}
   if(action){if(!action.disabled)void runAction(node,action.dataset.action);return}
   const row=event.target.closest('.bureau-dossier');
   if(row){renderDossier(node,row.dataset.dossier);try{node.scrollTop=0}catch(_){}}
@@ -297,6 +428,7 @@ function scheduleRefresh(){
   },800);
 }
 function forget(){
+  stopDemo();
   dossiers={valider:[],cours:[],termines:[]};loaded=false;lastError='';pendingIds.clear();
   const node=document.getElementById('bureauDialog');
   if(node){try{node.close()}catch(_){}node.innerHTML=''}
@@ -312,6 +444,6 @@ function init(){
   reload();
 }
 
-window.COURSES_BUREAU=Object.freeze({buildDossiers,dayLabel,open:openBureau});
+window.COURSES_BUREAU=Object.freeze({buildDossiers,dayLabel,posteFrame,demoAt,open:openBureau});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
