@@ -2,7 +2,7 @@
 'use strict';
 /* Écran « Familles » (Réglages › Administrateur) — propriétaire unique.
    Foyers → fiche du foyer avec onglets Demandes / Stats / Modifs / Appareils.
-   L'onglet Demandes regroupe les demandes de catalogue et les idées, corrections et bugs (table retours).
+   L'onglet Demandes regroupe les demandes de catalogue et les idées et corrections (table retours).
    Rien des familles n'entre dans les onglets de l'administrateur : tout reste ici. */
 
 const DAY=864e5;
@@ -11,11 +11,10 @@ const SVG_OPENAI='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7c.
 const SVG_CHATGPT='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M9 6h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_DELETE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6.5 7l.8 13h9.4l.8-13M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_PRODUCT='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 20h17v31H12z" fill="#f7f2e8" stroke="#758575" stroke-width="2"/><path d="M15 16h11l3 4H12z" fill="#e8eee6" stroke="#758575" stroke-width="2"/><path d="M38 14h9v7h-9z" fill="#d7dfd4"/><path d="M35 20h15l2 6v25H33V26z" fill="#859583"/><path d="M38 28h9" stroke="#f4f1e9" stroke-width="2.5" stroke-linecap="round"/></svg>';
-const FEEDBACK_LABELS=Object.freeze({idee:'Idée',correction:'Correction',bug:'Bug'});
+const FEEDBACK_LABELS=Object.freeze({idee:'Idée',correction:'Correction'});
 const SVG_FEEDBACK=Object.freeze({
   idee:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4" fill="none" stroke="#2f6a49" stroke-width="1.9" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z" fill="#f3d36b" stroke="#2f6a49" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-  correction:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" fill="#dfe9f6" stroke="#3c5f86" stroke-width="1.7" stroke-linejoin="round"/><path d="m13.5 6.5 4 4" stroke="#3c5f86" stroke-width="1.7"/></svg>',
-  bug:'<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="14" rx="5" ry="6" fill="#f6d9d4" stroke="#a3403c" stroke-width="1.7"/><path d="M12 8v12M7 12H3.5M20.5 12H17M7.5 17.5 4.5 20M16.5 17.5l3 2.5M9 6.5 7.5 4.5M15 6.5l1.5-2" fill="none" stroke="#a3403c" stroke-width="1.7" stroke-linecap="round"/></svg>'
+  correction:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" fill="#dfe9f6" stroke="#3c5f86" stroke-width="1.7" stroke-linejoin="round"/><path d="m13.5 6.5 4 4" stroke="#3c5f86" stroke-width="1.7"/></svg>'
 });
 const SVG_COPY='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.9"/></svg>';
 const SVG_DONE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -361,7 +360,7 @@ function feedbackRows(family){
 function lines(rows){return '<div class="connection-sync-section">'+rows.join('')+'</div>'}
 function tabBody(family,tab){
   if(tab==='demandes'){
-    const ideas=(family.feedback||[]).length?'<h4 class="sheet-section-title">Idées et bugs</h4><div class="family-request-list">'+feedbackRows(family)+'</div>':'';
+    const ideas=(family.feedback||[]).length?'<h4 class="sheet-section-title">Idées et corrections</h4><div class="family-request-list">'+feedbackRows(family)+'</div>':'';
     if(!family.requests.length)return (ideas?'':'<p class="family-admin-empty">Aucune demande pour le moment.</p>')+ideas;
     return '<div class="family-request-list">'+family.requests.map(row=>{
       const dish=row.type==='plat',state=requestState.get(row.id);

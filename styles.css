@@ -3066,8 +3066,8 @@ html[data-account="family"] #missingProductsDialog .missing-product-row.missing-
 .settings-sheet#familyDevicesDialog .connection-sync-line>span.is-current{color:#1f7a4a}
 .settings-sheet#familyDevicesDialog .family-devices-note{margin:12px 2px 0;color:var(--sheet-muted);font-size:var(--fs-note);line-height:1.4}
 .settings-sheet#familyDevicesDialog .family-devices-note+.family-devices-note{margin-top:4px}
-/* v849 — compte famille : idées, corrections et bugs (Réglages › Améliorer l'application). */
-.settings-sheet#familyFeedbackDialog .family-feedback-types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;height:42px;margin:0 auto 14px;padding:3px;border-radius:13px;background:rgba(118,128,120,.13);box-sizing:border-box}
+/* v849 — compte famille : idées et corrections (Réglages › Améliorer l'application). */
+.settings-sheet#familyFeedbackDialog .family-feedback-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;height:42px;margin:0 auto 14px;padding:3px;border-radius:13px;background:rgba(118,128,120,.13);box-sizing:border-box}
 .settings-sheet#familyFeedbackDialog .family-feedback-type{border:0;border-radius:10px;background:transparent;color:#55655a;font:inherit;font-size:var(--fs-text);white-space:nowrap;-webkit-appearance:none;appearance:none}
 .settings-sheet#familyFeedbackDialog .family-feedback-type.is-active{background:#fffefb;color:#1b2d21;font-weight:600;box-shadow:0 2px 7px rgba(40,60,46,.12)}
 .settings-sheet#familyFeedbackDialog .family-feedback-field{margin:0}
@@ -3265,7 +3265,6 @@ html[data-account="family"] #missingProductsDialog .missing-product-row.missing-
 .settings-sheet#familyAdminDialog .family-request-thumb.is-feedback svg{width:26px;height:26px}
 .settings-sheet#familyAdminDialog .family-request-thumb.is-idee{background:linear-gradient(145deg,#fdf6dc,#f6ebc2)}
 .settings-sheet#familyAdminDialog .family-request-thumb.is-correction{background:linear-gradient(145deg,#eef3fa,#e1e9f4)}
-.settings-sheet#familyAdminDialog .family-request-thumb.is-bug{background:linear-gradient(145deg,#fcefec,#f6e0db)}
 .settings-sheet#familyAdminDialog .family-feedback-row .family-request-copy strong{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
 .settings-sheet#familyAdminDialog .family-feedback-row.is-open .family-request-copy strong{-webkit-line-clamp:unset;display:block}
 .settings-sheet#familyAdminDialog .family-row-tools.is-feedback{grid-template-columns:1fr 1fr}

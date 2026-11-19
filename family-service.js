@@ -245,8 +245,8 @@ async function pushRequests(){
   }catch(error){console.warn('courses-family: demandes',error)}
 }
 
-/* ---------- Idées, corrections et bugs (table retours) ---------- */
-const FEEDBACK_TYPES=Object.freeze(['idee','correction','bug']);
+/* ---------- Idées et corrections (table retours) ---------- */
+const FEEDBACK_TYPES=Object.freeze(['idee','correction']);
 async function sendFeedback({type,message,contexte}={}){
   if(!session)throw new Error('Compte famille non connecté');
   const kind=FEEDBACK_TYPES.includes(type)?type:'idee';

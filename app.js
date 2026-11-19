@@ -1929,11 +1929,10 @@ async function openFamilyDevices(){
   const devices=await refreshFamilyDevices();
   list.innerHTML=devices.length?devices.map(device=>'<div class="connection-sync-line"><span>'+esc(device.nom)+'</span><span'+(device.current?' class="is-current"':'')+'>'+esc(device.current?'Cet appareil':relativeActivity(device.derniere_activite))+'</span></div>').join(''):'<div class="connection-sync-line"><span>Aucun appareil</span><span></span></div>';
 }
-/* Idées, corrections et bugs (compte famille) : envoyés à l'admin via la table « retours ». */
+/* Idées et corrections (compte famille) : envoyés à l'admin via la table « retours ». */
 const FAMILY_FEEDBACK_TYPES=Object.freeze({
   idee:{label:'Idée',placeholder:'Votre idée pour améliorer l’application…'},
-  correction:{label:'Correction',placeholder:'Ce qui est à corriger (produit, plat, texte…)'},
-  bug:{label:'Bug',placeholder:'Ce qui ne marche pas, et ce que vous faisiez…'}
+  correction:{label:'Correction',placeholder:'Ce qui ne marche pas ou est à corriger…'}
 });
 let familyFeedbackType='idee';
 function selectFamilyFeedbackType(type){

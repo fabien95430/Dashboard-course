@@ -1,5 +1,5 @@
 -- =====================================================================
--- Mes courses — version famille : AJOUT n°6 — idées, corrections et bugs
+-- Mes courses — version famille : AJOUT n°6 — idées et corrections
 -- À coller une seule fois dans : SQL Editor > New query > Run
 -- Les familles envoient leurs retours depuis Réglages ; l'admin les lit
 -- dans Réglages › Familles › (foyer) › Demandes et les marque « traités ».
@@ -8,7 +8,7 @@
 create table if not exists public.retours (
   id        uuid primary key default gen_random_uuid(),
   famille   uuid not null default auth.uid() references auth.users(id) on delete cascade,
-  type      text not null check (type in ('idee','correction','bug')),
+  type      text not null check (type in ('idee','correction')),
   message   text not null check (char_length(message) between 3 and 1000),
   contexte  jsonb not null default '{}'::jsonb,
   statut    text not null default 'nouveau' check (statut in ('nouveau','traite')),

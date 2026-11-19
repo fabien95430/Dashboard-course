@@ -29,7 +29,7 @@
   <link rel="preload" as="image" href="./www/empty-list-premium-v4.webp?v=305" fetchpriority="high">
   <link rel="preload" as="image" href="./www/list-header-pomme-poire-v791.webp">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=850">
+  <link rel="stylesheet" href="./styles.css?v=851">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=610">
 </head>
 <body>
@@ -65,7 +65,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v850</span>
+            <span class="page-version">v851</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -88,7 +88,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v850</span>
+            <span class="page-version">v851</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -124,7 +124,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v850</span>
+            <span class="page-version">v851</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -194,7 +194,7 @@
           <div class="settings-card">
             <button id="settingsFamilyFeedbackBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-bulb"></use></svg></span>
-              <span class="settings-copy"><strong>Idées et bugs</strong><small>Suggestions et problèmes</small></span>
+              <span class="settings-copy"><strong>Idées et corrections</strong><small>Suggestions et problèmes</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
           </div>
@@ -283,12 +283,11 @@
   </dialog>
 
   <dialog id="familyFeedbackDialog" class="dialog connection-dialog family-feedback-dialog settings-sheet" tabindex="-1">
-    <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-bulb"></use></svg></span><span class="settings-sheet-title">Idées et bugs</span></h3>
+    <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-bulb"></use></svg></span><span class="settings-sheet-title">Idées et corrections</span></h3>
     <p class="dialog-intro">Transmis directement à l’administrateur.</p>
     <div class="family-feedback-types" role="radiogroup" aria-label="Type de retour">
       <button type="button" role="radio" class="family-feedback-type is-active" aria-checked="true" data-type="idee">Idée</button>
       <button type="button" role="radio" class="family-feedback-type" aria-checked="false" data-type="correction">Correction</button>
-      <button type="button" role="radio" class="family-feedback-type" aria-checked="false" data-type="bug">Bug</button>
     </div>
     <label class="field family-feedback-field"><span>Message</span><textarea id="familyFeedbackMessage" rows="5" maxlength="1000" autocapitalize="sentences" placeholder="Votre idée pour améliorer l’application…"></textarea></label>
     <button id="familyFeedbackSend" class="primary family-feedback-send" type="button">Envoyer</button>
@@ -477,18 +476,18 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=850"></script>
+  <script src="./catalog.js?v=851"></script>
   <script src="./product-item-images.js?v=820" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=824"></script>
   <script src="./courses-notifications.js?v=832"></script>
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=848" data-app-ui="script"></script>
-  <script src="./family-service.js?v=850"></script>
-  <script src="./app.js?v=850"></script>
+  <script src="./family-service.js?v=851"></script>
+  <script src="./app.js?v=851"></script>
   <script src="./settings-tab-badge.js?v=830"></script>
   <script src="./settings-ui.js?v=827"></script>
   <script src="./error-center.js?v=820"></script>
-  <script src="./family-admin.js?v=850"></script>
+  <script src="./family-admin.js?v=851"></script>
 </body>
 </html>
