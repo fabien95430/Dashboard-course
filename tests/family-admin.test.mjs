@@ -167,3 +167,7 @@ test('idées et corrections : envoi depuis Réglages (famille), table protégée
   assert.match(ui,/function totalRequests\(\)\{return families\.reduce\(\(sum,family\)=>sum\+pendingOf\(family\)\+feedbackOf\(family\),0\)\}/);
   assert.match(ui,/adminSetFeedbackStatus\(access\(\)\.credentials\(\),feedback\.id,'traite'\)/);
 });
+
+test('popup idées et corrections : titre « Propositions d’améliorations »',()=>{
+  assert.match(read('index.html'),/settings-sheet-title">Propositions d’améliorations</);
+});
