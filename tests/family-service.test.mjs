@@ -59,7 +59,7 @@ test('service famille : clé publishable seulement, bibliothèque embarquée cha
 test('le mode admin ne dépend pas du service famille',()=>{
   const app=read('app.js');
   const login=app.match(/async function completeLogin\(\)\{[\s\S]*?\n\}/)?.[0]||'';
-  const adminBranch=login.slice(0,login.indexOf('enterLocalMode();'));
+  const adminBranch=login.slice(0,login.indexOf('enterAdminVaultMode(password,null);'));
   assert.doesNotMatch(adminBranch,/COURSES_FAMILY/);
   assert.match(app,/function saveLocalItems\(items\)\{\s*saveJson\(DEMO_KEY,items\);\s*if\(state\.family\)window\.COURSES_FAMILY\?\.listChanged\(\);/);
   assert.doesNotMatch(app,/saveJson\(DEMO_KEY,(?!items\);\s*if\(state\.family\))/);

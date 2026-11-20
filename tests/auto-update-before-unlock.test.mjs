@@ -213,7 +213,7 @@ test('la flèche ne tourne plus indéfiniment si la mise à jour ne répond pas'
 test('le retour au premier plan ne réinitialise pas un écran de connexion déjà affiché',()=>{
   const start=app.indexOf('function resumeForegroundSession(){');
   const body=app.slice(start,app.indexOf("document.addEventListener('visibilitychange'",start));
-  assert.match(body,/if\(state\.locked\)\{[\s\S]*?if\(UI\.securityOverlay\.classList\.contains\('is-visible'\)&&state\.securityMode==='unlock'\)return;\s*showSecurity\('unlock'\);/);
+  assert.match(body,/if\(state\.locked\)\{[\s\S]*?if\(UI\.securityOverlay\.classList\.contains\('is-visible'\)&&\(state\.securityMode==='unlock'\|\|state\.securityMode==='oauth'\)\)return;\s*showSecurity\('unlock'\);/);
 });
 
 test('l écran de connexion bloque le rebond et autorise le défilement seulement en cas de débordement',()=>{
