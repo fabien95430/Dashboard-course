@@ -224,3 +224,14 @@ test('bureau v869 : onglets sans recharger la scène, Supprimer, réessai de pub
   assert.match(script,/fetch\(f'\+refs\/heads\/\{branch\}:refs\/remotes\/origin\/\{branch\}', depth=2\)/);
   assert.doesNotMatch(script,/merge', '--squash'/);
 });
+
+test('bureau v876 : titre court de la fiche et scène gardée sans recréer les images',()=>{
+  const ui=read('bureau-ui.js');
+  assert.match(ui,/return 'Tâche terminée';/);
+  assert.match(ui,/return 'Tâche en cours';/);
+  assert.doesNotMatch(ui,/header\(dossier\.title,true\)/,'plus de message tronqué en titre de fiche');
+  assert.match(ui,/decoding="sync"/);
+  assert.match(ui,/if\(kept\)\{node\.querySelector\('\.bureau-scene'\)\.replaceWith\(kept\);updateScene\(kept\)\}/);
+  assert.match(ui,/if\(scene\)sceneKept=scene;/);
+  assert.match(ui,/function preloadScene\(\)/);
+});

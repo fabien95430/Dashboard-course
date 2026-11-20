@@ -114,8 +114,22 @@ function buildDossiers(rows,families,now=Date.now()){
 /* ---------- Scène : la pièce et les trois postes (images www/Bureau/webp, faites par scripts/make_bureau_images.py) ---------- */
 const SCENE_IMAGES='./www/Bureau/webp/';
 const SCENE_VERSION='865';
+function sceneUrl(file){return SCENE_IMAGES+file+'.webp?v='+SCENE_VERSION}
+/* Décodage synchrone : une image déjà chargée s'affiche d'un coup, sans case vide. */
 function sceneImage(file,cls){
-  return '<img class="'+cls+'" src="'+SCENE_IMAGES+file+'.webp?v='+SCENE_VERSION+'" alt="" decoding="async" draggable="false">';
+  return '<img class="'+cls+'" src="'+sceneUrl(file)+'" alt="" decoding="sync" draggable="false">';
+}
+/* Images de repos préchargées et décodées dès l'arrivée dans Réglages : le Bureau s'ouvre complet. */
+let scenePreload=null;
+const scenePreloaded=[];
+function preloadScene(){
+  if(scenePreload)return scenePreload;
+  scenePreload=Promise.all(['piece','dossier','trieur-repos','testeur-repos','developpeur-repos'].map(file=>{
+    const img=new Image();
+    img.decoding='async';img.src=sceneUrl(file);scenePreloaded.push(img);
+    return img.decode?img.decode().catch(()=>{}):Promise.resolve();
+  }));
+  return scenePreload;
 }
 /* Bureau vert vide au repos. Un dossier par tâche non terminée (En cours ou À valider), six visibles au plus. */
 const PILE_MAX=6;
@@ -400,14 +414,31 @@ function panelMarkup(current){
   else body=list.length?'<div class="bureau-dossiers">'+list.map(dossierRow).join('')+'</div>':'<p class="bureau-empty">'+EMPTY[current]+'</p>';
   return '<div class="bureau-panel" role="tabpanel">'+body+'</div>';
 }
+/* La scène (images déjà décodées) est gardée d'une vue à l'autre et d'une ouverture à l'autre :
+   seuls ses éléments variables sont mis à jour, sans recréer les images (pas de clignement). */
+let sceneKept=null;
 function renderBureau(node,tab){
+  const kept=node.querySelector('.bureau-scene')||sceneKept;
+  sceneKept=null;
   node.dataset.view='bureau';
   delete node.dataset.dossier;
   const current=tab||node.dataset.tab||(validerCount()?'valider':'cours');
   node.dataset.tab=current;
   node.innerHTML=header('Bureau')+'<p class="dialog-intro bureau-intro"><i class="bureau-status-dot" aria-hidden="true"></i>3 agents · '+(liveAgent()?'au travail':'en service')+'</p>'+
-    '<div class="bureau-scene">'+sceneMarkup()+'</div>'+tabsMarkup(current)+panelMarkup(current);
+    '<div class="bureau-scene">'+(kept?'':sceneMarkup())+'</div>'+tabsMarkup(current)+panelMarkup(current);
+  if(kept){node.querySelector('.bureau-scene').replaceWith(kept);updateScene(kept)}
   syncLive(node);
+}
+function updateScene(scene){
+  const art=scene.querySelector('.bureau-scene-art');
+  if(art){
+    art.setAttribute('aria-label','Le bureau des agents'+(validerCount()?', '+validerCount()+' dossiers à valider':''));
+    paintDemo(art);
+  }
+  const play=scene.querySelector('.bureau-play'),fresh=playButton();
+  if(play&&fresh)play.outerHTML=fresh;
+  else if(play)play.remove();
+  else if(fresh)scene.insertAdjacentHTML('beforeend',fresh);
 }
 /* Changement d'onglet : seuls les onglets et la liste changent ; la scène (images, animation) reste en place. */
 function switchTab(node,tab){
@@ -423,6 +454,14 @@ function findDossier(id){
   for(const key of Object.keys(dossiers)){const found=dossiers[key].find(item=>item.id===id);if(found)return found}
   return null;
 }
+/* Titre court de la fiche d'un dossier, selon son étape (le message complet est dans la frise). */
+function taskTitle(dossier){
+  if(['traite','publie','refuse','supprime'].includes(dossier.stage))return 'Tâche terminée';
+  if(dossier.stage==='pret')return 'Tâche à valider';
+  if(dossier.stage==='attente')return 'Tâche en attente';
+  if(dossier.stage==='echec')return 'Tâche en échec';
+  return 'Tâche en cours';
+}
 function step(icon,color,title,meta,body,muted){
   return '<li class="bureau-step'+(muted?' is-waiting':'')+'"><span class="bureau-step-avatar" style="--agent:'+color+'" aria-hidden="true">'+icon+'</span>'+
     '<div class="bureau-step-copy"><strong>'+esc(title)+'</strong>'+(meta?'<small>'+esc(meta)+'</small>':'')+(body||'')+'</div></li>';
@@ -430,6 +469,8 @@ function step(icon,color,title,meta,body,muted){
 function renderDossier(node,id,message=''){
   const dossier=findDossier(id);
   if(!dossier){renderBureau(node);return}
+  const scene=node.querySelector('.bureau-scene');
+  if(scene)sceneKept=scene;
   node.dataset.view='dossier';
   node.dataset.dossier=dossier.id;
   const received=[dayLabel(dossier.received),timeLabel(dossier.received),dossier.device].filter(Boolean).join(' · ');
@@ -439,7 +480,7 @@ function renderDossier(node,id,message=''){
     steps+=dossier.demo?step(SVG_DONE,agent.color,agent.name,DONE[agent.id],''):agentStep(agent,dossier);
   });
   if(dossier.demo){
-    node.innerHTML=header(dossier.title,true)+'<p class="dialog-intro">Démonstration · prêt à valider</p>'+
+    node.innerHTML=header(taskTitle(dossier),true)+'<p class="dialog-intro">Démonstration · prêt à valider</p>'+
       '<ol class="bureau-timeline">'+steps+'</ol>'+
       '<div class="bureau-actions is-single"><button type="button" class="primary" data-action="validate-demo">'+SVG_DONE+'<span>Valider</span></button></div>'+
       '<p class="bureau-step-note bureau-demo-note">Démonstration : rien n’est mis en ligne.</p>';
@@ -458,7 +499,7 @@ function renderDossier(node,id,message=''){
     (dossier.tests?'<p class="bureau-step-note">Tests : '+esc(dossier.tests)+'</p>':'')+
     (dossier.testsChanged.length?'<p class="bureau-step-note is-warning">Tests modifiés : '+esc(dossier.testsChanged.join(', '))+'</p>':'')+
     (dossier.remarques?'<p class="bureau-step-note">Remarques du Testeur : '+esc(dossier.remarques)+'</p>':'')+'</div>':'';
-  node.innerHTML=header(dossier.title,true)+'<p class="dialog-intro">'+esc([TYPE_LABELS[dossier.type],dossier.family,'reçu '+dayLabel(dossier.received).toLowerCase()].join(' · '))+'</p>'+
+  node.innerHTML=header(taskTitle(dossier),true)+'<p class="dialog-intro">'+esc([TYPE_LABELS[dossier.type],dossier.family,'reçu '+dayLabel(dossier.received).toLowerCase()].join(' · '))+'</p>'+
     '<ol class="bureau-timeline">'+steps+'</ol>'+summary+actionsMarkup(dossier)+
     '<p class="dialog-feedback'+(message?' is-visible':'')+'" role="status" aria-live="polite">'+esc(message)+'</p>';
 }
@@ -548,6 +589,8 @@ async function openBureau(){
   // Accès admin pas encore configuré : l'écran Familles le demande (même compte Supabase).
   if(!access()?.credentials()){window.COURSES_FAMILY_ADMIN?.open?.();return}
   const node=dialog();
+  // Première ouverture : les images de la scène sont attendues (au plus 0,6 s) pour s'afficher d'un bloc.
+  await Promise.race([preloadScene(),new Promise(resolve=>setTimeout(resolve,600))]);
   renderBureau(node,validerCount()?'valider':'cours');
   show(node);
   try{await refresh()}catch(_){}
@@ -566,7 +609,7 @@ function scheduleRefresh(){
 }
 function forget(){
   stopDemo();
-  dossiers={valider:[],cours:[],termines:[]};loaded=false;lastError='';pendingIds.clear();
+  dossiers={valider:[],cours:[],termines:[]};loaded=false;lastError='';pendingIds.clear();sceneKept=null;
   const node=document.getElementById('bureauDialog');
   if(node){try{node.close()}catch(_){}node.innerHTML=''}
   renderSummary();
@@ -574,7 +617,11 @@ function forget(){
 function init(){
   if(!ensureRow())return;
   renderSummary();
-  const reload=()=>{if(document.documentElement.dataset.account!=='family')void refresh().catch(()=>{})};
+  const reload=()=>{
+    if(document.documentElement.dataset.account==='family')return;
+    if(access()?.credentials())void preloadScene();
+    void refresh().catch(()=>{});
+  };
   document.addEventListener('courses:view-changed',event=>{if(event.detail?.view==='settings')reload()});
   document.addEventListener('courses:lock-changed',event=>{if(event.detail?.locked)forget();else reload()});
   document.addEventListener('courses:account-changed',reload);
