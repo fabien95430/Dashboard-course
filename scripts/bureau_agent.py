@@ -131,10 +131,17 @@ def guard(base: str = 'origin/main') -> str:
     blocked = [path for path in files if path.startswith(FORBIDDEN) or path in FORBIDDEN]
     if blocked:
         return 'Fichiers interdits modifiés : ' + ', '.join(blocked)
-    touched_tests = git('diff', '--cached', '--name-only', '--diff-filter=MDR', base, '--', 'tests/').stdout.split()
-    if touched_tests:
-        return 'Tests existants modifiés : ' + ', '.join(touched_tests)
+    # Un test existant peut être mis à jour (comportement demandé), jamais supprimé ni renommé.
+    removed_tests = git('diff', '--cached', '--name-only', '--diff-filter=DR', base, '--', 'tests/').stdout.split()
+    if removed_tests:
+        return 'Tests existants supprimés : ' + ', '.join(removed_tests)
     return ''
+
+
+def modified_tests(base: str = 'origin/main') -> list[str]:
+    """Tests existants mis à jour : signalés à l'administrateur dans « À valider »."""
+    changed_files(base)
+    return git('diff', '--cached', '--name-only', '--diff-filter=M', base, '--', 'tests/').stdout.split()
 
 
 def validate() -> tuple[bool, str]:
@@ -201,8 +208,10 @@ Tu es le DÉVELOPPEUR. Le plan du Trieur est dans {tri}.
 Applique-le avec le changement minimum, dans les modules propriétaires, en respectant AGENTS.md.
 - Ne touche pas à la version (.page-version, APP_VERSION, CACHE de sw.js, paramètres ?v=) :
   elle est incrémentée automatiquement à la publication.
-- Ne modifie ni .github/, ni supabase/, ni AGENTS.md, ni un test existant. Tu peux AJOUTER un test
-  dans tests/ pour le comportement modifié.
+- Ne modifie ni .github/, ni supabase/, ni AGENTS.md. Ajoute un test dans tests/ pour le comportement
+  modifié. Ne mets à jour un test existant que s'il vérifie précisément le comportement que la demande
+  change (par exemple l'ancien texte), sans retirer d'autre vérification ; ne supprime jamais un test.
+  Dans ce cas, dis-le explicitement dans ton résumé.
 - Lance `bash scripts/validate_repo.sh` et corrige jusqu'à ce que tout soit vert.
 {retour}
 Termine par un résumé en français des fichiers modifiés et pourquoi.
@@ -212,6 +221,8 @@ TESTEUR = COMMON + """
 Tu es le TESTEUR. Ne modifie aucun fichier du dépôt.
 Le plan du Trieur est dans {tri}. Relis les changements avec `git diff --cached origin/main`.
 Résultat de la validation automatique : {tests}.
+Tests existants mis à jour par le Développeur : {tests_modifies}. Pour chacun, vérifie qu'il suit seulement
+le nouveau comportement demandé et qu'aucune vérification n'a été retirée ou affaiblie ; sinon refuse.
 Vérifie que le changement répond à la demande et respecte AGENTS.md : module propriétaire, pas de
 couche sur couche (pas de surcharge CSS en fin de feuille, pas de !important ajouté, pas de script
 correctif), thème global (variables existantes), sécurité intacte, mobile-first, changement minimum.
@@ -276,7 +287,9 @@ def process(row: dict) -> None:
     tests = report.splitlines()[0]
 
     # Testeur
-    verdict = last_json(claude(TESTEUR.format(demande=demande, tri=tri, tests=tests),
+    tests_changed = modified_tests()
+    verdict = last_json(claude(TESTEUR.format(demande=demande, tri=tri, tests=tests,
+                                              tests_modifies=', '.join(tests_changed) or 'aucun'),
                                READ_TOOLS + ['Bash(git diff:*)'], 40))
     problem = guard()
     if problem:
@@ -293,7 +306,7 @@ def process(row: dict) -> None:
     update(row, etape='a_valider', agent={
         'resume': str(verdict.get('resume') or plan.get('resume') or '')[:900],
         'remarques': str(verdict.get('remarques') or '')[:600],
-        'fichiers': files[:40], 'tests': tests, 'branche': branch_name(row),
+        'fichiers': files[:40], 'tests': tests, 'tests_modifies': tests_changed[:20], 'branche': branch_name(row),
     })
     reset_to_main()
 

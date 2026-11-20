@@ -3355,6 +3355,7 @@ html[data-account="family"] #settingsBureauBtn{display:none!important}
 .settings-sheet#bureauDialog .bureau-actions button:disabled{opacity:.5}
 .settings-sheet#bureauDialog .bureau-actions .is-wide{grid-column:1/-1}
 .settings-sheet#bureauDialog .bureau-summary{margin:0 0 14px}
+.settings-sheet#bureauDialog .bureau-step-note.is-warning{color:#7a6440;font-weight:600}
 .settings-sheet#bureauDialog .dialog-feedback.is-visible{margin-top:10px;color:var(--sheet-muted);text-align:center}
 /* v838 — recherche sans résultat : raccourci vers Catalogue des produits › Ajout */
 .catalog-search-empty{height:auto;flex-direction:column;justify-content:flex-start;gap:12px;padding:26px 18px;text-align:center}

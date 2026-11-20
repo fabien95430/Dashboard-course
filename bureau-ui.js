@@ -96,6 +96,7 @@ function buildDossiers(rows,families,now=Date.now()){
       failedAt:String(agent.etape_echec||''),
       files:Array.isArray(agent.fichiers)?agent.fichiers.map(String):[],
       tests:String(agent.tests||''),
+      testsChanged:Array.isArray(agent.tests_modifies)?agent.tests_modifies.map(String):[],
       published:String(agent.version||'')
     };
     out[done?'termines':stage==='pret'?'valider':'cours'].push(dossier);
@@ -436,9 +437,11 @@ function renderDossier(node,id,message=''){
   else if(dossier.stage==='refuse')steps+=step(SVG_DONE,'#6b746d','Refusé',when(dossier.treated),'');
   else if(done)steps+=step(SVG_DONE,'#2f6a49','Traité',when(dossier.treated),'');
   const prepared=['pret','publication','publie'].includes(dossier.stage)&&(dossier.resume||dossier.files.length);
+  /* Un test existant mis à jour par l'agent est signalé avant Valider (règle Bureau d'AGENTS.md). */
   const summary=prepared?'<div class="bureau-summary"><p class="bureau-step-bubble">'+esc(dossier.resume)+'</p>'+
     (dossier.files.length?'<p class="bureau-step-note">Fichiers : '+esc(dossier.files.join(', '))+'</p>':'')+
     (dossier.tests?'<p class="bureau-step-note">Tests : '+esc(dossier.tests)+'</p>':'')+
+    (dossier.testsChanged.length?'<p class="bureau-step-note is-warning">Tests modifiés : '+esc(dossier.testsChanged.join(', '))+'</p>':'')+
     (dossier.remarques?'<p class="bureau-step-note">Remarques du Testeur : '+esc(dossier.remarques)+'</p>':'')+'</div>':'';
   node.innerHTML=header(dossier.title,true)+'<p class="dialog-intro">'+esc([TYPE_LABELS[dossier.type],dossier.family,'reçu '+dayLabel(dossier.received).toLowerCase()].join(' · '))+'</p>'+
     '<ol class="bureau-timeline">'+steps+'</ol>'+summary+actionsMarkup(dossier)+
