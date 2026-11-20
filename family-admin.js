@@ -322,8 +322,9 @@ function deleteFamily(node,button){
 async function openFamilies(){
   const node=dialog();
   if(!access()?.credentials()){renderAccess(node);show(node);return}
-  node.dataset.view='families';
-  node.innerHTML=header('Familles')+'<p class="dialog-intro">Choisissez un foyer.</p><p class="family-admin-empty">Chargement…</p>';
+  // Aucun texte d'attente : la liste connue s'affiche tout de suite, sinon l'écran attend les foyers sans texte.
+  if(families.length)renderFamilies(node);
+  else{node.dataset.view='families';node.innerHTML=header('Familles')+'<p class="dialog-intro">Choisissez un foyer.</p>'}
   show(node);
   try{await refresh()}catch(_){}
   if(node.dataset.view==='families')renderFamilies(node);

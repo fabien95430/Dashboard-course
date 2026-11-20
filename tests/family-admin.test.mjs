@@ -171,3 +171,8 @@ test('idées et corrections : envoi depuis Réglages (famille), table protégée
 test('popup idées et corrections : titre « Propositions d’améliorations »',()=>{
   assert.match(read('index.html'),/settings-sheet-title">Propositions d’améliorations</);
 });
+
+test('Familles s ouvre sans afficher « Chargement… »',()=>{
+  assert.doesNotMatch(read('family-admin.js'),/Chargement…/);
+  assert.match(read('family-admin.js'),/if\(families\.length\)renderFamilies\(node\);/);
+});

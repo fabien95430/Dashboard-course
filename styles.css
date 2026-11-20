@@ -3292,7 +3292,7 @@ html[data-account="family"] #settingsBureauBtn{display:none!important}
 /* Vue Bureau : en-tête, scène et onglets fixes ; seule la liste des dossiers défile. */
 .settings-sheet#bureauDialog[open][data-view="bureau"]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
 .settings-sheet#bureauDialog[data-view="bureau"]>*{flex:0 0 auto}
-.settings-sheet#bureauDialog[data-view="bureau"] .bureau-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin-bottom:calc(-1 * var(--sheet-bottom-inset))!important;padding:2px 0 calc(var(--sheet-bottom-inset) + 12px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10px);mask-image:linear-gradient(to bottom,transparent 0,#000 10px)}
+.settings-sheet#bureauDialog[data-view="bureau"] .bureau-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin-bottom:calc(-1 * var(--sheet-bottom-inset))!important;padding:12px 0 calc(var(--sheet-bottom-inset) + 12px)}
 .settings-sheet#bureauDialog .bureau-scene-art{position:relative;width:100%;aspect-ratio:1464/1074;-webkit-user-select:none;user-select:none;pointer-events:none}
 .settings-sheet#bureauDialog .bureau-scene-art img{display:block;width:100%;height:auto;-webkit-user-drag:none}
 .settings-sheet#bureauDialog .bureau-scene-art .bureau-room{position:absolute;inset:0;height:100%}
@@ -3323,7 +3323,7 @@ html[data-account="family"] #settingsBureauBtn{display:none!important}
 .settings-sheet#bureauDialog .bureau-tab-count{display:inline-grid;place-items:center;min-width:21px;height:21px;margin-left:6px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#d85d54;color:#fff;font-size:var(--fs-label);font-weight:700;line-height:1;vertical-align:1px}
 .settings-sheet#bureauDialog .bureau-actions.is-single{grid-template-columns:1fr}
 .settings-sheet#bureauDialog .bureau-demo-note{margin-top:10px;text-align:center}
-.settings-sheet#bureauDialog .bureau-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;height:42px;margin:0 auto 10px;padding:3px;box-sizing:border-box;border-radius:13px;background:rgba(118,128,120,.13)}
+.settings-sheet#bureauDialog .bureau-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;height:42px;margin:0 auto;padding:3px;box-sizing:border-box;border-radius:13px;background:rgba(118,128,120,.13)}
 .settings-sheet#bureauDialog .bureau-tab{border:0;border-radius:10px;background:transparent;color:#55655a;font:inherit;font-size:var(--fs-text);white-space:nowrap;-webkit-appearance:none;appearance:none}
 .settings-sheet#bureauDialog .bureau-tab.is-active{background:#fffefb;color:#1b2d21;font-weight:600;box-shadow:0 2px 7px rgba(40,60,46,.12)}
 .settings-sheet#bureauDialog .bureau-dossiers{border:1px solid var(--tile-line);border-radius:18px;background:var(--tile-bg);box-shadow:var(--tile-shadow);overflow:hidden}

@@ -249,4 +249,7 @@ test('bureau v876 : titre court de la fiche et scène gardée sans recréer les 
   const css=read('styles.css');
   assert.match(css,/#bureauDialog\[open\]\[data-view="bureau"\]\{display:flex!important;flex-direction:column!important;overflow:hidden!important\}/);
   assert.match(css,/#bureauDialog\[data-view="bureau"\] \.bureau-panel\{flex:1 1 auto;min-height:0;overflow-y:auto/);
+  // v884 : la liste passe nettement derrière la barre d'onglets, sans fondu.
+  assert.doesNotMatch(css.match(/\.bureau-panel\{[^}]*\}/)[0],/mask-image/);
+  assert.match(css,/\.bureau-tabs\{[^}]*margin:0 auto;/);
 });
