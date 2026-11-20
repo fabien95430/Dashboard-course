@@ -3401,7 +3401,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   position:absolute;left:50%;transform:translateX(-50%);
   /* Assez haut pour que le bouton reste au-dessus du clavier et de sa barre ⌃ ⌄ ✓. */
   top:max(calc(env(safe-area-inset-top,0px) + 20px),clamp(24px,calc((var(--security-screen-height) - 660px) * .45),104px));
-  width:calc(100% - 48px);max-width:384px;min-height:0;margin:0;padding:calc(var(--login-air) * .2) 0 0;
+  width:calc(100% - 48px);max-width:384px;min-height:0;margin:0;padding:calc(var(--login-air) * .55) 0 0;
   border:0;border-radius:0;background:transparent;box-shadow:none;
   color:var(--login-ink);text-align:center;
 }
@@ -3412,7 +3412,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-dynamic{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
 /* Formulaire épuré, resserré et centré : ne déborde plus sur le décor latéral. */
-.security-modal .password-panel{width:min(100%,var(--login-panel-width));margin:calc(28px + var(--login-air) * .5) auto 0;text-align:left}
+.security-modal .password-panel{width:min(100%,var(--login-panel-width));margin:calc(28px + var(--login-air) * .15) auto 0;text-align:left}
 /* Ouverture : animation de chargement au milieu de l'espace libre tant que app.js n'a pas
    choisi l'écran (compte famille : Ma liste directement ; sinon formulaire de connexion). */
 .security-loading{display:none}
