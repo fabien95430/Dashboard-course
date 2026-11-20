@@ -3397,7 +3397,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-dynamic{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
 /* Formulaire épuré, resserré et centré : ne déborde plus sur le décor latéral. */
-.security-modal .password-panel{width:min(100%,272px);margin:30px auto 0;text-align:left}
+.security-modal .password-panel{width:min(100%,272px);margin:46px auto 0;text-align:left}
 .password-panel[hidden]{display:none}
 .security-modal .field{margin:18px 0 0}
 .security-modal .field:first-child{margin-top:0}
@@ -3440,7 +3440,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 html[data-security-compact="true"] .security-modal{top:calc(env(safe-area-inset-top,0px) + 16px)}
 html[data-security-compact="true"] .security-ornament{margin-bottom:14px}
 html[data-security-compact="true"] .security-modal h3{font-size:38px}
-html[data-security-compact="true"] .security-modal .password-panel{margin-top:16px}
+html[data-security-compact="true"] .security-modal .password-panel{margin-top:28px}
 html[data-security-compact="true"] .security-modal .field{margin-top:10px}
 html[data-security-compact="true"] .security-modal .field:first-child{margin-top:0}
 html[data-security-compact="true"] .security-modal .field input{height:40px}
