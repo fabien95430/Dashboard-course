@@ -1806,6 +1806,9 @@ async function completeSecurityAction(){
       state.familyAdmin=payload.family_admin||null;
       rememberVaultSeal(password);
       state.locked=false;
+      // La copie chiffrée de la liste est déchiffrée avant de quitter l'écran de connexion :
+      // la liste s'affiche remplie, sans passer par « La liste est vide ».
+      await restoreOfflineState();
       hideSecurity();
       await connectFromRefresh();
       return;

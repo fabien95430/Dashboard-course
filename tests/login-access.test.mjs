@@ -70,3 +70,8 @@ test('clavier iOS : le formulaire garde sa composition et tous ses éléments vi
   assert.match(login,/id="securityTitle">Bonjour/);
   assert.match(login,/aria-controls="securityPassword" aria-pressed="false"/);
 });
+
+test('déverrouillage : la liste enregistrée est prête avant de quitter l’écran de connexion',()=>{
+  const app=read('app.js');
+  assert.match(app,/state\.locked=false;\s*\/\/[^\n]*\n[^\n]*\n\s*await restoreOfflineState\(\);\s*hideSecurity\(\);\s*await connectFromRefresh\(\);/);
+});
