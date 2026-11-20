@@ -95,7 +95,8 @@ test('connexion iOS : focus sans défilement automatique, formulaire assez haut 
 test('connexion : cohérente avec l’app (titre Baskerville, champs en ligne, bouton vert « Connexion »)',()=>{
   const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   assert.match(css,/\.security-modal h3\{margin:0;font:500 46px\/1\.05 "Baskerville"/);
-  assert.match(css,/border:0;border-bottom:1\.5px solid rgba\(27,82,56,\.32\);border-radius:0;/);
+  // v870 : soulignement épuré, plus fin.
+  assert.match(css,/border:0;border-bottom:1px solid rgba\(27,82,56,\.25\);border-radius:0;/);
   // Bouton « Connexion » : vert profond aux coins arrondis.
   assert.match(css,/\.security-modal \.password-panel \.primary\{[\s\S]*?background:linear-gradient\(135deg,#24683c,#175330\)/);
   const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');

@@ -3394,23 +3394,21 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-ornament b{width:6px;height:6px;transform:rotate(45deg);background:#96906f}
 /* v846 — même typographie que les pages de l’app : titres Baskerville, textes système. */
 .security-modal h3{margin:0;font:500 46px/1.05 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:-1.1px;color:#103c22}
-.security-modal .security-card-copy{max-width:none;margin:8px 0 0;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;color:#6f7880}
 .security-dynamic{display:none}
-.security-modal.is-creating .security-card-copy{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
-/* Formulaire resserré et centré : ne déborde plus sur le décor latéral. */
-.security-modal .password-panel{width:min(100%,272px);margin:22px auto 0;text-align:left}
+/* Formulaire épuré, resserré et centré : ne déborde plus sur le décor latéral. */
+.security-modal .password-panel{width:min(100%,272px);margin:30px auto 0;text-align:left}
 .password-panel[hidden]{display:none}
-.security-modal .field{margin:20px 0 0}
+.security-modal .field{margin:18px 0 0}
 .security-modal .field:first-child{margin-top:0}
 .security-modal .field>span,.security-password-field>label{
-  display:block;margin:0 0 2px;color:#5b7263;font:700 11.5px/18px -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:2px;text-transform:uppercase;
+  display:block;margin:0 0 2px;color:#6f7880;font:500 13px/18px -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:.2px;
 }
 .security-modal .field input{
-  display:block;width:100%;height:46px;padding:0 2px;outline:none;
-  /* Saisie : même police que « Votre liste vous attend », en noir. */
+  display:block;width:100%;height:40px;padding:0 2px;outline:none;
+  /* Saisie : police système, en noir. */
   color:#000;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:normal;
-  border:0;border-bottom:1.5px solid rgba(27,82,56,.32);border-radius:0;
+  border:0;border-bottom:1px solid rgba(27,82,56,.25);border-radius:0;
   background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;
   transition:border-color .15s ease,box-shadow .15s ease;
 }
@@ -3421,7 +3419,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-input-wrap{position:relative}
 .security-modal .security-input-wrap input{padding-right:48px}
 .security-password-toggle{
-  position:absolute;right:-8px;top:1px;display:grid;place-items:center;width:44px;height:44px;
+  position:absolute;right:-8px;top:-2px;display:grid;place-items:center;width:44px;height:44px;
   padding:0;border:0;border-radius:12px;background:transparent;color:#7d7558;cursor:pointer;
 }
 .security-password-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
@@ -3429,10 +3427,10 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-password-toggle[aria-pressed="true"] .eye-slash{display:block}
 .security-password-toggle:focus-visible{outline:2px solid #36753a;outline-offset:-3px}
 .security-modal .password-panel .primary{
-  width:100%;height:54px;margin-top:30px;padding:0 12px;border:0;border-radius:14px;
+  width:100%;height:46px;margin-top:28px;padding:0 12px;border:0;border-radius:23px;
   background:linear-gradient(135deg,#24683c,#175330);color:#fffdf4;
-  font:600 22px/1.1 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:.5px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);cursor:pointer;
+  font:600 19px/1.1 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:.5px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 20px rgba(23,83,48,.22);cursor:pointer;
 }
 .security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
 .security-modal .primary:disabled{opacity:.7;cursor:wait}
@@ -3442,13 +3440,12 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 html[data-security-compact="true"] .security-modal{top:calc(env(safe-area-inset-top,0px) + 16px)}
 html[data-security-compact="true"] .security-ornament{margin-bottom:14px}
 html[data-security-compact="true"] .security-modal h3{font-size:38px}
-html[data-security-compact="true"] .security-modal .security-card-copy{font-size:16px;margin-top:6px}
 html[data-security-compact="true"] .security-modal .password-panel{margin-top:16px}
 html[data-security-compact="true"] .security-modal .field{margin-top:10px}
 html[data-security-compact="true"] .security-modal .field:first-child{margin-top:0}
-html[data-security-compact="true"] .security-modal .field input{height:44px}
-html[data-security-compact="true"] .security-password-toggle{height:40px;top:2px}
-html[data-security-compact="true"] .security-modal .primary{height:48px;margin-top:18px;font-size:20px}
+html[data-security-compact="true"] .security-modal .field input{height:40px}
+html[data-security-compact="true"] .security-password-toggle{height:40px;top:0}
+html[data-security-compact="true"] .security-modal .primary{height:44px;margin-top:20px;font-size:18px}
 /* Paysage, texte agrandi ou erreur longue : le contenu reste accessible au défilement. */
 .security-shell.is-scrollable{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .security-shell.is-scrollable .security-modal{padding-bottom:20px}
