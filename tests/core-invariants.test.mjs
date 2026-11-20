@@ -35,7 +35,7 @@ test('OAuth ne persiste pas les identifiants Home Assistant en clair',()=>{
   assert.match(app,/sessionStorage\.setItem\(OAUTH_STATE_KEY,JSON\.stringify\(oauthState\)\)/);
   assert.match(app,/deleteKey\(STORAGE\.haUrl\);/);
   assert.match(app,/\/auth\/authorize\?client_id=/);
-  assert.match(app,/await storeSecureVault\(data\.refresh_token,state\.haUrl,password\)/);
+  assert.match(app,/await storeSecureVault\(data\.refresh_token,state\.haUrl,password,familyAdmin\)/);
 });
 
 test('la synchronisation Home Assistant reste événementielle sans polling permanent',()=>{

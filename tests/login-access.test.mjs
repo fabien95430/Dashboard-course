@@ -64,7 +64,7 @@ test('clavier iOS : le formulaire garde sa composition et tous ses éléments vi
   assert.doesNotMatch(ui+css,/is-keyboard-lifted|securityKeyboardIntent|--security-keyboard-lift/);
   assert.match(ui,/function syncSecurityLayoutHeight\(\)/);
   assert.match(css,/--security-screen-height:var\(--lock-screen-h,var\(--security-layout-height,100svh\)\)/);
-  assert.match(css,/\.security-modal \.field input\{[\s\S]*?font-size:18px/);
+  assert.match(css,/\.security-modal \.field input\{[\s\S]*?font:500 16px/);
   const login=read('index.html').split('id="securityOverlay"')[1].split('</section>')[0];
   assert.doesNotMatch(login,/security-hero|welcome-cart|Mes courses/);
   assert.match(login,/id="securityTitle">Bonjour/);
@@ -74,4 +74,38 @@ test('clavier iOS : le formulaire garde sa composition et tous ses éléments vi
 test('déverrouillage : la liste enregistrée est prête avant de quitter l’écran de connexion',()=>{
   const app=read('app.js');
   assert.match(app,/state\.locked=false;\s*\/\/[^\n]*\n[^\n]*\n\s*await restoreOfflineState\(\);\s*hideSecurity\(\);\s*await connectFromRefresh\(\);/);
+});
+
+test('admin sans coffre : mot de passe choisi deux fois, coffre vide, plus de mode test sans mot de passe',()=>{
+  const app=read('app.js');
+  const login=app.match(/async function completeLogin\(\)\{[\s\S]*?\n\}/)?.[0]||'';
+  const admin=login.slice(login.indexOf('isAdminIdentifier(identifier)'),login.indexOf('enterAdminVaultMode(password,null);'));
+  assert.ok(admin.includes("if(!password){error.textContent='Entre ton mot de passe.'"));
+  assert.ok(admin.includes('password.length<SECURITY.minPasswordLength'));
+  assert.ok(admin.includes("$('#securityConfirmWrap').hidden=false;"));
+  assert.ok(admin.includes("password!==UI.securityConfirm.value"));
+  assert.ok(admin.includes("await storeSecureVault('','',password,null);"));
+  assert.doesNotMatch(admin,/enterLocalMode\(\)/);
+  // Coffre vide accepté au déchiffrement, sans adresse HA isolée.
+  assert.match(app,/const empty=!!payload&&!payload\.refresh_token&&!payload\.ha_url;/);
+  assert.match(app,/ha_url:refreshToken\?normalizeHaUrl\(haUrl\):'',/);
+});
+
+test('coffre admin vide : déverrouillage local, accès admin conservé, verrouillage actif',()=>{
+  const app=read('app.js');
+  assert.match(app,/if\(!payload\.refresh_token\)\{enterAdminVaultMode\(password,payload\.family_admin\);return\}/);
+  assert.match(app,/function enterAdminVaultMode\(password,familyAdmin\)\{\s*enterLocalMode\(\);\s*state\.adminVault=true;[\s\S]*?rememberVaultSeal\(password\);\s*armIdleLock\(\);/);
+  assert.match(app,/function lockExempt\(\)\{return state\.demo&&!state\.adminVault\}/);
+  assert.match(app,/function lockApp\(message='Application verrouillée\.'\)\{\s*if\(lockExempt\(\)\|\|!vaultRecord\(\)\)return;/);
+  assert.match(app,/if\(!state\.demo\|\|state\.adminVault\)state\.familyAdmin=null;/);
+});
+
+test('retour OAuth dans un coffre existant : mot de passe vérifié avant le code, accès Supabase admin conservé',()=>{
+  const app=read('app.js');
+  assert.match(app,/const oauthIntoVault=state\.securityMode==='oauth'&&!!vaultRecord\(\);/);
+  const branch=app.slice(app.indexOf("if(state.securityMode==='oauth'){\n      const code"),app.indexOf('await connectAuthorized(state.accessToken);'));
+  assert.ok(branch.indexOf('decryptVault(vaultRecord(),password)')<branch.indexOf('exchangeCodeRaw('));
+  assert.ok(branch.includes('registerUnlockFailure()'));
+  assert.ok(branch.includes('familyAdmin=previous.family_admin||null;'));
+  assert.match(app,/const creating=mode==='migrate'\|\|\(mode==='oauth'&&!vaultRecord\(\)\);/);
 });

@@ -90,8 +90,11 @@ test('bureau : scène en images WebP légères tirées des PNG d’origine',asyn
     total+=statSync(url).size;
   }
   assert.ok(total<150000,'scène au repos sous 150 Ko ('+total+' octets)');
-  for(const file of ['01-piece-vide','02-trieur-repos','03-developpeur-repos','04-testeur-repos'])assert.ok(existsSync(new URL('../www/Bureau/'+file+'.png',import.meta.url)),'source '+file+'.png conservée');
-  assert.match(read('scripts/make_bureau_images.py'),/POSTE_WIDTH = 360/);
+  for(const file of ['01-piece-vide','14-piece-vide 2','02-trieur-repos','03-developpeur-repos','04-testeur-repos'])assert.ok(existsSync(new URL('../www/Bureau/'+file+'.png',import.meta.url)),'source '+file+'.png conservée');
+  const generator=read('scripts/make_bureau_images.py');
+  assert.match(generator,/POSTE_WIDTH = 360/);
+  assert.ok(generator.includes('ROOM_SOURCE = "14-piece-vide 2.png"'));
+  assert.ok(generator.includes('(728, 0), (1404, 391)'),'le haut du mur ne doit pas couper les fenêtres');
   assert.match(read('styles.css'),/\.bureau-poste\.is-trieur\{left:[\d.]+%;top:[\d.]+%\}/);
 });
 

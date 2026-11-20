@@ -394,6 +394,7 @@ let state={
   reconnectPromise:null,
   intentionalClose:false,
   demo:false,
+  adminVault:false,
   family:false,
   familyAdmin:null,
   lockTimer:null,
@@ -1534,7 +1535,10 @@ async function decryptVault(record,password){
   const key=await deriveVaultKey(password,salt,iterations);
   const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:vaultAad()},key,cipher);
   const payload=JSON.parse(UTF8_DECODER.decode(plain));
-  if(!payload?.refresh_token||!normalizeHaUrl(payload?.ha_url))throw new Error('Coffre invalide');
+  // Coffre admin complet (Home Assistant) ou coffre admin vide, créé avant la connexion HA.
+  const connected=!!payload?.refresh_token&&!!normalizeHaUrl(payload?.ha_url);
+  const empty=!!payload&&!payload.refresh_token&&!payload.ha_url;
+  if(!connected&&!empty)throw new Error('Coffre invalide');
   return payload;
 }
 /* Tant que l'admin est déverrouillé, le coffre peut être rescellé (ajout de l'accès « Familles »)
@@ -1547,7 +1551,8 @@ function rememberVaultSeal(password){
 async function storeSecureVault(refreshToken,haUrl,password,familyAdmin=state.familyAdmin){
   const payload={
     refresh_token:String(refreshToken||''),
-    ha_url:normalizeHaUrl(haUrl),
+    // Sans autorisation Home Assistant, le coffre reste vide (pas d'adresse seule).
+    ha_url:refreshToken?normalizeHaUrl(haUrl):'',
     created_at:Date.now()
   };
   // Accès administrateur du service famille (écran « Familles ») : rangé dans le coffre.
@@ -1578,7 +1583,7 @@ function wipeMemoryCredentials(){
   state.accessTokenExpiresAt=0;
   state.refreshToken='';
   vaultSeal=null;
-  if(!state.demo)state.familyAdmin=null;
+  if(!state.demo||state.adminVault)state.familyAdmin=null;
   void window.COURSES_FAMILY?.adminSignOut?.();
 }
 function closeSocket(){
@@ -1594,20 +1599,22 @@ function clearLockTimers(){
   clearTimeout(state.reconnectTimer);state.reconnectTimer=null;
   state.backgroundedAt=0;
 }
+/* Mode test sans coffre : jamais verrouillé. Coffre admin vide déverrouillé : verrouillé comme le coffre HA. */
+function lockExempt(){return state.demo&&!state.adminVault}
 function armBackgroundLock(){
-  if(state.demo||state.locked||!vaultRecord())return;
+  if(lockExempt()||state.locked||!vaultRecord())return;
   if(!state.backgroundedAt)state.backgroundedAt=Date.now();
   clearTimeout(state.backgroundLockTimer);
   const remaining=Math.max(0,autoLockDelayMs()-(Date.now()-state.backgroundedAt));
   state.backgroundLockTimer=setTimeout(()=>{
     state.backgroundLockTimer=null;
-    if(state.locked||state.demo||!vaultRecord())return;
+    if(state.locked||lockExempt()||!vaultRecord())return;
     lockApp('Verrouillage après passage en arrière-plan.');
   },remaining);
 }
 function armIdleLock(){
   clearTimeout(state.lockTimer);
-  if(state.demo||state.locked||!vaultRecord())return;
+  if(lockExempt()||state.locked||!vaultRecord())return;
   state.lockTimer=setTimeout(()=>lockApp('Verrouillage automatique après inactivité.'),autoLockDelayMs());
 }
 let unlockVersionChecked=false;
@@ -1634,8 +1641,9 @@ function showSecurity(mode,message=''){
   const withIdentifier=login||mode==='unlock';
   UI.securityIdentifierWrap.hidden=!withIdentifier;
   if(withIdentifier)UI.securityIdentifier.value=rememberedAccount()?.id||(mode==='unlock'?'admin':'');
-  const creating=mode==='oauth'||mode==='migrate';
-  $('.security-modal').classList.toggle('is-creating',creating);
+  // Retour OAuth dans un coffre admin existant : son mot de passe, sans confirmation.
+  const creating=mode==='migrate'||(mode==='oauth'&&!vaultRecord());
+  $('.security-modal').classList.toggle('is-creating',mode==='oauth'||mode==='migrate');
   $('#securityTitle').textContent='Bonjour';
   setSecurityPasswordVisible(false);
   $('#securityText').textContent=message||(creating
@@ -1666,7 +1674,7 @@ function hideSecurity(){
   refreshVisualLock();
 }
 function lockApp(message='Application verrouillée.'){
-  if(state.demo||!vaultRecord())return;
+  if(lockExempt()||!vaultRecord())return;
   if(UI.connectionDialog.open)UI.connectionDialog.close();
   if(UI.preferencesDialog.open)UI.preferencesDialog.close();
   if(UI.missingProductsDialog.open)UI.missingProductsDialog.close();
@@ -1684,7 +1692,7 @@ function clearLocalConnectionData(){
   clearLockTimers();closeSocket();wipeMemoryCredentials();
   deleteKey(STORAGE.vault);deleteKey(LEGACY_UNLOCK_KEY);deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);deleteKey(STORAGE.entity);deleteKey(STORAGE.entityPreference);
   clearOAuthState();clearUnlockGuard();
-  state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;
+  state.haUrl='';state.entity='';state.entities=[];state.items=[];state.locked=true;state.adminVault=false;
 }
 async function exchangeCodeRaw(code,returnedState){
   const authState=loadOAuthState();
@@ -1790,8 +1798,14 @@ async function completeSecurityAction(){
     // Le coffre de cet appareil appartient au compte administrateur.
     if(!await isAdminIdentifier(UI.securityIdentifier.value)){error.textContent='Identifiant incorrect.';UI.securityIdentifier.focus();return}
   }
+  // Retour OAuth avec un coffre admin déjà créé : son mot de passe est vérifié, pas recréé.
+  const oauthIntoVault=state.securityMode==='oauth'&&!!vaultRecord();
+  if(oauthIntoVault){
+    const retryMs=unlockRetryMs();
+    if(retryMs>0){error.textContent='Trop de tentatives. Réessaie dans '+Math.ceil(retryMs/1000)+' s.';return}
+  }
   if(!password){error.textContent='Entre le mot de passe local.';return}
-  if(state.securityMode==='oauth'||state.securityMode==='migrate'){
+  if((state.securityMode==='oauth'&&!oauthIntoVault)||state.securityMode==='migrate'){
     if(password.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
     if(password!==confirm){error.textContent='Les deux mots de passe ne correspondent pas.';return}
   }
@@ -1801,6 +1815,9 @@ async function completeSecurityAction(){
       if(await unlockVersionCheckPromise)return;
       const payload=await decryptVault(vaultRecord(),password);
       clearUnlockGuard();
+      // Coffre admin vide (Home Assistant pas encore connecté) : liste locale, coffre ouvert.
+      if(!payload.refresh_token){enterAdminVaultMode(password,payload.family_admin);return}
+      state.demo=false;state.adminVault=false;
       state.haUrl=normalizeHaUrl(payload.ha_url);
       state.refreshToken=String(payload.refresh_token||'');
       state.familyAdmin=payload.family_admin||null;
@@ -1827,9 +1844,23 @@ async function completeSecurityAction(){
     if(state.securityMode==='oauth'){
       const code=state.pendingOAuthCode;
       if(!code)throw new Error('Code OAuth manquant');
+      let familyAdmin=null;
+      if(oauthIntoVault){
+        // Vérifié avant d'utiliser le code OAuth : l'accès administrateur du coffre est conservé.
+        let previous;
+        try{previous=await decryptVault(vaultRecord(),password)}
+        catch(_){
+          const delay=registerUnlockFailure();
+          error.textContent=delay?'Mot de passe incorrect. Réessaie dans '+Math.ceil(delay/1000)+' s.':'Mot de passe incorrect.';
+          return;
+        }
+        clearUnlockGuard();
+        familyAdmin=previous.family_admin||null;
+      }
       const data=await exchangeCodeRaw(code,state.pendingOAuthState);
       if(!data?.refresh_token||!data?.access_token)throw new Error('Réponse OAuth incomplète');
-      await storeSecureVault(data.refresh_token,state.haUrl,password);
+      await storeSecureVault(data.refresh_token,state.haUrl,password,familyAdmin);
+      state.familyAdmin=familyAdmin;state.demo=false;state.adminVault=false;
       rememberVaultSeal(password);
       state.refreshToken=String(data.refresh_token);
       state.accessToken=String(data.access_token);
@@ -1852,8 +1883,9 @@ async function completeSecurityAction(){
   }finally{button.disabled=false}
 }
 /* Connexion depuis la tuile « Accès privé » : tri local par identifiant. L'administrateur
-   sans coffre sur cet appareil entre en mode local ; il connecte Home Assistant depuis
-   Réglages › Connexion Home Assistant (le coffre est créé au retour OAuth). */
+   sans coffre sur cet appareil choisit son mot de passe (saisi deux fois) : un coffre vide est
+   créé, puis il connecte Home Assistant depuis Réglages › Connexion Home Assistant (l'autorisation
+   est rangée dans ce même coffre au retour OAuth). */
 async function completeLogin(){
   const identifier=normalizeIdentifier(UI.securityIdentifier.value);
   const error=UI.securityError,button=UI.securitySubmit;
@@ -1861,8 +1893,24 @@ async function completeLogin(){
   button.disabled=true;
   try{
     if(await isAdminIdentifier(identifier)){
+      const password=UI.securityPassword.value;
+      if(vaultRecord()){showSecurity('unlock');return}
+      if(!password){error.textContent='Entre ton mot de passe.';UI.securityPassword.focus();return}
+      if(password.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
+      if($('#securityConfirmWrap').hidden){
+        // Premier accès admin sur cet appareil : aucun coffre à vérifier, le mot de passe est créé.
+        $('.security-modal').classList.add('is-creating');
+        $('#securityText').textContent='Premier accès sur cet appareil : confirme ton mot de passe. Il protégera Home Assistant et l’accès administrateur.';
+        $('#securityConfirmWrap').hidden=false;
+        UI.securityPassword.autocomplete='new-password';
+        UI.securitySubmit.textContent='Créer mon coffre';
+        UI.securityConfirm.focus();
+        return;
+      }
+      if(password!==UI.securityConfirm.value){error.textContent='Les deux mots de passe ne correspondent pas.';return}
+      await storeSecureVault('','',password,null);
       rememberAccount(identifier,'admin');
-      enterLocalMode();
+      enterAdminVaultMode(password,null);
       return;
     }
     if(!UI.securityPassword.value){error.textContent='Entre ton mot de passe.';return}
@@ -2025,10 +2073,19 @@ document.addEventListener('courses:family-revoked',()=>{
 });
 /* Mode local (sans Home Assistant) : liste conservée sur cet appareil. */
 function enterLocalMode(){
-  state.demo=true;state.locked=false;clearLockTimers();wipeMemoryCredentials();
+  state.demo=true;state.locked=false;state.adminVault=false;clearLockTimers();wipeMemoryCredentials();
   state.loading=false;state.error='';
   state.items=loadJson(DEMO_KEY,[])||[];
   hideSecurity();status('',STATUS_TEXT.demoTitle,STATUS_TEXT.demoDetail);renderView();
+}
+/* Admin dont le coffre est vide : liste locale comme le mode test, mais coffre déverrouillé
+   (accès Supabase admin, rescellement) et verrouillage automatique actifs. */
+function enterAdminVaultMode(password,familyAdmin){
+  enterLocalMode();
+  state.adminVault=true;
+  state.familyAdmin=familyAdmin?.email&&familyAdmin?.password?{email:String(familyAdmin.email),password:String(familyAdmin.password)}:null;
+  rememberVaultSeal(password);
+  armIdleLock();
 }
 function beginOAuth(){
   const feedback=UI.connectionDialogFeedback;
@@ -3246,7 +3303,9 @@ async function init(){
     state.pendingOAuthState=returnedState;
     history.replaceState({},'',REDIRECT_URI);
     state.loading=false;renderList();
-    showSecurity('oauth','Crée maintenant le mot de passe local qui protégera l’autorisation Home Assistant sur cet appareil.');
+    showSecurity('oauth',vaultRecord()
+      ?'Entre le mot de passe de ton coffre pour y ranger la connexion Home Assistant.'
+      :'Crée maintenant le mot de passe local qui protégera l’autorisation Home Assistant sur cet appareil.');
     status('is-waiting','Sécurisation requise','Créer le mot de passe local');
     return;
   }
@@ -3569,12 +3628,12 @@ function bindUiEvents(){
     showView();
   });
 }
-['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!state.demo)armIdleLock()},{passive:true}));
+['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener(name,()=>{if(!state.locked&&!lockExempt())armIdleLock()},{passive:true}));
 function resumeForegroundSession(){
   const backgroundedAt=state.backgroundedAt;
   clearTimeout(state.backgroundLockTimer);state.backgroundLockTimer=null;
   state.backgroundedAt=0;
-  if(backgroundedAt&&!state.locked&&!state.demo&&vaultRecord()&&Date.now()-backgroundedAt>=autoLockDelayMs()){
+  if(backgroundedAt&&!state.locked&&!lockExempt()&&vaultRecord()&&Date.now()-backgroundedAt>=autoLockDelayMs()){
     lockApp('Verrouillage après passage en arrière-plan.');
     return;
   }
@@ -3583,7 +3642,7 @@ function resumeForegroundSession(){
     state.view='list';
     renderView();
   }
-  if(state.demo){
+  if(lockExempt()){
     refreshItems();
     return;
   }
@@ -3593,8 +3652,14 @@ function resumeForegroundSession(){
     // Écran de connexion déjà affiché : ne pas le réinitialiser. La fenêtre d'identifiants iOS
     // (trousseau, Face ID) fait passer l'app un instant en arrière-plan ; la réafficher vidait le
     // champ et replaçait le curseur, ce qui rouvrait la fenêtre iOS en boucle.
-    if(UI.securityOverlay.classList.contains('is-visible')&&state.securityMode==='unlock')return;
+    // Retour OAuth dans un coffre existant : l'écran « ranger la connexion » reste affiché.
+    if(UI.securityOverlay.classList.contains('is-visible')&&(state.securityMode==='unlock'||state.securityMode==='oauth'))return;
     showSecurity('unlock');
+    return;
+  }
+  if(state.adminVault){
+    refreshItems();
+    armIdleLock();
     return;
   }
   if(state.ws?.readyState===WebSocket.OPEN){
@@ -3622,7 +3687,7 @@ document.addEventListener('visibilitychange',()=>{
   resumeForegroundSession();
 });
 window.addEventListener('online',()=>{
-  if(state.demo)return;
+  if(lockExempt())return;
   if(state.locked&&state.securityMode==='unlock'){
     // Retour du réseau : pas de vérification si la saisie du mot de passe a commencé.
     if(document.activeElement!==UI.securityPassword&&!UI.securityPassword.value)void gateUnlockOnUpdate();

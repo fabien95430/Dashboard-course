@@ -85,7 +85,7 @@ function buildDossiers(rows,families,now=Date.now()){
 
 /* ---------- Scène : la pièce et les trois postes (images www/Bureau/webp, faites par scripts/make_bureau_images.py) ---------- */
 const SCENE_IMAGES='./www/Bureau/webp/';
-const SCENE_VERSION='863';
+const SCENE_VERSION='865';
 function sceneImage(file,cls){
   return '<img class="'+cls+'" src="'+SCENE_IMAGES+file+'.webp?v='+SCENE_VERSION+'" alt="" decoding="async" draggable="false">';
 }
