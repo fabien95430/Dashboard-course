@@ -3398,7 +3398,8 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-dynamic{display:none}
 .security-modal.is-creating .security-card-copy{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
-.security-modal .password-panel{margin-top:22px;text-align:left}
+/* Formulaire resserré et centré : ne déborde plus sur le décor latéral. */
+.security-modal .password-panel{width:min(100%,272px);margin:22px auto 0;text-align:left}
 .password-panel[hidden]{display:none}
 .security-modal .field{margin:20px 0 0}
 .security-modal .field:first-child{margin-top:0}
