@@ -64,7 +64,8 @@ test('clavier iOS : le formulaire garde sa composition et tous ses éléments vi
   assert.doesNotMatch(ui+css,/is-keyboard-lifted|securityKeyboardIntent|--security-keyboard-lift/);
   assert.match(ui,/function syncSecurityLayoutHeight\(\)/);
   assert.match(css,/--security-screen-height:var\(--lock-screen-h,var\(--security-layout-height,100svh\)\)/);
-  assert.match(css,/\.security-modal \.field input\{[\s\S]*?font:500 16px/);
+  // v885 : la saisie a la police et la graisse des libellés (400), comme « Mot de passe ».
+  assert.match(css,/\.security-modal \.field input\{[\s\S]*?font:400 16px/);
   const login=read('index.html').split('id="securityOverlay"')[1].split('</section>')[0];
   assert.doesNotMatch(login,/security-hero|welcome-cart|Mes courses/);
   assert.match(login,/id="securityTitle">Bonjour/);
