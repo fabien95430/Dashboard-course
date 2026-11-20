@@ -1,0 +1,54 @@
+name: Diagnostic temporaire — contour du Bureau
+on:
+  push:
+    branches: [fix-bureau-wall-crop-20261120]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install Pillow
+      - name: Inspecter le PNG original et le détourage actuel
+        shell: bash
+        run: |
+          mkdir -p /tmp/bureau-diagnostic
+          python - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          import math
+          p=Path('www/Bureau/01-piece-vide.png')
+          im=Image.open(p).convert('RGB')
+          w,h=im.size
+          print('SOURCE',w,h,'corners',[im.getpixel(pt) for pt in [(0,0),(w-1,0),(0,h-1),(w-1,h-1)]])
+          points=[(62,378),(707,0),(728,0),(728,26),(1404,416),(1404,698),(755,1074),(709,1074),(62,698)]
+          r=im.copy();d=ImageDraw.Draw(r)
+          d.line(points+[points[0]],fill='#e0001d',width=5)
+          d.line([(728,0),(1404,350)],fill='#00ae77',width=4)
+          for x in [750,800,900,1000,1100,1200,1300,1380]:
+              y=int(26+(x-728)*(416-26)/(1404-728))
+              vals=[]
+              for shift in [-80,-60,-40,-20,0,20]:
+                  yy=max(0,min(h-1,y+shift))
+                  vals.append((shift,im.getpixel((x,yy))))
+              print('COLUMN',x,'mask y',y,'offset-colors',vals)
+              d.line([(x,y-90),(x,y+35)],fill='#e0001d',width=2)
+          r.thumbnail((900,900))
+          r.save('/tmp/bureau-diagnostic/bureau-original-outline.png')
+          a=im.copy()
+          a.thumbnail((900,900))
+          a.save('/tmp/bureau-diagnostic/bureau-original.png')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bureau-original-outline
+          path: /tmp/bureau-diagnostic/
+          if-no-files-found: error
