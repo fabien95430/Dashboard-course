@@ -93,6 +93,7 @@ function buildDossiers(rows,families,now=Date.now()){
       stageLabel:STAGE_LABELS[stage],
       stageTime:row.etape_le||'',
       resume:String(agent.resume||agent.tri||''),
+      sujet:String(agent.sujet||''),
       remarques:String(agent.remarques||''),
       reason:String(agent.raison||''),
       failedAt:String(agent.etape_echec||''),
@@ -182,11 +183,14 @@ const POSTE_CYCLE=Object.freeze(['frappe','repos','frappe','repos','frappe','rep
 const POSTE_PHASE=Object.freeze({trieur:0,testeur:3,developpeur:6});
 const DEMO_STEPS=Object.freeze([['trieur',3000],['developpeur',6500],['testeur',9500]]);
 const ACTIVITIES=Object.freeze({trieur:'Analyse la demande',developpeur:'Prépare le correctif',testeur:'Vérifie le résultat'});
-/* Sous l'action, le sujet réel du dossier traité (titre de la demande), pas une description générique. */
-const DETAIL_MAX=46;
+/* Sous l'action, l'intervention en quelques mots (« sujet » fourni par le Trieur, ex. « Mise à jour
+   du titre du popup ») ; jamais le texte de la demande. Avant le tri, le sujet n'est pas encore connu. */
+const DETAIL_MAX=48;
+const DETAIL_PENDING='Identification de l’intervention';
 function labelDetail(){
-  const dossier=demo?{message:'Trier les plats par temps de préparation'}:dossiers.cours.find(item=>TIMELINE.includes(item.stage));
-  const text=String(dossier?.message||'').replace(/\s+/g,' ').trim();
+  const dossier=demo?{sujet:'Tri des plats par temps'}:dossiers.cours.find(item=>TIMELINE.includes(item.stage));
+  const text=String(dossier?.sujet||'').replace(/\s+/g,' ').trim();
+  if(!text)return DETAIL_PENDING;
   return text.length>DETAIL_MAX?text.slice(0,DETAIL_MAX-1).trimEnd()+'…':text;
 }
 const DONE=Object.freeze({trieur:'Dossier trié',developpeur:'Version prête',testeur:'Tests verts'});

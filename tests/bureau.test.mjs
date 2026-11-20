@@ -117,6 +117,14 @@ test('bureau : actions, étiquettes reliées aux agents, onglets et dossier à v
   assert.doesNotMatch(ui,/const DETAILS=/);
   assert.match(ui,/detail=labelDetail\(\)/);
   assert.match(ui,/dossiers\.cours\.find\(item=>TIMELINE\.includes\(item\.stage\)\)/);
+  // v880 : l'intervention en quelques mots (sujet du Trieur), jamais le texte de la demande.
+  assert.match(ui,/String\(dossier\?\.sujet\|\|''\)/);
+  assert.doesNotMatch(ui.slice(ui.indexOf('function labelDetail('),ui.indexOf('function labelDetail(')+500),/message/);
+  const script=read('scripts/bureau_agent.py');
+  assert.match(script,/"sujet": "l'intervention en 3 à 6 mots, technique mais compréhensible/);
+  assert.match(script,/'sujet': ' '\.join\(str\(plan\.get\('sujet'\) or ''\)\.split\(\)\)\[:48\]/);
+  const built=loadBureau().buildDossiers([{id:'1',type:'correction',message:'texte famille',etape:'developpeur',agent:{sujet:'Mise à jour du titre du popup'}}],[]);
+  assert.equal(built.cours[0].sujet,'Mise à jour du titre du popup');
   assert.match(ui,/function typeLetters\(label\)/,'texte qui s’écrit lettre par lettre');
   assert.doesNotMatch(ui+css,/coursier|courier|bureau-bubble|bureau-badge|bureau-agents/,'ni livreur, ni bulles, ni légende');
   // Phrase juste au-dessus de la tête de chaque agent.

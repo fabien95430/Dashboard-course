@@ -200,6 +200,7 @@ Décide si elle est faisable en respectant AGENTS.md (changement minimum, pas de
 thème global, sécurité intacte). Une demande vague, hors sujet ou contraire aux règles n'est pas faisable.
 Termine ta réponse par ce seul objet JSON :
 {{"faisable": true|false, "resume": "en une ou deux phrases, en français, ce qui sera fait",
+  "sujet": "l'intervention en 3 à 6 mots, technique mais compréhensible, sans recopier la demande (ex. : Mise à jour du titre du popup, Mise à jour de la base SQL, Nouvelle stratégie de connexion)",
   "plan": "étapes précises : fichiers et fonctions à modifier", "raison": "si non faisable, pourquoi"}}
 """
 
@@ -247,7 +248,7 @@ def process(row: dict) -> None:
 
     reset_to_main()
     git('checkout', '-q', '-B', branch_name(row))
-    update(row, etape='trieur', agent={'debut': True, 'raison': '', 'etape_echec': '', 'resume': '', 'fichiers': [], 'tests': ''})
+    update(row, etape='trieur', agent={'debut': True, 'raison': '', 'etape_echec': '', 'resume': '', 'sujet': '', 'fichiers': [], 'tests': ''})
 
     def fail(stage: str, reason: str) -> None:
         update(row, etape='echec', agent={'etape_echec': stage, 'raison': reason[:900]})
@@ -263,7 +264,8 @@ def process(row: dict) -> None:
     if not plan.get('faisable'):
         fail('trieur', str(plan.get('raison') or 'Demande non faisable en l’état.'))
         return
-    update(row, etape='developpeur', agent={'tri': str(plan.get('resume') or '')[:600]})
+    update(row, etape='developpeur', agent={'tri': str(plan.get('resume') or '')[:600],
+                                             'sujet': ' '.join(str(plan.get('sujet') or '').split())[:48]})
 
     # Développeur (une seconde passe si la validation échoue)
     dev_tools = READ_TOOLS + ['Edit', 'Write', 'Bash(bash scripts/validate_repo.sh)', 'Bash(node --check:*)',
