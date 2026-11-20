@@ -1636,6 +1636,8 @@ function showSecurity(mode,message=''){
   const overlay=UI.securityOverlay;
   state.securityMode=mode;
   overlay.classList.add('is-visible');
+  // Fin du chargement d'ouverture : le formulaire remplace l'animation.
+  $('.security-modal').classList.remove('is-resuming');
   const login=mode==='login';
   // Ouverture de l'app (connexion ou déverrouillage du coffre) : identifiant + mot de passe.
   const withIdentifier=login||mode==='unlock';
@@ -1667,6 +1669,7 @@ function showSecurity(mode,message=''){
 function hideSecurity(){
   unlockVersionChecked=false;
   UI.securityOverlay.classList.remove('is-visible');
+  $('.security-modal').classList.remove('is-resuming');
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
   UI.securityError.textContent='';
@@ -3279,6 +3282,8 @@ renderSettingsPage=function(){
   if(connectionDot)connectionDot.classList.remove('is-online');
 };
 
+// Durée minimale de l'animation d'ouverture d'un compte famille : évite un simple clignement.
+const FAMILY_RESUME_MIN_MS=550;
 async function init(){
   renderView();
   if(!window.crypto?.subtle){
@@ -3325,10 +3330,21 @@ async function init(){
   }
   state.haUrl=normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
   if(rememberedAccount()?.kind==='family'&&window.COURSES_FAMILY){
-    // Compte famille : la session reste ouverte, sans redemander le mot de passe.
+    // Compte famille : la session reste ouverte, sans redemander le mot de passe. L'écran
+    // d'ouverture garde son animation de chargement (jamais le formulaire), puis Ma liste arrive.
+    const started=Date.now();
     try{
       const info=await window.COURSES_FAMILY.resume();
-      if(info){enterFamilyMode(info);return}
+      if(info){
+        await new Promise(resolve=>setTimeout(resolve,Math.max(0,FAMILY_RESUME_MIN_MS-(Date.now()-started))));
+        enterFamilyMode(info);
+        const main=document.querySelector('main');
+        if(main){
+          main.classList.add('is-arriving');
+          main.addEventListener('animationend',()=>main.classList.remove('is-arriving'),{once:true});
+        }
+        return;
+      }
     }catch(_){}
   }
   state.loading=false;renderView();showLogin();status('is-waiting','Connexion requise','Identifiant et mot de passe');
