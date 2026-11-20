@@ -157,6 +157,11 @@
   --line:var(--v23-line);
   --green:var(--v23-green);
   --danger:#df4040;
+  --login-ink:#103c22;
+  --login-muted:#425c48;
+  --login-outline:#789663;
+  --login-field-bg:rgba(255,253,247,.16);
+  --login-button-bg:linear-gradient(135deg,#24683c,#175330);
 }
 html,body{
   margin:0;
@@ -3387,17 +3392,16 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   top:max(calc(env(safe-area-inset-top,0px) + 20px),clamp(24px,calc((var(--security-screen-height) - 660px) * .45),104px));
   width:calc(100% - 48px);max-width:384px;min-height:0;margin:0;padding:0;
   border:0;border-radius:0;background:transparent;box-shadow:none;
-  color:#103c22;text-align:center;
+  color:var(--login-ink);text-align:center;
 }
-.security-ornament{display:flex;align-items:center;justify-content:center;gap:12px;width:52%;height:6px;margin:0 auto 22px}
-.security-ornament i{flex:1;height:1px;background:rgba(129,129,103,.48)}
-.security-ornament b{width:6px;height:6px;transform:rotate(45deg);background:#96906f}
 /* v846 — même typographie que les pages de l’app : titres Baskerville, textes système. */
-.security-modal h3{margin:0;font:500 46px/1.05 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:-1.1px;color:#103c22}
+.security-modal h3{margin:0;font:500 46px/1.05 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:-1.1px;color:var(--login-ink)}
+.security-modal .security-card-copy{margin:12px 0 0;color:var(--login-muted);font-size:var(--fs-sub);line-height:1.4}
+.security-modal.is-creating .security-card-copy{display:none}
 .security-dynamic{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
 /* Formulaire épuré, resserré et centré : ne déborde plus sur le décor latéral. */
-.security-modal .password-panel{width:min(100%,272px);margin:46px auto 0;text-align:left}
+.security-modal .password-panel{width:min(100%,304px);margin:28px auto 0;text-align:left}
 /* Ouverture : animation de chargement au milieu de l'espace libre tant que app.js n'a pas
    choisi l'écran (compte famille : Ma liste directement ; sinon formulaire de connexion). */
 .security-loading{display:none}
@@ -3412,38 +3416,40 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 @keyframes security-loading{0%,80%,100%{transform:scale(.55);opacity:.3}40%{transform:scale(1.15);opacity:1}}
 @media(prefers-reduced-motion:reduce){.security-loading i{animation-duration:1.6s}}
 .password-panel[hidden]{display:none}
-.security-modal .field{margin:18px 0 0}
+.security-modal .field{margin:14px 0 0}
 .security-modal .field:first-child{margin-top:0}
 .security-modal .field>span,.security-password-field>label{
-  display:block;margin:0 0 2px;color:#6f7880;font:500 13px/18px -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:.2px;
+  /* Libellés accessibles conservés ; le texte visible est dans le champ. */
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;
 }
 .security-modal .field input{
-  display:block;width:100%;height:40px;padding:0 2px;outline:none;
+  display:block;width:100%;height:48px;padding:0 14px;outline:none;
   /* Saisie : police système, en noir. */
   color:#000;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;letter-spacing:normal;
-  border:0;border-bottom:1px solid rgba(27,82,56,.25);border-radius:0;
-  background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;
+  border:1px solid var(--login-outline);border-radius:12px;
+  background:var(--login-field-bg);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;
   transition:border-color .15s ease,box-shadow .15s ease;
 }
-.security-modal .field input:focus{border-bottom-color:#198957;box-shadow:0 1px 0 #198957}
+.security-modal .field input:focus{border-color:var(--login-ink);box-shadow:0 0 0 2px var(--login-outline)}
+.security-modal .field input::placeholder{color:var(--login-muted);opacity:1;font-weight:400;letter-spacing:normal}
 /* Remplissage automatique iOS : pas de fond jaune, même rendu que la saisie. */
 .security-modal .field input:-webkit-autofill,.security-modal .field input:-webkit-autofill:hover,.security-modal .field input:-webkit-autofill:focus,.security-modal .field input:autofill{-webkit-text-fill-color:#000;caret-color:#000;-webkit-background-clip:text;background-clip:text;-webkit-box-shadow:0 0 0 1000px transparent inset;box-shadow:none;transition:background-color 100000s ease 0s}
 .security-modal .field input[type="password"]{font-size:16px;letter-spacing:.18em}
 .security-input-wrap{position:relative}
 .security-modal .security-input-wrap input{padding-right:48px}
 .security-password-toggle{
-  position:absolute;right:-8px;top:-2px;display:grid;place-items:center;width:44px;height:44px;
-  padding:0;border:0;border-radius:12px;background:transparent;color:#7d7558;cursor:pointer;
+  position:absolute;right:4px;top:2px;display:grid;place-items:center;width:44px;height:44px;
+  padding:0;border:0;border-radius:12px;background:transparent;color:var(--login-muted);cursor:pointer;
 }
 .security-password-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .security-password-toggle .eye-slash{display:none}
 .security-password-toggle[aria-pressed="true"] .eye-slash{display:block}
 .security-password-toggle:focus-visible{outline:2px solid #36753a;outline-offset:-3px}
 .security-modal .password-panel .primary{
-  width:100%;height:46px;margin-top:28px;padding:0 12px;border:0;border-radius:23px;
-  background:linear-gradient(135deg,#24683c,#175330);color:#fffdf4;
-  font:600 19px/1.1 "Baskerville","Iowan Old Style",Georgia,serif;letter-spacing:.5px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 20px rgba(23,83,48,.22);cursor:pointer;
+  width:100%;height:48px;margin-top:24px;padding:0 12px;border:0;border-radius:12px;
+  background:var(--login-button-bg);color:#fffdf4;
+  font-family:inherit;font-size:var(--fs-title);font-weight:600;line-height:1.1;letter-spacing:normal;
+  box-shadow:none;cursor:pointer;
 }
 .security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
 .security-modal .primary:disabled{opacity:.7;cursor:wait}
@@ -3451,13 +3457,12 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-modal .setup-error:empty{display:none}
 /* Petits téléphones : variante choisie sur la hauteur complète, pas à l'ouverture du clavier. */
 html[data-security-compact="true"] .security-modal{top:calc(env(safe-area-inset-top,0px) + 16px)}
-html[data-security-compact="true"] .security-ornament{margin-bottom:14px}
 html[data-security-compact="true"] .security-modal h3{font-size:38px}
-html[data-security-compact="true"] .security-modal .password-panel{margin-top:28px}
+html[data-security-compact="true"] .security-modal .password-panel{margin-top:24px}
 html[data-security-compact="true"] .security-modal .field{margin-top:10px}
 html[data-security-compact="true"] .security-modal .field:first-child{margin-top:0}
-html[data-security-compact="true"] .security-modal .field input{height:40px}
-html[data-security-compact="true"] .security-password-toggle{height:40px;top:0}
+html[data-security-compact="true"] .security-modal .field input{height:44px}
+html[data-security-compact="true"] .security-password-toggle{height:44px;top:0}
 html[data-security-compact="true"] .security-modal .primary{height:44px;margin-top:20px;font-size:18px}
 /* Paysage, texte agrandi ou erreur longue : le contenu reste accessible au défilement. */
 .security-shell.is-scrollable{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}

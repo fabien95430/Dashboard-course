@@ -32,11 +32,22 @@ const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.svg'
       await page.locator('#securityIdentifier').fill('jeje');
       await page.locator('#securityPassword').fill('exemple');
       await page.locator('#securityPassword').blur();
-      const boxes=()=>page.evaluate(()=>Object.fromEntries(['.security-ornament','#securityTitle','.security-card-copy','#securityIdentifier','#securityPassword','#securitySubmit'].map(selector=>{
+      const boxes=()=>page.evaluate(()=>Object.fromEntries(['#securityTitle','.security-card-copy','#securityIdentifier','#securityPassword','#securitySubmit'].map(selector=>{
         const el=document.querySelector(selector),r=el.getBoundingClientRect();
         return [selector,{x:r.x,y:r.y,width:r.width,height:r.height,display:getComputedStyle(el).display}];
       })));
       const before=await boxes();
+      await page.getByRole('textbox',{name:'Identifiant',exact:true}).waitFor({state:'visible'});
+      assert.equal(await page.locator('#securitySubmit').textContent(),'Se connecter');
+      assert.equal(await page.getByText('Mot de passe oublié ?',{exact:true}).count(),0);
+      for(const selector of ['#securityIdentifier','#securityPassword']){
+        const style=await page.locator(selector).evaluate(el=>{
+          const css=getComputedStyle(el);
+          return {borders:[css.borderTopWidth,css.borderRightWidth,css.borderBottomWidth,css.borderLeftWidth],radius:css.borderRadius};
+        });
+        assert.deepEqual(style.borders,['1px','1px','1px','1px']);
+        assert.equal(style.radius,'12px');
+      }
       const backgroundBefore=await page.locator('#securityOverlay').evaluate(el=>({h:el.getBoundingClientRect().height,size:getComputedStyle(el).backgroundSize}));
       const available=height-(height<=667?291:346);
       await page.locator('#securityIdentifier').focus();
@@ -53,7 +64,13 @@ const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.svg'
       assert.equal(await page.locator('#securityPassword').getAttribute('type'),'password');
       const scrollable=await page.locator('.security-shell').evaluate(el=>el.classList.contains('is-scrollable'));
       if(height>=667)assert.ok(before['#securitySubmit'].y+before['#securitySubmit'].height<=available,'button above keyboard '+height);
-      else assert.ok(scrollable,'short screen scroll fallback');
+      else assert.ok(scrollable||before['#securitySubmit'].y+before['#securitySubmit'].height<=available,'short screen: button visible or scrollable');
+      // Même avec un formulaire plus compact, une erreur longue doit rester accessible.
+      await page.locator('#securityError').evaluate(el=>{el.textContent='Erreur de connexion. '.repeat(30)});
+      await page.evaluate(h=>testKeyboard(h),available);
+      assert.equal(await page.locator('.security-shell').evaluate(el=>el.classList.contains('is-scrollable')),true,'long error scroll fallback');
+      await page.locator('#securityError').evaluate(el=>{el.textContent=''});
+      await page.evaluate(h=>testKeyboard(h),available);
       await page.evaluate(h=>testKeyboard(h,40),available);
       const compensated=await boxes();
       for(const key of Object.keys(before))assert.ok(Math.abs(compensated[key].y-before[key].y-40)<.1,'iOS offset compensation');

@@ -1656,7 +1656,7 @@ function showSecurity(mode,message=''){
   UI.securityPassword.autocomplete=creating?'new-password':'current-password';
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
-  UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Connexion';
+  UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Se connecter';
   UI.securityError.textContent='';
   refreshVisualLock();
   // Déverrouillage : la version est vérifiée AVANT de donner le champ mot de passe (et donc la
@@ -3452,7 +3452,7 @@ function setUnlockGate(locked){
     // Libellé d'origine conservé (« Connexion », « Chiffrer et continuer »…).
     if(locked&&!unlockGateLabel)unlockGateLabel=button.textContent||'';
     button.disabled=locked;
-    button.textContent=locked?'Vérification…':(unlockGateLabel||'Connexion');
+    button.textContent=locked?'Vérification…':(unlockGateLabel||'Se connecter');
     if(!locked)unlockGateLabel='';
   }
 }

@@ -33,7 +33,7 @@
   <!-- Fond de Ma liste : image déjà calculée (le SVG à filtres était recalculé par Safari au déverrouillage, d'où le fond en retard). -->
   <link rel="preload" as="image" href="./marble-ivory-sage-v852.jpg">
   <title>Mes courses</title>
-  <link rel="stylesheet" href="./styles.css?v=874">
+  <link rel="stylesheet" href="./styles.css?v=877">
   <link rel="stylesheet" href="./product-item-first-paint.css?v=610">
 </head>
 <body>
@@ -70,7 +70,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v876</span>
+            <span class="page-version">v877</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -93,7 +93,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v876</span>
+            <span class="page-version">v877</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -129,7 +129,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v876</span>
+            <span class="page-version">v877</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -228,19 +228,19 @@
   <section id="securityOverlay" class="overlay security-overlay is-visible" role="dialog" aria-modal="true" aria-labelledby="securityTitle">
     <div class="security-shell">
       <div class="modal security-modal is-resuming">
-        <div class="security-ornament" aria-hidden="true"><i></i><b></b><i></i></div>
         <h3 id="securityTitle">Bonjour</h3>
+        <p class="security-card-copy">Heureux de vous retrouver</p>
         <div class="security-loading" role="status" aria-label="Ouverture de votre liste"><i></i><i></i><i></i></div>
         <p id="securityText" class="security-dynamic" aria-live="polite"></p>
         <div id="passwordPanel" class="password-panel">
           <label id="securityIdentifierWrap" class="field" hidden>
             <span>Identifiant</span>
-            <input id="securityIdentifier" type="text" enterkeyhint="next" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+            <input id="securityIdentifier" type="text" placeholder="Identifiant" enterkeyhint="next" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
           </label>
           <div class="field security-password-field">
             <label for="securityPassword">Mot de passe</label>
             <div class="security-input-wrap">
-              <input id="securityPassword" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" enterkeyhint="go">
+              <input id="securityPassword" type="password" placeholder="Mot de passe" autocomplete="current-password" autocapitalize="none" spellcheck="false" enterkeyhint="go">
               <button id="securityPasswordToggle" class="security-password-toggle" type="button" aria-label="Afficher le mot de passe" aria-controls="securityPassword" aria-pressed="false">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m4 3 16 18"/></svg>
               </button>
@@ -248,9 +248,9 @@
           </div>
           <label id="securityConfirmWrap" class="field" hidden>
             <span>Confirmer le mot de passe</span>
-            <input id="securityConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+            <input id="securityConfirm" type="password" placeholder="Confirmer le mot de passe" autocomplete="new-password" autocapitalize="none" spellcheck="false">
           </label>
-          <button id="securitySubmit" class="primary" type="button">Connexion</button>
+          <button id="securitySubmit" class="primary" type="button">Se connecter</button>
         </div>
         <div id="securityError" class="setup-error" role="alert"></div>
       </div>
@@ -481,7 +481,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=876"></script>
+  <script src="./catalog.js?v=877"></script>
   <script src="./product-item-images.js?v=820" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=824"></script>
@@ -489,7 +489,7 @@
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=848" data-app-ui="script"></script>
   <script src="./family-service.js?v=867"></script>
-  <script src="./app.js?v=874"></script>
+  <script src="./app.js?v=877"></script>
   <script src="./settings-tab-badge.js?v=830"></script>
   <script src="./settings-ui.js?v=827"></script>
   <script src="./error-center.js?v=820"></script>
