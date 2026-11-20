@@ -101,22 +101,22 @@ function pileMarkup(count){
   return pile;
 }
 
-/* Ce que fait chaque agent : une courte phrase juste au-dessus de sa tête, avec une coche quand il a fini (jusqu'à ta validation).
-   head : tête en % de la scène ; lift : écart au-dessus de la tête (px) ; shift : part de l'étiquette à gauche de la tête (%),
-   pour que les trois phrases ne se chevauchent pas (le Trieur, au fond, un peu plus haut). */
+/* Pendant la démonstration, seule l'étiquette de l'agent actif montre son action et son détail.
+   head : tête en % de la scène ; lift : écart au-dessus de la tête (px) ; shift : part de l'étiquette à gauche de la tête (%). */
 const LEADS=Object.freeze({
   trieur:{head:[53.5,33.6],lift:16,shift:50},
-  testeur:{head:[37.5,39.8],lift:6,shift:85},
-  developpeur:{head:[71.5,44.8],lift:6,shift:30}
+  testeur:{head:[37.5,39.8],lift:6,shift:70},
+  developpeur:{head:[71.5,44.8],lift:6,shift:55}
 });
 const TYPE_MS=45;      // une lettre
 function labelMarkup(agent,typing=false){
-  const state=agentState(agent.id),text=agentText(agent.id),lead=LEADS[agent.id];
-  const letters=typing?[...text].map(letter=>letter===' '?' ':'<span>'+esc(letter)+'</span>').join(''):esc(text);
-  return '<span class="bureau-label is-'+agent.id+' is-'+state+(typing?' is-typing':'')+'" style="--agent:'+agent.color+';left:'+lead.head[0]+'%;top:calc('+lead.head[1]+'% - '+lead.lift+'px);transform:translate(-'+lead.shift+'%,-100%)" aria-label="'+esc(agent.name+' : '+text)+'"'+(typing?' data-since="'+Math.round(demo?.ms||0)+'"':'')+'>'+(state==='done'?'<i aria-hidden="true">'+SVG_DONE+'</i>':'')+'<b aria-hidden="true">'+letters+'</b></span>';
+  if(agentState(agent.id)!=='busy')return '';
+  const title=ACTIVITIES[agent.id],detail=DETAILS[agent.id],lead=LEADS[agent.id];
+  const letters=text=>typing?[...text].map(letter=>letter===' '?' ':'<span>'+esc(letter)+'</span>').join(''):esc(text);
+  return '<span class="bureau-label is-'+agent.id+' is-busy'+(typing?' is-typing':'')+'" style="--agent:'+agent.color+';left:'+lead.head[0]+'%;top:calc('+lead.head[1]+'% - '+lead.lift+'px);transform:translate(-'+lead.shift+'%,-100%)" aria-label="'+esc(agent.name+' : '+title+'. '+detail)+'"'+(typing?' data-since="'+Math.round(demo?.ms||0)+'"':'')+'><b aria-hidden="true">'+letters(title)+'</b><small aria-hidden="true">'+letters(detail)+'</small></span>';
 }
 function typeLetters(label){
-  const letters=label.querySelectorAll('b span');
+  const letters=label.querySelectorAll('b span,small span');
   const shown=Math.floor(((demo?.ms||0)-Number(label.dataset.since||0))/TYPE_MS)+1;
   letters.forEach((letter,index)=>letter.classList.toggle('is-on',index<shown));
   if(shown>=letters.length)label.classList.remove('is-typing');
@@ -125,21 +125,22 @@ function sceneMarkup(){
   // Ordre d'affichage = profondeur : Trieur au fond, puis Testeur (gauche) et Développeur (droite).
   return '<div class="bureau-scene-art" role="img" aria-label="Le bureau des agents'+(validerCount()?', '+validerCount()+' dossiers à valider':'')+'">'+sceneImage('piece','bureau-room')+
     AGENTS.map(agent=>'<span class="bureau-poste is-'+agent.id+'" data-frame="repos">'+sceneImage(agent.id+'-repos','is-repos')+'</span>').join('')+
-    '<span class="bureau-pile">'+pileMarkup(pileCount())+'</span>'+AGENTS.map(agent=>labelMarkup(agent)).join('')+'</div>'+
+    '<span class="bureau-pile">'+pileMarkup(pileCount())+'</span>'+AGENTS.map(agent=>labelMarkup(agent,!!demo&&!demo.finished)).join('')+'</div>'+
     playButton();
 }
 
 /* ---------- Actions (démonstration en attendant les agents) ----------
-   Une demande traitée en 10 secondes : le Trieur trie, le Développeur code, le Testeur teste,
-   puis le dossier arrive sur la pile de ton bureau et dans « À valider ». Seul l'agent au travail bouge
-   (image par image : repos / frappe / tête inclinée). Les phrases gardent leur coche tant que le dossier
-   n'est pas validé. Rien n'est enregistré ni mis en ligne. Coupé à la fermeture du popup pendant le
+   Le Trieur, puis le Développeur, puis le Testeur travaillent chacun à leur tour.
+   Seul l'agent actif bouge et affiche sa bulle (action + détail). Au relais et après
+   le cycle, la bulle disparaît ; le dossier reste dans « À valider » jusqu'à validation.
+   Rien n'est enregistré ni mis en ligne. Coupé à la fermeture du popup pendant le
    traitement, au verrouillage et si « réduire les animations » est actif. */
 const POSTE_MS=480;    // une image de poste
 const POSTE_CYCLE=Object.freeze(['frappe','repos','frappe','repos','frappe','repos','tete','tete','repos']);
 const POSTE_PHASE=Object.freeze({trieur:0,testeur:3,developpeur:6});
 const DEMO_STEPS=Object.freeze([['trieur',3000],['developpeur',6500],['testeur',9500]]);
-const ACTIVITIES=Object.freeze({trieur:'Trie le courrier',developpeur:'Code la version',testeur:'Lance les tests'});
+const ACTIVITIES=Object.freeze({trieur:'Analyse la demande',developpeur:'Prépare le correctif',testeur:'Vérifie le résultat'});
+const DETAILS=Object.freeze({trieur:'Identifie le type et les priorités',developpeur:'Repère les fichiers concernés',testeur:'Contrôle les tests et le rendu'});
 const DONE=Object.freeze({trieur:'Dossier trié',developpeur:'Version prête',testeur:'Tests verts'});
 let demo=null;         // {start, ms, timer, finished}
 
@@ -161,16 +162,7 @@ function demoDossier(){
 function validerList(){return demo?.finished?[demoDossier(),...dossiers.valider]:dossiers.valider}
 function validerCount(){return validerList().length}
 function agentState(id){
-  if(demo&&!demo.finished){
-    const step=demoAt(demo.ms);
-    return step.active===id?'busy':step.done.includes(id)?'done':'wait';
-  }
-  // Leur part est faite : ils gardent la coche tant que le dossier n'est pas validé.
-  return validerCount()?'done':'wait';
-}
-function agentText(id){
-  const state=agentState(id);
-  return state==='busy'?ACTIVITIES[id]:state==='done'?DONE[id]:'En attente';
+  return demo&&!demo.finished&&demoAt(demo.ms).active===id?'busy':null;
 }
 function ensureDemoLayers(scene){
   const loads=[];
@@ -196,9 +188,8 @@ function paintDemo(scene){
       poste.dataset.frame=frame==='repos'||ready(poste.querySelector('.is-'+frame))?frame:'repos';
     }
     const label=scene.querySelector('.bureau-label.is-'+agent.id);
-    if(label&&!label.classList.contains('is-'+state)){
-      label.outerHTML=labelMarkup(agent,true);
-    }
+    if(state==='busy'&&!label)scene.insertAdjacentHTML('beforeend',labelMarkup(agent,true));
+    else if(state!=='busy'&&label)label.remove();
     const typing=scene.querySelector('.bureau-label.is-typing.is-'+agent.id);
     if(typing)typeLetters(typing);
   });

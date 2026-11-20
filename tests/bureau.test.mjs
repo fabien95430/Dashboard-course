@@ -111,7 +111,8 @@ test('bureau : actions, étiquettes reliées aux agents, onglets et dossier à v
   assert.match(ui,/function forget\(\)\{\n  stopDemo\(\);/,'oublié au verrouillage');
   assert.match(ui,/data-action="demo"/);
   assert.match(ui,/data-action="validate-demo"/,'le dossier de démonstration se valide');
-  assert.match(ui,/const ACTIVITIES=Object\.freeze\(\{trieur:'Trie le courrier',developpeur:'Code la version',testeur:'Lance les tests'\}\)/);
+  assert.match(ui,/const ACTIVITIES=Object\.freeze\(\{trieur:'Analyse la demande',developpeur:'Prépare le correctif',testeur:'Vérifie le résultat'\}\)/);
+  assert.match(ui,/const DETAILS=Object\.freeze\(\{trieur:'Identifie le type et les priorités',developpeur:'Repère les fichiers concernés',testeur:'Contrôle les tests et le rendu'\}\)/);
   assert.match(ui,/function typeLetters\(label\)/,'texte qui s’écrit lettre par lettre');
   assert.doesNotMatch(ui+css,/coursier|courier|bureau-bubble|bureau-badge|bureau-agents/,'ni livreur, ni bulles, ni légende');
   // Phrase juste au-dessus de la tête de chaque agent.
@@ -121,10 +122,16 @@ test('bureau : actions, étiquettes reliées aux agents, onglets et dossier à v
   }
   assert.match(ui,/top:calc\('\+lead\.head\[1\]\+'% - '\+lead\.lift\+'px\)/);
   assert.doesNotMatch(ui+css,/bureau-leads/,'plus de traits');
-  assert.match(ui,/state==='done'\?'<i aria-hidden="true">'\+SVG_DONE\+'<\/i>'/,'coche dans la phrase de l’agent qui a fini');
+  assert.match(ui,/if\(agentState\(agent\.id\)!=='busy'\)return '';/,'pas de bulle hors intervention');
+  assert.match(ui,/else if\(state!=='busy'&&label\)label\.remove\(\);/,'bulle précédente supprimée au relais');
+  assert.match(ui,/const letters=label\.querySelectorAll\('b span,small span'\)/,'les deux lignes s’animent');
+  assert.match(css,/\.bureau-label small\{[^}]*line-height:/,'détail lisible');
+  assert.doesNotMatch(ui,/'En attente'/,'plus de badge En attente');
   assert.doesNotMatch(ui+css,/bureau-head/,'pas de repère sous les phrases');
-  // Agents : coche gardée tant que le dossier n'est pas validé.
-  assert.match(ui,/return validerCount\(\)\?'done':'wait';/);
+  // Une seule bulle à la fois, aucune à la fin du cycle ou quand il n'a pas commencé.
+  assert.match(ui,/return demo&&!demo\.finished&&demoAt\(demo\.ms\)\.active===id\?'busy':null;/);
+  assert.match(ui,/AGENTS\.map\(agent=>labelMarkup\(agent,!!demo&&!demo\.finished\)\)/);
+  assert.doesNotMatch(ui,/state==='done'/,'pas de badge de fin de tâche persistant');
   // Onglets : En cours, À valider (pastille rouge), Terminés.
   assert.match(ui,/const TABS=Object\.freeze\(\[\['cours','En cours'\],\['valider','À valider'\],\['termines','Terminés'\]\]\);/);
   assert.match(ui,/class="bureau-tab-count"/);
