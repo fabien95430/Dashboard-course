@@ -3378,6 +3378,10 @@ html[data-account="family"] #settingsBureauBtn{display:none!important}
 /* Espace libre réparti dans l'écran de connexion selon la hauteur (0 à 64 px), en gardant
    le bouton au-dessus du clavier et de sa barre ⌃ ⌄ ✓. */
 :root{--login-air:clamp(0px,calc((var(--security-screen-height) - 740px) * .55),64px)}
+/* Largeur du formulaire : il s'arrête avant l'étagère de l'image de fond. L'image est calée sur la
+   hauteur d'écran et centrée ; le montant de l'étagère est à 16,4 % de cette hauteur à droite du
+   centre, d'où une demi-largeur de .164 × hauteur moins 12 px de marge. */
+:root{--login-panel-width:clamp(240px,calc(var(--security-screen-height) * .328 - 24px),304px)}
 html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   overflow:hidden!important;overscroll-behavior:none!important;
   background:#f4f0e8 url("./welcome-kitchen-sage-v855.webp") center top / auto var(--security-screen-height) no-repeat!important;
@@ -3409,7 +3413,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-dynamic{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
 /* Formulaire épuré, resserré et centré : ne déborde plus sur le décor latéral. */
-.security-modal .password-panel{width:min(100%,304px);margin:calc(28px + var(--login-air) * .5) auto 0;text-align:left}
+.security-modal .password-panel{width:min(100%,var(--login-panel-width));margin:calc(28px + var(--login-air) * .5) auto 0;text-align:left}
 /* Ouverture : animation de chargement au milieu de l'espace libre tant que app.js n'a pas
    choisi l'écran (compte famille : Ma liste directement ; sinon formulaire de connexion). */
 .security-loading{display:none}
