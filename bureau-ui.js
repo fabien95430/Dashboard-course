@@ -153,9 +153,9 @@ const LEADS=Object.freeze({
 const TYPE_MS=45;      // une lettre
 function labelMarkup(agent,typing=false){
   if(agentState(agent.id)!=='busy')return '';
-  const title=ACTIVITIES[agent.id],detail=DETAILS[agent.id],lead=LEADS[agent.id];
+  const title=ACTIVITIES[agent.id],detail=labelDetail(),lead=LEADS[agent.id];
   const letters=text=>typing?[...text].map(letter=>letter===' '?' ':'<span>'+esc(letter)+'</span>').join(''):esc(text);
-  return '<span class="bureau-label is-'+agent.id+' is-busy'+(typing?' is-typing':'')+'" style="--agent:'+agent.color+';left:'+lead.head[0]+'%;top:calc('+lead.head[1]+'% - '+lead.lift+'px);transform:translate(-'+lead.shift+'%,-100%)" aria-label="'+esc(agent.name+' : '+title+'. '+detail)+'"'+(typing?' data-since="'+Math.round(demo?.ms||0)+'"':'')+'><b aria-hidden="true">'+letters(title)+'</b><small aria-hidden="true">'+letters(detail)+'</small></span>';
+  return '<span class="bureau-label is-'+agent.id+' is-busy'+(typing?' is-typing':'')+'" style="--agent:'+agent.color+';left:'+lead.head[0]+'%;top:calc('+lead.head[1]+'% - '+lead.lift+'px);transform:translate(-'+lead.shift+'%,-100%)" aria-label="'+esc(agent.name+' : '+title+'. '+detail)+'" data-detail="'+esc(detail)+'"'+(typing?' data-since="'+Math.round(demo?.ms||0)+'"':'')+'><b aria-hidden="true">'+letters(title)+'</b><small aria-hidden="true">'+letters(detail)+'</small></span>';
 }
 function typeLetters(label){
   const letters=label.querySelectorAll('b span,small span');
@@ -182,7 +182,13 @@ const POSTE_CYCLE=Object.freeze(['frappe','repos','frappe','repos','frappe','rep
 const POSTE_PHASE=Object.freeze({trieur:0,testeur:3,developpeur:6});
 const DEMO_STEPS=Object.freeze([['trieur',3000],['developpeur',6500],['testeur',9500]]);
 const ACTIVITIES=Object.freeze({trieur:'Analyse la demande',developpeur:'Prépare le correctif',testeur:'Vérifie le résultat'});
-const DETAILS=Object.freeze({trieur:'Identifie le type et les priorités',developpeur:'Repère les fichiers concernés',testeur:'Contrôle les tests et le rendu'});
+/* Sous l'action, le sujet réel du dossier traité (titre de la demande), pas une description générique. */
+const DETAIL_MAX=46;
+function labelDetail(){
+  const dossier=demo?{message:'Trier les plats par temps de préparation'}:dossiers.cours.find(item=>TIMELINE.includes(item.stage));
+  const text=String(dossier?.message||'').replace(/\s+/g,' ').trim();
+  return text.length>DETAIL_MAX?text.slice(0,DETAIL_MAX-1).trimEnd()+'…':text;
+}
 const DONE=Object.freeze({trieur:'Dossier trié',developpeur:'Version prête',testeur:'Tests verts'});
 let demo=null;         // {start, ms, timer, finished}
 
@@ -238,6 +244,7 @@ function paintDemo(scene){
     const label=scene.querySelector('.bureau-label.is-'+agent.id);
     if(state==='busy'&&!label)scene.insertAdjacentHTML('beforeend',labelMarkup(agent,!!demo));
     else if(state!=='busy'&&label)label.remove();
+    else if(label&&!demo&&label.dataset.detail!==labelDetail())label.outerHTML=labelMarkup(agent,false);
     const typing=scene.querySelector('.bureau-label.is-typing.is-'+agent.id);
     if(typing)typeLetters(typing);
   });

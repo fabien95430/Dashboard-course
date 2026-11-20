@@ -113,7 +113,10 @@ test('bureau : actions, étiquettes reliées aux agents, onglets et dossier à v
   assert.match(ui,/data-action="demo"/);
   assert.match(ui,/data-action="validate-demo"/,'le dossier de démonstration se valide');
   assert.match(ui,/const ACTIVITIES=Object\.freeze\(\{trieur:'Analyse la demande',developpeur:'Prépare le correctif',testeur:'Vérifie le résultat'\}\)/);
-  assert.match(ui,/const DETAILS=Object\.freeze\(\{trieur:'Identifie le type et les priorités',developpeur:'Repère les fichiers concernés',testeur:'Contrôle les tests et le rendu'\}\)/);
+  // v879 : sous l'action, le sujet du dossier traité (plus de description générique).
+  assert.doesNotMatch(ui,/const DETAILS=/);
+  assert.match(ui,/detail=labelDetail\(\)/);
+  assert.match(ui,/dossiers\.cours\.find\(item=>TIMELINE\.includes\(item\.stage\)\)/);
   assert.match(ui,/function typeLetters\(label\)/,'texte qui s’écrit lettre par lettre');
   assert.doesNotMatch(ui+css,/coursier|courier|bureau-bubble|bureau-badge|bureau-agents/,'ni livreur, ni bulles, ni légende');
   // Phrase juste au-dessus de la tête de chaque agent.
