@@ -35,7 +35,9 @@ test('l identifiant est mémorisé sans secret et oublié à la déconnexion',()
   const app=read('app.js');
   assert.match(app,/account:'courses-account-v1'/);
   assert.match(app,/function rememberAccount\(id,kind\)\{saveJson\(STORAGE\.account,\{id:String\(id\|\|''\),kind\}\)\}/);
-  assert.match(app,/const login=mode==='login';\s*UI\.securityIdentifierWrap\.hidden=!login;/);
+  assert.match(app,/const login=mode==='login';[\s\S]*?const withIdentifier=login\|\|mode==='unlock';\s*UI\.securityIdentifierWrap\.hidden=!withIdentifier;/);
+  // Déverrouillage du coffre : identifiant admin + mot de passe, comme à la connexion.
+  assert.match(app,/if\(!await isAdminIdentifier\(UI\.securityIdentifier\.value\)\)\{error\.textContent='Identifiant incorrect\.'/);
   const revoke=app.match(/async function revoke\(\)\{[\s\S]*?\n\}/)?.[0]||'';
   assert.ok(revoke.includes('forgetAccount();'));
   assert.ok(revoke.includes('showLogin();'));

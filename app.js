@@ -1630,8 +1630,10 @@ function showSecurity(mode,message=''){
   state.securityMode=mode;
   overlay.classList.add('is-visible');
   const login=mode==='login';
-  UI.securityIdentifierWrap.hidden=!login;
-  if(login)UI.securityIdentifier.value=rememberedAccount()?.id||'';
+  // Ouverture de l'app (connexion ou déverrouillage du coffre) : identifiant + mot de passe.
+  const withIdentifier=login||mode==='unlock';
+  UI.securityIdentifierWrap.hidden=!withIdentifier;
+  if(withIdentifier)UI.securityIdentifier.value=rememberedAccount()?.id||(mode==='unlock'?'admin':'');
   const creating=mode==='oauth'||mode==='migrate';
   $('.security-modal').classList.toggle('is-creating',creating);
   $('#securityTitle').textContent='Bonjour';
@@ -1785,6 +1787,8 @@ async function completeSecurityAction(){
       error.textContent='Trop de tentatives. Réessaie dans '+Math.ceil(retryMs/1000)+' s.';
       return;
     }
+    // Le coffre de cet appareil appartient au compte administrateur.
+    if(!await isAdminIdentifier(UI.securityIdentifier.value)){error.textContent='Identifiant incorrect.';UI.securityIdentifier.focus();return}
   }
   if(!password){error.textContent='Entre le mot de passe local.';return}
   if(state.securityMode==='oauth'||state.securityMode==='migrate'){
