@@ -1,14 +1,14 @@
-name: Diagnostic temporaire — nouvelle pièce Bureau
+name: Conversion temporaire — Bureau source 14
 on:
   push:
     branches: [fix-bureau-wall-crop-20261120]
-  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  visual:
+  convert:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -17,28 +17,37 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install Pillow
-      - name: Examiner le nouveau fond 14-piece-vide 2
+      - name: Régénérer piece.webp depuis 14-piece-vide 2.png
         shell: bash
         run: |
-          mkdir -p /tmp/bureau-diagnostic
           python - <<'PY'
           from PIL import Image, ImageDraw
           from pathlib import Path
-          src=Path('www/Bureau/14-piece-vide 2.png')
-          im=Image.open(src).convert('RGBA')
-          print('14 SOURCE',im.size,'mode',im.mode,'corners',[im.getpixel(pt) for pt in [(0,0),(im.width-1,0),(0,im.height-1),(im.width-1,im.height-1)]])
-          orig=im.copy()
-          orig.thumbnail((1200,900))
-          orig.save('/tmp/bureau-diagnostic/new-piece-original.png')
-          points=[(62,378),(707,0),(728,0),(728,26),(1404,416),(1404,698),(755,1074),(709,1074),(62,698)]
-          overlay=im.copy()
-          d=ImageDraw.Draw(overlay)
-          d.line(points+[points[0]],fill=(250,0,30),width=6)
-          overlay.thumbnail((1200,900))
-          overlay.save('/tmp/bureau-diagnostic/new-piece-with-old-mask.png')
+          source=Path('www/Bureau/14-piece-vide 2.png')
+          target=Path('www/Bureau/webp/piece.webp')
+          room=Image.open(source).convert('RGBA')
+          assert room.size == (1464,1074), room.size
+          outline=[(62,378),(707,0),(728,0),(1404,391),(1404,698),(755,1074),(709,1074),(62,698)]
+          scale=4
+          mask=Image.new('L',(room.width*scale,room.height*scale),0)
+          ImageDraw.Draw(mask).polygon([(x*scale,y*scale) for x,y in outline],fill=255)
+          room.putalpha(mask.resize(room.size,Image.Resampling.LANCZOS))
+          assert room.getpixel((1000,255))[3] > 200
+          room=room.resize((1200,round(room.height*1200/room.width)),Image.Resampling.LANCZOS)
+          room.save(target,'WEBP',quality=86,method=6,exact=False)
+          print('SOURCE',source,'OUTPUT',target,'bytes',target.stat().st_size)
+          assert target.stat().st_size < 75000
+          assert Image.open(target).size == (1200,880)
           PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add www/Bureau/webp/piece.webp
+          if ! git diff --cached --quiet; then
+            git commit -m "bureau: reconstruit la pièce à partir du nouveau PNG sans couper les fenêtres"
+            git push origin "HEAD:fix-bureau-wall-crop-20261120"
+          fi
       - uses: actions/upload-artifact@v4
         with:
-          name: bureau-nouvelle-source
-          path: /tmp/bureau-diagnostic/
+          name: bureau-source14-webp
+          path: www/Bureau/webp/piece.webp
           if-no-files-found: error
