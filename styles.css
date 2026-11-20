@@ -160,6 +160,7 @@
   --login-ink:#103c22;
   --login-muted:#425c48;
   --login-outline:#789663;
+  --login-focus:#2f7a4c;
   --login-field-bg:rgba(255,253,247,.16);
   --login-button-bg:linear-gradient(135deg,#24683c,#175330);
 }
@@ -3374,6 +3375,9 @@ html[data-account="family"] #settingsBureauBtn{display:none!important}
 /* Connexion : géométrie stable, décor plein écran et verre ivoire.
    La hauteur est mémorisée avant le clavier par app-ui.js, jamais dérivée de sa hauteur visible. */
 :root{--security-screen-height:var(--lock-screen-h,var(--security-layout-height,100svh))}
+/* Espace libre réparti dans l'écran de connexion selon la hauteur (0 à 64 px), en gardant
+   le bouton au-dessus du clavier et de sa barre ⌃ ⌄ ✓. */
+:root{--login-air:clamp(0px,calc((var(--security-screen-height) - 740px) * .55),64px)}
 html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   overflow:hidden!important;overscroll-behavior:none!important;
   background:#f4f0e8 url("./welcome-kitchen-sage-v855.webp") center top / auto var(--security-screen-height) no-repeat!important;
@@ -3394,7 +3398,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   position:absolute;left:50%;transform:translateX(-50%);
   /* Assez haut pour que le bouton reste au-dessus du clavier et de sa barre ⌃ ⌄ ✓. */
   top:max(calc(env(safe-area-inset-top,0px) + 20px),clamp(24px,calc((var(--security-screen-height) - 660px) * .45),104px));
-  width:calc(100% - 48px);max-width:384px;min-height:0;margin:0;padding:0;
+  width:calc(100% - 48px);max-width:384px;min-height:0;margin:0;padding:calc(var(--login-air) * .2) 0 0;
   border:0;border-radius:0;background:transparent;box-shadow:none;
   color:var(--login-ink);text-align:center;
 }
@@ -3405,7 +3409,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-dynamic{display:none}
 .security-modal.is-creating .security-dynamic{display:block;margin:8px 0 0;font-size:14px;line-height:1.35;color:#29432a}
 /* Formulaire épuré, resserré et centré : ne déborde plus sur le décor latéral. */
-.security-modal .password-panel{width:min(100%,304px);margin:28px auto 0;text-align:left}
+.security-modal .password-panel{width:min(100%,304px);margin:calc(28px + var(--login-air) * .5) auto 0;text-align:left}
 /* Ouverture : animation de chargement au milieu de l'espace libre tant que app.js n'a pas
    choisi l'écran (compte famille : Ma liste directement ; sinon formulaire de connexion). */
 .security-loading{display:none}
@@ -3420,7 +3424,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 @keyframes security-loading{0%,80%,100%{transform:scale(.55);opacity:.3}40%{transform:scale(1.15);opacity:1}}
 @media(prefers-reduced-motion:reduce){.security-loading i{animation-duration:1.6s}}
 .password-panel[hidden]{display:none}
-.security-modal .field{margin:14px 0 0}
+.security-modal .field{margin:calc(14px + var(--login-air) * .1) 0 0}
 .security-modal .field:first-child{margin-top:0}
 .security-modal .field>span,.security-password-field>label{
   /* Libellés accessibles conservés ; le texte visible est dans le champ. */
@@ -3434,7 +3438,8 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   background:var(--login-field-bg);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;
   transition:border-color .15s ease,box-shadow .15s ease;
 }
-.security-modal .field input:focus{border-color:var(--login-ink);box-shadow:0 0 0 2px var(--login-outline)}
+/* Focus : un seul contour vert, épaissi à l'intérieur (pas de double trait noir + vert). */
+.security-modal .field input:focus{border-color:var(--login-focus);box-shadow:inset 0 0 0 1px var(--login-focus)}
 .security-modal .field input::placeholder{color:var(--login-muted);opacity:1;font-weight:400;letter-spacing:normal}
 /* Remplissage automatique iOS : pas de fond jaune, même rendu que la saisie. */
 .security-modal .field input:-webkit-autofill,.security-modal .field input:-webkit-autofill:hover,.security-modal .field input:-webkit-autofill:focus,.security-modal .field input:autofill{-webkit-text-fill-color:#000;caret-color:#000;-webkit-background-clip:text;background-clip:text;-webkit-box-shadow:0 0 0 1000px transparent inset;box-shadow:none;transition:background-color 100000s ease 0s}
@@ -3450,7 +3455,7 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 .security-password-toggle[aria-pressed="true"] .eye-slash{display:block}
 .security-password-toggle:focus-visible{outline:2px solid #36753a;outline-offset:-3px}
 .security-modal .password-panel .primary{
-  width:100%;height:48px;margin-top:24px;padding:0 12px;border:0;border-radius:12px;
+  width:100%;height:48px;margin-top:calc(24px + var(--login-air) * .2);padding:0 12px;border:0;border-radius:12px;
   background:var(--login-button-bg);color:#fffdf4;
   font-family:inherit;font-size:var(--fs-title);font-weight:600;line-height:1.1;letter-spacing:normal;
   box-shadow:none;cursor:pointer;
