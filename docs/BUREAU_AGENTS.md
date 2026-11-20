@@ -1,6 +1,6 @@
 # Bureau des agents IA — ce qui est validé
 
-Décisions prises avec l'utilisateur le 19/11/2026 sur les maquettes. **Rien de ce document n'est encore intégré à l'application**, sauf la partie « Idées et corrections », déjà en ligne.
+Décisions prises avec l'utilisateur le 19/11/2026 sur les maquettes. L'écran Bureau (étape 1) et les agents (étape 2) sont intégrés ; voir les sections correspondantes.
 
 Le plan complet en 3 étapes (écran Bureau, Trieur automatique, Développeur et Testeur) et les textes ChatGPT sont dans le projet claude.ai « Appli course » :
 - `plan-bureau-agents-ia` ;
@@ -109,14 +109,28 @@ Le code de la scène de maquette est dans `maquette-scene.js`. C'est une référ
 - Coursier retiré (images 11 et 12 non utilisées).
 - Le temps réel `retours` passe par le canal admin unique, partagé avec Familles.
 
+## Étape 2 : les agents au travail (v867)
+
+- **Déclenchement** : `supabase/07-bureau.sql` ajoute au retour son étape (`etape`), le suivi des agents (`agent`) et un relais vers GitHub (`repository_dispatch` `bureau_agent`). Le relais part quand une **correction** arrive, ou quand l'administrateur **autorise**, **valide** ou **refuse** dans le Bureau. Le jeton GitHub reste dans le coffre Supabase (Vault).
+- **Traitement** : `.github/workflows/bureau-agent.yml` lance `scripts/bureau_agent.py`, une seule exécution à la fois, qui vide la file :
+  1. décisions en attente : **Valider** → fusion de la branche sur `main` en un commit, version globale incrémentée, validation complète ; **Refuser** → branche supprimée ;
+  2. une demande à la fois (correction reçue ou idée autorisée), sur la branche `bureau/<id>` : **Trieur** (analyse, faisable ou non), **Développeur** (changement, une seconde passe si la validation échoue), **Testeur** (validation `validate_repo.sh` + relecture selon `AGENTS.md`), puis « À valider ».
+- **Garde-fous** : Claude Code tourne sans aucun secret dans son environnement et avec des outils limités ; le message de la famille lui est donné comme une donnée. Tout changement de `.github/`, `supabase/`, `AGENTS.md`, d'un test existant, ou toute validation en échec met la demande en **Échec** (bouton **Relancer**).
+- **Bureau** : étapes réelles (À autoriser, En file, Tri, Dév., Test, Prêt, Publication, Échec, En ligne, Refusé). L'agent au travail s'anime dans la scène avec sa bulle. Fiche : frise par agent, résumé, fichiers et tests, boutons **Autoriser**, **Valider et mettre en ligne**, **Refuser**, **Relancer**.
+- Une famille ne peut envoyer qu'un retour neuf (`etape = recu`) : elle ne peut pas s'autoriser elle-même.
+
+### Mise en service (à faire une fois par l'administrateur)
+
+1. **Jeton Claude** : sur l'ordinateur, `claude setup-token`, puis dans GitHub › Settings › Secrets and variables › Actions, secret `CLAUDE_CODE_OAUTH_TOKEN`.
+2. **Clé Supabase** : Supabase › Project Settings › API, clé `service_role` → secret GitHub `SUPABASE_SERVICE_ROLE_KEY`.
+3. **Jeton GitHub pour le relais** : GitHub › Settings › Developer settings › Fine-grained tokens, dépôt `Dashboard-course` seul, permission *Contents : Read and write*. Dans Supabase › SQL Editor : `select vault.create_secret('<jeton>', 'github_bureau');`
+4. **SQL** : coller `supabase/07-bureau.sql` dans Supabase › SQL Editor › Run.
+5. Essai : envoyer une correction depuis un compte famille, puis suivre le Bureau (ou GitHub › Actions › « Bureau des agents »).
+
 ## En attente
 
-- Décisions du plan à prendre :
-  - heure du passage du soir (proposé : 21 h) ;
-  - plafond de dossiers par soir (proposé : 5) ;
-  - approbation automatique de la tâche du soir ;
-  - garder ou non « Idées et corrections » dans Familles ;
-  - règle « Bureau » dans `AGENTS.md`.
+- Décisions prises le 20/11/2026 : traitement dès qu'une demande arrive, une à la fois ; validation finale toujours par l'administrateur ; « Idées et corrections » gardé dans Familles ; idées sur autorisation, corrections automatiques ; règle « Bureau des agents » ajoutée à `AGENTS.md`.
+- Pas d'aperçu de la modification avant validation (GitHub Pages ne publie que `main`) : résumé, fichiers et tests seulement.
 
 ## Visuels corrigés — v863
 

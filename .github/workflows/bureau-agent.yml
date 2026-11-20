@@ -1,0 +1,44 @@
+name: Bureau des agents
+
+# Déclenché par Supabase (supabase/07-bureau.sql) quand une correction arrive ou quand
+# l'administrateur autorise, valide ou refuse dans le Bureau. Une seule exécution à la fois ;
+# l'orchestrateur traite la file jusqu'au bout (scripts/bureau_agent.py, docs/BUREAU_AGENTS.md).
+on:
+  repository_dispatch:
+    types: [bureau_agent]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bureau-agent
+  cancel-in-progress: false
+
+jobs:
+  agents:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Récupérer main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Installer Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Traiter la file du Bureau
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/bureau_agent.py

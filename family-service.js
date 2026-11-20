@@ -430,6 +430,15 @@ async function adminSetFeedbackStatus(credentials,id,statut){
   const {error}=await db.from('retours').update({statut}).eq('id',id);
   if(error)throw error;
 }
+/* Décisions du Bureau : autoriser une idée (ou relancer), valider ou refuser un dossier prêt.
+   Supabase prévient alors GitHub (supabase/07-bureau.sql). */
+const BUREAU_DECISIONS=Object.freeze(['autorise','valide','refuse']);
+async function adminSetFeedbackStage(credentials,id,etape){
+  if(!BUREAU_DECISIONS.includes(etape))throw new Error('Étape non autorisée');
+  const db=await admin(credentials);
+  const {error}=await db.from('retours').update({etape}).eq('id',id);
+  if(error)throw error;
+}
 async function adminRevokeDevice(credentials,id){
   const db=await admin(credentials);
   const {error}=await db.from('appareils').update({revoque:true}).eq('id',id);
@@ -452,7 +461,7 @@ async function adminManageFamily(credentials,payload){
 async function adminBureau(credentials){
   const db=await admin(credentials);
   const [feedback,families]=await Promise.all([
-    db.from('retours').select('id,famille,type,message,contexte,statut,cree_le,traite_le').order('cree_le',{ascending:false}).limit(100),
+    db.from('retours').select('id,famille,type,message,contexte,statut,cree_le,traite_le,etape,agent,etape_le').order('cree_le',{ascending:false}).limit(100),
     db.rpc('familles').then(result=>result.error?[]:(result.data||[]),()=>[])
   ]);
   if(feedback.error)throw feedback.error;
@@ -489,7 +498,7 @@ const api=Object.freeze({
   sendFeedback,listFeedback,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),
-  adminOverview,adminBureau,adminSetRequestStatus,adminSetFeedbackStatus,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
+  adminOverview,adminBureau,adminSetRequestStatus,adminSetFeedbackStatus,adminSetFeedbackStage,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
 });
 Object.defineProperty(window,'COURSES_FAMILY',{value:api,configurable:false,enumerable:false,writable:false});
 })();
