@@ -18,10 +18,12 @@ const TIMELINE=Object.freeze(['trieur','developpeur','testeur']);
 const TYPE_LABELS=Object.freeze({idee:'Idée',correction:'Correction'});
 const ETAPES=Object.freeze(['recu','autorise','trieur','developpeur','testeur','a_valider','valide','refuse','publie','echec']);
 const STAGE_LABELS=Object.freeze({attente:'À autoriser',file:'En file',trieur:'Tri',developpeur:'Dév.',testeur:'Test',
-  pret:'Prêt',publication:'Publication',echec:'Échec',publie:'En ligne',refuse:'Refusé',traite:'Traité'});
+  pret:'Prêt',publication:'Publication',echec:'Échec',publie:'En ligne',refuse:'Refusé',supprime:'Supprimé',traite:'Traité'});
 /* Étape affichée d'un retour : une idée reçue attend l'autorisation, une correction part seule. */
 function stageOf(row){
   const etape=ETAPES.includes(row?.etape)?row.etape:'recu';
+  // « Supprimer » un dossier préparé par les agents (à valider ou en échec) ; une idée non autorisée est « Refusée ».
+  if(etape==='refuse'&&(row?.agent?.etape_echec||row?.agent?.tests))return 'supprime';
   if(row?.statut==='traite')return etape==='publie'||etape==='refuse'?etape:'traite';
   if(etape==='recu')return row?.type==='idee'?'attente':'file';
   if(etape==='autorise')return 'file';
@@ -99,7 +101,7 @@ function buildDossiers(rows,families,now=Date.now()){
       testsChanged:Array.isArray(agent.tests_modifies)?agent.tests_modifies.map(String):[],
       published:String(agent.version||'')
     };
-    out[done?'termines':stage==='pret'?'valider':'cours'].push(dossier);
+    out[done||stage==='supprime'?'termines':stage==='pret'?'valider':'cours'].push(dossier);
   });
   const recent=(a,b)=>(Date.parse(b.received)||0)-(Date.parse(a.received)||0);
   out.cours.sort(recent);
@@ -382,25 +384,38 @@ const EMPTY=Object.freeze({
   cours:'Aucun dossier en cours.',
   termines:'Aucun dossier terminé.'
 });
-function renderBureau(node,tab){
-  node.dataset.view='bureau';
-  delete node.dataset.dossier;
-  const current=tab||node.dataset.tab||(validerCount()?'valider':'cours');
-  node.dataset.tab=current;
+function tabsMarkup(current){
+  return '<div class="bureau-tabs" role="tablist">'+TABS.map(([id,label])=>{
+    // « À valider » : pastille rouge de notification ; « En cours » : nombre à la suite.
+    const count=id==='valider'?validerCount():(dossiers[id]||[]).length;
+    const extra=id==='valider'?(count?'<span class="bureau-tab-count" aria-label="'+count+' à valider">'+(count>99?'99+':count)+'</span>':''):id==='cours'&&count?' · '+count:'';
+    return '<button type="button" role="tab" class="bureau-tab'+(id===current?' is-active':'')+'" aria-selected="'+(id===current)+'" data-tab="'+id+'">'+label+extra+'</button>';
+  }).join('')+'</div>';
+}
+function panelMarkup(current){
   const list=current==='valider'?validerList():dossiers[current]||[];
   let body;
   if(!loaded&&lastError)body='<p class="bureau-empty">Service famille indisponible.</p>';
   else if(!loaded)body='<p class="bureau-empty">Chargement…</p>';
   else body=list.length?'<div class="bureau-dossiers">'+list.map(dossierRow).join('')+'</div>':'<p class="bureau-empty">'+EMPTY[current]+'</p>';
+  return '<div class="bureau-panel" role="tabpanel">'+body+'</div>';
+}
+function renderBureau(node,tab){
+  node.dataset.view='bureau';
+  delete node.dataset.dossier;
+  const current=tab||node.dataset.tab||(validerCount()?'valider':'cours');
+  node.dataset.tab=current;
   node.innerHTML=header('Bureau')+'<p class="dialog-intro bureau-intro"><i class="bureau-status-dot" aria-hidden="true"></i>3 agents · '+(liveAgent()?'au travail':'en service')+'</p>'+
-    '<div class="bureau-scene">'+sceneMarkup()+'</div>'+
-    '<div class="bureau-tabs" role="tablist">'+TABS.map(([id,label])=>{
-      // « À valider » : pastille rouge de notification ; « En cours » : nombre à la suite.
-      const count=id==='valider'?validerCount():(dossiers[id]||[]).length;
-      const extra=id==='valider'?(count?'<span class="bureau-tab-count" aria-label="'+count+' à valider">'+(count>99?'99+':count)+'</span>':''):id==='cours'&&count?' · '+count:'';
-      return '<button type="button" role="tab" class="bureau-tab'+(id===current?' is-active':'')+'" aria-selected="'+(id===current)+'" data-tab="'+id+'">'+label+extra+'</button>';
-    }).join('')+'</div>'+body;
+    '<div class="bureau-scene">'+sceneMarkup()+'</div>'+tabsMarkup(current)+panelMarkup(current);
   syncLive(node);
+}
+/* Changement d'onglet : seuls les onglets et la liste changent ; la scène (images, animation) reste en place. */
+function switchTab(node,tab){
+  const tabs=node.querySelector('.bureau-tabs'),panel=node.querySelector('.bureau-panel');
+  if(node.dataset.view!=='bureau'||!tabs||!panel){renderBureau(node,tab);return}
+  node.dataset.tab=tab;
+  tabs.outerHTML=tabsMarkup(tab);
+  panel.outerHTML=panelMarkup(tab);
 }
 
 function findDossier(id){
@@ -434,7 +449,7 @@ function renderDossier(node,id,message=''){
   if(dossier.stage==='echec'&&dossier.failedAt==='publication')steps+=step(SVG_PERSON,'#df4040','Publication','Échec · '+when(dossier.stageTime),'<p class="bureau-step-note">'+esc(dossier.reason)+'</p>');
   if(dossier.stage==='publication')steps+=step(SVG_PERSON,'#2f6a49','Publication','En cours…','');
   if(dossier.stage==='publie')steps+=step(SVG_DONE,'#2f6a49','En ligne',[dossier.published,when(dossier.treated)].filter(Boolean).join(' · '),'');
-  else if(dossier.stage==='refuse')steps+=step(SVG_DONE,'#6b746d','Refusé',when(dossier.treated),'');
+  else if(dossier.stage==='refuse'||dossier.stage==='supprime')steps+=step(SVG_DONE,'#6b746d',STAGE_LABELS[dossier.stage],when(dossier.treated),'');
   else if(done)steps+=step(SVG_DONE,'#2f6a49','Traité',when(dossier.treated),'');
   const prepared=['pret','publication','publie'].includes(dossier.stage)&&(dossier.resume||dossier.files.length);
   /* Un test existant mis à jour par l'agent est signalé avant Valider (règle Bureau d'AGENTS.md). */
@@ -452,6 +467,7 @@ const AGENT_WAIT=Object.freeze({attente:'En attente de ton autorisation',file:'E
 function agentStep(agent,dossier){
   const order=TIMELINE.indexOf(agent.id);
   const stage=dossier.stage;
+  if(stage==='supprime')return step(SVG_PERSON,agent.color,agent.name,'Non concerné','',true);
   const failed=stage==='echec'?(dossier.failedAt==='publication'?TIMELINE.length:Math.max(0,TIMELINE.indexOf(dossier.failedAt))):-1;
   const reached=['pret','publication','publie'].includes(stage)?TIMELINE.length:TIMELINE.includes(stage)?TIMELINE.indexOf(stage):failed;
   if(stage==='echec'&&order===failed)return step(SVG_PERSON,agent.color,agent.name,'Échec','<p class="bureau-step-note">'+esc(dossier.reason)+'</p>');
@@ -468,8 +484,12 @@ function actionsMarkup(dossier){
   const copy=actionButton('copy','Copier',SVG_COPY,false,false);
   let buttons;
   if(dossier.stage==='attente')buttons=actionButton('authorize','Autoriser',SVG_DONE,true,pending,true)+actionButton('refuse','Refuser',SVG_REFUSE,false,pending)+copy;
-  else if(dossier.stage==='pret')buttons=actionButton('validate','Valider et mettre en ligne',SVG_DONE,true,pending,true)+actionButton('refuse','Refuser',SVG_REFUSE,false,pending)+copy;
-  else if(dossier.stage==='echec')buttons=actionButton('relaunch','Relancer',SVG_DONE,true,pending,true)+actionButton('treated','Marquer traité',SVG_DONE,false,pending)+copy;
+  else if(dossier.stage==='pret')buttons=actionButton('validate','Valider et mettre en ligne',SVG_DONE,true,pending,true)+actionButton('delete','Supprimer',SVG_REFUSE,false,pending,true);
+  else if(dossier.stage==='echec'){
+    // Échec à la publication : le travail des agents est gardé, seule la publication est refaite.
+    const retry=dossier.failedAt==='publication'?actionButton('republish','Réessayer la publication',SVG_DONE,true,pending,true):actionButton('relaunch','Relancer',SVG_DONE,true,pending,true);
+    buttons=retry+actionButton('delete','Supprimer',SVG_REFUSE,false,pending,true);
+  }
   else if(['file','publication'].includes(dossier.stage)||TIMELINE.includes(dossier.stage))return '<div class="bureau-actions is-single">'+copy+'</div>';
   else return '';
   return '<div class="bureau-actions">'+buttons+'</div>';
@@ -484,8 +504,9 @@ async function copyText(text){
   }catch(_){return false}
 }
 /* Décisions de l'administrateur (Supabase prévient ensuite les agents). */
-const DECISIONS=Object.freeze({authorize:'autorise',relaunch:'autorise',validate:'valide',refuse:'refuse'});
+const DECISIONS=Object.freeze({authorize:'autorise',relaunch:'autorise',republish:'valide',validate:'valide',refuse:'refuse',delete:'refuse'});
 const DONE_MESSAGES=Object.freeze({authorize:'Autorisé : les agents s’en occupent.',relaunch:'Relancé : les agents s’en occupent.',
+  republish:'Publication relancée.',delete:'Supprimé : retiré du Bureau.',
   validate:'Validé : mise en ligne en cours.',refuse:'Refusé : rien ne sera mis en ligne.',treated:'Marqué traité.'});
 async function runAction(node,action){
   const dossier=findDossier(node.dataset.dossier);
@@ -515,7 +536,7 @@ function onDialogClick(event){
   if(event.target===node){node.close();return}
   if(event.target.closest('.bureau-back')){renderBureau(node);try{node.scrollTop=0}catch(_){}return}
   const tab=event.target.closest('.bureau-tab');
-  if(tab){renderBureau(node,tab.dataset.tab);return}
+  if(tab){switchTab(node,tab.dataset.tab);return}
   const action=event.target.closest('[data-action]');
   if(action?.dataset.action==='demo'){if(demo)stopDemo();else void startDemo(node);return}
   if(action?.dataset.action==='validate-demo'){demo=null;renderBureau(node,'cours');try{node.scrollTop=0}catch(_){}return}

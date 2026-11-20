@@ -91,11 +91,11 @@ def push(*refspecs: str) -> None:
         raise RuntimeError('push refusé : ' + result.stderr.replace(token, '***')[-400:])
 
 
-def fetch(*refs: str) -> None:
+def fetch(*refs: str, depth: int = 1) -> None:
     token = os.environ.get('GITHUB_TOKEN', '')
     repo = os.environ.get('GITHUB_REPOSITORY', 'fabien95430/Dashboard-course')
     url = f'https://x-access-token:{token}@github.com/{repo}.git'
-    result = subprocess.run(['git', 'fetch', '--depth=1', url, *refs], cwd=ROOT, text=True, capture_output=True)
+    result = subprocess.run(['git', 'fetch', f'--depth={depth}', url, *refs], cwd=ROOT, text=True, capture_output=True)
     if result.returncode:
         raise RuntimeError('fetch impossible : ' + result.stderr.replace(token, '***')[-400:])
 
@@ -247,7 +247,7 @@ def process(row: dict) -> None:
 
     reset_to_main()
     git('checkout', '-q', '-B', branch_name(row))
-    update(row, etape='trieur', agent={'debut': True, 'raison': '', 'resume': '', 'fichiers': [], 'tests': ''})
+    update(row, etape='trieur', agent={'debut': True, 'raison': '', 'etape_echec': '', 'resume': '', 'fichiers': [], 'tests': ''})
 
     def fail(stage: str, reason: str) -> None:
         update(row, etape='echec', agent={'etape_echec': stage, 'raison': reason[:900]})
@@ -343,12 +343,15 @@ def publish(row: dict) -> None:
     branch = branch_name(row)
     reset_to_main()
     try:
-        fetch(f'+refs/heads/{branch}:refs/remotes/origin/{branch}')
+        fetch(f'+refs/heads/{branch}:refs/remotes/origin/{branch}', depth=2)
     except RuntimeError:
         update(row, etape='echec', agent={'etape_echec': 'publication', 'raison': 'Branche introuvable : relance la demande.'})
         return
-    merged = git('merge', '--squash', f'origin/{branch}', check=False)
+    # Historique réduit (fetch --depth) : on applique le seul commit de l'agent sur la version
+    # actuelle de main, avec son parent comme base (d'où --depth=2 ci-dessus).
+    merged = git('cherry-pick', '--no-commit', f'origin/{branch}', check=False)
     if merged.returncode:
+        git('cherry-pick', '--abort', check=False)
         git('reset', '-q', '--hard')
         update(row, etape='echec', agent={'etape_echec': 'publication',
                                           'raison': 'Conflit avec une version plus récente : relance la demande.'})

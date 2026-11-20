@@ -186,7 +186,7 @@ test('bureau : étapes des agents, dossier prêt à valider et décisions de l�
   assert.equal(bureau.stageOf({type:'idee',statut:'nouveau',etape:'autorise'}),'file');
   assert.equal(bureau.stageOf({type:'correction',statut:'nouveau',etape:'valide'}),'publication');
   const ui=read('bureau-ui.js'),service=read('family-service.js'),sql=read('supabase/07-bureau.sql');
-  assert.match(ui,/const DECISIONS=Object\.freeze\(\{authorize:'autorise',relaunch:'autorise',validate:'valide',refuse:'refuse'\}\);/);
+  assert.match(ui,/const DECISIONS=Object\.freeze\(\{authorize:'autorise',relaunch:'autorise',republish:'valide',validate:'valide',refuse:'refuse',delete:'refuse'\}\);/);
   assert.match(service,/const BUREAU_DECISIONS=Object\.freeze\(\['autorise','valide','refuse'\]\);/);
   assert.match(service,/if\(!BUREAU_DECISIONS\.includes\(etape\)\)throw/);
   // Une famille ne peut ni s'autoriser ni remplir le suivi des agents ; le jeton GitHub reste dans le Vault.
@@ -204,4 +204,23 @@ test('bureau : orchestrateur sans secret pour Claude, garde-fous et une seule ex
   assert.match(workflow,/concurrency:\s*\n\s*group: bureau-agent\s*\n\s*cancel-in-progress: false/);
   assert.match(workflow,/persist-credentials: false/);
   assert.match(workflow,/fetch-depth: 1/);
+});
+
+test('bureau v869 : onglets sans recharger la scène, Supprimer, réessai de publication, titres colorés',()=>{
+  const ui=read('bureau-ui.js'),css=read('styles.css'),script=read('scripts/bureau_agent.py');
+  assert.match(ui,/if\(tab\)\{switchTab\(node,tab\.dataset\.tab\);return\}/,'un onglet ne redessine pas tout le Bureau');
+  const sw=ui.slice(ui.indexOf('function switchTab('),ui.indexOf('function findDossier('));
+  assert.doesNotMatch(sw,/sceneMarkup|innerHTML/,'la scène reste en place');
+  assert.match(ui,/actionButton\('republish','Réessayer la publication'/);
+  assert.match(ui,/republish:'valide'/);
+  assert.match(ui,/actionButton\('validate','Valider et mettre en ligne',SVG_DONE,true,pending,true\)\+actionButton\('delete','Supprimer'/);
+  assert.match(ui,/buttons=retry\+actionButton\('delete','Supprimer',SVG_REFUSE,false,pending,true\);/);
+  const bureau=loadBureau();
+  assert.equal(bureau.stageOf({type:'correction',statut:'traite',etape:'refuse',agent:{etape_echec:'publication'}}),'supprime');
+  assert.equal(bureau.stageOf({type:'idee',statut:'traite',etape:'refuse',agent:{}}),'refuse');
+  assert.match(css,/\.bureau-label b\{display:block;font-weight:700;color:var\(--agent\)\}/);
+  // Publication : le commit de l'agent est appliqué sur main (historique réduit), plus de fusion impossible.
+  assert.match(script,/git\('cherry-pick', '--no-commit', f'origin\/\{branch\}', check=False\)/);
+  assert.match(script,/fetch\(f'\+refs\/heads\/\{branch\}:refs\/remotes\/origin\/\{branch\}', depth=2\)/);
+  assert.doesNotMatch(script,/merge', '--squash'/);
 });
