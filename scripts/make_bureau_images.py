@@ -21,6 +21,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "www" / "Bureau"
 TARGET = SOURCE / "webp"
+ROOM_SOURCE = "14-piece-vide 2.png"  # source complète, ne pas reprendre 01 pour le fond
 POSTES = {
     "02-trieur-repos.png": "trieur-repos.webp",
     "03-developpeur-repos.png": "developpeur-repos.webp",
@@ -38,9 +39,9 @@ VARIANTES = {
 # Source indépendante : la pièce ne contient aucun dossier permanent.
 DOSSIER_SOURCE = "13-dossier-tache.png"
 POSTE_WIDTH = 360
-# Contour de la pièce dans 01-piece-vide.png (1464 × 1074) : haut des murs, côtés, bords du parquet.
+# Contour de la pièce dans 14-piece-vide 2.png (1464 × 1075) : garder le haut du mur droit au-dessus des trois fenêtres.
 ROOM_OUTLINE = (
-    (62, 378), (707, 0), (728, 0), (728, 26), (1404, 416),
+    (62, 378), (707, 0), (728, 0), (1404, 391),
     (1404, 698), (755, 1074), (709, 1074), (62, 698),
 )
 
@@ -104,7 +105,7 @@ def save_poste(image: Image.Image, target: str) -> None:
 
 def main() -> int:
     TARGET.mkdir(exist_ok=True)
-    room = cut_out_room(Image.open(SOURCE / "01-piece-vide.png").convert("RGB"))
+    room = cut_out_room(Image.open(SOURCE / ROOM_SOURCE).convert("RGB"))
     room = room.resize((1200, round(room.height * 1200 / room.width)), Image.LANCZOS)
     room.save(TARGET / "piece.webp", "WEBP", quality=86, method=6, exact=False)
     for source, target in POSTES.items():
