@@ -18,8 +18,8 @@ test('ouverture : le formulaire revient dès qu’un écran de sécurité est af
   assert.match(app,/function hideSecurity\(\)\{[\s\S]*?\$\('\.security-modal'\)\.classList\.remove\('is-resuming'\);/);
 });
 
-test('compte famille repris : durée minimale puis arrivée animée de Ma liste',()=>{
+test('compte famille déjà connecté : Ma liste s’ouvre directement, sans écran d’accueil ni délai',()=>{
   const app=read('app.js');
-  assert.match(app,/const FAMILY_RESUME_MIN_MS=\d+;/);
-  assert.match(app,/const info=await window\.COURSES_FAMILY\.resume\(\);[\s\S]*?FAMILY_RESUME_MIN_MS[\s\S]*?enterFamilyMode\(info\);[\s\S]*?classList\.add\('is-arriving'\)/);
+  assert.match(app,/rememberedAccount\(\)\?\.kind==='family'&&window\.COURSES_FAMILY\)\{[\s\S]*?hideSecurity\(\);\s*try\{\s*const info=await window\.COURSES_FAMILY\.resume\(\);\s*if\(info\)\{enterFamilyMode\(info\);return\}/);
+  assert.doesNotMatch(app,/FAMILY_RESUME_MIN_MS/);
 });

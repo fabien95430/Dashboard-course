@@ -3282,8 +3282,6 @@ renderSettingsPage=function(){
   if(connectionDot)connectionDot.classList.remove('is-online');
 };
 
-// Durée minimale de l'animation d'ouverture d'un compte famille : évite un simple clignement.
-const FAMILY_RESUME_MIN_MS=550;
 async function init(){
   renderView();
   if(!window.crypto?.subtle){
@@ -3330,21 +3328,12 @@ async function init(){
   }
   state.haUrl=normalizeHaUrl(localStorage.getItem(STORAGE.haUrl)||'');
   if(rememberedAccount()?.kind==='family'&&window.COURSES_FAMILY){
-    // Compte famille : la session reste ouverte, sans redemander le mot de passe. L'écran
-    // d'ouverture garde son animation de chargement (jamais le formulaire), puis Ma liste arrive.
-    const started=Date.now();
+    // Compte famille : la session reste ouverte, sans redemander le mot de passe. Ma liste
+    // s'ouvre directement, sans écran d'accueil ; il ne revient que si la reprise échoue.
+    hideSecurity();
     try{
       const info=await window.COURSES_FAMILY.resume();
-      if(info){
-        await new Promise(resolve=>setTimeout(resolve,Math.max(0,FAMILY_RESUME_MIN_MS-(Date.now()-started))));
-        enterFamilyMode(info);
-        const main=document.querySelector('main');
-        if(main){
-          main.classList.add('is-arriving');
-          main.addEventListener('animationend',()=>main.classList.remove('is-arriving'),{once:true});
-        }
-        return;
-      }
+      if(info){enterFamilyMode(info);return}
     }catch(_){}
   }
   state.loading=false;renderView();showLogin();status('is-waiting','Connexion requise','Identifiant et mot de passe');
