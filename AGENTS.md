@@ -1,5 +1,55 @@
 # Règles agent
 
+## Règles du projet
+
+Le dépôt, branche `main`, est la source de vérité. Lire les fichiers concernés et comprendre l'implémentation actuelle avant toute modification ; ne jamais se fier à une description ou à une ancienne conversation.
+
+- Faire le changement minimum demandé. Ne pas refondre ce qui fonctionne.
+- Architecture statique HTML/CSS/JS servie par GitHub Pages, reliée à Home Assistant (et au service famille Supabase). Aucun framework, backend, outil de build ni dépendance externe sans demande explicite.
+- Conserver OAuth Home Assistant, le WebSocket, le coffre chiffré, le verrouillage et la biométrie. Ne jamais réduire la sécurité ni stocker de secret dans le dépôt.
+- `catalog.js` reste la source du catalogue. La liste Home Assistant `Courses` reste prioritaire.
+- Synchronisation événementielle (WebSocket, temps réel) : jamais de polling permanent.
+- Mobile-first : préserver les safe areas iOS et le comportement au clavier.
+- Signaler toute demande qui entrerait en conflit avec ces règles au lieu de la contourner.
+
+## Structure du code
+
+Pas de couche sur couche : un comportement a un seul module propriétaire, et on modifie ce module. Ne jamais ajouter un fichier, un bloc CSS « correctif » en fin de feuille, un `!important` supplémentaire ou un écouteur global pour corriger après coup le travail d'un autre module.
+
+Conventions de chaque module JavaScript :
+
+- un fichier = une IIFE `(() => { 'use strict'; … })();`, sans `import` ni variable globale libre ;
+- l'API publique, s'il y en a une, est exposée par un seul objet `window.COURSES_…` (figé ou défini par `Object.defineProperty` quand il touche aux accès) ; les autres modules passent par cet objet, jamais par le DOM interne d'un autre module ;
+- commentaires et textes d'interface en français ; nommer le module propriétaire en tête de fichier ;
+- chargement décrit dans `docs/ASSET_GRAPH.md` : tout nouveau fichier y est ajouté, ainsi que dans `SHELL` de `sw.js`. Préférer étendre un module existant à en créer un nouveau.
+
+Propriétaires principaux :
+
+| Fichier | Rôle |
+| --- | --- |
+| `index.html` | structure des écrans, marqueurs de version, chargement du shell |
+| `app.js` | Ma liste, connexion Home Assistant (OAuth, WebSocket), coffre, verrouillage, écran de connexion ; API `COURSES_LIST`, `COURSES_HA_CLIENT` |
+| `app-ui.js` | affichage des versions, viewport et clavier de l'écran de connexion, état vide de Ma liste |
+| `catalog.js` | catalogue produits et chargement différé des modules |
+| `catalog-quantities.js` | besoins, conditionnements, portions (`COURSES_QUANTITIES`) |
+| `dishes-ui.js`, `dish-*.js` | Plats : cartes, fiches, ajout, visuels locaux |
+| `product-item-images.js` | visuels produits (WebP unitaires) |
+| `settings-ui.js` | Réglages et navigation (`COURSES_SETTINGS_NAV`) |
+| `family-service.js` | service famille Supabase (`COURSES_FAMILY`), seule porte vers Supabase |
+| `family-admin.js` | écran Familles (administrateur) |
+| `bureau-ui.js` | écran Bureau des agents (`docs/BUREAU_AGENTS.md`) |
+| `missing-*.js` | demandes de produits et plats manquants |
+| `error-center.js` | centre d'erreurs |
+| `sw.js` | cache hors ligne, version du cache, empreintes des visuels |
+
+## Thème global
+
+L'apparence est commune à toute l'application : réutiliser les variables de `styles.css` (`:root` : `--text`, `--muted`, `--line`, `--green`, `--danger`, `--tile-bg`, `--fs-title`, `--fs-text`, `--fs-label`…) et les composants existants (tuiles, popups, boutons `primary`/`secondary`, en-têtes). Ne pas introduire de nouvelle police, palette, ombre ou taille de texte locale quand une variable existe ; une nouvelle valeur de thème s'ajoute dans `:root`, pas dans un composant. Modifier la règle CSS existante du composant plutôt qu'empiler un bloc de surcharge. Dans Réglages, aucun texte sous 13,5 px, hors pastilles de compteur.
+
+## Tests
+
+`bash scripts/validate_repo.sh` vérifie la syntaxe de tous les fichiers JavaScript et lance toute la suite `tests/*.test.mjs` ; elle doit rester verte. Ajouter ou ajuster les tests du comportement modifié. Ne jamais supprimer ni affaiblir un test ou un invariant existant pour faire passer un changement ; si un test doit changer parce que le comportement demandé change, le dire explicitement dans le commit.
+
 ## Module propriétaire et factorisation
 
 Pour modifier un comportement existant, modifier le module qui en est propriétaire. Ne pas ajouter un script correctif, une interception de clic, un MutationObserver ou une surcharge CSS uniquement pour contourner ce module.
@@ -80,3 +130,14 @@ Un produit utilise une image WebP unitaire dans `www/Items/`. Lire `docs/IMAGES_
 **Poids des WebP produits : plafond strict de 15 000 octets sur le fichier final.** La taille annoncée dans le prompt et `output_compression` ne sont pas des garanties. Pour une génération automatique, mesurer puis optimiser réellement le WebP localement *avant* de mettre à jour `sw.js` et avant la validation/publication ; conserver la transparence, les contours, les proportions, le rendu premium et la lisibilité à 192 px. Une image trop lourde ne doit pas simplement être renvoyée sans tentative d'optimisation. Si le générateur ne possède pas cette étape, corriger le module propriétaire et ses tests plutôt que relever la limite, désactiver le contrôle ou multiplier les appels payants. Ne jamais faire passer une image dégradée uniquement pour respecter le seuil. En cas d'échec technique ou visuel, conserver la demande en attente et remonter l'erreur précise ; ne pas la marquer résolue.
 
 Ne jamais réintroduire d’atlas, de planche ou de sprite produit. `product-item-images.js` peut harmoniser le cadrage des WebP unitaires, et le SVG premium local reste le seul fallback si une image manque ou échoue.
+
+## Bureau des agents
+
+Le Bureau (`bureau-ui.js`, `docs/BUREAU_AGENTS.md`) suit les idées et corrections envoyées par les familles (table `retours` du service famille).
+
+- Une seule demande traitée à la fois ; les suivantes attendent leur tour.
+- Une **correction** est traitée automatiquement dès son arrivée. Une **idée** n'est traitée qu'après autorisation de l'administrateur dans le Bureau.
+- L'agent travaille sur une branche `bureau/<id>` à partir de `main`, applique toutes les règles de ce fichier, puis lance `bash scripts/validate_repo.sh`. En cas d'échec, la demande est marquée en échec et n'est pas proposée à la validation.
+- L'agent ne modifie jamais les workflows GitHub, les secrets ni les tests existants (il peut en ajouter), et ne publie jamais sur `main` lui-même.
+- La publication sur `main` n'a lieu qu'après **Valider** dans le Bureau, en un seul commit atomique avec incrément de la version globale. **Refuser** supprime la branche sans rien publier.
+- Le résumé proposé à la validation indique les fichiers modifiés et le résultat des tests.
