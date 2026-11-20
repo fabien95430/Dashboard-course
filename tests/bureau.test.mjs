@@ -126,8 +126,8 @@ test('bureau : actions, étiquettes reliées aux agents, onglets et dossier à v
   assert.match(ui,/const TABS=Object\.freeze\(\[\['cours','En cours'\],\['valider','À valider'\],\['termines','Terminés'\]\]\);/);
   assert.match(ui,/class="bureau-tab-count"/);
   assert.match(css,/\.bureau-tab-count\{[^}]*background:#d85d54/);
-  // Pile : un dossier par dossier à valider, 6 au plus.
-  assert.match(ui,/function pileCount\(\)\{return Math\.min\(validerCount\(\),PILE_MAX\)\}/);
+  // Pile : tâches non terminées, 6 au plus, aucun dossier permanent.
+  assert.match(ui,/function pileCount\(\)\{return pileCountFor\(dossiers\.cours\.length,validerCount\(\),!!demo&&!demo\.finished\)\}/);
   assert.match(ui,/const PILE_MAX=6;/);
   for(let k=1;k<=6;k++)assert.match(css,new RegExp('\\.bureau-pile-dossier\\.is-'+k+'\\{left:'));
   // Démonstration : une demande en 10 s — Trieur, puis Développeur, puis Testeur, puis dossier posé.
@@ -139,4 +139,20 @@ test('bureau : actions, étiquettes reliées aux agents, onglets et dossier à v
   for(const file of ['trieur-frappe','trieur-tete','developpeur-frappe','developpeur-tete','testeur-frappe','testeur-tete','dossier']){
     assert.ok(read('www/Bureau/webp/'+file+'.webp').length>0,file);
   }
+});
+
+
+test('bureau : la pile suit les tâches actives et disparaît quand il n’en reste aucune',()=>{
+  const {pileCountFor}=loadBureau();
+  assert.equal(pileCountFor(0,0),0);
+  assert.equal(pileCountFor(1,0),1);
+  assert.equal(pileCountFor(3,0),3);
+  assert.equal(pileCountFor(2,1),3,'un dossier à valider reste une tâche non terminée');
+  assert.equal(pileCountFor(0,0,true),1,'une démonstration en cours est visible');
+  assert.equal(pileCountFor(0,1,false),1,'la fin de la démo ne double pas le dossier');
+  assert.equal(pileCountFor(0,0,false),0,'après traitement, le bureau est vide');
+  assert.equal(pileCountFor(20,2),6,'pile visible bornée, compteurs de liste inchangés');
+  const script=read('scripts/make_bureau_images.py');
+  assert.match(script,/DOSSIER_SOURCE = "13-dossier-tache.png"/);
+  assert.doesNotMatch(script,/DOSSIER_OUTLINE/,'le dossier ne doit plus être extrait du fond vide');
 });

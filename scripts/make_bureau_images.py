@@ -6,7 +6,7 @@
   de contact douce intégrée (le poste ne flotte pas sur le parquet) ; les variantes
   frappe / tête reprennent l'image au repos et n'en remplacent que les mains ou la tête
   (zones ZONES) : bureau, chaise et écran restent identiques au pixel près quand elles alternent ;
-- www/Bureau/webp/dossier.webp : le dossier du haut de la pile de ton bureau, détouré, pour l'empiler.
+- www/Bureau/webp/dossier.webp : dossier indépendant, affiché seulement pour une tâche non terminée.
 Les PNG d'origine restent les sources et ne sont jamais modifiés.
 Nécessite Pillow et NumPy.
 Usage : python3 scripts/make_bureau_images.py
@@ -35,9 +35,8 @@ VARIANTES = {
     "09-testeur-frappe.png": ("04-testeur-repos.png", (470, 520, 880, 760), "testeur-frappe.webp"),
     "10-testeur-tete.png": ("04-testeur-repos.png", (630, 50, 960, 400), "testeur-tete.webp"),
 }
-# Dossier du haut de la pile de ton bureau dans 01-piece-vide.png, et cadre de découpe.
-DOSSIER_OUTLINE = ((669, 723), (709.5, 696), (764.5, 728), (764.5, 736), (722, 760.5), (669.5, 731.5))
-DOSSIER_BOX = (664, 692, 769, 764)
+# Source indépendante : la pièce ne contient aucun dossier permanent.
+DOSSIER_SOURCE = "13-dossier-tache.png"
 POSTE_WIDTH = 360
 # Contour de la pièce dans 01-piece-vide.png (1464 × 1074) : haut des murs, côtés, bords du parquet.
 ROOM_OUTLINE = (
@@ -112,12 +111,21 @@ def main() -> int:
         save_poste(Image.open(SOURCE / source).convert("RGBA"), target)
     for source, (base, zone, target) in VARIANTES.items():
         rest = Image.open(SOURCE / base).convert("RGBA")
-        save_poste(only_zone(rest, align_on(rest, Image.open(SOURCE / source).convert("RGBA")), zone), target)
-    source = Image.open(SOURCE / "01-piece-vide.png").convert("RGBA")
-    mask = Image.new("L", (source.width * 4, source.height * 4), 0)
-    ImageDraw.Draw(mask).polygon([(x * 4, y * 4) for x, y in DOSSIER_OUTLINE], fill=255)
-    source.putalpha(mask.resize(source.size, Image.LANCZOS))
-    source.crop(DOSSIER_BOX).save(TARGET / "dossier.webp", "WEBP", quality=90, method=6, exact=False)
+        variant = Image.open(SOURCE / source).convert("RGBA").resize(rest.size, Image.LANCZOS)
+        changed = with_contact_shadow(only_zone(rest, align_on(rest, variant), zone))
+        fixed = Image.open(TARGET / POSTES[base]).convert("RGBA")
+        changed = changed.resize(fixed.size, Image.LANCZOS)
+        area = Image.new("L", fixed.size, 0)
+        scale = POSTE_WIDTH / rest.width
+        x0, y0, x1, y1 = zone
+        ImageDraw.Draw(area).rectangle(
+            (int((x0-32)*scale), int((y0-32)*scale),
+             int((x1+32)*scale), int((y1+32)*scale)), fill=255)
+        stable = Image.composite(changed, fixed, area)
+        assert not np.any(np.asarray(stable)[np.asarray(area)==0] != np.asarray(fixed)[np.asarray(area)==0])
+        stable.save(TARGET / target, "WEBP", lossless=True, method=6, exact=True)
+    folder = Image.open(SOURCE / DOSSIER_SOURCE).convert("RGBA").resize((105, 74), Image.LANCZOS)
+    folder.save(TARGET / "dossier.webp", "WEBP", lossless=True, method=6, exact=True)
     for path in sorted(TARGET.glob("*.webp")):
         print(f"{path.relative_to(ROOT)} {path.stat().st_size} octets")
     return 0

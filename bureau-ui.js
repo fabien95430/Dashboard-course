@@ -85,13 +85,16 @@ function buildDossiers(rows,families,now=Date.now()){
 
 /* ---------- Scène : la pièce et les trois postes (images www/Bureau/webp, faites par scripts/make_bureau_images.py) ---------- */
 const SCENE_IMAGES='./www/Bureau/webp/';
-const SCENE_VERSION='858';
+const SCENE_VERSION='863';
 function sceneImage(file,cls){
   return '<img class="'+cls+'" src="'+SCENE_IMAGES+file+'.webp?v='+SCENE_VERSION+'" alt="" decoding="async" draggable="false">';
 }
-/* Pile de ton bureau : un dossier de plus par dossier à valider (6 au plus), posé sur la pile de l'image. */
+/* Bureau vert vide au repos. Un dossier par tâche non terminée (En cours ou À valider), six visibles au plus. */
 const PILE_MAX=6;
-function pileCount(){return Math.min(validerCount(),PILE_MAX)}
+function pileCountFor(inProgress,awaitingValidation,processingDemo=false){
+  return Math.min(inProgress+awaitingValidation+(processingDemo?1:0),PILE_MAX);
+}
+function pileCount(){return pileCountFor(dossiers.cours.length,validerCount(),!!demo&&!demo.finished)}
 function pileMarkup(count){
   let pile='';
   for(let k=1;k<=count;k++)pile+=sceneImage('dossier','bureau-pile-dossier is-'+k);
@@ -477,6 +480,6 @@ function init(){
   reload();
 }
 
-window.COURSES_BUREAU=Object.freeze({buildDossiers,dayLabel,posteFrame,demoAt,LEADS,open:openBureau});
+window.COURSES_BUREAU=Object.freeze({buildDossiers,dayLabel,posteFrame,demoAt,pileCountFor,LEADS,open:openBureau});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

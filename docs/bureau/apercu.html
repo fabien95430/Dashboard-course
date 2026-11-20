@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bureau — aperçu des visuels</title>
+<style>body{margin:0;padding:24px;background:#f5f2e9;color:#253e30;font:16px system-ui}main{max-width:1100px;margin:auto}h1{font:36px Georgia;margin:0 0 16px}.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}button,input{font:inherit;padding:8px 12px;border:1px solid #bcc9b9;border-radius:12px;background:#fffdf8;color:inherit}input{width:64px}.scene{position:relative;width:100%;aspect-ratio:1464/1074;overflow:hidden;border-radius:20px}.bg{width:100%;display:block}.sprite{position:absolute;pointer-events:none}p{color:#617265}button:focus-visible,input:focus-visible{outline:3px solid #426447}</style>
+<main><h1>Le Bureau</h1><div class="controls"><label>Tâches en cours <input id="count" type="number" min="0" max="12" value="0"></label><button id="zero">Aucune tâche</button><button id="three">3 tâches</button><button id="play" aria-pressed="false">Alterner les poses</button><span id="status" aria-live="polite"></span></div>
+<div class="scene" id="scene"><img class="bg" src="assets/01-piece-vide.webp" alt="Pièce du Bureau, bureau vert sans dossiers"></div><p>Aperçu autonome : les dossiers du bureau vert représentent les tâches en cours. Aucune tâche = aucun dossier. Ces fichiers ne sont pas encore chargés par l’application.</p></main>
+<script>
+const scene=document.querySelector('#scene'),status=document.querySelector('#status');
+const groups=[
+ {files:['02-trieur-repos','05-trieur-frappe','06-trieur-tete'],anchor:[760,602]},
+ {files:['03-developpeur-repos','07-developpeur-frappe','08-developpeur-tete'],anchor:[1040,757]},
+ {files:['04-testeur-repos','09-testeur-frappe','10-testeur-tete'],anchor:[490,757]}
+];
+function sprite(file,w,h,x,y){const im=new Image();im.className='sprite';im.alt='';im.src='assets/'+file+'.webp';Object.assign(im.style,{width:w/1464*100+'%',height:h/1074*100+'%',left:x/1464*100+'%',top:y/1074*100+'%'});scene.append(im);return im;}
+const scale=244/300;
+const people=groups.map(g=>sprite(g.files[0],384*scale,480*scale,g.anchor[0]-192*scale,g.anchor[1]-462*scale));
+const courier=sprite('11-coursier-pas-gauche',240*.72,480*.72,535-120*.72,900-450*.72);
+const folders=[];
+function showTasks(n){folders.forEach(im=>im.remove());folders.length=0;for(let i=0;i<n;i++){const im=sprite('13-dossier-tache',120,84,711-60,739-42-i*4);im.dataset.task=String(i);folders.push(im);}status.textContent=n===0?'Bureau sans dossier':n+' dossier'+(n>1?'s':'');}
+const count=document.querySelector('#count');
+count.addEventListener('input',()=>showTasks(Math.max(0,Math.min(12,Math.trunc(Number(count.value)||0)))));
+document.querySelector('#zero').onclick=()=>{count.value=0;showTasks(0);};
+document.querySelector('#three').onclick=()=>{count.value=3;showTasks(3);};
+let timer=null,phase=0;
+function stop(){clearInterval(timer);timer=null;document.querySelector('#play').textContent='Alterner les poses';document.querySelector('#play').setAttribute('aria-pressed','false');}
+document.querySelector('#play').onclick=()=>{if(timer){stop();return;}document.querySelector('#play').textContent='Arrêter';document.querySelector('#play').setAttribute('aria-pressed','true');timer=setInterval(()=>{phase=(phase+1)%3;people.forEach((im,i)=>im.src='assets/'+groups[i].files[phase]+'.webp');courier.src='assets/'+(phase%2?'12-coursier-pas-droit':'11-coursier-pas-gauche')+'.webp';},650);};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+showTasks(0);
+</script></html>

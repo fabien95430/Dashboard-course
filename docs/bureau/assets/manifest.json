@@ -1,0 +1,308 @@
+{
+  "total_image_bytes": 924506,
+  "frames": [
+    {
+      "file": "01-piece-vide.webp",
+      "width": 1464,
+      "height": 1074,
+      "bytes": 55926,
+      "sha256": "cd9d9c3ee0323a112c458cb7eddca4f39e9c33dd1d07010c777013acce00d583",
+      "alpha_bbox": null
+    },
+    {
+      "file": "02-trieur-repos.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 83788,
+      "sha256": "e8a42f1d1a84095a9ec7a76b068166ee6e296e93b65ef99015b0cabae16b06c4",
+      "alpha_bbox": [
+        43,
+        67,
+        368,
+        462
+      ]
+    },
+    {
+      "file": "03-developpeur-repos.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 86028,
+      "sha256": "e0206539c67eb89336f50c6a129d01045940a16fe759ceb91f7b785830ffdfae",
+      "alpha_bbox": [
+        44,
+        57,
+        374,
+        461
+      ]
+    },
+    {
+      "file": "04-testeur-repos.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 83938,
+      "sha256": "cca3ca5c1d00093a3ad1128d00d9dc11a597bd680c802b00b91e5a0ea508f22a",
+      "alpha_bbox": [
+        43,
+        50,
+        377,
+        461
+      ]
+    },
+    {
+      "file": "05-trieur-frappe.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 84272,
+      "sha256": "cc31325d31be1734c81d6a7133aefd00b3447bb60597bc4f0082e35302a70eb6",
+      "alpha_bbox": [
+        43,
+        67,
+        368,
+        462
+      ]
+    },
+    {
+      "file": "06-trieur-tete.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 83450,
+      "sha256": "313fbcb068d61e78b02cc3051f56acaa99a9c90c987db85af96bbaea759eb3ef",
+      "alpha_bbox": [
+        43,
+        68,
+        368,
+        462
+      ]
+    },
+    {
+      "file": "07-developpeur-frappe.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 86982,
+      "sha256": "7eb321e30b0efc294616a9de08f94f07f9c91347cf7726b13bb6d73cef8822cb",
+      "alpha_bbox": [
+        44,
+        57,
+        374,
+        461
+      ]
+    },
+    {
+      "file": "08-developpeur-tete.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 86978,
+      "sha256": "019d6994338ff4bc5c449f93685a1c93fba8779db509a5d908bb23fb446f842d",
+      "alpha_bbox": [
+        44,
+        58,
+        374,
+        461
+      ]
+    },
+    {
+      "file": "09-testeur-frappe.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 84326,
+      "sha256": "1396e59c38f35be97048eae607bdea823333a72a7c6b2cb647b49a262c4e0a25",
+      "alpha_bbox": [
+        43,
+        50,
+        377,
+        461
+      ]
+    },
+    {
+      "file": "10-testeur-tete.webp",
+      "width": 384,
+      "height": 480,
+      "bytes": 84264,
+      "sha256": "528a2163c5e7d1b23fd4bb1f588430c02e6d975f232b96ba782d1fa1501a399c",
+      "alpha_bbox": [
+        43,
+        50,
+        377,
+        461
+      ]
+    },
+    {
+      "file": "11-coursier-pas-gauche.webp",
+      "width": 240,
+      "height": 480,
+      "bytes": 47048,
+      "sha256": "37d63542040ffca2ab66a3f3f967ca30fb83701bf50ebf74cad3a183a6b19af2",
+      "alpha_bbox": [
+        40,
+        30,
+        200,
+        450
+      ]
+    },
+    {
+      "file": "12-coursier-pas-droit.webp",
+      "width": 240,
+      "height": 480,
+      "bytes": 47876,
+      "sha256": "a44f077c16f6da462614d1db40fa4774adf98be4ced6ca16048a58d5d13534a9",
+      "alpha_bbox": [
+        40,
+        30,
+        200,
+        450
+      ]
+    },
+    {
+      "file": "13-dossier-tache.webp",
+      "width": 160,
+      "height": 112,
+      "bytes": 9630,
+      "sha256": "fe295151330e4b2a5d8b660fbf2677bc1156c726dc8696d09ef02ec3476fdeb9",
+      "alpha_bbox": [
+        8,
+        11,
+        152,
+        101
+      ]
+    }
+  ],
+  "groups": {
+    "trieur": {
+      "canvas": [
+        384,
+        480
+      ],
+      "desk_width": 300,
+      "anchor": [
+        192,
+        462
+      ],
+      "source_origin": [
+        448,
+        1326
+      ],
+      "scale": 0.3851091142490372
+    },
+    "developpeur": {
+      "canvas": [
+        384,
+        480
+      ],
+      "desk_width": 300,
+      "anchor": [
+        192,
+        462
+      ],
+      "source_origin": [
+        449,
+        1294
+      ],
+      "scale": 0.3875968992248062
+    },
+    "testeur": {
+      "canvas": [
+        384,
+        480
+      ],
+      "desk_width": 300,
+      "anchor": [
+        192,
+        462
+      ],
+      "source_origin": [
+        538,
+        1297
+      ],
+      "scale": 0.3424657534246575
+    }
+  },
+  "layout": {
+    "background": {
+      "file": "01-piece-vide.webp",
+      "width": 1464,
+      "height": 1074
+    },
+    "workstations": {
+      "trieur": {
+        "anchor": [
+          760,
+          602
+        ],
+        "scale": 0.8133333333333334
+      },
+      "developpeur": {
+        "anchor": [
+          1040,
+          757
+        ],
+        "scale": 0.8133333333333334
+      },
+      "testeur": {
+        "anchor": [
+          490,
+          757
+        ],
+        "scale": 0.8133333333333334
+      }
+    },
+    "courier": {
+      "anchor": [
+        535,
+        900
+      ],
+      "scale": 0.72
+    },
+    "task_folder": {
+      "file": "13-dossier-tache.webp",
+      "canvas": [
+        160,
+        112
+      ],
+      "center": [
+        711,
+        739
+      ],
+      "scale": 0.75,
+      "step": [
+        0,
+        -4
+      ],
+      "rule": "one overlay per active task; zero tasks = no overlay"
+    }
+  },
+  "checks": [
+    {
+      "file": "05-trieur-frappe.webp",
+      "changed_pixels_outside_motion_zone": 0
+    },
+    {
+      "file": "06-trieur-tete.webp",
+      "changed_pixels_outside_motion_zone": 0
+    },
+    {
+      "file": "07-developpeur-frappe.webp",
+      "changed_pixels_outside_motion_zone": 0
+    },
+    {
+      "file": "08-developpeur-tete.webp",
+      "changed_pixels_outside_motion_zone": 0
+    },
+    {
+      "file": "09-testeur-frappe.webp",
+      "changed_pixels_outside_motion_zone": 0
+    },
+    {
+      "file": "10-testeur-tete.webp",
+      "changed_pixels_outside_motion_zone": 0
+    },
+    {
+      "group": "coursier",
+      "upper_body_identical_before_export": true,
+      "floor_anchor": [
+        120,
+        450
+      ]
+    }
+  ],
+  "format": "WebP; lossless RGBA for all animated frames"
+}

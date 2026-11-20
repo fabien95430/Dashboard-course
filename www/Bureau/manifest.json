@@ -4,7 +4,7 @@
     "width": 1464,
     "height": 1074,
     "mode": "RGB",
-    "bytes": 1801018,
+    "bytes": 1598286,
     "alpha_extrema": null,
     "subject_bbox_alpha128": null
   },
@@ -193,6 +193,23 @@
       93,
       754,
       1419
+    ]
+  },
+  {
+    "file": "13-dossier-tache.png",
+    "width": 160,
+    "height": 112,
+    "mode": "RGBA",
+    "bytes": 13154,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "subject_bbox_alpha128": [
+      8,
+      11,
+      152,
+      101
     ]
   }
 ]

@@ -3292,12 +3292,12 @@ html[data-account="family"] #settingsBureauBtn{display:none!important}
 .settings-sheet#bureauDialog .bureau-poste[data-frame="frappe"] .is-frappe,.settings-sheet#bureauDialog .bureau-poste[data-frame="tete"] .is-tete{visibility:visible}
 .settings-sheet#bureauDialog .bureau-poste:not([data-frame="repos"]) .is-repos{visibility:hidden}
 .settings-sheet#bureauDialog .bureau-scene-art img.bureau-pile-dossier{position:absolute;width:7.172%;filter:drop-shadow(0 1px 1px rgba(120,80,20,.18))}
-.settings-sheet#bureauDialog .bureau-pile-dossier.is-1{left:45.423%;top:63.780%}
-.settings-sheet#bureauDialog .bureau-pile-dossier.is-2{left:45.287%;top:63.128%}
-.settings-sheet#bureauDialog .bureau-pile-dossier.is-3{left:45.423%;top:62.477%}
-.settings-sheet#bureauDialog .bureau-pile-dossier.is-4{left:45.287%;top:61.825%}
-.settings-sheet#bureauDialog .bureau-pile-dossier.is-5{left:45.423%;top:61.173%}
-.settings-sheet#bureauDialog .bureau-pile-dossier.is-6{left:45.287%;top:60.521%}
+.settings-sheet#bureauDialog .bureau-pile-dossier.is-1{left:45.423%;top:65.700%}
+.settings-sheet#bureauDialog .bureau-pile-dossier.is-2{left:45.423%;top:65.300%}
+.settings-sheet#bureauDialog .bureau-pile-dossier.is-3{left:45.423%;top:64.900%}
+.settings-sheet#bureauDialog .bureau-pile-dossier.is-4{left:45.423%;top:64.500%}
+.settings-sheet#bureauDialog .bureau-pile-dossier.is-5{left:45.423%;top:64.100%}
+.settings-sheet#bureauDialog .bureau-pile-dossier.is-6{left:45.423%;top:63.700%}
 .settings-sheet#bureauDialog .bureau-poste.is-trieur{left:42.76%;top:27.04%}
 .settings-sheet#bureauDialog .bureau-poste.is-testeur{left:23.63%;top:38.59%}
 .settings-sheet#bureauDialog .bureau-poste.is-developpeur{left:60.18%;top:39.71%}

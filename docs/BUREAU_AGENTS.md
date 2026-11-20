@@ -105,7 +105,7 @@ Le code de la scène de maquette est dans `maquette-scene.js`. C'est une référ
 - **Phrases au-dessus des agents** (v860) : la phrase de chaque agent est dans une petite étiquette juste au-dessus de sa tête (celle du Trieur, au fond, un peu plus haut). Quand il a fini, une **coche** à sa couleur s'ajoute devant sa phrase et reste tant que le dossier n'est pas validé. Les phrases s'écrivent lettre par lettre.
 - Sous la scène, directement les onglets **En cours · À valider · Terminés** ; pastille rouge de notification à côté de « À valider ». Le bouton de démonstration est un petit bouton lecture en haut à droite de la scène.
 - Fin de la démonstration : le dossier « Trier les plats par temps » arrive dans « À valider » (pastille, dossier sur la pile, coches sur les agents) et y reste, même popup fermé, jusqu'à **Valider** dans sa fiche. Rien n'est mis en ligne.
-- **Pile de ton bureau** : un dossier de plus (`www/Bureau/webp/dossier.webp`, découpé dans la pièce) par dossier à valider, 6 au plus.
+- **Pile de ton bureau** : fond sans dossier permanent ; un dossier séparé par tâche non terminée (En cours ou À valider), 6 visibles au plus. Sans tâche, le bureau vert est vide. La démonstration compte uniquement pendant son traitement ou tant qu’elle reste à valider.
 - Coursier retiré (images 11 et 12 non utilisées).
 - Le temps réel `retours` passe par le canal admin unique, partagé avec Familles.
 
@@ -117,3 +117,7 @@ Le code de la scène de maquette est dans `maquette-scene.js`. C'est une référ
   - approbation automatique de la tâche du soir ;
   - garder ou non « Idées et corrections » dans Familles ;
   - règle « Bureau » dans `AGENTS.md`.
+
+## Visuels corrigés — v863
+
+Fond du bureau vert vidé, dossier indépendant (www/Bureau/13-dossier-tache.png), variantes stabilisées hors des zones animées et URLs d’images révisées. Les sources détaillées, le manifeste et un aperçu autonome de contrôle sont dans [bureau/assets](bureau/assets/README.md). Les images du coursier restent des livrables de référence et ne sont pas réintroduites dans l’interface.
