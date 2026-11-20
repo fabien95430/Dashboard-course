@@ -45,8 +45,9 @@ const mime={'.html':'text/html','.css':'text/css','.js':'text/javascript','.svg'
           const css=getComputedStyle(el);
           return {borders:[css.borderTopWidth,css.borderRightWidth,css.borderBottomWidth,css.borderLeftWidth],radius:css.borderRadius};
         });
-        assert.deepEqual(style.borders,['1px','1px','1px','1px']);
-        assert.equal(style.radius,'12px');
+        // v883 : champs soulignés.
+        assert.deepEqual(style.borders,['0px','0px','1px','0px']);
+        assert.equal(style.radius,'0px');
       }
       const backgroundBefore=await page.locator('#securityOverlay').evaluate(el=>({h:el.getBoundingClientRect().height,size:getComputedStyle(el).backgroundSize}));
       const available=height-(height<=667?291:346);

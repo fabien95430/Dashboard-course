@@ -95,8 +95,8 @@ test('connexion iOS : focus sans défilement automatique, formulaire assez haut 
 test('connexion : version B, contours sauge, bouton « Se connecter », sans lien de récupération',()=>{
   const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
   assert.match(css,/\.security-modal h3\{margin:0;font:500 46px\/1\.05 "Baskerville"/);
-  // v877 : contours complets demandés à la place du soulignement.
-  assert.match(css,/border:1px solid var\(--login-outline\);border-radius:12px;/);
+  // v883 : retour aux champs soulignés (maquette validée), plus de contour complet.
+  assert.match(css,/border:0;border-bottom:1px solid var\(--login-line\);border-radius:0;/);
   assert.match(css,/\.security-modal \.password-panel \.primary\{[\s\S]*?background:var\(--login-button-bg\)/);
   const ui=readFileSync(new URL('../app-ui.js',import.meta.url),'utf8');
   // Ma liste vide : plus de bouton « Ouvrir le catalogue ».
