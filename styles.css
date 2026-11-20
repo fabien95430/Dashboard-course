@@ -3289,6 +3289,10 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .settings-view .settings-icon-bureau{position:relative!important;overflow:visible!important}
 html[data-account="family"] #settingsBureauBtn{display:none!important}
 .settings-sheet#bureauDialog .bureau-scene{position:relative;margin:0 0 12px;background:transparent}
+/* Vue Bureau : en-tête, scène et onglets fixes ; seule la liste des dossiers défile. */
+.settings-sheet#bureauDialog[open][data-view="bureau"]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
+.settings-sheet#bureauDialog[data-view="bureau"]>*{flex:0 0 auto}
+.settings-sheet#bureauDialog[data-view="bureau"] .bureau-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin-bottom:calc(-1 * var(--sheet-bottom-inset))!important;padding:2px 0 calc(var(--sheet-bottom-inset) + 12px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10px);mask-image:linear-gradient(to bottom,transparent 0,#000 10px)}
 .settings-sheet#bureauDialog .bureau-scene-art{position:relative;width:100%;aspect-ratio:1464/1074;-webkit-user-select:none;user-select:none;pointer-events:none}
 .settings-sheet#bureauDialog .bureau-scene-art img{display:block;width:100%;height:auto;-webkit-user-drag:none}
 .settings-sheet#bureauDialog .bureau-scene-art .bureau-room{position:absolute;inset:0;height:100%}

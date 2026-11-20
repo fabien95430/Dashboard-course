@@ -234,4 +234,8 @@ test('bureau v876 : titre court de la fiche et scène gardée sans recréer les 
   assert.match(ui,/if\(kept\)\{node\.querySelector\('\.bureau-scene'\)\.replaceWith\(kept\);updateScene\(kept\)\}/);
   assert.match(ui,/if\(scene\)sceneKept=scene;/);
   assert.match(ui,/function preloadScene\(\)/);
+  assert.doesNotMatch(ui,/Tâche en attente|Tâche en échec/,'attente et échec sont rangés dans « en cours »');
+  const css=read('styles.css');
+  assert.match(css,/#bureauDialog\[open\]\[data-view="bureau"\]\{display:flex!important;flex-direction:column!important;overflow:hidden!important\}/);
+  assert.match(css,/#bureauDialog\[data-view="bureau"\] \.bureau-panel\{flex:1 1 auto;min-height:0;overflow-y:auto/);
 });

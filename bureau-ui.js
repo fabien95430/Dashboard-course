@@ -458,8 +458,6 @@ function findDossier(id){
 function taskTitle(dossier){
   if(['traite','publie','refuse','supprime'].includes(dossier.stage))return 'Tâche terminée';
   if(dossier.stage==='pret')return 'Tâche à valider';
-  if(dossier.stage==='attente')return 'Tâche en attente';
-  if(dossier.stage==='echec')return 'Tâche en échec';
   return 'Tâche en cours';
 }
 function step(icon,color,title,meta,body,muted){
