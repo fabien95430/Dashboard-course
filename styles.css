@@ -3383,14 +3383,14 @@ html[data-account="family"] #settingsBureauBtn{display:none!important}
 :root{--login-panel-width:clamp(240px,calc(var(--security-screen-height) * .328 - 24px),304px)}
 html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
   overflow:hidden!important;overscroll-behavior:none!important;
-  background:#f4f0e8 url("./welcome-kitchen-sage-v855.webp") center top / auto var(--security-screen-height) no-repeat!important;
+  background:#f4f0e8 url("./welcome-kitchen-sage-v887.webp") center top / auto var(--security-screen-height) no-repeat!important;
 }
 .security-overlay{
   z-index:65;top:0!important;right:0!important;bottom:auto!important;left:0!important;
   height:calc(var(--security-screen-height) + env(safe-area-inset-bottom,0px))!important;
   min-height:0!important;padding:0!important;overflow:hidden!important;place-items:stretch!important;
   overscroll-behavior:none;
-  background:#f4f0e8 url("./welcome-kitchen-sage-v855.webp") center top / cover no-repeat!important;
+  background:#f4f0e8 url("./welcome-kitchen-sage-v887.webp") center top / cover no-repeat!important;
   background-position:center var(--security-viewport-offset,0px)!important;
 }
 .security-shell{

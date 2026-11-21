@@ -40,3 +40,5 @@ Le comportement correspondant reste porté uniquement par les modules actifs dé
 
 
 Le module `courses-notifications.js` est chargé directement par `index.html` avant `app.js`; il partage le client HA existant et gère exclusivement les souscriptions Web Push des appareils. Les scripts `missing-products-fixes.js` et `missing-products-dishes.js` lui délèguent l'envoi multi-iPhone, sans nouveau WebSocket ni polling.
+
+Le fond de connexion `welcome-kitchen-sage-v887.webp` est préchargé par `index.html`, peint par `styles.css` et conservé dans `CORE_VISUALS` de `sw.js`. Il remplace le décor v855 sans étagère ni plante en haut à droite. Les images `www/startup/launch-*.jpg?v=887` utilisent le même fond pour le lancement iOS.
