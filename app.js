@@ -1899,21 +1899,13 @@ async function completeLogin(){
       const password=UI.securityPassword.value;
       if(vaultRecord()){showSecurity('unlock');return}
       if(!password){error.textContent='Entre ton mot de passe.';UI.securityPassword.focus();return}
-      if(password.length<SECURITY.minPasswordLength){error.textContent='Choisis au moins '+SECURITY.minPasswordLength+' caractères.';return}
-      if($('#securityConfirmWrap').hidden){
-        // Premier accès admin sur cet appareil : aucun coffre à vérifier, le mot de passe est créé.
-        $('.security-modal').classList.add('is-creating');
-        $('#securityText').textContent='Premier accès sur cet appareil : confirme ton mot de passe. Il protégera Home Assistant et l’accès administrateur.';
-        $('#securityConfirmWrap').hidden=false;
-        UI.securityPassword.autocomplete='new-password';
-        UI.securitySubmit.textContent='Créer mon coffre';
-        UI.securityConfirm.focus();
-        return;
-      }
-      if(password!==UI.securityConfirm.value){error.textContent='Les deux mots de passe ne correspondent pas.';return}
-      await storeSecureVault('','',password,null);
+      // Premier accès admin sur cet appareil : le mot de passe est celui du compte administrateur
+      // Supabase, vérifié une seule fois ici ; ensuite le coffre se déverrouille hors ligne.
+      if(!window.COURSES_FAMILY?.adminVerify){error.textContent='Service indisponible, réessaie plus tard.';return}
+      const familyAdmin=await window.COURSES_FAMILY.adminVerify(password);
+      await storeSecureVault('','',password,familyAdmin);
       rememberAccount(identifier,'admin');
-      enterAdminVaultMode(password,null);
+      enterAdminVaultMode(password,familyAdmin);
       return;
     }
     if(!UI.securityPassword.value){error.textContent='Entre ton mot de passe.';return}

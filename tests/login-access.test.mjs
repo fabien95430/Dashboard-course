@@ -25,10 +25,12 @@ test('le tri admin / famille est local : empreinte SHA-256 de l identifiant norm
   assert.equal(hash,createHash('sha256').update('admin').digest('hex'));
   assert.match(app,/function normalizeIdentifier\(value\)\{return String\(value\|\|''\)\.trim\(\)\.toLowerCase\(\)\}/);
   assert.match(app,/await sha256Hex\(id\)===ADMIN_IDENTIFIER_SHA256/);
-  // Aucun appel réseau dans le tri.
+  // Aucun appel réseau dans le tri lui-même.
   const login=app.match(/async function completeLogin\(\)\{[\s\S]*?\n\}/)?.[0]||'';
   assert.ok(login.includes('isAdminIdentifier(identifier)'));
-  assert.doesNotMatch(login,/fetch\(|WebSocket|supabase/i);
+  const tri=app.match(/async function isAdminIdentifier\(value\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.ok(tri,'tri absent');
+  assert.doesNotMatch(tri,/fetch\(|WebSocket|supabase|COURSES_FAMILY/i);
 });
 
 test('l identifiant est mémorisé sans secret et oublié à la déconnexion',()=>{
@@ -77,19 +79,27 @@ test('déverrouillage : la liste enregistrée est prête avant de quitter l’é
   assert.match(app,/state\.locked=false;\s*\/\/[^\n]*\n[^\n]*\n\s*await restoreOfflineState\(\);\s*hideSecurity\(\);\s*await connectFromRefresh\(\);/);
 });
 
-test('admin sans coffre : mot de passe choisi deux fois, coffre vide, plus de mode test sans mot de passe',()=>{
+test('admin sans coffre : mot de passe du compte admin Supabase vérifié une fois, sans saisie double',()=>{
+  // v889 : le même mot de passe admin sur tous les appareils (choix du propriétaire).
   const app=read('app.js');
   const login=app.match(/async function completeLogin\(\)\{[\s\S]*?\n\}/)?.[0]||'';
-  const admin=login.slice(login.indexOf('isAdminIdentifier(identifier)'),login.indexOf('enterAdminVaultMode(password,null);'));
+  const admin=login.slice(login.indexOf('isAdminIdentifier(identifier)'),login.indexOf('enterAdminVaultMode(password,familyAdmin);'));
+  assert.ok(admin.includes("if(vaultRecord()){showSecurity('unlock');return}"),'un coffre existant se déverrouille localement');
   assert.ok(admin.includes("if(!password){error.textContent='Entre ton mot de passe.'"));
-  assert.ok(admin.includes('password.length<SECURITY.minPasswordLength'));
-  assert.ok(admin.includes("$('#securityConfirmWrap').hidden=false;"));
-  assert.ok(admin.includes("password!==UI.securityConfirm.value"));
-  assert.ok(admin.includes("await storeSecureVault('','',password,null);"));
+  assert.ok(admin.includes('const familyAdmin=await window.COURSES_FAMILY.adminVerify(password);'));
+  assert.ok(admin.indexOf('adminVerify(password)')<admin.indexOf("await storeSecureVault('','',password,familyAdmin);"),'coffre créé seulement après vérification');
+  assert.doesNotMatch(admin,/securityConfirmWrap|UI\.securityConfirm|minPasswordLength/);
   assert.doesNotMatch(admin,/enterLocalMode\(\)/);
   // Coffre vide accepté au déchiffrement, sans adresse HA isolée.
   assert.match(app,/const empty=!!payload&&!payload\.refresh_token&&!payload\.ha_url;/);
   assert.match(app,/ha_url:refreshToken\?normalizeHaUrl\(haUrl\):'',/);
+  const service=read('family-service.js');
+  assert.match(service,/adminEmail:'admin\.maison@gmail\.com'/);
+  const verify=service.match(/async function adminVerify\(password\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.match(verify,/persistSession:false,autoRefreshToken:false/);
+  assert.match(verify,/status===400\|\|status===401\|\|status===403\)throw fail\('wrong'/);
+  assert.match(verify,/throw fail\('unavailable','Service indisponible, réessaie plus tard\.'\)/);
+  assert.doesNotMatch(verify,/localStorage|sessionStorage/,'aucun secret conservé hors du coffre');
 });
 
 test('coffre admin vide : déverrouillage local, accès admin conservé, verrouillage actif',()=>{

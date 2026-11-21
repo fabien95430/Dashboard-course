@@ -11,6 +11,8 @@ const CONFIG=Object.freeze({
   // Clé publishable : publique par conception, l'accès aux données est protégé par RLS.
   key:'sb_publishable_OCoP4SmvfqxVPKdJbhdHsA_BFraB-fh',
   emailDomain:'@famille.invalid',
+  // Compte administrateur Supabase : son mot de passe est aussi celui de l'accès « admin » de l'app.
+  adminEmail:'admin.maison@gmail.com',
   // Clé publique Web Push réservée aux téléphones famille (la clé privée est un secret Supabase).
   vapidPublicKey:'BPONs8dXD96tiHA8HA5LjIb17wPp4Roa8OhK0Jpyhx-8R-TUV00HN1jP3893gsU6JpexdFa0gOLfxDf8cf7ORZg',
   library:'./vendor/supabase.min.js?v=2119'
@@ -403,6 +405,26 @@ async function admin(credentials){
   }
   return adminClient;
 }
+/* Premier accès « admin » sur un appareil : le mot de passe est vérifié une fois par le compte
+   administrateur Supabase, puis ne sert plus qu'au coffre local (le déverrouillage reste hors ligne).
+   Erreurs : code 'wrong' (mot de passe refusé), 'busy' (trop d'essais), 'unavailable' (service injoignable). */
+async function adminVerify(password){
+  const fail=(code,message)=>Object.assign(new Error(message),{code});
+  let lib;
+  try{lib=await loadLibrary()}catch(_){throw fail('unavailable','Service indisponible, réessaie plus tard.')}
+  const probe=lib.createClient(CONFIG.url,CONFIG.key,{auth:{storageKey:KEYS.adminAuth+'-verify',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+  let result;
+  try{result=await probe.auth.signInWithPassword({email:CONFIG.adminEmail,password:String(password||'')})}
+  catch(_){throw fail('unavailable','Service indisponible, réessaie plus tard.')}
+  const status=Number(result?.error?.status||0);
+  if(result?.error){
+    if(status===400||status===401||status===403)throw fail('wrong','Mot de passe incorrect.');
+    if(status===429)throw fail('busy','Trop de tentatives. Réessaie dans quelques minutes.');
+    throw fail('unavailable','Service indisponible, réessaie plus tard.');
+  }
+  try{await probe.auth.signOut()}catch(_){}
+  return {email:CONFIG.adminEmail,password:String(password||'')};
+}
 async function adminOverview(credentials){
   const db=await admin(credentials);
   const since=new Date(Date.now()-31*864e5).toISOString();
@@ -498,7 +520,7 @@ const api=Object.freeze({
   sendFeedback,listFeedback,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),
-  adminOverview,adminBureau,adminSetRequestStatus,adminSetFeedbackStatus,adminSetFeedbackStage,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
+  adminVerify,adminOverview,adminBureau,adminSetRequestStatus,adminSetFeedbackStatus,adminSetFeedbackStage,adminRevokeDevice,adminManageFamily,adminWatchRequests,adminSignOut
 });
 Object.defineProperty(window,'COURSES_FAMILY',{value:api,configurable:false,enumerable:false,writable:false});
 })();

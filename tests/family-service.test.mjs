@@ -56,11 +56,17 @@ test('service famille : clé publishable seulement, bibliothèque embarquée cha
   assert.ok(read('vendor/supabase.min.js').startsWith('/*! @supabase/supabase-js'));
 });
 
-test('le mode admin ne dépend pas du service famille',()=>{
+test('le mode admin ne dépend du service famille qu au premier accès sur un appareil',()=>{
   const app=read('app.js');
   const login=app.match(/async function completeLogin\(\)\{[\s\S]*?\n\}/)?.[0]||'';
-  const adminBranch=login.slice(0,login.indexOf('enterAdminVaultMode(password,null);'));
-  assert.doesNotMatch(adminBranch,/COURSES_FAMILY/);
+  const adminBranch=login.slice(0,login.indexOf('enterAdminVaultMode(password,familyAdmin);'));
+  // v889 : seul le premier accès vérifie le mot de passe auprès du compte admin Supabase.
+  assert.equal((adminBranch.match(/COURSES_FAMILY/g)||[]).length,2);
+  assert.ok(adminBranch.indexOf("if(vaultRecord()){showSecurity('unlock');return}")<adminBranch.indexOf('COURSES_FAMILY'));
+  // Déverrouillage du coffre : entièrement local.
+  const unlock=app.slice(app.indexOf("if(state.securityMode==='unlock'){"),app.indexOf('rememberVaultSeal(password);\n      state.locked=false;'));
+  assert.ok(unlock.length>0);
+  assert.doesNotMatch(unlock,/COURSES_FAMILY|fetch\(/);
   assert.match(app,/function saveLocalItems\(items\)\{\s*saveJson\(DEMO_KEY,items\);\s*if\(state\.family\)window\.COURSES_FAMILY\?\.listChanged\(\);/);
   assert.doesNotMatch(app,/saveJson\(DEMO_KEY,(?!items\);\s*if\(state\.family\))/);
 });

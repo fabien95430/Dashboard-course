@@ -220,7 +220,7 @@ function header(title,back){
     '<span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-home"></use></svg></span><span class="settings-sheet-title">'+esc(title)+'</span></h3>';
 }
 
-const ADMIN_EMAIL='admin.maison@gmail.com';
+const ADMIN_EMAIL=window.COURSES_FAMILY?.config?.adminEmail||'';
 function renderAccess(node,message=''){
   node.dataset.view='access';
   node.innerHTML=header('Familles')+
