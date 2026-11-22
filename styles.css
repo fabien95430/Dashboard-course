@@ -3258,11 +3258,15 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 .settings-view .settings-icon-bureau{position:relative!important;overflow:visible!important}
 html[data-account="family"] #settingsBureauBtn{display:none!important}
 .settings-sheet#bureauDialog .bureau-scene{margin:0 0 12px;background:transparent}
+/* Bureau en plein écran (sans poignée ni coins arrondis), sous la safe area du haut ; sortie par le bouton retour de l'en-tête. */
+.settings-sheet#bureauDialog{top:0!important;height:100dvh!important;max-height:none!important;padding-top:calc(max(14px,env(safe-area-inset-top)) + 12px)!important;border-top:0!important;border-radius:0!important}
+.settings-sheet#bureauDialog::before{display:none}
 /* Vue Bureau : en-tête, scène et onglets fixes ; seule la liste des dossiers défile. */
 .settings-sheet#bureauDialog[open][data-view="bureau"]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
 .settings-sheet#bureauDialog[data-view="bureau"]>*{flex:0 0 auto}
 .settings-sheet#bureauDialog[data-view="bureau"] .bureau-panel{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin-bottom:calc(-1 * var(--sheet-bottom-inset))!important;padding:12px 0 calc(var(--sheet-bottom-inset) + 12px)}
-.settings-sheet#bureauDialog .bureau-scene-art{position:relative;width:100%;aspect-ratio:1464/1074;-webkit-user-select:none;user-select:none;pointer-events:none}
+/* Scène agrandie : la pièce (92 % de la largeur de l'image) va jusqu'à 14 px des bords de l'écran ; postes, dossiers et bulles suivent (positions en %). */
+.settings-sheet#bureauDialog .bureau-scene-art{--bureau-art-w:min(calc((100vw - 28px) / .92),560px);position:relative;width:var(--bureau-art-w);margin-left:calc((100% - var(--bureau-art-w)) / 2);aspect-ratio:1464/1074;-webkit-user-select:none;user-select:none;pointer-events:none}
 .settings-sheet#bureauDialog .bureau-scene-art img{display:block;width:100%;height:auto;-webkit-user-drag:none}
 .settings-sheet#bureauDialog .bureau-scene-art .bureau-room{position:absolute;inset:0;height:100%}
 .settings-sheet#bureauDialog .bureau-poste{position:absolute;width:21.17%}

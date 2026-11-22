@@ -149,7 +149,8 @@ function pileMarkup(count){
 const LEADS=Object.freeze({
   trieur:{head:[53.5,33.6],lift:16,shift:50},
   testeur:{head:[37.5,39.8],lift:6,shift:70},
-  developpeur:{head:[71.5,44.8],lift:6,shift:55}
+  // Bulle du Développeur décalée vers les fenêtres : elle ne cache plus le Trieur.
+  developpeur:{head:[71.5,44.8],lift:10,shift:35}
 });
 const TYPE_MS=45;      // une lettre
 function labelMarkup(agent,typing=false){
@@ -394,8 +395,13 @@ function show(node){
   try{node.scrollTop=0}catch(_){}
   requestAnimationFrame(()=>{try{node.focus({preventScroll:true})}catch(_){}});
 }
+function backButton(cls,label){
+  return '<button type="button" class="settings-sheet-back '+cls+'" aria-label="'+label+'"><svg aria-hidden="true"><use href="#i-chevron"></use></svg></button>';
+}
+/* Bouton retour en tête : sur la vue Bureau il ferme l'écran (retour aux Réglages), sur une fiche il revient au Bureau. */
 function header(title,back){
-  return '<h3'+(back?' class="has-back"':'')+'>'+(back?'<button type="button" class="settings-sheet-back bureau-back" aria-label="Retour au bureau"><svg aria-hidden="true"><use href="#i-chevron"></use></svg></button>':'')+
+  const button=back==='close'?backButton('bureau-close','Retour aux réglages'):back?backButton('bureau-back','Retour au bureau'):'';
+  return '<h3'+(button?' class="has-back"':'')+'>'+button+
     '<span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-briefcase"></use></svg></span><span class="settings-sheet-title">'+esc(title)+'</span></h3>';
 }
 function dossierRow(dossier){
@@ -435,7 +441,7 @@ function renderBureau(node,tab){
   delete node.dataset.dossier;
   const current=tab||node.dataset.tab||(validerCount()?'valider':'cours');
   node.dataset.tab=current;
-  node.innerHTML=header('Bureau')+'<p class="dialog-intro bureau-intro"><i class="bureau-status-dot" aria-hidden="true"></i>3 agents · '+(liveAgent()?'au travail':'en service')+'</p>'+
+  node.innerHTML=header('Bureau','close')+'<p class="dialog-intro bureau-intro"><i class="bureau-status-dot" aria-hidden="true"></i>3 agents · '+(liveAgent()?'au travail':'en service')+'</p>'+
     '<div class="bureau-scene">'+(kept?'':sceneMarkup())+'</div>'+tabsMarkup(current)+panelMarkup(current);
   if(kept){node.querySelector('.bureau-scene').replaceWith(kept);updateScene(kept)}
   syncLive(node);
@@ -583,7 +589,8 @@ async function runAction(node,action){
 }
 function onDialogClick(event){
   const node=event.currentTarget;
-  if(event.target===node){node.close();return}
+  // Plein écran : pas de fond à toucher, seul le bouton retour ferme le Bureau.
+  if(event.target.closest('.bureau-close')){node.close();return}
   if(event.target.closest('.bureau-back')){renderBureau(node);try{node.scrollTop=0}catch(_){}return}
   const tab=event.target.closest('.bureau-tab');
   if(tab){switchTab(node,tab.dataset.tab);return}

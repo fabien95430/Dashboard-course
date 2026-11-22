@@ -253,3 +253,18 @@ test('bureau v876 : titre court de la fiche et scène gardée sans recréer les 
   assert.doesNotMatch(css.match(/\.bureau-panel\{[^}]*\}/)[0],/mask-image/);
   assert.match(css,/\.bureau-tabs\{[^}]*margin:0 auto;/);
 });
+
+test('bureau v898 : plein écran, sortie par le bouton retour de l’en-tête',()=>{
+  const ui=read('bureau-ui.js');
+  assert.match(ui,/node\.innerHTML=header\('Bureau','close'\)\+/);
+  assert.match(ui,/backButton\('bureau-close','Retour aux réglages'\)/);
+  assert.match(ui,/if\(event\.target\.closest\('\.bureau-close'\)\)\{node\.close\(\);return\}/);
+  assert.doesNotMatch(ui,/if\(event\.target===node\)\{node\.close\(\);return\}/,'plus de fermeture au toucher du fond');
+  const css=read('styles.css');
+  assert.match(css,/\.settings-sheet#bureauDialog\{top:0!important;height:100dvh!important;max-height:none!important;[^}]*border-radius:0!important\}/);
+  assert.match(css,/\.settings-sheet#bureauDialog::before\{display:none\}/);
+  // Aucune bulle ne cache un agent : celle du Développeur part vers les fenêtres.
+  assert.match(ui,/developpeur:\{head:\[71\.5,44\.8\],lift:10,shift:35\}/);
+  // Scène agrandie : la pièce s'arrête à 14 px des bords de l'écran.
+  assert.match(css,/\.bureau-scene-art\{--bureau-art-w:min\(calc\(\(100vw - 28px\) \/ \.92\),560px\);position:relative;width:var\(--bureau-art-w\);margin-left:calc\(\(100% - var\(--bureau-art-w\)\) \/ 2\)/);
+});
