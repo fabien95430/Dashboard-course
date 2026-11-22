@@ -243,8 +243,16 @@ function installPreferenceDialogAppearance(){
     #preferencesNotificationsPanel .notifications-management-summary{display:grid;gap:6px;padding:14px;border:1px solid #e4eee6;border-radius:17px;background:#f4f9f4}
     #preferencesNotificationsPanel .notifications-management-summary strong{font-size:var(--fs-text);color:#173527}
     #preferencesNotificationsPanel .notifications-management-summary small{font-size:var(--fs-note);color:#557364;line-height:1.45;overflow-wrap:anywhere}
-    #preferencesNotificationsPanel .notifications-management-actions{display:flex;gap:8px;flex-wrap:wrap}
-    #preferencesNotificationsPanel .notifications-management-actions button{flex:1 1 130px;min-height:44px;border-radius:13px;padding:8px 12px;font-size:var(--fs-text);font-weight:750;white-space:nowrap}
+    #preferencesNotificationsPanel .notifications-devices[hidden]{display:none}
+    #preferencesNotificationsPanel .notifications-devices{list-style:none;margin:6px 0 0;padding:0;display:grid}
+    #preferencesNotificationsPanel .notifications-devices li{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 0;border-top:1px solid rgba(71,98,77,.11)}
+    #preferencesNotificationsPanel .notifications-device-copy{display:grid;gap:2px;min-width:0;flex:1}
+    #preferencesNotificationsPanel .notifications-device-copy strong{font-size:var(--fs-text);color:#173527;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #preferencesNotificationsPanel .notifications-device-copy small{font-size:var(--fs-note);color:#557364;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #preferencesNotificationsPanel .notifications-device-remove{flex:0 0 auto;min-height:34px;margin:0;padding:0 12px;border:1px solid rgba(71,98,77,.11);border-radius:11px;background:rgba(255,255,255,.35);color:#385540;font-size:var(--fs-note);font-weight:750;white-space:nowrap}
+    #preferencesNotificationsPanel .notifications-device-remove:disabled{opacity:.5}
+    #preferencesNotificationsPanel .notifications-management-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:stretch}
+    #preferencesNotificationsPanel .notifications-management-actions button{width:100%;height:47px;margin:0;border-radius:15px;padding:0 12px;font-size:var(--fs-text);font-weight:750;white-space:nowrap}
     #preferencesNotificationsPanel .notifications-management-hint{margin:0;font-size:var(--fs-note);line-height:1.5;color:#7d858d}
     .connection-dialog .connection-sync-section{margin-top:0;padding:12px 13px;border:1px solid #e5ede6;border-radius:16px;background:#f8faf7}
     .connection-dialog .sheet-section-title{margin:14px 0 7px;font-size:var(--fs-note);color:#52675a;font-weight:800}
@@ -316,6 +324,7 @@ function initSettingsNavigation(){
     setTitle('Notifications','bell');
     if(intro)intro.textContent='Gérez les notifications envoyées à cet iPhone.';
     if(!dialog.open)dialog.showModal();
+    void globalThis.COURSES_NOTIFICATIONS?.refreshDevices?.();
   }
 
   window.COURSES_SETTINGS_NAV=Object.freeze({setTitle});

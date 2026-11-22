@@ -30,3 +30,15 @@ test('workflow OpenAI garde le flux original en secours',()=>{
  assert.match(wf,/'PUSH_ENDPOINT':'push_endpoint'/);
  assert.match(wf,/'PUSH_SUBSCRIPTIONS':'push_subscriptions'/);
 });
+test('popup Notifications : liste des appareils enregistrés et boutons alignés',()=>{
+ const src=read('courses-notifications.js'),html=read('index.html'),settings=read('settings-ui.js'),family=read('family-service.js');
+ assert.match(html,/<ul id="notificationsDevicesList" class="notifications-devices"/);
+ assert.match(src,/function renderDevices\(list\)/);
+ assert.match(src,/refreshDevices,getStatus/);
+ assert.match(src,/current:row\.id===id,removable:row\.id!==id/);
+ assert.match(src,/removable:false/, 'une famille ne retire pas un autre appareil');
+ assert.match(family,/from\('abonnements'\)\.select\('endpoint,cree_le,appareils\(nom\)'\)/);
+ assert.match(settings,/globalThis\.COURSES_NOTIFICATIONS\?\.refreshDevices\?\.\(\)/);
+ assert.match(settings,/notifications-management-actions\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(settings,/notifications-management-actions button\{width:100%;height:47px;margin:0;/);
+});

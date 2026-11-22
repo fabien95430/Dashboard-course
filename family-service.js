@@ -363,6 +363,14 @@ async function removeSubscription(endpoint){
   const {error}=await db.from('abonnements').delete().eq('endpoint',String(endpoint));
   return !error;
 }
+/* Appareils abonnés du foyer, avec le nom donné à l'appareil à la connexion. */
+async function listSubscriptions(){
+  if(!session)return [];
+  const db=await familyClient();
+  const {data,error}=await db.from('abonnements').select('endpoint,cree_le,appareils(nom)').order('cree_le',{ascending:true});
+  if(error)throw new Error('Liste des appareils indisponible');
+  return (data||[]).map(row=>({endpoint:String(row.endpoint||''),nom:String(row.appareils?.nom||''),cree_le:row.cree_le||''}));
+}
 async function countSubscriptions(){
   if(!session)return 0;
   const db=await familyClient();
@@ -517,7 +525,7 @@ const api=Object.freeze({
   emailFor,displayName,ensureUuids,rowToItem,itemToRow,
   signIn,resume,signOut,listChanged,pushList,
   registerDevice,listDevices,touchDevice,
-  saveSubscription,removeSubscription,countSubscriptions,
+  saveSubscription,removeSubscription,countSubscriptions,listSubscriptions,
   sendFeedback,listFeedback,
   isActive:()=>!!session,
   currentName:()=>displayName(session?.user?.email||''),

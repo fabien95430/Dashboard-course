@@ -48,7 +48,7 @@ function decode(row){
   try{
     const data=JSON.parse(row.description.slice(PREFIX.length));
     const push=safePush(data);
-    return data.v===1&&push?{uid:String(row.uid||''),summary:String(row.summary||''),id:String(data.id||''),push}:null;
+    return data.v===1&&push?{uid:String(row.uid||''),summary:String(row.summary||''),id:String(data.id||''),at:String(data.at||''),push}:null;
   }catch(_){return null}
 }
 async function publicKey(){
@@ -87,7 +87,8 @@ async function remember(push){
   if(!valid||!connected())return false;
   const id=ownId(),summary='Courses Push '+id;
   const existing=(await rows()).map(decode).filter(Boolean).find(row=>row.id===id);
-  const description=PREFIX+JSON.stringify({v:1,id,...valid});
+  const at=existing?.at||new Date().toISOString();
+  const description=PREFIX+JSON.stringify({v:1,id,at,...valid});
   if(existing){
     if(JSON.stringify(existing.push)!==JSON.stringify(valid)){
       await ha().callService('todo','update_item',{entity_id:ENTITY,item:existing.uid||existing.summary,description});
@@ -108,6 +109,7 @@ async function registerFamily({ask=false}={}){
     await window.COURSES_FAMILY.saveSubscription(await currentPush({ask}));
     const count=await window.COURSES_FAMILY.countSubscriptions();
     setStatus('Actives · '+count+' appareil'+(count>1?'s':'')+' enregistré'+(count>1?'s':''));
+    void refreshDevices();
     return true;
   }catch(error){setStatus(String(error?.message||'Inscription impossible').slice(0,130));return false}
 }
@@ -123,6 +125,7 @@ async function register({ask=false}={}){
     await remember(await currentPush({ask}));
     const count=new Set((await rows()).map(decode).filter(Boolean).map(r=>r.push.endpoint)).size;
     setStatus('Actives · '+count+' appareil'+(count>1?'s':'')+' enregistré'+(count>1?'s':''));
+    void refreshDevices();
     return true;
   })();
   task=job;
@@ -162,6 +165,7 @@ async function disable(){
       const registration=await navigator.serviceWorker.ready,subscription=await registration.pushManager.getSubscription();
       if(subscription){await window.COURSES_FAMILY.removeSubscription(subscription.endpoint);await subscription.unsubscribe()}
       setStatus('Notifications désactivées sur cet iPhone');
+      void refreshDevices();
       return true;
     }catch(error){setStatus(String(error?.message||'Désactivation impossible'));return false}
   }
@@ -172,8 +176,92 @@ async function disable(){
     const registration=await navigator.serviceWorker.ready;
     await (await registration.pushManager.getSubscription())?.unsubscribe();
     setStatus('Notifications désactivées sur cet iPhone');
+    void refreshDevices();
     return true;
   }catch(error){setStatus(String(error?.message||'Désactivation impossible'));return false}
+}
+/* ---------- Liste des appareils enregistrés (popup Notifications) ---------- */
+function deviceKind(endpoint){
+  let host='';
+  try{host=new URL(endpoint).hostname}catch(_){}
+  if(/(^|\.)push\.apple\.com$/.test(host))return 'iPhone';
+  if(/(^|\.)googleapis\.com$/.test(host))return 'Android ou Chrome';
+  if(/mozilla\.(com|org)$/.test(host))return 'Firefox';
+  if(/(^|\.)windows\.com$/.test(host)||/notify\.windows/.test(host))return 'Windows';
+  return 'Navigateur';
+}
+function addedOn(value){
+  const date=new Date(value);
+  return Number.isFinite(date.getTime())?'ajouté le '+date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'';
+}
+async function ownEndpoint(){
+  try{
+    const registration=await navigator.serviceWorker?.getRegistration?.();
+    return String((await registration?.pushManager?.getSubscription?.())?.endpoint||'');
+  }catch(_){return ''}
+}
+async function devices(){
+  if(family()){
+    const own=await ownEndpoint();
+    return (await window.COURSES_FAMILY.listSubscriptions()).map(row=>({
+      key:row.endpoint,name:row.nom||deviceKind(row.endpoint),at:row.cree_le,current:!!own&&row.endpoint===own,removable:false
+    }));
+  }
+  if(!connected())return null;
+  const id=ownId(),seen=new Set(),result=[];
+  for(const row of (await rows()).map(decode).filter(Boolean)){
+    if(seen.has(row.push.endpoint))continue;
+    seen.add(row.push.endpoint);
+    result.push({key:row.uid||row.summary,name:deviceKind(row.push.endpoint),at:row.at,current:row.id===id,removable:row.id!==id});
+  }
+  return result;
+}
+function renderDevices(list){
+  const host=document.getElementById('notificationsDevicesList');
+  if(!host)return;
+  host.replaceChildren();
+  if(!Array.isArray(list)||!list.length){host.hidden=true;return}
+  // Appareil courant en tête ; numérotation quand plusieurs appareils portent le même nom.
+  const ordered=[...list].sort((a,b)=>Number(b.current)-Number(a.current));
+  const totals={},ranks={};
+  ordered.forEach(d=>{totals[d.name]=(totals[d.name]||0)+1});
+  for(const device of ordered){
+    ranks[device.name]=(ranks[device.name]||0)+1;
+    const item=document.createElement('li');
+    const copy=document.createElement('span');copy.className='notifications-device-copy';
+    const name=document.createElement('strong');
+    name.textContent=device.name+(totals[device.name]>1&&!device.current?' '+ranks[device.name]:'');
+    const detail=document.createElement('small');
+    detail.textContent=[device.current?'Cet appareil':'',addedOn(device.at)].filter(Boolean).join(' · ')||'Enregistré';
+    copy.append(name,detail);item.append(copy);
+    if(device.removable){
+      const remove=document.createElement('button');
+      remove.type='button';remove.className='notifications-device-remove';remove.textContent='Retirer';
+      remove.addEventListener('click',()=>{void removeDevice(device.key,remove)});
+      item.append(remove);
+    }
+    host.append(item);
+  }
+  host.hidden=false;
+}
+async function refreshDevices(){
+  try{renderDevices(await devices())}catch(_){renderDevices(null)}
+}
+/* Administrateur : retire de Home Assistant un autre appareil (il ne reçoit plus rien). */
+async function removeDevice(key,button){
+  if(family()||!connected()||!key)return false;
+  if(button)button.disabled=true;
+  try{
+    await ha().callService('todo','remove_item',{entity_id:ENTITY,item:key});
+    const count=new Set((await rows()).map(decode).filter(Boolean).map(r=>r.push.endpoint)).size;
+    if(/^Actives/.test(status))setStatus('Actives · '+count+' appareil'+(count>1?'s':'')+' enregistré'+(count>1?'s':''));
+    await refreshDevices();
+    return true;
+  }catch(error){
+    if(button)button.disabled=false;
+    setStatus(String(error?.message||'Retrait impossible').slice(0,130));
+    return false;
+  }
 }
 function bind(){
   const enable=document.getElementById('enableMissingNotifications');
@@ -187,5 +275,5 @@ function bind(){
   });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-Object.defineProperty(window,'COURSES_NOTIFICATIONS',{value:Object.freeze({register,recipients,broadcast,disable,safePush,getStatus:()=>status}),configurable:false,enumerable:false,writable:false});
+Object.defineProperty(window,'COURSES_NOTIFICATIONS',{value:Object.freeze({register,recipients,broadcast,disable,safePush,refreshDevices,getStatus:()=>status}),configurable:false,enumerable:false,writable:false});
 })();
