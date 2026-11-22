@@ -1,0 +1,3 @@
+# Python compilé (réécrit à chaque lancement des tests)
+__pycache__/
+*.pyc

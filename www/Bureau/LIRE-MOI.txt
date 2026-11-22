@@ -1,8 +1,0 @@
-Sources du Bureau
-Les PNG 01 à 12 sont les maîtres de génération. Le fond 01 a été corrigé pour supprimer les dossiers permanents du bureau vert.
-13-dossier-tache.png est le dossier indépendant, affiché par bureau-ui.js selon les tâches non terminées.
-Les fichiers réellement chargés par l’application sont les WebP produits par scripts/make_bureau_images.py.
-Les variantes de poste réutilisent les pixels fixes du repos et ne changent que leurs zones animées.
-Les images du coursier sont conservées comme sources ; elles ne sont pas chargées par l’interface actuelle.
-Les variantes PNG brutes gardent les légères différences du générateur : utiliser les WebP préparés.
-Aperçu et détails : docs/BUREAU_AGENTS.md et docs/bureau/assets/README.md.

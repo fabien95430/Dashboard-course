@@ -41,7 +41,7 @@ test('les deux références approuvées Mayonnaise et Paprika sont conservées �
   }
 });
 
-test('les cadrages antérieurs sont recalculés seulement pour les visuels renouvelés', () => {
+test('les cadrages antérieurs sont recalculés pour les visuels renouvelés', () => {
   const source = read('product-item-images.js');
   const currentVersion = read('dish-local-images.js').match(/const APP_VERSION='(v\d+)'/)[1];
   for (const version of ['v740',currentVersion]) {
@@ -55,9 +55,10 @@ test('les cadrages antérieurs sont recalculés seulement pour les visuels renou
     const style = window.COURSES_PRODUCT_IMAGES.visualScaleStyle;
     const factors = new Function(source.slice(source.indexOf('const PRODUCT_VISUAL_FACTORS='),source.indexOf('let visualScaleSaveTimer='))+';return PRODUCT_VISUAL_FACTORS;')();
     for (const slug of slugs) {
-      if (version==='v740' && !canonical.has(slug)) assert.equal(style(asset(slug)), factors.has(asset(slug))?'--single-product-scale:'+Math.round(factors.get(asset(slug))[0]*1000)/1000+';--single-product-shift-x:0%;--single-product-shift-y:0%':'',slug);
+      if (version==='v740') assert.equal(style(asset(slug)), factors.has(asset(slug))?'--single-product-scale:'+Math.round(factors.get(asset(slug))[0]*1000)/1000+';--single-product-shift-x:0%;--single-product-shift-y:0%':'',slug);
       else assert.ok(style(asset(slug)).includes('--single-product-scale:'+Math.round(1.2*(factors.get(asset(slug))?.[0]||1)*1000)/1000+';'),slug);
     }
-    for (const slug of ['lait','riz-blanc']) assert.ok(style(asset(slug)).includes('--single-product-scale:'+Math.round(1.2*(factors.get(asset(slug))?.[0]||1)*1000)/1000+';'),slug);
+    // v890 : un cache antérieur à v785 est entièrement remesuré (VISUAL_SCALE_MIN_VERSION) ; les autres produits ne gardent plus leur ancien cadrage.
+    if (version!=='v740') for (const slug of ['lait','riz-blanc']) assert.ok(style(asset(slug)).includes('--single-product-scale:'+Math.round(1.2*(factors.get(asset(slug))?.[0]||1)*1000)/1000+';'),slug);
   }
 });

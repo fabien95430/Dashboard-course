@@ -20,7 +20,7 @@ test('sept WebP entiers, 256 px, canal alpha et sous 15 Ko',()=>{
     assert.ok(b.length<=15000,slug);
   }
 });
-test('v733 invalide seulement les sept cadrages conservés en localStorage',()=>{
+test('v733 invalide les sept cadrages conservés en localStorage',()=>{
  const window={COURSES_TEXT,COURSES_CATALOG:{groups:{}},COURSES_APP_VERSION:'v733'};
  const document={readyState:'loading',addEventListener(){}};
  const items=Object.fromEntries([...slugs,'mozzarella'].map(s=>[src(s),[1.45,18,-18]]));
@@ -29,5 +29,6 @@ test('v733 invalide seulement les sept cadrages conservés en localStorage',()=>
  const style=window.COURSES_PRODUCT_IMAGES.visualScaleStyle;
  const expected={"butternut": 1.0, "courge": 1.0, "navets": 0.963, "echalotes": 1, "noisettes": 0.905, "ail": 1, "oignons-jaunes": 0.92};
  for(const s of slugs)assert.equal(style(src(s)),expected[s]===1?'':'--single-product-scale:'+expected[s]+';--single-product-shift-x:0%;--single-product-shift-y:0%',s);
- assert.ok(style(src('mozzarella')).includes('--single-product-scale:1.262;'));
+ // v890 : un cache antérieur à v785 est entièrement remesuré (VISUAL_SCALE_MIN_VERSION) ; les autres produits ne gardent plus leur ancien cadrage.
+ assert.ok(!style(src('mozzarella')).includes('--single-product-scale:1.262;'));
 });

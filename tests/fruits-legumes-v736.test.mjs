@@ -30,12 +30,13 @@ function scaleAt(version,stored){
   vm.runInNewContext(readFileSync(join(root,'product-item-images.js'),'utf8'),{window,document,localStorage});
   return window.COURSES_PRODUCT_IMAGES.visualScaleStyle;
 }
-test('les trois nouvelles images v736 seulement perdent les métriques anciennes',()=>{
+test('les trois nouvelles images v736 perdent les métriques anciennes',()=>{
   const items=Object.fromEntries([...changed,'radis'].map(s=>[asset(s),[1.35,12,-9]]));
   const previous=scaleAt('v736',{version:'v735',items});
   const cold={brocoli:0.956,basilic:1,carottes:1.04};
   for(const slug of changed)assert.equal(previous(asset(slug)),cold[slug]===1?'':'--single-product-scale:'+cold[slug]+';--single-product-shift-x:0%;--single-product-shift-y:0%',slug);
-  assert.ok(previous(asset('radis')).includes('--single-product-scale:1.29;'));
-  const current=scaleAt('v736',{version:'v736',items});
+  // v890 : un cache antérieur à v785 est entièrement remesuré (VISUAL_SCALE_MIN_VERSION) ; les autres produits ne gardent plus leur ancien cadrage.
+  assert.equal(previous(asset('radis')),scaleAt('v736',{version:'v736',items:{}})(asset('radis')));
+  const current=scaleAt('v736',{version:'v785',items}); // cache récent (≥ VISUAL_SCALE_MIN_VERSION)
   for(const slug of changed)assert.ok(current(asset(slug)).includes('--single-product-scale:'+{"brocoli": 1.29, "basilic": 1.35, "carottes": 1.404}[slug]+';'),slug);
 });

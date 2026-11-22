@@ -704,15 +704,8 @@ html #products .product.is-deferred{display:none!important}
   font-size:var(--fs-note);
   font-weight:820;
 }
-.section-icon{
-  display:grid;
-  place-items:center;
-  color:#0c7040;
-}
-.section-icon svg{
-  fill:none;
-  stroke:currentColor;
-}
+
+
 .settings-row{
   width:100%;
   border-bottom:1px solid #edf0eb;
@@ -1736,10 +1729,7 @@ body{
   margin-top:4px;
   border-radius:13px;
 }
-.security-lock-now{
-  height:46px;
-  margin-top:12px;
-}
+
 .security-settings-dialog>.dialog-actions{
   margin-top:10px;
 }
@@ -1933,21 +1923,8 @@ body{
   max-width:300px;
   margin:0;
 }
-.missing-products-close{
-  flex:0 0 36px;
-  width:36px;
-  height:36px;
-  border:0;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  padding:0 0 2px;
-  background:#eef1ed;
-  color:#4c5650;
-  font-size:25px;
-  line-height:1;
-}
-.missing-products-close:active{transform:scale(.96)}
+
+
 .missing-products-add{
   margin-top:18px;
   display:grid;
@@ -2398,19 +2375,8 @@ body{
 .settings-section h2{
   margin-bottom:11px;
 }
-.section-icon{
-  width:34px;
-  height:34px;
-  border-radius:11px;
-  border:1px solid rgba(18,112,64,.08);
-  background:linear-gradient(180deg,#eef8ef,#e5f3e7);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
-}
-.section-icon svg{
-  width:19px;
-  height:19px;
-  stroke-width:1.9;
-}
+
+
 
 .settings-card{
   display:grid;
@@ -2974,7 +2940,7 @@ body{
   font-size:var(--fs-text)!important;
   line-height:1!important;
 }
-.settings-sheet .security-lock-now{box-sizing:border-box;width:100%!important;margin-inline:auto!important}
+
 .settings-sheet::-webkit-scrollbar,.settings-sheet *::-webkit-scrollbar{display:none}
 .settings-sheet::before{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:4px;background:rgba(126,135,129,.51);pointer-events:none;z-index:2}
 .settings-sheet::backdrop{background:rgba(30,43,37,.35)!important;-webkit-backdrop-filter:blur(13px)!important;backdrop-filter:blur(13px)!important}
@@ -3045,7 +3011,7 @@ body{
 /* Finitions Réglages : actions, lignes et états des feuilles iOS. */
 .settings-sheet#connectionDialog[open],.settings-sheet#settingsDialog[open]{display:flex!important;flex-direction:column!important}
 .settings-sheet#connectionDialog .dialog-actions{flex:0 0 auto;margin-top:auto!important;padding-top:18px}
-.settings-sheet#settingsDialog .security-lock-now{flex:0 0 auto;margin-top:auto!important}
+
 .settings-sheet#preferencesDialog .preference-dialog-scroll>.dialog-actions{position:sticky;z-index:2;bottom:0;margin-top:16px!important;padding:12px 0 2px;background:linear-gradient(180deg,rgba(247,246,240,0),rgba(247,246,240,.96) 30%)}
 .settings-sheet .security-action-row>.chevron,.settings-sheet .settings-sheet-icon svg{fill:none!important;stroke-linecap:round;stroke-linejoin:round}
 .settings-sheet .security-action-row>.chevron{stroke:currentColor!important}
@@ -3288,7 +3254,7 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 /* v858 — Réglages › Administrateur › Bureau (bureau-ui.js), étape 1 : écran sans agents */
 .settings-view .settings-icon-bureau{position:relative!important;overflow:visible!important}
 html[data-account="family"] #settingsBureauBtn{display:none!important}
-.settings-sheet#bureauDialog .bureau-scene{position:relative;margin:0 0 12px;background:transparent}
+.settings-sheet#bureauDialog .bureau-scene{margin:0 0 12px;background:transparent}
 /* Vue Bureau : en-tête, scène et onglets fixes ; seule la liste des dossiers défile. */
 .settings-sheet#bureauDialog[open][data-view="bureau"]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
 .settings-sheet#bureauDialog[data-view="bureau"]>*{flex:0 0 auto}

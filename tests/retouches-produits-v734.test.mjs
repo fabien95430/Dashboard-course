@@ -25,8 +25,8 @@ test('trois retouches ciblées sont des WebP transparents 384px et sans image ma
   }
 });
 
-test('les nouveaux cadrages sont recalculés sans vider ceux des produits inchangés',()=>{
-  assert.match(imageScript,/const changedSince734=!Number\.isFinite\(cacheVersion\)\|\|cacheVersion<734;/);
-  assert.match(imageScript,/const changedImages734=\['\.\/www\/Items\/cereales\.webp','\.\/www\/Items\/petits-pots\.webp','\.\/www\/Items\/pop-corn\.webp'\]/);
-  assert.match(imageScript,/changedSince734&&changedImages734\.includes\(source\)/);
+test('les cadrages antérieurs à ces retouches sont remesurés (version minimale du cache)',()=>{
+  // Depuis v890 : version minimale du cache au lieu des listes v734 (tests/product-image-scale-cache-version.test.mjs).
+  const minimum=Number(imageScript.match(/const VISUAL_SCALE_MIN_VERSION=(\d+);/)?.[1]);
+  assert.ok(minimum>=734);
 });

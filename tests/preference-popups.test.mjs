@@ -290,7 +290,7 @@ test('Réglages aligne les éléments internes sur une colonne centrale sobre',(
   assert.match(css,/\.settings-sheet \.dialog-actions > button:only-child\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/s);
   assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions\{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:10px\}/);
   assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions > button\{[^}]*min-width:0;[^}]*width:100%!important;[^}]*min-height:48px!important;[^}]*height:48px!important;/s);
-  assert.match(css,/\.settings-sheet \.security-lock-now\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/);
+  // Bouton « Verrouiller maintenant » retiré de l'interface : sa règle CSS est supprimée (v890).
   assert.match(css,/\.settings-sheet \.dialog-intro,[^\n]*\{[^}]*padding-left:58px!important;[^}]*max-width:var\(--sheet-inner-max\)!important/);
 });
 
