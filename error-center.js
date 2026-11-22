@@ -323,7 +323,7 @@ function installStyle(){
   const style=document.createElement('style');
   style.id='courses-error-center-style';
   style.textContent=`
-    #preferencesErrorMessages .security-setting-icon{position:relative;overflow:visible}
+    #preferencesErrorMessages .settings-icon{position:relative;overflow:visible}
     .courses-error-badge{position:absolute;top:-7px;right:-8px;min-width:19px;height:19px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#ff3b30;color:#fff;font-size:9.5px;line-height:15px;font-weight:850;display:none;place-items:center;box-sizing:border-box;box-shadow:0 2px 7px rgba(207,33,26,.22)}
     .courses-error-center{display:grid;gap:0;padding-bottom:4px}
     .courses-error-list{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);overflow:hidden}
@@ -359,11 +359,11 @@ function updateBadge(entries=readEntries()){
   const button=document.getElementById('preferencesErrorMessages');
   if(!button)return;
   const active=entries.filter(entry=>!entry.resolved).length;
-  const icon=button.querySelector('.security-setting-icon');
+  const icon=button.querySelector('.settings-icon');
   let badge=button.querySelector('.courses-error-badge');
   if(!badge&&icon){badge=document.createElement('span');badge.className='courses-error-badge';badge.setAttribute('aria-hidden','true');icon.appendChild(badge)}
   if(badge){badge.textContent=active>99?'99+':String(active);badge.style.display=active?'grid':'none'}
-  const small=button.querySelector('.security-setting-copy small');
+  const small=button.querySelector('.settings-copy small');
   if(small)small.textContent=active?(active+' erreur'+(active>1?'s':'')+' à traiter'):'Aucune erreur active';
 }
 function panelElements(){
@@ -380,7 +380,7 @@ function showErrorCenter(){
     node.hidden=true;
   });
   panel.hidden=false;
-  if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Messages d’erreur','management');else if(title)title.textContent='Messages d’erreur';
+  if(window.COURSES_SETTINGS_NAV?.setTitle)window.COURSES_SETTINGS_NAV.setTitle('Messages d’erreur','bolt');else if(title)title.textContent='Messages d’erreur';
   if(intro)intro.textContent='Anomalies actives et problèmes récemment résolus.';
   currentFilter='active';
   openErrorId='';

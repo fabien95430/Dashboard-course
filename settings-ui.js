@@ -44,15 +44,10 @@ function initPreferencesExtras(){
   const startView=document.getElementById('preferencesStartView');
   if(!dialog||!startView)return;
 
-  let documentationButton=document.getElementById('preferencesDocumentation');
-  if(!documentationButton){
-    documentationButton=document.createElement('button');
-    documentationButton.id='preferencesDocumentation';
-    documentationButton.type='button';
-    documentationButton.className='secondary';
-    documentationButton.textContent='Documentation';
-    documentationButton.setAttribute('aria-label','Ouvrir la documentation PDF');
-    dialog.appendChild(documentationButton);
+  /* Aide › Documentation : ouvre le guide PDF dans un nouvel onglet. */
+  const documentationButton=document.getElementById('settingsDocumentationBtn');
+  if(documentationButton&&documentationButton.dataset.bound!=='1'){
+    documentationButton.dataset.bound='1';
     documentationButton.addEventListener('click',()=>{
       const link=document.createElement('a');
       link.href=DOCUMENTATION_URL;
@@ -82,7 +77,7 @@ function initPreferencesExtras(){
 
   const syncSelects=()=>{servingsSelect.value=String(readPreferredServings())};
   dialog.addEventListener('close',syncSelects);
-  document.getElementById('settingsPreferencesBtn')?.addEventListener('click',syncSelects);
+  document.getElementById('settingsListBtn')?.addEventListener('click',syncSelects);
   servingsSelect.addEventListener('change',()=>{
     const nextServings=Number(servingsSelect.value);
     if(SERVING_OPTIONS.includes(nextServings)){
@@ -243,7 +238,6 @@ function installPreferenceDialogAppearance(){
       transform:none!important;
     }
     #preferencesDialog .preference-dialog-scroll>h3{display:flex;align-items:center;gap:6px}
-    #preferencesApplicationManagement .application-management-options:empty{display:none!important}
     #preferencesNotificationsPanel[hidden]{display:none!important}
     #preferencesNotificationsPanel{display:grid;gap:14px;padding-top:18px}
     #preferencesNotificationsPanel .notifications-management-summary{display:grid;gap:6px;padding:14px;border:1px solid #e4eee6;border-radius:17px;background:#f4f9f4}
@@ -275,58 +269,16 @@ function ensurePreferenceDialogScroll(dialog){
   return content;
 }
 
-function initApplicationManagement(){
+/* Les sous-vues de la feuille Préférences (Affichage et liste, Notifications, Messages d’erreur)
+   s'ouvrent directement depuis Réglages : pas de menu intermédiaire ni de flèche retour. */
+function initSettingsNavigation(){
   installPreferenceDialogAppearance();
   bindPreferenceKeyboardStability();
   const dialog=document.getElementById('preferencesDialog');
-  const documentationButton=document.getElementById('preferencesDocumentation');
   const selectionsButton=document.getElementById('settingsListBtn');
-  const missingProductsButton=document.getElementById('settingsMissingProductsBtn');
-  if(!dialog||!documentationButton||!selectionsButton||!missingProductsButton)return;
+  const notificationsButton=document.getElementById('settingsNotificationsBtn');
+  if(!dialog||!selectionsButton)return;
   const content=ensurePreferenceDialogScroll(dialog);
-
-  let managementButton=document.getElementById('settingsApplicationManagementBtn');
-  if(!managementButton){
-    managementButton=document.createElement('button');
-    managementButton.id='settingsApplicationManagementBtn';
-    managementButton.className='settings-row';
-    managementButton.type='button';
-    managementButton.innerHTML='<span class="settings-icon"><svg><use href="#i-gear"></use></svg></span><span class="settings-copy"><strong>Gestion de l’application</strong><small>Documentation et historique</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
-    missingProductsButton.after(managementButton);
-  }
-
-  const selectionOptions=content.querySelector('.preference-options');
-  let managementPanel=document.getElementById('preferencesApplicationManagement');
-  if(!managementPanel){
-    managementPanel=document.createElement('div');
-    managementPanel.id='preferencesApplicationManagement';
-    managementPanel.hidden=true;
-    (selectionOptions||content.querySelector('.dialog-actions'))?.before(managementPanel);
-  }
-
-  let managementOptions=managementPanel.querySelector('.application-management-options');
-  if(!managementOptions){
-    managementOptions=document.createElement('div');
-    managementOptions.className='preference-options application-management-options';
-    managementPanel.appendChild(managementOptions);
-  }
-  const purchaseHistoryRow=dialog.querySelector('[data-purchase-history-toggle="1"]');
-  if(purchaseHistoryRow)managementOptions.appendChild(purchaseHistoryRow);
-
-  documentationButton.className='security-action-row';
-  documentationButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-list"></use></svg></span><span class="security-setting-copy"><strong>Documentation</strong><small>Guide complet de l’application</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
-  managementPanel.appendChild(documentationButton);
-
-  let notificationsButton=document.getElementById('preferencesNotificationsButton');
-  if(!notificationsButton){
-    notificationsButton=document.createElement('button');
-    notificationsButton.id='preferencesNotificationsButton';
-    notificationsButton.type='button';
-    notificationsButton.className='security-action-row';
-    notificationsButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-bell"></use></svg></span><span class="security-setting-copy"><strong>Notifications</strong><small id="notificationsManagementSummary">À activer sur chaque iPhone</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
-  }
-  managementPanel.appendChild(notificationsButton);
-
   const notificationsPanel=document.getElementById('preferencesNotificationsPanel');
   const currentNotificationStatus=window.COURSES_NOTIFICATIONS?.getStatus?.();
   if(currentNotificationStatus){
@@ -336,119 +288,74 @@ function initApplicationManagement(){
 
   const title=content.querySelector(':scope>h3');
   const intro=content.querySelector(':scope>.dialog-intro');
-  const originalTitle=title?.textContent||'Préférences';
+  const iconUse=title?.querySelector('.settings-sheet-icon use');
+  const originalIcon=iconUse?.getAttribute('href')||'#i-list';
+  const originalTitle=title?.querySelector('.settings-sheet-title')?.textContent||title?.textContent||'Affichage et liste';
   const originalIntro=intro?.textContent||'';
-  const selectionNodes=[...content.children].filter(node=>node!==title&&node!==intro&&node!==managementPanel);
+  const selectionNodes=[...content.children].filter(node=>node!==title&&node!==intro&&node!==notificationsPanel);
   const originalHidden=new Map(selectionNodes.map(node=>[node,node.hidden]));
 
-  /* Dans les sous-écrans de Gestion, une flèche remplace l'icône devant le titre et ramène au menu Gestion. */
-  let backButton=title?.querySelector('.settings-sheet-back')||null;
-  if(title&&!backButton){
-    backButton=document.createElement('button');
-    backButton.type='button';
-    backButton.className='settings-sheet-back';
-    backButton.hidden=true;
-    backButton.setAttribute('aria-label','Retour à Gestion de l’application');
-    backButton.innerHTML='<svg aria-hidden="true"><use href="#i-chevron"></use></svg>';
-    title.prepend(backButton);
-  }
-  backButton?.addEventListener('click',()=>showManagement());
-
-  function setTitle(label,parent=''){
+  /* Titre et icône de la sous-vue affichée ; sans icône, celle de Préférences. */
+  function setTitle(label,icon=''){
     const labelNode=title?.querySelector('.settings-sheet-title');
     if(labelNode)labelNode.textContent=label;
     else if(title)title.textContent=label;
-    const back=parent==='management';
-    if(backButton)backButton.hidden=!back;
-    title?.classList.toggle('has-back',back);
+    iconUse?.setAttribute('href',icon?'#i-'+icon:originalIcon);
   }
 
   function showSelections(){
     [...content.children].forEach(node=>{if(node!==title&&node!==intro)node.hidden=true});
     selectionNodes.forEach(node=>{node.hidden=Boolean(originalHidden.get(node))});
-    managementPanel.hidden=true;
-    setTitle(originalTitle,'');
+    setTitle(originalTitle);
     if(intro)intro.textContent=originalIntro;
-  }
-
-  function showManagement(){
-    [...content.children].forEach(node=>{if(node===title||node===intro||node===managementPanel)return;node.hidden=true});
-    managementPanel.hidden=false;
-    setTitle('Gestion de l’application','preferences');
-    if(intro)intro.textContent='Documentation, historique et informations.';
-    if(!dialog.open)dialog.showModal();
-    document.dispatchEvent(new CustomEvent('courses:settings-management-opened'));
   }
 
   function showNotifications(){
     [...content.children].forEach(node=>{if(node===title||node===intro||node===notificationsPanel)return;node.hidden=true});
     if(notificationsPanel)notificationsPanel.hidden=false;
-    setTitle('Notifications','management');
+    setTitle('Notifications','bell');
     if(intro)intro.textContent='Gérez les notifications envoyées à cet iPhone.';
     if(!dialog.open)dialog.showModal();
   }
 
   window.COURSES_SETTINGS_NAV=Object.freeze({setTitle});
   selectionsButton.addEventListener('click',showSelections,true);
-  managementButton.addEventListener('click',showManagement);
-  notificationsButton.addEventListener('click',showNotifications);
+  notificationsButton?.addEventListener('click',showNotifications);
   dialog.addEventListener('close',showSelections);
 }
 
-function initializeApplicationManagement(){
-  initApplicationManagement();
+function initializeSettingsNavigation(){
+  initSettingsNavigation();
   document.dispatchEvent(new CustomEvent('courses:settings-management-ready'));
 }
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',initializeApplicationManagement,{once:true});
+  document.addEventListener('DOMContentLoaded',initializeSettingsNavigation,{once:true});
 }else{
-  initializeApplicationManagement();
+  initializeSettingsNavigation();
 }
 })();
 
 (() => {
 'use strict';
 
-function initAdministratorSettings(){
-  const preferencesSection=document.getElementById('settingsMissingProductsBtn')?.closest('.settings-section');
-  const managementButton=document.getElementById('settingsApplicationManagementBtn');
-  const managementPanel=document.getElementById('preferencesApplicationManagement');
-  if(!preferencesSection||!managementButton||!managementPanel)return;
-
-  let adminSection=document.getElementById('settingsAdministratorSection');
-  if(!adminSection){
-    adminSection=document.createElement('section');
-    adminSection.id='settingsAdministratorSection';
-    adminSection.className='settings-section';
-    adminSection.innerHTML='<h2>Administrateur</h2><div class="settings-card"></div>';
-    preferencesSection.after(adminSection);
-  }
-  adminSection.querySelector('.settings-card')?.appendChild(managementButton);
-  /* Compte famille : pas de section Administrateur ; Gestion de l'application rejoint
-     la carte Préférences, sous le Catalogue des produits. */
-  const preferencesCard=preferencesSection.querySelector('.settings-card');
-  const placeManagement=kind=>{
-    const target=kind==='family'?preferencesCard:adminSection.querySelector('.settings-card');
-    if(target&&managementButton.parentElement!==target)target.appendChild(managementButton);
-    adminSection.hidden=kind==='family';
+/* Titres de section selon le compte : la famille n'a ni Home Assistant ni Sécurité,
+   et sa section Administrateur devient « Contribuer » (Catalogue, Idées et corrections). */
+function initAccountSections(){
+  const accountTitle=document.getElementById('settingsAccountTitle');
+  const adminTitle=document.getElementById('settingsAdministratorTitle');
+  if(!accountTitle||!adminTitle)return;
+  const apply=kind=>{
+    const family=kind==='family';
+    accountTitle.textContent=family?'Compte':'Compte et sécurité';
+    adminTitle.textContent=family?'Contribuer':'Administrateur';
   };
-  placeManagement(document.documentElement.dataset.account==='family'?'family':'admin');
-  document.addEventListener('courses:account-changed',event=>placeManagement(event.detail?.kind));
-
-  let errorMessagesButton=document.getElementById('preferencesErrorMessages');
-  if(!errorMessagesButton){
-    errorMessagesButton=document.createElement('button');
-    errorMessagesButton.id='preferencesErrorMessages';
-    errorMessagesButton.type='button';
-    errorMessagesButton.className='security-action-row';
-    errorMessagesButton.innerHTML='<span class="security-setting-icon"><svg><use href="#i-list"></use></svg></span><span class="security-setting-copy"><strong>Messages d’erreur</strong><small>Erreurs détectées par l’application</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
-    managementPanel.appendChild(errorMessagesButton);
-  }
+  apply(document.documentElement.dataset.account==='family'?'family':'admin');
+  document.addEventListener('courses:account-changed',event=>apply(event.detail?.kind));
 }
 
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',initAdministratorSettings,{once:true});
+  document.addEventListener('DOMContentLoaded',initAccountSections,{once:true});
 }else{
-  initAdministratorSettings();
+  initAccountSections();
 }
 })();

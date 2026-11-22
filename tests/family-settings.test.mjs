@@ -16,17 +16,22 @@ test('Réglages famille : Appareils connectés remplace Connexion Home Assistant
   assert.match(app,/device\.current\?'Cet appareil':relativeActivity\(device\.derniere_activite\)/);
 });
 
-test('Réglages famille : Sécurité, Administrateur, Messages d erreur et suppression du catalogue masqués',()=>{
+test('Réglages famille : Sécurité, Messages d erreur et suppression du catalogue masqués',()=>{
   const css=read('styles.css');
-  for(const selector of ['#settingsConnectionBtn','.settings-section:has(#settingsSecurityBtn)','#settingsAdministratorSection','#preferencesErrorMessages','#settingsMissingProductsCount','#missingProductsDialog .catalog-view-switch','#catalogRemovePanel','#missingProductsDialog .missing-row-caret','#missingProductsDialog .missing-row-tools']){
+  // v891 : Sécurité partage la carte Compte (Appareils connectés reste visible) ; la section Administrateur devient Contribuer.
+  assert.doesNotMatch(css,/html\[data-account="family"\] #settingsAdministratorSection/);
+  for(const selector of ['#settingsConnectionBtn','#settingsSecurityBtn','#preferencesErrorMessages','#settingsMissingProductsCount','#missingProductsDialog .catalog-view-switch','#catalogRemovePanel','#missingProductsDialog .missing-row-caret','#missingProductsDialog .missing-row-tools']){
     assert.ok(css.includes('html[data-account="family"] '+selector),selector);
   }
 });
 
-test('Réglages famille : Gestion de l application rejoint la carte Préférences',()=>{
+test('Réglages famille : sections Compte et Contribuer selon le compte',()=>{
   const settings=read('settings-ui.js');
-  assert.match(settings,/const target=kind==='family'\?preferencesCard:adminSection\.querySelector\('\.settings-card'\);/);
-  assert.match(settings,/document\.addEventListener\('courses:account-changed',event=>placeManagement\(event\.detail\?\.kind\)\);/);
+  // v891 : plus de ligne Gestion à déplacer ; seuls les titres de section suivent le compte.
+  assert.doesNotMatch(settings,/settingsApplicationManagementBtn|placeManagement/);
+  assert.match(settings,/accountTitle\.textContent=family\?'Compte':'Compte et sécurité';/);
+  assert.match(settings,/adminTitle\.textContent=family\?'Contribuer':'Administrateur';/);
+  assert.match(settings,/document\.addEventListener\('courses:account-changed',event=>apply\(event\.detail\?\.kind\)\);/);
 });
 
 test('Catalogue famille : demandes seulement, sans dépliage ni outils de génération',()=>{

@@ -35,8 +35,8 @@ test('les responsabilités extraites ont des propriétaires explicites',()=>{
   assert.match(appUi,/function syncListEmptyState\(root\)/);
   assert.match(settingsUi,/const STORAGE_PREFERRED_SERVINGS=/);
   assert.match(settingsUi,/const PREFERENCE_DIALOG_SELECTOR=/);
-  assert.match(settingsUi,/function initApplicationManagement\(\)/);
-  assert.match(settingsUi,/function initAdministratorSettings\(\)/);
+  assert.match(settingsUi,/function initSettingsNavigation\(\)/);
+  assert.match(settingsUi,/function initAccountSections\(\)/);
   const missingFixesAsset=runtime.match(/\.\/missing-products-fixes\.js\?v=\d+/)?.[0]||'';
   const missingPopupAsset=runtime.match(/\.\/missing-products-popup-ui\.js\?v=\d+/)?.[0]||'';
   const productImagesAsset=runtime.match(/\.\/product-item-images\.js\?v=\d+/)?.[0]||'';

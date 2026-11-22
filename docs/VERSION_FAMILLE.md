@@ -11,11 +11,12 @@ Les foyers de la famille utilisent la même application (GitHub Pages) avec leur
 
 ## Ce que voit une famille
 
-- Sa liste (partagée entre ses téléphones), Catalogue, Plats, Préférences, Personnalisation des recettes.
-- Catalogue des produits : **demandes** d’ajout uniquement (pas de suppression, pas d’OpenAI/ChatGPT).
-- Gestion de l’application : Historique, Documentation, Notifications.
-- Appareils connectés : lecture seule. Seul l’administrateur peut déconnecter un téléphone.
-- Masqués : Connexion Home Assistant, Sécurité, Administrateur, Messages d’erreur.
+- Sa liste (partagée entre ses téléphones), Catalogue, Plats.
+- Réglages › **Compte** : Appareils connectés, en lecture seule. Seul l’administrateur peut déconnecter un téléphone.
+- Réglages › **Préférences** : Affichage et liste (dont l’historique des achats), Personnalisation des recettes, Notifications.
+- Réglages › **Contribuer** : Catalogue des produits (**demandes** d’ajout uniquement, pas de suppression, pas d’OpenAI/ChatGPT), Idées et corrections.
+- Réglages › **Aide** : Documentation.
+- Masqués : Connexion Home Assistant, Sécurité, Familles, Bureau, Messages d’erreur.
 
 ## Écran administrateur « Familles »
 
@@ -43,7 +44,7 @@ Scripts à exécuter une seule fois, dans l’ordre (SQL Editor › New query �
 - Clé Web Push **réservée aux familles** : la clé publique est dans `family-service.js`, la clé privée uniquement dans les secrets Supabase (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`). L'administrateur garde sa propre clé (Home Assistant → GitHub).
 - Fonction Edge `notifier` (`supabase/functions/notifier/index.ts`), « Verify JWT » désactivé : appelée par les déclencheurs de `05-famille.sql`.
 - Article ajouté → les autres téléphones du foyer ; demande intégrée → tous les téléphones du foyer.
-- Chaque téléphone famille active les notifications dans Gestion de l’application › Notifications.
+- Chaque téléphone famille active les notifications dans Réglages › Préférences › Notifications.
 
 Seule la clé **publishable** figure dans le code (`family-service.js`). Ne jamais committer la clé secrète / `service_role`.
 

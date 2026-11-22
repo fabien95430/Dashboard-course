@@ -45,5 +45,6 @@ test('les propriétaires secondaires sont chargés depuis leur vrai contexte',()
   assert.match(catalog,/loadRepurchaseSoon\(\)/);
   assert.match(catalog,/loadDishAddedMarker/);
   assert.doesNotMatch(settings,/data-dish-added-marker|dish-added-marker\.js/);
-  assert.match(settings,/new CustomEvent\('courses:settings-management-opened'\)/);
+  // v891 : le menu Gestion de l'application a disparu, son événement d'ouverture aussi (aucun écouteur).
+  assert.doesNotMatch(settings,/courses:settings-management-opened/);
 });

@@ -10,7 +10,7 @@ Ce document décrit le chargement actif de l’application statique. Il ne rempl
 
 `runtime-features.js` charge `missing-products-fixes.js`, `missing-products-popup-ui.js`, `product-item-images.js` et `purchase-intelligence.js`. `product-item-images.js` ne charge plus l’administration du catalogue et ne décore le Catalogue que lorsqu’il est visible. Quand le lot de visuels Produits actuellement visible est terminé (chargé ou en erreur), il publie `courses:product-images-idle`. `catalog.js` autorise alors `dish-local-images.js` à précharger les visuels Plats un par un et en basse priorité ; l’affichage des cartes Plats reste en `loading="lazy"` et n’est jamais déclenché automatiquement.
 
-`settings-ui.js` charge `missing-products-dishes.js` et `missing-products-modern.js`. `catalog-product-admin.js` n’est demandé qu’à l’ouverture de **Gestion de l’application**.
+`settings-ui.js` charge `missing-products-dishes.js` et `missing-products-modern.js`. `catalog-product-admin.js` n’est demandé qu’à l’ouverture de la vue **Suppression** du **Catalogue des produits**.
 
 ## Règle du Service Worker
 

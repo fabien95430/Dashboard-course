@@ -187,7 +187,7 @@ function historyStatusMarkup(){
 function emptyMarkup(){
   const enabled=intelligence()?.isEnabled?.()!==false;
   if(!enabled){
-    return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez l’historique des achats dans Réglages › Gestion de l’application.</span></div>';
+    return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez l’historique des achats dans Réglages › Affichage et liste.</span></div>';
   }
   return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent quand un prochain achat approche.</span>'+historyStatusMarkup()+'</div>';
 }

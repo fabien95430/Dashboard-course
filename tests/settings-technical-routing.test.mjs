@@ -23,35 +23,37 @@ test('Connexion Home Assistant présente les deux statuts sans toucher aux liste
  assert.match(app,/window\.addEventListener\('courses:missing-ha-status'/);
  assert.match(app,/MISSING_REQUESTS\.getSharedStatus\?\.\(\)/);
 });
-test('Notifications reste une sous-vue de Gestion de l application et conserve les actions Push',()=>{
+test('Notifications s ouvre depuis Réglages › Préférences et conserve les actions Push',()=>{
  const html=read('index.html'),ui=read('settings-ui.js'),notify=read('courses-notifications.js');
  const preferences=fragment(html,'<dialog id="preferencesDialog"','<dialog id="missingProductsDialog"');
  for(const id of ['preferencesNotificationsPanel','enableMissingNotifications','disableMissingNotifications','missingNotificationsStatus'])assert.match(preferences,new RegExp('id="'+id+'"'));
- assert.match(ui,/managementPanel\.appendChild\(notificationsButton\)/);
+ // v891 : la ligne Notifications est dans Réglages › Préférences, plus dans Gestion de l'application.
+ assert.match(html,/id="settingsNotificationsBtn" class="settings-row"[\s\S]*?id="notificationsManagementSummary"/);
+ assert.match(ui,/getElementById\('settingsNotificationsBtn'\)/);
  assert.match(ui,/function showNotifications\(\)/);
- assert.match(ui,/notificationsButton\.addEventListener\('click',showNotifications\)/);
- assert.match(ui,/setTitle\('Notifications','management'\)/);
+ assert.match(ui,/notificationsButton\?\.addEventListener\('click',showNotifications\)/);
+ assert.match(ui,/setTitle\('Notifications','bell'\)/);
  assert.match(ui,/dialog\.addEventListener\('close',showSelections\)/);
  assert.match(notify,/const id of \['missingNotificationsStatus','notificationsManagementSummary'\]/);
  assert.match(notify,/enable\.addEventListener\('click',\(\)=>\{void register\(\{ask:true\}\)\}\)/);
  assert.match(notify,/getElementById\('disableMissingNotifications'\)\?\.addEventListener\('click'/);
 });
-test('le clic Notifications affiche la sous-vue sans laisser le panneau Gestion visible',()=>{
+test('le clic Notifications affiche la sous-vue seule',()=>{
  const source=read('settings-ui.js');
  const method=fragment(source,'  function showNotifications(){','  window.COURSES_SETTINGS_NAV=');
  const title={hidden:false},intro={hidden:false,textContent:''};
- const managementPanel={hidden:false},notificationPanel={hidden:true},other={hidden:false};
- const content={children:[title,intro,managementPanel,notificationPanel,other]};
+ const options={hidden:false},notificationPanel={hidden:true},other={hidden:false};
+ const content={children:[title,intro,options,notificationPanel,other]};
  let displayed='',opened=false;
  const dialog={open:false,showModal(){opened=true;this.open=true}};
- const showNotifications=new Function('content','title','intro','managementPanel','notificationsPanel','setTitle','dialog',method+'return showNotifications;')(
-   content,title,intro,managementPanel,notificationPanel,(label,back)=>{displayed=label+':'+back},dialog
+ const showNotifications=new Function('content','title','intro','notificationsPanel','setTitle','dialog',method+'return showNotifications;')(
+   content,title,intro,notificationPanel,(label,back)=>{displayed=label+':'+back},dialog
  );
  showNotifications();
  assert.equal(notificationPanel.hidden,false);
- assert.equal(managementPanel.hidden,true);
+ assert.equal(options.hidden,true);
  assert.equal(other.hidden,true);
- assert.equal(displayed,'Notifications:management');
+ assert.equal(displayed,'Notifications:bell');
  assert.equal(opened,true);
 });
 test('le design préserve les safe areas et évite de masquer les panneaux cachés',()=>{

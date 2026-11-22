@@ -159,7 +159,8 @@ test('idées et corrections : envoi depuis Réglages (famille), table protégée
   assert.match(service,/table:'retours'/);
   assert.match(service,/adminSetFeedbackStatus/);
   const html=read('index.html'),app=read('app.js'),ui=read('family-admin.js');
-  assert.match(html,/<section class="settings-section settings-family-only">[\s\S]*?id="settingsFamilyFeedbackBtn"/);
+  // v891 : Idées et corrections rejoint la section Contribuer (#settingsAdministratorSection, retitrée pour la famille).
+  assert.match(html,/<section id="settingsAdministratorSection" class="settings-section">[\s\S]*?id="settingsFamilyFeedbackBtn" class="settings-row settings-family-only"/);
   assert.match(html,/id="familyFeedbackDialog" class="dialog connection-dialog family-feedback-dialog settings-sheet"/);
   for(const type of ['idee','correction'])assert.match(html,new RegExp('data-type="'+type+'"'));
   assert.doesNotMatch(html,/data-type="bug"/);

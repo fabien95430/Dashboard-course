@@ -235,9 +235,10 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(dishes,/Modifiez ingrédients et quantités pour 2 personnes\./);
   assert.match(dishes,/À ajouter manuellement si besoin\./);
   assert.match(missing,/Demandez l’ajout d’un produit ou d’un plat\./);
-  assert.match(settings,/Documentation, historique et informations\./);
+  // v891 : plus d'écran Gestion ; Documentation s'ouvre depuis Réglages › Aide.
+  assert.doesNotMatch(settings,/Documentation, historique et informations/);
   assert.match(repurchase,/Suggestions selon vos habitudes\. Aucun ajout automatique\./);
-  assert.match(repurchase,/Activez l’historique des achats dans Réglages › Gestion de l’application\./);
+  assert.match(repurchase,/Activez l’historique des achats dans Réglages › Affichage et liste\./);
   assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
 });
 
@@ -246,9 +247,10 @@ test('les sous-vues de Réglages sans flèche gardent leur navigation et leur fe
   const settings=read('settings-ui.js'),errors=read('error-center.js'),catalog=read('catalog-product-admin.js'),app=read('app.js');
   const html=read('index.html'),css=read('styles.css');
   assert.doesNotMatch(settings,/preference-title-back|dataset.preferenceBack/);
-  assert.match(settings,/function setTitle\(label,parent=''\)\{/);
-  assert.match(settings,/setTitle\('Gestion de l’application','preferences'\)/);
-  assert.match(errors,/COURSES_SETTINGS_NAV\.setTitle\('Messages d’erreur','management'\)/);
+  // v891 : sous-vues ouvertes directement depuis Réglages, l'icône du titre suit la sous-vue.
+  assert.match(settings,/function setTitle\(label,icon=''\)\{/);
+  assert.doesNotMatch(settings,/Gestion de l’application/);
+  assert.match(errors,/COURSES_SETTINGS_NAV\.setTitle\('Messages d’erreur','bolt'\)/);
   assert.doesNotMatch(catalog,/COURSES_SETTINGS_NAV|preferencesDialog/);
   assert.match(app,/bindDialogBackdropClose\(UI\.preferencesDialog\)/);
   assert.match(html,/id="settingsDialog" class="dialog security-settings-dialog settings-sheet"/);
@@ -285,7 +287,7 @@ test('Réglages aligne les éléments internes sur une colonne centrale sobre',(
   const css=read('styles.css');
   assert.match(css,/--sheet-inner-max:400px/);
   assert.match(css,/\.settings-sheet > :where\(:not\(\.courses-openai-feedback\)\),\s*\.settings-sheet \.preference-dialog-scroll\{[^}]*width:100%!important;[^}]*max-width:var\(--sheet-inner-max\)!important;[^}]*margin-inline:auto!important/s);
-  assert.match(css,/\.settings-sheet \.preference-dialog-scroll > :is\(\.field,\.preference-options,\.dialog-actions,#preferencesApplicationManagement,#preferencesNotificationsPanel\)\{/);
+  assert.match(css,/\.settings-sheet \.preference-dialog-scroll > :is\(\.field,\.preference-options,\.dialog-actions,#preferencesNotificationsPanel\)\{/);
   assert.match(css,/\.settings-sheet \.dialog-actions\{\s*display:flex;\s*align-items:stretch;\s*justify-content:center;/);
   assert.match(css,/\.settings-sheet \.dialog-actions > button:only-child\{[^}]*width:100%!important;[^}]*margin-inline:auto!important/s);
   assert.match(css,/\.settings-sheet\.recipe-customization-dialog \.dialog-actions\{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:10px\}/);
@@ -343,19 +345,19 @@ test('v607 : en-têtes lisibles, champs ouverts par l utilisateur seulement, rec
   assert.match(dishes,/\[data-step="choose"\] :is\(\.recipe-customization-list,\.recipe-customization-status,\.recipe-customization-add,\.dialog-actions\)\{display:none!important\}/);
 });
 
-test('v617 : les sous-écrans de Gestion ont une flèche retour à la place de l icône, sans tuile différée',()=>{
-  const settings=read('settings-ui.js'),css=read('styles.css'),catalog=read('catalog-product-admin.js');
-  assert.match(settings,/backButton\.className='settings-sheet-back';/);
-  assert.match(settings,/backButton\?\.addEventListener\('click',\(\)=>showManagement\(\)\)/);
-  assert.match(settings,/const back=parent==='management';[\s\S]*?backButton\.hidden=!back;[\s\S]*?classList\.toggle\('has-back',back\)/);
-  assert.match(settings,/setTitle\('Notifications','management'\)/);
+test('v891 : Réglages ouvre directement les sous-vues, sans menu Gestion ni flèche retour ; ordre des sections',()=>{
+  const settings=read('settings-ui.js'),css=read('styles.css'),catalog=read('catalog-product-admin.js'),html=read('index.html');
+  // Comportement modifié en v891 : la flèche retour vers Gestion n'existe plus (Gestion supprimé).
+  assert.doesNotMatch(settings,/showManagement|backButton|parent==='management'/);
+  assert.match(settings,/setTitle\('Notifications','bell'\)/);
+  // La flèche des autres feuilles (recettes, familles, bureau) garde son style.
   assert.match(css,/\.settings-sheet \.settings-sheet-back\{position:absolute;[^}]*width:44px;height:44px;/);
   assert.match(css,/\.settings-sheet h3\.has-back \.settings-sheet-icon\{visibility:hidden\}/);
-  // v624 : le Catalogue a quitté Gestion pour « Catalogue des produits » ; plus aucune tuile différée dans Gestion.
   assert.doesNotMatch(settings,/preferencesProductCatalog/);
   assert.doesNotMatch(catalog,/preferencesProductCatalog/);
-  const ui=settings.indexOf("managementPanel.appendChild(notificationsButton)"),err=settings.indexOf('managementPanel.appendChild(errorMessagesButton)');
-  assert.ok(ui>0&&ui<err,'ordre Documentation, Notifications, Messages d erreur');
+  const order=['settingsAccountTitle','settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsRecipeCustomizationBtn','settingsNotificationsBtn','settingsAdministratorTitle','settingsMissingProductsBtn','settingsFamilyFeedbackBtn','preferencesErrorMessages','settingsDocumentationBtn','settingsLogoutBtn'].map(id=>html.indexOf('id="'+id+'"'));
+  assert.ok(order.every((pos,i)=>pos>0&&(i===0||pos>order[i-1])),'ordre Compte et sécurité, Préférences, Administrateur, Aide');
+  assert.ok(html.indexOf('id="settingsLockBtn"')<html.indexOf('id="settingsFamilyDevicesBtn"'),'bouton de verrouillage caché en tête de carte');
 });
 
 test('v618 : Messages d erreur en liste groupée, détails dépliés sur place, sélecteur à deux mots',()=>{
