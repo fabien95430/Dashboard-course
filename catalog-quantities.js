@@ -481,15 +481,16 @@ function technicalMode(name){
   const meta=PRODUCT_META.get(name);
   return TECHNICAL_MODE_BY_SUB[meta?.sub]||'Unité';
 }
+// Fruits vendus à la pièce dans le catalogue (Pommes, Bananes, Poires…) : comptés à la pièce dans les plats aussi.
+const RECIPE_PIECE_SUBS=new Set(['Fruits classiques']);
 function variablePurchaseStepFor(name){
   if(purchaseReferenceFor(name))return null;
   const step=VARIABLE_PURCHASE_STEPS[technicalMode(name)];
   if(!step)return null;
-  const recipeUnit=RECIPE_UNITS[name]||'g';
+  // Un fruit compté à la pièce n'a pas de pas de 100 g : sinon « 1 banane » s'affichait « 100 pièces ».
+  const recipeUnit=RECIPE_UNITS[name]||(RECIPE_PIECE_SUBS.has(PRODUCT_META.get(name)?.sub)?'piece':'g');
   return recipeUnit===step.unit?step:null;
 }
-// Fruits vendus à la pièce dans le catalogue (Pommes, Bananes, Poires…) : comptés à la pièce dans les plats aussi.
-const RECIPE_PIECE_SUBS=new Set(['Fruits classiques']);
 function recipeUnitFor(name){
   return RECIPE_UNITS[name]||purchaseReferenceFor(name)?.unit||(RECIPE_PIECE_SUBS.has(PRODUCT_META.get(name)?.sub)?'piece':'')||variablePurchaseStepFor(name)?.unit||'g';
 }
@@ -750,7 +751,9 @@ function decorateShoppingList(){
   reconcileDishContributions();
   shoppingList.querySelectorAll('.list-row[data-name]').forEach(row=>{
     const name=String(row.dataset.name||'');
-    const step=variablePurchaseStepFor(name);
+    // Le poids (100 g par occurrence) n'a de sens que pour une quantité venue d'un plat :
+    // un produit ajouté seul depuis le catalogue garde son compteur (« 1 », « 2 »…).
+    const step=aggregateContribution(name).present?variablePurchaseStepFor(name):null;
     const countBadge=row.querySelector('.list-qty');
     let measured=row.querySelector('.list-measured-quantity');
     if(!step){
