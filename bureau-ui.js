@@ -338,10 +338,10 @@ function ensureRow(){
     row.innerHTML='<span class="settings-icon settings-icon-bureau"><svg><use href="#i-briefcase"></use></svg><span id="settingsBureauCount" class="settings-count" hidden>0</span></span><span class="settings-copy"><strong>Bureau</strong><small id="settingsBureauSummary">Agents IA</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
     row.addEventListener('click',openBureau);
   }
-  // Juste sous « Familles ».
+  // Juste sous « Familles » (Familles se place toujours en tête de carte).
   const families=document.getElementById('settingsFamiliesBtn');
   if(families&&families.parentElement===card)families.after(row);
-  else if(row.parentElement!==card)card.appendChild(row);
+  else if(row.parentElement!==card)card.prepend(row);
   return row;
 }
 /* Pastille rouge : dossiers à valider. */

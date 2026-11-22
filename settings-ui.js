@@ -339,7 +339,7 @@ if(document.readyState==='loading'){
 'use strict';
 
 /* Titres de section selon le compte : la famille n'a ni Home Assistant ni Sécurité,
-   et sa section Administrateur devient « Contribuer » (Catalogue, Idées et corrections). */
+   et sa section Administrateur devient « Contribuer » (Idées et corrections). */
 function initAccountSections(){
   const accountTitle=document.getElementById('settingsAccountTitle');
   const adminTitle=document.getElementById('settingsAdministratorTitle');

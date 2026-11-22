@@ -355,9 +355,14 @@ test('v891 : Réglages ouvre directement les sous-vues, sans menu Gestion ni fl�
   assert.match(css,/\.settings-sheet h3\.has-back \.settings-sheet-icon\{visibility:hidden\}/);
   assert.doesNotMatch(settings,/preferencesProductCatalog/);
   assert.doesNotMatch(catalog,/preferencesProductCatalog/);
-  const order=['settingsAccountTitle','settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsRecipeCustomizationBtn','settingsNotificationsBtn','settingsAdministratorTitle','settingsMissingProductsBtn','settingsFamilyFeedbackBtn','preferencesErrorMessages','settingsDocumentationBtn','settingsLogoutBtn'].map(id=>html.indexOf('id="'+id+'"'));
-  assert.ok(order.every((pos,i)=>pos>0&&(i===0||pos>order[i-1])),'ordre Compte et sécurité, Préférences, Administrateur, Aide');
+  const order=['settingsAccountTitle','settingsConnectionBtn','settingsSecurityBtn','settingsListBtn','settingsNotificationsBtn','settingsMissingProductsBtn','settingsRecipeCustomizationBtn','settingsAdministratorTitle','settingsFamilyFeedbackBtn','preferencesErrorMessages','settingsDocumentationBtn','settingsLogoutBtn'].map(id=>html.indexOf('id="'+id+'"'));
+  assert.ok(order.every((pos,i)=>pos>0&&(i===0||pos>order[i-1])),'ordre Compte et sécurité, Préférences, Catalogue et recettes, Administrateur, Aide');
   assert.ok(html.indexOf('id="settingsLockBtn"')<html.indexOf('id="settingsFamilyDevicesBtn"'),'bouton de verrouillage caché en tête de carte');
+  // v892 : Catalogue des produits et Personnalisation des recettes partagent la section Catalogue et recettes.
+  assert.match(html,/<h2>Catalogue et recettes<\/h2>\s*<div class="settings-card">\s*<button id="settingsMissingProductsBtn"[\s\S]*?<button id="settingsRecipeCustomizationBtn"[\s\S]*?<\/section>/);
+  // Familles puis Bureau en tête de la carte Administrateur, quel que soit l'ordre de chargement.
+  assert.match(read('family-admin.js'),/if\(row\.parentElement!==card\)card\.prepend\(row\);/);
+  assert.match(read('bureau-ui.js'),/if\(families&&families\.parentElement===card\)families\.after\(row\);\s*else if\(row\.parentElement!==card\)card\.prepend\(row\);/);
 });
 
 test('v618 : Messages d erreur en liste groupée, détails dépliés sur place, sélecteur à deux mots',()=>{

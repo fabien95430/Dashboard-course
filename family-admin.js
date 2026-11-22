@@ -149,10 +149,8 @@ function ensureRow(){
     row.innerHTML='<span class="settings-icon settings-icon-families"><svg><use href="#i-home"></use></svg><span id="settingsFamiliesCount" class="settings-count" hidden>0</span></span><span class="settings-copy"><strong>Familles</strong><small id="settingsFamiliesSummary">Service famille</small></span><svg class="chevron"><use href="#i-chevron"></use></svg>';
     row.addEventListener('click',openFamilies);
   }
-  // Juste sous « Catalogue des produits ».
-  const catalog=document.getElementById('settingsMissingProductsBtn');
-  if(catalog&&catalog.parentElement===card)catalog.after(row);
-  else if(row.parentElement!==card)card.appendChild(row);
+  // En tête de la carte Administrateur.
+  if(row.parentElement!==card)card.prepend(row);
   return row;
 }
 /* Pastille rouge sur la ligne Familles + signal pour la pastille de l'onglet Réglages. */

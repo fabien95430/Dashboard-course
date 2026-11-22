@@ -71,7 +71,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v891</span>
+            <span class="page-version">v892</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -94,7 +94,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v891</span>
+            <span class="page-version">v892</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -130,7 +130,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v891</span>
+            <span class="page-version">v892</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -173,11 +173,6 @@
               <span class="settings-copy"><strong>Affichage et liste</strong><small>Tri, ouverture, personnes, suggestions</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
-            <button id="settingsRecipeCustomizationBtn" class="settings-row" type="button">
-              <span class="settings-icon"><svg><use href="#i-grid"></use></svg></span>
-              <span class="settings-copy"><strong>Personnalisation des recettes</strong><small>Ingrédients choisis par défaut</small></span>
-              <svg class="chevron"><use href="#i-chevron"></use></svg>
-            </button>
             <button id="settingsNotificationsBtn" class="settings-row" type="button">
               <span class="settings-icon"><svg><use href="#i-bell"></use></svg></span>
               <span class="settings-copy"><strong>Notifications</strong><small id="notificationsManagementSummary">À activer sur chaque iPhone</small></span>
@@ -186,8 +181,8 @@
           </div>
         </section>
 
-        <section id="settingsAdministratorSection" class="settings-section">
-          <h2 id="settingsAdministratorTitle">Administrateur</h2>
+        <section class="settings-section">
+          <h2>Catalogue et recettes</h2>
           <div class="settings-card">
             <button id="settingsMissingProductsBtn" class="settings-row missing-products-settings-row" type="button">
               <span class="settings-icon settings-icon-missing">
@@ -197,6 +192,17 @@
               <span class="settings-copy"><strong>Catalogue des produits</strong><small>Ajouter ou retirer produits et plats</small></span>
               <svg class="chevron"><use href="#i-chevron"></use></svg>
             </button>
+            <button id="settingsRecipeCustomizationBtn" class="settings-row" type="button">
+              <span class="settings-icon"><svg><use href="#i-grid"></use></svg></span>
+              <span class="settings-copy"><strong>Personnalisation des recettes</strong><small>Ingrédients choisis par défaut</small></span>
+              <svg class="chevron"><use href="#i-chevron"></use></svg>
+            </button>
+          </div>
+        </section>
+
+        <section id="settingsAdministratorSection" class="settings-section">
+          <h2 id="settingsAdministratorTitle">Administrateur</h2>
+          <div class="settings-card">
             <button id="settingsFamilyFeedbackBtn" class="settings-row settings-family-only" type="button">
               <span class="settings-icon"><svg><use href="#i-bulb"></use></svg></span>
               <span class="settings-copy"><strong>Idées et corrections</strong><small>Suggestions et problèmes</small></span>
@@ -497,7 +503,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=891"></script>
+  <script src="./catalog.js?v=892"></script>
   <script src="./product-item-images.js?v=890" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=824"></script>
@@ -507,9 +513,9 @@
   <script src="./family-service.js?v=889"></script>
   <script src="./app.js?v=889"></script>
   <script src="./settings-tab-badge.js?v=830"></script>
-  <script src="./settings-ui.js?v=891"></script>
+  <script src="./settings-ui.js?v=892"></script>
   <script src="./error-center.js?v=891"></script>
-  <script src="./family-admin.js?v=891"></script>
-  <script src="./bureau-ui.js?v=883"></script>
+  <script src="./family-admin.js?v=892"></script>
+  <script src="./bureau-ui.js?v=892"></script>
 </body>
 </html>

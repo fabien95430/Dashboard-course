@@ -13,8 +13,9 @@ Les foyers de la famille utilisent la même application (GitHub Pages) avec leur
 
 - Sa liste (partagée entre ses téléphones), Catalogue, Plats.
 - Réglages › **Compte** : Appareils connectés, en lecture seule. Seul l’administrateur peut déconnecter un téléphone.
-- Réglages › **Préférences** : Affichage et liste (dont l’historique des achats), Personnalisation des recettes, Notifications.
-- Réglages › **Contribuer** : Catalogue des produits (**demandes** d’ajout uniquement, pas de suppression, pas d’OpenAI/ChatGPT), Idées et corrections.
+- Réglages › **Préférences** : Affichage et liste (dont l’historique des achats), Notifications.
+- Réglages › **Catalogue et recettes** : Catalogue des produits (**demandes** d’ajout uniquement, pas de suppression, pas d’OpenAI/ChatGPT), Personnalisation des recettes.
+- Réglages › **Contribuer** : Idées et corrections.
 - Réglages › **Aide** : Documentation.
 - Masqués : Connexion Home Assistant, Sécurité, Familles, Bureau, Messages d’erreur.
 
