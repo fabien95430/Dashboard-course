@@ -408,13 +408,14 @@ async function admin(credentials){
 /* Premier accès « admin » sur un appareil : le mot de passe est vérifié une fois par le compte
    administrateur Supabase, puis ne sert plus qu'au coffre local (le déverrouillage reste hors ligne).
    Erreurs : code 'wrong' (mot de passe refusé), 'busy' (trop d'essais), 'unavailable' (service injoignable). */
-async function adminVerify(password){
+async function adminVerify(password,email=CONFIG.adminEmail){
   const fail=(code,message)=>Object.assign(new Error(message),{code});
   let lib;
   try{lib=await loadLibrary()}catch(_){throw fail('unavailable','Service indisponible, réessaie plus tard.')}
   const probe=lib.createClient(CONFIG.url,CONFIG.key,{auth:{storageKey:KEYS.adminAuth+'-verify',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
   let result;
-  try{result=await probe.auth.signInWithPassword({email:CONFIG.adminEmail,password:String(password||'')})}
+  const account=String(email||CONFIG.adminEmail).trim().toLowerCase();
+  try{result=await probe.auth.signInWithPassword({email:account,password:String(password||'')})}
   catch(_){throw fail('unavailable','Service indisponible, réessaie plus tard.')}
   const status=Number(result?.error?.status||0);
   if(result?.error){
@@ -423,7 +424,7 @@ async function adminVerify(password){
     throw fail('unavailable','Service indisponible, réessaie plus tard.');
   }
   try{await probe.auth.signOut()}catch(_){}
-  return {email:CONFIG.adminEmail,password:String(password||'')};
+  return {email:account,password:String(password||'')};
 }
 async function adminOverview(credentials){
   const db=await admin(credentials);

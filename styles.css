@@ -3430,6 +3430,8 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 }
 .security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
 .security-modal .primary:disabled{opacity:.7;cursor:wait}
+.security-modal .security-logout{display:block;margin:14px auto 0;padding:10px 12px;border:0;background:transparent;color:var(--login-muted);font:400 15px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.security-modal .security-logout[hidden]{display:none}
 .security-modal .setup-error{min-height:0;margin:10px 0 0;padding:8px 10px;border-radius:10px;background:rgba(255,248,231,.88);color:#8a2825;font-size:14px;line-height:1.35}
 .security-modal .setup-error:empty{display:none}
 /* Petits téléphones : variante choisie sur la hauteur complète, pas à l'ouverture du clavier. */

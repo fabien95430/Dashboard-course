@@ -95,7 +95,8 @@ test('admin sans coffre : mot de passe du compte admin Supabase vérifié une fo
   assert.match(app,/ha_url:refreshToken\?normalizeHaUrl\(haUrl\):'',/);
   const service=read('family-service.js');
   assert.match(service,/adminEmail:'admin\.maison@gmail\.com'/);
-  const verify=service.match(/async function adminVerify\(password\)\{[\s\S]*?\n\}/)?.[0]||'';
+  // v894 : e-mail optionnel (par défaut le compte admin) pour revérifier le mot de passe rangé dans le coffre.
+  const verify=service.match(/async function adminVerify\(password,email=CONFIG\.adminEmail\)\{[\s\S]*?\n\}/)?.[0]||'';
   assert.match(verify,/persistSession:false,autoRefreshToken:false/);
   assert.match(verify,/status===400\|\|status===401\|\|status===403\)throw fail\('wrong'/);
   assert.match(verify,/throw fail\('unavailable','Service indisponible, réessaie plus tard\.'\)/);
@@ -119,4 +120,37 @@ test('retour OAuth dans un coffre existant : mot de passe vérifié avant le cod
   assert.ok(branch.includes('registerUnlockFailure()'));
   assert.ok(branch.includes('familyAdmin=previous.family_admin||null;'));
   assert.match(app,/const creating=mode==='migrate'\|\|\(mode==='oauth'&&!vaultRecord\(\)\);/);
+});
+
+test('retour Home Assistant sans deuxième mot de passe : clé du coffre non exportable, effacée au retour',()=>{
+  const app=read('app.js');
+  // Clé dérivée du mot de passe (deriveVaultKey : extractable false), jamais le mot de passe lui-même.
+  assert.match(app,/\{name:'AES-GCM',length:256\},\s*false,/);
+  assert.match(app,/vaultCarryKey=async\(\)=>\{const \{salt,iterations\}=vaultParts\(vaultRecord\(\)\);return deriveVaultKey\(secret,salt,iterations\)\};/);
+  const save=app.match(/async function saveOAuthCarry\(nonce\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.match(save,/store\.put\(\{key,nonce,createdAt:Date\.now\(\)\},'vault'\)/);
+  assert.doesNotMatch(save,/password|secret/,'le mot de passe ne quitte pas la mémoire');
+  const take=app.match(/async function takeOAuthCarry\(nonce\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.ok(take.indexOf('await clearOAuthCarry()')<take.indexOf('return carry.key'),'clé effacée dès sa lecture');
+  assert.match(take,/carry\.nonce!==nonce\|\|Date\.now\(\)-Number\(carry\.createdAt\|\|0\)>OAUTH_CARRY_MAX_MS/);
+  assert.match(app,/function clearOAuthState\(\)\{\s*void clearOAuthCarry\(\);/,'effacée avec l\u2019état OAuth (déconnexion, abandon)');
+  assert.match(app,/vaultSeal=null;vaultCarryKey=null;/,'oubliée au verrouillage');
+  // Au retour : la clé ouvre le coffre existant AVANT d'utiliser le code OAuth ; sinon saisie du mot de passe.
+  const carry=app.match(/async function completeOAuthWithCarry\(key\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.ok(carry.indexOf('openVaultWithKey(record,key)')<carry.indexOf('exchangeCodeRaw('));
+  assert.match(carry,/catch\(_\)\{return false\}/);
+  assert.match(app,/const carried=vaultRecord\(\)\?await takeOAuthCarry\(returnedState\):null;/);
+});
+
+test('mot de passe admin changé dans Supabase : appareil déconnecté ; bouton de déconnexion sur l’écran de déverrouillage',()=>{
+  const app=read('app.js'),html=read('index.html');
+  const verify=app.match(/function verifyAdminPasswordLater\(familyAdmin\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.match(verify,/navigator\.onLine===false\)return;/,'hors ligne : rien');
+  assert.match(verify,/if\(error\?\.code!=='wrong'\|\|state\.family\|\|localStorage\.getItem\(STORAGE\.vault\)!==vault\)return;/,'seul un refus net déconnecte');
+  assert.match(verify,/await revoke\(\);/);
+  assert.match(app,/verifyAdminPasswordLater\(payload\.family_admin\);\s*if\(!payload\.refresh_token\)/,'revérifié à chaque déverrouillage, sans bloquer');
+  assert.match(html,/<button id="securityLogout" class="security-logout" type="button" hidden>Déconnecter cet appareil<\/button>/);
+  assert.match(app,/\$\('#securityLogout'\)\.hidden=mode!=='unlock';/);
+  const out=app.match(/function signOutFromLockScreen\(\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.ok(out.indexOf('confirm(')<out.indexOf('clearLocalConnectionData()'),'confirmation avant d\u2019effacer');
 });

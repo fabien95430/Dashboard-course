@@ -1513,26 +1513,37 @@ async function deriveVaultKey(password,salt,iterations=SECURITY.iterations){
 function vaultAad(){return UTF8.encode('courses-secure-vault-v1|'+CLIENT_ID)}
 async function encryptVault(payload,password){
   const salt=crypto.getRandomValues(new Uint8Array(16));
-  const iv=crypto.getRandomValues(new Uint8Array(12));
   const key=await deriveVaultKey(password,salt,SECURITY.iterations);
+  return sealVaultWithKey(payload,key,salt,SECURITY.iterations);
+}
+/* Chiffrement avec une clé déjà dérivée du mot de passe (même sel) : nouveau IV à chaque écriture. */
+async function sealVaultWithKey(payload,key,salt,iterations){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
   const plain=UTF8.encode(JSON.stringify(payload));
   const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:vaultAad()},key,plain);
   return {
     version:SECURITY.version,
     kdf:SECURITY.kdf,
-    iterations:SECURITY.iterations,
+    iterations,
     salt:bytesToBase64(salt),
     iv:bytesToBase64(iv),
     ciphertext:bytesToBase64(new Uint8Array(cipher))
   };
 }
-async function decryptVault(record,password){
+function vaultParts(record){
   if(!record||Number(record.version)!==SECURITY.version||record.kdf!==SECURITY.kdf)throw new Error('Coffre de sécurité incompatible');
   const iterations=Number(record.iterations);
   if(!Number.isInteger(iterations)||iterations<SECURITY.iterations||iterations>2000000)throw new Error('Paramètres du coffre invalides');
   const salt=base64ToBytes(record.salt),iv=base64ToBytes(record.iv),cipher=base64ToBytes(record.ciphertext);
   if(salt.length<16||iv.length!==12||cipher.length<16)throw new Error('Coffre de sécurité invalide');
-  const key=await deriveVaultKey(password,salt,iterations);
+  return {iterations,salt,iv,cipher};
+}
+async function decryptVault(record,password){
+  const {iterations,salt}=vaultParts(record);
+  return openVaultWithKey(record,await deriveVaultKey(password,salt,iterations));
+}
+async function openVaultWithKey(record,key){
+  const {iv,cipher}=vaultParts(record);
   const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:vaultAad()},key,cipher);
   const payload=JSON.parse(UTF8_DECODER.decode(plain));
   // Coffre admin complet (Home Assistant) ou coffre admin vide, créé avant la connexion HA.
@@ -1543,10 +1554,21 @@ async function decryptVault(record,password){
 }
 /* Tant que l'admin est déverrouillé, le coffre peut être rescellé (ajout de l'accès « Familles »)
    sans redemander le mot de passe déjà saisi à l'ouverture. Effacé au verrouillage. */
-let vaultSeal=null;
+let vaultSeal=null,vaultCarryKey=null;
 function rememberVaultSeal(password){
   const secret=String(password||'');
   vaultSeal=familyAdmin=>storeSecureVault(state.refreshToken,state.haUrl,secret,familyAdmin);
+  // Clé du coffre actuel (même sel), dérivée à la demande pour la connexion Home Assistant.
+  vaultCarryKey=async()=>{const {salt,iterations}=vaultParts(vaultRecord());return deriveVaultKey(secret,salt,iterations)};
+}
+/* Déverrouillé par la clé transportée (retour OAuth) : rescellement avec cette même clé. */
+function rememberVaultSealWithKey(key,salt,iterations){
+  vaultSeal=async familyAdmin=>{
+    const payload={refresh_token:String(state.refreshToken||''),ha_url:state.refreshToken?normalizeHaUrl(state.haUrl):'',created_at:Date.now()};
+    if(familyAdmin?.email&&familyAdmin?.password)payload.family_admin={email:String(familyAdmin.email),password:String(familyAdmin.password)};
+    saveJson(STORAGE.vault,await sealVaultWithKey(payload,key,salt,iterations));
+  };
+  vaultCarryKey=async()=>key;
 }
 async function storeSecureVault(refreshToken,haUrl,password,familyAdmin=state.familyAdmin){
   const payload={
@@ -1574,6 +1596,7 @@ function loadOAuthState(){
   return current;
 }
 function clearOAuthState(){
+  void clearOAuthCarry();
   try{sessionStorage.removeItem(OAUTH_STATE_KEY)}catch(_){}
   deleteKey(OAUTH_TEMP_KEY);
   deleteKey(LEGACY_OAUTH_STATE_KEY);
@@ -1582,7 +1605,7 @@ function wipeMemoryCredentials(){
   state.accessToken='';
   state.accessTokenExpiresAt=0;
   state.refreshToken='';
-  vaultSeal=null;
+  vaultSeal=null;vaultCarryKey=null;
   if(!state.demo||state.adminVault)state.familyAdmin=null;
   void window.COURSES_FAMILY?.adminSignOut?.();
 }
@@ -1657,6 +1680,8 @@ function showSecurity(mode,message=''){
   UI.securityPassword.value='';
   UI.securityConfirm.value='';
   UI.securitySubmit.textContent=creating?'Chiffrer et continuer':'Se connecter';
+  // Écran de déverrouillage : effacer le coffre de cet appareil sans l'ouvrir (mot de passe oublié…).
+  $('#securityLogout').hidden=mode!=='unlock';
   UI.securityError.textContent='';
   refreshVisualLock();
   // Déverrouillage : la version est vérifiée AVANT de donner le champ mot de passe (et donc la
@@ -1819,6 +1844,7 @@ async function completeSecurityAction(){
       const payload=await decryptVault(vaultRecord(),password);
       clearUnlockGuard();
       // Coffre admin vide (Home Assistant pas encore connecté) : liste locale, coffre ouvert.
+      verifyAdminPasswordLater(payload.family_admin);
       if(!payload.refresh_token){enterAdminVaultMode(password,payload.family_admin);return}
       state.demo=false;state.adminVault=false;
       state.haUrl=normalizeHaUrl(payload.ha_url);
@@ -2082,7 +2108,70 @@ function enterAdminVaultMode(password,familyAdmin){
   rememberVaultSeal(password);
   armIdleLock();
 }
-function beginOAuth(){
+/* Connexion Home Assistant depuis l'admin déverrouillé : la clé du coffre (dérivée du mot de passe,
+   NON exportable) traverse l'aller-retour OAuth dans IndexedDB, pour ranger l'autorisation au retour
+   sans redemander le mot de passe. Jamais le mot de passe lui-même ; effacée au retour, à l'abandon
+   (20 min, comme l'état OAuth) et à la déconnexion. */
+const OAUTH_CARRY_DB='courses-oauth-carry',OAUTH_CARRY_MAX_MS=20*60*1000;
+function oauthCarryStore(mode,run){
+  return new Promise((resolve,reject)=>{
+    let open;
+    try{open=indexedDB.open(OAUTH_CARRY_DB,1)}catch(error){reject(error);return}
+    open.onupgradeneeded=()=>open.result.createObjectStore('carry');
+    open.onerror=()=>reject(open.error);
+    open.onsuccess=()=>{
+      const db=open.result,tx=db.transaction('carry',mode),request=run(tx.objectStore('carry'));
+      tx.oncomplete=()=>{db.close();resolve(request?.result)};
+      tx.onerror=tx.onabort=()=>{db.close();reject(tx.error)};
+    };
+  });
+}
+async function saveOAuthCarry(nonce){
+  if(!vaultCarryKey||!vaultRecord()||!window.indexedDB)return;
+  const key=await vaultCarryKey();
+  await oauthCarryStore('readwrite',store=>store.put({key,nonce,createdAt:Date.now()},'vault'));
+}
+async function takeOAuthCarry(nonce){
+  if(!window.indexedDB)return null;
+  try{
+    const carry=await oauthCarryStore('readonly',store=>store.get('vault'));
+    await clearOAuthCarry();
+    if(!carry?.key||carry.nonce!==nonce||Date.now()-Number(carry.createdAt||0)>OAUTH_CARRY_MAX_MS)return null;
+    return carry.key;
+  }catch(_){return null}
+}
+function clearOAuthCarry(){
+  if(!window.indexedDB)return Promise.resolve();
+  return oauthCarryStore('readwrite',store=>store.delete('vault')).catch(()=>{});
+}
+/* Retour OAuth : l'autorisation est rangée dans le coffre existant avec la clé transportée.
+   Échec (clé absente, expirée ou coffre modifié) : on revient à la saisie du mot de passe. */
+async function completeOAuthWithCarry(key){
+  const record=vaultRecord();
+  let previous;
+  try{previous=await openVaultWithKey(record,key)}catch(_){return false}
+  const {salt,iterations}=vaultParts(record);
+  const data=await exchangeCodeRaw(state.pendingOAuthCode,state.pendingOAuthState);
+  if(!data?.refresh_token||!data?.access_token)throw new Error('Réponse OAuth incomplète');
+  const familyAdmin=previous.family_admin||null;
+  const payload={refresh_token:String(data.refresh_token),ha_url:normalizeHaUrl(state.haUrl),created_at:Date.now()};
+  if(familyAdmin?.email&&familyAdmin?.password)payload.family_admin={email:String(familyAdmin.email),password:String(familyAdmin.password)};
+  saveJson(STORAGE.vault,await sealVaultWithKey(payload,key,salt,iterations));
+  deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);
+  state.familyAdmin=familyAdmin;state.demo=false;state.adminVault=false;
+  rememberVaultSealWithKey(key,salt,iterations);
+  state.refreshToken=String(data.refresh_token);
+  state.accessToken=String(data.access_token);
+  state.accessTokenExpiresAt=Date.now()+Number(data.expires_in||1800)*1000;
+  state.locked=false;
+  clearOAuthState();state.pendingOAuthCode='';state.pendingOAuthState='';
+  hideSecurity();
+  // Autorisation rangée : un Home Assistant momentanément injoignable se reconnecte comme d'habitude.
+  try{await connectAuthorized(state.accessToken)}
+  catch(error){status('is-waiting','Reconnexion…',error?.message||'Home Assistant momentanément indisponible');armIdleLock();scheduleReconnect()}
+  return true;
+}
+async function beginOAuth(){
   const feedback=UI.connectionDialogFeedback;
   const value=normalizeHaUrl(UI.connectionHaUrl.value);
   if(!value){setDialogFeedback(feedback,'Entre une adresse HTTPS Home Assistant valide.','error');return}
@@ -2099,8 +2188,35 @@ function beginOAuth(){
   }catch(_){
     setDialogFeedback(feedback,'Le stockage temporaire du navigateur est indisponible.','error');return;
   }
+  // Sans clé transportée (stockage refusé), le retour redemandera simplement le mot de passe.
+  try{await saveOAuthCarry(nonce)}catch(_){}
   const authorize=value+'/auth/authorize?client_id='+encodeURIComponent(CLIENT_ID)+'&redirect_uri='+encodeURIComponent(REDIRECT_URI)+'&state='+encodeURIComponent(nonce);
   location.assign(authorize);
+}
+/* Bouton « Déconnecter cet appareil » de l'écran de déverrouillage : le coffre (verrouillé) est
+   effacé sans être ouvert ; il faudra se reconnecter (Supabase puis Home Assistant). */
+function signOutFromLockScreen(){
+  if(!vaultRecord())return;
+  if(!confirm('Déconnecter cet appareil ?\n\nLe coffre sera effacé. Pour revenir, il faudra ton mot de passe puis la connexion Home Assistant.'))return;
+  clearLocalConnectionData();
+  forgetAccount();
+  renderProducts();renderList();
+  showLogin('Appareil déconnecté.');
+}
+/* À chaque déverrouillage, en ligne : le mot de passe admin rangé dans le coffre est revérifié
+   auprès de Supabase, en arrière-plan. Refusé (changé dans Supabase) → appareil déconnecté.
+   Service injoignable, hors ligne ou trop d'essais → rien ne change (le coffre reste local). */
+function verifyAdminPasswordLater(familyAdmin){
+  if(!familyAdmin?.email||!familyAdmin?.password||navigator.onLine===false)return;
+  const service=window.COURSES_FAMILY;
+  if(!service?.adminVerify)return;
+  const vault=localStorage.getItem(STORAGE.vault);
+  service.adminVerify(familyAdmin.password,familyAdmin.email).catch(async error=>{
+    // Seul un refus net du mot de passe déconnecte, et seulement si le même coffre est toujours là.
+    if(error?.code!=='wrong'||state.family||localStorage.getItem(STORAGE.vault)!==vault)return;
+    await revoke();
+    UI.securityError.textContent='Ton mot de passe a changé : reconnecte-toi avec le nouveau.';
+  });
 }
 async function revoke(){
   if(state.family){
@@ -3298,6 +3414,16 @@ async function init(){
     state.pendingOAuthState=returnedState;
     history.replaceState({},'',REDIRECT_URI);
     state.loading=false;renderList();
+    // Admin déverrouillé au départ : la clé du coffre a traversé l'aller-retour, pas de deuxième saisie.
+    const carried=vaultRecord()?await takeOAuthCarry(returnedState):null;
+    if(carried){
+      try{if(await completeOAuthWithCarry(carried))return}
+      catch(error){
+        clearOAuthState();state.pendingOAuthCode='';state.pendingOAuthState='';
+        showSecurity('unlock','Connexion Home Assistant impossible : '+(error?.message||'réessaie')+'. Déverrouille puis recommence depuis Réglages.');
+        return;
+      }
+    }
     showSecurity('oauth',vaultRecord()
       ?'Entre le mot de passe de ton coffre pour y ranger la connexion Home Assistant.'
       :'Crée maintenant le mot de passe local qui protégera l’autorisation Home Assistant sur cet appareil.');
@@ -3563,6 +3689,7 @@ function bindUiEvents(){
   UI.familyFeedbackDialog.querySelectorAll('.family-feedback-type').forEach(button=>{button.onclick=()=>selectFamilyFeedbackType(button.dataset.type)});
   UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};
   UI.securitySubmit.onclick=completeSecurityAction;
+  $('#securityLogout').onclick=signOutFromLockScreen;
   const passwordToggle=document.getElementById('securityPasswordToggle');
   passwordToggle.addEventListener('pointerdown',event=>{
     if(document.activeElement===UI.securityPassword)event.preventDefault();
