@@ -1691,8 +1691,11 @@ function showSecurity(mode,message=''){
   if(mode==='unlock'||mode==='login')void gateUnlockOnUpdate();
   else focusSecurityPassword();
 }
+let securitySubmitting=false;
 function hideSecurity(){
   unlockVersionChecked=false;
+  // Connexion ou déverrouillage réussi depuis la tuile : vibration de confirmation dès la fermeture.
+  if(securitySubmitting){securitySubmitting=false;window.CoursesHaptics?.play('success')}
   UI.securityOverlay.classList.remove('is-visible');
   $('.security-modal').classList.remove('is-resuming');
   UI.securityPassword.value='';
@@ -1810,6 +1813,17 @@ async function connectFromRefresh(){
   state.reconnectPromise=reconnect;
   try{return await reconnect}
   finally{if(state.reconnectPromise===reconnect)state.reconnectPromise=null}
+}
+/* Validation de la tuile de connexion : vibration d'erreur si un message d'erreur s'affiche
+   (mot de passe incorrect, identifiant inconnu…), vibration de succès à la fermeture de la tuile. */
+async function submitSecurity(){
+  if(securitySubmitting)return;
+  securitySubmitting=true;
+  try{await completeSecurityAction()}
+  finally{
+    if(securitySubmitting&&UI.securityError.textContent)window.CoursesHaptics?.play('error');
+    securitySubmitting=false;
+  }
 }
 async function completeSecurityAction(){
   const password=UI.securityPassword.value;
@@ -3619,12 +3633,28 @@ async function checkForUpdateBeforeUnlock(){
     if(!reloading&&(state.securityMode==='unlock'||state.securityMode==='login'))setUnlockGate(false);
   }
 }
-/* Mise à jour depuis l'en-tête : l'étape en cours puis le résultat restent écrits sous le titre de Réglages. */
+/* Mise à jour depuis l'en-tête : l'étape en cours s'écrit sous le titre de Réglages, dans le style du sous-titre ;
+   le résultat s'efface ensuite en fondu et le sous-titre d'origine revient. */
+const HEADER_STATUS_HOLD_MS={ok:3500,new:3500,error:6000};
+let headerStatusTimer=null;
 function setHeaderRefreshStatus(text,kind=''){
   const status=document.getElementById('settingsHeaderStatus');
   if(!status)return;
+  if(!status.dataset.defaultText)status.dataset.defaultText=status.textContent;
+  clearTimeout(headerStatusTimer);
+  delete status.dataset.fading;
   status.textContent=text;
   status.dataset.state=kind;
+  const hold=HEADER_STATUS_HOLD_MS[kind];
+  if(!hold)return;
+  headerStatusTimer=setTimeout(()=>{
+    status.dataset.fading='true';
+    headerStatusTimer=setTimeout(()=>{
+      status.textContent=status.dataset.defaultText;
+      status.dataset.state='';
+      delete status.dataset.fading;
+    },260);
+  },hold);
 }
 function headerRefreshTime(){
   try{return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit'}).format(new Date())}catch(_){return ''}
@@ -3688,16 +3718,16 @@ function bindUiEvents(){
   UI.familyFeedbackSend.onclick=()=>{void sendFamilyFeedback()};
   UI.familyFeedbackDialog.querySelectorAll('.family-feedback-type').forEach(button=>{button.onclick=()=>selectFamilyFeedbackType(button.dataset.type)});
   UI.familyDeviceName.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();saveFamilyDeviceName()}};
-  UI.securitySubmit.onclick=completeSecurityAction;
+  UI.securitySubmit.onclick=submitSecurity;
   $('#securityLogout').onclick=signOutFromLockScreen;
   const passwordToggle=document.getElementById('securityPasswordToggle');
   passwordToggle.addEventListener('pointerdown',event=>{
     if(document.activeElement===UI.securityPassword)event.preventDefault();
   });
   passwordToggle.onclick=()=>setSecurityPasswordVisible(UI.securityPassword.type==='password');
-  UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+  UI.securityPassword.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submitSecurity()}};
   UI.securityIdentifier.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();UI.securityPassword.focus()}};
-  UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();completeSecurityAction()}};
+  UI.securityConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submitSecurity()}};
   UI.refreshBtn.onclick=event=>refreshFromHeader(UI.refreshBtn,event.isTrusted);
   $('#settingsConnectionBtn').onclick=openConnectionSettings;
   $('#settingsSecurityBtn').onclick=openSettings;

@@ -40,3 +40,11 @@ test('le type de retour suit le message : erreur, retrait ou succès',()=>{
   assert.equal(JSON.stringify(calls[0]),'[10]');
   assert.equal(JSON.stringify(calls[1]),'[22,70,22]');
 });
+
+test('la tuile de connexion vibre en cas d erreur et à la connexion réussie',()=>{
+  const app=read('app.js');
+  assert.match(app,/async function submitSecurity\(\)\{[\s\S]*?await completeSecurityAction\(\)[\s\S]*?if\(securitySubmitting&&UI\.securityError\.textContent\)window\.CoursesHaptics\?\.play\('error'\)/);
+  assert.match(app,/function hideSecurity\(\)\{[\s\S]*?if\(securitySubmitting\)\{securitySubmitting=false;window\.CoursesHaptics\?\.play\('success'\)\}/);
+  assert.match(app,/UI\.securitySubmit\.onclick=submitSecurity;/);
+  assert.doesNotMatch(app,/e\.preventDefault\(\);completeSecurityAction\(\)/);
+});

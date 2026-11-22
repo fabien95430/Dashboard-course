@@ -396,3 +396,10 @@ test('v621 : recettes par catégories repliables avec flèche retour, et rafraî
   assert.match(css,/@keyframes header-refresh-spin\{to\{transform:rotate\(-360deg\)\}\}/);
   assert.match(css,/#refreshBtn\.is-refreshing::after\{[^}]*animation:header-refresh-halo 1\.6s/);
 });
+test('statut de mise à jour de Réglages : style du sous-titre, pastille, puis retour au sous-titre',()=>{
+  const app=readFileSync(new URL('../app.js',import.meta.url),'utf8'),css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.match(app,/const HEADER_STATUS_HOLD_MS=\{ok:3500,new:3500,error:6000\};/);
+  assert.match(app,/status\.textContent=status\.dataset\.defaultText;/);
+  assert.match(css,/#settingsHeaderStatus\[data-fading\]\{opacity:0\}/);
+  assert.doesNotMatch(css,/#settingsHeaderStatus\[data-state="ok"\]\{color:/);
+});

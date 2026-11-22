@@ -294,10 +294,14 @@ svg{display:block}
 @keyframes header-refresh-spin{to{transform:rotate(-360deg)}}
 #refreshBtn.is-refreshing::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #2a5b43;opacity:0;pointer-events:none;animation:header-refresh-halo 1.6s ease-out infinite}
 @keyframes header-refresh-halo{0%{transform:scale(.85);opacity:.45}100%{transform:scale(1.25);opacity:0}}
-#settingsHeaderStatus{font-variant-numeric:tabular-nums;transition:color .2s ease}
-#settingsHeaderStatus[data-state="ok"]{color:#1f7a4a}
-#settingsHeaderStatus[data-state="new"]{color:#9a6a00}
-#settingsHeaderStatus[data-state="error"]{color:#b6652c}
+/* Statut de mise à jour : même police et même gris que le sous-titre, seule la pastille porte la couleur. */
+#settingsHeaderStatus{font-variant-numeric:tabular-nums;transition:opacity .26s ease}
+#settingsHeaderStatus[data-fading]{opacity:0}
+#settingsHeaderStatus:is([data-state="busy"],[data-state="ok"],[data-state="new"],[data-state="error"])::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;vertical-align:1px;background:var(--green)}
+#settingsHeaderStatus[data-state="busy"]::before{background:#9aa79f;animation:header-status-pulse 1.2s ease-in-out infinite}
+#settingsHeaderStatus[data-state="new"]::before{background:#c08a1a}
+#settingsHeaderStatus[data-state="error"]::before{background:var(--danger)}
+@keyframes header-status-pulse{50%{opacity:.35}}
 @media(prefers-reduced-motion:reduce){.icon-btn.is-refreshing .refresh-icon{animation-duration:3s}#refreshBtn.is-refreshing::after{animation:none}#refreshBtn>svg{transition:none}}
 
 /* Recherche */
