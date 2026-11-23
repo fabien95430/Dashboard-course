@@ -382,10 +382,35 @@ function dialog(){
   node.addEventListener('click',onDialogClick);
   node.addEventListener('close',onDialogClose);
   node.addEventListener('keydown',event=>{
-    if((event.key==='Enter'||event.key===' ')&&event.target.classList?.contains('bureau-dossier')){event.preventDefault();renderDossier(node,event.target.dataset.dossier)}
+    if((event.key==='Enter'||event.key===' ')&&event.target.classList?.contains('bureau-dossier')){event.preventDefault();openDossier(event.target.dataset.dossier)}
   });
   document.body.appendChild(node);
   return node;
+}
+/* Fiche d'une tâche : popup normal des Réglages (feuille à hauteur fixe) ouvert par-dessus le Bureau plein écran. */
+function dossierDialog(){
+  let node=document.getElementById('bureauDossierDialog');
+  if(node)return node;
+  node=document.createElement('dialog');
+  node.id='bureauDossierDialog';
+  node.className='dialog connection-dialog settings-sheet bureau-sheet';
+  node.tabIndex=-1;
+  node.addEventListener('click',onDossierClick);
+  node.addEventListener('close',onDossierClose);
+  document.body.appendChild(node);
+  return node;
+}
+function openDossier(id){
+  const node=dossierDialog();
+  if(!renderDossier(node,id))return;
+  show(node);
+}
+/* Fiche refermée : la liste du Bureau reprend l'étape à jour (la scène reste en place). */
+function onDossierClose(){
+  const node=document.getElementById('bureauDossierDialog');
+  if(node)delete node.dataset.dossier;
+  const bureau=document.getElementById('bureauDialog');
+  if(bureau?.open&&bureau.dataset.view==='bureau')renderBureau(bureau);
 }
 function show(node){
   if(!node.open){
@@ -431,12 +456,10 @@ function panelMarkup(current){
   else body=list.length?'<div class="bureau-dossiers">'+list.map(dossierRow).join('')+'</div>':'<p class="bureau-empty">'+EMPTY[current]+'</p>';
   return '<div class="bureau-panel" role="tabpanel">'+body+'</div>';
 }
-/* La scène (images déjà décodées) est gardée d'une vue à l'autre et d'une ouverture à l'autre :
+/* La scène (images déjà décodées) reste dans le Bureau d'une ouverture à l'autre (la fiche s'ouvre dans son propre popup) :
    seuls ses éléments variables sont mis à jour, sans recréer les images (pas de clignement). */
-let sceneKept=null;
 function renderBureau(node,tab){
-  const kept=node.querySelector('.bureau-scene')||sceneKept;
-  sceneKept=null;
+  const kept=node.querySelector('.bureau-scene');
   node.dataset.view='bureau';
   delete node.dataset.dossier;
   const current=tab||node.dataset.tab||(validerCount()?'valider':'cours');
@@ -483,10 +506,7 @@ function step(icon,color,title,meta,body,muted){
 }
 function renderDossier(node,id,message=''){
   const dossier=findDossier(id);
-  if(!dossier){renderBureau(node);return}
-  const scene=node.querySelector('.bureau-scene');
-  if(scene)sceneKept=scene;
-  node.dataset.view='dossier';
+  if(!dossier){if(node.open)node.close();return false}
   node.dataset.dossier=dossier.id;
   const received=[dayLabel(dossier.received),timeLabel(dossier.received),dossier.device].filter(Boolean).join(' · ');
   const done=dossier.stage==='traite';
@@ -499,7 +519,7 @@ function renderDossier(node,id,message=''){
       '<ol class="bureau-timeline">'+steps+'</ol>'+
       '<div class="bureau-actions is-single"><button type="button" class="primary" data-action="validate-demo">'+SVG_DONE+'<span>Valider</span></button></div>'+
       '<p class="bureau-step-note bureau-demo-note">Démonstration : rien n’est mis en ligne.</p>';
-    return;
+    return true;
   }
   const when=iso=>[dayLabel(iso),timeLabel(iso)].filter(Boolean).join(' · ');
   if(dossier.stage==='echec'&&dossier.failedAt==='publication')steps+=step(SVG_PERSON,'#df4040','Publication','Échec · '+when(dossier.stageTime),'<p class="bureau-step-note">'+esc(dossier.reason)+'</p>');
@@ -517,6 +537,7 @@ function renderDossier(node,id,message=''){
   node.innerHTML=header(taskTitle(dossier),true)+'<p class="dialog-intro">'+esc([TYPE_LABELS[dossier.type],dossier.family,'reçu '+dayLabel(dossier.received).toLowerCase()].join(' · '))+'</p>'+
     '<ol class="bureau-timeline">'+steps+'</ol>'+summary+actionsMarkup(dossier)+
     '<p class="dialog-feedback'+(message?' is-visible':'')+'" role="status" aria-live="polite">'+esc(message)+'</p>';
+  return true;
 }
 /* Étape de chaque agent dans la frise : fait, au travail, en échec ou en attente. */
 const AGENT_WAIT=Object.freeze({attente:'En attente de ton autorisation',file:'En file d’attente'});
@@ -581,25 +602,37 @@ async function runAction(node,action){
     else await service().adminSetFeedbackStatus(access().credentials(),dossier.id,'traite');
     await refresh().catch(()=>{});
     pendingIds.delete(dossier.id);
-    if(node.dataset.view==='dossier'&&node.dataset.dossier===dossier.id)renderDossier(node,dossier.id,DONE_MESSAGES[action]);
+    if(node.open&&node.dataset.dossier===dossier.id)renderDossier(node,dossier.id,DONE_MESSAGES[action]);
   }catch(_){
     pendingIds.delete(dossier.id);
-    if(node.dataset.view==='dossier'&&node.dataset.dossier===dossier.id)renderDossier(node,dossier.id,'Action impossible, réessaie.');
+    if(node.open&&node.dataset.dossier===dossier.id)renderDossier(node,dossier.id,'Action impossible, réessaie.');
   }
 }
 function onDialogClick(event){
   const node=event.currentTarget;
   // Plein écran : pas de fond à toucher, seul le bouton retour ferme le Bureau.
   if(event.target.closest('.bureau-close')){node.close();return}
-  if(event.target.closest('.bureau-back')){renderBureau(node);try{node.scrollTop=0}catch(_){}return}
   const tab=event.target.closest('.bureau-tab');
   if(tab){switchTab(node,tab.dataset.tab);return}
   const action=event.target.closest('[data-action]');
   if(action?.dataset.action==='demo'){if(demo)stopDemo();else void startDemo(node);return}
-  if(action?.dataset.action==='validate-demo'){demo=null;renderBureau(node,'cours');try{node.scrollTop=0}catch(_){}return}
-  if(action){if(!action.disabled)void runAction(node,action.dataset.action);return}
   const row=event.target.closest('.bureau-dossier');
-  if(row){renderDossier(node,row.dataset.dossier);try{node.scrollTop=0}catch(_){}}
+  if(row)openDossier(row.dataset.dossier);
+}
+/* Clics de la fiche : retour (ou toucher hors de la feuille) referme la fiche ; les actions restent dans la fiche. */
+function onDossierClick(event){
+  const node=event.currentTarget;
+  const rect=node.getBoundingClientRect();
+  const outside=event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom;
+  if(outside||event.target.closest('.bureau-back')){node.close();return}
+  const action=event.target.closest('[data-action]');
+  if(action?.dataset.action==='validate-demo'){
+    demo=null;node.close();
+    const bureau=document.getElementById('bureauDialog');
+    if(bureau?.open)renderBureau(bureau,'cours');
+    return;
+  }
+  if(action&&!action.disabled)void runAction(node,action.dataset.action);
 }
 async function openBureau(){
   // Accès admin pas encore configuré : l'écran Familles le demande (même compte Supabase).
@@ -625,9 +658,11 @@ function scheduleRefresh(){
 }
 function forget(){
   stopDemo();
-  dossiers={valider:[],cours:[],termines:[]};loaded=false;lastError='';pendingIds.clear();sceneKept=null;
-  const node=document.getElementById('bureauDialog');
-  if(node){try{node.close()}catch(_){}node.innerHTML=''}
+  dossiers={valider:[],cours:[],termines:[]};loaded=false;lastError='';pendingIds.clear();
+  for(const id of ['bureauDossierDialog','bureauDialog']){
+    const node=document.getElementById(id);
+    if(node){try{node.close()}catch(_){}node.innerHTML=''}
+  }
   renderSummary();
 }
 function init(){

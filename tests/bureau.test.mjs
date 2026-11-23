@@ -243,7 +243,8 @@ test('bureau v876 : titre court de la fiche et scène gardée sans recréer les 
   assert.doesNotMatch(ui,/header\(dossier\.title,true\)/,'plus de message tronqué en titre de fiche');
   assert.match(ui,/decoding="sync"/);
   assert.match(ui,/if\(kept\)\{node\.querySelector\('\.bureau-scene'\)\.replaceWith\(kept\);updateScene\(kept\)\}/);
-  assert.match(ui,/if\(scene\)sceneKept=scene;/);
+  // v900 : la fiche s'ouvre dans son propre popup, la scène ne quitte plus le Bureau.
+  assert.match(ui,/const kept=node\.querySelector\('\.bureau-scene'\);/);
   assert.match(ui,/function preloadScene\(\)/);
   assert.doesNotMatch(ui,/Tâche en attente|Tâche en échec/,'attente et échec sont rangés dans « en cours »');
   const css=read('styles.css');
@@ -273,4 +274,15 @@ test('bureau v899 : en-tête calé sur celui de Réglages, air autour de la scè
   const css=read('styles.css');
   assert.match(css,/\.settings-sheet#bureauDialog\{[^}]*padding-top:calc\(max\(14px,env\(safe-area-inset-top\)\) \+ 28px\)!important;/);
   assert.match(css,/\.settings-sheet#bureauDialog \.bureau-scene\{margin:16px 0 28px;background:transparent\}/);
+});
+
+test('bureau v900 : fiche d’une tâche dans un popup normal par-dessus le Bureau',()=>{
+  const ui=read('bureau-ui.js');
+  assert.match(ui,/node\.id='bureauDossierDialog';/);
+  assert.match(ui,/if\(row\)openDossier\(row\.dataset\.dossier\);/);
+  assert.match(ui,/if\(outside\|\|event\.target\.closest\('\.bureau-back'\)\)\{node\.close\(\);return\}/);
+  assert.doesNotMatch(ui,/dataset\.view='dossier'/,'le Bureau garde toujours sa vue');
+  const css=read('styles.css');
+  assert.match(css,/\.settings-sheet#bureauDossierDialog \.bureau-timeline\{/);
+  assert.doesNotMatch(css,/#bureauDossierDialog\{[^}]*100dvh/,'la fiche garde la hauteur des popups de Réglages');
 });
