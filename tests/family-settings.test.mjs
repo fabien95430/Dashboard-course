@@ -20,9 +20,11 @@ test('Réglages famille : Sécurité, Messages d erreur et suppression du catalo
   const css=read('styles.css');
   // v891 : Sécurité partage la carte Compte (Appareils connectés reste visible) ; la section Administrateur devient Contribuer.
   assert.doesNotMatch(css,/html\[data-account="family"\] #settingsAdministratorSection/);
-  for(const selector of ['#settingsConnectionBtn','#settingsSecurityBtn','#preferencesErrorMessages','#settingsMissingProductsCount','#missingProductsDialog .catalog-view-switch','#catalogRemovePanel','#missingProductsDialog .missing-row-caret','#missingProductsDialog .missing-row-tools']){
+  for(const selector of ['#settingsConnectionBtn','#settingsSecurityBtn','#preferencesErrorMessages','#missingProductsDialog .catalog-view-switch','#catalogRemovePanel','#missingProductsDialog .missing-row-caret','#missingProductsDialog .missing-row-tools']){
     assert.ok(css.includes('html[data-account="family"] '+selector),selector);
   }
+  // v902 : la pastille des demandes reste visible sur « Catalogue des produits » pour une famille.
+  assert.ok(!css.includes('html[data-account="family"] #settingsMissingProductsCount'));
 });
 
 test('Réglages famille : sections Compte et Contribuer selon le compte',()=>{
@@ -53,4 +55,27 @@ test('popup « Cet appareil » : bouton Se déconnecter vers la page de connexio
   assert.match(app,/UI\.familyDeviceSignOut\.onclick=\(\)=>\{void revoke\(\)\}/);
   // Connexion affichée avant la déconnexion réseau : Ma liste ne s'affiche pas entre les deux.
   assert.match(app,/forgetAccount\(\);\s*showLogin\(\);[\s\S]*?requestAnimationFrame\(\(\)=>requestAnimationFrame\(resolve\)\)\);\s*UI\.settingsDialog\.close\(\);\s*UI\.familyDeviceDialog\?\.close\(\);\s*await window\.COURSES_FAMILY\?\.signOut\(\);/);
+});
+
+test('v902 : pastilles des demandes cohérentes (même rouge, mêmes nombres sur Réglages, Catalogue des produits, Produits et Plats)',()=>{
+  const dishes=read('missing-products-dishes.js'),css=read('styles.css'),tab=read('settings-tab-badge.js'),soon=read('repurchase-soon.js'),app=read('app.js');
+  assert.match(dishes,/function syncCounts\(\)\{\s*const counts=\{products:productCount\(\),dishes:readDishes\(\)\.length\};/);
+  assert.match(dishes,/>Produits<i class="missing-mode-count" hidden>0<\/i><\/button>/);
+  assert.match(dishes,/>Plats<i class="missing-mode-count" hidden>0<\/i><\/button>/);
+  // « À intégrer » suit l'onglet affiché ; app.js n'y écrit plus le nombre de produits.
+  assert.match(dishes,/listCount\.textContent=String\(counts\[mode==='dishes'\?'dishes':'products'\]\);/);
+  assert.doesNotMatch(app,/listCount\.textContent=/);
+  assert.equal((dishes.match(/listCount\.textContent=/g)||[]).length,1,'une seule écriture du nombre');
+  // Une seule couleur de pastille : la variable --danger du thème.
+  assert.match(css,/\.settings-view \.settings-count\{[^}]*background:var\(--danger\)!important/);
+  assert.match(css,/#missingProductsDialog \.missing-mode-count\{[^}]*background:var\(--danger\)/);
+  assert.match(tab,/background:'var\(--danger\)'/);
+  assert.match(soon,/\.repurchase-count\{[\s\S]*?background:var\(--danger\)/);
+  assert.doesNotMatch(tab,/#ff3b30/);
+  // Chiffres centrés sur la hauteur des capitales, quelle que soit la police (SF Pro sur iPhone).
+  assert.match(css,/\.settings-view \.settings-count\{[^}]*line-height:1!important;text-box:trim-both cap alphabetic/);
+  assert.match(css,/#missingProductsDialog \.missing-mode-count\{[^}]*text-box:trim-both cap alphabetic/);
+  assert.match(tab,/badge\.style\.setProperty\('text-box','trim-both cap alphabetic'\);/);
+  assert.match(soon,/\.repurchase-count\{[^}]*text-box:trim-both cap alphabetic/);
+  assert.doesNotMatch(soon.match(/\.repurchase-count\{[^}]*\}/)?.[0]||'',/#2378f2/);
 });

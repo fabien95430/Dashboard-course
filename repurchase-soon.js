@@ -81,8 +81,8 @@ function ensureStyles(){
   style.textContent=`
     .repurchase-count{
       position:absolute;right:-4px;top:-5px;min-width:19px;height:19px;padding:0 4px;border:2px solid rgba(255,255,255,.98);
-      border-radius:999px;display:grid;place-items:center;background:#2378f2;color:#fff;box-sizing:border-box;
-      font-size:10px;line-height:1;font-weight:820;letter-spacing:0;box-shadow:0 2px 7px rgba(35,120,242,.24);pointer-events:none
+      border-radius:999px;display:block;align-content:center;text-align:center;background:var(--danger);color:#fff;box-sizing:border-box;
+      font-size:10px;line-height:1;text-box:trim-both cap alphabetic;font-variant-numeric:tabular-nums;font-weight:820;letter-spacing:0;box-shadow:0 2px 7px rgba(223,64,64,.22);pointer-events:none
     }
     .repurchase-dialog{
       width:100%;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;

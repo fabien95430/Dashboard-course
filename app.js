@@ -2971,8 +2971,7 @@ function renderMissingProducts(){
   renderMissingCategorySelection();
   const list=UI.missingProductsList;
   const count=state.missingProducts.length;
-  const listCount=$('#missingProductsListCount');
-  if(listCount)listCount.textContent=String(count);
+  // Le nombre « À intégrer » est tenu par missing-products-dishes.js (onglet Produits ou Plats).
   if(!list)return;
   if(!count){
     list.innerHTML='<div class="missing-products-empty">Aucun produit noté pour le moment.</div>';

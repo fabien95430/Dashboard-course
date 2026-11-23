@@ -16,19 +16,24 @@ Object.assign(badge.style,{
   padding:'0 4px',
   border:'2px solid rgba(255,255,255,.98)',
   borderRadius:'999px',
-  background:'#ff3b30',
+  // Même rouge que toutes les pastilles de l'app (variable du thème).
+  background:'var(--danger)',
   color:'#fff',
   boxSizing:'border-box',
   fontSize:'10px',
-  lineHeight:'14px',
+  lineHeight:'1',
   fontStyle:'normal',
   fontWeight:'800',
   letterSpacing:'0',
-  placeItems:'center',
+  textAlign:'center',
+  alignContent:'center',
   pointerEvents:'none',
   zIndex:'12',
-  boxShadow:'0 2px 7px rgba(207,33,26,.24)'
+  boxShadow:'0 2px 7px rgba(223,64,64,.22)'
 });
+// Chiffre centré sur sa hauteur réelle (hauteur des capitales), quelle que soit la police de l'appareil.
+badge.style.setProperty('text-box','trim-both cap alphabetic');
+badge.style.setProperty('font-variant-numeric','tabular-nums');
 tab.style.position='relative';
 tab.appendChild(badge);
 
@@ -63,7 +68,7 @@ window.addEventListener('courses:family-requests-changed',event=>{
 function syncBadge(){
   const count=Math.max(0,Number(REQUESTS.counts?.().total)||0)+familyRequests;
   badge.textContent=count>99?'99+':String(count);
-  badge.style.display=count>0?'grid':'none';
+  badge.style.display=count>0?'block':'none';
   if(count>0)requestAnimationFrame(positionBadge);
   void syncAppIconBadge(count);
 }

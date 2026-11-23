@@ -24,7 +24,7 @@ const SCOPES={
   'missing-products-fixes.js':/\.courses-openai-feedback/
 };
 // Titres (page et popups), glyphes (« + », « × ») et pastilles de compteur : hors règle texte.
-const EXEMPT=/(^|\s)\.settings-sheet h3|settings-sheet-title|\.connection-dialog h3|\.page-header h1|missing-products-close|missing-add-start>span:first-child|courses-error-badge|settings-count/;
+const EXEMPT=/(^|\s)\.settings-sheet h3|settings-sheet-title|\.connection-dialog h3|\.page-header h1|missing-products-close|missing-add-start>span:first-child|courses-error-badge|settings-count|missing-mode-count/;
 
 function declarations(){
   const found=[];

@@ -305,7 +305,7 @@ function initMissingProductsAndDishes(){
   modeSwitch.className='missing-mode-switch';
   modeSwitch.setAttribute('role','tablist');
   modeSwitch.setAttribute('aria-label','Type d’élément manquant');
-  modeSwitch.innerHTML='<span class="missing-mode-lens" aria-hidden="true"></span><button class="missing-mode-button is-active" type="button" data-missing-mode="products" role="tab" aria-selected="true">Produits</button><button class="missing-mode-button" type="button" data-missing-mode="dishes" role="tab" aria-selected="false">Plats</button>';
+  modeSwitch.innerHTML='<span class="missing-mode-lens" aria-hidden="true"></span><button class="missing-mode-button is-active" type="button" data-missing-mode="products" role="tab" aria-selected="true">Produits<i class="missing-mode-count" hidden>0</i></button><button class="missing-mode-button" type="button" data-missing-mode="dishes" role="tab" aria-selected="false">Plats<i class="missing-mode-count" hidden>0</i></button>';
   viewSwitch.after(modeSwitch);
 
   const imageHintField=document.createElement('label');
@@ -439,6 +439,18 @@ function initMissingProductsAndDishes(){
     }).join('');
     notifyMissingRequestsRendered('dishes');
   }
+  /* Compteurs des demandes : pastille sur « Produits » et « Plats », nombre « À intégrer » de l'onglet affiché.
+     Seule écriture de ces compteurs (même total que la pastille de Réglages). */
+  function syncCounts(){
+    const counts={products:productCount(),dishes:readDishes().length};
+    modeSwitch.querySelectorAll('[data-missing-mode]').forEach(button=>{
+      const badge=button.querySelector('.missing-mode-count'),count=counts[button.dataset.missingMode]||0;
+      if(!badge)return;
+      badge.textContent=count>99?'99+':String(count);
+      badge.hidden=count===0;
+    });
+    listCount.textContent=String(counts[mode==='dishes'?'dishes':'products']);
+  }
   function renderMode(){
     const dishesMode=mode==='dishes';
     modeSwitch.querySelectorAll('[data-missing-mode]').forEach(button=>{
@@ -450,13 +462,9 @@ function initMissingProductsAndDishes(){
     input.setAttribute('aria-label',dishesMode?'Nom du plat':'Nom du produit');
     listHeading.textContent='À intégrer';
     applyLayout();
-    if(dishesMode){
-      renderDishes();
-      listCount.textContent=String(dishes.length);
-    }else{
-      listCount.textContent=String(productCount());
-      queueEnhanceProducts();
-    }
+    if(dishesMode)renderDishes();
+    else queueEnhanceProducts();
+    syncCounts();
     renderDishCategoryGrid();
   }
   function setMode(next,{animate=true,clearInput=true}={}){
@@ -615,8 +623,8 @@ function removeDish(id){
     if(mode==='dishes'){
       dishes=readDishes();
       renderDishes();
-      listCount.textContent=String(dishes.length);
     }
+    syncCounts();
     return true;
   }
   function syncNewProductRequests(notify=true){
@@ -644,7 +652,7 @@ function removeDish(id){
       imageHintInput.value='';
       setStep('list');
     }
-    if(mode==='products')listCount.textContent=String(products.length);
+    syncCounts();
     queueEnhanceProducts();
     if(added.length&&notify)revealProduct(added[added.length-1].id);
   }
@@ -726,6 +734,7 @@ function removeDish(id){
   window.addEventListener(REQUESTS.eventName,event=>{
     syncNewProductRequests(!event.detail?.remote);
     if(mode==='dishes')renderDishes();
+    syncCounts();
   });
   document.addEventListener('courses:products-updated',reconcileProducts);
   document.addEventListener('courses:dishes-rendered',()=>{
