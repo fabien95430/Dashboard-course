@@ -1,3 +1,6 @@
+/* repurchase-soon.js — propriétaire des suggestions « À racheter » (fusionnées dans Favoris du Catalogue).
+   Moteur seul : app.js affiche les produits en tête de Favoris avec la mention « À racheter » et la
+   pastille du chip Favoris. Aucun ajout automatique à Ma liste. */
 (() => {
 'use strict';
 
@@ -5,23 +8,25 @@ const CATALOG=window.COURSES_CATALOG;
 if(!CATALOG?.groups)return;
 
 const DAY=86400000;
-const MAX_BADGE=99;
 const NAMES=[...new Set(Object.values(CATALOG.groups).flatMap(subs=>Object.values(subs||{}).flatMap(names=>Array.isArray(names)?names:[])))];
 const META=new Map();
 Object.entries(CATALOG.groups).forEach(([category,subs])=>Object.entries(subs||{}).forEach(([sub,names])=>{
   (Array.isArray(names)?names:[]).forEach(name=>META.set(name,{category,sub}));
 }));
 
-let dialog=null;
+// Habitude prouvée : au moins 3 achats faits lors de courses différentes (2 intervalles).
+const MIN_INTERVALS=2;
+// Rythme régulier : écart médian des intervalles au plus à 50 % de l'intervalle typique.
+const MAX_SPREAD=.5;
+// Habitude arrêtée : pas racheté depuis plus de 3 fois son rythme.
+const STALE_CYCLES=3;
+
 let refreshFrame=0;
 let booted=false;
-
-const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const slugify=window.COURSES_TEXT.slug;
+let lastSignature=null;
 
 function intelligence(){return window.COURSES_PURCHASE_INTELLIGENCE||null}
 function listService(){return window.COURSES_LIST||null}
-function appLocked(){return document.getElementById('app')?.classList.contains('is-locked')!==false}
 
 // Les courses se font le week-end : la « prochaine course » est le week-end à venir
 // (celui en cours le samedi et le dimanche), la suivante a lieu une semaine plus tard.
@@ -32,281 +37,55 @@ function nextTripStart(now=Date.now()){
   date.setDate(date.getDate()+(day===0?-1:(6-day)));
   return date.getTime();
 }
-function followingTripStart(now=Date.now()){
-  const date=new Date(nextTripStart(now));
-  date.setDate(date.getDate()+7);
-  return date.getTime();
-}
 
+/* À racheter : habitude prouvée et régulière, encore active, dont le rythme réel (durée typique entre
+   deux achats, sans durée par défaut ni raccourci) est atteint à la prochaine course. */
 function suggestionFor(name,now=Date.now()){
   const api=intelligence(),list=listService();
   if(!api?.isEnabled?.()||!list)return null;
   const p=api.profileFor?.(name);
-  if(!p?.lastAt||Number(p.samples||0)<1)return null;
+  if(!p?.lastAt||Number(p.intervalSamples||0)<MIN_INTERVALS)return null;
   if(Number(list.getQuantity?.(name)||0)>0)return null;
-  const stock=api.stockFor?.(name,now);
-  if(!stock)return null;
-  const cycle=Math.max(1,Math.round(Number(p.recentDays||p.baseDays)||1));
-  const dueRaw=cycle-Number(stock.ageDays||0);
-  const depleted=Number(stock.estimatedQty||0)<=0;
-  // Courses hebdomadaires : à prévoir si le produit manquera avant la course suivante.
-  if(!depleted&&now+dueRaw*DAY>=followingTripStart(now))return null;
+  const cycle=Number(p.medianDays||0);
+  if(!(cycle>=1)||Number(p.intervalSpread)>MAX_SPREAD)return null;
+  if((now-p.lastAt)/DAY>cycle*STALE_CYCLES)return null;
+  const ageAtTrip=(Math.max(now,nextTripStart(now))-p.lastAt)/DAY;
+  // Tolérance d'un jour (ou 10 % du rythme) : un produit acheté chaque samedi ressort le samedi suivant.
+  if(ageAtTrip<cycle-Math.max(1,cycle*.1))return null;
   const meta=META.get(name)||{};
   return {
     name,
     category:meta.category||p.category||'',
     sub:meta.sub||p.sub||'',
-    cadence:cycle,
-    dueIn:depleted?Math.min(0,dueRaw):dueRaw,
-    evidence:Number(p.samples||0)+Number(p.feedbackSamples||0),
-    depleted
+    cadence:Math.round(cycle),
+    dueIn:Math.round(cycle-ageAtTrip),
+    evidence:Number(p.intervalSamples||0)
   };
 }
 
 function suggestions(now=Date.now()){
-  return NAMES.map(name=>suggestionFor(name,now)).filter(Boolean).sort((a,b)=>{
-    const aDue=a.dueIn<=0?0:a.dueIn,bDue=b.dueIn<=0?0:b.dueIn;
-    return aDue-bDue||b.evidence-a.evidence||a.name.localeCompare(b.name,'fr',{sensitivity:'base'});
-  });
+  return NAMES.map(name=>suggestionFor(name,now)).filter(Boolean).sort((a,b)=>
+    a.dueIn-b.dueIn||b.evidence-a.evidence||a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
 }
 
-// Toutes les suggestions sont pour la prochaine course ; la couleur distingue un produit déjà épuisé.
-function timingLabel(){return 'Prochaine course'}
-function timingClass(item){return Math.ceil(item.dueIn)<=0?'is-now':'is-soon'}
-
-function ensureStyles(){
-  if(document.getElementById('courses-repurchase-soon-style'))return;
-  const style=document.createElement('style');
-  style.id='courses-repurchase-soon-style';
-  style.textContent=`
-    .repurchase-count{
-      position:absolute;right:-4px;top:-5px;min-width:19px;height:19px;padding:0 4px;border:2px solid rgba(255,255,255,.98);
-      border-radius:999px;display:block;align-content:center;text-align:center;background:var(--danger);color:#fff;box-sizing:border-box;
-      font-size:10px;line-height:1;text-box:trim-both cap alphabetic;font-variant-numeric:tabular-nums;font-weight:820;letter-spacing:0;box-shadow:0 2px 7px rgba(223,64,64,.22);pointer-events:none
-    }
-    .repurchase-dialog{
-      width:100%;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;
-      background:#f7f7f2;color:#17231c;overflow:hidden
-    }
-    .repurchase-dialog::backdrop{background:#f7f7f2}
-    .repurchase-screen{
-      width:100%;height:100%;box-sizing:border-box;display:flex;flex-direction:column;
-      padding:0 18px
-    }
-    .repurchase-head{
-      display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;flex:0 0 auto;box-sizing:border-box;
-      padding:max(29px,calc(env(safe-area-inset-top) + 23px)) 0 12px
-    }
-    .repurchase-head::after{content:'';width:42px;height:42px}
-    .repurchase-back{
-      width:42px;height:42px;margin:0;padding:0 2px 4px 0;border:0!important;border-radius:0!important;outline:0!important;
-      display:grid;place-items:center;background:transparent!important;color:#142019;box-shadow:none!important;
-      -webkit-backdrop-filter:none!important;backdrop-filter:none!important;-webkit-appearance:none!important;appearance:none!important;
-      -webkit-tap-highlight-color:transparent;font-size:42px;line-height:1;font-family:inherit
-    }
-    .repurchase-back:hover,.repurchase-back:active,.repurchase-back:focus,.repurchase-back:focus-visible{
-      border:0!important;border-radius:0!important;outline:0!important;background:transparent!important;box-shadow:none!important
-    }
-    .repurchase-head h2{margin:0;padding:0;color:#0d3f2c;font-size:22px;line-height:1;font-weight:820;letter-spacing:-.035em;text-align:center}
-    .repurchase-info{
-      flex:0 0 auto;margin:5px 0 13px;padding:12px 14px;border:1px solid rgba(35,120,242,.07);border-radius:16px;
-      display:flex;gap:10px;align-items:flex-start;background:#edf5ff;color:#315375;font-size:12.5px;line-height:1.35;font-weight:580
-    }
-    .repurchase-info-mark{width:20px;height:20px;flex:0 0 20px;border-radius:50%;display:grid;place-items:center;background:#2378f2;color:#fff;font-size:12px;font-weight:850}
-    .repurchase-list{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:1px 1px max(calc(env(safe-area-inset-bottom) + 28px),36px);display:flex;flex-direction:column;gap:10px}
-    .repurchase-row{
-      min-height:83px;padding:10px 11px 10px 9px;border:1px solid rgba(37,61,45,.055);border-radius:20px;
-      display:grid;grid-template-columns:68px minmax(0,1fr) 43px;align-items:center;gap:9px;background:rgba(255,255,255,.92);
-      box-shadow:0 8px 22px rgba(39,60,45,.055)
-    }
-    .repurchase-thumb{width:66px;height:62px;position:relative;display:grid;place-items:center;overflow:hidden}
-    .repurchase-thumb img{width:92%;height:92%;object-fit:contain;display:block;transform:translate(var(--single-product-shift-x,0%),calc(1px + var(--single-product-shift-y,0%))) scale(var(--single-product-scale,1));transform-origin:center}
-    .repurchase-thumb-fallback{display:none;width:48px;height:48px;border-radius:15px;place-items:center;background:#eef2ed;color:#678071;font-size:17px;font-weight:820}
-    .repurchase-thumb.is-fallback img{display:none}.repurchase-thumb.is-fallback .repurchase-thumb-fallback{display:grid}
-    .repurchase-copy{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
-    .repurchase-copy strong{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#152219;font-size:15px;line-height:1.13;font-weight:800;letter-spacing:-.022em}
-    .repurchase-copy small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#87908a;font-size:11px;line-height:1.2;font-weight:560}
-    .repurchase-timing{margin-top:4px;min-height:22px;padding:0 9px;border-radius:999px;display:inline-flex;align-items:center;gap:5px;font-size:10.5px;line-height:1;font-weight:780}
-    .repurchase-timing::before{content:'';width:6px;height:6px;border:1.7px solid currentColor;border-radius:50%;box-sizing:border-box}
-    .repurchase-timing.is-now{background:#fff0e8;color:#d85a22}.repurchase-timing.is-close{background:#fff5df;color:#ca7a16}.repurchase-timing.is-soon{background:#edf4ff;color:#3470ba}
-    .repurchase-add{
-      width:38px;height:38px;border:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#1c9c60,#12824e);
-      color:#fff;box-shadow:0 7px 16px rgba(18,130,78,.20),inset 0 1px 0 rgba(255,255,255,.22);font-size:26px;line-height:1;font-weight:350;
-      -webkit-appearance:none;appearance:none;transition:transform .12s ease,opacity .12s ease
-    }
-    .repurchase-add:active{transform:scale(.94)}.repurchase-add:disabled{opacity:.5}
-    .repurchase-empty{flex:1;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 22px;text-align:center;color:#7c8780}
-    .repurchase-empty-mark{width:70px;height:70px;margin-bottom:17px;border-radius:50%;display:grid;place-items:center;background:#eef3ef;color:#2b7951;font-size:31px;box-shadow:inset 0 0 0 1px rgba(43,121,81,.05)}
-    .repurchase-empty strong{color:#174c36;font-size:20px;line-height:1.1;font-weight:820;letter-spacing:-.03em}
-    .repurchase-empty span{max-width:300px;margin-top:7px;font-size:13px;line-height:1.42;font-weight:540}
-    .repurchase-history-status{max-width:300px;margin:22px 0 0;padding:11px 14px;border-radius:14px;background:rgba(255,255,255,.72);border:1px solid rgba(37,61,45,.06);color:#6f7a73;font-size:12.5px;line-height:1.4;font-weight:560}
-    .repurchase-history-status strong{display:block;color:#2b5a43;font-size:13px;line-height:1.3;font-weight:760;letter-spacing:-.01em}
-    .repurchase-history-status small{display:block;margin-top:3px;font-size:12px;line-height:1.35;font-weight:560;color:#7c8780}
-    @media(max-width:360px){.repurchase-screen{padding-left:14px;padding-right:14px}.repurchase-row{grid-template-columns:58px minmax(0,1fr) 40px}.repurchase-thumb{width:56px;height:56px}.repurchase-add{width:36px;height:36px}}
-    @media(prefers-reduced-motion:reduce){.repurchase-add{transition:none}}
-  `;
-  document.head.appendChild(style);
-}
-
-function ensureButton(){
-  const button=document.getElementById('repurchaseSoonBtn');
-  if(!button)return false;
-  if(button.dataset.repurchaseBound==='1')return true;
-  button.dataset.repurchaseBound='1';
-  button.addEventListener('click',openDialog);
-  return true;
-}
-
-function ensureDialog(){
-  if(dialog?.isConnected)return dialog;
-  dialog=document.getElementById('repurchaseSoonDialog');
-  if(dialog)return dialog;
-  dialog=document.createElement('dialog');
-  dialog.id='repurchaseSoonDialog';
-  dialog.className='repurchase-dialog';
-  dialog.setAttribute('aria-labelledby','repurchaseSoonTitle');
-  dialog.innerHTML='<div class="repurchase-screen"><header class="repurchase-head"><button class="repurchase-back" type="button" aria-label="Retour au Catalogue">‹</button><h2 id="repurchaseSoonTitle">À prévoir</h2></header><div class="repurchase-info"><span class="repurchase-info-mark" aria-hidden="true">i</span><span>Suggestions selon vos habitudes. Aucun ajout automatique.</span></div><div class="repurchase-list"></div></div>';
-  document.body.appendChild(dialog);
-  dialog.querySelector('.repurchase-back')?.addEventListener('click',()=>dialog.close());
-  dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close()});
-  return dialog;
-}
-
-// Montre que l'historique apprend : achats déjà enregistrés sur cet appareil et derniers produits.
-function historyStatusMarkup(){
-  const summary=intelligence()?.summary?.(3);
-  if(!summary)return '';
-  if(!summary.purchases){
-    return '<p class="repurchase-history-status">Aucun achat enregistré pour le moment. Cochez ✓ les produits achetés dans Ma liste.</p>';
-  }
-  const count=summary.purchases+' achat'+(summary.purchases>1?'s':'')+' enregistré'+(summary.purchases>1?'s':'')+' dans l’historique partagé';
-  const recent=summary.recent.length?'<small>Derniers : '+esc(summary.recent.join(', '))+(summary.products>summary.recent.length?'…':'')+'</small>':'';
-  return '<p class="repurchase-history-status"><strong>'+count+'</strong>'+recent+'</p>';
-}
-
-function emptyMarkup(){
-  const enabled=intelligence()?.isEnabled?.()!==false;
-  if(!enabled){
-    return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">↻</div><strong>Historique désactivé</strong><span>Activez l’historique des achats dans Réglages › Affichage et liste.</span></div>';
-  }
-  return '<div class="repurchase-empty"><div class="repurchase-empty-mark" aria-hidden="true">✓</div><strong>Rien à prévoir pour le moment</strong><span>Les suggestions apparaissent quand un prochain achat approche.</span>'+historyStatusMarkup()+'</div>';
-}
-
-// Le cycle est exprimé en courses hebdomadaires plutôt qu'en jours.
-function cadenceLabel(item){
-  const trips=Math.max(1,Math.round(Number(item.cadence||0)/7));
-  return trips===1?'À chaque course':'Toutes les '+trips+' courses';
-}
-
-function createRow(item){
-  const first=Array.from(item.name)[0]?.toUpperCase()||'•';
-  const source='./www/Items/'+slugify(item.name)+'.webp';
-  // Même cadrage par produit que Ma liste (vignette compacte) : tailles homogènes entre produits.
-  const scaleStyle=window.COURSES_PRODUCT_IMAGES?.visualScaleStyle?.(source,true)||'';
-  const template=document.createElement('template');
-  template.innerHTML='<article class="repurchase-row" data-name="'+esc(item.name)+'">'+
-    '<span class="repurchase-thumb"><img '+(scaleStyle?'style="'+esc(scaleStyle)+'" ':'')+'src="'+esc(source)+'" alt="" loading="lazy" decoding="async" draggable="false" data-single-product-source="'+esc(source)+'" data-single-product-compact="1"><span class="repurchase-thumb-fallback">'+esc(first)+'</span></span>'+
-    '<span class="repurchase-copy"><strong>'+esc(item.name)+'</strong><small>'+esc(cadenceLabel(item))+'</small><span class="repurchase-timing '+timingClass(item)+'">'+esc(timingLabel(item))+'</span></span>'+
-    '<button class="repurchase-add" type="button" data-name="'+esc(item.name)+'" aria-label="Ajouter '+esc(item.name)+' à Ma liste">+</button>'+
-  '</article>';
-  const row=template.content.firstElementChild;
-  const image=row.querySelector('.repurchase-thumb img');
-  image?.addEventListener('error',()=>image.parentElement?.classList.add('is-fallback'),{once:true});
-  if(image)window.COURSES_PRODUCT_IMAGES?.frame?.(image);
-  const button=row.querySelector('.repurchase-add');
-  button?.addEventListener('click',()=>addSuggested(button));
-  return row;
-}
-
-// Met à jour le texte d'une ligne conservée sans toucher à sa vignette déjà affichée.
-function updateRow(row,item){
-  const small=row.querySelector('.repurchase-copy small');
-  if(small&&small.textContent!==cadenceLabel(item))small.textContent=cadenceLabel(item);
-  const timing=row.querySelector('.repurchase-timing');
-  if(timing){
-    const className='repurchase-timing '+timingClass(item);
-    if(timing.className!==className)timing.className=className;
-    if(timing.textContent!==timingLabel(item))timing.textContent=timingLabel(item);
-  }
-  const button=row.querySelector('.repurchase-add');
-  if(button?.disabled&&button.textContent==='✓'){button.textContent='+';button.disabled=false}
-}
-
-// Réconcilie les lignes par nom : une ligne déjà présente est réutilisée telle quelle
-// (même <img>), seules les lignes nouvelles sont créées et les disparues retirées.
-function syncRows(root,items,create,update){
-  const existing=new Map();
-  Array.from(root.children).forEach(node=>{
-    const name=node.dataset?.name;
-    if(name&&!existing.has(name))existing.set(name,node);
-    else node.remove();
-  });
-  items.forEach((item,index)=>{
-    let row=existing.get(item.name);
-    if(row){existing.delete(item.name);update(row,item)}
-    else row=create(item);
-    const current=root.children[index]||null;
-    if(current!==row)root.insertBefore(row,current);
-  });
-  existing.forEach(row=>row.remove());
-}
-
-function renderDialog(items=suggestions()){
-  const root=ensureDialog().querySelector('.repurchase-list');
-  if(!root)return;
-  if(!items.length){root.innerHTML=emptyMarkup();return}
-  syncRows(root,items,createRow,updateRow);
-}
-
-async function addSuggested(button){
-  const name=String(button?.dataset?.name||'').trim(),list=listService();
-  if(!name||!list?.ensureQuantity||button.disabled)return;
-  button.disabled=true;
-  const previous=button.textContent;
-  button.textContent='…';
-  try{
-    const current=Math.max(0,Number(list.getQuantity?.(name)||0));
-    const result=await list.ensureQuantity(name,current+1);
-    if(Number(result?.failed||0)>0)throw new Error('add failed');
-    button.textContent='✓';
-    window.CoursesHaptics?.vibrate(6);
-    setTimeout(()=>refresh(true),260);
-  }catch(_){
-    button.textContent='!';
-    setTimeout(()=>{if(button.isConnected){button.textContent=previous;button.disabled=false}},900);
-  }
-}
-
-function syncBadge(items=suggestions()){
-  const badge=document.querySelector('#repurchaseSoonBtn .repurchase-count');
-  if(!badge)return;
-  const count=items.length;
-  badge.hidden=count===0;
-  badge.textContent=count>MAX_BADGE?MAX_BADGE+'+':String(count);
-}
-
-function refresh(includeDialog=false){
+// Prévient app.js (Favoris et sa pastille) seulement quand la liste des suggestions change.
+function refresh(){
   if(refreshFrame)return;
   refreshFrame=requestAnimationFrame(()=>{
     refreshFrame=0;
     const items=suggestions();
-    syncBadge(items);
-    if((includeDialog||dialog?.open)&&dialog?.open)renderDialog(items);
+    const signature=items.map(item=>item.name).join('\u0001');
+    if(signature===lastSignature)return;
+    lastSignature=signature;
+    document.dispatchEvent(new CustomEvent('courses:repurchase-changed',{detail:{count:items.length,names:items.map(item=>item.name)}}));
   });
-}
-
-function openDialog(){
-  if(appLocked())return;
-  const target=ensureDialog();
-  renderDialog();
-  if(!target.open)target.showModal();
 }
 
 function bindEvents(){
   document.addEventListener('courses:list-changed',()=>refresh(true));
   document.addEventListener('courses:purchase-history-changed',()=>refresh(true));
   document.addEventListener('courses:lock-changed',event=>{
-    if(event.detail?.locked){if(dialog?.open)dialog.close();return}
+    if(event.detail?.locked)return;
     refresh(true);
   });
   window.addEventListener('storage',event=>{
@@ -319,8 +98,8 @@ function init(){
   if(booted)return;
   if(!intelligence()||!listService())return;
   booted=true;
-  ensureStyles();ensureButton();ensureDialog();bindEvents();refresh();
-  window.COURSES_REPURCHASE_SOON=Object.freeze({suggestions:()=>suggestions(),refresh:()=>refresh(true),open:openDialog});
+  window.COURSES_REPURCHASE_SOON=Object.freeze({suggestions:()=>suggestions(),refresh:()=>refresh(true)});
+  bindEvents();refresh();
 }
 
 function bootstrap(){

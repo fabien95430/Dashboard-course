@@ -2,7 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
+// v903 : « À prévoir » n'a plus d'écran à part ; ses suggestions « À racheter » sont fusionnées dans
+// Favoris (app.js). Ce fichier vérifie désormais les règles du moteur (repurchase-soon.js) et la fusion.
 const source=fs.readFileSync(new URL('../repurchase-soon.js',import.meta.url),'utf8');
+const app=fs.readFileSync(new URL('../app.js',import.meta.url),'utf8');
+const index=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 
 function extract(startMarker,endMarker){
   const start=source.indexOf(startMarker);
@@ -11,112 +15,83 @@ function extract(startMarker,endMarker){
   return source.slice(start,end);
 }
 
-function fakeRoot(){
-  const root={children:[]};
-  const attach=node=>{node.remove=()=>{const i=root.children.indexOf(node);if(i>=0)root.children.splice(i,1)};return node};
-  root.insertBefore=(node,ref)=>{
-    node.remove?.();
-    attach(node);
-    const i=ref?root.children.indexOf(ref):-1;
-    if(i<0)root.children.push(node);else root.children.splice(i,0,node);
-  };
-  root.add=node=>{attach(node);root.children.push(node);return node};
-  return root;
+const DAY=86400000;
+const at=(y,m,d,h=12)=>new Date(y,m-1,d,h).getTime();
+const tripCode=extract('function nextTripStart(now=Date.now()){','/* À racheter');
+const trips=new Function(tripCode+';return {nextTripStart};')();
+const rules=extract('const DAY=86400000;','let refreshFrame=0;');
+const make=new Function('intelligence','listService','CATALOG',rules+tripCode+extract('function suggestionFor(name,now=Date.now()){','function suggestions(')+';return suggestionFor;');
+
+function engine(profiles,inList=new Set()){
+  const api={isEnabled:()=>true,profileFor:name=>profiles[name]||null};
+  return make(()=>api,()=>({getQuantity:name=>inList.has(name)?1:0}),{groups:{}});
 }
 
-const syncRows=new Function(extract('function syncRows(root,items,create,update){','function renderDialog(')+';return syncRows;')();
-
-test('À prévoir réutilise les lignes existantes après un ajout au lieu de recréer les vignettes',()=>{
-  const root=fakeRoot();
-  const created=[];
-  const updated=[];
-  const create=item=>{const row={dataset:{name:item.name},image:{}};created.push(item.name);return row};
-  const update=(row,item)=>updated.push(item.name);
-
-  syncRows(root,[{name:'Lait'},{name:'Œufs'},{name:'Pain'}],create,update);
-  assert.deepEqual(root.children.map(row=>row.dataset.name),['Lait','Œufs','Pain']);
-  const [lait,oeufs,pain]=root.children;
-  created.length=0;
-
-  // « Œufs » vient d'être ajouté à Ma liste : il disparaît, les autres lignes restent les mêmes nœuds.
-  syncRows(root,[{name:'Lait'},{name:'Pain'}],create,update);
-  assert.deepEqual(created,[],'aucune ligne ne doit être recréée');
-  assert.deepEqual(updated,['Lait','Pain']);
-  assert.equal(root.children[0],lait);
-  assert.equal(root.children[1],pain);
-  assert.equal(root.children.includes(oeufs),false);
-
-  // Nouvel ordre et nouvelle suggestion : seule la nouvelle ligne est créée.
-  syncRows(root,[{name:'Pain'},{name:'Beurre'},{name:'Lait'}],create,update);
-  assert.deepEqual(created,['Beurre']);
-  assert.deepEqual(root.children.map(row=>row.dataset.name),['Pain','Beurre','Lait']);
-  assert.equal(root.children[0],pain);
-  assert.equal(root.children[2],lait);
-});
-
-test('À prévoir retire l état vide avant d afficher des suggestions',()=>{
-  const root=fakeRoot();
-  root.add({dataset:{}});
-  syncRows(root,[{name:'Lait'}],item=>({dataset:{name:item.name}}),()=>{});
-  assert.deepEqual(root.children.map(row=>row.dataset.name),['Lait']);
-});
-
-test('le rendu de À prévoir ne reconstruit plus toute la liste en HTML',()=>{
-  const render=extract('function renderDialog(','async function addSuggested(');
-  assert.match(render,/syncRows\(root,items,createRow,updateRow\)/);
-  assert.doesNotMatch(render,/root\.innerHTML=items\.map/);
-});
-
-const tripCode=extract('function nextTripStart(now=Date.now()){','function suggestionFor(');
-const trips=new Function(tripCode+';return {nextTripStart,followingTripStart};')();
-const at=(y,m,d,h=12)=>new Date(y,m-1,d,h).getTime();
-
-test('À prévoir cale la prochaine course sur le week-end',()=>{
+test('À racheter cale la prochaine course sur le week-end',()=>{
   // 7 novembre 2026 = samedi.
   assert.equal(trips.nextTripStart(at(2026,11,4)),at(2026,11,7,0),'mercredi → samedi qui vient');
   assert.equal(trips.nextTripStart(at(2026,11,7,18)),at(2026,11,7,0),'samedi → ce week-end');
   assert.equal(trips.nextTripStart(at(2026,11,8,10)),at(2026,11,7,0),'dimanche → ce week-end');
-  assert.equal(trips.followingTripStart(at(2026,11,8,10)),at(2026,11,14,0));
-  assert.equal(trips.followingTripStart(at(2026,11,9)),at(2026,11,21,0),'lundi → course d après le samedi 14');
 });
 
-test('À prévoir parle en courses et non en jours',()=>{
-  const labels=new Function(extract('function timingLabel(){','function ensureStyles(){')+extract('function cadenceLabel(item){','function createRow(item){')+';return {timingLabel,timingClass,cadenceLabel};')();
-  assert.equal(labels.cadenceLabel({cadence:2}),'À chaque course');
-  assert.equal(labels.cadenceLabel({cadence:9}),'À chaque course');
-  assert.equal(labels.cadenceLabel({cadence:14}),'Toutes les 2 courses');
-  assert.equal(labels.timingLabel({dueIn:3}),'Prochaine course');
-  assert.equal(labels.timingClass({dueIn:-1}),'is-now');
-  assert.equal(labels.timingClass({dueIn:3}),'is-soon');
-  assert.doesNotMatch(source,/'Dans '\+days\+' jours'/);
-  assert.doesNotMatch(source,/'Cycle estimé : '/);
+test('À racheter : une habitude prouvée (au moins 3 achats sur des courses différentes)',()=>{
+  const now=at(2026,11,4);
+  const lastAt=at(2026,10,31,11);
+  const suggest=engine({
+    Lait:{lastAt,intervalSamples:2,medianDays:7,intervalSpread:0},
+    Brie:{lastAt,intervalSamples:1,medianDays:7,intervalSpread:0},
+    Pain:{lastAt,intervalSamples:0,medianDays:0,intervalSpread:0}
+  });
+  assert.ok(suggest('Lait',now),'3 achats hebdomadaires : à racheter samedi');
+  assert.equal(suggest('Brie',now),null,'2 achats seulement : pas encore une habitude');
+  assert.equal(suggest('Pain',now),null,'un seul achat : rien');
 });
 
-test('un saumon acheté samedi est prévu pour la course suivante, pas dans 2 jours',()=>{
-  const body=extract('const DAY=86400000;','const MAX_BADGE')+tripCode+extract('function suggestionFor(name,now=Date.now()){','function suggestions(');
-  const make=new Function('intelligence','listService','META',body+';return suggestionFor;');
-  const purchaseAt=at(2026,11,7,11);
+test('À racheter : rythme régulier et réel, sans durée par défaut ni raccourci',()=>{
+  const now=at(2026,11,4);
+  const suggest=engine({
+    Riz:{lastAt:at(2026,10,31,11),intervalSamples:4,medianDays:28,intervalSpread:.1},
+    Chips:{lastAt:at(2026,10,17,11),intervalSamples:4,medianDays:14,intervalSpread:.8},
+    Lessive:{lastAt:at(2026,10,10,11),intervalSamples:3,medianDays:28,intervalSpread:.1}
+  });
+  assert.equal(suggest('Riz',now),null,'acheté il y a une semaine, rythme de 4 semaines : pas encore');
+  assert.equal(suggest('Chips',now),null,'achats irréguliers : jamais proposé');
+  assert.ok(suggest('Lessive',now),'4 semaines atteintes samedi (10/10 → 07/11)');
+  assert.equal(suggest('Lessive',now).cadence,28);
+});
+
+test('À racheter : habitude arrêtée et produit déjà dans Ma liste exclus',()=>{
+  const now=at(2026,11,4);
   const profiles={
-    Saumon:{lastAt:purchaseAt,samples:2,recentDays:2},
-    Lessive:{lastAt:at(2026,9,28),samples:2,recentDays:45},
-    Riz:{lastAt:purchaseAt,samples:2,recentDays:60}
+    Yaourts:{lastAt:at(2026,9,1,11),intervalSamples:5,medianDays:7,intervalSpread:0},
+    Oeufs:{lastAt:at(2026,10,31,11),intervalSamples:5,medianDays:7,intervalSpread:0}
   };
-  const api={isEnabled:()=>true,profileFor:name=>profiles[name],stockFor:(name,now)=>({ageDays:(now-profiles[name].lastAt)/86400000,estimatedQty:1})};
-  const suggestionFor=make(()=>api,()=>({getQuantity:()=>0}),new Map());
-  const now=at(2026,11,7,18);
-  assert.ok(suggestionFor('Saumon',now),'le saumon manquera avant samedi prochain');
-  assert.ok(suggestionFor('Lessive',now),'la lessive (fin le 12/11) manquera avant samedi prochain');
-  assert.equal(suggestionFor('Riz',now),null,'le riz tient bien au-delà de la course suivante');
-  profiles.Lessive.lastAt=at(2026,10,1);
-  assert.equal(suggestionFor('Lessive',now),null,'fin le 15/11 : elle peut attendre la course du 14/11');
+  assert.equal(engine(profiles)('Yaourts',now),null,'pas racheté depuis plus de 3 fois son rythme');
+  assert.equal(engine(profiles,new Set(['Oeufs']))('Oeufs',now),null,'déjà dans Ma liste');
+  assert.ok(engine(profiles)('Oeufs',now));
 });
 
-test('les vignettes de À prévoir utilisent le cadrage par produit de Ma liste',()=>{
-  const create=extract('function createRow(item){','// Met à jour le texte');
-  assert.match(create,/window\.COURSES_PRODUCT_IMAGES\?\.visualScaleStyle\?\.\(source,true\)/);
-  assert.match(create,/data-single-product-source="'\+esc\(source\)\+'" data-single-product-compact="1"/);
-  assert.match(create,/window\.COURSES_PRODUCT_IMAGES\?\.frame\?\.\(image\)/);
-  assert.match(source,/\.repurchase-thumb img\{[^}]*scale\(var\(--single-product-scale,1\)\)/);
-  const images=fs.readFileSync(new URL('../product-item-images.js',import.meta.url),'utf8');
-  assert.match(images,/window\.COURSES_PRODUCT_IMAGES=Object\.freeze\(\{warm:warmProductImages,visualScaleStyle,frame:frameProductImage\}\)/);
+test('À racheter : un produit acheté chaque samedi ressort le samedi suivant, pas avant',()=>{
+  const suggest=engine({Saumon:{lastAt:at(2026,11,7,11),intervalSamples:3,medianDays:7,intervalSpread:0}});
+  assert.equal(suggest('Saumon',at(2026,11,7,18)),null,'acheté aujourd hui : rien');
+  assert.ok(suggest('Saumon',at(2026,11,11)),'mercredi : prévu pour samedi 14');
+});
+
+test('À racheter fusionné dans Favoris : en tête, mention et pastille ; plus d écran à part',()=>{
+  assert.match(app,/function favorites\(\)\{\s*const due=dueProducts\(\);[\s\S]*?return \[\.\.\.due,\.\.\.out\];/);
+  assert.match(app,/productCardCache\.forEach\(\(card,key\)=>card\.classList\.toggle\('is-due',active&&repurchaseDue\.has\(key\)\)\);/);
+  const quantities=fs.readFileSync(new URL('../catalog-quantities.js',import.meta.url),'utf8');
+  assert.match(quantities,/const subcategory=card\.classList\.contains\('is-due'\)\?'À racheter':String\(meta\?\.sub\|\|meta\?\.category\|\|''\);/);
+  assert.match(app,/const chip=\$\('#categories \.cat\[data-category="Favoris"\]'\);/);
+  assert.match(app,/document\.addEventListener\('courses:repurchase-changed',\(\)=>\{/);
+  assert.match(source,/new CustomEvent\('courses:repurchase-changed',\{detail:\{count:items\.length/);
+  assert.doesNotMatch(index,/repurchaseSoonBtn/);
+  assert.doesNotMatch(source,/showModal|repurchaseSoonDialog|createElement\('dialog'\)/);
+});
+
+test('les marques À racheter suivent le thème global',()=>{
+  const css=fs.readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+  assert.match(css,/--due:#c4621c;/);
+  assert.match(css,/\.product\.is-due \.pcat\{color:var\(--due\);font-weight:700\}/);
+  assert.match(css,/\.cat \.cat-count\{[^}]*background:var\(--danger\);[^}]*text-box:trim-both cap alphabetic/);
 });

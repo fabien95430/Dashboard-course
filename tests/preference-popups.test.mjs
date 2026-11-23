@@ -237,9 +237,11 @@ test('les explications de popup restent courtes et essentielles',()=>{
   assert.match(missing,/Demandez l’ajout d’un produit ou d’un plat\./);
   // v891 : plus d'écran Gestion ; Documentation s'ouvre depuis Réglages › Aide.
   assert.doesNotMatch(settings,/Documentation, historique et informations/);
-  assert.match(repurchase,/Suggestions selon vos habitudes\. Aucun ajout automatique\./);
-  assert.match(repurchase,/Activez l’historique des achats dans Réglages › Affichage et liste\./);
-  assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\./);
+  // v903 : plus d'écran « À prévoir » ; aucun ajout automatique (le moteur ne touche jamais Ma liste).
+  assert.doesNotMatch(repurchase,/Suggestions selon vos habitudes|increment|addItem/);
+  // v903 : plus d'écran vide « Historique désactivé » ; historique désactivé → aucune suggestion (isEnabled).
+  assert.match(repurchase,/if\(!api\?\.isEnabled\?\.\(\)\|\|!list\)return null;/);
+  assert.doesNotMatch(repurchase,/Les suggestions apparaissent quand un prochain achat approche/);
 });
 
 

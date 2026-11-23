@@ -248,11 +248,12 @@ function consumedForCycle(name,cycleAt){
   return consumptionsFor(name).reduce((total,event)=>total+(aliases.has(Number(event.cycleAt))?Math.max(1,Number(event.qty)||1):0),0);
 }
 function adaptiveProfile(meta,household=readHousehold()){
-  const base=baseRule(meta),events=eventsFor(meta.name),intervals=[];
+  const base=baseRule(meta),events=eventsFor(meta.name),intervals=[],rawIntervals=[];
   const householdFactor=clamp(Math.pow(2/Math.max(1,household),.42),.62,1.18);
   for(let i=1;i<events.length;i++){
     const days=(events[i].at-events[i-1].at)/DAY;
     if(days<.75)continue;
+    rawIntervals.push(days);
     const sampleHousehold=(Math.max(1,events[i-1].household||household)+Math.max(1,events[i].household||household))/2;
     const normalized=days/clamp(Math.pow(2/sampleHousehold,.42),.62,1.18);
     intervals.push(normalized*householdFactor);
@@ -282,9 +283,14 @@ function adaptiveProfile(meta,household=readHousehold()){
   if(base.shelf>0)days=Math.min(days,base.shelf);
   const cycleAt=Number(last?.firstAt||last?.at)||0;
   const consumedQty=last?consumedForCycle(meta.name,cycleAt):0;
+  // Rythme réel des achats (suggestions « À racheter ») : durée typique entre deux courses et sa régularité,
+  // sans durée par défaut ni coefficient de prudence.
+  const recentRaw=rawIntervals.slice(-8),medianDays=median(recentRaw)||0;
+  const intervalSpread=medianDays?median(recentRaw.map(value=>Math.abs(value-medianDays)))/medianDays:0;
   return {
     days:Math.max(1,Math.round(days)),base,typicalQty,lastQty,cycleAt,consumedQty,
-    purchaseSamples:purchaseSamples.length,feedbackSamples:directSamples.length
+    purchaseSamples:purchaseSamples.length,feedbackSamples:directSamples.length,
+    intervalSamples:rawIntervals.length,medianDays,intervalSpread
   };
 }
 function rebuild(household=readHousehold()){
@@ -294,6 +300,7 @@ function rebuild(household=readHousehold()){
     products[key]={
       name:meta.name,category:meta.category,sub:meta.sub,baseDays:model.base.days,recentDays:model.days,
       samples:model.purchaseSamples,feedbackSamples:model.feedbackSamples,lastAt:Number(events.at(-1)?.at)||0,
+      intervalSamples:model.intervalSamples,medianDays:model.medianDays,intervalSpread:model.intervalSpread,
       cycleAt:model.cycleAt,lastQty:model.lastQty,consumedQty:model.consumedQty,
       stockQty:Math.max(0,model.lastQty-model.consumedQty),typicalQty:model.typicalQty,household
     };

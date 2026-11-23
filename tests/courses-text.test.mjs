@@ -39,9 +39,10 @@ test('les modules utilisent la clé partagée au lieu de leur propre copie',()=>
     ['purchase-intelligence.js',/const norm=window\.COURSES_TEXT\.key;/],
     ['catalog-product-admin.js',/const norm=window\.COURSES_TEXT\.key;/],
     ['app.js',/const key=window\.COURSES_TEXT\.key\(value\);[\s\S]*const productSlug=window\.COURSES_TEXT\.slug;/],
-    ['product-item-images.js',/const slugify=window\.COURSES_TEXT\.slug;/],
-    ['repurchase-soon.js',/const slugify=window\.COURSES_TEXT\.slug;/]
+    ['product-item-images.js',/const slugify=window\.COURSES_TEXT\.slug;/]
   ])assert.match(read(file),pattern,file);
+  // v903 : repurchase-soon.js n'affiche plus de vignettes (fusion dans Favoris) et n'utilise plus de slug.
+  assert.doesNotMatch(read('repurchase-soon.js'),/const slugify=/);
   // catalog.js est chargé en premier par index.html, avant tout module qui lit COURSES_TEXT.
   const scripts=[...read('index.html').matchAll(/<script src="\.\/([^"?]+)/g)].map(match=>match[1]);
   assert.equal(scripts[0],'catalog.js');

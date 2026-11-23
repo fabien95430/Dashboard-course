@@ -83,18 +83,10 @@ test('le résumé de l historique compte les achats et liste les derniers produi
   assert.deepEqual(JSON.parse(JSON.stringify(summary)),{purchases:5,products:4,recent:['Lait demi-écrémé','Bananes','Pain']});
 });
 
-test('l écran vide de À prévoir montre si les achats sont bien enregistrés',()=>{
+test('l écran vide de À prévoir a disparu avec la fusion dans Favoris (v903) ; le résumé reste disponible',()=>{
   const repurchase=readFileSync(new URL('../repurchase-soon.js',import.meta.url),'utf8');
-  const start=repurchase.indexOf('function historyStatusMarkup(){');
-  const end=repurchase.indexOf('function emptyMarkup(){',start);
-  assert.ok(start>=0&&end>start,'historyStatusMarkup introuvable');
-  const esc=value=>String(value).replace(/</g,'&lt;');
-  const markup=summary=>vm.runInNewContext(repurchase.slice(start,end)+';historyStatusMarkup()',{esc,intelligence:()=>summary?{summary:()=>summary}:null});
-  assert.equal(markup(null),'');
-  assert.match(markup({purchases:0,products:0,recent:[]}),/Aucun achat enregistré pour le moment\. Cochez ✓ les produits achetés dans Ma liste\./);
-  assert.match(markup({purchases:1,products:1,recent:['Bananes']}),/<strong>1 achat enregistré dans l’historique partagé<\/strong><small>Derniers : Bananes<\/small>/);
-  assert.match(markup({purchases:12,products:5,recent:['Lait demi-écrémé','Bananes','Pain']}),/12 achats enregistrés dans l’historique partagé<\/strong><small>Derniers : Lait demi-écrémé, Bananes, Pain…<\/small>/);
-  assert.match(repurchase,/Les suggestions apparaissent quand un prochain achat approche\.<\/span>'\+historyStatusMarkup\(\)/);
+  assert.doesNotMatch(repurchase,/function historyStatusMarkup\(\)|function emptyMarkup\(\)/);
+  assert.match(source,/summary:\(limit=3\)=>historySummary\(limit\)/);
 });
 
 

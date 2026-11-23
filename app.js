@@ -573,14 +573,46 @@ function bindProductImageFallbacks(root){
 
 function usageSave(){saveJson(STORAGE.usage,state.usage)}
 function recordUsage(name){const key=norm(name);const old=state.usage[key]||{count:0,lastAt:0};state.usage[key]={count:Number(old.count||0)+1,lastAt:Date.now()};usageSave()}
-function favorites(){
-  const curated=FAVORITES.map(n=>BY_NAME.get(norm(n))).filter(Boolean);
-  if(!state.preferences.smartFavorites)return unique(curated).slice(0,12);
-  const ranked=Object.entries(state.usage).filter(([key])=>BY_NAME.has(key)).sort((a,b)=>Number(b[1]?.count||0)-Number(a[1]?.count||0)||Number(b[1]?.lastAt||0)-Number(a[1]?.lastAt||0)).map(([key])=>BY_NAME.get(key));
-  const out=[],seen=new Set();
-  [...ranked,...curated].forEach(p=>{const k=norm(p?.name);if(!p||!k||seen.has(k)||out.length>=12)return;seen.add(k);out.push(p)});
-  return out;
+/* « À racheter » (repurchase-soon.js) : produits dont le rythme d'achat réel est atteint à la
+   prochaine course. Ils remontent en tête de Favoris avec la mention « À racheter ». */
+let repurchaseDue=new Set();
+function dueProducts(){
+  const items=window.COURSES_REPURCHASE_SOON?.suggestions?.()||[];
+  const products=unique(items.map(item=>BY_NAME.get(norm(item.name))).filter(Boolean));
+  repurchaseDue=new Set(products.map(product=>norm(product.name)));
+  return products;
 }
+function favorites(){
+  const due=dueProducts();
+  const curated=FAVORITES.map(n=>BY_NAME.get(norm(n))).filter(Boolean);
+  const ranked=state.preferences.smartFavorites
+    ?Object.entries(state.usage).filter(([key])=>BY_NAME.has(key)).sort((a,b)=>Number(b[1]?.count||0)-Number(a[1]?.count||0)||Number(b[1]?.lastAt||0)-Number(a[1]?.lastAt||0)).map(([key])=>BY_NAME.get(key))
+    :[];
+  const out=[],seen=new Set(repurchaseDue);
+  [...ranked,...curated].forEach(p=>{const k=norm(p?.name);if(!p||!k||seen.has(k)||out.length>=12)return;seen.add(k);out.push(p)});
+  return [...due,...out];
+}
+// Repère « À racheter » sur les cartes de Favoris (hors recherche). Le texte de la ligne sous le nom
+// (« À racheter » ou la sous-catégorie) est écrit par catalog-quantities.js, propriétaire de cette ligne.
+function syncDueMarks(){
+  const active=state.category==='Favoris'&&!String(state.productQuery||'').trim();
+  productCardCache.forEach((card,key)=>card.classList.toggle('is-due',active&&repurchaseDue.has(key)));
+}
+// Pastille du chip Favoris : nombre de produits à racheter.
+function syncFavoritesBadge(){
+  const chip=$('#categories .cat[data-category="Favoris"]');
+  if(!chip)return;
+  let badge=chip.querySelector('.cat-count');
+  if(!badge){badge=document.createElement('i');badge.className='cat-count';badge.setAttribute('aria-hidden','true');chip.appendChild(badge)}
+  const count=(window.COURSES_REPURCHASE_SOON?.suggestions?.()||[]).length;
+  badge.textContent=count>99?'99+':String(count);
+  badge.hidden=count===0;
+  chip.setAttribute('aria-label',count?'Favoris, '+count+' à racheter':'Favoris');
+}
+document.addEventListener('courses:repurchase-changed',()=>{
+  syncFavoritesBadge();
+  if(state.category==='Favoris')renderProducts();
+});
 function unique(products){const seen=new Set();return products.filter(p=>{const k=norm(p.name);if(!k||seen.has(k))return false;seen.add(k);return true})}
 const sortProductsAlpha=products=>[...products].sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
 function visibleProducts(){
@@ -727,6 +759,7 @@ function renderCategories(){
     el.querySelectorAll('.cat').forEach(button=>button.onclick=()=>selectCategory(button.dataset.category||DEFAULT_CATALOG_CATEGORY));
   }
   syncCategorySelection();
+  syncFavoritesBadge();
 }
 const productCardCache=new Map();
 let productGridReady=false;
@@ -933,6 +966,7 @@ function renderProducts(){
   const quantities=new Map(activeGroups().map(group=>[norm(group.summary),group.count]));
   ensureProductGrid(el,quantities);
   syncProductGrid(products,quantities);
+  syncDueMarks();
   updateProductCount(products);
   notifyProductsUpdated();
 }

@@ -70,12 +70,13 @@ test('v902 : pastilles des demandes cohérentes (même rouge, mêmes nombres sur
   assert.match(css,/\.settings-view \.settings-count\{[^}]*background:var\(--danger\)!important/);
   assert.match(css,/#missingProductsDialog \.missing-mode-count\{[^}]*background:var\(--danger\)/);
   assert.match(tab,/background:'var\(--danger\)'/);
-  assert.match(soon,/\.repurchase-count\{[\s\S]*?background:var\(--danger\)/);
+  // v903 : la pastille « À racheter » est sur le chip Favoris (styles.css), plus dans repurchase-soon.js.
+  assert.match(css,/\.cat \.cat-count\{[^}]*background:var\(--danger\)/);
+  assert.doesNotMatch(soon,/repurchase-count/);
   assert.doesNotMatch(tab,/#ff3b30/);
   // Chiffres centrés sur la hauteur des capitales, quelle que soit la police (SF Pro sur iPhone).
   assert.match(css,/\.settings-view \.settings-count\{[^}]*line-height:1!important;text-box:trim-both cap alphabetic/);
   assert.match(css,/#missingProductsDialog \.missing-mode-count\{[^}]*text-box:trim-both cap alphabetic/);
   assert.match(tab,/badge\.style\.setProperty\('text-box','trim-both cap alphabetic'\);/);
-  assert.match(soon,/\.repurchase-count\{[^}]*text-box:trim-both cap alphabetic/);
-  assert.doesNotMatch(soon.match(/\.repurchase-count\{[^}]*\}/)?.[0]||'',/#2378f2/);
+  assert.match(css,/\.cat \.cat-count\{[^}]*text-box:trim-both cap alphabetic/);
 });

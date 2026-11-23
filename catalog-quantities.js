@@ -727,7 +727,8 @@ function decorateProducts(){
     const name=String(card.dataset.name||'');
     const meta=PRODUCT_META.get(name);
     const detail=card.querySelector('.pcat');
-    const subcategory=String(meta?.sub||meta?.category||'');
+    // Favoris : produit à racheter (repère posé par app.js) → « À racheter » à la place de la sous-catégorie.
+    const subcategory=card.classList.contains('is-due')?'À racheter':String(meta?.sub||meta?.category||'');
     if(detail){
       if(detail.textContent!==subcategory)detail.textContent=subcategory;
       detail.hidden=!subcategory;

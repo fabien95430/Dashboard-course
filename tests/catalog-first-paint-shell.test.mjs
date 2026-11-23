@@ -32,7 +32,8 @@ test('les libellés et actions de Ma liste et du Catalogue sont définitifs dès
   assert.doesNotMatch(listHeader,/page-header-actions|icon-btn/,'Ma liste n a plus de bouton dans son en-tête');
   assert.doesNotMatch(index,/listFilterBtn|listFilterMenu|list-filter/,'le menu de filtre de Ma liste est retiré');
   const catalogHeader=index.slice(index.indexOf('<section id="catalogView"'),index.indexOf('</header>',index.indexOf('<section id="catalogView"')));
-  assert.ok(catalogHeader.includes('id="repurchaseSoonBtn"'),'À racheter bientôt reste sur le Catalogue');
+  // v903 : « À prévoir » est fusionné dans Favoris ; plus de bouton horloge dans l'en-tête du Catalogue.
+  assert.ok(!catalogHeader.includes('id="repurchaseSoonBtn"'),'plus de bouton À racheter bientôt sur le Catalogue');
   const settingsHeader=index.slice(index.indexOf('<section id="settingsView"'),index.indexOf('</header>',index.indexOf('<section id="settingsView"')));
   assert.ok(settingsHeader.includes('<div class="page-header-actions">')&&settingsHeader.includes('id="refreshBtn"'),'le rafraîchissement est dans l en-tête de Réglages');
   assert.equal(index.match(/id="refreshBtn"/g)?.length,1,'un seul bouton de rafraîchissement');
@@ -42,8 +43,9 @@ test('les libellés et actions de Ma liste et du Catalogue sont définitifs dès
   assert.match(dishes,/dishes\?'Choisissez un plat à cuisiner ':'Ajouter vos produits '/);
 });
 
-test('le bouton À racheter bientôt est seulement branché par son module propriétaire',()=>{
-  assert.match(repurchase,/function ensureButton\(\)[\s\S]*?getElementById\('repurchaseSoonBtn'\)[\s\S]*?dataset\.repurchaseBound='1'[\s\S]*?addEventListener\('click',openDialog\)/);
+test('À racheter : le module propriétaire ne crée plus de bouton ni d écran (fusion dans Favoris, v903)',()=>{
+  assert.doesNotMatch(repurchase,/getElementById\('repurchaseSoonBtn'\)|openDialog/);
+  assert.match(repurchase,/window\.COURSES_REPURCHASE_SOON=Object\.freeze\(\{suggestions:\(\)=>suggestions\(\),refresh:\(\)=>refresh\(true\)\}\);/);
   assert.doesNotMatch(repurchase,/refresh\.before\(actions\)/);
   assert.doesNotMatch(repurchase,/actions\.append\(button,refresh\)/);
   assert.doesNotMatch(repurchase,/button\.id='repurchaseSoonBtn'/);

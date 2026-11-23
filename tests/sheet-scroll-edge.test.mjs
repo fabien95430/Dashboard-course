@@ -23,8 +23,8 @@ test('feuilles des Réglages : les modules ne remettent pas de marge basse concu
   assert.doesNotMatch(read('catalog-product-admin.js'),/\.catalog-remove-panel\{[^}]*padding-bottom/);
 });
 
-test('À prévoir : la liste plein écran défile jusqu au bord et garde la barre d accueil en fin de liste',()=>{
+test('À prévoir : plus de liste plein écran, les suggestions sont dans la grille Favoris (v903)',()=>{
   const source=read('repurchase-soon.js');
-  assert.match(source,/\.repurchase-screen\{[^}]*padding:0 18px\s*\}/);
-  assert.match(source,/\.repurchase-list\{[^}]*padding:1px 1px max\(calc\(env\(safe-area-inset-bottom\) \+ 28px\),36px\)/);
+  assert.doesNotMatch(source,/\.repurchase-screen|\.repurchase-list/);
+  assert.match(read('app.js'),/return \[\.\.\.due,\.\.\.out\];/);
 });
