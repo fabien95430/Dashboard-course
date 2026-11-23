@@ -154,3 +154,26 @@ test('mot de passe admin changé dans Supabase : appareil déconnecté ; bouton 
   const out=app.match(/function signOutFromLockScreen\(\)\{[\s\S]*?\n\}/)?.[0]||'';
   assert.ok(out.indexOf('confirm(')<out.indexOf('clearLocalConnectionData()'),'confirmation avant d\u2019effacer');
 });
+
+test('v901 : mot de passe du coffre propre, choisi dans Connexion Home Assistant après le retour OAuth',()=>{
+  const app=read('app.js'),html=read('index.html');
+  // Indicateur dans le contenu chiffré : coffre distinct du mot de passe Supabase rangé dedans.
+  assert.match(app,/const vaultCode=!\(familyAdmin\?\.password&&String\(password\)===String\(familyAdmin\.password\)\);/);
+  assert.match(app,/if\(vaultCode\)payload\.vault_code=true;/);
+  assert.match(app,/state\.vaultCode=!!payload\.vault_code;\s*\/\/ Coffre admin vide/);
+  assert.match(app,/state\.vaultCode=!!previous\.vault_code;/);
+  assert.match(app,/vaultSeal=null;vaultCarryKey=null;state\.vaultCode=false;/);
+  // Étape du popup : Home Assistant connecté, coffre encore ouvert par Supabase.
+  assert.match(app,/function needsVaultCode\(\)\{return !state\.family&&!state\.demo&&!state\.locked&&!!state\.refreshToken&&!!vaultRecord\(\)&&!state\.vaultCode\}/);
+  const carry=app.match(/async function completeOAuthWithCarry\(key\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.match(carry,/openVaultCodeStepIfNeeded\(\);\s*return true;/);
+  const save=app.match(/async function saveVaultCode\(\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.ok(save.includes("next===state.familyAdmin.password"),'différent du mot de passe Supabase');
+  assert.ok(save.indexOf('next!==confirm')<save.indexOf('storeSecureVault('),'confirmation avant le rescellement');
+  assert.match(save,/await storeSecureVault\(state\.refreshToken,state\.haUrl,next,state\.familyAdmin\);\s*rememberVaultSeal\(next\);/);
+  assert.match(html,/<input id="connectionVaultPassword" type="password" autocomplete="new-password"/);
+  assert.match(html,/<button id="connectionVaultBtn" class="primary connection-connect-btn connection-vault-step" type="button" hidden>Protéger la connexion<\/button>/);
+  // Mot de passe Supabase changé : coffre propre → pas de déconnexion, accès Supabase oublié.
+  const verify=app.match(/function verifyAdminPasswordLater\(familyAdmin\)\{[\s\S]*?\n\}/)?.[0]||'';
+  assert.ok(verify.indexOf('if(state.vaultCode){state.familyAdmin=null;')<verify.indexOf('await revoke();'));
+});

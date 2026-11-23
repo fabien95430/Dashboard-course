@@ -258,6 +258,9 @@ const UI = Object.freeze({
   changePasswordPanel: document.getElementById('changePasswordPanel'),
   autoLockSelect: document.getElementById('autoLockSelect'),
   connectionHaUrl: document.getElementById('connectionHaUrl'),
+  connectionVaultPassword: document.getElementById('connectionVaultPassword'),
+  connectionVaultConfirm: document.getElementById('connectionVaultConfirm'),
+  connectionVaultBtn: document.getElementById('connectionVaultBtn'),
   connectionEntitySelect: document.getElementById('connectionEntitySelect'),
   preferencesListSort: document.getElementById('preferencesListSort'),
   preferencesStartView: document.getElementById('preferencesStartView'),
@@ -373,6 +376,8 @@ let state={
   accessToken:'',
   accessTokenExpiresAt:0,
   refreshToken:'',
+  // Coffre admin protégé par son propre mot de passe (différent du mot de passe Supabase).
+  vaultCode:false,
   locked:true,
   securityMode:'',
   pendingOAuthCode:'',
@@ -1552,6 +1557,20 @@ async function openVaultWithKey(record,key){
   if(!connected&&!empty)throw new Error('Coffre invalide');
   return payload;
 }
+/* Contenu du coffre : autorisation Home Assistant, accès admin Supabase et indicateur
+   « mot de passe du coffre distinct de Supabase » (vault_code). */
+function vaultPayload(refreshToken,haUrl,familyAdmin,vaultCode){
+  const payload={
+    refresh_token:String(refreshToken||''),
+    // Sans autorisation Home Assistant, le coffre reste vide (pas d'adresse seule).
+    ha_url:refreshToken?normalizeHaUrl(haUrl):'',
+    created_at:Date.now()
+  };
+  // Accès administrateur du service famille (écrans « Familles » et « Bureau ») : rangé dans le coffre.
+  if(familyAdmin?.email&&familyAdmin?.password)payload.family_admin={email:String(familyAdmin.email),password:String(familyAdmin.password)};
+  if(vaultCode)payload.vault_code=true;
+  return payload;
+}
 /* Tant que l'admin est déverrouillé, le coffre peut être rescellé (ajout de l'accès « Familles »)
    sans redemander le mot de passe déjà saisi à l'ouverture. Effacé au verrouillage. */
 let vaultSeal=null,vaultCarryKey=null;
@@ -1564,22 +1583,15 @@ function rememberVaultSeal(password){
 /* Déverrouillé par la clé transportée (retour OAuth) : rescellement avec cette même clé. */
 function rememberVaultSealWithKey(key,salt,iterations){
   vaultSeal=async familyAdmin=>{
-    const payload={refresh_token:String(state.refreshToken||''),ha_url:state.refreshToken?normalizeHaUrl(state.haUrl):'',created_at:Date.now()};
-    if(familyAdmin?.email&&familyAdmin?.password)payload.family_admin={email:String(familyAdmin.email),password:String(familyAdmin.password)};
-    saveJson(STORAGE.vault,await sealVaultWithKey(payload,key,salt,iterations));
+    saveJson(STORAGE.vault,await sealVaultWithKey(vaultPayload(state.refreshToken,state.haUrl,familyAdmin,state.vaultCode),key,salt,iterations));
   };
   vaultCarryKey=async()=>key;
 }
 async function storeSecureVault(refreshToken,haUrl,password,familyAdmin=state.familyAdmin){
-  const payload={
-    refresh_token:String(refreshToken||''),
-    // Sans autorisation Home Assistant, le coffre reste vide (pas d'adresse seule).
-    ha_url:refreshToken?normalizeHaUrl(haUrl):'',
-    created_at:Date.now()
-  };
-  // Accès administrateur du service famille (écran « Familles ») : rangé dans le coffre.
-  if(familyAdmin?.email&&familyAdmin?.password)payload.family_admin={email:String(familyAdmin.email),password:String(familyAdmin.password)};
-  const secure=await encryptVault(payload,password);
+  // Mot de passe du coffre distinct du mot de passe Supabase rangé dedans : le coffre ne dépend plus de Supabase.
+  const vaultCode=!(familyAdmin?.password&&String(password)===String(familyAdmin.password));
+  const secure=await encryptVault(vaultPayload(refreshToken,haUrl,familyAdmin,vaultCode),password);
+  state.vaultCode=vaultCode;
   saveJson(STORAGE.vault,secure);
   // Remove every previous plaintext credential after a successful encrypted write.
   deleteKey(STORAGE.auth);
@@ -1605,7 +1617,7 @@ function wipeMemoryCredentials(){
   state.accessToken='';
   state.accessTokenExpiresAt=0;
   state.refreshToken='';
-  vaultSeal=null;vaultCarryKey=null;
+  vaultSeal=null;vaultCarryKey=null;state.vaultCode=false;
   if(!state.demo||state.adminVault)state.familyAdmin=null;
   void window.COURSES_FAMILY?.adminSignOut?.();
 }
@@ -1857,6 +1869,7 @@ async function completeSecurityAction(){
       if(await unlockVersionCheckPromise)return;
       const payload=await decryptVault(vaultRecord(),password);
       clearUnlockGuard();
+      state.vaultCode=!!payload.vault_code;
       // Coffre admin vide (Home Assistant pas encore connecté) : liste locale, coffre ouvert.
       verifyAdminPasswordLater(payload.family_admin);
       if(!payload.refresh_token){enterAdminVaultMode(password,payload.family_admin);return}
@@ -1912,6 +1925,7 @@ async function completeSecurityAction(){
       clearOAuthState();state.pendingOAuthCode='';state.pendingOAuthState='';
       hideSecurity();
       await connectAuthorized(state.accessToken);
+      openVaultCodeStepIfNeeded();
       return;
     }
   }catch(err){
@@ -2168,9 +2182,8 @@ async function completeOAuthWithCarry(key){
   const data=await exchangeCodeRaw(state.pendingOAuthCode,state.pendingOAuthState);
   if(!data?.refresh_token||!data?.access_token)throw new Error('Réponse OAuth incomplète');
   const familyAdmin=previous.family_admin||null;
-  const payload={refresh_token:String(data.refresh_token),ha_url:normalizeHaUrl(state.haUrl),created_at:Date.now()};
-  if(familyAdmin?.email&&familyAdmin?.password)payload.family_admin={email:String(familyAdmin.email),password:String(familyAdmin.password)};
-  saveJson(STORAGE.vault,await sealVaultWithKey(payload,key,salt,iterations));
+  state.vaultCode=!!previous.vault_code;
+  saveJson(STORAGE.vault,await sealVaultWithKey(vaultPayload(data.refresh_token,state.haUrl,familyAdmin,state.vaultCode),key,salt,iterations));
   deleteKey(STORAGE.auth);deleteKey(STORAGE.haUrl);
   state.familyAdmin=familyAdmin;state.demo=false;state.adminVault=false;
   rememberVaultSealWithKey(key,salt,iterations);
@@ -2183,6 +2196,7 @@ async function completeOAuthWithCarry(key){
   // Autorisation rangée : un Home Assistant momentanément injoignable se reconnecte comme d'habitude.
   try{await connectAuthorized(state.accessToken)}
   catch(error){status('is-waiting','Reconnexion…',error?.message||'Home Assistant momentanément indisponible');armIdleLock();scheduleReconnect()}
+  openVaultCodeStepIfNeeded();
   return true;
 }
 async function beginOAuth(){
@@ -2218,7 +2232,8 @@ function signOutFromLockScreen(){
   showLogin('Appareil déconnecté.');
 }
 /* À chaque déverrouillage, en ligne : le mot de passe admin rangé dans le coffre est revérifié
-   auprès de Supabase, en arrière-plan. Refusé (changé dans Supabase) → appareil déconnecté.
+   auprès de Supabase, en arrière-plan. Refusé (changé dans Supabase) → appareil déconnecté si le coffre
+   s'ouvre encore avec ce mot de passe ; sinon (mot de passe du coffre propre) seul l'accès Supabase est oublié.
    Service injoignable, hors ligne ou trop d'essais → rien ne change (le coffre reste local). */
 function verifyAdminPasswordLater(familyAdmin){
   if(!familyAdmin?.email||!familyAdmin?.password||navigator.onLine===false)return;
@@ -2228,6 +2243,9 @@ function verifyAdminPasswordLater(familyAdmin){
   service.adminVerify(familyAdmin.password,familyAdmin.email).catch(async error=>{
     // Seul un refus net du mot de passe déconnecte, et seulement si le même coffre est toujours là.
     if(error?.code!=='wrong'||state.family||localStorage.getItem(STORAGE.vault)!==vault)return;
+    // Coffre à mot de passe propre : l'appareil reste connecté, seul l'accès Supabase rangé est oublié
+    // (Familles et Bureau le redemanderont).
+    if(state.vaultCode){state.familyAdmin=null;try{await vaultSeal?.(null)}catch(_){}return}
     await revoke();
     UI.securityError.textContent='Ton mot de passe a changé : reconnecte-toi avec le nouveau.';
   });
@@ -2856,12 +2874,48 @@ function clearPasswordChangeForm(){
   UI.changePasswordPanel.hidden=true;
   $('#changePasswordBtn').hidden=false;
 }
+/* Étape « mot de passe du coffre » du popup Connexion Home Assistant : Home Assistant connecté
+   mais coffre encore ouvert par le mot de passe Supabase. Le nouveau mot de passe remplace
+   celui de Supabase à l'ouverture de l'appli ; il ne quitte jamais l'appareil. */
+const CONNECTION_INTRO='Synchronisation sécurisée de vos courses.';
+const CONNECTION_OAUTH_HINT='Connexion OAuth sécurisée. L’autorisation reste chiffrée sur cet appareil.';
+function needsVaultCode(){return !state.family&&!state.demo&&!state.locked&&!!state.refreshToken&&!!vaultRecord()&&!state.vaultCode}
+function setConnectionVaultStep(on){
+  const dialog=UI.connectionDialog;
+  dialog.querySelector('.dialog-intro').textContent=on?'Home Assistant autorisé. Dernière étape.':CONNECTION_INTRO;
+  for(const node of dialog.querySelectorAll('.connection-vault-step'))node.hidden=!on;
+  for(const node of dialog.querySelectorAll('.connection-main-step'))node.hidden=on;
+  UI.connectionVaultPassword.value='';UI.connectionVaultConfirm.value='';
+}
+function openVaultCodeStepIfNeeded(){if(needsVaultCode())openConnectionSettings()}
+async function saveVaultCode(){
+  const next=UI.connectionVaultPassword.value,confirm=UI.connectionVaultConfirm.value;
+  const feedback=UI.connectionDialogFeedback,button=UI.connectionVaultBtn;
+  if(!needsVaultCode()){openConnectionSettings();return}
+  if(next.length<SECURITY.minPasswordLength){setDialogFeedback(feedback,'Choisis au moins '+SECURITY.minPasswordLength+' caractères.','error');return}
+  if(next!==confirm){setDialogFeedback(feedback,'Les deux mots de passe ne correspondent pas.','error');return}
+  if(state.familyAdmin?.password&&next===state.familyAdmin.password){setDialogFeedback(feedback,'Choisis un mot de passe différent de celui de Supabase.','error');return}
+  button.disabled=true;
+  try{
+    await storeSecureVault(state.refreshToken,state.haUrl,next,state.familyAdmin);
+    rememberVaultSeal(next);
+    clearUnlockGuard();
+    armIdleLock();
+    openConnectionSettings();
+    setDialogFeedback(UI.connectionDialogFeedback,'Connexion protégée');
+  }catch(_){
+    setDialogFeedback(feedback,'Enregistrement impossible, réessaie.','error');
+  }finally{button.disabled=false}
+}
 function openConnectionSettings(){
   const notConnected=state.demo;
   const urlInput=UI.connectionHaUrl;
   if(urlInput)urlInput.value=state.haUrl||'';
+  setConnectionVaultStep(needsVaultCode());
   UI.connectionConnectBtn.hidden=!notConnected;
   UI.connectionOAuthHint.hidden=!notConnected;
+  // Coffre encore ouvert par le mot de passe Supabase : le mot de passe du coffre suivra la connexion.
+  UI.connectionOAuthHint.textContent=state.vaultCode?CONNECTION_OAUTH_HINT:'Tu choisiras ensuite le mot de passe du coffre.';
   const choices=state.entities.length?state.entities:(state.entity?[{id:state.entity,name:state.entity}]:[]);
   const select=UI.connectionEntitySelect;
   if(select){
@@ -2873,7 +2927,8 @@ function openConnectionSettings(){
   const dialog=UI.connectionDialog;
   select?.blur();
   urlInput?.blur();
-  showNeutralDialog(dialog);
+  // Déjà ouvert (étape du coffre validée) : contenu mis à jour sans rouvrir.
+  if(!dialog.open)showNeutralDialog(dialog);
 }
 async function saveConnectionSettings(){
   if(state.demo)return;
@@ -3708,6 +3763,8 @@ async function refreshFromHeader(button,checkUpdate=false){
 
 function bindUiEvents(){
   UI.connectionConnectBtn.onclick=beginOAuth;
+  UI.connectionVaultBtn.onclick=saveVaultCode;
+  UI.connectionVaultConfirm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();void saveVaultCode()}};
   UI.familyDeviceSave.onclick=saveFamilyDeviceName;
   // Mauvais identifiant ou téléphone prêté : retour à la page de connexion sans nommer l'appareil.
   UI.familyDeviceSignOut.onclick=()=>{void revoke()};

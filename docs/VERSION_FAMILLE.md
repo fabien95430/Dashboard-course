@@ -5,7 +5,9 @@ Les foyers de la famille utilisent la même application (GitHub Pages) avec leur
 ## Connexion
 
 - Écran d’accueil unique « Accès privé » : **Identifiant** puis **Mot de passe**. L’identifiant est mémorisé sur l’appareil.
-- `admin` → version administrateur (coffre local, Home Assistant). Home Assistant se connecte depuis Réglages › Connexion Home Assistant.
+- `admin` → version administrateur (coffre local, Home Assistant). Première connexion sur un appareil : mot de passe du compte administrateur Supabase, vérifié une fois en ligne ; il ouvre le coffre tant que Home Assistant n'est pas connecté.
+- Home Assistant se connecte depuis Réglages › Connexion Home Assistant. Au retour, le même popup demande le **mot de passe du coffre** (saisi deux fois, différent de celui de Supabase) : il remplace le mot de passe Supabase à l'ouverture de l'appli et ne quitte jamais l'appareil. Le mot de passe Supabase reste rangé dans le coffre pour Familles et Bureau. Un coffre déjà connecté à Home Assistant mais encore ouvert par le mot de passe Supabase affiche cette étape à l'ouverture du popup.
+- Mot de passe Supabase changé : coffre encore ouvert par lui → appareil déconnecté ; coffre à mot de passe propre → l'appareil reste connecté, seul l'accès Supabase rangé est oublié (Familles le redemande).
 - Tout autre identifiant → compte famille Supabase (`<identifiant>@famille.invalid`). Une fois connecté, plus de mot de passe ni de verrouillage.
 - Au premier lancement, chaque téléphone famille reçoit un nom (« Cet appareil »).
 

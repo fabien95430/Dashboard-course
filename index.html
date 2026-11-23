@@ -71,7 +71,7 @@
         <div>
           <div class="page-title-row">
             <h1>Ma liste</h1>
-            <span class="page-version">v900</span>
+            <span class="page-version">v901</span>
           </div>
           <p>Votre liste de courses</p>
         </div>
@@ -94,7 +94,7 @@
         <div>
           <div class="page-title-row">
             <h1>Catalogue</h1>
-            <span class="page-version">v900</span>
+            <span class="page-version">v901</span>
           </div>
           <p>Ajouter vos produits</p>
         </div>
@@ -130,7 +130,7 @@
         <div>
           <div class="page-title-row">
             <h1>Réglages</h1>
-            <span class="page-version">v900</span>
+            <span class="page-version">v901</span>
           </div>
           <p id="settingsHeaderStatus" aria-live="polite">Personnalisez votre expérience</p>
         </div>
@@ -327,26 +327,36 @@
   <dialog id="connectionDialog" class="dialog connection-dialog settings-sheet" tabindex="-1" autofocus>
     <h3><span class="settings-sheet-icon" aria-hidden="true"><svg><use href="#i-home"></use></svg></span><span class="settings-sheet-title">Connexion Home Assistant</span></h3>
     <p class="dialog-intro">Synchronisation sécurisée de vos courses.</p>
-    <label class="field">
+    <label class="field connection-main-step">
       <span>Adresse Home Assistant</span>
       <input id="connectionHaUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://xxxxxxxx.ui.nabu.casa">
     </label>
     <p id="connectionOAuthHint" class="connection-oauth-hint" hidden>Connexion OAuth sécurisée. L’autorisation reste chiffrée sur cet appareil.</p>
     <button id="connectionConnectBtn" class="primary connection-connect-btn" type="button" hidden>Connecter Home Assistant</button>
-    <label class="field connection-list-field">
+    <label class="field connection-list-field connection-main-step">
       <span>Liste Home Assistant</span>
       <select id="connectionEntitySelect">
         <option value="" selected>Choisir une liste</option>
       </select>
       <span id="connectionListSyncStatus" class="connection-list-status" role="status">Connexion…</span>
     </label>
-    <h4 class="sheet-section-title">Synchronisation</h4>
-    <div class="connection-sync-section" aria-label="État des synchronisations">
+    <h4 class="sheet-section-title connection-main-step">Synchronisation</h4>
+    <div class="connection-sync-section connection-main-step" aria-label="État des synchronisations">
       <div class="connection-sync-line">
         <span>Produits &amp; plats manquants</span>
         <span id="missingSyncStatus" role="status" aria-live="polite">Vérification…</span>
       </div>
     </div>
+    <label class="field connection-vault-step" hidden>
+      <span>Mot de passe du coffre</span>
+      <input id="connectionVaultPassword" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false" enterkeyhint="next">
+    </label>
+    <label class="field connection-vault-step" hidden>
+      <span>Confirmer le mot de passe</span>
+      <input id="connectionVaultConfirm" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false" enterkeyhint="done">
+    </label>
+    <p class="connection-oauth-hint connection-vault-step" hidden>Il ouvre l’appli et ne quitte jamais ce téléphone.</p>
+    <button id="connectionVaultBtn" class="primary connection-connect-btn connection-vault-step" type="button" hidden>Protéger la connexion</button>
     <p id="connectionDialogFeedback" class="dialog-feedback" role="status" aria-live="polite"></p>
   </dialog>
 
@@ -505,7 +515,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status"></div>
-  <script src="./catalog.js?v=900"></script>
+  <script src="./catalog.js?v=901"></script>
   <script src="./product-item-images.js?v=890" data-product-item-images="1"></script>
   <script src="./preferences-service.js?v=398"></script>
   <script src="./missing-requests-store.js?v=824"></script>
@@ -513,7 +523,7 @@
   <script src="./bottom-nav-liquid.js?v=573"></script>
   <script src="./app-ui.js?v=848" data-app-ui="script"></script>
   <script src="./family-service.js?v=896"></script>
-  <script src="./app.js?v=896"></script>
+  <script src="./app.js?v=901"></script>
   <script src="./settings-tab-badge.js?v=830"></script>
   <script src="./settings-ui.js?v=892"></script>
   <script src="./error-center.js?v=891"></script>
