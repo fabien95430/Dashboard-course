@@ -73,3 +73,14 @@ test('les visuels déjà en cache sont revalidés sans être re-téléchargés �
   assert.match(sw,/headers\.set\('If-Modified-Since',modified\)/);
   assert.match(sw,/if\(response\.status===304&&hit\)return cache\.put\(request,markVisualRefreshed\(hit\.clone\(\)\)\);/);
 });
+
+test('v905 : chaque photo de plat a sa vignette de carte et sa photo de fiche (scripts/make_dish_cards.py)',async()=>{
+  const {readdirSync}=await import('node:fs');
+  const list=(dir,ext)=>readdirSync(new URL('../www/Plats/'+dir,import.meta.url)).filter(f=>f.endsWith(ext)).map(f=>f.slice(0,-ext.length));
+  const cards=new Set(list('cartes/','.webp')),sheets=new Set(list('fiches/','.webp'));
+  for(const photo of list('','.png')){
+    // Sans ces copies, l'app retombe sur le PNG et signale « Visuel de catalogue indisponible ».
+    assert.ok(cards.has(photo),'vignette de carte manquante : '+photo);
+    assert.ok(sheets.has(photo),'photo de fiche manquante : '+photo);
+  }
+});

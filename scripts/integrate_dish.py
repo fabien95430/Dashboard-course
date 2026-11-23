@@ -391,6 +391,12 @@ def integrate_files(name: str, metadata: dict, child: bool, image: bytes) -> tup
     local_images_path.write_text(local_text, encoding="utf-8")
     sw_path.write_text(sw_text, encoding="utf-8")
     index_path.write_text(index_text, encoding="utf-8")
+    # Vignette de carte et photo de fiche (WebP) : sans elles, l'app retombe sur la photo d'origine
+    # et signale « Visuel de catalogue indisponible ». Puis empreintes des visuels du service worker.
+    import make_dish_cards
+    import update_visual_hashes
+    make_dish_cards.make_copies(image_path)
+    update_visual_hashes.refresh()
     return new_version, filename
 
 

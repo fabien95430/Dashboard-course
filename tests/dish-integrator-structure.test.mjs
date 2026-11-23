@@ -91,3 +91,13 @@ for tags,child,filename in [
   const result=spawnSync('python3',['-c',python],{cwd:new URL('../',import.meta.url),encoding:'utf8'});
   assert.equal(result.status,0,result.stderr||result.stdout);
 });
+
+test('v905 : l intégration automatique d un plat crée sa vignette de carte et sa photo de fiche',()=>{
+  const integrate=readFileSync(new URL('../scripts/integrate_dish.py',import.meta.url),'utf8');
+  const cards=readFileSync(new URL('../scripts/make_dish_cards.py',import.meta.url),'utf8');
+  const workflow=readFileSync(new URL('../.github/workflows/integrate-dish-openai.yml',import.meta.url),'utf8');
+  assert.match(cards,/def make_copies\(photo: Path, force: bool = False\) -> list\[Path\]:/);
+  assert.match(integrate,/make_dish_cards\.make_copies\(image_path\)\s*update_visual_hashes\.refresh\(\)/);
+  assert.match(workflow,/"www\/Plats\/cartes\/\$stem\.webp" "www\/Plats\/fiches\/\$stem\.webp"/);
+  assert.match(workflow,/pip install --quiet --disable-pip-version-check "Pillow>=10,<12"\s*python3 scripts\/run_openai_integration\.py dish/);
+});

@@ -26,19 +26,28 @@ TARGETS = (
 )
 
 
+def make_copies(photo: Path, force: bool = False) -> list[Path]:
+    """Crée la vignette de carte et la photo de fiche d'une photo de plat. Renvoie les copies créées.
+    Utilisée aussi par scripts/integrate_dish.py à l'ajout automatique d'un plat."""
+    created: list[Path] = []
+    for target, width, quality in TARGETS:
+        target.mkdir(exist_ok=True)
+        copy = target / (photo.stem + ".webp")
+        if copy.exists() and not force:
+            continue
+        with Image.open(photo) as image:
+            image = image.convert("RGB")
+            height = round(image.height * width / image.width)
+            image.resize((width, height), Image.LANCZOS).save(copy, "WEBP", quality=quality, method=6)
+        created.append(copy)
+    return created
+
+
 def main() -> int:
     force = "--force" in sys.argv[1:]
     created = 0
-    for target, width, quality in TARGETS:
-        target.mkdir(exist_ok=True)
-        for photo in sorted(SOURCE.glob("*.png")):
-            copy = target / (photo.stem + ".webp")
-            if copy.exists() and not force:
-                continue
-            with Image.open(photo) as image:
-                image = image.convert("RGB")
-                height = round(image.height * width / image.width)
-                image.resize((width, height), Image.LANCZOS).save(copy, "WEBP", quality=quality, method=6)
+    for photo in sorted(SOURCE.glob("*.png")):
+        for copy in make_copies(photo, force):
             created += 1
             print(f"copie créée : {copy.relative_to(ROOT)}")
     print(f"{created} copie(s) WebP créée(s)")
