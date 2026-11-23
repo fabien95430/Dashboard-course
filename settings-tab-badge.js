@@ -59,14 +59,18 @@ async function syncAppIconBadge(count){
   }catch(_){}
 }
 
-// Demandes des familles (écran admin « Familles », family-admin.js) : comptées dans la pastille.
-let familyRequests=0;
-window.addEventListener('courses:family-requests-changed',event=>{
-  familyRequests=document.documentElement.dataset.account==='family'?0:Math.max(0,Number(event.detail?.count)||0);
-  syncBadge();
-});
+/* Pastille de l'onglet Réglages = somme des pastilles visibles dans Réglages : Catalogue des produits
+   (demandes), et pour l'administrateur Familles, Bureau (à valider) et Messages d'erreur. Chaque
+   module propriétaire publie son nombre. */
+const adminCounts={family:0,bureau:0,errors:0};
+const isFamilyAccount=()=>document.documentElement.dataset.account==='family';
+for(const [event,key] of [['courses:family-requests-changed','family'],['courses:bureau-count-changed','bureau'],['courses:error-count-changed','errors']]){
+  window.addEventListener(event,detail=>{adminCounts[key]=Math.max(0,Number(detail.detail?.count)||0);syncBadge()});
+}
+document.addEventListener('courses:account-changed',()=>syncBadge());
 function syncBadge(){
-  const count=Math.max(0,Number(REQUESTS.counts?.().total)||0)+familyRequests;
+  const admin=isFamilyAccount()?0:adminCounts.family+adminCounts.bureau+adminCounts.errors;
+  const count=Math.max(0,Number(REQUESTS.counts?.().total)||0)+admin;
   badge.textContent=count>99?'99+':String(count);
   badge.style.display=count>0?'block':'none';
   if(count>0)requestAnimationFrame(positionBadge);

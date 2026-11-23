@@ -345,11 +345,16 @@ function ensureRow(){
   else if(row.parentElement!==card)card.prepend(row);
   return row;
 }
-/* Pastille rouge : dossiers à valider. */
+/* Pastille rouge : dossiers à valider, comptés aussi dans la pastille de l'onglet Réglages. */
+let publishedCount=-1;
 function renderSummary(){
   const count=access()?.credentials()?dossiers.valider.length:0;
   const badge=document.getElementById('settingsBureauCount');
   if(badge){badge.textContent=count>99?'99+':String(count);badge.hidden=count<1}
+  if(count!==publishedCount){
+    publishedCount=count;
+    window.dispatchEvent(new CustomEvent('courses:bureau-count-changed',{detail:{count}}));
+  }
   const summary=document.getElementById('settingsBureauSummary');
   if(!summary)return;
   if(!access()?.credentials()||!loaded)summary.textContent='Agents IA';

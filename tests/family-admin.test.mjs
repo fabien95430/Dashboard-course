@@ -111,7 +111,9 @@ test('demandes des familles : pastille sur la ligne Familles et sur l’onglet R
   assert.match(source,/adminWatchRequests\?\.\(credentials,scheduleRefresh\)/);
   const badge=read('settings-tab-badge.js');
   assert.match(badge,/courses:family-requests-changed/);
-  assert.match(badge,/counts\?\.\(\)\.total\)\|\|0\)\+familyRequests/);
+  // v904 : la pastille de l'onglet additionne aussi Bureau et Messages d'erreur (comptes admin).
+  assert.match(badge,/counts\?\.\(\)\.total\)\|\|0\)\+admin/);
+  assert.match(badge,/const admin=isFamilyAccount\(\)\?0:adminCounts\.family\+adminCounts\.bureau\+adminCounts\.errors;/);
   assert.match(read('family-service.js'),/table:'catalogue_perso'/);
 });
 

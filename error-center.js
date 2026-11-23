@@ -324,7 +324,7 @@ function installStyle(){
   style.id='courses-error-center-style';
   style.textContent=`
     #preferencesErrorMessages .settings-icon{position:relative;overflow:visible}
-    .courses-error-badge{position:absolute;top:-7px;right:-8px;min-width:19px;height:19px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#ff3b30;color:#fff;font-size:9.5px;line-height:15px;font-weight:850;display:none;place-items:center;box-sizing:border-box;box-shadow:0 2px 7px rgba(207,33,26,.22)}
+    .courses-error-badge{position:absolute;top:-6px;right:-7px;min-width:20px;height:20px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:var(--danger);color:#fff;font-size:10px;line-height:1;font-weight:800;display:none;align-content:center;text-align:center;text-box:trim-both cap alphabetic;font-variant-numeric:tabular-nums;box-sizing:border-box;box-shadow:0 2px 7px rgba(223,64,64,.22)}
     .courses-error-center{display:grid;gap:0;padding-bottom:4px}
     .courses-error-list{border:1px solid var(--tile-line,rgba(33,55,40,.035));border-radius:18px;background:var(--tile-bg,#fffefb);box-shadow:var(--tile-shadow,none);overflow:hidden}
     .courses-error-item+.courses-error-item{border-top:1px solid rgba(39,66,47,.09)}
@@ -355,6 +355,7 @@ function formatDate(value){
   try{return new Intl.DateTimeFormat('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(date)}catch(_){return ''}
 }
 function escapeHtml(value){return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+let publishedErrorCount=-1;
 function updateBadge(entries=readEntries()){
   const button=document.getElementById('preferencesErrorMessages');
   if(!button)return;
@@ -362,7 +363,12 @@ function updateBadge(entries=readEntries()){
   const icon=button.querySelector('.settings-icon');
   let badge=button.querySelector('.courses-error-badge');
   if(!badge&&icon){badge=document.createElement('span');badge.className='courses-error-badge';badge.setAttribute('aria-hidden','true');icon.appendChild(badge)}
-  if(badge){badge.textContent=active>99?'99+':String(active);badge.style.display=active?'grid':'none'}
+  if(badge){badge.textContent=active>99?'99+':String(active);badge.style.display=active?'block':'none'}
+  // Même nombre compté dans la pastille de l'onglet Réglages (settings-tab-badge.js).
+  if(active!==publishedErrorCount){
+    publishedErrorCount=active;
+    window.dispatchEvent(new CustomEvent('courses:error-count-changed',{detail:{count:active}}));
+  }
   const small=button.querySelector('.settings-copy small');
   if(small)small.textContent=active?(active+' erreur'+(active>1?'s':'')+' à traiter'):'Aucune erreur active';
 }

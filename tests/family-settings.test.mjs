@@ -80,3 +80,14 @@ test('v902 : pastilles des demandes cohérentes (même rouge, mêmes nombres sur
   assert.match(tab,/badge\.style\.setProperty\('text-box','trim-both cap alphabetic'\);/);
   assert.match(css,/\.cat \.cat-count\{[^}]*text-box:trim-both cap alphabetic/);
 });
+
+test('v904 : pastille de l’onglet Réglages = somme des pastilles de Réglages ; même rouge pour Messages d’erreur',()=>{
+  const tab=read('settings-tab-badge.js'),errors=read('error-center.js'),bureau=read('bureau-ui.js');
+  for(const event of ['courses:family-requests-changed','courses:bureau-count-changed','courses:error-count-changed'])assert.ok(tab.includes("'"+event+"'"),event);
+  assert.match(errors,/new CustomEvent\('courses:error-count-changed',\{detail:\{count:active\}\}\)/);
+  assert.match(bureau,/new CustomEvent\('courses:bureau-count-changed',\{detail:\{count\}\}\)/);
+  const badge=errors.match(/\.courses-error-badge\{[^}]*\}/)?.[0]||'';
+  assert.match(badge,/background:var\(--danger\)/);
+  assert.match(badge,/text-box:trim-both cap alphabetic/);
+  assert.doesNotMatch(badge,/#ff3b30/);
+});
