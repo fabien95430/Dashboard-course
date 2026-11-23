@@ -268,3 +268,9 @@ test('bureau v898 : plein écran, sortie par le bouton retour de l’en-tête',(
   // Scène agrandie : la pièce s'arrête à 14 px des bords de l'écran.
   assert.match(css,/\.bureau-scene-art\{--bureau-art-w:min\(calc\(\(100vw - 28px\) \/ \.92\),560px\);position:relative;width:var\(--bureau-art-w\);margin-left:calc\(\(100% - var\(--bureau-art-w\)\) \/ 2\)/);
 });
+
+test('bureau v899 : en-tête calé sur celui de Réglages, air autour de la scène',()=>{
+  const css=read('styles.css');
+  assert.match(css,/\.settings-sheet#bureauDialog\{[^}]*padding-top:calc\(max\(14px,env\(safe-area-inset-top\)\) \+ 28px\)!important;/);
+  assert.match(css,/\.settings-sheet#bureauDialog \.bureau-scene\{margin:16px 0 28px;background:transparent\}/);
+});

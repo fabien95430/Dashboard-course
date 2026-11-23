@@ -3257,9 +3257,9 @@ html[data-account="family"] #settingsFamiliesBtn{display:none!important}
 /* v858 — Réglages › Administrateur › Bureau (bureau-ui.js), étape 1 : écran sans agents */
 .settings-view .settings-icon-bureau{position:relative!important;overflow:visible!important}
 html[data-account="family"] #settingsBureauBtn{display:none!important}
-.settings-sheet#bureauDialog .bureau-scene{margin:0 0 12px;background:transparent}
-/* Bureau en plein écran (sans poignée ni coins arrondis), sous la safe area du haut ; sortie par le bouton retour de l'en-tête. */
-.settings-sheet#bureauDialog{top:0!important;height:100dvh!important;max-height:none!important;padding-top:calc(max(14px,env(safe-area-inset-top)) + 12px)!important;border-top:0!important;border-radius:0!important}
+.settings-sheet#bureauDialog .bureau-scene{margin:16px 0 28px;background:transparent}
+/* Bureau en plein écran (sans poignée ni coins arrondis) ; en-tête calé sur celui de l'écran Réglages (sous la zone floutée) ; sortie par le bouton retour de l'en-tête. */
+.settings-sheet#bureauDialog{top:0!important;height:100dvh!important;max-height:none!important;padding-top:calc(max(14px,env(safe-area-inset-top)) + 28px)!important;border-top:0!important;border-radius:0!important}
 .settings-sheet#bureauDialog::before{display:none}
 /* Vue Bureau : en-tête, scène et onglets fixes ; seule la liste des dossiers défile. */
 .settings-sheet#bureauDialog[open][data-view="bureau"]{display:flex!important;flex-direction:column!important;overflow:hidden!important}
