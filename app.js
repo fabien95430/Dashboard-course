@@ -1038,7 +1038,8 @@ function listStructureSignature(rows,showCategorySections){
       group.summary,
       product?.category||'Autres',
       product?.sub||product?.category||'Article',
-      product?sprite(product,true):'<span class="unknown">•</span>'
+      product?sprite(product,true):'<span class="unknown">•</span>',
+      group.count>1?'quantite':''
     ].join('\u0000');
   }).join('\u0001');
 }
@@ -1048,21 +1049,9 @@ function patchListRowState(row,group){
   if(row.classList.contains('is-busy')!==busy){row.classList.toggle('is-busy',busy);changed=true}
   const check=row.querySelector('.purchase-check');
   if(check&&check.disabled!==busy){check.disabled=busy;changed=true}
-  const desiredQuantity=group.count>1?'x'+group.count:'';
-  let quantity=row.querySelector('.list-qty');
-  if(desiredQuantity){
-    if(!quantity){
-      quantity=document.createElement('span');
-      quantity.className='list-qty';
-      const undo=row.querySelector('.undo-purchase');
-      if(undo)undo.before(quantity);else row.appendChild(quantity);
-      changed=true;
-    }
-    if(quantity.textContent!==desiredQuantity){quantity.textContent=desiredQuantity;changed=true}
-  }else if(quantity){
-    quantity.remove();
-    changed=true;
-  }
+  // Le sélecteur n'existe que pour une quantité > 1 ; son apparition change la structure (rendu complet).
+  const quantity=row.querySelector('.list-qty'),desiredQuantity=String(group.count);
+  if(quantity&&quantity.textContent!==desiredQuantity){quantity.textContent=desiredQuantity;changed=true}
   return changed;
 }
 function patchRenderedListRows(root,rows,structureSignature){
@@ -1165,12 +1154,15 @@ function renderList(){
     const category=product?.category||'Autres';
     const categoryLabel=product?.sub||product?.category||'Article';
     const itemDetail=showCategorySections?'':'<small>'+esc(categoryLabel)+'</small>';
-    const quantity=group.count>1?'<span class="list-qty">x'+group.count+'</span>':'';
+    const label=esc(group.summary);
+    const quantity=group.count>1
+      ?'<span class="list-qty-stepper"><button class="list-qty-step" type="button" data-name="'+label+'" data-step="-1" aria-label="Retirer un '+label+'">−</button><span class="list-qty" aria-live="polite">'+group.count+'</span><button class="list-qty-step" type="button" data-name="'+label+'" data-step="1" aria-label="Ajouter un '+label+'">+</button></span>'
+      :'';
     const categoryHeading=showCategorySections&&category!==previousCategory
       ?'<div class="list-category-heading" role="heading" aria-level="2">'+esc(category)+'</div>'
       :'';
     previousCategory=category;
-    return categoryHeading+'<div class="list-row '+(busy?'is-busy':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
+    return categoryHeading+'<div class="list-row'+(busy?' is-busy':'')+(group.count>1?' has-qty':'')+'" data-key="'+esc(key)+'" data-name="'+esc(group.summary)+'">'+
       '<button class="purchase-check" type="button" data-name="'+esc(group.summary)+'" aria-label="Marquer '+esc(group.summary)+' comme acheté" '+(busy?'disabled':'')+'><svg><use href="#i-check"></use></svg></button>'+
       '<span class="list-icon">'+(product?sprite(product,true):'<span class="unknown">•</span>')+'</span>'+
       '<span class="list-copy"><strong class="list-name">'+esc(catalogProductFor(group.summary)?.name||group.summary)+'</strong>'+itemDetail+'</span>'+
@@ -1187,6 +1179,16 @@ function renderList(){
     const row=button.closest('.list-row');
     closeListRowMenu();
     removeGroup(button.dataset.name||'',row,'purchase');
+  });
+  el.querySelectorAll('.list-qty-step').forEach(button=>button.onclick=event=>{
+    event.stopPropagation();
+    const row=button.closest('.list-row'),name=button.dataset.name||'',step=Number(button.dataset.step)||0;
+    if(!row||state.productBusy.has(norm(name)))return;
+    closeListRowMenu();
+    // Retour immédiat du chiffre ; la liste se recale au rafraîchissement Home Assistant.
+    const value=row.querySelector('.list-qty'),target=Math.max(1,(Number(value?.textContent)||1)+step);
+    if(value)value.textContent=String(target);
+    queueCatalogQuantityChange(name,step);
   });
   el.querySelectorAll('.undo-purchase').forEach(button=>button.onclick=event=>{
     event.stopPropagation();

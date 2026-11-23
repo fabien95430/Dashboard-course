@@ -12,13 +12,14 @@ function extractBetween(startMarker,endMarker){
 }
 
 test('Ma liste réutilise les lignes lorsque seule la quantité ou l état occupé change',()=>{
+  // v906 : la quantité est le chiffre du sélecteur − n + ; son apparition ou sa disparition
+  // (passage par 1) change la signature de structure et passe par le rendu complet.
   const source=extractBetween('function patchListRowState(row,group){','function patchRenderedListRows(root,rows,structureSignature){');
-  const makePatch=new Function('norm','state','document',`${source}; return patchListRowState;`);
+  const makePatch=new Function('norm','state',`${source}; return patchListRowState;`);
   const busy=new Set(['lait']);
-  let quantity=null;
+  const quantity={textContent:'2'};
   const check={disabled:false};
   const classes=new Set();
-  const undo={before(node){quantity=node}};
   const row={
     classList:{
       contains:name=>classes.has(name),
@@ -27,32 +28,29 @@ test('Ma liste réutilise les lignes lorsque seule la quantité ou l état occup
     querySelector(selector){
       if(selector==='.purchase-check')return check;
       if(selector==='.list-qty')return quantity;
-      if(selector==='.undo-purchase')return undo;
       return null;
-    },
-    appendChild(node){quantity=node}
+    }
   };
-  const document={createElement(){
-    const node={className:'',textContent:'',remove(){if(quantity===node)quantity=null}};
-    return node;
-  }};
-  const patch=makePatch(value=>String(value).toLowerCase(),{productBusy:busy},document);
+  const patch=makePatch(value=>String(value).toLowerCase(),{productBusy:busy});
 
-  assert.equal(patch(row,{summary:'Lait',count:2}),true);
-  const quantityNode=quantity;
-  assert.equal(quantityNode.textContent,'x2');
+  assert.equal(patch(row,{summary:'Lait',count:2}),true,'seul l état occupé a changé');
+  assert.equal(quantity.textContent,'2');
   assert.equal(check.disabled,true);
   assert.equal(classes.has('is-busy'),true);
 
   busy.clear();
   assert.equal(patch(row,{summary:'Lait',count:3}),true);
-  assert.equal(quantity,quantityNode,'le badge de quantité existant doit être réutilisé');
-  assert.equal(quantity.textContent,'x3');
+  assert.equal(quantity.textContent,'3','le chiffre du sélecteur existant doit être réutilisé');
   assert.equal(check.disabled,false);
-  assert.equal(classes.has('is-busy'),false);
+  assert.equal(patch(row,{summary:'Lait',count:3}),false,'aucun changement, aucune écriture');
+});
 
-  assert.equal(patch(row,{summary:'Lait',count:1}),true);
-  assert.equal(quantity,null,'le badge doit disparaître quand la quantité revient à 1');
+test('la présence du sélecteur de quantité fait partie de la structure de Ma liste',()=>{
+  const signature=extractBetween('function listStructureSignature(','function patchListRowState(row,group){');
+  assert.match(signature,/group\.count>1\?'quantite':''/);
+  const render=extractBetween('function renderList(){','function updateListReorderAvailability(root){');
+  assert.match(render,/list-qty-stepper/);
+  assert.match(render,/queueCatalogQuantityChange\(name,step\)/);
 });
 
 test('le rendu complet reste le repli dès que la structure de Ma liste change',()=>{
