@@ -20,6 +20,8 @@ function syncPageVersions(){
     if(badge.textContent!==APP_VERSION)badge.textContent=APP_VERSION;
     if(badge.dataset.label!==label)badge.dataset.label=label;
   });
+  const loginVersion=document.getElementById('securityVersion');
+  if(loginVersion&&loginVersion.textContent!==label)loginVersion.textContent=label;
   if(!document.getElementById('app-version-ui')){
     const style=document.createElement('style');
     style.id='app-version-ui';
