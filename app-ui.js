@@ -20,8 +20,6 @@ function syncPageVersions(){
     if(badge.textContent!==APP_VERSION)badge.textContent=APP_VERSION;
     if(badge.dataset.label!==label)badge.dataset.label=label;
   });
-  const loginVersion=document.getElementById('securityVersion');
-  if(loginVersion&&loginVersion.textContent!==label)loginVersion.textContent=label;
   if(!document.getElementById('app-version-ui')){
     const style=document.createElement('style');
     style.id='app-version-ui';
@@ -272,8 +270,6 @@ function syncSecurityKeyboardState(){
   // Normalement tout tient au-dessus du clavier. Le paysage, le texte agrandi et les messages
   // longs restent accessibles en faisant défiler le contenu, sans réduire ou masquer les champs.
   const available=securityViewportHeight();
-  // Clavier réellement ouvert (et pas seulement un champ actif) : la zone visible rétrécit nettement.
-  shell.classList.toggle('is-keyboard-open',visible&&Math.round(window.innerHeight||0)-available>150);
   const scrollable=visible&&modal&&modal.offsetTop+modal.scrollHeight>available;
   shell.classList.toggle('is-scrollable',Boolean(scrollable));
   if(scrollable)shell.style.height=available+'px';

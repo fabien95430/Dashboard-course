@@ -1185,8 +1185,7 @@ html{background:#f7f3ec}
 }
 .page-version[data-label]{font-size:0!important}
 .page-version[data-label]::after{content:attr(data-label);font-size:10px}
-/* La version de l'écran de connexion reprend la pastille de Réglages. */
-.security-shell .security-version,.page-version{
+.page-version{
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1237,7 +1236,7 @@ html{background:#f7f3ec}
   .page-title-row{
     height:35px;
   }
-  .security-shell .security-version,.page-version{
+  .page-version{
     height:14px;
     line-height:12px;
   }
@@ -3454,11 +3453,6 @@ html:has(#securityOverlay.is-visible),body:has(#securityOverlay.is-visible){
 }
 .security-modal .primary:focus-visible{outline:2px solid #143e25;outline-offset:3px}
 .security-modal .primary:disabled{opacity:.7;cursor:wait}
-/* Version discrète en bas à droite, à côté de la barre du geste iPhone (sans la chevaucher) et
-   assez loin du coin arrondi de l'écran : pastille de Réglages rendue opaque pour rester lisible sur la photo. */
-.security-shell .security-version{position:absolute;right:calc(env(safe-area-inset-right,0px) + 28px);bottom:max(10px,calc(env(safe-area-inset-bottom,0px) * .5 + 4px));pointer-events:none;background:#e3ebe1;color:#2d4a35;font-weight:600;box-shadow:0 1px 3px rgba(20,40,25,.22),0 0 0 .5px rgba(45,74,53,.18)}
-/* Clavier ouvert : l'écran est réduit à la zone visible, la version ne doit pas remonter avec. */
-.security-shell .security-version:empty,.security-shell.is-keyboard-open .security-version{display:none}
 .security-modal .security-logout{display:block;margin:14px auto 0;padding:10px 12px;border:0;background:transparent;color:var(--login-muted);font:400 15px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .security-modal .security-logout[hidden]{display:none}
 .security-modal .setup-error{min-height:0;margin:10px 0 0;padding:8px 10px;border-radius:10px;background:rgba(255,248,231,.88);color:#8a2825;font-size:14px;line-height:1.35}
