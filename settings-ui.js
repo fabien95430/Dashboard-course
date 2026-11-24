@@ -5,7 +5,7 @@ const STORAGE_PREFERRED_SERVINGS='courses-dish-preferred-servings-v1';
 const STORAGE_SERVINGS='courses-dish-servings-v1';
 const SERVING_OPTIONS=Object.freeze([2,4,5]);
 const DEFAULT_SERVINGS=2;
-const DOCUMENTATION_URL='./docs/guide-fonctionnement-courses.pdf?v=299';
+const DOCUMENTATION_URL='./docs/guide-fonctionnement-courses.pdf?v=908';
 
 function clearLegacyCatalogMode(){
   try{
