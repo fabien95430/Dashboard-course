@@ -76,6 +76,27 @@ test('modifs : écart avec le plat de base, sans jamais changer la base',()=>{
   assert.deepEqual([...base['Penne poulet crème']],['Penne','Poulet','Crème fraîche','Champignons','Parmesan']);
 });
 
+test('modifs : quantités pour 2 personnes changées par un foyer, comparées au plat de base',()=>{
+  const base={'Spaghetti carbonara':['Spaghetti','Lardons','Œufs','Parmesan']};
+  const quantities={
+    getBaseNeed:(dish,name,count)=>count===2&&dish==='Spaghetti carbonara'?{Spaghetti:200,Lardons:100,'Œufs':2,Parmesan:80}[name]:null,
+    formatNeed:(name,value)=>name==='Œufs'?value+' pièces':value+' g'
+  };
+  const admin=loadAdmin({COURSES_DISH_BASE:base,COURSES_QUANTITIES:quantities});
+  const modifs=admin.modifsFor([
+    {recette_id:'Spaghetti carbonara',donnees:{quantites:{Spaghetti:250,Parmesan:80}}}
+  ]);
+  assert.equal(modifs.length,1,'un changement de quantité seul apparaît dans Modifs');
+  assert.equal(modifs[0].detail,'Spaghetti 200 g → 250 g','une quantité identique à la base n’est pas listée');
+  const both=admin.modifsFor([
+    {recette_id:'Spaghetti carbonara',donnees:{ingredients:['Spaghetti','Lardons','Œufs','Parmesan','Crème fraîche'],quantites:{'Œufs':3}}}
+  ],base,quantities);
+  assert.equal(both[0].detail,'+ Crème fraîche · Œufs 2 pièces → 3 pièces');
+  assert.equal(admin.modifsFor([{recette_id:'Spaghetti carbonara',donnees:{quantites:{Spaghetti:200}}}],base,quantities).length,0);
+  assert.deepEqual([...base['Spaghetti carbonara']],['Spaghetti','Lardons','Œufs','Parmesan'],'le plat de base ne change jamais');
+  assert.match(read('catalog-quantities.js'),/\n  formatNeed,\n/,'le format des quantités vient du module propriétaire');
+});
+
 test('Familles : demandes avec OpenAI, ChatGPT et refus confirmé, via les modules propriétaires',()=>{
   const source=read('family-admin.js');
   assert.match(source,/data-tool="openai"/);

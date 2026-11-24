@@ -921,6 +921,7 @@ window.COURSES_QUANTITIES=Object.freeze({
   getNeed:(dish,name,count)=>needFor(name,dish,count),
   getBaseNeed:(dish,name,count)=>baseNeedFor(name,dish,count),
   getRecipeUnit:recipeUnitFor,
+  formatNeed,
   hasRecipeNeeds,
   setRecipeNeeds,
   resetRecipeNeeds,

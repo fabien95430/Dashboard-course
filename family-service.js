@@ -22,7 +22,8 @@ const KEYS=Object.freeze({
   adminAuth:'courses-family-admin-auth-v1',
   device:'courses-family-device-v1',
   list:'courses-external-demo-items-v2',
-  customizations:'courses-dish-customizations-v1'
+  customizations:'courses-dish-customizations-v1',
+  needs:'courses-dish-need-overrides-v2'
 });
 // Données locales de la famille reflétées dans `preferences.donnees` (aucune donnée secrète).
 const PREFERENCE_KEYS=Object.freeze([
@@ -175,6 +176,49 @@ function subscribeList(){
 }
 
 /* ---------- Préférences et personnalisation des recettes ---------- */
+/* JSON à clés triées : jsonb renvoie les clés dans son propre ordre, la comparaison n'en dépend pas. */
+function stableJson(value){
+  if(Array.isArray(value))return '['+value.map(stableJson).join(',')+']';
+  if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(key=>JSON.stringify(key)+':'+stableJson(value[key])).join(',')+'}';
+  return JSON.stringify(value);
+}
+function cleanQuantities(raw){
+  const out={};
+  if(raw&&typeof raw==='object'&&!Array.isArray(raw))Object.entries(raw).forEach(([name,value])=>{
+    const amount=Number(value);
+    if(name&&Number.isFinite(amount)&&amount>0)out[name]=amount;
+  });
+  return out;
+}
+/* Un plat personnalisé dans `personnalisations.donnees` : la liste des ingrédients seule (format
+   historique) ou, dès qu'une quantité pour 2 personnes a changé, {ingredients?, quantites}.
+   L'écran admin « Familles › Modifs » lit cette table ; le plat de base n'est jamais modifié. */
+function customizationPayload(custom,needs){
+  const out={};
+  const dishes=new Set([...Object.keys(custom||{}),...Object.keys(needs||{})]);
+  dishes.forEach(dish=>{
+    const ingredients=Array.isArray(custom?.[dish])?custom[dish].map(String):null;
+    const quantites=cleanQuantities(needs?.[dish]);
+    if(Object.keys(quantites).length)out[dish]=ingredients?{ingredients,quantites}:{quantites};
+    else if(ingredients)out[dish]=ingredients;
+  });
+  return out;
+}
+function splitCustomizations(rows){
+  const custom={},needs={};
+  (rows||[]).forEach(row=>{
+    const dish=String(row?.recette_id||''),data=row?.donnees;
+    if(!dish||!data||typeof data!=='object')return;
+    if(Array.isArray(data)){custom[dish]=data.map(String);return}
+    if(Array.isArray(data.ingredients))custom[dish]=data.ingredients.map(String);
+    const quantites=cleanQuantities(data.quantites);
+    if(Object.keys(quantites).length)needs[dish]=quantites;
+  });
+  return {custom,needs};
+}
+function localCustomizationPayload(){
+  return customizationPayload(readJson(KEYS.customizations,{})||{},readJson(KEYS.needs,{})||{});
+}
 function preferencePayload(){
   const out={};
   PREFERENCE_KEYS.forEach(key=>{const raw=localStorage.getItem(key);if(raw!==null)out[key]=raw});
@@ -188,16 +232,20 @@ async function pullPreferences(){
   ]);
   PREFERENCE_KEYS.forEach(removeKey);
   Object.entries(prefs?.donnees||{}).forEach(([key,raw])=>{if(PREFERENCE_KEYS.includes(key)&&typeof raw==='string')try{localStorage.setItem(key,raw)}catch(_){}});
-  const customizations={};
-  (custom||[]).forEach(row=>{customizations[row.recette_id]=row.donnees});
+  const {custom:customizations,needs}=splitCustomizations(custom);
   if(Object.keys(customizations).length)writeJson(KEYS.customizations,customizations);else removeKey(KEYS.customizations);
+  // Les quantités voyagent aussi dans les préférences (copie complète) ; à défaut, celles des plats modifiés.
+  if(!Object.prototype.hasOwnProperty.call(prefs?.donnees||{},KEYS.needs)&&Object.keys(needs).length)writeJson(KEYS.needs,needs);
   preferenceSnapshot=JSON.stringify(preferencePayload());
-  customizationSnapshot=JSON.stringify(readJson(KEYS.customizations,{})||{});
+  // Référence = ce que le serveur connaît : des quantités encore jamais envoyées partent au prochain envoi.
+  const server={};
+  (custom||[]).forEach(row=>{if(row?.recette_id)server[row.recette_id]=row.donnees});
+  customizationSnapshot=stableJson(server);
 }
 async function pushPreferences(){
   if(!session)return;
   const prefs=preferencePayload(),prefsText=JSON.stringify(prefs);
-  const custom=readJson(KEYS.customizations,{})||{},customText=JSON.stringify(custom);
+  const custom=localCustomizationPayload(),customText=stableJson(custom);
   if(prefsText===preferenceSnapshot&&customText===customizationSnapshot)return;
   try{
     const db=await familyClient();
@@ -208,7 +256,7 @@ async function pushPreferences(){
     }
     if(customText!==customizationSnapshot){
       const before=JSON.parse(customizationSnapshot||'{}');
-      const rows=Object.entries(custom).filter(([id,value])=>JSON.stringify(value)!==JSON.stringify(before[id])).map(([recette_id,donnees])=>({famille:session.user.id,recette_id,donnees}));
+      const rows=Object.entries(custom).filter(([id,value])=>stableJson(value)!==stableJson(before[id])).map(([recette_id,donnees])=>({famille:session.user.id,recette_id,donnees}));
       const gone=Object.keys(before).filter(id=>!(id in custom));
       if(rows.length){const {error}=await db.from('personnalisations').upsert(rows,{onConflict:'famille,recette_id'});if(error)throw error}
       if(gone.length){const {error}=await db.from('personnalisations').delete().in('recette_id',gone);if(error)throw error}
@@ -522,7 +570,7 @@ async function adminSignOut(){
 const api=Object.freeze({
   config:CONFIG,
   events:Object.freeze({list:LIST_EVENT,revoked:REVOKED_EVENT}),
-  emailFor,displayName,ensureUuids,rowToItem,itemToRow,
+  emailFor,displayName,ensureUuids,rowToItem,itemToRow,customizationPayload,splitCustomizations,
   signIn,resume,signOut,listChanged,pushList,
   registerDevice,listDevices,touchDevice,
   saveSubscription,removeSubscription,countSubscriptions,listSubscriptions,

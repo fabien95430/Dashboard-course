@@ -46,6 +46,28 @@ test('liste famille : chaque article a un identifiant UUID et l aller-retour lig
   assert.deepEqual({...family.rowToItem(row)},{uid:items[1].uid,summary:'Pain',status:'completed',description:'Plat : Croque'});
 });
 
+test('plats modifiés : ingrédients et quantités partent ensemble vers personnalisations, aller-retour fidèle',()=>{
+  const family=loadService();
+  const payload=family.customizationPayload(
+    {'Penne poulet crème':['Penne','Dinde'],'Salade César':['Salade verte']},
+    {'Penne poulet crème':{Penne:250},'Spaghetti carbonara':{Spaghetti:300,Lardons:0}}
+  );
+  assert.deepEqual(JSON.parse(JSON.stringify(payload)),{
+    'Penne poulet crème':{ingredients:['Penne','Dinde'],quantites:{Penne:250}},
+    'Salade César':['Salade verte'],
+    'Spaghetti carbonara':{quantites:{Spaghetti:300}}
+  },'sans quantité changée, le format historique (liste) est conservé');
+  const rows=Object.entries(payload).map(([recette_id,donnees])=>({recette_id,donnees}));
+  rows.push({recette_id:'Vide',donnees:null});
+  const back=family.splitCustomizations(rows);
+  assert.deepEqual(JSON.parse(JSON.stringify(back.custom)),{'Penne poulet crème':['Penne','Dinde'],'Salade César':['Salade verte']});
+  assert.deepEqual(JSON.parse(JSON.stringify(back.needs)),{'Penne poulet crème':{Penne:250},'Spaghetti carbonara':{Spaghetti:300}});
+  const source=read('family-service.js');
+  assert.match(source,/const custom=localCustomizationPayload\(\),customText=stableJson\(custom\);/,'les quantités changées sont envoyées avec les ingrédients');
+  assert.match(source,/needs:'courses-dish-need-overrides-v2'/,'même clé que catalog-quantities.js');
+  assert.match(read('catalog-quantities.js'),/const STORAGE_RECIPE_NEEDS='courses-dish-need-overrides-v2';/);
+});
+
 test('service famille : clé publishable seulement, bibliothèque embarquée chargée à la demande',()=>{
   const source=read('family-service.js'),index=read('index.html');
   assert.match(source,/key:'sb_publishable_[A-Za-z0-9_-]+'/);

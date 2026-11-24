@@ -83,15 +83,21 @@ function statsFor(purchases,now=Date.now()){
   const categories=[...cats.entries()].sort((a,b)=>b[1]-a[1]).slice(0,4).map(([name,count])=>({name,share:Math.round(count*100/total)+' %'}));
   return {courses:days.size,checked:recent.length,top,categories};
 }
-function modifsFor(customizations,base=window.COURSES_DISH_BASE||{}){
+/* Plats modifiés par un foyer (table `personnalisations`) : ingrédients ajoutés ou retirés et
+   quantités pour 2 personnes changées, comparés au plat de base, qui n'est jamais modifié.
+   `donnees` : liste d'ingrédients (format historique) ou {ingredients?, quantites}. */
+function modifsFor(customizations,base=window.COURSES_DISH_BASE||{},quantities=window.COURSES_QUANTITIES){
+  const amountText=(name,value)=>quantities?.formatNeed?.(name,value)||String(Math.round(value*100)/100).replace('.',',');
   return (customizations||[]).map(row=>{
     const dish=String(row.recette_id||'');
     const original=base[dish];
-    const chosen=Array.isArray(row.donnees)?row.donnees.map(String):[];
-    if(!original||!chosen.length)return null;
+    const data=row.donnees;
+    if(!original||!data||typeof data!=='object')return null;
+    const list=Array.isArray(data)?data:(Array.isArray(data.ingredients)?data.ingredients:null);
+    const chosen=list?list.map(String):[...original];
+    if(!chosen.length)return null;
     const removed=original.filter(name=>!chosen.includes(name));
     const added=chosen.filter(name=>!original.includes(name));
-    if(!removed.length&&!added.length)return null;
     const parts=[];
     if(removed.length&&added.length&&removed.length===added.length&&removed.length<=2){
       removed.forEach((name,index)=>parts.push(name+' → '+added[index]));
@@ -99,6 +105,18 @@ function modifsFor(customizations,base=window.COURSES_DISH_BASE||{}){
       if(added.length)parts.push('+ '+added.join(', '));
       if(removed.length)parts.push('− '+removed.join(', '));
     }
+    const amounts=!Array.isArray(data)&&data.quantites&&typeof data.quantites==='object'&&!Array.isArray(data.quantites)?data.quantites:{};
+    chosen.forEach(name=>{
+      if(!Object.prototype.hasOwnProperty.call(amounts,name))return;
+      const value=Number(amounts[name]);
+      if(!Number.isFinite(value)||value<=0)return;
+      const before=Number(quantities?.getBaseNeed?.(dish,name,2));
+      if(Number.isFinite(before)&&before>0){
+        if(Math.abs(before-value)<0.001)return;
+        parts.push(name+' '+amountText(name,before)+' → '+amountText(name,value));
+      }else parts.push(name+' '+amountText(name,value));
+    });
+    if(!parts.length)return null;
     return {dish,detail:parts.join(' · ')};
   }).filter(Boolean).sort((a,b)=>a.dish.localeCompare(b.dish,'fr'));
 }
