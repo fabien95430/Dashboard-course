@@ -17,3 +17,10 @@ test('app-ui.js renseigne #securityVersion avec le libellé court', () => {
   assert.match(ui, /getElementById\('securityVersion'\)/);
   assert.match(ui, /loginVersion\.textContent=label/);
 });
+
+test("la version de l'écran de connexion est masquée quand le clavier est ouvert", () => {
+  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+  assert.match(css, /\.security-shell\.is-keyboard-open \.security-version\{display:none\}/);
+  assert.match(ui, /classList\.toggle\('is-keyboard-open',visible&&Math\.round\(window\.innerHeight\|\|0\)-available>150\)/);
+  assert.doesNotMatch(css, /:focus-within \.security-version/, 'un champ actif sans clavier ne doit pas masquer la version');
+});
