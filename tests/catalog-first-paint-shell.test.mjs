@@ -262,7 +262,7 @@ test('sélection sauge visible et lettres descendantes non rognées sur les troi
   assert.ok(styles.includes('.product.is-selected{\n  background:linear-gradient(155deg,#e4ede3,#e9f0e8)'));
   assert.ok(styles.includes('border-color:#648773;\n  border-width:2px;'));
   assert.ok(styles.includes('box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 6px 18px rgba(47,77,55,.14)'));
-  assert.ok(styles.includes('font-size:14.5px!important;\n    line-height:1.22!important'));
+  assert.ok(styles.includes('font-size:14.5px!important;\n    line-height:1.3!important'));
   assert.ok(styles.includes('font-size:17.5px!important;line-height:1.22!important'));
   assert.ok(styles.includes('font-size:34px!important;\n    line-height:35px!important'));
   assert.ok(styles.includes('.page-title-row{\n    height:35px;'));

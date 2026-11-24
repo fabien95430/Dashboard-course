@@ -651,12 +651,12 @@ html #products .product.is-deferred{display:none!important}
   align-self:end;
 }
 .pname{
-  padding:0 2px;
+  padding:0 2px 2px;
   color:#263c2d;
   font-family:"Baskerville","Iowan Old Style",Georgia,serif;
   text-align:left;
   font-size:15px;
-  line-height:1.1;
+  line-height:1.25;
   font-weight:600;
   white-space:nowrap;
   overflow:hidden;
@@ -1136,7 +1136,7 @@ html{background:#f7f3ec}
   }
   .product .pname{
     font-size:14.5px!important;
-    line-height:1.22!important;
+    line-height:1.3!important;
   }
   .product .pcat{
     font-size:9.5px!important;
